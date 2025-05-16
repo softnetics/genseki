@@ -1,4 +1,4 @@
-export { Builder } from './core/builder'
+export { Builder } from './builder'
 export type {
   ApiReturnType,
   ClientApiArgs,
@@ -14,16 +14,10 @@ export type {
   InferFullSchemaFromCollection,
   InferSlugFromCollection,
   InferTableNameFromCollection,
-} from './core/collection'
-export { ApiDefaultMethod } from './core/collection'
-export {
-  type BaseConfig,
-  type ClientConfig,
-  defineBaseConfig,
-  getClientCollection,
-  getClientConfig,
-  type ServerConfig,
-} from './core/config'
+} from './collection'
+export { ApiDefaultMethod } from './collection'
+export type { BaseConfig, ClientConfig, ServerConfig } from './config'
+export { defineBaseConfig, getClientCollection, getClientConfig } from './config'
 export type {
   ApiRoute,
   ApiRouteHandlerPayload,
@@ -31,5 +25,5 @@ export type {
   ApiRouteSchema,
   ClientApiRouteHandlerPayload,
   InferApiRouteResponses,
-} from './core/endpoint'
-export { type Field, FieldBuilder } from './core/field'
+} from './endpoint'
+export { type Field, FieldBuilder } from './field'
