@@ -2,6 +2,9 @@ import { headers as nextHeaders } from 'next/headers'
 
 import { ServerConfig } from '@repo/drizzlify'
 
+import { RootCollectionLayout } from '~/layouts/root-collection'
+
+import NotfoundPage from './404'
 import { RootAuthPage } from './root-auth'
 import { RootCollectionPage } from './root-collection'
 
@@ -11,7 +14,7 @@ interface RootProps {
   searchParamsPromise: Promise<{ [key: string]: string | string[] }>
 }
 
-export async function RootCrudPage(props: RootProps) {
+export async function RootPage(props: RootProps) {
   const { serverConfig, paramsPromise, searchParamsPromise } = props
 
   const [params, searchParams, headers] = await Promise.all([
@@ -20,7 +23,14 @@ export async function RootCrudPage(props: RootProps) {
     nextHeaders(),
   ])
 
-  const feature = params.segments[0]
+  /**
+   * @description First segment is the feature segment, we use this thing for capturing the main route
+   *
+   * i.e. /collections/... -> `collections`
+   *      /users/... -> `users`
+   *      /plugins/... -> `plugins`
+   */
+  const feature = Array.isArray(params.segments) ? params.segments[0] : undefined
 
   if (feature === 'auth') {
     return (
@@ -32,17 +42,18 @@ export async function RootCrudPage(props: RootProps) {
       />
     )
   }
-
   if (feature === 'collections') {
     return (
-      <RootCollectionPage
-        serverConfig={serverConfig}
-        segments={params.segments.slice(1)}
-        searchParams={searchParams}
-        headers={headers}
-      />
+      <RootCollectionLayout serverConfig={serverConfig}>
+        <RootCollectionPage
+          serverConfig={serverConfig}
+          segments={params.segments.slice(1)}
+          searchParams={searchParams}
+          headers={headers}
+        />
+      </RootCollectionLayout>
     )
   }
 
-  throw new Error(`Feature ${feature} not found`)
+  return <NotfoundPage redirectURL="/admin/collections" />
 }

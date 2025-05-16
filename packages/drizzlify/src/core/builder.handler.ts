@@ -1,15 +1,4 @@
-import {
-  eq,
-  getTableColumns,
-  getTableName,
-  is,
-  Many,
-  One,
-  or,
-  Relation,
-  Table,
-  TableRelationalConfig,
-} from 'drizzle-orm'
+import { Column, eq, getTableName, Many, One, or, Table, TableRelationalConfig } from 'drizzle-orm'
 import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
 import { PgTransaction } from 'drizzle-orm/pg-core'
 import { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
@@ -21,10 +10,11 @@ import {
   ApiFindOneHandler,
   ApiUpdateHandler,
   CollectionAdminApi,
+  CollectionConfig,
   InferFields,
 } from './collection'
 import { MinimalContext } from './config'
-import { Field, Fields } from './field'
+import { Field } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,
@@ -34,27 +24,27 @@ import {
 } from './utils'
 
 export function createDefaultApiHandlers<
+  TSlug extends string = string,
   TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<any> = Fields<any>,
+  TFields extends Record<string, Field<TContext>> = Record<string, Field<TContext>>,
 >(args: {
   schema: Record<string, unknown>
-  fields: TFields
-  tableTsKey: string
+  collectionConfig: CollectionConfig<TSlug, TContext, TFields>
+  tableKey: string
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const { fields, tableTsKey, tableNamesMap, tables, schema } = args
+  const { collectionConfig, tableKey, tableNamesMap, tables, schema } = args
 
-  const tableRelationalConfig = tables[tableTsKey]
+  const tableRelationalConfig = tables[tableKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)
   const tableName = tableRelationalConfig.tsName
-  const tableSchema = getTableFromSchema(schema, tableTsKey)
-  const queryPayload = createDrizzleQuery(fields)
+  const tableSchema = getTableFromSchema(schema, tableKey)
+  const queryPayload = createDrizzleQuery(collectionConfig.fields)
 
   const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
-
     const result = await query.findFirst({
       ...queryPayload,
       where: eq(primaryKeyColumn, args.id),
@@ -64,7 +54,7 @@ export function createDefaultApiHandlers<
       throw new Error('Record not found')
     }
 
-    return mapResultToFields(fields, result) as InferFields<TFields>
+    return mapResultToFields(collectionConfig.fields, result) as InferFields<TFields>
   }
 
   const findMany: ApiFindManyHandler<TContext, TFields> = async (args) => {
@@ -87,7 +77,9 @@ export function createDefaultApiHandlers<
     })
 
     return {
-      data: result.map((result) => mapResultToFields(fields, result)) as InferFields<TFields>[],
+      data: result.map((result) =>
+        mapResultToFields(collectionConfig.fields, result)
+      ) as InferFields<TFields>[],
       // TODO: Get total from query
       total: 0,
       page: 0,
@@ -96,35 +88,33 @@ export function createDefaultApiHandlers<
 
   const create: ApiCreateHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
-
     const id = await db.transaction(async (tx) => {
-      return new ApiHandler(tableTsKey, fields, {
+      return new ApiHandler(tableKey, collectionConfig.fields, {
         schema,
         context: args.context,
-        tableRelationalConfigByTableTsName: tables,
-        tableTsNameByTableDbName: tableNamesMap,
+        tables,
+        tableNamesMap,
       }).create(tx, args.data)
     })
 
-    return id
+    return { id }
   }
 
   const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
 
     await db.transaction(async (tx) => {
-      return new ApiHandler(tableTsKey, fields, {
+      return new ApiHandler(tableKey, collectionConfig.fields, {
         schema,
         context: args.context,
-        tableRelationalConfigByTableTsName: tables,
-        tableTsNameByTableDbName: tableNamesMap,
-      }).update(args.id, tx, args.data)
+        tables,
+        tableNamesMap,
+      }).update(tx, args.data)
     })
 
-    return args.id
+    return { id: args.id }
   }
 
-  // why not just delete? why _delete?
   const _delete: ApiDeleteHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
 
@@ -144,29 +134,24 @@ export function createDefaultApiHandlers<
 }
 
 class ApiHandler {
-  private readonly tableRelationalConfig
-  private readonly primaryColumn
-  private readonly primaryColumnTsName
-  private readonly table
+  private readonly tableRelationalConfig = this.config.tables[this.tableKey]
+  private readonly primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
+  private readonly primaryColumnName = getColumnTsName(
+    this.config.schema[this.tableKey] as Table,
+    this.primaryColumn
+  )
+  private readonly tableSchema = getTableFromSchema(this.config.schema, this.tableKey)
 
   constructor(
-    private readonly tableTsName: string,
-    private readonly fields: Fields<any>,
+    private readonly tableKey: string,
+    private readonly fields: Record<string, Field<any>>,
     private readonly config: {
       schema: Record<string, unknown>
       context: MinimalContext
-      tableTsNameByTableDbName: Record<string, string>
-      tableRelationalConfigByTableTsName: Record<string, TableRelationalConfig>
+      tables: Record<string, TableRelationalConfig>
+      tableNamesMap: Record<string, string>
     }
-  ) {
-    this.tableRelationalConfig = this.config.tableRelationalConfigByTableTsName[tableTsName]
-    this.table = getTableFromSchema(this.config.schema, this.tableTsName)
-    this.primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
-    this.primaryColumnTsName = getColumnTsName(
-      getTableColumns(this.config.schema[this.tableTsName] as Table),
-      this.primaryColumn
-    )
-  }
+  ) {}
 
   // Case 1: connect to one e.g. posts to author
   // Get field author, authorId, and put it in the payload
@@ -191,96 +176,91 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
-    console.log('input', input)
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('oneInput', oneInput)
-    const fullInput = { ...input, ...oneInput }
-    console.log('fullInput', fullInput)
-    const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
-    const id = result[this.primaryColumnTsName]
+    const fullInput = { ...input, ...oneInput.query }
+    const result = (await tx.insert(this.tableSchema).values([fullInput]).returning())[0]
+    const id = result[this.primaryColumnName]
     await this.resolveManyRelations(id, tx, this.fields, data)
-    return id
+
+    return id as string | number
   }
 
   async update(
-    id: string | number,
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
-    console.log('[update] input', input)
-    const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('[update] oneInput', oneInput)
+    const oneInput = this.resolveOneRelations(tx, this.fields, data)
     const fullInput = { ...input, ...oneInput }
-    console.log('[update] fullInput', fullInput)
-    const result = (
-      await tx.update(this.table).set([fullInput]).where(eq(this.primaryColumn, id)).returning()
-    )[0]
-    id = result[this.primaryColumnTsName]
+    const result = (await tx.update(this.tableSchema).set([fullInput]).returning())[0]
+    const id = result[this.primaryColumnName]
     await this.resolveManyRelations(id, tx, this.fields, data)
-    return id
+
+    return id as string | number
   }
 
   private async resolveOneRelations(
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Fields<any>,
+    fields: Record<string, Field<any>>,
     data: Record<string, any>
   ) {
-    const create = async (referencedTable: Table, fields: Fields<any>, value: any) => {
+    const connect = async (table: Table, primaryColumn: Column, value: any) => {
+      const primaryKeyFieldName = getColumnTsName(table, primaryColumn)
+      return { [primaryKeyFieldName]: value }
+    }
+
+    const create = async (
+      table: Table,
+      primaryColumn: Column,
+      fields: Record<string, Field>,
+      value: any
+    ) => {
+      const primaryKeyFieldName = getColumnTsName(table, primaryColumn)
+
       const id = await new ApiHandler(
-        // TODO: i think this should not use public prefix to search the table
-        this.config.tableTsNameByTableDbName[`public.${getTableName(referencedTable)}`],
+        this.config.tableNamesMap[getTableName(table)],
         fields,
         this.config
       ).create(tx, value)
 
-      return id
+      return { [primaryKeyFieldName]: id }
     }
 
-    const result = await Promise.all(
-      Object.entries(fields).flatMap(async ([fieldName, field]) => {
-        if (!isRelationField(field) || !is(field._.relation, One)) return []
+    const result = Object.entries(fields).flatMap(async ([key, field]) => {
+      if (isRelationField(field) && field._.$relation instanceof One) {
+        const value = data[key]
 
-        const relationFields = field._.relation.config?.fields ?? []
+        const referencedTable = field._.$relation.referencedTable
+        const referencedTableRelationalConfig =
+          this.config.tables[this.config.tableNamesMap[field._.$relation.referencedTableName]]
+        const primaryColumn = getPrimaryColumn(referencedTableRelationalConfig)
 
-        if (relationFields.length !== 1) {
-          throw new Error('Relation fields must be 1. Multiple relations not supported')
-        }
-
-        const relationField = relationFields[0]
-        const relationFieldTsName = getColumnTsName(getTableColumns(this.table), relationField)
-
-        const value = data[fieldName]
-
-        // Case that call with undefined value of relation like update data without update the relation
-        if (value === undefined) return []
-
-        // TODO: map key from field to ts
         switch (field.type) {
           case 'connectOrCreate': {
             if (typeof value === 'string' || typeof value === 'number') {
-              return [relationFieldTsName, value]
+              return [[key, await connect(referencedTable, primaryColumn, value)]] as const
             }
 
             return [
-              relationFieldTsName,
-              await create(field._.relation.referencedTable, field.fields, value),
-            ]
+              [key, await create(referencedTable, primaryColumn, field.fields, value)],
+            ] as const
           }
           case 'connect': {
-            return [relationFieldTsName, value]
+            return [[key, await connect(referencedTable, primaryColumn, value)]] as const
           }
           case 'create': {
             return [
-              relationFieldTsName,
-              await create(field._.relation.referencedTable, field.fields, value),
-            ]
+              [key, await create(referencedTable, primaryColumn, field.fields, value)],
+            ] as const
           }
         }
-      })
-    )
+      }
 
-    const resolvedRelationsMap = Object.fromEntries(result.filter((r) => r.length > 0))
+      return []
+    })
+
+    const resolvedResult = await Promise.all(result)
+    const resolvedRelationsMap = Object.fromEntries(resolvedResult)
     return resolvedRelationsMap
   }
 
@@ -291,168 +271,141 @@ class ApiHandler {
     data: Record<string, any>
   ) {
     // update the referenced table to have this id
-    const connect = async (tableConfig: TableRelationalConfig, relation: Relation, value: any) => {
-      const referencedFieldName = this.findReferencedColumnFromManyRelation(relation)
+    const connect = async (
+      table: Table,
+      tableRelationalConfig: TableRelationalConfig,
+      referencedTable: Table,
+      value: any
+    ) => {
+      const primaryColumn = getPrimaryColumn(tableRelationalConfig)
+      const referencedFieldName = this.findReferencedFieldName(
+        table,
+        tableRelationalConfig,
+        referencedTable
+      )
 
-      const primaryColumn = getPrimaryColumn(tableConfig)
       await tx
-        .update(this.config.schema[tableConfig.tsName] as Table)
+        .update(table)
         .set({ [referencedFieldName]: id })
         .where(eq(primaryColumn, value))
     }
 
-    const create = async (tableConfig: TableRelationalConfig, relation: Relation, value: any) => {
-      const referencedFieldTsName = this.findReferencedColumnFromManyRelation(relation)
+    const create = async (
+      table: Table,
+      tableRelationalConfig: TableRelationalConfig,
+      referencedTable: Table,
+      value: any
+    ) => {
+      const referencedFieldName = this.findReferencedFieldName(
+        table,
+        tableRelationalConfig,
+        referencedTable
+      )
       const payload = {
         ...value,
-        [referencedFieldTsName]: id,
+        [referencedFieldName]: id,
       }
-      await tx
-        .insert(this.config.schema[tableConfig.tsName] as Table)
-        .values([payload])
-        .returning()
+      await tx.insert(table).values([payload]).returning()
     }
 
-    const resultPromises = Object.entries(fields).flatMap(async ([fieldName, field]) => {
+    const resultPromises = Object.entries(fields).flatMap(async ([key, field]) => {
       // Filter out non-relation fields
-      if (!isRelationField(field)) return []
-      if (!is(field._.relation, Many)) return []
-      const values = data[fieldName] as any[]
-      if (!values || values.length === 0) return []
+      if (!isRelationField(field)) {
+        return []
+      }
 
-      const promises = values.map(async (value) => {
-        const sourceTableRelationalConfig =
-          this.config.tableRelationalConfigByTableTsName[field._.referencedTableTsName]
+      if (field._.$relation instanceof Many) {
+        const values = data[key] as any[]
 
-        const _connectFn = () => connect(sourceTableRelationalConfig, field._.relation, value)
-        const _createFn = () => create(sourceTableRelationalConfig, field._.relation, value)
+        const promises = values.map(async (value) => {
+          const referencedTable = field._.$relation.referencedTable
+          const referencedTableRelationalConfig = this.config.tables[
+            this.config.tableNamesMap[field._.$relation.referencedTableName]
+          ] as TableRelationalConfig
 
-        switch (field.type) {
-          case 'connectOrCreate': {
-            if (typeof value === 'string' || typeof value === 'number') {
-              return [[fieldName, await _connectFn()]] as const
+          const _connectFn = () =>
+            connect(referencedTable, referencedTableRelationalConfig, this.tableSchema, value)
+
+          const _createFn = () =>
+            create(referencedTable, referencedTableRelationalConfig, this.tableSchema, value)
+
+          switch (field.type) {
+            case 'connectOrCreate': {
+              if (typeof value === 'string' || typeof value === 'number') {
+                return [[key, await _connectFn()]] as const
+              }
+              return [[key, await _createFn()]] as const
             }
-            return [[fieldName, await _createFn()]] as const
+            case 'connect':
+              return [[key, await _connectFn()]] as const
+            case 'create':
+              return [[key, await _createFn()]] as const
           }
-          case 'connect':
-            return [[fieldName, await _connectFn()]] as const
-          case 'create':
-            return [[fieldName, await _createFn()]] as const
-        }
-      })
+        })
 
-      return await Promise.all(promises)
+        return await Promise.all(promises)
+      }
+
+      return []
     })
 
     await Promise.all(resultPromises)
   }
 
-  /**
-   * This function is designed to find the referenced column from a many-to-one relation.
-   * For example,
-   *
-   * const posts = pgTable('posts', {
-   *   id: serial('id').primaryKey(),
-   *   authorId: integer('author_id').notNull(),
-   * })
-   *
-   * const authors = pgTable('authors', {
-   *   id: serial('id').primaryKey(),
-   * })
-   *
-   * const postsRelation = relation(posts, {
-   *   author: one(authors, {
-   *     fields: [posts.authorId],
-   *     references: [authors.id],
-   *   }),
-   * })
-   *
-   * const authorsRelation = relation(authors, {
-   *   posts: many(posts)
-   * })
-   *
-   * In this case, if we call `findReferencedColumnFromManyRelation(authorsConfig, "posts")`,
-   * it will return "authorId" of "posts" table as the referenced column.
-   *
-   * First, it finds "authorsRelation" and check the relation field named "posts".
-   * Then, it loops through the relations of "posts" (postsRelation) and finds the relation of "authors".
-   * Finally, it returns the field name of the relation "posts.authorId".
-   */
-  private findReferencedColumnFromManyRelation(relation: Relation) {
-    if (!is(relation, Many)) {
-      throw new Error(`Relation of "${relation.referencedTableName}" is not Many. Try to fix it`)
-    }
-
-    const referencedTableRelationalConfig = Object.values(
-      this.config.tableRelationalConfigByTableTsName
-    ).find((value) => {
-      return value.dbName === relation.referencedTableName
+  private findReferencedFieldName(
+    table: Table,
+    tableRelationalConfig: TableRelationalConfig,
+    referencedTable: Table
+  ) {
+    const relation = Object.values(tableRelationalConfig.relations).find((relation) => {
+      return relation.referencedTableName === getTableName(referencedTable)
     })
-    if (!referencedTableRelationalConfig) {
-      throw new Error(`Referenced Table "${relation.referencedTableName}" not found`)
-    }
 
-    const relationField = Object.values(referencedTableRelationalConfig.relations).find(
-      (relation) => {
-        return getTableName(relation.sourceTable) === referencedTableRelationalConfig.dbName
-      }
-    )
-    if (!relationField) {
-      throw new Error(`Relation field "${relation.referencedTableName}" not found`)
-    }
-    if (!is(relationField, One)) {
-      throw new Error(`Relation field "${relation.referencedTableName}" is not One. Try to fix it`)
-    }
+    if (!relation) throw new Error('Relation not found')
 
-    const fields = relationField.config?.fields ?? []
-    if (fields.length !== 1) {
-      throw new Error('Relation fields must be 1. Multiple relations not supported')
-    }
-    const column = fields[0]
-    const referenceFieldName = getColumnTsName(referencedTableRelationalConfig.columns, column)
+    const referencedColumn = Object.values(tableRelationalConfig.columns).find((column) => {
+      return column._.name === relation.fieldName
+    })
+
+    if (!referencedColumn) throw new Error('Referenced column not found')
+
+    const referenceFieldName = getColumnTsName(table, referencedColumn)
     return referenceFieldName
   }
 
-  private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
+  private getColumnValues(
+    fields: Record<string, Field<any>>,
+    data: Record<string, any>
+  ): Record<string, any> {
     const result = Object.fromEntries(
-      Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'columns' && data[field._.fieldName]) {
-          return [[field._.columnTsName, data[field._.fieldName]]]
-        }
+      Object.entries(fields).flatMap(([key, field]) => {
+        if (field._.$source === 'columns') return [[field._.$columnTsName, data[key]]]
         return []
       })
     )
+
     return result
   }
 }
 
-function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Record<string, any> {
+// TODO: Fix this
+// TODO: Considering adding "_id" for every output field
+function mapResultToFields(
+  fields: Record<string, Field<any>>,
+  result: Record<string, any>
+): Record<string, any> {
   const mappedResult = Object.fromEntries(
-    Object.entries(fields).flatMap(([fieldName, field]) => {
-      if (field._.source === 'columns') {
-        const value = result[field._.columnTsName]
-        if (!value) return []
-        return [[field._.fieldName, value]]
+    Object.entries(fields).flatMap(([key, field]) => {
+      const value = result[key]
+      if (field._.$source === 'columns') {
+        return [[field._.$columnTsName, value]]
       }
       if (isRelationField(field)) {
-        const value = result[field._.relationTsName]
-        if (!value) return []
-
-        // TODO: This might break for sure
-        if (field.type === 'connectOrCreate') {
-          return [[fieldName, value]]
-        }
-
         if (field.type === 'create') {
-          return [[field._.fieldName, mapResultToFields(field.fields, value)]]
+          return [[field._.$fieldName, mapResultToFields(field.fields, value)]]
         } else if (field.type === 'connect') {
-          const primaryColumnTsName = field._.primaryColumnTsName
-          if (Array.isArray(value)) {
-            const values = value.map((v) => v[primaryColumnTsName])
-            return [[field._.fieldName, values]]
-          }
-
-          return [[field._.fieldName, value[primaryColumnTsName]]]
+          const primaryColumnTsName = field._.$primaryColumnTsName
+          return [[field._.$fieldName, value[primaryColumnTsName]]]
         }
       }
       return []

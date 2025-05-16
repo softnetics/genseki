@@ -2,7 +2,6 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import z from 'zod'
 
 import * as schema from './__mocks__/complex-schema'
-import { Builder } from './builder'
 import { defineBaseConfig, getClientConfig } from './config'
 
 const db = drizzle({
@@ -32,38 +31,50 @@ const baseConfig = defineBaseConfig({
         enabled: true,
       },
     },
+    oauth2: {
+      google: {
+        clientId: '',
+        clientSecret: '',
+      },
+    },
     secret: '',
   },
 })
 
-const builder = new Builder(baseConfig).$context<typeof baseConfig.context>()
+const builder = baseConfig.builder()
 
-const authorFields = builder.fields('authors', (fb) => ({
-  id: fb.columns('id', {
-    type: 'text',
-  }),
-  name: fb.columns('name', {
-    type: 'text',
-  }),
-  email: fb.columns('email', {
-    type: 'text',
-  }),
-}))
+const authorFieldBuilder = builder.fieldsFrom('authors')
 
-const categoryFields = builder.fields('categories', (fb) => ({
-  id: fb.columns('id', {
+const authorFields = {
+  id: authorFieldBuilder.columns('id', {
     type: 'text',
   }),
-  name: fb.columns('name', {
+  name: authorFieldBuilder.columns('name', {
     type: 'text',
   }),
-}))
+  email: authorFieldBuilder.columns('email', {
+    type: 'text',
+  }),
+}
 
-const postToTagsFields = builder.fields('postsToTags', (fb) => ({
-  postId: fb.columns('postId', {
+const categoryFieldBuilder = builder.fieldsFrom('categories')
+
+const categoryFields = {
+  id: categoryFieldBuilder.columns('id', {
+    type: 'text',
+  }),
+  name: categoryFieldBuilder.columns('name', {
+    type: 'text',
+  }),
+}
+
+const postToTagsFieldBuilder = builder.fieldsFrom('postsToTags')
+
+const postToTagsFields = {
+  postId: postToTagsFieldBuilder.columns('postId', {
     type: 'number',
   }),
-  tagId: fb.columns('tagId', {
+  tagId: postToTagsFieldBuilder.columns('tagId', {
     type: 'selectNumber',
     options: async (context) => {
       const result = await context.db.query.tags.findMany()
@@ -73,7 +84,7 @@ const postToTagsFields = builder.fields('postsToTags', (fb) => ({
       }))
     },
   }),
-}))
+}
 
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
@@ -81,19 +92,21 @@ export const authorCollection = builder.collection('authors', {
   primaryField: 'id',
 })
 
+const postFieldBuilder = builder.fieldsFrom('posts')
+
 export const postCollection = builder.collection('posts', {
   slug: 'posts',
-  fields: builder.fields('posts', (fb) => ({
-    id: fb.columns('id', {
+  fields: {
+    id: postFieldBuilder.columns('id', {
       type: 'number',
     }),
-    title: fb.columns('title', {
+    title: postFieldBuilder.columns('title', {
       type: 'text',
     }),
-    content: fb.columns('content', {
+    content: postFieldBuilder.columns('content', {
       type: 'text',
     }),
-    author: fb.relations('author', {
+    author: postFieldBuilder.relations('author', {
       type: 'connectOrCreate',
       fields: authorFields,
       options: async (args) => {
@@ -104,7 +117,7 @@ export const postCollection = builder.collection('posts', {
         }))
       },
     }),
-    categories: fb.relations('category', {
+    categories: postFieldBuilder.relations('category', {
       type: 'connectOrCreate',
       fields: categoryFields,
       options: async (args) => {
@@ -115,11 +128,11 @@ export const postCollection = builder.collection('posts', {
         }))
       },
     }),
-    tags: fb.relations('tags', {
+    tags: postFieldBuilder.relations('tags', {
       type: 'create',
       fields: postToTagsFields,
     }),
-  })),
+  },
   primaryField: 'id',
   admin: {
     api: {
@@ -131,29 +144,6 @@ export const postCollection = builder.collection('posts', {
       customEndpoint: builder.endpoint(
         {
           path: '/hello',
-          method: 'POST',
-          body: z.object({
-            name: z.string(),
-          }),
-          responses: {
-            200: z.object({
-              hello: z.string(),
-            }),
-          },
-        },
-        ({ context, body }) => {
-          const name = body.name
-          return {
-            status: 200,
-            body: {
-              hello: 's',
-            },
-          }
-        }
-      ),
-      customEndpoint2: builder.endpoint(
-        {
-          path: '/hello2',
           method: 'POST',
           body: z.object({
             name: z.string(),

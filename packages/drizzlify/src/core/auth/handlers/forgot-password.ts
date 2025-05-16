@@ -3,21 +3,15 @@ import z from 'zod'
 import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
 
 import { AuthContext } from '../context'
-import { WithPrefix } from '../types'
 
 interface InternalRouteOptions {
   prefix?: string
 }
 
-export function forgotPasswordEmail<const TOptions extends InternalRouteOptions>(
-  options: TOptions
-) {
+export function forgotPasswordEmail(options: InternalRouteOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix ? `${options.prefix}/forgot-password` : '/forgot-password') as WithPrefix<
-      TOptions['prefix'],
-      '/forgot-password'
-    >,
+    path: options.prefix ? `${options.prefix}/forgot-password` : '/forgot-password',
     body: z.interface({
       email: z.string(),
     }),

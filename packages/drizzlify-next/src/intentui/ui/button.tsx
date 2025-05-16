@@ -1,123 +1,108 @@
 'use client'
-
-import { forwardRef } from 'react'
+import React, { forwardRef } from 'react'
 import {
   Button as ButtonPrimitive,
   type ButtonProps as ButtonPrimitiveProps,
-  composeRenderProps,
   Link,
-  type LinkProps as LinkPrimitiveProps,
+  LinkProps as LinkPrimitiveProps,
 } from 'react-aria-components'
 
-import { tv, VariantProps } from 'tailwind-variants'
+import { cva, type VariantProps } from 'class-variance-authority'
 
-const buttonStyles = tv({
-  base: [
-    'relative isolate inline-flex items-center justify-center gap-x-2 font-medium',
-    'outline-0 outline-offset-2 hover:no-underline focus-visible:outline-2',
-    'inset-ring inset-ring-fg/20 bg-(--btn-bg) pressed:bg-(--btn-overlay) text-(--btn-fg) shadow-[shadow:inset_0_2px_--theme(--color-white/15%)] hover:bg-(--btn-overlay) dark:inset-ring-fg/15 dark:shadow-none',
-    'forced-colors:outline-[Highlight] forced-colors:[--btn-icon:ButtonText] forced-colors:hover:[--btn-icon:ButtonText]',
-    '*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-1 *:data-[slot=icon]:size-4 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:text-current/60 pressed:*:data-[slot=icon]:text-current *:data-[slot=icon]:transition hover:*:data-[slot=icon]:text-current/90',
-    '*:data-[slot=avatar]:-mx-0.5 *:data-[slot=avatar]:my-1 *:data-[slot=avatar]:*:size-4 *:data-[slot=avatar]:size-4 *:data-[slot=avatar]:shrink-0',
-  ],
+import { cn } from '~/utils/cn'
+
+const buttonVariants = cva('cursor-pointer flex items-center justify-center', {
   variants: {
-    intent: {
-      primary: [
-        'outline-primary [--btn-bg:theme(--color-primary/95%)] [--btn-fg:var(--color-primary-fg)] [--btn-overlay:var(--color-primary)]',
-      ],
-      secondary: [
-        'outline-primary [--btn-bg:theme(--color-secondary/90%)] [--btn-fg:var(--color-secondary-fg)] [--btn-overlay:var(--color-secondary)]',
-      ],
-      warning: [
-        'outline-warning [--btn-bg:theme(--color-warning/95%)] [--btn-fg:var(--color-warning-fg)] [--btn-overlay:var(--color-warning)]',
-      ],
-      danger: [
-        'outline-danger [--btn-bg:theme(--color-danger/95%)] [--btn-fg:var(--color-danger-fg)] [--btn-overlay:var(--color-danger)]',
-      ],
-      outline: [
-        'shadow-none outline-primary [--btn-fg:var(--color-fg)] [--btn-overlay:theme(--color-secondary/90%)]',
-      ],
-      plain: [
-        'inset-ring-transparent shadow-none outline-primary [--btn-fg:var(--color-fg)] [--btn-overlay:theme(--color-secondary/90%)] dark:inset-ring-transparent',
-      ],
+    variant: {
+      primary: `brand-primary-gradient-25% hover:brand-primary-gradient-15% [&>*]:text-white text-white
+        shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_3px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]`,
+      secondary: `brand-secondary-gradient-10% hover:brand-secondary-gradient-20% [&>*]:text-accent text-accent
+        shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_2px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]`,
+      tertiary: `bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/15 hover:bg-primary/25 [&>*]:text-accent text-accent`,
+      naked:
+        '[&>*]:text-secondary-fg text-secondary-fg bg-bg hover:shadow-sm transition-shadow shadow-md dark:shadow-secondary border-b border-stroke-trivial/10',
+      outline:
+        '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary shadow-[inset_0_0_0_1px_var(--color-stroke-trivial)] bg-bg [background-image:radial-gradient(150%_90%_at_50%_50%,var(--color-bg)_40%,--alpha(var(--color-secondary-fg)/20%))]',
+      ghost: '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary',
+      vanish: '[&>*]:text-secondary-fg text-secondary-fg',
+      destruction:
+        '[&>*]:text-white text-white bg-valencia-500 hover:bg-valencia-600 shadow-[inset_0_0_0_1px_var(--color-valencia-600),inset_0_2px_0_0_--alpha(var(--color-white)/20%)]',
     },
     size: {
-      'extra-small':
-        'h-8 px-[calc(var(--spacing)*2.7)] text-xs/4 **:data-[slot=avatar]:*:size-3.5 **:data-[slot=avatar]:size-3.5 **:data-[slot=icon]:size-3 lg:text-[0.800rem]/4',
-      small: 'h-9 px-3.5 text-sm/5 sm:text-sm/5',
-      medium: 'h-10 px-4 text-base sm:text-sm/6',
-      large:
-        'h-11 px-4.5 text-base *:data-[slot=icon]:mx-[-1.5px] sm:*:data-[slot=icon]:size-5 lg:text-base/7',
-      'square-petite': 'size-9 shrink-0',
-    },
-    shape: {
-      square: 'rounded-lg',
-      circle: 'rounded-full',
+      md: 'p-6 gap-x-2 rounded-md text-base font-medium',
+      sm: 'p-4 gap-x-2 rounded-md text-sm font-medium',
+      xs: 'p-2 gap-x-1 rounded-sm text-sm font-medium',
+      xxs: 'p-1 gap-x-1 rounded-xs text-xs font-medium',
     },
     isDisabled: {
-      false: 'cursor-pointer forced-colors:disabled:text-[GrayText]',
-      true: 'inset-shadow-none cursor-default border-0 opacity-50 ring-0 dark:inset-ring-0 forced-colors:disabled:text-[GrayText]',
-    },
-    isPending: {
-      true: 'cursor-default opacity-50',
+      true: 'opacity-50 cursor-not-allowed pointer-events-none',
+      false: null,
     },
   },
   defaultVariants: {
-    intent: 'primary',
-    size: 'medium',
-    shape: 'square',
+    variant: 'primary',
+    size: 'md',
+    isDisabled: false,
   },
 })
 
-interface ButtonProps extends ButtonPrimitiveProps, VariantProps<typeof buttonStyles> {}
+type ButtonVariants = VariantProps<typeof buttonVariants>
 
-const Button = forwardRef<HTMLButtonElement, ButtonProps>(function Button(
-  { className, intent, size, shape, ...props },
-  ref
-) {
-  return (
-    <ButtonPrimitive
-      ref={ref}
-      {...props}
-      className={composeRenderProps(className, (className, renderProps) =>
-        buttonStyles({
-          ...renderProps,
-          intent,
-          size,
-          shape,
-          className,
-        })
-      )}
-    >
-      {(values) => (
-        <>{typeof props.children === 'function' ? props.children(values) : props.children}</>
-      )}
-    </ButtonPrimitive>
-  )
-})
+type ButtonProps = ButtonPrimitiveProps &
+  Required<Omit<ButtonVariants, 'isDisabled'>> &
+  Pick<ButtonVariants, 'isDisabled'> & {
+    leadingIcon?: React.ReactElement
+    trailingIcon?: React.ReactElement
+  }
 
-interface ButtonLinkProps extends LinkPrimitiveProps, VariantProps<typeof buttonStyles> {}
+const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+  ({ className, variant, size, ...props }, ref) => {
+    const { isDisabled } = props
+    return (
+      <ButtonPrimitive
+        ref={ref}
+        {...props}
+        className={cn(buttonVariants({ variant, size, isDisabled, className }))}
+      >
+        {(values) => (
+          <>
+            {props.leadingIcon}
+            {typeof props.children === 'function' ? props.children(values) : props.children}
+            {props.trailingIcon}
+          </>
+        )}
+      </ButtonPrimitive>
+    )
+  }
+)
+
+type ButtonLinkProps = LinkPrimitiveProps &
+  Required<Omit<ButtonVariants, 'isDisabled'>> &
+  Pick<ButtonVariants, 'isDisabled'> & {
+    leadingIcon?: React.ReactElement
+    trailingIcon?: React.ReactElement
+  }
 
 const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
-  { className, intent, size, shape, ...props },
+  { className, variant, size, isDisabled = false, children, ...props },
   ref
 ) {
   return (
     <Link
       ref={ref}
       data-slot="button"
+      className={cn(buttonVariants({ variant, size, isDisabled, className }))}
       {...props}
-      className={composeRenderProps(className, (className, renderProps) =>
-        buttonStyles({
-          ...renderProps,
-          intent,
-          size,
-          shape,
-          className,
-        })
+    >
+      {(values) => (
+        <>
+          {props.leadingIcon}
+          {typeof children === 'function' ? children(values) : children}
+          {props.trailingIcon}
+        </>
       )}
-    />
+    </Link>
   )
 })
-export type { ButtonProps }
-export { Button, ButtonLink, buttonStyles }
+
+export { Button, ButtonLink, type ButtonProps }

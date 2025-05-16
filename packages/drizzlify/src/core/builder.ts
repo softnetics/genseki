@@ -2,67 +2,52 @@ import {
   createTableRelationsHelpers,
   extractTablesRelationalConfig,
   ExtractTablesWithRelations,
-  is,
+  getTableName,
   Table,
 } from 'drizzle-orm'
-import { Simplify } from 'type-fest'
 
 import { createDefaultApiHandlers } from './builder.handler'
-import {
-  Collection,
-  CollectionConfig,
-  FindTableByTableTsName,
-  GetAllTableTsNames,
-} from './collection'
+import { Collection, CollectionConfig, FindTableByTableKey, GetAllTableKeys } from './collection'
 import { MinimalContext } from './config'
 import { ApiRoute, ApiRouteHandler, ApiRouter, ApiRouteSchema, createEndpoint } from './endpoint'
-import { FieldBuilder, Fields, FieldsInitial, FieldsWithFieldName, OptionCallback } from './field'
-import { appendFieldNameToFields } from './utils'
+import { Field, FieldBuilder, OptionCallback } from './field'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
 > {
-  private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
-  private readonly tableTsNameByTableDbName: Record<string, string>
+  private readonly tables: ExtractTablesWithRelations<TFullSchema>
+  private readonly tableNamesMap: Record<string, string>
 
-  constructor(private readonly config: { schema: TFullSchema }) {
+  constructor(private readonly builderOptions: { schema: TFullSchema; context?: TContext }) {
     const tablesConfig = extractTablesRelationalConfig(
-      this.config.schema,
+      this.builderOptions.schema,
       createTableRelationsHelpers
     )
 
-    this.tableRelationalConfigByTableTsName =
-      tablesConfig.tables as ExtractTablesWithRelations<TFullSchema>
-    this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
-  }
-
-  $context<TContext extends MinimalContext<TFullSchema>>(): Builder<TFullSchema, TContext> {
-    return new Builder<TFullSchema, TContext>({ schema: this.config.schema })
+    this.tables = tablesConfig.tables as ExtractTablesWithRelations<TFullSchema>
+    this.tableNamesMap = tablesConfig.tableNamesMap
   }
 
   collection<
     TSlug extends string = string,
-    TTableKey extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    TFields extends Fields<TContext> = Fields<TContext>,
-    TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
-  >(tableTsName: TTableKey, config: CollectionConfig<TSlug, TContext, TFields, TApiRouter>) {
-    const table = this.config.schema[tableTsName]
-    const tableRelationalConfig =
-      this.tableRelationalConfigByTableTsName[
-        tableTsName as unknown as keyof typeof this.tableRelationalConfigByTableTsName
-      ]
+    TTableKey extends GetAllTableKeys<TFullSchema> = GetAllTableKeys<TFullSchema>,
+    const TFields extends Record<string, Field<TContext>> = Record<string, Field<TContext>>,
+    const TApiRouter extends ApiRouter = ApiRouter,
+  >(tableKey: TTableKey, config: CollectionConfig<TSlug, TContext, TFields, TApiRouter>) {
+    const tableSchema = this.builderOptions.schema[tableKey]
+    const tableConfig = this.tables[tableKey as unknown as keyof typeof this.tables]
 
-    if (!is(table, Table)) {
-      throw new Error(`Table ${tableTsName as string} not found`)
+    if (!(tableSchema instanceof Table)) {
+      throw new Error(`Table ${tableKey as string} not found`)
     }
 
     const defaultHandlers = createDefaultApiHandlers({
-      schema: this.config.schema,
-      fields: config.fields,
-      tableTsKey: tableTsName,
-      tables: this.tableRelationalConfigByTableTsName,
-      tableNamesMap: this.tableTsNameByTableDbName,
+      schema: this.builderOptions.schema,
+      collectionConfig: config,
+      tableKey: tableKey,
+      tables: this.tables,
+      tableNamesMap: this.tableNamesMap,
     })
 
     const api = {
@@ -75,8 +60,8 @@ export class Builder<
 
     return {
       _: {
-        table: table,
-        tableConfig: tableRelationalConfig,
+        $table: tableSchema,
+        $tableConfig: tableConfig,
       },
       ...config,
       admin: {
@@ -111,28 +96,25 @@ export class Builder<
       },
     } as Collection<
       TSlug,
-      FindTableByTableTsName<TFullSchema, TTableKey>['_']['name'],
+      FindTableByTableKey<TFullSchema, TTableKey>['_']['name'],
       TFullSchema,
       TContext,
-      FieldsWithFieldName<TFields>,
+      TFields,
       TApiRouter
     >
   }
 
-  fields<
-    TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContext>,
-  >(
-    tableTsName: TTableTsName,
-    optionsFn: (
-      fb: FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
-    ) => TFields
-  ): Simplify<FieldsWithFieldName<TFields>> {
-    const fb = new FieldBuilder(
-      tableTsName,
-      this.tableRelationalConfigByTableTsName
-    ) as FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
-    return appendFieldNameToFields(optionsFn(fb))
+  fieldsFrom<TTableKey extends GetAllTableKeys<TFullSchema>>(
+    tableKey: TTableKey
+  ): FieldBuilder<TFullSchema, FindTableByTableKey<TFullSchema, TTableKey>['_']['name'], TContext> {
+    const fullSchema = this.builderOptions.schema
+    const value = fullSchema[tableKey as keyof typeof fullSchema]
+
+    if (!(value instanceof Table)) {
+      throw new Error(`Table ${tableKey as string} not found`)
+    }
+
+    return new FieldBuilder(fullSchema, getTableName(value), this.builderOptions.context)
   }
 
   options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {

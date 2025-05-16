@@ -19,7 +19,7 @@ const Keyboard = forwardRef(function Keyboard(
     <KeyboardPrimitive
       ref={ref}
       className={twMerge(
-        'hidden font-mono text-current/60 group-hover:text-fg group-focus:text-fg group-focus:opacity-90 group-disabled:opacity-50 lg:inline-flex forced-colors:group-focus:text-[HighlightText] forced-colors:group-focus:text-[HighlightText]',
+        'text-current/60 group-hover:text-fg group-focus:text-fg hidden font-mono group-focus:opacity-90 group-disabled:opacity-50 lg:inline-flex forced-colors:group-focus:text-[HighlightText]',
         classNames?.base
       )}
       {...props}

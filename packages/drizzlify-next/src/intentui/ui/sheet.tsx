@@ -126,8 +126,10 @@ const SheetContent = ({
               {typeof children === 'function' ? children(values) : children}
               {closeButton && (
                 <Dialog.CloseIndicator
-                  className="top-2.5 right-2.5"
+                  className="right-6! top-6!"
                   isDismissable={_isDismissable}
+                  variant="outline"
+                  size="md"
                 />
               )}
             </>

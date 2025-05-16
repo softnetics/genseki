@@ -10,6 +10,7 @@ import {
   ClientApiArgs,
   ClientApiRouteHandlerPayload,
   Collection,
+  CollectionApiDefaultMethod,
   InferApiRouteResponses,
   InferApiRouterFromCollection,
   ServerConfig,
@@ -27,7 +28,7 @@ export type DefaultMethodFromCollection<
   TCollection extends Collection<any, any, any, any, any, any>
     ? Simplify<
         ExtractObjectValues<{
-          [TMethod in ApiDefaultMethod]: TMethod extends ApiDefaultMethod
+          [TMethod in CollectionApiDefaultMethod<TCollection>]: TMethod extends ApiDefaultMethod
             ? {
                 slug: TCollection['slug']
                 method: TMethod
@@ -47,6 +48,7 @@ export type CustomMethodFromCollection<
           [TMethod in keyof InferApiRouterFromCollection<TCollection>]: {
             slug: TCollection['slug']
             method: TMethod
+            // _deug: TCollection
             payload: InferApiRouterFromCollection<TCollection>[TMethod] extends ApiRouteSchema
               ? Simplify<
                   ClientApiRouteHandlerPayload<InferApiRouterFromCollection<TCollection>[TMethod]>

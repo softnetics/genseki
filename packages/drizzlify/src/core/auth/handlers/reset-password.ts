@@ -8,14 +8,10 @@ interface InternalRouteOptions {
   prefix?: string
 }
 
-export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function resetPasswordEmail(options: InternalRouteOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix
-      ? `${options.prefix}/reset-password`
-      : '/reset-password') as TOptions['prefix'] extends string
-      ? `${TOptions['prefix']}/reset-password`
-      : '/reset-password',
+    path: options.prefix ? `${options.prefix}/reset-password` : '/reset-password',
     query: z.interface({
       token: z.string(),
     }),

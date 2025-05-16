@@ -20,7 +20,7 @@ export function Form<
           slug: props.slug,
           method: props.method,
           payload: {
-            ...(props.id ? { id: props.id } : {}),
+            ...(props.id && { id: props.id }),
             data: data as any,
           },
         } as any)
