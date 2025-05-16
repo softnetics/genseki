@@ -1,6 +1,6 @@
 {
   "name": "@genseki/next",
-  "private": true,
+  "version": "0.0.0",
   "sideEffects": false,
   "type": "module",
   "main": "./src/index.ts",

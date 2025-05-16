@@ -43,9 +43,6 @@ generated
 # CSV
 *.csv
 
-# changesets
-/.changeset/
-
 data
 public
 
