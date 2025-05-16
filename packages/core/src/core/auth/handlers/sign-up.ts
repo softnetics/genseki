@@ -18,7 +18,7 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
       '/sign-up'
     >,
     body: z
-      .interface({
+      .object({
         name: z.string(),
         email: z.string(),
         password: z.string(),
@@ -26,9 +26,9 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
       })
       .and(z.record(z.string(), z.any())),
     responses: {
-      200: z.interface({
+      200: z.object({
         token: z.string().nullable(),
-        user: z.interface({
+        user: z.object({
           id: z.string(),
           name: z.string(),
           email: z.string(),

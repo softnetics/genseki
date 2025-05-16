@@ -19,7 +19,7 @@ export function signOut<const TOptions extends InternalRouteOptions>(options: TO
     >,
     body: undefined,
     responses: {
-      200: z.interface({
+      200: z.object({
         status: z.string(),
       }),
     },

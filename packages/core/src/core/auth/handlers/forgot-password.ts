@@ -18,14 +18,14 @@ export function forgotPasswordEmail<const TOptions extends InternalRouteOptions>
       TOptions['prefix'],
       '/forgot-password'
     >,
-    body: z.interface({
+    body: z.object({
       email: z.string(),
     }),
     responses: {
-      200: z.interface({
+      200: z.object({
         status: z.string(),
       }),
-      400: z.interface({
+      400: z.object({
         status: z.string(),
       }),
     },

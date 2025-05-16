@@ -15,13 +15,13 @@ export function me<const TOptions extends InternalRouteOptions>(options: TOption
       ? `${TOptions['prefix']}/me`
       : '/me',
     responses: {
-      200: z.interface({
+      200: z.object({
         id: z.string(),
         name: z.string(),
         email: z.string(),
         'image?': z.string().nullable(),
       }),
-      401: z.interface({
+      401: z.object({
         status: z.string(),
       }),
     },

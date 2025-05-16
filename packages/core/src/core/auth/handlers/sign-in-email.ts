@@ -19,14 +19,14 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
       '/sign-in/email'
     >,
 
-    body: z.interface({
+    body: z.object({
       email: z.string(),
       password: z.string(),
     }),
     responses: {
-      200: z.interface({
+      200: z.object({
         token: z.string().nullable(),
-        user: z.interface({
+        user: z.object({
           id: z.string(),
           name: z.string(),
           email: z.string(),

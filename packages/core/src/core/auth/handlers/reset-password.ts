@@ -16,17 +16,17 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
       : '/reset-password') as TOptions['prefix'] extends string
       ? `${TOptions['prefix']}/reset-password`
       : '/reset-password',
-    query: z.interface({
+    query: z.object({
       token: z.string(),
     }),
-    body: z.interface({
+    body: z.object({
       password: z.string(),
     }),
     responses: {
-      200: z.interface({
+      200: z.object({
         status: z.string(),
       }),
-      400: z.interface({
+      400: z.object({
         status: z.string(),
       }),
     },
