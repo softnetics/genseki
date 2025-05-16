@@ -1,9 +1,9 @@
 {
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
-"changelog": ["@changesets/changelog-github", { "repo": "softnetics/ttc" }],
+"changelog": ["@changesets/changelog-github", { "repo": "softnetics/kivotos" }],
   "commit": false,
   "fixed": [
-    ["@api/cms"]
+    ["@kivotos/core", "@kivotos/next"]
   ],
   "linked": [],
   "access": "restricted",
