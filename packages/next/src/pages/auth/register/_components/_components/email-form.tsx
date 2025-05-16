@@ -24,7 +24,7 @@ const formSchema = z
 type RegisterFormInput = z.input<typeof formSchema>
 type RegisterFormOutput = z.output<typeof formSchema>
 
-export default function EmailRegisterForm() {
+export function EmailRegisterForm() {
   const form = useForm<RegisterFormInput, any, RegisterFormOutput>({
     resolver: zodResolver(formSchema),
     mode: 'onChange',

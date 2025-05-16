@@ -1,4 +1,4 @@
-const LeftPanel = () => {
+export const LeftPanel = () => {
   return (
     <div className="bg-muted hidden w-1/2 items-center justify-center p-10 md:flex">
       <div className="flex flex-col justify-between p-20">
@@ -11,5 +11,3 @@ const LeftPanel = () => {
     </div>
   )
 }
-
-export default LeftPanel

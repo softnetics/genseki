@@ -13,27 +13,27 @@ import { Label } from '~/intentui/ui/field'
 import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
-import LeftPanel from '../_components/left-panel'
+import { LeftPanel } from '../_components/left-panel'
 import { TermAndPrivacy } from '../_components/term-and-privacy'
 
 const formSchema = z
   .object({
     password: z
       .string()
-      .min(8, { message: '❌ ความยาวอย่างน้อย 8 ตัวอักษร' })
-      .regex(/[A-Za-z]/, { message: '❌ ต้องมีตัวอักษรภาษาอังกฤษ (A-Z, a-z)' })
-      .regex(/[0-9]/, { message: '❌ ต้องมีตัวเลข (0-9)' }),
+      .min(8, { message: '❌ Password must be at least 8 characters long' })
+      .regex(/[A-Za-z]/, { message: '❌ Must contain English letters (A-Z, a-z)' })
+      .regex(/[0-9]/, { message: '❌ Must contain numbers (0-9)' }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
-    message: 'รหัสผ่านไม่ถูกต้อง',
+    message: 'Passwords do not match',
     path: ['confirmPassword'],
   })
 
 type ResetPasswordInput = z.input<typeof formSchema>
 type ResetPasswordOutput = z.output<typeof formSchema>
 
-const ResetPasswordConfirmPage: NextPage = () => {
+export const ResetPasswordConfirmPage: NextPage = () => {
   const searchParams = useSearchParams()
   const phone = searchParams.get('phone') || ''
 
@@ -63,9 +63,9 @@ const ResetPasswordConfirmPage: NextPage = () => {
           </div>
           <div className="my-auto flex flex-col gap-4">
             <div>
-              <h2 className="text-2xl font-semibold">ตั้งรหัสผ่านใหม่</h2>
+              <h2 className="text-2xl font-semibold">Reset Password</h2>
               <p className="text-muted-foreground mt-1 text-sm">
-                กรุณาตั้งรหัสผ่านใหม่เพื่อเข้าสู่ระบบ
+                Please set a new password to access your account.
               </p>
             </div>
             <Form {...form}>
@@ -79,7 +79,7 @@ const ResetPasswordConfirmPage: NextPage = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <TextField {...field} type="password" placeholder="รหัสผ่านใหม่" />
+                      <TextField {...field} type="password" placeholder="New Password" />
                       <FormMessage />
                     </FormItem>
                   )}
@@ -89,13 +89,13 @@ const ResetPasswordConfirmPage: NextPage = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <TextField {...field} type="password" placeholder="ยืนยันรหัสผ่านใหม่" />
+                      <TextField {...field} type="password" placeholder="Confirm New Password" />
                       <FormMessage />
                     </FormItem>
                   )}
                 />
                 <Button variant="primary" size="sm" className="w-full" type="submit">
-                  ยืนยันการตั้งรหัสผ่าน
+                  Confirm Password Reset
                 </Button>
               </form>
             </Form>
@@ -106,5 +106,3 @@ const ResetPasswordConfirmPage: NextPage = () => {
     </div>
   )
 }
-
-export default ResetPasswordConfirmPage

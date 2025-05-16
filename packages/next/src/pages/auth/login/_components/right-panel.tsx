@@ -1,42 +1,25 @@
 'use client'
 
 import { useState } from 'react'
-import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
 import { GithubLogo } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
-import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
 import { Tabs } from '~/intentui/ui/tab'
 import { useRootContext } from '~/providers/root'
 import { cn } from '~/utils/cn'
 
-import EmailLoginForm from './_components/email-form'
-import PhoneLoginForm from './_components/phone-form'
+import { EmailLoginForm } from './_components/email-form'
+import { PhoneLoginForm } from './_components/phone-form'
 
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
-
-const emailFormSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
-  password: z.string(),
-})
-type EmailLoginFormInput = z.input<typeof emailFormSchema>
-type EmailLoginFormOutput = z.output<typeof emailFormSchema>
-
-const phoneFormSchema = z.object({
-  phoneNumber: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
-  password: z.string(),
-})
-type PhoneLoginFormInput = z.input<typeof phoneFormSchema>
-type PhoneLoginFormOutput = z.output<typeof phoneFormSchema>
 
 interface RightPanelProps {
   action: (formData: FormData) => Promise<any>
 }
 
-export default function RightPanel({ action }: RightPanelProps) {
+export function RightPanel({ action }: RightPanelProps) {
   const { clientConfig } = useRootContext()
   const emailAndPasswordEnabled = clientConfig.auth?.login?.emailAndPassword?.enabled
   const phoneNumberEnabled = clientConfig.auth.login?.phoneNumber?.enabled
@@ -46,32 +29,6 @@ export default function RightPanel({ action }: RightPanelProps) {
   const [tabsState, setTabsState] = useState(
     emailAndPasswordEnabled ? 'email' : phoneNumberEnabled ? 'phone' : 'email'
   )
-
-  const emailForm = useForm<EmailLoginFormInput, any, EmailLoginFormOutput>({
-    resolver: zodResolver(emailFormSchema),
-    mode: 'onChange',
-  })
-
-  const { handleSubmit: emailHandleSubmit, control: emailControl } = emailForm
-
-  const onLoginWithEmail = async (data: EmailLoginFormInput) => {
-    const formData = new FormData()
-    formData.append('email', data.email)
-    formData.append('password', data.password)
-    await action(formData)
-  }
-
-  const phoneForm = useForm<PhoneLoginFormInput, any, PhoneLoginFormOutput>({
-    resolver: zodResolver(phoneFormSchema),
-    mode: 'onChange',
-  })
-  const { handleSubmit: phoneHandleSubmit, control: phoneControl } = phoneForm
-  const onLoginWithPhone = async (data: PhoneLoginFormInput) => {
-    const formData = new FormData()
-    formData.append('phoneNumber', data.phoneNumber)
-    formData.append('password', data.password)
-    await action(formData)
-  }
 
   return (
     <div className="relative flex w-full items-center justify-center p-6 md:w-1/2">

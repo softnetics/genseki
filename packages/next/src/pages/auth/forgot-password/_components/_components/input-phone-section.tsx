@@ -13,14 +13,14 @@ const schema = z.object({
   phone: z.string().regex(/^[0-9]{10}$/, { message: 'เบอร์โทรศัพท์ไม่ถูกต้อง' }),
 })
 
-export type InputPhoneForm = z.infer<typeof schema>
-export type OutputPhoneForm = z.infer<typeof schema>
+export type InputPhoneForm = z.input<typeof schema>
+export type OutputPhoneForm = z.output<typeof schema>
 
 interface InputPhoneSectionProps {
   onNext: (phone: string) => void
 }
 
-export default function InputPhoneSection({ onNext }: InputPhoneSectionProps) {
+export function InputPhoneSection({ onNext }: InputPhoneSectionProps) {
   const form = useForm<InputPhoneForm, any, OutputPhoneForm>({
     resolver: zodResolver(schema),
     mode: 'onChange',

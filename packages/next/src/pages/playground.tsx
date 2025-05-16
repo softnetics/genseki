@@ -9,7 +9,7 @@ import Link from 'next/link'
 import { Button } from '~/intentui/ui/button'
 import { Input } from '~/intentui/ui/field'
 
-const RegisterPage: NextPage = () => {
+export const RegisterPage: NextPage = () => {
   const [email, setEmail] = useState('')
 
   const handleEmailSignIn = async () => {
@@ -51,7 +51,7 @@ const RegisterPage: NextPage = () => {
               value={email}
               onChange={(e) => setEmail(e.target.value)}
             />
-            <Button className="w-full" onClick={handleEmailSignIn}>
+            <Button size="md" variant="primary" className="w-full" onClick={handleEmailSignIn}>
               Sign In with Email
             </Button>
           </div>
@@ -61,6 +61,7 @@ const RegisterPage: NextPage = () => {
           อ
           <Button
             variant="outline"
+            size="md"
             className="w-full"
             onClick={() => {
               // signIn('github')
@@ -84,5 +85,3 @@ const RegisterPage: NextPage = () => {
     </div>
   )
 }
-
-export default RegisterPage

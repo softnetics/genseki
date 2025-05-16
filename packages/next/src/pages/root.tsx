@@ -1,7 +1,7 @@
 import { ServerConfig } from '@kivotos/core'
 import { headers as nextHeaders } from 'next/headers'
 
-import RootAuthPage from './auth/root-auth'
+import { RootAuthPage } from './auth/root-auth'
 import { RootCollectionPage } from './root-collection'
 
 interface RootProps {
@@ -27,7 +27,6 @@ export async function RootPage(props: RootProps) {
         serverConfig={serverConfig}
         segments={params.segments.slice(1)}
         searchParams={searchParams}
-        headers={headers}
       />
     )
   }

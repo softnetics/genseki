@@ -1,9 +1,9 @@
 import { ServerConfig } from '@kivotos/core'
 
-import { RegisterPage, ResetPassword } from '~/index'
+import { RegisterPage, ResetPasswordConfirmPage } from '~/index'
 
-import ForgotPasswordPage from './forgot-password'
-import LoginPage from './login'
+import { ForgotPasswordPage } from './forgot-password'
+import { LoginPage } from './login'
 
 interface RootProps {
   serverConfig: ServerConfig
@@ -22,7 +22,7 @@ interface RootProps {
  * 404                          Not Found
  * 400-599                      Server Error
  */
-export default async function RootAuthPage(props: RootProps) {
+export async function RootAuthPage(props: RootProps) {
   const { serverConfig, segments } = props
 
   const method = segments[0]
@@ -36,11 +36,11 @@ export default async function RootAuthPage(props: RootProps) {
   }
 
   if (method === 'forgot-password') {
-    return <ForgotPasswordPage />
+    return <ForgotPasswordPage serverConfig={serverConfig} />
   }
 
   if (method === 'reset-password') {
-    return <ResetPassword />
+    return <ResetPasswordConfirmPage />
   }
 
   throw new Error(`Invalid path: ${segments.join('/')}`) // TODO: 404

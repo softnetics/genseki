@@ -10,12 +10,12 @@ import { Tabs } from '~/intentui/ui/tab'
 import { useRootContext } from '~/providers/root'
 import { cn } from '~/utils/cn'
 
-import EmailRegisterForm from './_components/email-form'
-import PhoneRegisterForm from './_components/phone-form'
+import { EmailRegisterForm } from './_components/email-form'
+import { PhoneRegisterForm } from './_components/phone-form'
 
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
 
-export default function RegisterRightPanel() {
+export function RegisterRightPanel() {
   const { clientConfig } = useRootContext()
   const emailEnabled = clientConfig.auth?.login?.emailAndPassword?.enabled
   const phoneEnabled = clientConfig.auth?.login?.phoneNumber?.enabled

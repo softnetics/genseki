@@ -10,7 +10,7 @@ import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
 const schema = z.object({
-  email: z.string().email({ message: 'อีเมลไม่ถูกต้อง' }),
+  email: z.string().email({ message: 'Invalid email address' }),
 })
 
 export type InputEmailForm = z.infer<typeof schema>
@@ -20,7 +20,7 @@ interface InputEmailSectionProps {
   onNext: (email: string) => void
 }
 
-export default function InputEmailSection({ onNext }: InputEmailSectionProps) {
+export function InputEmailSection({ onNext }: InputEmailSectionProps) {
   const form = useForm<InputEmailForm, any, OutputEmailForm>({
     resolver: zodResolver(schema),
     mode: 'onChange',

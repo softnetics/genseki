@@ -21,7 +21,7 @@ interface RightPanelProps {
   action: (formData: FormData) => Promise<any>
 }
 
-export default function EmailLoginForm({ action }: RightPanelProps) {
+export function EmailLoginForm({ action }: RightPanelProps) {
   const emailForm = useForm<EmailLoginFormInput, any, EmailLoginFormOutput>({
     resolver: zodResolver(emailFormSchema),
     mode: 'onChange',

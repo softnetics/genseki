@@ -2,17 +2,17 @@
 
 import { ServerConfig } from '@kivotos/core'
 
-import RightPanel from './_components/right-panel'
+import { RightPanel } from './_components/right-panel'
 import { signInAction } from './action'
 import { setServerConfig } from './server-context'
 
-import LeftPanel from '../_components/left-panel'
+import { LeftPanel } from '../_components/left-panel'
 
 interface LoginPageProps {
   serverConfig: ServerConfig
 }
 
-export default async function LoginPage({ serverConfig }: LoginPageProps) {
+export async function LoginPage({ serverConfig }: LoginPageProps) {
   setServerConfig(serverConfig)
 
   return (

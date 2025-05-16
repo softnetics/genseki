@@ -285,6 +285,7 @@ function FormFieldValue<
 export interface FormSubmitButtonProps extends ButtonProps {
   isLoading?: boolean
   isError?: boolean
+  // TODO: implement icons
   //   leftIcon?: IconDefinition
   //   rightIcon?: IconDefinition
   loadingIconSide?: 'left' | 'right'
@@ -294,6 +295,7 @@ export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitBu
     const {
       isLoading: isLoadingProp,
       isError: isErrorProp,
+      // TODO: implement icons
       //   leftIcon,
       //   rightIcon,
       loadingIconSide = 'right',
@@ -305,6 +307,7 @@ export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitBu
     const isFormError = Object.keys(errors).length > 0
     const isLoading = isLoadingProp ?? isSubmitting
     const isError = isErrorProp ?? isFormError
+    // TODO: implement icons
     // const loadingIconElement = <FontAwesomeIcon className="animate-spin" icon={faSpinnerThird} />
     // const leftIconElement =
     //   isLoading && loadingIconSide === 'left'

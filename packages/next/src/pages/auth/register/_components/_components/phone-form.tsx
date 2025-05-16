@@ -23,7 +23,7 @@ const phoneFormSchema = z
 type PhoneRegisterInput = z.input<typeof phoneFormSchema>
 type PhoneRegisterOutput = z.output<typeof phoneFormSchema>
 
-export default function PhoneRegisterForm() {
+export function PhoneRegisterForm() {
   const form = useForm<PhoneRegisterInput, any, PhoneRegisterOutput>({
     resolver: zodResolver(phoneFormSchema),
     mode: 'onChange',

@@ -21,7 +21,7 @@ interface RightPanelProps {
   action: (formData: FormData) => Promise<any>
 }
 
-export default function PhoneLoginForm({ action }: RightPanelProps) {
+export function PhoneLoginForm({ action }: RightPanelProps) {
   const phoneForm = useForm<PhoneLoginFormInput, any, PhoneLoginFormOutput>({
     resolver: zodResolver(phoneFormSchema),
     mode: 'onChange',

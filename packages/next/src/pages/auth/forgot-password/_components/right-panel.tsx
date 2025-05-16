@@ -11,14 +11,14 @@ import { Tabs } from '~/intentui/ui/tab'
 import { useRootContext } from '~/providers/root'
 import { cn } from '~/utils/cn'
 
-import InputEmailSection from './_components/input-email-section'
-import InputOtpSection from './_components/input-otp-section'
-import InputPhoneSection from './_components/input-phone-section'
+import { InputEmailSection } from './_components/input-email-section'
+import { InputOtpSection } from './_components/input-otp-section'
+import { InputPhoneSection } from './_components/input-phone-section'
 
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
 import { Step } from '../types'
 
-export default function ForgotPasswordRightPanel() {
+export function ForgotPasswordRightPanel() {
   const router = useRouter()
   const { clientConfig } = useRootContext()
 
@@ -41,14 +41,14 @@ export default function ForgotPasswordRightPanel() {
         <div className="my-auto flex flex-col gap-4">
           <div>
             <h2 className="text-2xl font-semibold">
-              {step === Step.INPUT_PHONE ? 'ลืมรหัสผ่าน' : 'กรอกรหัส OTP'}
+              {step === Step.INPUT_PHONE ? 'Forgot Password' : 'Enter OTP'}
             </h2>
             <p className="text-muted-foreground mt-1 text-sm">
               {step === Step.INPUT_PHONE
                 ? authType === 'phone'
-                  ? 'กรอกเบอร์โทรศัพท์เพื่อรับรหัส OTP'
-                  : 'กรอกอีเมลเพื่อรับรหัส OTP'
-                : `${authType === 'phone' ? 'เบอร์โทร' : 'อีเมล'}ลงท้ายด้วย ${target.slice(-4)}`}
+                  ? 'Enter your phone number to receive an OTP'
+                  : 'Enter your email to receive an OTP'
+                : `${authType === 'phone' ? 'Phone number' : 'Email'} ending with ${target.slice(-4)}`}
             </p>
           </div>
 

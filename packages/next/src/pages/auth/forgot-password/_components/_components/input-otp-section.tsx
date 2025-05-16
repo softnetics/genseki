@@ -10,13 +10,13 @@ import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { InputOTP } from '~/intentui/ui/input-otp'
 
 const otpSchema = z.object({
-  otp: z.string().regex(/^[0-9]{6}$/, { message: 'รหัส OTP ต้องมี 6 หลัก' }),
+  otp: z.string().regex(/^[0-9]{6}$/, { message: 'OTP code must be 6 digits' }),
 })
 
 export type InputOtpForm = z.infer<typeof otpSchema>
 export type OutputOtpForm = z.infer<typeof otpSchema>
 
-export default function InputOtpSection({ onSuccess }: { onSuccess: () => void }) {
+export function InputOtpSection({ onSuccess }: { onSuccess: () => void }) {
   const form = useForm<InputOtpForm, any, OutputOtpForm>({
     resolver: zodResolver(otpSchema),
     mode: 'onChange',
@@ -48,7 +48,7 @@ export default function InputOtpSection({ onSuccess }: { onSuccess: () => void }
           )}
         />
         <Button variant="primary" type="submit" className="w-full" size="sm">
-          ถัดไป
+          Next
         </Button>
       </form>
     </Form>
