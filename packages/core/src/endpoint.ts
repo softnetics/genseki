@@ -15,13 +15,13 @@ export type InferPathParams<TPath extends string> = Simplify<
     ? {
         [key in TRest as TRest extends `${infer THead}/${string}` ? THead : TRest]: string
       } & InferPathParams<TRest>
-    : never
+    : {}
 >
 
-export interface ApiRouteHandlerPayload<
-  TContext extends Record<string, unknown> = {},
+export type ApiRouteHandlerPayload<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
-> {
+> = {
   body: TApiRouteSchema extends ApiRouteMutationSchema ? Output<TApiRouteSchema['body']> : never
   headers: Output<TApiRouteSchema['headers']>
   query: Output<TApiRouteSchema['query']>
@@ -56,14 +56,21 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContext extends Record<string, unknown> = {},
+  TContext extends Record<string, unknown> = Record<string, unknown>,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
   payload: ApiRouteHandlerPayload<TContext, TApiRouteSchema>
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
+export type GetApiRouteSchemaFromApiRouteHandler<
+  TApiRouteHandler extends ApiRouteHandler<any, any>,
+> =
+  TApiRouteHandler extends ApiRouteHandler<any, infer TApiRouteSchema extends ApiRouteSchema>
+    ? TApiRouteSchema
+    : never
+
 export type ApiRouteMiddleware<
-  TContext extends Record<string, unknown> = {},
+  TContext extends Record<string, unknown> = Record<string, unknown>,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (args: {
   payload: ApiRouteHandlerPayload<TContext, TApiRouteSchema>

@@ -4,15 +4,19 @@ import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
 
 import { AccountProvider } from '../constant'
 import { AuthContext } from '../context'
+import { WithPrefix } from '../types'
 
 interface InternalRouteOptions {
   prefix?: string
 }
 
-export function signUp(options: InternalRouteOptions) {
+export function signUp<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: options.prefix ? `${options.prefix}/sign-up` : '/sign-up',
+    path: (options.prefix ? `${options.prefix}/sign-up` : '/sign-up') as WithPrefix<
+      TOptions['prefix'],
+      '/sign-up'
+    >,
     body: z
       .interface({
         name: z.string(),

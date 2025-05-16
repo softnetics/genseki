@@ -2,8 +2,8 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import z from 'zod'
 
 import * as schema from './__mocks__/complex-schema'
-import { defineBaseConfig, getClientConfig } from './config'
 import { Builder } from './builder'
+import { defineBaseConfig, getClientConfig } from './config'
 
 const db = drizzle({
   connection: '',
@@ -32,17 +32,11 @@ const baseConfig = defineBaseConfig({
         enabled: true,
       },
     },
-    oauth2: {
-      google: {
-        clientId: '',
-        clientSecret: '',
-      },
-    },
     secret: '',
   },
 })
 
-const builder = new Builder(baseConfig).
+const builder = new Builder(baseConfig).$context<typeof baseConfig.context>()
 
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
@@ -60,18 +54,16 @@ export const authorCollection = builder.collection('authors', {
   primaryField: 'id',
 })
 
-const postFieldBuilder = builder.fieldsFrom('posts')
-
 export const postCollection = builder.collection('posts', {
   slug: 'posts',
-  fields: {
-    id: postFieldBuilder.columns('id', {
+  fields: builder.fields('posts', (fb) => ({
+    id: fb.columns('id', {
       type: 'number',
     }),
-    title: postFieldBuilder.columns('title', {
+    title: fb.columns('title', {
       type: 'text',
     }),
-    content: postFieldBuilder.columns('content', {
+    content: fb.columns('content', {
       type: 'text',
     }),
     author: fb.relations('author', (fb) => ({
@@ -143,6 +135,29 @@ export const postCollection = builder.collection('posts', {
       customEndpoint: builder.endpoint(
         {
           path: '/hello',
+          method: 'POST',
+          body: z.object({
+            name: z.string(),
+          }),
+          responses: {
+            200: z.object({
+              hello: z.string(),
+            }),
+          },
+        },
+        ({ context, body }) => {
+          const name = body.name
+          return {
+            status: 200,
+            body: {
+              hello: 's',
+            },
+          }
+        }
+      ),
+      customEndpoint2: builder.endpoint(
+        {
+          path: '/hello2',
           method: 'POST',
           body: z.object({
             name: z.string(),

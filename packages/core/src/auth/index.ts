@@ -1,9 +1,12 @@
 import { AnyColumn, AnyTable } from 'drizzle-orm'
+import * as R from 'remeda'
+import { Simplify } from 'type-fest'
 
 import { AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
 import { MinimalContext } from '../config'
+import { ApiRouteHandler } from '../endpoint'
 
 export type AnyTypedColumn<T> = AnyColumn & { _: { data: T; dialect: 'pg' } }
 export type WithNotNull<T> = T & { _: { notNull: true } }
@@ -15,6 +18,7 @@ export type WithAnyTable<TColumns extends Record<string, AnyColumn>> = AnyTable<
 
 export type AnyUserTable = WithAnyTable<{
   id: WithNotNull<AnyTypedColumn<string>>
+  name: WithNotNull<AnyTypedColumn<string>>
   email: WithNotNull<AnyTypedColumn<string>>
   emailVerified: WithNotNull<AnyTypedColumn<boolean>>
   image: AnyTypedColumn<string>
@@ -91,6 +95,22 @@ export interface AuthConfig {
   }
 }
 
+type ChangeAuthHandlerContextToMinimalContext<
+  TContext extends MinimalContext,
+  THandlers extends Record<string, { handler: ApiRouteHandler<any, any> }>,
+> = {
+  [K in keyof THandlers]: THandlers[K]['handler'] extends ApiRouteHandler<
+    any,
+    infer TApiRouteSchema
+  >
+    ? TApiRouteSchema & { handler: ApiRouteHandler<TContext, TApiRouteSchema> }
+    : never
+}
+
+type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> = Simplify<{
+  [K in keyof T as K extends string ? `${TPrefix}.${K}` : never]: T[K]
+}>
+
 export type Auth<
   TContext extends MinimalContext = MinimalContext,
   TAuthConfig extends AuthConfig = AuthConfig,
@@ -98,7 +118,15 @@ export type Auth<
   config: TAuthConfig
   context: TContext
   authContext: AuthContext
-  handlers: ReturnType<typeof createAuthHandlers>['handlers']
+  handlers: Simplify<
+    AddObjectKeyPrefix<
+      ChangeAuthHandlerContextToMinimalContext<
+        TContext,
+        ReturnType<typeof createAuthHandlers>['handlers']
+      >,
+      'auth'
+    >
+  >
 }
 
 export function createAuth<TContext extends MinimalContext = MinimalContext>(
@@ -106,12 +134,34 @@ export function createAuth<TContext extends MinimalContext = MinimalContext>(
   context: TContext
 ): Auth<TContext> {
   const authContext = createAuthContext(config, context)
-  const { handlers } = createAuthHandlers(config)
+  const { handlers: originalHandlers } = createAuthHandlers(config)
+
+  const handlers = R.mapValues(originalHandlers, (h) => {
+    const handler: ApiRouteHandler<TContext, any> = (args) => {
+      return h.handler({ ...args, context: authContext } as any) as any
+    }
+    return { ...h, handler }
+  }) as ChangeAuthHandlerContextToMinimalContext<
+    TContext,
+    ReturnType<typeof createAuthHandlers>['handlers']
+  >
+
+  const prefixedHandlers = Object.fromEntries(
+    Object.entries(handlers).map(([key, value]) => {
+      return [`auth.${key}`, value]
+    })
+  ) as unknown as AddObjectKeyPrefix<
+    ChangeAuthHandlerContextToMinimalContext<
+      TContext,
+      ReturnType<typeof createAuthHandlers>['handlers']
+    >,
+    'auth'
+  >
 
   return {
     config,
     context,
     authContext,
-    handlers,
+    handlers: prefixedHandlers,
   }
 }

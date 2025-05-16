@@ -3,16 +3,17 @@ import { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 
 import { AuthConfig, createAuth } from './auth'
-import { createAuthContext } from './auth/context'
-import { Builder } from './builder'
 import {
   ClientCollection,
   Collection,
+  ExtractAllCollectionCustomEndpoints,
+  ExtractAllCollectionDefaultEndpoints,
+  getAllCollectionEndpoints,
   ToClientCollection,
   ToClientCollectionList,
 } from './collection'
 import { ApiRouter, ClientApiRouter, ToClientApiRouter } from './endpoint'
-import { BaseField, Field } from './field'
+import { Field, FieldClient } from './field'
 import { isRelationField } from './utils'
 
 export type MinimalContext<
@@ -45,14 +46,14 @@ export interface ServerConfig<
     any,
     any
   >[],
-  TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+  TApiRouter extends ApiRouter<TContext> = ReturnType<typeof createAuth<TContext>>['handlers'],
 > extends BaseConfig<TFullSchema> {
   context: TContext
   collections: TCollections
   endpoints?: TApiRouter
 }
 
-export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig> =
+export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any, any>> =
   TServerConfig extends ServerConfig<any, any, any, infer TApiRouter>
     ? TApiRouter extends ApiRouter
       ? TApiRouter
@@ -69,7 +70,7 @@ export function defineBaseConfig<
   } as MinimalContext<TFullSchema, TContext>
 
   function toServerConfig<
-    TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
+    const TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
       any,
       any,
       any,
@@ -77,9 +78,15 @@ export function defineBaseConfig<
       any,
       any
     >[],
-    TEndpoints extends ApiRouter<MinimalContext<TFullSchema, TContext>> = {},
+    const TEndpoints extends ApiRouter<MinimalContext<TFullSchema, TContext>> = {},
   >(args: { collections: TCollections; endpoints?: TEndpoints }) {
     const auth = createAuth(config.auth, context)
+    const collectionEndpoints = getAllCollectionEndpoints(args.collections)
+
+    type Endpoints = TEndpoints &
+      typeof auth.handlers &
+      ExtractAllCollectionCustomEndpoints<TCollections> &
+      ExtractAllCollectionDefaultEndpoints<TCollections>
 
     return {
       ...config,
@@ -88,29 +95,20 @@ export function defineBaseConfig<
       endpoints: {
         ...args.endpoints,
         ...auth.handlers,
-      } as TEndpoints & typeof auth.handlers,
+        ...collectionEndpoints,
+      } as Endpoints,
     } satisfies ServerConfig<
       TFullSchema,
       MinimalContext<TFullSchema, TContext>,
       TCollections,
-      TEndpoints & typeof auth.handlers
+      Endpoints
     >
-  }
-
-  function builder() {
-    const authContext = createAuthContext(config.auth, context)
-
-    return new Builder({
-      schema: config.schema,
-      context: { ...context, auth: authContext },
-    })
   }
 
   return {
     ...config,
     context,
     toServerConfig,
-    builder,
   }
 }
 
@@ -124,7 +122,7 @@ export interface ClientConfig<
   }
 }
 
-export function getBaseField<const TField extends Field>(name: string, field: TField): BaseField {
+export function getBaseField<const TField extends Field>(name: string, field: TField): FieldClient {
   if (isRelationField(field)) {
     if (field.type === 'create' || field.type === 'connectOrCreate') {
       const sanitizedFields = Object.fromEntries(
@@ -139,7 +137,7 @@ export function getBaseField<const TField extends Field>(name: string, field: TF
           fields: sanitizedFields,
         },
         ['_', 'options' as any]
-      ) as unknown as BaseField
+      ) as unknown as FieldClient
     }
 
     return R.omit(
@@ -149,7 +147,7 @@ export function getBaseField<const TField extends Field>(name: string, field: TF
         placeholder: field.placeholder ?? name,
       },
       ['_', 'options' as any]
-    ) as unknown as BaseField
+    ) as unknown as FieldClient
   }
 
   return R.omit(
@@ -159,7 +157,7 @@ export function getBaseField<const TField extends Field>(name: string, field: TF
       placeholder: field.placeholder ?? name,
     },
     ['_', 'options' as any]
-  ) as BaseField
+  ) as unknown as FieldClient
 }
 
 export function getClientCollection<const TCollection extends Collection>(
@@ -173,13 +171,12 @@ export function getClientCollection<const TCollection extends Collection>(
   })) as unknown as ToClientCollection<TCollection>
 }
 
-export type ToClientConfig<TServerConfig extends ServerConfig<any, any, any, ApiRouter>> =
-  ClientConfig<
-    ToClientCollectionList<TServerConfig['collections']>,
-    ToClientApiRouter<InferApiRouterFromServerConfig<TServerConfig>>
-  >
+export type ToClientConfig<TServerConfig extends ServerConfig<any, any, any, any>> = ClientConfig<
+  ToClientCollectionList<TServerConfig['collections']>,
+  ToClientApiRouter<InferApiRouterFromServerConfig<TServerConfig>>
+>
 
-export function getClientConfig<const TServerConfig extends ServerConfig<any, any, any, ApiRouter>>(
+export function getClientConfig<const TServerConfig extends ServerConfig<any, any, any, any>>(
   serverConfig: TServerConfig
 ) {
   const collections = serverConfig.collections

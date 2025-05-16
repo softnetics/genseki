@@ -2,13 +2,13 @@ import {
   Column,
   FindTableByDBName,
   getTableName,
+  is,
   One,
   Relation,
-  Relations,
   Simplify,
-  Table,
+  TableRelationalConfig,
 } from 'drizzle-orm'
-import * as R from 'remeda'
+import z, { ZodObject } from 'zod'
 
 import {
   appendFieldNameToFields,
@@ -22,164 +22,178 @@ export type OptionCallback<
   TContext extends Record<string, unknown> = {},
 > = (args: TContext) => Promise<Array<{ label: string; value: TType }>>
 
+export type FieldsWithFieldName<TFields extends Record<string, Field<any>>> = {
+  [TKey in keyof TFields]: TFields[TKey] & { _: { fieldName: string } }
+}
+
 export interface FieldMetadataColumns {
-  $source: 'columns'
-  $columnTsName: string
-  $column: Column
+  source: 'columns'
+  columnTsName: string
+  column: Column
 }
 
 export interface FieldMetadataRelations {
-  $source: 'relations'
-  $fieldName: string
-  $relation: Relation
-  $primaryColumn: Column
-  $primaryColumnTsName: string
+  source: 'relations'
+  relation: Relation
+  relationTsName: string
+  referencedTableTsName: string
+  sourceTableTsName: string
+  primaryColumn: Column
+  primaryColumnTsName: string
 }
 
 export type FieldMetadata = FieldMetadataColumns | FieldMetadataRelations
 
-export interface FieldColumnStringCollectionOptions<TContext extends Record<string, unknown> = {}> {
+export const FieldMutateModeCollection = {
+  ENABLED: 'enabled',
+  DISABLED: 'disabled',
+  HIDDEN: 'hidden',
+} as const
+export type FieldMutateModeCollection = typeof FieldMutateModeCollection
+export type FieldMutateMode =
+  (typeof FieldMutateModeCollection)[keyof typeof FieldMutateModeCollection]
+
+export type FieldBase = {
+  label?: string
+  placeholder?: string
+  update?: FieldMutateMode
+  create?: FieldMutateMode
+}
+
+export interface FieldColumnStringCollectionOptions<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+> {
   text: {
     type: 'text'
     default?: string
     label?: string
     placeholder?: string
     // editor?: Editor // TODO: Support rich text editor
-  }
+  } & FieldBase
   selectText: {
     type: 'selectText'
     options: OptionCallback<string, TContext>
     default?: string
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
   time: {
     type: 'time'
     default?: Date
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
   media: {
     type: 'media'
     mimeTypes: string[]
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
 export interface FieldColumnStringArrayCollectionOptions<
-  TContext extends Record<string, unknown> = {},
+  TContext extends Record<string, unknown> = Record<string, unknown>,
 > {
   comboboxText: {
     type: 'comboboxText'
     options: OptionCallback<string, TContext>
     label?: string
-    default?: string[]
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
-export interface FieldColumnNumberCollectionOptions<TContext extends Record<string, unknown> = {}> {
+export interface FieldColumnNumberCollectionOptions<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+> {
   number: {
     type: 'number'
     default?: number
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
   selectNumber: {
     type: 'selectNumber'
     options: OptionCallback<number, TContext>
     default?: number
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
 export interface FieldColumnNumberArrayCollectionOptions<
-  TContext extends Record<string, unknown> = {},
+  TContext extends Record<string, unknown> = Record<string, unknown>,
 > {
   comboboxNumber: {
     type: 'comboboxNumber'
     options: OptionCallback<number, TContext>
     label?: string
-    default?: number[]
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
 export interface FieldColumnBooleanCollectionOptions {
   checkbox: {
     type: 'checkbox'
     default?: boolean
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
   switch: {
     type: 'switch'
     default?: boolean
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
 export interface FieldColumnBooleanArrayCollectionOptions {
   comboboxBoolean: {
     type: 'comboboxBoolean'
     default?: boolean[]
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
 export interface FieldColumnDateCollectionOptions {
   date: {
     type: 'date'
     default?: Date
-    label?: string
-    placeholder?: string
-  }
+  } & FieldBase
 }
 
 export type FieldRelationCollectionOptions<
-  TContext extends Record<string, unknown> = {},
+  TContext extends Record<string, unknown> = Record<string, unknown>,
   TInputType extends string | number = string | number,
 > = {
   connect: {
     type: 'connect'
-    label?: string
-    placeholder?: string
+    fields: FieldsInitial<TContext>
     options: OptionCallback<TInputType, TContext>
-  }
+  } & FieldBase
   create: {
     type: 'create'
-    label?: string
-    placeholder?: string
-    fields: Record<string, Field<TContext>>
-  }
+    fields: FieldsInitial<TContext>
+  } & FieldBase
   connectOrCreate: {
     type: 'connectOrCreate'
-    label?: string
-    placeholder?: string
-    fields: Record<string, Field<TContext>>
+    fields: FieldsInitial<TContext>
     options: OptionCallback<TInputType, TContext>
-  }
+  } & FieldBase
 }
 
-export type FieldColumnCollection<TContext extends Record<string, unknown> = {}> =
-  FieldColumnStringCollectionOptions<TContext> &
-    FieldColumnStringArrayCollectionOptions<TContext> &
-    FieldColumnNumberCollectionOptions<TContext> &
-    FieldColumnNumberArrayCollectionOptions<TContext> &
-    FieldColumnBooleanCollectionOptions &
-    FieldColumnDateCollectionOptions
+export type FieldColumnCollection<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+> = FieldColumnStringCollectionOptions<TContext> &
+  FieldColumnStringArrayCollectionOptions<TContext> &
+  FieldColumnNumberCollectionOptions<TContext> &
+  FieldColumnNumberArrayCollectionOptions<TContext> &
+  FieldColumnBooleanCollectionOptions &
+  FieldColumnBooleanArrayCollectionOptions &
+  FieldColumnDateCollectionOptions
 
 export type FieldColumn<TContext extends Record<string, unknown> = Record<string, unknown>> =
   FieldColumnCollection<TContext>[keyof FieldColumnCollection<TContext>] & {
     _: FieldMetadataColumns
   }
 
-export type FieldRelationCollection<TContext extends Record<string, unknown> = {}> =
-  FieldRelationCollectionOptions<TContext>
+export type FieldRelationCollection<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+> = Simplify<
+  FieldRelationCollectionOptions<TContext> & {
+    connect: {
+      fields: Fields<TContext>
+    }
+    create: {
+      fields: Fields<TContext>
+    }
+    connectOrCreate: {
+      fields: Fields<TContext>
+    }
+  }
+>
 
 export type FieldRelation<TContext extends Record<string, unknown> = Record<string, unknown>> =
   FieldRelationCollection<TContext>[keyof FieldRelationCollection<TContext>] & {
@@ -197,9 +211,15 @@ export type Field<TContext extends Record<string, unknown> = Record<string, unkn
   | FieldColumn<TContext>
   | FieldRelation<TContext>
 
-export type BaseField = Omit<Field, 'options'>
+export type FieldsInitial<TContext extends Record<string, unknown> = Record<string, unknown>> =
+  Record<string, Field<TContext>>
 
-type ColumnKeysFromTable<TTable extends Table> = Extract<keyof TTable['_']['columns'], string>
+export type Fields<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFields extends FieldsInitial<TContext> = FieldsInitial<TContext>,
+> = FieldsWithFieldName<TFields>
+
+export type FieldClient = Omit<Field, 'options'>
 
 export type FieldColumnOptionsFromTable<
   TColumn extends Column,
@@ -250,61 +270,42 @@ type GetReferencedTableTsName<
   > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
     ? TReferencedTableRelationalConfig['tsName']
     : never
-}[keyof TTable['_']['columns']]
 
-type RelationKeysFromTable<
-  TFullSchema extends Record<string, unknown>,
-  TTable extends Table,
-> = Extract<keyof ExtractTableRelationsFromSchema<TFullSchema, TTable['_']['name']>, string>
-
-type RelationFieldOptionsFromTable<
-  TFullSchema extends Record<string, unknown>,
-  TRelation extends Relation,
-  TContext extends Record<string, unknown> = {},
-> = GetPrimaryColumn<
-  FindTableByTableName<TFullSchema, TRelation['referencedTableName']>
->['_']['dataType'] extends 'string'
-  ? FieldRelationCollectionOptions<TContext, string>['connect' | 'create' | 'connectOrCreate']
-  : GetPrimaryColumn<
-        FindTableByTableName<TFullSchema, TRelation['referencedTableName']>
-      >['_']['dataType'] extends 'number'
-    ? FieldRelationCollectionOptions<TContext, number>['connect' | 'create' | 'connectOrCreate']
-    : never
+type GetRelationMode<TRelation extends Relation> = TRelation extends One ? 'one' : 'many'
 
 export class FieldBuilder<
   TFullSchema extends Record<string, unknown>,
-  TTableName extends string,
-  TContext extends Record<string, unknown> = {},
-  TTable extends Table = FindTableByTableName<TFullSchema, TTableName>,
+  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
+  TTableTsName extends string,
+  TContext extends Record<string, unknown> = Record<string, unknown>,
 > {
-  protected _table: TTable | null = null
-  protected _relations: Relations<TTableName, Record<string, Relation<TTableName>>> | null = null
+  private readonly tableRelationalConfig: TTableRelationConfigByTableTsName[TTableTsName]
 
   constructor(
-    fullSchema: TFullSchema,
-    private readonly tableName: string,
-    private readonly context?: TContext
+    tableTsName: TTableTsName,
+    private readonly tableRelationalConfigByTableTsName: TTableRelationConfigByTableTsName
   ) {
-    for (const value of R.values(fullSchema)) {
-      if (value instanceof Table && getTableName(value) === this.tableName) {
-        this._table = value as typeof this._table
-      }
-      if (value instanceof Relations && getTableName(value.table) === this.tableName) {
-        this._relations = value
-      }
-    }
+    this.tableRelationalConfig = tableRelationalConfigByTableTsName[
+      tableTsName
+    ] as TTableRelationConfigByTableTsName[TTableTsName]
   }
 
   columns<
-    TColumnKey extends ColumnKeysFromTable<TTable>,
-    TOptions extends FieldColumnOptionsFromTable<TTable['_']['columns'][TColumnKey], TContext>,
-  >(columnKey: TColumnKey, options: TOptions) {
-    if (!this._table) throw new Error(`Table not found for table ${this.tableName}`)
-
+    TColumnTsName extends Extract<
+      keyof TTableRelationConfigByTableTsName[TTableTsName]['columns'],
+      string
+    >,
+    const TOptions extends FieldColumnOptionsFromTable<
+      TTableRelationConfigByTableTsName[TTableTsName]['columns'][TColumnTsName],
+      TContext
+    >,
+  >(columnTsName: TColumnTsName, options: TOptions) {
     const fieldMetadata = {
-      $source: 'columns',
-      $columnTsName: columnKey,
-      $column: getTableColumns(this._table)[columnKey] as TTable['_']['columns'][TColumnKey],
+      source: 'columns',
+      columnTsName: columnTsName,
+      column: this.tableRelationalConfig['columns'][
+        columnTsName
+      ] as TTableRelationConfigByTableTsName[TTableTsName]['columns'][TColumnTsName],
     } satisfies FieldMetadata
 
     return {
@@ -343,23 +344,9 @@ export class FieldBuilder<
       relationTsName
     ] as TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
 
-    type GetRelationMode<TRelation extends Relation> = TRelation extends One ? 'one' : 'many'
-
-    const relationsConfig = this._relations.config(
-      createTableRelationsHelpers(this._relations.table)
-    )
-
-    const relation = relationsConfig[path]
-
-    const primaryColumnEntry = R.entries(
-      getTableColumns(relationsConfig[path].referencedTable)
-    ).find(([_, column]) => column.primary)
-
-    if (!primaryColumnEntry) throw new Error(`Primary column not found for relation ${path}`)
-
-    type ReferencedTable = FindTableByTableName<
-      TFullSchema,
-      TRelations[TPath]['referencedTableName']
+    type ReferencedTableRelationalConfig = FindTableByDBName<
+      TTableRelationConfigByTableTsName,
+      TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]['referencedTableName']
     >
 
     const referencedTableRelationalConfig = Object.values(
@@ -406,14 +393,28 @@ export class FieldBuilder<
     }
 
     const fieldMetadata = {
-      $source: 'relations',
-      $fieldName: path,
-      $relation: relationsConfig[path] as unknown as TRelations[TPath],
-      $primaryColumn: primaryColumnEntry[1] as GetPrimaryColumn<ReferencedTable>,
-      $primaryColumnTsName: primaryColumnEntry[0],
+      source: 'relations',
+      relationTsName: relationTsName,
+      referencedTableTsName: referencedTableRelationalConfig.tsName,
+      sourceTableTsName: sourceTableRelationalConfig.tsName,
+      relation: relation,
+      primaryColumn: primaryColumn as GetReferencedPrimaryColumn<
+        TTableRelationConfigByTableTsName,
+        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+      >,
+      primaryColumnTsName: primaryColumnTsName as string,
     } satisfies FieldMetadata
 
-    const mode = (relation instanceof One ? 'one' : 'many') as GetRelationMode<TRelations[TPath]>
+    const mode = (is(relation, One) ? 'one' : 'many') as GetRelationMode<
+      TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+    >
+
+    type Result = TOptions & {
+      _: typeof fieldMetadata
+      mode: GetRelationMode<
+        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+      >
+    }
 
     return {
       _: fieldMetadata,
@@ -436,4 +437,84 @@ export class FieldBuilder<
     const fb = new FieldBuilder(tableTsName, this.tableRelationalConfigByTableTsName)
     return appendFieldNameToFields(optionsFn(fb as any))
   }
+}
+
+type FieldToZodScheama<TField extends Field<any>> =
+  TField extends FieldColumnStringCollectionOptions<any>[keyof FieldColumnStringCollectionOptions<any>]
+    ? z.ZodString
+    : TField extends FieldColumnStringArrayCollectionOptions<any>[keyof FieldColumnStringArrayCollectionOptions<any>]
+      ? z.ZodArray<z.ZodString>
+      : TField extends FieldColumnNumberCollectionOptions<any>[keyof FieldColumnNumberCollectionOptions<any>]
+        ? z.ZodNumber
+        : TField extends FieldColumnNumberArrayCollectionOptions<any>[keyof FieldColumnNumberArrayCollectionOptions<any>]
+          ? z.ZodArray<z.ZodNumber>
+          : TField extends FieldColumnBooleanCollectionOptions[keyof FieldColumnBooleanCollectionOptions]
+            ? z.ZodBoolean
+            : TField extends FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
+              ? z.ZodArray<z.ZodBoolean>
+              : TField extends FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
+                ? z.ZodDate
+                : never
+// TODO: Relation input
+// TODO: Optioanl and default values
+
+export function fieldToZodScheama<TField extends Field<any>>(
+  field: TField
+): FieldToZodScheama<TField> {
+  // TODO: More options
+  switch (field.type) {
+    // string input
+    case 'text':
+    case 'selectText':
+    case 'time':
+    case 'media':
+      return z.string() as FieldToZodScheama<TField>
+    // string[] input
+    case 'comboboxText':
+      return z.array(z.string()) as FieldToZodScheama<TField>
+    // number input
+    case 'number':
+    case 'selectNumber':
+      return z.number() as FieldToZodScheama<TField>
+    // number[] input
+    case 'comboboxNumber':
+      return z.array(z.number()) as FieldToZodScheama<TField>
+    // boolean input
+    case 'checkbox':
+    case 'switch':
+      return z.boolean() as FieldToZodScheama<TField>
+    // boolean[] input
+    case 'comboboxBoolean':
+      return z.array(z.boolean()) as FieldToZodScheama<TField>
+    // date input
+    case 'date':
+      return z.date() as FieldToZodScheama<TField>
+    // TODO: relation input
+    // case 'connect':
+    //   return z.any() as FieldToZodScheama<TField>
+    // case 'create':
+    //   return z.any() as FieldToZodScheama<TField>
+    // case 'connectOrCreate':
+    //   return z.any() as FieldToZodScheama<TField>
+    default:
+      throw new Error(`Unknown field type: ${(field as any).type}`)
+  }
+}
+
+type FieldsToZodObject<TFields extends Fields<any>> = ZodObject<{
+  [TKey in keyof TFields]: TFields[TKey] extends Field<any> ? z.ZodTypeAny : never
+}>
+
+export function fieldsToZodObject<TFields extends Fields<any>>(
+  fields: TFields
+): FieldsToZodObject<TFields> {
+  const zodObject = Object.entries(fields).reduce(
+    (acc, [key, field]) => {
+      acc[key] = fieldToZodScheama(field)
+      return acc
+    },
+    {} as Record<string, z.ZodTypeAny>
+  )
+
+  return z.object(zodObject) as FieldsToZodObject<TFields>
 }

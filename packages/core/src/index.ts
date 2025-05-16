@@ -7,7 +7,6 @@ export type {
   CollectionAdminApi,
   CollectionAdminApiConfig,
   CollectionAdminConfig,
-  CollectionApiDefaultMethod,
   CollectionConfig,
   InferApiRouterFromCollection,
   InferContextFromCollection,

@@ -4,16 +4,21 @@ import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
 
 import { AccountProvider } from '../constant'
 import { AuthContext } from '../context'
+import { WithPrefix } from '../types'
 import { setSessionCookie } from '../utils'
 
 interface InternalRouteOptions {
   prefix?: string
 }
 
-export function signInEmail(options: InternalRouteOptions) {
+export function signInEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: options.prefix ? `${options.prefix}/sign-in` : '/sign-in',
+    path: (options.prefix ? `${options.prefix}/sign-in/email` : '/sign-in/email') as WithPrefix<
+      TOptions['prefix'],
+      '/sign-in/email'
+    >,
+
     body: z.interface({
       email: z.string(),
       password: z.string(),

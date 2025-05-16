@@ -8,10 +8,12 @@ interface InternalRouteOptions {
   prefix?: string
 }
 
-export function me(options: InternalRouteOptions) {
+export function me<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'GET',
-    path: options.prefix ? `${options.prefix}/me` : '/me',
+    path: (options.prefix ? `${options.prefix}/me` : '/me') as TOptions['prefix'] extends string
+      ? `${TOptions['prefix']}/me`
+      : '/me',
     responses: {
       200: z.interface({
         id: z.string(),
