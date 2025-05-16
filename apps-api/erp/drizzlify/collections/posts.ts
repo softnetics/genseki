@@ -1,26 +1,26 @@
 import { builder } from '../helper'
 
-const postsField = builder.fieldsFrom('posts')
+const postsField = builder.fields('posts', (fb) => ({
+  id: fb.columns('id', {
+    type: 'text',
+  }),
+  title: fb.columns('title', {
+    type: 'text',
+  }),
+  content: fb.columns('content', {
+    type: 'text',
+  }),
+  author: fb.relations('author', {
+    type: 'connect',
+    options: builder.options(async ({ db }) => {
+      const result = await db.query.users.findMany({ columns: { id: true, name: true } })
+      return result.map((user) => ({ label: user.name ?? user.id, value: user.id }))
+    }),
+  }),
+}))
 
 export const postsCollection = builder.collection('posts', {
   slug: 'posts',
   primaryField: 'id',
-  fields: {
-    id: postsField.columns('id', {
-      type: 'text',
-    }),
-    title: postsField.columns('title', {
-      type: 'text',
-    }),
-    content: postsField.columns('content', {
-      type: 'text',
-    }),
-    authorId: postsField.relations('author', {
-      type: 'connect',
-      options: builder.options(async ({ db }) => {
-        const result = await db.query.users.findMany({ columns: { id: true, firstName: true } })
-        return result.map((user) => ({ label: user.firstName ?? user.id, value: user.id }))
-      }),
-    }),
-  },
+  fields: postsField,
 })

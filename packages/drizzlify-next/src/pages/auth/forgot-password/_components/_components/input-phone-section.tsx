@@ -1,0 +1,54 @@
+'use client'
+
+import { useForm } from 'react-hook-form'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import z from 'zod'
+
+import { Button } from '~/intentui/ui/button'
+import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { TextField } from '~/intentui/ui/text-field'
+
+const schema = z.object({
+  phone: z.string().regex(/^[0-9]{10}$/, { message: 'เบอร์โทรศัพท์ไม่ถูกต้อง' }),
+})
+
+export type InputPhoneForm = z.infer<typeof schema>
+export type OutputPhoneForm = z.infer<typeof schema>
+
+interface InputPhoneSectionProps {
+  onNext: (phone: string) => void
+}
+
+export default function InputPhoneSection({ onNext }: InputPhoneSectionProps) {
+  const form = useForm<InputPhoneForm, any, OutputPhoneForm>({
+    resolver: zodResolver(schema),
+    mode: 'onChange',
+  })
+
+  return (
+    <Form {...form}>
+      <form
+        onSubmit={form.handleSubmit(() => {
+          // await api.sendOtp(phone)
+          onNext(form.getValues('phone'))
+        })}
+        className="flex flex-col gap-4"
+      >
+        <FormField
+          control={form.control}
+          name="phone"
+          render={({ field }) => (
+            <FormItem>
+              <TextField {...field} placeholder="เบอร์โทรศัพท์" />
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <Button variant="primary" type="submit" className="w-full" size="sm">
+          ส่งรหัส OTP
+        </Button>
+      </form>
+    </Form>
+  )
+}

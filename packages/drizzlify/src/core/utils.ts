@@ -1,6 +1,5 @@
 import { Column, ExtractObjectValues, is, Table, TableRelationalConfig } from 'drizzle-orm'
-import { IsNever, Simplify } from 'type-fest'
-import z, { ZodObject } from 'zod'
+import { Simplify } from 'type-fest'
 
 import { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
@@ -104,23 +103,3 @@ export function appendFieldNameToFields<TFields extends FieldsInitial<any>>(
     })
   ) as FieldsWithFieldName<TFields>
 }
-
-export type JoinArrays<T extends any[]> = Simplify<
-  T extends [infer A]
-    ? IsNever<A> extends true
-      ? {}
-      : A
-    : T extends [infer A, ...infer B]
-      ? IsNever<A> extends true
-        ? JoinArrays<B>
-        : A & JoinArrays<B>
-      : T extends []
-        ? {}
-        : never
->
-
-export type ToZodObject<T extends Record<string, any>> = ZodObject<{
-  [Key in keyof T]-?: T[Key] extends undefined
-    ? z.ZodOptional<z.ZodType<NonNullable<T[Key]>>>
-    : z.ZodType<T[Key]>
-}>

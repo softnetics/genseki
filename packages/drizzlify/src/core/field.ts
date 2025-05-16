@@ -9,7 +9,6 @@ import {
   Simplify,
   TableRelationalConfig,
 } from 'drizzle-orm'
-import z, { ZodObject } from 'zod'
 
 import { GetAllTableTsNames } from './collection'
 import {
@@ -152,7 +151,6 @@ export type FieldRelationCollectionOptions<
 > = {
   connect: {
     type: 'connect'
-    fields: FieldsInitial<TContext>
     options: OptionCallback<TInputType, TContext>
   } & FieldBase
   create: {
@@ -173,7 +171,6 @@ export type FieldColumnCollection<
   FieldColumnNumberCollectionOptions<TContext> &
   FieldColumnNumberArrayCollectionOptions<TContext> &
   FieldColumnBooleanCollectionOptions &
-  FieldColumnBooleanArrayCollectionOptions &
   FieldColumnDateCollectionOptions
 
 export type FieldColumn<TContext extends Record<string, unknown> = Record<string, unknown>> =
@@ -185,9 +182,6 @@ export type FieldRelationCollection<
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = Simplify<
   FieldRelationCollectionOptions<TContext> & {
-    connect: {
-      fields: Fields<TContext>
-    }
     create: {
       fields: Fields<TContext>
     }
@@ -405,84 +399,4 @@ export class FieldBuilder<
     const fb = new FieldBuilder(tableTsName, this.tableRelationalConfigByTableTsName)
     return appendFieldNameToFields(optionsFn(fb as any))
   }
-}
-
-type FieldToZodScheama<TField extends Field<any>> =
-  TField extends FieldColumnStringCollectionOptions<any>[keyof FieldColumnStringCollectionOptions<any>]
-    ? z.ZodString
-    : TField extends FieldColumnStringArrayCollectionOptions<any>[keyof FieldColumnStringArrayCollectionOptions<any>]
-      ? z.ZodArray<z.ZodString>
-      : TField extends FieldColumnNumberCollectionOptions<any>[keyof FieldColumnNumberCollectionOptions<any>]
-        ? z.ZodNumber
-        : TField extends FieldColumnNumberArrayCollectionOptions<any>[keyof FieldColumnNumberArrayCollectionOptions<any>]
-          ? z.ZodArray<z.ZodNumber>
-          : TField extends FieldColumnBooleanCollectionOptions[keyof FieldColumnBooleanCollectionOptions]
-            ? z.ZodBoolean
-            : TField extends FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
-              ? z.ZodArray<z.ZodBoolean>
-              : TField extends FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
-                ? z.ZodDate
-                : never
-// TODO: Relation input
-// TODO: Optioanl and default values
-
-export function fieldToZodScheama<TField extends Field<any>>(
-  field: TField
-): FieldToZodScheama<TField> {
-  // TODO: More options
-  switch (field.type) {
-    // string input
-    case 'text':
-    case 'selectText':
-    case 'time':
-    case 'media':
-      return z.string() as FieldToZodScheama<TField>
-    // string[] input
-    case 'comboboxText':
-      return z.array(z.string()) as FieldToZodScheama<TField>
-    // number input
-    case 'number':
-    case 'selectNumber':
-      return z.number() as FieldToZodScheama<TField>
-    // number[] input
-    case 'comboboxNumber':
-      return z.array(z.number()) as FieldToZodScheama<TField>
-    // boolean input
-    case 'checkbox':
-    case 'switch':
-      return z.boolean() as FieldToZodScheama<TField>
-    // boolean[] input
-    case 'comboboxBoolean':
-      return z.array(z.boolean()) as FieldToZodScheama<TField>
-    // date input
-    case 'date':
-      return z.date() as FieldToZodScheama<TField>
-    // TODO: relation input
-    // case 'connect':
-    //   return z.any() as FieldToZodScheama<TField>
-    // case 'create':
-    //   return z.any() as FieldToZodScheama<TField>
-    // case 'connectOrCreate':
-    //   return z.any() as FieldToZodScheama<TField>
-    default:
-      throw new Error(`Unknown field type: ${(field as any).type}`)
-  }
-}
-
-type FieldsToZodObject<TFields extends Fields<any>> = ZodObject<{
-  [TKey in keyof TFields]: TFields[TKey] extends Field<any> ? z.ZodTypeAny : never
-}>
-
-export function fieldsToZodObject<TFields extends Fields<any>>(
-  fields: TFields
-): FieldsToZodObject<TFields> {
-  const zodObject = Object.entries(fields).reduce(
-    (acc, [key, field]) => {
-      acc[key] = fieldToZodScheama(field)
-      return acc
-    },
-    {} as Record<string, z.ZodTypeAny>
-  )
-
-  return z.object(zodObject) as FieldsToZodObject<TFields>
 }

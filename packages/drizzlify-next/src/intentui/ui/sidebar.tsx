@@ -1,6 +1,6 @@
 'use client'
 
-import { createContext, forwardRef, use, useCallback, useEffect, useMemo, useState } from 'react'
+import React, { createContext, use, useCallback, useEffect, useMemo, useState } from 'react'
 import type {
   ButtonProps,
   DisclosureGroupProps,
@@ -22,9 +22,12 @@ import {
   Text,
 } from 'react-aria-components'
 
-import { IconChevronLgDown, IconHamburger, IconSidebarFill } from '@intentui/icons'
+import { List, Sidebar as PhosphorSidebar } from '@phosphor-icons/react'
+import { CaretDown } from '@phosphor-icons/react'
 import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
+
+import BaseIcon from '~/components/primitives/base-icon'
 
 import { Badge } from './badge'
 import { Button } from './button'
@@ -34,7 +37,7 @@ import { Tooltip, TooltipContent } from './tooltip'
 
 import { useMediaQuery } from '../utils/use-media-query'
 
-const SIDEBAR_COOKIE_NAME = 'sidebar:state'
+const SIDEBAR_COOKIE_NAME = 'sidebar-state'
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
 type SidebarContextProps = {
   state: 'expanded' | 'collapsed'
@@ -130,12 +133,12 @@ const SidebarProvider = ({
       <div
         className={twMerge(
           '@container **:data-[slot=icon]:shrink-0',
-          '[--sidebar-width-dock:3.25rem] [--sidebar-width:17rem]',
+          '[--sidebar-width-dock:3.5rem] [--sidebar-width:14.375rem]',
           '[--sidebar-border:color-mix(in_oklch,var(--color-sidebar)_25%,black_6%)]',
           'dark:[--sidebar-border:color-mix(in_oklch,var(--color-sidebar)_55%,white_10%)]',
           '[--sidebar-accent:color-mix(in_oklab,var(--color-sidebar)_95%,black_5%)]',
           'dark:[--sidebar-accent:color-mix(in_oklab,var(--color-sidebar)_90%,white_10%)]',
-          'flex min-h-svh w-full text-sidebar-fg',
+          'text-sidebar-fg flex min-h-svh w-full',
           'group/sidebar-root has-data-[sidebar-intent=inset]:bg-sidebar dark:has-data-[sidebar-intent=inset]:bg-bg',
           className
         )}
@@ -159,9 +162,9 @@ const gap = tv({
       default: 'group-data-[sidebar-collapsible=dock]/sidebar-container:w-(--sidebar-width-dock)',
       fleet: 'group-data-[sidebar-collapsible=dock]/sidebar-container:w-(--sidebar-width-dock)',
       float:
-        'group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+theme(spacing.4))]',
+        'group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+--spacing(4))]',
       inset:
-        'group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+theme(spacing.2))]',
+        'group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+--spacing(2))]',
     },
   },
 })
@@ -180,9 +183,9 @@ const sidebar = tv({
     },
     intent: {
       float:
-        'bg-bg p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var+theme(spacing.4)+2px)]',
+        'bg-bg p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(--spacing(4)+2px)]',
       inset: [
-        'bg-sidebar p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+theme(spacing.2)+2px)] dark:bg-bg',
+        'bg-sidebar p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+--spacing(2)+2px)] dark:bg-bg',
       ],
       fleet: [
         'group-data-[sidebar-collapsible=dock]/sidebar-container:w-(--sidebar-width-dock)',
@@ -220,7 +223,7 @@ const Sidebar = ({
         data-sidebar-intent={intent}
         data-sidebar-collapsible="none"
         className={twMerge(
-          'flex h-full w-(--sidebar-width) flex-col border-r bg-sidebar text-sidebar-fg',
+          'w-(--sidebar-width) bg-sidebar text-sidebar-fg flex h-full flex-col border-r',
           className
         )}
         {...props}
@@ -253,7 +256,7 @@ const Sidebar = ({
       data-sidebar-collapsible={state === 'collapsed' ? collapsible : ''}
       data-sidebar-intent={intent}
       data-sidebar-side={side}
-      className="group/sidebar-container peer hidden text-sidebar-fg md:block"
+      className="group/sidebar-container text-sidebar-fg peer hidden md:block"
       {...props}
     >
       <div aria-hidden="true" className={gap({ intent })} />
@@ -268,9 +271,9 @@ const Sidebar = ({
         <div
           data-sidebar="default"
           className={twJoin(
-            'flex h-full w-full flex-col text-sidebar-fg',
+            'text-sidebar-fg flex h-full w-full flex-col',
             'group-data-[sidebar-intent=inset]/sidebar-container:bg-sidebar dark:group-data-[sidebar-intent=inset]/sidebar-container:bg-bg',
-            'group-data-[sidebar-intent=float]/sidebar-container:rounded-lg group-data-[sidebar-intent=float]/sidebar-container:border group-data-[sidebar-intent=float]/sidebar-container:border-(--sidebar-border) group-data-[sidebar-intent=float]/sidebar-container:bg-sidebar group-data-[sidebar-intent=float]/sidebar-container:shadow-xs'
+            'group-data-[sidebar-intent=float]/sidebar-container:border-(--sidebar-border) group-data-[sidebar-intent=float]/sidebar-container:bg-sidebar group-data-[sidebar-intent=float]/sidebar-container:shadow-xs group-data-[sidebar-intent=float]/sidebar-container:rounded-lg group-data-[sidebar-intent=float]/sidebar-container:border'
           )}
         >
           {props.children}
@@ -284,8 +287,8 @@ const header = tv({
   base: 'mb-2 flex flex-col **:data-[slot=sidebar-label-mask]:hidden',
   variants: {
     collapsed: {
-      false: 'px-4 py-[calc(var(--spacing)*4)]',
-      true: 'mt-2 p-5 group-data-[sidebar-intent=float]/sidebar-container:mt-2 md:mx-auto md:size-9 md:items-center md:justify-center md:rounded-lg md:p-0 md:hover:bg-(--sidebar-accent)',
+      false: '',
+      true: 'mt-2 group-data-[sidebar-intent=float]/sidebar-container:mt-2 md:mx-auto md:size-9 md:items-center md:justify-center md:p-0 md:hover:bg-(--sidebar-accent)',
     },
   },
 })
@@ -354,8 +357,8 @@ const SidebarContent = ({ className, ...props }: React.ComponentProps<'div'>) =>
     <div
       data-sidebar-content="true"
       className={twMerge(
-        'flex min-h-0 flex-1 scroll-mb-96 flex-col overflow-auto *:data-sidebar-section:border-l-0',
-        state === 'collapsed' && 'items-center',
+        '*:data-sidebar-section:border-l-0 flex min-h-0 flex-1 scroll-mb-96 flex-col overflow-auto',
+        state === 'collapsed' && 'items-stretch',
         className
       )}
       {...props}
@@ -379,23 +382,24 @@ const SidebarSectionGroup = ({ className, ...props }: React.ComponentProps<'sect
   )
 }
 
-const SidebarSection = ({
-  className,
-  ...props
-}: React.ComponentProps<'div'> & { title?: string }) => {
+interface SidebarSectionProps extends React.ComponentProps<'div'> {
+  label?: string
+}
+const SidebarSection = ({ className, ...props }: SidebarSectionProps) => {
   const { state } = useSidebar()
   return (
     <div
       data-sidebar-section="true"
       className={twMerge(
-        'col-span-full flex flex-col gap-y-0.5 in-data-[sidebar-intent=fleet]:px-0 px-2 **:data-sidebar-section:**:gap-y-0 **:data-sidebar-section:pr-0',
+        '**:data-sidebar-section:**:gap-y-0 **:data-sidebar-section:pr-0 col-span-full flex flex-col gap-y-0.5',
+        state === 'expanded' && 'px-2.5',
         className
       )}
       {...props}
     >
-      {state !== 'collapsed' && 'title' in props && (
-        <Header className="group-data-[sidebar-collapsible=dock]/sidebar-container:-mt-8 mb-1 flex shrink-0 items-center rounded-md px-2.5 font-medium text-sidebar-fg/70 text-xs outline-none ring-sidebar-ring transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 *:data-[slot=icon]:size-4 *:data-[slot=icon]:shrink-0 group-data-[sidebar-collapsible=dock]/sidebar-container:opacity-0">
-          {props.title}
+      {state !== 'collapsed' && 'label' in props && (
+        <Header className="text-sidebar-fg/70 ring-sidebar-ring mb-1 flex shrink-0 items-center rounded-md px-2.5 text-xs font-medium outline-none transition-[margin,opa] duration-200 ease-linear focus-visible:ring-2 *:data-[slot=icon]:size-4 *:data-[slot=icon]:shrink-0 group-data-[sidebar-collapsible=dock]/sidebar-container:-mt-8 group-data-[sidebar-collapsible=dock]/sidebar-container:opacity-0">
+          {props.label}
         </Header>
       )}
       <div className="grid grid-cols-[auto_1fr] gap-y-0.5">{props.children}</div>
@@ -405,19 +409,22 @@ const SidebarSection = ({
 
 const sidebarItemStyles = tv({
   base: [
-    'group/sidebar-item relative col-span-full cursor-pointer overflow-hidden rounded-lg px-[calc(var(--spacing)*2.3)] py-[calc(var(--spacing)*1.3)] text-sidebar-fg/70 outline-hidden sm:text-sm/6',
+    'group/sidebar-item relative col-span-full cursor-pointer overflow-hidden text-sidebar-fg/70 focus-visible:outline-hidden sm:text-sm',
     '**:data-[slot=menu-trigger]:-mr-1 **:data-[slot=menu-trigger]:absolute **:data-[slot=menu-trigger]:right-0 **:data-[slot=menu-trigger]:flex **:data-[slot=menu-trigger]:h-full **:data-[slot=menu-trigger]:w-[calc(var(--sidebar-width)-90%)] **:data-[slot=menu-trigger]:items-center **:data-[slot=menu-trigger]:justify-end **:data-[slot=menu-trigger]:pr-2.5 **:data-[slot=menu-trigger]:opacity-0 **:data-[slot=menu-trigger]:pressed:opacity-100 pressed:**:data-[slot=menu-trigger]:opacity-100 **:data-[slot=menu-trigger]:has-data-focus:opacity-100 **:data-[slot=menu-trigger]:focus-visible:opacity-100 hover:**:data-[slot=menu-trigger]:opacity-100',
-    '**:data-[slot=avatar]:*:size-4 **:data-[slot=avatar]:size-4 **:data-[slot=icon]:size-4 **:data-[slot=avatar]:shrink-0 **:data-[slot=icon]:shrink-0',
-    'in-data-[sidebar-intent=fleet]:rounded-none',
+    '**:data-[slot=avatar]:*:size-4 **:data-[slot=avatar]:size-4 **:data-[slot=icon]:size-7 **:data-[slot=avatar]:shrink-0 **:data-[slot=icon]:shrink-0',
+    'bg-bg hover:bg-[--alpha(var(--color-muted-fg)/10%)] focus:bg-[--alpha(var(--color-muted-fg)/10%)] hover:text-sidebar-fg py-6! pl-14! first-of-type:rounded-t-md last-of-type:rounded-b-md',
   ],
   variants: {
+    ghost: {
+      true: 'bg-transparent hover:bg-transparent',
+    },
     collapsed: {
       false:
         'grid grid-cols-[auto_1fr_1.5rem_0.5rem_auto] items-center **:data-[slot=avatar]:*:mr-2 **:data-[slot=avatar]:mr-2 **:data-[slot=icon]:mr-2 supports-[grid-template-columns:subgrid]:grid-cols-subgrid',
       true: 'flex not-has-data-[slot=icon]:hidden size-9 items-center justify-center gap-x-0 p-0 **:data-[slot=menu-trigger]:hidden',
     },
     isCurrent: {
-      true: 'bg-(--sidebar-accent) text-fg hover:bg-(--sidebar-accent)/90 hover:text-fg **:data-[slot=menu-trigger]:from-(--sidebar-accent) **:data-[slot=icon]:text-fg [&_.text-muted-fg]:text-fg/80',
+      true: 'bg-primary/10 text-text-accent pointer-events-none hover:bg-(--sidebar-accent)/90 hover:text-fg **:data-[slot=menu-trigger]:from-(--sidebar-accent) **:data-[slot=icon]:text-fg [&_.text-muted-fg]:text-fg/80',
     },
     isActive: {
       true: 'bg-(--sidebar-accent) text-sidebar-fg **:data-[slot=menu-trigger]:flex',
@@ -426,9 +433,17 @@ const sidebarItemStyles = tv({
       true: 'cursor-default opacity-50',
     },
   },
+  compoundVariants: [
+    {
+      ghost: true,
+      isCurrent: true,
+      className: 'bg-transparent focus:bg-red-500!',
+    },
+  ],
 })
 
 interface SidebarItemProps extends Omit<React.ComponentProps<typeof Link>, 'children'> {
+  ghost?: boolean
   isCurrent?: boolean
   tooltip?: React.ReactNode | string
   children?:
@@ -444,6 +459,7 @@ const SidebarItem = ({
   tooltip,
   children,
   badge,
+  ghost,
   className,
   ref,
   ...props
@@ -462,28 +478,29 @@ const SidebarItem = ({
           collapsed: isCollapsed,
           isActive: renderProps.isPressed || renderProps.isFocusVisible || renderProps.isHovered,
           className: cls,
+          ghost,
         })
       )}
       {...props}
     >
       {(values) => (
         <>
+          {isCurrent && !ghost && <div className="bg-primary absolute inset-y-4 left-4 w-1" />}
           {typeof children === 'function' ? children({ ...values, isCollapsed }) : children}
-
           {badge &&
             (state !== 'collapsed' ? (
               <Badge
                 shape="square"
                 intent="primary"
                 data-slot="sidebar-badge"
-                className="-translate-y-1/2 absolute inset-ring-1 inset-ring-primary/20 inset-y-1/2 right-1.5 h-5.5 w-auto text-[10px] transition-colors group-data-current:inset-ring-transparent"
+                className="inset-ring-1 inset-ring-ring/20 group-data-current:inset-ring-transparent absolute inset-y-1/2 right-1.5 h-auto w-auto -translate-y-1/2 p-4 text-[10px] transition-colors"
               >
                 {badge}
               </Badge>
             ) : (
               <div
                 aria-hidden
-                className="absolute top-1 right-1 size-1.5 rounded-full bg-primary"
+                className="bg-primary absolute right-1 top-1 size-1.5 rounded-full"
               />
             ))}
         </>
@@ -518,39 +535,37 @@ const sidebarLink = tv({
     },
   },
 })
-interface SidebarLinkProps extends LinkProps {
-  className?: string
-}
 
-const SidebarLink = forwardRef<HTMLAnchorElement, SidebarLinkProps>(function SidebarLink(
-  { className, ...props },
-  ref
-) {
-  const { state, isMobile } = useSidebar()
-  const collapsed = state === 'collapsed' && !isMobile
-  return (
-    <Link
-      ref={ref}
-      className={composeRenderProps(className, (className, renderProps) =>
-        sidebarLink({
-          ...renderProps,
-          collapsed,
-          className,
-        })
-      )}
-      {...props}
-    />
-  )
-})
+interface SidebarLinkProps extends LinkProps {}
+
+const SidebarLink = React.forwardRef<HTMLAnchorElement, SidebarLinkProps>(
+  ({ className, ...props }, ref) => {
+    const { state, isMobile } = useSidebar()
+    const collapsed = state === 'collapsed' && !isMobile
+    return (
+      <Link
+        ref={ref}
+        className={composeRenderProps(className, (className, renderProps) =>
+          sidebarLink({
+            ...renderProps,
+            collapsed,
+            className,
+          })
+        )}
+        {...props}
+      />
+    )
+  }
+)
 
 const SidebarInset = ({ className, ref, ...props }: React.ComponentProps<'main'>) => {
   return (
     <main
       ref={ref}
       className={twMerge(
-        'relative flex min-h-svh w-full flex-1 flex-col peer-data-[sidebar-intent=inset]:border peer-data-[sidebar-intent=inset]:border-(--sidebar-border)',
-        'bg-bg peer-data-[sidebar-intent=inset]:overflow-hidden dark:peer-data-[sidebar-intent=inset]:bg-sidebar',
-        'peer-data-[sidebar-intent=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[sidebar-state=collapsed]:peer-data-[sidebar-intent=inset]:ml-2 md:peer-data-[sidebar-intent=inset]:m-2 md:peer-data-[sidebar-intent=inset]:ml-0 md:peer-data-[sidebar-intent=inset]:rounded-xl md:peer-data-[sidebar-intent=inset]:shadow-xs',
+        'peer-data-[sidebar-intent=inset]:border-(--sidebar-border) relative flex min-h-svh w-full flex-1 flex-col peer-data-[sidebar-intent=inset]:border',
+        'bg-bg dark:peer-data-[sidebar-intent=inset]:bg-sidebar peer-data-[sidebar-intent=inset]:overflow-hidden',
+        'md:peer-data-[sidebar-intent=inset]:shadow-xs peer-data-[sidebar-intent=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[sidebar-intent=inset]:m-2 md:peer-data-[sidebar-intent=inset]:ml-0 md:peer-data-[sidebar-state=collapsed]:peer-data-[sidebar-intent=inset]:ml-2 md:peer-data-[sidebar-intent=inset]:rounded-xl',
         className
       )}
       {...props}
@@ -576,8 +591,8 @@ const SidebarDisclosureGroup = ({
 
 interface SidebarDisclosureProps extends DisclosureProps {}
 
-const SidebarDisclosure = forwardRef<HTMLDivElement, SidebarDisclosureProps>(
-  function SidebarDisclosure({ className, ...props }, ref) {
+const SidebarDisclosure = React.forwardRef<HTMLDivElement, Omit<SidebarDisclosureProps, 'ref'>>(
+  ({ className, ...props }, ref) => {
     const { state } = useSidebar()
     return (
       <Disclosure
@@ -585,10 +600,7 @@ const SidebarDisclosure = forwardRef<HTMLDivElement, SidebarDisclosureProps>(
         data-sidebar-disclosure="true"
         className={composeTailwindRenderProps(
           className,
-          twMerge(
-            'in-data-[sidebar-intent=fleet]:px-0 px-2.5',
-            state !== 'collapsed' && 'col-span-full'
-          )
+          twMerge(state === 'expanded' ? 'px-2.5' : 'col-span-full')
         )}
         {...props}
       />
@@ -598,13 +610,13 @@ const SidebarDisclosure = forwardRef<HTMLDivElement, SidebarDisclosureProps>(
 
 const sidebarDisclosureTrigger = tv({
   base: [
-    'group relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-[calc(var(--spacing)*2.3)] py-[calc(var(--spacing)*1.3)] text-sidebar-fg/70 outline-hidden sm:text-sm/6',
-    'in-data-[sidebar-intent=fleet]:rounded-none in-data-[sidebar-intent=fleet]:py-2 in-data-[sidebar-intent=fleet]:**:data-[slot=chevron]:hidden',
+    'group relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-[calc(var(--spacing)*4)] py-[calc(var(--spacing)*4)] text-sidebar-fg/70 outline-hidden sm:text-sm',
+    'in-data-[sidebar-intent=fleet]:rounded-none hover:bg-muted/60 in-data-[sidebar-intent=fleet]:py-6 in-data-[sidebar-intent=fleet]:**:data-[slot=chevron]:hidden',
   ],
   variants: {
     collapsed: {
       false: 'col-span-full **:data-[slot=icon]:mr-2',
-      true: 'size-9 justify-center p-0',
+      true: 'justify-center',
     },
     isActive: {
       true: 'bg-(--sidebar-accent) text-sidebar-fg',
@@ -616,8 +628,9 @@ const sidebarDisclosureTrigger = tv({
 })
 
 interface SidebarDisclosureTriggerProps extends ButtonProps {}
-const SidebarDisclosureTrigger = forwardRef<HTMLButtonElement, SidebarDisclosureTriggerProps>(
-  function SidebarDisclosureTrigger({ className, ...props }, ref) {
+
+const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisclosureTriggerProps>(
+  ({ className, ...props }, ref) => {
     const { state, isMobile } = useSidebar()
     const collapsed = state === 'collapsed' && !isMobile
     return (
@@ -640,9 +653,11 @@ const SidebarDisclosureTrigger = forwardRef<HTMLButtonElement, SidebarDisclosure
             <>
               {typeof props.children === 'function' ? props.children(values) : props.children}
               {state !== 'collapsed' && (
-                <IconChevronLgDown
-                  data-slot="chevron"
-                  className="z-10 ml-auto size-3.5 transition-transform group-aria-expanded:rotate-180"
+                <BaseIcon
+                  icon={CaretDown}
+                  size="sm"
+                  weight="regular"
+                  className="z-10 ml-auto size-7 transition-transform group-aria-expanded:rotate-180"
                 />
               )}
             </>
@@ -657,7 +672,7 @@ const SidebarDisclosurePanel = (props: React.ComponentProps<typeof DisclosurePan
   return (
     <DisclosurePanel
       data-sidebar-disclosure-panel="true"
-      className="col-span-full grid grid-cols-[auto_1fr] gap-y-0.5"
+      className="col-span-full grid grid-cols-[auto_1fr] rounded-md"
       {...props}
     />
   )
@@ -668,7 +683,7 @@ const SidebarSeparator = ({ className, ...props }: SidebarSeparatorProps) => {
     <Separator
       orientation="horizontal"
       className={twMerge(
-        'col-span-full mx-auto my-2.5 h-px w-[calc(var(--sidebar-width)-theme(spacing.6))] bg-border',
+        'bg-border col-span-full mx-auto my-2.5 h-px w-[calc(var(--sidebar-width)--spacing(6))]',
         className
       )}
       {...props}
@@ -676,14 +691,20 @@ const SidebarSeparator = ({ className, ...props }: SidebarSeparatorProps) => {
   )
 }
 
-const SidebarTrigger = ({ onPress, children, ...props }: React.ComponentProps<typeof Button>) => {
+const SidebarTrigger = ({
+  onPress,
+  children,
+  variant,
+  size,
+  ...props
+}: React.ComponentProps<typeof Button>) => {
   const { toggleSidebar } = useSidebar()
   return (
     <Button
       aria-label={props['aria-label'] || 'Toggle Sidebar'}
       data-sidebar-trigger="true"
-      intent={props.intent || 'plain'}
-      size={props.size || 'square-petite'}
+      size={size}
+      variant={variant}
       onPress={(event) => {
         onPress?.(event)
         toggleSidebar()
@@ -692,8 +713,13 @@ const SidebarTrigger = ({ onPress, children, ...props }: React.ComponentProps<ty
     >
       {children || (
         <>
-          <IconSidebarFill className="hidden md:inline" />
-          <IconHamburger className="inline md:hidden" />
+          <BaseIcon
+            icon={PhosphorSidebar}
+            size="sm"
+            weight="duotone"
+            className="hidden md:inline"
+          />
+          <BaseIcon icon={List} size="sm" weight="duotone" className="inline md:hidden" />
           <span className="sr-only">Toggle Sidebar</span>
         </>
       )}
@@ -713,10 +739,10 @@ const SidebarRail = ({ className, ref, ...props }: React.ComponentProps<'button'
       tabIndex={-1}
       onClick={toggleSidebar}
       className={twMerge(
-        '-translate-x-1/2 group-data-[sidebar-side=left]/sidebar-container:-right-4 absolute inset-y-0 z-20 hidden w-4 outline-hidden transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-transparent group-data-[sidebar-side=right]/sidebar-container:left-0 sm:flex',
+        'outline-hidden absolute inset-y-0 z-20 hidden w-4 -translate-x-1/2 transition-all ease-linear after:absolute after:inset-y-0 after:left-1/2 after:w-[2px] hover:after:bg-transparent group-data-[sidebar-side=left]/sidebar-container:-right-4 group-data-[sidebar-side=right]/sidebar-container:left-0 sm:flex',
         'in-data-[sidebar-side=left]:cursor-w-resize in-data-[sidebar-side=right]:cursor-e-resize',
         '[[data-sidebar-side=left][data-sidebar-state=collapsed]_&]:cursor-e-resize [[data-sidebar-side=right][data-sidebar-state=collapsed]_&]:cursor-w-resize',
-        'group-data-[sidebar-collapsible=hidden]/sidebar-container:translate-x-0 group-data-[sidebar-collapsible=hidden]/sidebar-container:hover:bg-secondary group-data-[sidebar-collapsible=hidden]/sidebar-container:after:left-full',
+        'group-data-[sidebar-collapsible=hidden]/sidebar-container:hover:bg-secondary group-data-[sidebar-collapsible=hidden]/sidebar-container:translate-x-0 group-data-[sidebar-collapsible=hidden]/sidebar-container:after:left-full',
         '[[data-sidebar-side=left][data-sidebar-collapsible=hidden]_&]:-right-2 [[data-sidebar-side=right][data-sidebar-collapsible=hidden]_&]:-left-2',
         className
       )}
@@ -736,7 +762,10 @@ const SidebarLabel = ({ className, ref, ...props }: SidebarLabelProps) => {
         tabIndex={-1}
         ref={ref}
         slot="label"
-        className={twMerge('col-start-2 overflow-hidden whitespace-nowrap', className)}
+        className={twMerge(
+          'outline-hidden col-start-2 overflow-hidden whitespace-nowrap text-sm',
+          className
+        )}
         {...props}
       >
         {props.children}
@@ -776,6 +805,7 @@ export type {
   SidebarNavProps,
   SidebarProps,
   SidebarProviderProps,
+  SidebarSectionProps,
   SidebarSeparatorProps,
 }
 

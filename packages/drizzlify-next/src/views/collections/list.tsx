@@ -40,10 +40,10 @@ export async function ListView<TServerConfig extends ServerConfig>(
   return (
     <div className="flex flex-col gap-y-3">
       <div className="flex justify-between gap-x-3">
-        <h1 className="font-semibold text-2xl">{formatSlug(collection.slug)}</h1>
+        <h1 className="text-2xl font-semibold">{formatSlug(collection.slug)}</h1>
         <ButtonLink
-          size="medium"
-          intent="secondary"
+          variant="primary"
+          size="sm"
           href={`/admin/collections/${collection.slug}/create`}
         >
           Create

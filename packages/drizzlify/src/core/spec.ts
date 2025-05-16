@@ -32,6 +32,12 @@ const baseConfig = defineBaseConfig({
         enabled: true,
       },
     },
+    oauth2: {
+      google: {
+        clientId: '',
+        clientSecret: '',
+      },
+    },
     secret: '',
   },
 })
@@ -131,29 +137,6 @@ export const postCollection = builder.collection('posts', {
       customEndpoint: builder.endpoint(
         {
           path: '/hello',
-          method: 'POST',
-          body: z.object({
-            name: z.string(),
-          }),
-          responses: {
-            200: z.object({
-              hello: z.string(),
-            }),
-          },
-        },
-        ({ context, body }) => {
-          const name = body.name
-          return {
-            status: 200,
-            body: {
-              hello: 's',
-            },
-          }
-        }
-      ),
-      customEndpoint2: builder.endpoint(
-        {
-          path: '/hello2',
           method: 'POST',
           body: z.object({
             name: z.string(),

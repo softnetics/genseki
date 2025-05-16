@@ -2,7 +2,7 @@ import { headers as nextHeaders } from 'next/headers'
 
 import { ServerConfig } from '@repo/drizzlify'
 
-import { RootAuthPage } from './root-auth'
+import { RootAuthPage } from './auth/root-auth'
 import { RootCollectionPage } from './root-collection'
 
 interface RootProps {

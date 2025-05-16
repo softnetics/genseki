@@ -15,24 +15,21 @@ export type InferPathParams<TPath extends string> = Simplify<
     ? {
         [key in TRest as TRest extends `${infer THead}/${string}` ? THead : TRest]: string
       } & InferPathParams<TRest>
-    : {}
+    : never
 >
 
 export type ApiRouteHandlerPayload<
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends Record<string, unknown> = {},
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
-> = ConditionalExcept<
-  {
-    body: TApiRouteSchema extends ApiRouteMutationSchema ? Output<TApiRouteSchema['body']> : never
-    headers: Output<TApiRouteSchema['headers']>
-    query: Output<TApiRouteSchema['query']>
-    pathParams: TApiRouteSchema['pathParams'] extends InputSchema
-      ? InferPathParams<TApiRouteSchema['path']> & Output<TApiRouteSchema['pathParams']>
-      : InferPathParams<TApiRouteSchema['path']>
-    context: TContext
-  },
-  never
->
+> = {
+  body: TApiRouteSchema extends ApiRouteMutationSchema ? Output<TApiRouteSchema['body']> : never
+  headers: Output<TApiRouteSchema['headers']>
+  query: Output<TApiRouteSchema['query']>
+  pathParams: TApiRouteSchema['pathParams'] extends InputSchema
+    ? InferPathParams<TApiRouteSchema['path']> & Output<TApiRouteSchema['pathParams']>
+    : InferPathParams<TApiRouteSchema['path']>
+  context: TContext
+}
 
 export type ClientApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> =
   ConditionalExcept<
@@ -59,7 +56,7 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends Record<string, unknown> = {},
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
   payload: ApiRouteHandlerPayload<TContext, TApiRouteSchema>
@@ -73,7 +70,7 @@ export type GetApiRouteSchemaFromApiRouteHandler<
     : never
 
 export type ApiRouteMiddleware<
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends Record<string, unknown> = {},
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (args: {
   payload: ApiRouteHandlerPayload<TContext, TApiRouteSchema>

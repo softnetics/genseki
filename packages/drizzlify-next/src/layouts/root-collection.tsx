@@ -1,22 +1,11 @@
-import { type Collection, type ServerConfig } from '@repo/drizzlify'
+import { type ServerConfig } from '@repo/drizzlify'
 
+import AppSidebar from '~/components/collection-sidebar/app-sidebar'
+import AppSidebarNav from '~/components/collection-sidebar/app-sidebar-nav'
+import { SidebarInset, SidebarProvider } from '~/intentui/ui/sidebar'
 import type { ServerFunction } from '~/server-function'
 
 import { RootLayout } from './root'
-
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarHeader,
-  SidebarInset,
-  SidebarItem,
-  SidebarLabel,
-  SidebarNav,
-  SidebarProvider,
-  SidebarSection,
-  SidebarTrigger,
-} from '../intentui/ui/sidebar'
-import { formatSlug } from '../utils/format-slug'
 
 interface RootLayoutProps<TServerConfig extends ServerConfig<any, any, any, any>> {
   serverConfig: TServerConfig
@@ -29,40 +18,23 @@ export function RootCollectionLayout<TServerConfig extends ServerConfig<any, any
 ) {
   return (
     <RootLayout serverConfig={props.serverConfig} serverFunction={props.serverFunction}>
-      <SidebarProvider>
+      {props.children}
+    </RootLayout>
+  )
+  return (
+    <RootLayout serverConfig={props.serverConfig} serverFunction={props.serverFunction}>
+      <SidebarProvider className="">
         <AppSidebar collections={props.serverConfig.collections} />
         <SidebarInset>
           <AppSidebarNav />
-          <div className="p-4 lg:p-6">{props.children}</div>
+          <div className="h-[200vh] p-4 lg:p-6">
+            <div className="bg-accent h-[20rem] w-full" />
+            <div className="bg-accent mt-4 h-[1rem] w-full" />
+            <div className="bg-accent mt-2 h-[1rem] w-full" />
+            <div className="bg-accent mt-2 h-[1rem] w-full" />
+          </div>
         </SidebarInset>
       </SidebarProvider>
     </RootLayout>
-  )
-}
-
-function AppSidebar(props: { collections: Collection[] }) {
-  return (
-    <Sidebar>
-      <SidebarHeader>Drizzlify</SidebarHeader>
-      <SidebarContent>
-        <SidebarSection title="Collections">
-          {props.collections.map((collection) => (
-            <SidebarItem key={collection.slug} href={`/admin/collections/${collection.slug}`}>
-              <SidebarLabel>{formatSlug(collection.slug)}</SidebarLabel>
-            </SidebarItem>
-          ))}
-        </SidebarSection>
-      </SidebarContent>
-    </Sidebar>
-  )
-}
-
-function AppSidebarNav() {
-  return (
-    <SidebarNav className="border-b">
-      <span className="flex items-center gap-x-4">
-        <SidebarTrigger className="-mx-2" />
-      </span>
-    </SidebarNav>
   )
 }

@@ -37,6 +37,17 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
   } satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+    console.log('signInEmail handler', args)
+
+    // return {
+    //   status: 200,
+    //   headers: new Headers(),
+    //   body: {
+    //     token: 'test token',
+    //     user: 'test user',
+    //   },
+    // }
+
     const account = await args.context.internalHandlers.account.findByUserEmailAndProvider(
       args.body.email,
       AccountProvider.CREDENTIAL

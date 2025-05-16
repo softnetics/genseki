@@ -41,6 +41,7 @@
   },
   "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",
+  "tailwindCSS.classFunctions": ["cva", "cx"],
   "tailwindCSS.experimental.configFile": {
     "packages/drizzlify-next/src/styles/tailwind.css": "packages/drizzlify-next/**",
     "apps-api/erp/src/app/global.css": "apps-api/erp/**",
