@@ -1,50 +1,43 @@
-import z from 'zod'
-
 import { builder } from '../helper'
-
-const categoriesField = builder.fieldsFrom('categories')
-const categoryTagsField = builder.fieldsFrom('categoryTags')
 
 export const categoriesCollection = builder.collection('categories', {
   slug: 'categories',
   primaryField: 'id',
-  fields: {
-    id: categoriesField.columns('id', {
+  fields: builder.fields('categories', (fb) => ({
+    id: fb.columns('id', {
       type: 'text',
     }),
-    name: categoriesField.columns('name', {
+    name: fb.columns('name', {
       type: 'text',
     }),
-    posts: categoriesField.relations('posts', {
+    posts: fb.relations('posts', (fb) => ({
       type: 'connect',
-      options: builder.options(async ({ db }) => {
-        const result = await db.query.users.findMany({ columns: { id: true, firstName: true } })
-        return result.map((user) => ({ label: user.firstName ?? user.id, value: user.id }))
-      }),
-    }),
-    tags: categoriesField.relations('tags', {
-      type: 'create',
-      fields: {
-        name: categoryTagsField.columns('name', {
+      fields: fb.fields('posts', (fb) => ({
+        id: fb.columns('id', {
           type: 'text',
         }),
-      },
-    }),
-  },
-
-  admin: {
-    endpoints: builder.endpoint(
-      {
-        path: '/categories',
-        method: 'POST',
-        body: z.object({}),
-        responses: {
-          200: z.object({
-            message: z.string(),
-          }),
-        },
-      },
-      ({ context }) => {}
-    ),
-  },
+        title: fb.columns('title', {
+          type: 'text',
+        }),
+        content: fb.columns('content', {
+          type: 'text',
+        }),
+      })),
+      options: builder.options(async ({ db }) => {
+        const result = await db.query.users.findMany({ columns: { id: true, name: true } })
+        return result.map((user) => ({ label: user.name ?? user.id, value: user.id }))
+      }),
+    })),
+    tags: fb.relations('tags', (fb) => ({
+      type: 'create',
+      fields: fb.fields('categoryTags', (fb) => ({
+        id: fb.columns('id', {
+          type: 'text',
+        }),
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+      })),
+    })),
+  })),
 })

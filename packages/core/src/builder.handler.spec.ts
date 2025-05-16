@@ -265,7 +265,7 @@ describe('ApiHandler', () => {
             nameField: fb.columns('nameTs', {
               type: 'text',
             }),
-            authorField: fb.relations('authorTs', {
+            authorField: fb.relations('authorTs', (fb) => ({
               type: 'create',
               fields: fb.fields('authorTs', (fb) => ({
                 idField: fb.columns('idTs', {
@@ -278,7 +278,7 @@ describe('ApiHandler', () => {
                 }),
               })),
               options: async () => [],
-            }),
+            })),
           })),
           primaryField: 'idField',
         })
@@ -443,9 +443,9 @@ describe('ApiHandler', () => {
             nameField: fb.columns('nameTs', {
               type: 'text',
             }),
-            postsField: fb.relations('postsTs', {
+            postsField: fb.relations('postsTs', (fb) => ({
               type: 'create',
-              fields: fb.fields('authorTs', (fb) => ({
+              fields: fb.fields('postWithAuthorTs', (fb) => ({
                 idField: fb.columns('idTs', {
                   type: 'number',
                   create: 'hidden',
@@ -456,7 +456,7 @@ describe('ApiHandler', () => {
                 }),
               })),
               options: async () => [],
-            }),
+            })),
           })),
         })
 
@@ -633,8 +633,18 @@ describe('ApiHandler', () => {
             nameField: fb.columns('nameTs', {
               type: 'text',
             }),
-            authorField: fb.relations('authorTs', {
+            authorField: fb.relations('authorTs', (fb) => ({
               type: 'connect',
+              fields: fb.fields('authorTs', (fb) => ({
+                idField: fb.columns('idTs', {
+                  type: 'number',
+                  create: 'hidden',
+                  update: 'hidden',
+                }),
+                nameField: fb.columns('nameTs', {
+                  type: 'text',
+                }),
+              })),
               options: async (args) => {
                 const result = await args.db.query.authorTs.findMany()
                 return result.map((author) => ({
@@ -642,7 +652,7 @@ describe('ApiHandler', () => {
                   value: author.idTs,
                 }))
               },
-            }),
+            })),
           })),
         })
 
@@ -796,8 +806,18 @@ describe('ApiHandler', () => {
             nameField: fb.columns('nameTs', {
               type: 'text',
             }),
-            postsField: fb.relations('postsTs', {
+            postsField: fb.relations('postsTs', (fb) => ({
               type: 'connect',
+              fields: fb.fields('postWithAuthorTs', (fb) => ({
+                idField: fb.columns('idTs', {
+                  type: 'number',
+                  create: 'hidden',
+                  update: 'hidden',
+                }),
+                nameField: fb.columns('nameTs', {
+                  type: 'text',
+                }),
+              })),
               options: async (args) => {
                 const result = await args.db.query.authorTs.findMany()
                 return result.map((author) => ({
@@ -805,7 +825,7 @@ describe('ApiHandler', () => {
                   value: author.idTs as number,
                 }))
               },
-            }),
+            })),
           })),
         })
 

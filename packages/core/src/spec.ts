@@ -38,46 +38,19 @@ const baseConfig = defineBaseConfig({
 
 const builder = new Builder(baseConfig).$context<typeof baseConfig.context>()
 
-const authorFields = builder.fields('authors', (fb) => ({
-  id: fb.columns('id', {
-    type: 'text',
-  }),
-  name: fb.columns('name', {
-    type: 'text',
-  }),
-  email: fb.columns('email', {
-    type: 'text',
-  }),
-}))
-
-const categoryFields = builder.fields('categories', (fb) => ({
-  id: fb.columns('id', {
-    type: 'text',
-  }),
-  name: fb.columns('name', {
-    type: 'text',
-  }),
-}))
-
-const postToTagsFields = builder.fields('postsToTags', (fb) => ({
-  postId: fb.columns('postId', {
-    type: 'number',
-  }),
-  tagId: fb.columns('tagId', {
-    type: 'selectNumber',
-    options: async (context) => {
-      const result = await context.db.query.tags.findMany()
-      return result.map((tag) => ({
-        label: tag.name,
-        value: tag.id,
-      }))
-    },
-  }),
-}))
-
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
-  fields: authorFields,
+  fields: builder.fields('authors', (fb) => ({
+    id: fb.columns('id', {
+      type: 'text',
+    }),
+    name: fb.columns('name', {
+      type: 'text',
+    }),
+    email: fb.columns('email', {
+      type: 'text',
+    }),
+  })),
   primaryField: 'id',
 })
 
@@ -93,9 +66,19 @@ export const postCollection = builder.collection('posts', {
     content: fb.columns('content', {
       type: 'text',
     }),
-    author: fb.relations('author', {
+    author: fb.relations('author', (fb) => ({
       type: 'connectOrCreate',
-      fields: authorFields,
+      fields: fb.fields('authors', (fb) => ({
+        id: fb.columns('id', {
+          type: 'text',
+        }),
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+        email: fb.columns('email', {
+          type: 'text',
+        }),
+      })),
       options: async (args) => {
         const result = await args.db.query.authors.findMany()
         return result.map((author) => ({
@@ -103,10 +86,17 @@ export const postCollection = builder.collection('posts', {
           value: author.id,
         }))
       },
-    }),
-    categories: fb.relations('category', {
+    })),
+    categories: fb.relations('category', (fb) => ({
       type: 'connectOrCreate',
-      fields: categoryFields,
+      fields: fb.fields('categories', (fb) => ({
+        id: fb.columns('id', {
+          type: 'text',
+        }),
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+      })),
       options: async (args) => {
         const result = await args.db.query.categories.findMany()
         return result.map((category) => ({
@@ -114,11 +104,25 @@ export const postCollection = builder.collection('posts', {
           value: category.id,
         }))
       },
-    }),
-    tags: fb.relations('tags', {
+    })),
+    tags: fb.relations('tags', (fb) => ({
       type: 'create',
-      fields: postToTagsFields,
-    }),
+      fields: fb.fields('postsToTags', (fb) => ({
+        postId: fb.columns('postId', {
+          type: 'number',
+        }),
+        tagId: fb.columns('tagId', {
+          type: 'selectNumber',
+          options: async (context) => {
+            const result = await context.db.query.tags.findMany()
+            return result.map((tag) => ({
+              label: tag.name,
+              value: tag.id,
+            }))
+          },
+        }),
+      })),
+    })),
   })),
   primaryField: 'id',
   admin: {

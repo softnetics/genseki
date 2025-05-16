@@ -1,6 +1,5 @@
 import {
   Column,
-  ExtractTablesWithRelations,
   FindTableByDBName,
   getTableName,
   is,
@@ -11,7 +10,6 @@ import {
 } from 'drizzle-orm'
 import z, { ZodObject } from 'zod'
 
-import { GetAllTableTsNames } from './collection'
 import {
   appendFieldNameToFields,
   GetPrimaryColumn,
@@ -258,10 +256,19 @@ type GetReferencedPrimaryColumn<
   FindTableByDBName<
     TTableRelationConfigByTableTsName,
     TRelation['referencedTableName']
-  > extends infer TReferencedTableRelationalConfig
-    ? TReferencedTableRelationalConfig extends TableRelationalConfig
-      ? GetPrimaryColumn<TReferencedTableRelationalConfig>
-      : never
+  > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
+    ? GetPrimaryColumn<TReferencedTableRelationalConfig>
+    : never
+
+type GetReferencedTableTsName<
+  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
+  TRelation extends Relation,
+> =
+  FindTableByDBName<
+    TTableRelationConfigByTableTsName,
+    TRelation['referencedTableName']
+  > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
+    ? TReferencedTableRelationalConfig['tsName']
     : never
 
 type GetRelationMode<TRelation extends Relation> = TRelation extends One ? 'one' : 'many'
@@ -319,7 +326,20 @@ export class FieldBuilder<
       >,
       TContext
     >,
-  >(relationTsName: TRelationTsName, options: TOptions) {
+  >(
+    relationTsName: TRelationTsName,
+    optionsFn: (
+      fb: FieldBuilder<
+        TFullSchema,
+        TTableRelationConfigByTableTsName,
+        GetReferencedTableTsName<
+          TTableRelationConfigByTableTsName,
+          TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+        >,
+        TContext
+      >
+    ) => TOptions
+  ) {
     const relation = this.tableRelationalConfig['relations'][
       relationTsName
     ] as TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
@@ -352,6 +372,21 @@ export class FieldBuilder<
 
     const primaryColumn = getPrimaryColumn(referencedTableRelationalConfig)
     const primaryColumnTsName = getPrimaryColumnTsName(referencedTableRelationalConfig)
+
+    const fb = new FieldBuilder(
+      referencedTableRelationalConfig.tsName,
+      this.tableRelationalConfigByTableTsName
+    ) as FieldBuilder<
+      TFullSchema,
+      TTableRelationConfigByTableTsName,
+      GetReferencedTableTsName<
+        TTableRelationConfigByTableTsName,
+        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+      >,
+      TContext
+    >
+
+    const options = optionsFn(fb)
 
     if (options.type === 'connectOrCreate' || options.type === 'create') {
       options.fields = appendFieldNameToFields(options.fields)
@@ -393,13 +428,10 @@ export class FieldBuilder<
     >
   }
 
-  fields<
-    TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContext>,
-  >(
+  fields<TFields extends FieldsInitial<TContext>>(
     tableTsName: TTableTsName,
     optionsFn: (
-      fb: FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
+      fb: FieldBuilder<TFullSchema, TTableRelationConfigByTableTsName, TTableTsName, TContext>
     ) => TFields
   ): Simplify<FieldsWithFieldName<TFields>> {
     const fb = new FieldBuilder(tableTsName, this.tableRelationalConfigByTableTsName)
