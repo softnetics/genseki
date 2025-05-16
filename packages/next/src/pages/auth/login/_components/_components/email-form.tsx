@@ -14,6 +14,7 @@ const emailFormSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
   password: z.string(),
 })
+
 type EmailLoginFormInput = z.input<typeof emailFormSchema>
 type EmailLoginFormOutput = z.output<typeof emailFormSchema>
 
@@ -29,11 +30,9 @@ export function EmailLoginForm({ action }: RightPanelProps) {
 
   const { handleSubmit: emailHandleSubmit, control: emailControl } = emailForm
 
-  const onLoginWithEmail = async (data: EmailLoginFormInput) => {
-    const formData = new FormData()
-    formData.append('email', data.email)
-    formData.append('password', data.password)
-    await action(formData)
+  const onLoginWithEmail = async (data: EmailLoginFormOutput) => {
+    console.log('Email login data:', data)
+    // TODO: call email login API
   }
 
   return (
