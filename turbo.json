@@ -17,9 +17,6 @@
       "cache": false,
       "persistent": true
     },
-    "codegen": {
-      "dependsOn": ["^codegen"]
-    },
     "test": {},
     "format:check": {}
   }
