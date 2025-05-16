@@ -34,7 +34,7 @@ export default function ForgotPasswordRightPanel() {
     <div className="relative flex w-full items-center justify-center p-6 md:w-1/2">
       <div className="flex h-full w-full max-w-sm flex-col space-y-6">
         <div className="absolute right-16 top-16 text-right text-sm">
-          <Link href="/login" className="text-muted-foreground text-md hover:underline">
+          <Link href="./login" className="text-muted-foreground text-md hover:underline">
             Back to Login
           </Link>
         </div>
