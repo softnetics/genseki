@@ -21,18 +21,15 @@ export type InferPathParams<TPath extends string> = Simplify<
 export type ApiRouteHandlerPayload<
   TContext extends Record<string, unknown> = Record<string, unknown>,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
-> = ConditionalExcept<
-  {
-    body: TApiRouteSchema extends ApiRouteMutationSchema ? Output<TApiRouteSchema['body']> : never
-    headers: Output<TApiRouteSchema['headers']>
-    query: Output<TApiRouteSchema['query']>
-    pathParams: TApiRouteSchema['pathParams'] extends InputSchema
-      ? InferPathParams<TApiRouteSchema['path']> & Output<TApiRouteSchema['pathParams']>
-      : InferPathParams<TApiRouteSchema['path']>
-    context: TContext
-  },
-  never
->
+> = {
+  body: TApiRouteSchema extends ApiRouteMutationSchema ? Output<TApiRouteSchema['body']> : never
+  headers: Output<TApiRouteSchema['headers']>
+  query: Output<TApiRouteSchema['query']>
+  pathParams: TApiRouteSchema['pathParams'] extends InputSchema
+    ? InferPathParams<TApiRouteSchema['path']> & Output<TApiRouteSchema['pathParams']>
+    : InferPathParams<TApiRouteSchema['path']>
+  context: TContext
+}
 
 export type ClientApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> =
   ConditionalExcept<
