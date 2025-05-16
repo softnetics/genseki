@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
-import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
 const phoneFormSchema = z
@@ -43,7 +43,9 @@ export function PhoneRegisterForm() {
           name="phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} placeholder="Phone Number" label="Phone Number" />
+              <FormControl>
+                <TextField {...field} placeholder="Phone Number" label="Phone Number" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -53,7 +55,9 @@ export function PhoneRegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} type="password" placeholder="Password" label="Password" />
+              <FormControl>
+                <TextField {...field} type="password" placeholder="Password" label="Password" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -63,12 +67,14 @@ export function PhoneRegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <TextField
-                {...field}
-                type="password"
-                placeholder="Confirm Password"
-                label="Confirm Password"
-              />
+              <FormControl>
+                <TextField
+                  {...field}
+                  type="password"
+                  placeholder="Confirm Password"
+                  label="Confirm Password"
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

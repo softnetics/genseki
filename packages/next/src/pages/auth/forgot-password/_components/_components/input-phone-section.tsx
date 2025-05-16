@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
-import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
 const schema = z.object({
@@ -39,7 +39,9 @@ export function InputPhoneSection({ onNext }: InputPhoneSectionProps) {
           name="phone"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} placeholder="เบอร์โทรศัพท์" />
+              <FormControl>
+                <TextField {...field} placeholder="เบอร์โทรศัพท์" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

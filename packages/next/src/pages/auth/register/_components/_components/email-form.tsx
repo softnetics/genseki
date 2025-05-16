@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
-import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
 const formSchema = z
@@ -44,7 +44,9 @@ export function EmailRegisterForm() {
           name="email"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} placeholder="Email" label="Email" />
+              <FormControl>
+                <TextField {...field} placeholder="Email" label="Email" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -54,7 +56,9 @@ export function EmailRegisterForm() {
           name="name"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} placeholder="Name" label="Name" />
+              <FormControl>
+                <TextField {...field} placeholder="Name" label="Name" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -64,7 +68,9 @@ export function EmailRegisterForm() {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} type="password" placeholder="Password" label="Password" />
+              <FormControl>
+                <TextField {...field} type="password" placeholder="Password" label="Password" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -74,12 +80,14 @@ export function EmailRegisterForm() {
           name="confirmPassword"
           render={({ field }) => (
             <FormItem>
-              <TextField
-                {...field}
-                type="password"
-                placeholder="Confirm Password"
-                label="Confirm Password"
-              />
+              <FormControl>
+                <TextField
+                  {...field}
+                  type="password"
+                  placeholder="Confirm Password"
+                  label="Confirm Password"
+                />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}

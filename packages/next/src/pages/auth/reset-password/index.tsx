@@ -10,7 +10,7 @@ import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
 import { Label } from '~/intentui/ui/field'
-import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
 import { LeftPanel } from '../_components/left-panel'
@@ -78,7 +78,9 @@ export const ResetPasswordConfirmPage: NextPage = () => {
                   name="password"
                   render={({ field }) => (
                     <FormItem>
-                      <TextField {...field} type="password" placeholder="New Password" />
+                      <FormControl>
+                        <TextField {...field} type="password" placeholder="New Password" />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}
@@ -88,7 +90,9 @@ export const ResetPasswordConfirmPage: NextPage = () => {
                   name="confirmPassword"
                   render={({ field }) => (
                     <FormItem>
-                      <TextField {...field} type="password" placeholder="Confirm New Password" />
+                      <FormControl>
+                        <TextField {...field} type="password" placeholder="Confirm New Password" />
+                      </FormControl>
                       <FormMessage />
                     </FormItem>
                   )}

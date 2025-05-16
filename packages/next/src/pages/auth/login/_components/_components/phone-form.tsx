@@ -7,7 +7,7 @@ import Link from 'next/link'
 import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
-import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { TextField } from '~/intentui/ui/text-field'
 
 const phoneFormSchema = z.object({
@@ -41,7 +41,9 @@ export function PhoneLoginForm({ action }: RightPanelProps) {
           name="phoneNumber"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} placeholder="Phone Number" label="phone number" />
+              <FormControl>
+                <TextField {...field} placeholder="Phone Number" label="phone number" />
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
@@ -51,7 +53,9 @@ export function PhoneLoginForm({ action }: RightPanelProps) {
           name="password"
           render={({ field }) => (
             <FormItem>
-              <TextField {...field} type="password" placeholder="Password" label="password" />
+              <FormControl>
+                <TextField {...field} type="password" placeholder="Password" label="password" />
+              </FormControl>
               <FormMessage />
               <div className="mt-1 text-right">
                 <Link href="/forgot-password" className="text-primary text-sm hover:underline">

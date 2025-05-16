@@ -6,7 +6,7 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 
 import { Button } from '~/intentui/ui/button'
-import { Form, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
 import { InputOTP } from '~/intentui/ui/input-otp'
 
 const otpSchema = z.object({
@@ -35,13 +35,15 @@ export function InputOtpSection({ onSuccess }: { onSuccess: () => void }) {
           name="otp"
           render={({ field }) => (
             <FormItem>
-              <InputOTP maxLength={6} className="!h-[100px] w-full" {...field}>
-                <InputOTP.Group className="flex w-full flex-row justify-between">
-                  {[0, 1, 2, 3, 4, 5].map((i) => (
-                    <InputOTP.Slot key={i} index={i} className="h-[50px] w-[50px]" />
-                  ))}
-                </InputOTP.Group>
-              </InputOTP>
+              <FormControl>
+                <InputOTP maxLength={6} className="!h-[100px] w-full" {...field}>
+                  <InputOTP.Group className="flex w-full flex-row justify-between">
+                    {[0, 1, 2, 3, 4, 5].map((i) => (
+                      <InputOTP.Slot key={i} index={i} className="h-[50px] w-[50px]" />
+                    ))}
+                  </InputOTP.Group>
+                </InputOTP>
+              </FormControl>
               <FormMessage />
             </FormItem>
           )}
