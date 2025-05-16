@@ -43,8 +43,9 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "tailwindCSS.classFunctions": ["cva", "cx"],
   "tailwindCSS.experimental.configFile": {
-    "packages/drizzlify-next/src/styles/tailwind.css": "packages/drizzlify-next/**",
-    "apps-api/erp/src/app/global.css": "apps-api/erp/**",
-    "apps-api/erp/src/app/(admin)/admin/tailwind.css": "apps-api/erp/(admin)/**"
+    "packages/next/src/styles/tailwind.css": "packages/next/**",
+    "examples/erp/src/app/global.css": "examples/erp/**",
+    "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/(admin)/**",
+    "examples/erp/src/app/(admin)/playground/tailwind.css": "examples/erp/(admin)/playground/**"
   }
 }

@@ -1,4 +1,4 @@
-import { UIPlayground } from '@repo/drizzlify-next'
+import { UIPlayground } from '@kivotos/next'
 
 interface PlaygroundPageProps {
   params: Promise<{ segments: string[] }>

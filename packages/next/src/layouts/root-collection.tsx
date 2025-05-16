@@ -1,8 +1,4 @@
-<<<<<<< HEAD:packages/drizzlify-next/src/layouts/root-collection.tsx
-import { type ServerConfig } from '@repo/drizzlify'
-=======
-import { type Collection, type ServerConfig } from '@kivotos/core'
->>>>>>> origin/main:packages/next/src/layouts/root-collection.tsx
+import { type ServerConfig } from '@kivotos/core'
 
 import AppSidebar from '~/components/collection-sidebar/app-sidebar'
 import AppSidebarNav from '~/components/collection-sidebar/app-sidebar-nav'
