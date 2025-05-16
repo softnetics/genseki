@@ -1,7 +1,6 @@
 import z from 'zod'
 
-import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
-
+import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AuthContext } from '../context'
 import { WithPrefix } from '../types'
 import { deleteSessionCookie, getSessionCookie } from '../utils'
@@ -13,13 +12,13 @@ interface InternalRouteOptions {
 export function signOut<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix ? `${options.prefix}/sign-out` : '/sign-out') as WithPrefix<
+    path: (options.prefix ? `${options.prefix}/auth/sign-out` : '/auth/sign-out') as WithPrefix<
       TOptions['prefix'],
       '/sign-out'
     >,
     body: undefined,
     responses: {
-      200: z.interface({
+      200: z.object({
         status: z.string(),
       }),
     },
@@ -45,8 +44,5 @@ export function signOut<const TOptions extends InternalRouteOptions>(options: TO
     }
   }
 
-  return {
-    ...schema,
-    handler,
-  } satisfies ApiRoute
+  return createEndpoint(schema, handler)
 }

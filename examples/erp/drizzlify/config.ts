@@ -23,7 +23,7 @@ export const serverConfig = baseConfig.toServerConfig({
       },
       ({ query }) => {
         return {
-          status: 200,
+          status: 200 as const,
           body: {
             message: `Hello ${query.name ?? 'World'}`,
           },
@@ -45,7 +45,7 @@ export const serverConfig = baseConfig.toServerConfig({
       },
       ({ query }) => {
         return {
-          status: 200,
+          status: 200 as const,
           body: {
             message: `Hello2 ${query.name ?? 'World'}`,
           },

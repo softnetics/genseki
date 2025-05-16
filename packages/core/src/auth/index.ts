@@ -103,7 +103,7 @@ type ChangeAuthHandlerContextToMinimalContext<
     any,
     infer TApiRouteSchema
   >
-    ? TApiRouteSchema & { handler: ApiRouteHandler<TContext, TApiRouteSchema> }
+    ? { schema: TApiRouteSchema; handler: ApiRouteHandler<TContext, TApiRouteSchema> }
     : never
 }
 
@@ -140,7 +140,7 @@ export function createAuth<TContext extends MinimalContext = MinimalContext>(
     const handler: ApiRouteHandler<TContext, any> = (args) => {
       return h.handler({ ...args, context: authContext } as any) as any
     }
-    return { ...h, handler }
+    return { schema: h.schema, handler }
   }) as ChangeAuthHandlerContextToMinimalContext<
     TContext,
     ReturnType<typeof createAuthHandlers>['handlers']
