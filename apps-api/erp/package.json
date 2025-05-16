@@ -1,0 +1,43 @@
+{
+  "name": "@api/erp",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' next dev --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "db:migrate": "drizzle-kit migrate",
+    "db:generate": "drizzle-kit generate"
+  },
+  "dependencies": {
+    "@repo/drizzlify": "workspace:^",
+    "@repo/drizzlify-next": "workspace:^",
+    "@tailwindcss/postcss": "^4.0.14",
+    "drizzle-orm": "^0.41.0",
+    "next": "15.2.2",
+    "next-themes": "^0.4.6",
+    "pg": "^8.14.1",
+    "postcss": "^8.5.3",
+    "react": "18.3.1",
+    "react-dom": "18.3.1",
+    "tailwindcss": "^4.0.14",
+    "zod": "3.24.4"
+  },
+  "devDependencies": {
+    "@repo/project-config": "workspace:^",
+    "@types/node": "^22.13.10",
+    "@types/pg": "^8.11.11",
+    "@types/react": "18.3.18",
+    "@types/react-dom": "18.3.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "drizzle-kit": "^0.30.6",
+    "type-fest": "^4.38.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.9"
+  }
+}

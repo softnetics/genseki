@@ -1,0 +1,9 @@
+{
+  "ui": "src/integrations/next/intentui/ui",
+  "utils": "src/integrations/next/intentui/utils",
+  "gray": "slate",
+  "css": "src/integrations/next/intentui/index.css",
+  "alias": "~/integrations/next/intentui",
+  "language": "typescript",
+  "$schema": "https://intentui.com/schema.json"
+}

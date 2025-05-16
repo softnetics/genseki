@@ -1,0 +1,61 @@
+name: Continuous Integration
+on:
+  push:
+    branches:
+      - main
+  pull_request:
+
+jobs:
+  ci:
+    if: ${{ github.event_name == 'push' || (!contains(github.event.pull_request.title, 'DRAFT') && !contains(github.event.pull_request.title, 'Draft') && !contains(github.event.pull_request.title, 'draft') && !contains(github.event.pull_request.labels.*.name, 'draft')) }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    concurrency:
+      group: ci-${{ github.ref }}
+      cancel-in-progress: true
+
+    steps:
+      - uses: actions/checkout@v3
+        name: Checkout
+        with:
+          fetch-depth: 0
+
+      - name: Setup GitHub Actions caching for Turbo
+        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+
+      - name: Setup pnpm
+        uses: pnpm/action-setup@v4
+        with:
+          version: 9.0.0
+
+      - name: Setup node with cache
+        uses: actions/setup-node@v3
+        with:
+          node-version: 22.14.0
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Get turbo filter
+        id: get-turbo-filter
+        run: |
+          if [ "${{ github.event_name }}" == "pull_request" ]; then
+            TURBO_FILTER="--filter=...[origin/${{ github.base_ref }}]"
+            echo "This is a pull request event. Setting turbo filter to '$TURBO_FILTER'"
+          elif [ "${{ github.event_name }}" == "push" ]; then
+            TURBO_FILTER="--filter=...[${{ github.event.before }}]"
+            echo "This is a push event. Setting turbo filter to '$TURBO_FILTER'"
+          else
+            echo "Unsupported event '${{ github.event_name }}' detected. Exiting."
+            exit 1
+          fi
+
+          echo "TURBO_FILTER=$TURBO_FILTER" >> $GITHUB_OUTPUT
+
+      - name: Codegen
+        run: pnpm codegen
+
+      - name: Run all
+        run: pnpm turbo typecheck format:check lint test ${{ steps.get-turbo-filter.outputs.TURBO_FILTER }}
