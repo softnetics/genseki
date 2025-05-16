@@ -1,1 +1,1 @@
-export { default } from '@repo/project-config/prettier/base.mjs'
+export { default } from '@internals/project-config/prettier/base.mjs'
