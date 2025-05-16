@@ -15,7 +15,6 @@ const emailFormSchema = z.object({
   password: z.string(),
 })
 
-type EmailLoginFormInput = z.input<typeof emailFormSchema>
 type EmailLoginFormOutput = z.output<typeof emailFormSchema>
 
 interface RightPanelProps {
@@ -23,7 +22,7 @@ interface RightPanelProps {
 }
 
 export function EmailLoginForm({ action }: RightPanelProps) {
-  const emailForm = useForm<EmailLoginFormInput, any, EmailLoginFormOutput>({
+  const emailForm = useForm({
     resolver: zodResolver(emailFormSchema),
     mode: 'onChange',
   })

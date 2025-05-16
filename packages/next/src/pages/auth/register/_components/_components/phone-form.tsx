@@ -20,18 +20,17 @@ const phoneFormSchema = z
     path: ['confirmPassword'],
   })
 
-type PhoneRegisterInput = z.input<typeof phoneFormSchema>
 type PhoneRegisterOutput = z.output<typeof phoneFormSchema>
 
 export function PhoneRegisterForm() {
-  const form = useForm<PhoneRegisterInput, any, PhoneRegisterOutput>({
+  const form = useForm({
     resolver: zodResolver(phoneFormSchema),
     mode: 'onChange',
   })
 
   const { handleSubmit, control } = form
 
-  const onSubmit = async (data: PhoneRegisterInput) => {
+  const onSubmit = async (data: PhoneRegisterOutput) => {
     console.log('Phone register data:', data)
     // TODO: call phone register API
   }

@@ -14,7 +14,6 @@ const phoneFormSchema = z.object({
   phoneNumber: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),
   password: z.string(),
 })
-type PhoneLoginFormInput = z.input<typeof phoneFormSchema>
 type PhoneLoginFormOutput = z.output<typeof phoneFormSchema>
 
 interface RightPanelProps {
@@ -22,12 +21,12 @@ interface RightPanelProps {
 }
 
 export function PhoneLoginForm({ action }: RightPanelProps) {
-  const phoneForm = useForm<PhoneLoginFormInput, any, PhoneLoginFormOutput>({
+  const phoneForm = useForm({
     resolver: zodResolver(phoneFormSchema),
     mode: 'onChange',
   })
   const { handleSubmit: phoneHandleSubmit, control: phoneControl } = phoneForm
-  const onLoginWithPhone = async (data: PhoneLoginFormInput) => {
+  const onLoginWithPhone = async (data: PhoneLoginFormOutput) => {
     const formData = new FormData()
     formData.append('phoneNumber', data.phoneNumber)
     formData.append('password', data.password)

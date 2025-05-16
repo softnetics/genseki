@@ -21,18 +21,17 @@ const formSchema = z
     path: ['confirmPassword'],
   })
 
-type RegisterFormInput = z.input<typeof formSchema>
 type RegisterFormOutput = z.output<typeof formSchema>
 
 export function EmailRegisterForm() {
-  const form = useForm<RegisterFormInput, any, RegisterFormOutput>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     mode: 'onChange',
   })
 
   const { handleSubmit, control } = form
 
-  const onSubmit = async (data: RegisterFormInput) => {
+  const onSubmit = async (data: RegisterFormOutput) => {
     console.log('Email register data:', data)
     // TODO: call email register API
   }

@@ -30,21 +30,20 @@ const formSchema = z
     path: ['confirmPassword'],
   })
 
-type ResetPasswordInput = z.input<typeof formSchema>
 type ResetPasswordOutput = z.output<typeof formSchema>
 
 export const ResetPasswordConfirmPage: NextPage = () => {
   const searchParams = useSearchParams()
   const phone = searchParams.get('phone') || ''
 
-  const form = useForm<ResetPasswordInput, any, ResetPasswordOutput>({
+  const form = useForm({
     resolver: zodResolver(formSchema),
     mode: 'all',
   })
 
   const { handleSubmit, control } = form
 
-  const handleResetPassword = async (data: ResetPasswordInput) => {
+  const handleResetPassword = async (data: ResetPasswordOutput) => {
     // TODO: Call API to reset password here
     console.log('Resetting password for phone:', phone)
     console.log('New password:', data.password)

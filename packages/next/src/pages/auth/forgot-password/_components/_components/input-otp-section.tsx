@@ -13,11 +13,10 @@ const otpSchema = z.object({
   otp: z.string().regex(/^[0-9]{6}$/, { message: 'OTP code must be 6 digits' }),
 })
 
-export type InputOtpForm = z.infer<typeof otpSchema>
 export type OutputOtpForm = z.infer<typeof otpSchema>
 
 export function InputOtpSection({ onSuccess }: { onSuccess: () => void }) {
-  const form = useForm<InputOtpForm, any, OutputOtpForm>({
+  const form = useForm({
     resolver: zodResolver(otpSchema),
     mode: 'onChange',
   })
