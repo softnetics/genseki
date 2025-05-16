@@ -1,8 +1,6 @@
 import {
   Column,
-  createTableRelationsHelpers,
-  ExtractTableRelationsFromSchema,
-  getTableColumns,
+  FindTableByDBName,
   getTableName,
   One,
   Relation,
@@ -12,7 +10,12 @@ import {
 } from 'drizzle-orm'
 import * as R from 'remeda'
 
-import { FindTableByTableName } from './collection'
+import {
+  appendFieldNameToFields,
+  GetPrimaryColumn,
+  getPrimaryColumn,
+  getPrimaryColumnTsName,
+} from './utils'
 
 export type OptionCallback<
   TType extends string | number,
@@ -219,9 +222,33 @@ export type FieldColumnOptionsFromTable<
                 : never
           : never
 
-type GetPrimaryColumn<TTable extends Table> = {
-  [TColKey in keyof TTable['_']['columns']]: TTable['_']['columns'][TColKey]['_']['isPrimaryKey'] extends true
-    ? TTable['_']['columns'][TColKey]
+type RelationFieldOptionsFromTable<
+  TRelationPrimaryColumn extends Column,
+  TContext extends Record<string, unknown> = {},
+> = TRelationPrimaryColumn['_']['data'] extends infer TType extends string | number
+  ? FieldRelationCollectionOptions<TContext, TType>['connect' | 'create' | 'connectOrCreate']
+  : TRelationPrimaryColumn
+
+type GetReferencedPrimaryColumn<
+  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
+  TRelation extends Relation,
+> =
+  FindTableByDBName<
+    TTableRelationConfigByTableTsName,
+    TRelation['referencedTableName']
+  > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
+    ? GetPrimaryColumn<TReferencedTableRelationalConfig>
+    : never
+
+type GetReferencedTableTsName<
+  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
+  TRelation extends Relation,
+> =
+  FindTableByDBName<
+    TTableRelationConfigByTableTsName,
+    TRelation['referencedTableName']
+  > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
+    ? TReferencedTableRelationalConfig['tsName']
     : never
 }[keyof TTable['_']['columns']]
 
@@ -287,11 +314,34 @@ export class FieldBuilder<
   }
 
   relations<
-    TPath extends RelationKeysFromTable<TFullSchema, TTable>,
-    TRelations extends ExtractTableRelationsFromSchema<TFullSchema, TTable['_']['name']>,
-    TOptions extends RelationFieldOptionsFromTable<TFullSchema, TRelations[TPath], TContext>,
-  >(path: TPath, options: TOptions) {
-    if (!this._relations) throw new Error(`Relations not found for table ${this.tableName}`)
+    TRelationTsName extends Extract<
+      keyof TTableRelationConfigByTableTsName[TTableTsName]['relations'],
+      string
+    >,
+    const TOptions extends RelationFieldOptionsFromTable<
+      GetReferencedPrimaryColumn<
+        TTableRelationConfigByTableTsName,
+        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+      >,
+      TContext
+    >,
+  >(
+    relationTsName: TRelationTsName,
+    optionsFn: (
+      fb: FieldBuilder<
+        TFullSchema,
+        TTableRelationConfigByTableTsName,
+        GetReferencedTableTsName<
+          TTableRelationConfigByTableTsName,
+          TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+        >,
+        TContext
+      >
+    ) => TOptions
+  ) {
+    const relation = this.tableRelationalConfig['relations'][
+      relationTsName
+    ] as TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
 
     type GetRelationMode<TRelation extends Relation> = TRelation extends One ? 'one' : 'many'
 
@@ -312,6 +362,49 @@ export class FieldBuilder<
       TRelations[TPath]['referencedTableName']
     >
 
+    const referencedTableRelationalConfig = Object.values(
+      this.tableRelationalConfigByTableTsName
+    ).find((t) => t.dbName === relation.referencedTableName) as
+      | ReferencedTableRelationalConfig
+      | undefined
+    if (!referencedTableRelationalConfig) {
+      throw new Error(`Referenced table ${relation.referencedTableName} not found in schema`)
+    }
+
+    type SourceTableRelationalConfig = FindTableByDBName<
+      TTableRelationConfigByTableTsName,
+      TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]['sourceTable']['_']['name']
+    >
+
+    const sourceTableRelationalConfig = Object.values(this.tableRelationalConfigByTableTsName).find(
+      (t) => t.dbName === getTableName(relation.sourceTable)
+    ) as SourceTableRelationalConfig | undefined
+    if (!sourceTableRelationalConfig) {
+      throw new Error(`Source table ${relation.sourceTable._.name} not found in schema`)
+    }
+
+    const primaryColumn = getPrimaryColumn(referencedTableRelationalConfig)
+    const primaryColumnTsName = getPrimaryColumnTsName(referencedTableRelationalConfig)
+
+    const fb = new FieldBuilder(
+      referencedTableRelationalConfig.tsName,
+      this.tableRelationalConfigByTableTsName
+    ) as FieldBuilder<
+      TFullSchema,
+      TTableRelationConfigByTableTsName,
+      GetReferencedTableTsName<
+        TTableRelationConfigByTableTsName,
+        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+      >,
+      TContext
+    >
+
+    const options = optionsFn(fb)
+
+    if (options.type === 'connectOrCreate' || options.type === 'create') {
+      options.fields = appendFieldNameToFields(options.fields)
+    }
+
     const fieldMetadata = {
       $source: 'relations',
       $fieldName: path,
@@ -326,6 +419,21 @@ export class FieldBuilder<
       _: fieldMetadata,
       ...options,
       mode,
-    } as Simplify<TOptions & { _: typeof fieldMetadata; mode: GetRelationMode<TRelations[TPath]> }>
+    } as Simplify<
+      Result &
+        (Result extends FieldRelationCollection<any>['connectOrCreate' | 'create']
+          ? { fields: FieldsWithFieldName<Result['fields']> }
+          : {})
+    >
+  }
+
+  fields<TFields extends FieldsInitial<TContext>>(
+    tableTsName: TTableTsName,
+    optionsFn: (
+      fb: FieldBuilder<TFullSchema, TTableRelationConfigByTableTsName, TTableTsName, TContext>
+    ) => TFields
+  ): Simplify<FieldsWithFieldName<TFields>> {
+    const fb = new FieldBuilder(tableTsName, this.tableRelationalConfigByTableTsName)
+    return appendFieldNameToFields(optionsFn(fb as any))
   }
 }

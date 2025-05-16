@@ -3,6 +3,7 @@ import z from 'zod'
 
 import * as schema from './__mocks__/complex-schema'
 import { defineBaseConfig, getClientConfig } from './config'
+import { Builder } from './builder'
 
 const db = drizzle({
   connection: '',
@@ -41,54 +42,21 @@ const baseConfig = defineBaseConfig({
   },
 })
 
-const builder = baseConfig.builder()
-
-const authorFieldBuilder = builder.fieldsFrom('authors')
-
-const authorFields = {
-  id: authorFieldBuilder.columns('id', {
-    type: 'text',
-  }),
-  name: authorFieldBuilder.columns('name', {
-    type: 'text',
-  }),
-  email: authorFieldBuilder.columns('email', {
-    type: 'text',
-  }),
-}
-
-const categoryFieldBuilder = builder.fieldsFrom('categories')
-
-const categoryFields = {
-  id: categoryFieldBuilder.columns('id', {
-    type: 'text',
-  }),
-  name: categoryFieldBuilder.columns('name', {
-    type: 'text',
-  }),
-}
-
-const postToTagsFieldBuilder = builder.fieldsFrom('postsToTags')
-
-const postToTagsFields = {
-  postId: postToTagsFieldBuilder.columns('postId', {
-    type: 'number',
-  }),
-  tagId: postToTagsFieldBuilder.columns('tagId', {
-    type: 'selectNumber',
-    options: async (context) => {
-      const result = await context.db.query.tags.findMany()
-      return result.map((tag) => ({
-        label: tag.name,
-        value: tag.id,
-      }))
-    },
-  }),
-}
+const builder = new Builder(baseConfig).
 
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
-  fields: authorFields,
+  fields: builder.fields('authors', (fb) => ({
+    id: fb.columns('id', {
+      type: 'text',
+    }),
+    name: fb.columns('name', {
+      type: 'text',
+    }),
+    email: fb.columns('email', {
+      type: 'text',
+    }),
+  })),
   primaryField: 'id',
 })
 
@@ -106,9 +74,19 @@ export const postCollection = builder.collection('posts', {
     content: postFieldBuilder.columns('content', {
       type: 'text',
     }),
-    author: postFieldBuilder.relations('author', {
+    author: fb.relations('author', (fb) => ({
       type: 'connectOrCreate',
-      fields: authorFields,
+      fields: fb.fields('authors', (fb) => ({
+        id: fb.columns('id', {
+          type: 'text',
+        }),
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+        email: fb.columns('email', {
+          type: 'text',
+        }),
+      })),
       options: async (args) => {
         const result = await args.db.query.authors.findMany()
         return result.map((author) => ({
@@ -116,10 +94,17 @@ export const postCollection = builder.collection('posts', {
           value: author.id,
         }))
       },
-    }),
-    categories: postFieldBuilder.relations('category', {
+    })),
+    categories: fb.relations('category', (fb) => ({
       type: 'connectOrCreate',
-      fields: categoryFields,
+      fields: fb.fields('categories', (fb) => ({
+        id: fb.columns('id', {
+          type: 'text',
+        }),
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+      })),
       options: async (args) => {
         const result = await args.db.query.categories.findMany()
         return result.map((category) => ({
@@ -127,12 +112,26 @@ export const postCollection = builder.collection('posts', {
           value: category.id,
         }))
       },
-    }),
-    tags: postFieldBuilder.relations('tags', {
+    })),
+    tags: fb.relations('tags', (fb) => ({
       type: 'create',
-      fields: postToTagsFields,
-    }),
-  },
+      fields: fb.fields('postsToTags', (fb) => ({
+        postId: fb.columns('postId', {
+          type: 'number',
+        }),
+        tagId: fb.columns('tagId', {
+          type: 'selectNumber',
+          options: async (context) => {
+            const result = await context.db.query.tags.findMany()
+            return result.map((tag) => ({
+              label: tag.name,
+              value: tag.id,
+            }))
+          },
+        }),
+      })),
+    })),
+  })),
   primaryField: 'id',
   admin: {
     api: {

@@ -1,28 +1,21 @@
 import { builder } from '../helper'
 
-const usersField = builder.fieldsFrom('users')
-
 export const usersCollection = builder.collection('users', {
   slug: 'users',
   primaryField: 'id',
-  fields: {
-    id: usersField.columns('id', {
+  fields: builder.fields('users', (fb) => ({
+    id: fb.columns('id', {
       type: 'text',
     }),
-    firstName: usersField.columns('firstName', {
+    name: fb.columns('name', {
       type: 'text',
     }),
-    lastName: usersField.columns('lastName', {
+    email: fb.columns('email', {
       type: 'text',
     }),
-    fullName: usersField.columns('fullName', {
-      type: 'text',
+    image: fb.columns('image', {
+      type: 'media',
+      mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
     }),
-    email: usersField.columns('email', {
-      type: 'text',
-    }),
-    password: usersField.columns('password', {
-      type: 'text',
-    }),
-  },
+  })),
 })
