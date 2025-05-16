@@ -123,8 +123,8 @@ const Tab = ({ children, ref, ...props }: TabProps) => {
                 // vertical
                 'group-data-[orientation=vertical]/tabs:left-0 group-data-[orientation=vertical]/tabs:h-[calc(100%-10%)] group-data-[orientation=vertical]/tabs:w-0.5 group-data-[orientation=vertical]/tabs:transform'
               )}
-              layoutId="current-selected"
-              transition={{ type: 'spring', stiffness: 500, damping: 40 }}
+              // layoutId="current-selected"
+              // transition={{ type: 'spring', stiffness: 500, damping: 40 }}
             />
           )}
         </>
