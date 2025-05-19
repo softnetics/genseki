@@ -4,4 +4,4 @@
 "@kivotos/next": minor
 ---
 
-[[BRV-89] Server Function RPC](https://app.plane.so/softnetics/browse/BRV-89/)
+[[DRIZZ-39] Server Function RPC](https://app.plane.so/softnetics/browse/DRIZZ-39/)
