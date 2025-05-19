@@ -3,19 +3,13 @@ import z from 'zod'
 import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { AuthContext } from '../context'
-import { WithPrefix } from '../types'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
+interface InternalRouteOptions {}
 
 export function signUp<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix ? `${options.prefix}/auth/sign-up` : '/auth/sign-up') as WithPrefix<
-      TOptions['prefix'],
-      '/auth/sign-up'
-    >,
+    path: '/api/auth/sign-up',
     body: z
       .object({
         name: z.string(),

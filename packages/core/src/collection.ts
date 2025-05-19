@@ -547,7 +547,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
   TMethod extends ApiDefaultMethod,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? {
-      path: `/${TCollection['slug']}/${TMethod}`
+      path: `/api/${TCollection['slug']}/${TMethod}`
       method: 'POST'
       body: ToZodObject<InferCreateFields<TCollection['fields']>>
       responses: {
@@ -556,7 +556,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
     }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? {
-        path: `/${TCollection['slug']}/${TMethod}/:id`
+        path: `/api/${TCollection['slug']}/${TMethod}/:id`
         method: 'GET'
         pathParams: ToZodObject<{ id: string }>
         responses: {
@@ -565,7 +565,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
       }
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
       ? {
-          path: `/${TCollection['slug']}/${TMethod}`
+          path: `/api/${TCollection['slug']}/${TMethod}`
           method: 'GET'
           query: ToZodObject<{
             limit?: number
@@ -579,7 +579,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
         }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? {
-            path: `/${TCollection['slug']}/${TMethod}/:id`
+            path: `/api/${TCollection['slug']}/${TMethod}/:id`
             method: 'PATCH'
             pathParams: ToZodObject<{ id: string }>
             body: ToZodObject<InferUpdateFields<TCollection['fields']>>
@@ -589,7 +589,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
           }
         : TMethod extends typeof ApiDefaultMethod.DELETE
           ? {
-              path: `/${TCollection['slug']}/${TMethod}`
+              path: `/api/${TCollection['slug']}/${TMethod}`
               method: 'DELETE'
               body: ToZodObject<{ ids: string[] | number[] }>
               responses: {
@@ -653,7 +653,7 @@ export function getAllCollectionEndpoints<
             const body = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}/${method}`,
               method: 'POST',
               // TODO: fieldToZodObject but create fields
               body: body,
@@ -677,13 +677,13 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [[endpointName, { ...schema, handler }]]
+            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
           }
           case ApiDefaultMethod.FIND_ONE: {
             const response = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/${collection.slug}/${method}/:id`,
+              path: `/api/${collection.slug}/${method}/:id`,
               method: 'GET',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),
@@ -705,13 +705,13 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [[endpointName, { ...schema, handler }]]
+            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
           }
           case ApiDefaultMethod.FIND_MANY: {
             const response = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}/${method}`,
               method: 'GET',
               query: z.object({
                 limit: z.number().optional(),
@@ -739,13 +739,13 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [[endpointName, { ...schema, handler }]]
+            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
           }
           case ApiDefaultMethod.UPDATE: {
             const body = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}/${method}`,
               method: 'PATCH',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),
@@ -773,11 +773,11 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [[endpointName, { ...schema, handler }]]
+            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
           }
           case ApiDefaultMethod.DELETE: {
             const schema = {
-              path: `/${collection.slug}/${method}/:id`,
+              path: `/api/${collection.slug}/${method}/:id`,
               method: 'DELETE',
               body: z.object({
                 ids: z.union([z.string().array(), z.number().array()]),
@@ -799,7 +799,7 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: { message: 'ok' } }
             }
 
-            return [[endpointName, { ...schema, handler }]]
+            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
           }
           default:
             throw new Error(`Unknown method: ${method}`)
@@ -809,8 +809,8 @@ export function getAllCollectionEndpoints<
   )
 
   return {
-    ...customEndpoints,
     ...defaultEndpoints,
+    ...customEndpoints,
   } as ExtractAllCollectionCustomEndpoints<TCollections> &
     ExtractAllCollectionDefaultEndpoints<TCollections>
 }

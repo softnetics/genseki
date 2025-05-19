@@ -490,12 +490,12 @@ export function fieldToZodScheama<TField extends Field<any>>(
     case 'date':
       return z.date() as FieldToZodScheama<TField>
     // TODO: relation input
-    // case 'connect':
-    //   return z.any() as FieldToZodScheama<TField>
-    // case 'create':
-    //   return z.any() as FieldToZodScheama<TField>
-    // case 'connectOrCreate':
-    //   return z.any() as FieldToZodScheama<TField>
+    case 'connect':
+      return z.any() as unknown as FieldToZodScheama<TField>
+    case 'create':
+      return z.any() as unknown as FieldToZodScheama<TField>
+    case 'connectOrCreate':
+      return z.any() as unknown as FieldToZodScheama<TField>
     default:
       throw new Error(`Unknown field type: ${(field as any).type}`)
   }

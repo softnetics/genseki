@@ -2,7 +2,6 @@ import z from 'zod'
 
 import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AuthContext } from '../context'
-import { WithPrefix } from '../types'
 
 interface InternalRouteOptions {
   prefix?: string
@@ -11,10 +10,7 @@ interface InternalRouteOptions {
 export function me<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'GET',
-    path: (options.prefix ? `${options.prefix}/auth/me` : '/auth/me') as WithPrefix<
-      TOptions['prefix'],
-      '/auth/me'
-    >,
+    path: '/api/auth/me',
     responses: {
       200: z.object({
         id: z.string(),

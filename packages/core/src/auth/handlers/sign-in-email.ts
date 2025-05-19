@@ -3,7 +3,6 @@ import z from 'zod'
 import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { AuthContext } from '../context'
-import { WithPrefix } from '../types'
 import { setSessionCookie } from '../utils'
 
 interface InternalRouteOptions {
@@ -13,10 +12,7 @@ interface InternalRouteOptions {
 export function signInEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix
-      ? `${options.prefix}/auth/sign-in/email`
-      : '/auth/sign-in/email') as WithPrefix<TOptions['prefix'], '/auth/sign-in/email'>,
-
+    path: '/api/auth/sign-in-email',
     body: z.object({
       email: z.string(),
       password: z.string(),
