@@ -1,7 +1,6 @@
 import z from 'zod'
 
-import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
-
+import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { AuthContext } from '../context'
 import { WithPrefix } from '../types'
@@ -13,12 +12,12 @@ interface InternalRouteOptions {
 export function signUp<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix ? `${options.prefix}/sign-up` : '/sign-up') as WithPrefix<
+    path: (options.prefix ? `${options.prefix}/auth/sign-up` : '/auth/sign-up') as WithPrefix<
       TOptions['prefix'],
-      '/sign-up'
+      '/auth/sign-up'
     >,
     body: z
-      .interface({
+      .object({
         name: z.string(),
         email: z.string(),
         password: z.string(),
@@ -26,9 +25,9 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
       })
       .and(z.record(z.string(), z.any())),
     responses: {
-      200: z.interface({
+      200: z.object({
         token: z.string().nullable(),
-        user: z.interface({
+        user: z.object({
           id: z.string(),
           name: z.string(),
           email: z.string(),
@@ -73,8 +72,5 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
     }
   }
 
-  return {
-    ...schema,
-    handler,
-  } satisfies ApiRoute
+  return createEndpoint(schema, handler)
 }

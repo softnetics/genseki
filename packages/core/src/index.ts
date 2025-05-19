@@ -20,10 +20,11 @@ export type { BaseConfig, ClientConfig, ServerConfig } from './config'
 export { defineBaseConfig, getClientCollection, getClientConfig } from './config'
 export type {
   ApiRoute,
+  ApiRouteHandler,
   ApiRouteHandlerPayload,
   ApiRouter,
+  ApiRouteResponse,
   ApiRouteSchema,
-  ClientApiRouteHandlerPayload,
   InferApiRouteResponses,
 } from './endpoint'
 export { type Field, FieldBuilder } from './field'
