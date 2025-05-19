@@ -2,7 +2,6 @@ import z from 'zod'
 
 import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AuthContext } from '../context'
-import { WithPrefix } from '../types'
 
 interface InternalRouteOptions {
   prefix?: string
@@ -11,9 +10,7 @@ interface InternalRouteOptions {
 export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix
-      ? `${options.prefix}/auth/reset-password`
-      : '/auth/reset-password') as WithPrefix<TOptions['prefix'], '/auth/reset-password'>,
+    path: '/api/auth/reset-password',
     query: z.object({
       token: z.string(),
     }),

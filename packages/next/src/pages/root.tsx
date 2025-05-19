@@ -11,7 +11,7 @@ interface RootProps {
   searchParamsPromise: Promise<{ [key: string]: string | string[] }>
 }
 
-export async function RootCrudPage(props: RootProps) {
+export async function RootPage(props: RootProps) {
   const { serverConfig, paramsPromise, searchParamsPromise } = props
 
   const [params, searchParams, headers] = await Promise.all([

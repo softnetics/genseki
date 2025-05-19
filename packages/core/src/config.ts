@@ -46,7 +46,8 @@ export interface ServerConfig<
     any,
     any
   >[],
-  TApiRouter extends ApiRouter<TContext> = ReturnType<typeof createAuth<TContext>>['handlers'],
+  TApiRouter extends ApiRouter<TContext> = ReturnType<typeof createAuth<TContext>>['handlers'] &
+    ApiRouter<TContext>,
 > extends BaseConfig<TFullSchema> {
   context: TContext
   collections: TCollections

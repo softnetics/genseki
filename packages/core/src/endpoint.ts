@@ -60,7 +60,7 @@ export type ApiRouteHandlerPayloadWithContext<
 
 export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, InputSchema>>> =
   ExtractObjectValues<{
-    [TStatus in keyof TResponses]: TResponses[TStatus] extends InputSchema
+    [TStatus in Extract<keyof TResponses, number>]: TResponses[TStatus] extends InputSchema
       ? {
           status: TStatus
           body: Output<TResponses[TStatus]>
@@ -111,14 +111,28 @@ export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
 
 export type ApiRoute<
   TContext extends Record<string, unknown> = Record<string, unknown>,
-  TApiRouteSchema extends ApiRouteSchema = any,
+  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
   handler: ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
+export type AppendPrefixPathToApiRoute<
+  TApiRoute extends ApiRoute<any, any>,
+  TPrefixPath extends string,
+> =
+  TApiRoute extends ApiRoute<infer TContext, any>
+    ? TApiRoute extends { schema: { path: infer TPath extends string } }
+      ? Simplify<
+          { path: `${TPrefixPath}${TPath}` } & Omit<TApiRoute['schema'], 'path'>
+        > extends infer TNewApiRouteSchema extends ApiRouteSchema
+        ? ApiRoute<TContext, TNewApiRouteSchema>
+        : never
+      : never
+    : never
+
 export interface ApiRouter<TContext extends Record<string, unknown> = Record<string, unknown>> {
-  [key: string]: ApiRoute<TContext>
+  [key: string]: ApiRoute<TContext, any>
 }
 
 export interface ClientApiRouter {
