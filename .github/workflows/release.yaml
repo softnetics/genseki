@@ -48,12 +48,18 @@ jobs:
       - name: Install changeset
         run: pnpm install -g changeset
 
+      - name: Install dependencies
+        run: pnpm install --prefer-offline --frozen-lockfile
+
+      - name: Build artifacts
+        run: pnpm build
+
       - name: Create Versioning Pull Request
         id: changesets
         uses: changesets/action@v1.5.2
-        env:
-          GITHUB_TOKEN: ${{ github.token }}
         with:
           createGithubReleases: true
           version: changeset version
           publish: changeset release
+        env:
+          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
