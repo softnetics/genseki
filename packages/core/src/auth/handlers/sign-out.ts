@@ -1,7 +1,7 @@
 import z from 'zod'
 
-import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
-import { AuthContext } from '../context'
+import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
+import { type AuthContext } from '../context'
 import { deleteSessionCookie, getSessionCookie } from '../utils'
 
 interface InternalRouteOptions {

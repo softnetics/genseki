@@ -1,8 +1,8 @@
-import { Column, is, Table, TableRelationalConfig } from 'drizzle-orm'
-import { IsNever, Simplify, ValueOf } from 'type-fest'
+import { Column, is, Table, type TableRelationalConfig } from 'drizzle-orm'
+import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import z, { ZodObject } from 'zod'
 
-import { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
+import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
   return field._.source === 'relations'

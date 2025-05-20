@@ -1,4 +1,4 @@
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 import { getClientCollection } from '@kivotos/core'
 
 import { ListTable } from './list.client'

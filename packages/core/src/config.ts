@@ -1,19 +1,19 @@
-import { Simplify } from 'drizzle-orm'
 import { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
+import type { Simplify } from 'type-fest'
 
-import { AuthConfig, createAuth } from './auth'
+import { type AuthConfig, createAuth } from './auth'
 import {
-  ClientCollection,
-  Collection,
-  ExtractAllCollectionCustomEndpoints,
-  ExtractAllCollectionDefaultEndpoints,
+  type ClientCollection,
+  type Collection,
+  type ExtractAllCollectionCustomEndpoints,
+  type ExtractAllCollectionDefaultEndpoints,
   getAllCollectionEndpoints,
-  ToClientCollection,
-  ToClientCollectionList,
+  type ToClientCollection,
+  type ToClientCollectionList,
 } from './collection'
-import { ApiRouter, ClientApiRouter, ToClientApiRouter } from './endpoint'
-import { Field, FieldClient } from './field'
+import type { ApiRouter, ClientApiRouter, ToClientApiRouter } from './endpoint'
+import type { Field, FieldClient } from './field'
 import { isRelationField } from './utils'
 
 export type MinimalContext<

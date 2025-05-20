@@ -1,10 +1,10 @@
 'use client'
 
-import { createContext, ReactNode, useContext } from 'react'
+import { createContext, type ReactNode, useContext } from 'react'
 
 import type { ClientConfig, Collection, ServerConfig } from '@kivotos/core'
 
-import { ServerFunction } from '../server-function'
+import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {
   clientConfig: ClientConfig

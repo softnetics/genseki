@@ -1,6 +1,6 @@
 'use server'
 
-import { handleServerFunction, ServerFunction } from '@kivotos/next'
+import { handleServerFunction, type ServerFunction } from '@kivotos/next'
 
 import { serverConfig } from '~/drizzlify/config'
 

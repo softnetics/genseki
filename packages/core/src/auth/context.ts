@@ -1,11 +1,11 @@
-import { and, AnyTable, asc, Column, desc, eq } from 'drizzle-orm'
-import { UndefinedToOptional } from 'type-fest/source/internal'
+import { and, type AnyTable, asc, Column, desc, eq } from 'drizzle-orm'
+import type { UndefinedToOptional } from 'type-fest/source/internal'
 
-import { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
+import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
 import { AccountProvider } from './constant'
 import { getSessionCookie } from './utils'
 
-import { MinimalContext } from '../config'
+import type { MinimalContext } from '../config'
 
 type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
   [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true

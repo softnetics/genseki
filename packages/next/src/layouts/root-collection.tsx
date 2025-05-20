@@ -14,7 +14,7 @@ import {
   SidebarSection,
   SidebarTrigger,
 } from '../intentui/ui/sidebar'
-import { ServerFunction } from '../server-function'
+import type { ServerFunction } from '../server-function'
 import { formatSlug } from '../utils/format-slug'
 
 interface RootLayoutProps<TServerConfig extends ServerConfig<any, any, any, any>> {

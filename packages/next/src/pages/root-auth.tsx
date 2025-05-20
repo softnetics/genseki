@@ -1,4 +1,4 @@
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 import { SignInView } from '../views/auth/sign-in'
 

@@ -9,7 +9,7 @@ import {
   type LinkProps as LinkPrimitiveProps,
 } from 'react-aria-components'
 
-import { tv, VariantProps } from 'tailwind-variants'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 const buttonStyles = tv({
   base: [

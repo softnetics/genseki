@@ -8,13 +8,13 @@ import {
   or,
   Relation,
   Table,
-  TableRelationalConfig,
+  type TableRelationalConfig,
 } from 'drizzle-orm'
-import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
+import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
 import { PgTransaction } from 'drizzle-orm/pg-core'
 import { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
-import {
+import type {
   ApiCreateHandler,
   ApiDeleteHandler,
   ApiFindManyHandler,
@@ -23,8 +23,8 @@ import {
   CollectionAdminApi,
   InferFields,
 } from './collection'
-import { MinimalContext } from './config'
-import { Field, Fields } from './field'
+import type { MinimalContext } from './config'
+import type { Field, Fields } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,

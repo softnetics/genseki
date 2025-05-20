@@ -1,10 +1,10 @@
-import { ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
-import { getClientConfig, ServerConfig } from '@kivotos/core'
+import { getClientConfig, type ServerConfig } from '@kivotos/core'
 
 import { UiProviders } from '../intentui/providers'
 import { RootProvider } from '../providers/root'
-import { ServerFunction } from '../server-function'
+import type { ServerFunction } from '../server-function'
 
 interface RootLayoutProps<TServerConfig extends ServerConfig<any, any, any, any>> {
   serverConfig: TServerConfig

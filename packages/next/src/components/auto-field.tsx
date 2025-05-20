@@ -1,4 +1,4 @@
-import { Field, ServerConfig } from '@kivotos/core'
+import type { Field, ServerConfig } from '@kivotos/core'
 
 import { Checkbox } from '../intentui/ui/checkbox'
 import { Select, SelectList, SelectOption, SelectTrigger } from '../intentui/ui/select'

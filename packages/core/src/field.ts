@@ -1,18 +1,18 @@
 import {
   Column,
-  FindTableByDBName,
+  type FindTableByDBName,
   getTableName,
   is,
   One,
   Relation,
-  Simplify,
-  TableRelationalConfig,
+  type TableRelationalConfig,
 } from 'drizzle-orm'
+import type { Simplify } from 'type-fest'
 import z, { ZodObject } from 'zod'
 
 import {
   appendFieldNameToFields,
-  GetPrimaryColumn,
+  type GetPrimaryColumn,
   getPrimaryColumn,
   getPrimaryColumnTsName,
 } from './utils'

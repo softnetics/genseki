@@ -3,13 +3,13 @@
 import { useMemo } from 'react'
 
 import {
-  AccessorKeyColumnDef,
+  type AccessorKeyColumnDef,
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
 
-import { ClientCollection, FieldsClient, InferFields } from '@kivotos/core'
+import type { ClientCollection, FieldsClient, InferFields } from '@kivotos/core'
 
 import { CustomTable } from '../../intentui/ui/custom-table'
 import { TableCell } from '../../intentui/ui/table'
