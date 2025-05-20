@@ -39,16 +39,16 @@ export function createRestClient<TServerConfig extends ServerConfig<any, any, an
       return makeFetch('GET', path, payload, config)
     },
     POST: async (path: string, payload: AnyPayload) => {
-      return makeFetch('GET', path, payload, config)
+      return makeFetch('POST', path, payload, config)
     },
     PUT: async (path: string, payload: AnyPayload) => {
-      return makeFetch('GET', path, payload, config)
+      return makeFetch('PUT', path, payload, config)
     },
     DELETE: async (path: string, payload: AnyPayload) => {
-      return makeFetch('GET', path, payload, config)
+      return makeFetch('DELETE', path, payload, config)
     },
     PATCH: async (path: string, payload: AnyPayload) => {
-      return makeFetch('GET', path, payload, config)
+      return makeFetch('PATCH', path, payload, config)
     },
   }
 }
