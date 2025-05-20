@@ -1,5 +1,5 @@
-import { Column, ExtractObjectValues, is, Table, TableRelationalConfig } from 'drizzle-orm'
-import { IsNever, Simplify } from 'type-fest'
+import { Column, is, Table, TableRelationalConfig } from 'drizzle-orm'
+import { IsNever, Simplify, ValueOf } from 'type-fest'
 import z, { ZodObject } from 'zod'
 
 import { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
@@ -8,19 +8,17 @@ export function isRelationField(field: Field): field is FieldRelation {
   return field._.source === 'relations'
 }
 
-export type GetPrimaryColumn<TTableRelationalConfig extends TableRelationalConfig> =
-  ExtractObjectValues<{
-    [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
-      ? TTableRelationalConfig['columns'][K]
-      : never
-  }>
+export type GetPrimaryColumn<TTableRelationalConfig extends TableRelationalConfig> = ValueOf<{
+  [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
+    ? TTableRelationalConfig['columns'][K]
+    : never
+}>
 
-export type GetPrimaryColumnTsName<TTableRelationalConfig extends TableRelationalConfig> =
-  ExtractObjectValues<{
-    [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
-      ? K
-      : never
-  }>
+export type GetPrimaryColumnTsName<TTableRelationalConfig extends TableRelationalConfig> = ValueOf<{
+  [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
+    ? K
+    : never
+}>
 
 export function getPrimaryColumn<TTableConfig extends TableRelationalConfig>(
   tableConfig: TTableConfig

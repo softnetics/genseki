@@ -56,7 +56,7 @@ export interface ServerConfig<
 
 export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any, any>> =
   TServerConfig extends ServerConfig<any, any, any, infer TApiRouter>
-    ? TApiRouter extends ApiRouter
+    ? TApiRouter extends ApiRouter<any>
       ? TApiRouter
       : never
     : never
@@ -175,7 +175,7 @@ export function getClientCollection<const TCollection extends Collection>(
 
 export type ToClientConfig<TServerConfig extends ServerConfig<any, any, any, any>> = ClientConfig<
   ToClientCollectionList<TServerConfig['collections']>,
-  ToClientApiRouter<InferApiRouterFromServerConfig<TServerConfig>>
+  Simplify<ToClientApiRouter<InferApiRouterFromServerConfig<TServerConfig>>>
 >
 
 export function getClientConfig<const TServerConfig extends ServerConfig<any, any, any, any>>(

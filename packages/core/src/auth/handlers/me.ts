@@ -22,7 +22,7 @@ export function me<const TOptions extends InternalRouteOptions>(options: TOption
         status: z.string(),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     const user = await args.context.requiredAuthenticated(args.headers)

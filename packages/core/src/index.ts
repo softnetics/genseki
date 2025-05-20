@@ -25,6 +25,7 @@ export type {
   ApiRouter,
   ApiRouteResponse,
   ApiRouteSchema,
+  ClientApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
 export { type Field, FieldBuilder } from './field'

@@ -1,0 +1,8 @@
+---
+"@example/erp": patch
+"@kivotos/core": minor
+"@kivotos/next": minor
+"@kivotos/rest": minor
+---
+
+[[DRIZZ-40] Rest RPC](https://app.plane.so/softnetics/browse/DRIZZ-40/)

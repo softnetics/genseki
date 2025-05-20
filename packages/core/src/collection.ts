@@ -440,21 +440,19 @@ export type Collection<
   admin: CollectionAdmin<TContext, TFields, TApiRouter>
 }
 
-export type ToClientCollection<TCollection extends Collection> = ClientCollection<
-  InferSlugFromCollection<TCollection>,
-  InferTableNameFromCollection<TCollection>,
-  InferFullSchemaFromCollection<TCollection>,
-  InferContextFromCollection<TCollection>,
-  InferFieldsFromCollection<TCollection>,
-  // TODO: fix this
-  // InferApiRouterFromCollection<TCollection>
-  any
->
+export type ToClientCollection<TCollection extends Collection<any, any, any, any, any, any>> =
+  ClientCollection<
+    InferSlugFromCollection<TCollection>,
+    InferTableNameFromCollection<TCollection>,
+    InferFullSchemaFromCollection<TCollection>,
+    InferContextFromCollection<TCollection>,
+    InferFieldsFromCollection<TCollection>,
+    InferApiRouterFromCollection<TCollection>
+  >
 
-export type ToClientCollectionList<TCollections extends Collection[]> = TCollections extends [
-  infer TCollection,
-  ...infer TCollectionsRest,
-]
+export type ToClientCollectionList<
+  TCollections extends Collection<any, any, any, any, any, any>[],
+> = TCollections extends [infer TCollection, ...infer TCollectionsRest]
   ? [
       ToClientCollection<TCollection extends Collection ? TCollection : never>,
       ...ToClientCollectionList<TCollectionsRest extends Collection[] ? TCollectionsRest : never>,
@@ -478,7 +476,8 @@ export type ClientCollection<
   }
 >
 
-export type InferSlugFromCollection<TCollection extends Collection> = TCollection['slug']
+export type InferSlugFromCollection<TCollection extends Collection<any, any, any, any, any, any>> =
+  TCollection['slug']
 
 export type InferTableNameFromCollection<
   TCollection extends Collection<any, any, any, any, any, any>,

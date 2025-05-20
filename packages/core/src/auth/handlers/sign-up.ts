@@ -29,7 +29,7 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
         }),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     const hasedPassword = args.body.password // TODO: hash password
