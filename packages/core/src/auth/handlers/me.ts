@@ -1,7 +1,6 @@
 import z from 'zod'
 
-import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
-
+import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AuthContext } from '../context'
 
 interface InternalRouteOptions {
@@ -11,17 +10,15 @@ interface InternalRouteOptions {
 export function me<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'GET',
-    path: (options.prefix ? `${options.prefix}/me` : '/me') as TOptions['prefix'] extends string
-      ? `${TOptions['prefix']}/me`
-      : '/me',
+    path: '/api/auth/me',
     responses: {
-      200: z.interface({
+      200: z.object({
         id: z.string(),
         name: z.string(),
         email: z.string(),
-        'image?': z.string().nullable(),
+        image: z.string().nullable().optional(),
       }),
-      401: z.interface({
+      401: z.object({
         status: z.string(),
       }),
     },
@@ -36,8 +33,5 @@ export function me<const TOptions extends InternalRouteOptions>(options: TOption
     }
   }
 
-  return {
-    ...schema,
-    handler,
-  } satisfies ApiRoute
+  return createEndpoint(schema, handler)
 }

@@ -1,9 +1,9 @@
-function setCookie(headers: Headers, name: string, value: string) {
-  headers.append('Set-Cookie', `${name}=${value}; Path=/; HttpOnly; SameSite=Strict`)
+function setCookie(headers: Record<string, string>, name: string, value: string) {
+  headers['Set-Cookie'] = `${name}=${value}; Path=/; HttpOnly; SameSite=Strict`
 }
 
-function getCookie(headers: Headers, name: string) {
-  const cookie = headers.get('Cookie')
+function getCookie(headers: Record<string, string>, name: string) {
+  const cookie = headers[name]
   if (!cookie) return null
   const cookies = cookie.split('; ')
   for (const c of cookies) {
@@ -13,20 +13,20 @@ function getCookie(headers: Headers, name: string) {
   return null
 }
 
-function deleteCookie(headers: Headers, name: string) {
-  headers.append('Set-Cookie', `${name}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`)
+function deleteCookie(headers: Record<string, string>, name: string) {
+  headers['Set-Cookie'] = `${name}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`
 }
 
 const SESSION_COOKIE_NAME = 'SESSION_ID'
 
-export function getSessionCookie(headers: Headers) {
+export function getSessionCookie(headers: Record<string, string>) {
   return getCookie(headers, SESSION_COOKIE_NAME)
 }
 
-export function setSessionCookie(headers: Headers, value: string) {
+export function setSessionCookie(headers: Record<string, string>, value: string) {
   setCookie(headers, SESSION_COOKIE_NAME, value)
 }
 
-export function deleteSessionCookie(headers: Headers) {
+export function deleteSessionCookie(headers: Record<string, string>) {
   deleteCookie(headers, SESSION_COOKIE_NAME)
 }

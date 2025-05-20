@@ -1,227 +1,49 @@
-import { ExtractObjectValues, Simplify } from 'drizzle-orm'
+import type { Simplify } from 'type-fest'
 
 import {
-  ApiDefaultMethod,
-  ApiReturnType,
   ApiRoute,
   ApiRouteHandlerPayload,
   ApiRouter,
+  ApiRouteResponse,
   ApiRouteSchema,
-  ClientApiArgs,
-  ClientApiRouteHandlerPayload,
-  Collection,
-  CollectionApiDefaultMethod,
-  InferApiRouteResponses,
-  InferApiRouterFromCollection,
   ServerConfig,
 } from '@kivotos/core'
 
+type ExtractObjectValues<T> = T[keyof T]
+
 export type ServerFunction<TServerConfig extends ServerConfig<any, any, any, any>> = <
-  const TMethod extends GetServerMethod<TServerConfig> = GetServerMethod<TServerConfig>,
+  TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
 >(
-  args: TMethod
-) => Promise<GetServerMethodResponse<TServerConfig, TMethod>>
+  args: TApiArgs
+) => Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>>
 
-export type DefaultMethodFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> =
-  TCollection extends Collection<any, any, any, any, any, any>
-    ? Simplify<
-        ExtractObjectValues<{
-          [TMethod in CollectionApiDefaultMethod<TCollection>]: TMethod extends ApiDefaultMethod
-            ? {
-                slug: TCollection['slug']
-                method: TMethod
-                payload: Simplify<ClientApiArgs<TMethod, TCollection['fields']>>
-              }
-            : never
-        }>
-      >
-    : never
+type GetServerFunctionResponse<
+  TServerConfig extends ServerConfig<any, any, any, ApiRouter>,
+  TMethod extends keyof TServerConfig['endpoints'],
+> = TServerConfig['endpoints'][TMethod] extends infer TApiRoute extends ApiRoute<any, any>
+  ? ApiRouteResponse<TApiRoute['schema']['responses']>
+  : never
 
-export type CustomMethodFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> =
-  TCollection extends Collection<any, any, any, any, any, any>
-    ? Simplify<
-        ExtractObjectValues<{
-          [TMethod in keyof InferApiRouterFromCollection<TCollection>]: {
-            slug: TCollection['slug']
-            method: TMethod
-            // _deug: TCollection
-            payload: InferApiRouterFromCollection<TCollection>[TMethod] extends ApiRouteSchema
-              ? Simplify<
-                  ClientApiRouteHandlerPayload<InferApiRouterFromCollection<TCollection>[TMethod]>
-                >
-              : never
-          }
-        }>
-      >
-    : never
-
-type AllMethodFromCollection<TCollection extends Collection<any, any, any, any, any, any>> =
-  TCollection extends Collection<any, any, any, any, any, any>
-    ? Simplify<DefaultMethodFromCollection<TCollection> | CustomMethodFromCollection<TCollection>>
-    : never
-
-export type CustomMethodFromServerConfig<TServerConfig extends ServerConfig> =
-  Exclude<TServerConfig['endpoints'], undefined> extends infer TRouter extends ApiRouter<any>
-    ? ExtractObjectValues<{
-        [TMethod in keyof TRouter]: {
-          slug: 'custom'
-          method: TMethod
-          payload: TRouter[TMethod] extends ApiRouteSchema
-            ? Simplify<ClientApiRouteHandlerPayload<TRouter[TMethod]>>
-            : never
-        }
-      }>
-    : never
-
-type CustomMethodFromServerConfigResponse<
-  TServerConfig extends ServerConfig<any, any, any, any>,
-  TMethodName extends string,
-> =
-  Exclude<TServerConfig['endpoints'], undefined> extends infer TRouter extends ApiRouter<any>
-    ? TMethodName extends keyof TRouter
-      ? TRouter[TMethodName] extends infer TRoute extends ApiRouteSchema
-        ? Simplify<InferApiRouteResponses<TRoute>>
-        : never
+export type GetServerFunctionApiArgs<TApiRouter extends ApiRouter<any> | undefined> =
+  ExtractObjectValues<{
+    [TMethod in Extract<keyof TApiRouter, string>]: TApiRouter[TMethod] extends ApiRoute<
+      any,
+      infer TApiRouteSchema extends ApiRouteSchema
+    >
+      ? Simplify<{ method: TMethod } & ApiRouteHandlerPayload<TApiRouteSchema>>
       : never
-    : never
-
-type CustomMethodFromCollectionResponse<
-  TCollection extends Collection<any, any, any, any, any, any>,
-  TMethodName extends string,
-> = Exclude<TCollection['admin']['endpoints'], undefined>[TMethodName] extends infer TRoute extends
-  ApiRouteSchema
-  ? TRoute extends ApiRouteSchema
-    ? Simplify<InferApiRouteResponses<TRoute>>
-    : never
-  : never
-
-type DefaultMethodFromCollectionResponse<
-  TCollection extends Collection<any, any, any, any, any, any>,
-  TMethodName extends string,
-> = TMethodName extends ApiDefaultMethod
-  ? Simplify<ApiReturnType<TMethodName, TCollection['fields']>>
-  : never
-
-export type GetServerMethodResponse<
-  TServerConfig extends ServerConfig<any, any, any, any>,
-  TMethod extends GetServerMethod<TServerConfig>,
-> = TMethod['slug'] extends 'custom'
-  ? CustomMethodFromServerConfigResponse<TServerConfig, TMethod['method']>
-  : TMethod['method'] extends ApiDefaultMethod
-    ? DefaultMethodFromCollectionResponse<
-        Extract<TServerConfig['collections'][number], { slug: TMethod['slug'] }>,
-        TMethod['method']
-      >
-    : CustomMethodFromCollectionResponse<
-        Extract<TServerConfig['collections'][number], { slug: TMethod['slug'] }>,
-        TMethod['method']
-      >
-
-export type GetServerMethod<TServerConfig extends ServerConfig<any, any, any, any>> = Simplify<
-  | AllMethodFromCollection<TServerConfig['collections'][number]>
-  | CustomMethodFromServerConfig<TServerConfig>
->
-
-function isCustomMethodFromServerConfig<TMethod extends { slug: string }>(method: TMethod) {
-  return (method as any).slug === 'custom'
-}
-
-function isCustomMethodFromCollection<TMethod extends { slug: string; method: string }>(
-  method: TMethod
-) {
-  return (
-    (method as any).slug !== 'custom' &&
-    !Object.values(ApiDefaultMethod).includes(method.method as any)
-  )
-}
-
-function isDefaultMethodFromCollection<TMethod extends { slug: string; method: string }>(
-  method: TMethod
-) {
-  return (
-    (method as any).slug !== 'custom' &&
-    Object.values(ApiDefaultMethod).includes(method.method as any)
-  )
-}
+  }>
 
 export async function handleServerFunction<
-  TServerConfig extends ServerConfig<any, any, any, ApiRouter>,
-  TMethod extends GetServerMethod<TServerConfig>,
+  TServerConfig extends ServerConfig<any, any, any, any>,
+  TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
 >(
   serverConfig: TServerConfig,
-  method: TMethod
-): Promise<GetServerMethodResponse<TServerConfig, TMethod>> {
-  const slug = method.slug
-
-  if (isCustomMethodFromServerConfig(method)) {
-    const handlers = serverConfig.endpoints
-    if (!handlers) throw new Error('No endpoints found in server config')
-
-    const handler = handlers[method.method] as ApiRoute<any, ApiRouteSchema>
-    if (!handler) {
-      throw new Error(`Method ${method.method} not found`)
-    }
-
-    const result = await handler.handler({
-      context: serverConfig.context,
-      ...(method.payload as any),
-    } as ApiRouteHandlerPayload<any, ApiRouteSchema>)
-
-    return result as GetServerMethodResponse<TServerConfig, TMethod>
-  } else if (isCustomMethodFromCollection(method)) {
-    const collection = serverConfig.collections.find(
-      (collection: Collection) => collection.slug === slug
-    )
-    if (!collection) {
-      throw new Error(`Collection ${slug} not found`)
-    }
-
-    const handlers = collection.admin.endpoints
-
-    const handler = handlers?.[method.method] as ApiRoute<any, ApiRouteSchema>
-    if (!handler) {
-      throw new Error(`Method ${method.method} not found`)
-    }
-
-    const result = await handler.handler({
-      context: { ...serverConfig.context, db: serverConfig.db },
-      ...(method.payload as any),
-    } as ApiRouteHandlerPayload<any, ApiRouteSchema>)
-
-    return result as GetServerMethodResponse<TServerConfig, TMethod>
-  } else if (isDefaultMethodFromCollection(method)) {
-    const collection = serverConfig.collections.find(
-      (collection: Collection) => collection.slug === slug
-    )
-    if (!collection) {
-      throw new Error(`Collection ${slug} not found`)
-    }
-
-    const handlers = collection.admin.api
-
-    const handler = handlers[method.method as ApiDefaultMethod]
-    if (!handler) {
-      throw new Error(`Method ${method.method} not found`)
-    }
-
-    // TODO: Fix request
-    const request = new Request('')
-    const result = await handler(
-      {
-        context: { ...serverConfig.context, db: serverConfig.db },
-        fields: collection.fields,
-        slug: collection.slug,
-        ...(method.payload as any),
-      } as any,
-      request
-    )
-
-    return result as GetServerMethodResponse<TServerConfig, TMethod>
+  args: TApiArgs
+): Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>> {
+  const apiRoute = serverConfig.endpoints?.[args.method as keyof typeof serverConfig.endpoints]
+  if (!apiRoute) {
+    throw new Error(`No API route found for method: ${args.method}`)
   }
-
-  throw new Error(`Method ${method.method} not found`)
+  return apiRoute.handler({ ...args, context: serverConfig.context })
 }

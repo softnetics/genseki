@@ -1,10 +1,8 @@
 import z from 'zod'
 
-import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
-
+import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { AuthContext } from '../context'
-import { WithPrefix } from '../types'
 import { setSessionCookie } from '../utils'
 
 interface InternalRouteOptions {
@@ -14,23 +12,19 @@ interface InternalRouteOptions {
 export function signInEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix ? `${options.prefix}/sign-in/email` : '/sign-in/email') as WithPrefix<
-      TOptions['prefix'],
-      '/sign-in/email'
-    >,
-
-    body: z.interface({
+    path: '/api/auth/sign-in-email',
+    body: z.object({
       email: z.string(),
       password: z.string(),
     }),
     responses: {
-      200: z.interface({
+      200: z.object({
         token: z.string().nullable(),
-        user: z.interface({
+        user: z.object({
           id: z.string(),
           name: z.string(),
           email: z.string(),
-          'image?': z.string().nullable(),
+          image: z.string().nullable().optional(),
         }),
       }),
     },
@@ -54,7 +48,7 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     })
 
-    const responseHeaders = new Headers()
+    const responseHeaders = {}
     setSessionCookie(responseHeaders, session.token)
 
     return {
@@ -67,8 +61,5 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
     }
   }
 
-  return {
-    ...schema,
-    handler,
-  } satisfies ApiRoute
+  return createEndpoint(schema, handler)
 }

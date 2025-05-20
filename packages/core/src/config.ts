@@ -46,11 +46,12 @@ export interface ServerConfig<
     any,
     any
   >[],
-  TApiRouter extends ApiRouter<TContext> = ReturnType<typeof createAuth<TContext>>['handlers'],
+  TApiRouter extends ApiRouter<TContext> = ReturnType<typeof createAuth<TContext>>['handlers'] &
+    ApiRouter<TContext>,
 > extends BaseConfig<TFullSchema> {
   context: TContext
   collections: TCollections
-  endpoints?: TApiRouter
+  endpoints: TApiRouter
 }
 
 export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any, any>> =
@@ -83,11 +84,6 @@ export function defineBaseConfig<
     const auth = createAuth(config.auth, context)
     const collectionEndpoints = getAllCollectionEndpoints(args.collections)
 
-    type Endpoints = TEndpoints &
-      typeof auth.handlers &
-      ExtractAllCollectionCustomEndpoints<TCollections> &
-      ExtractAllCollectionDefaultEndpoints<TCollections>
-
     return {
       ...config,
       context: context,
@@ -96,12 +92,18 @@ export function defineBaseConfig<
         ...args.endpoints,
         ...auth.handlers,
         ...collectionEndpoints,
-      } as Endpoints,
+      } as TEndpoints &
+        typeof auth.handlers &
+        ExtractAllCollectionCustomEndpoints<TCollections> &
+        ExtractAllCollectionDefaultEndpoints<TCollections>,
     } satisfies ServerConfig<
       TFullSchema,
       MinimalContext<TFullSchema, TContext>,
       TCollections,
-      Endpoints
+      TEndpoints &
+        typeof auth.handlers &
+        ExtractAllCollectionCustomEndpoints<TCollections> &
+        ExtractAllCollectionDefaultEndpoints<TCollections>
     >
   }
 

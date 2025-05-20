@@ -26,7 +26,7 @@ export type AuthContext<TConfig extends AuthConfig = AuthConfig> = {
   authConfig: TConfig
   internalHandlers: InternalHandlers
 
-  requiredAuthenticated: (headers: Headers) => Promise<InferTableType<AnyUserTable>>
+  requiredAuthenticated: (headers: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
 }
 
 export function createAuthContext<TAuthConfig extends AuthConfig, TContext extends MinimalContext>(
@@ -39,7 +39,7 @@ export function createAuthContext<TAuthConfig extends AuthConfig, TContext exten
     authConfig: authConfig,
     internalHandlers: internalHandlers,
 
-    requiredAuthenticated: async (headers: Headers) => {
+    requiredAuthenticated: async (headers: Record<string, string>) => {
       const sessionId = getSessionCookie(headers)
       if (!sessionId) throw new Error('Unauthorized')
       const session = await internalHandlers.session.findUserBySessionId(sessionId)

@@ -15,7 +15,14 @@ import {
   GetAllTableTsNames,
 } from './collection'
 import { MinimalContext } from './config'
-import { ApiRoute, ApiRouteHandler, ApiRouter, ApiRouteSchema, createEndpoint } from './endpoint'
+import {
+  ApiRoute,
+  ApiRouteHandler,
+  ApiRouter,
+  ApiRouteSchema,
+  AppendPrefixPathToApiRoute,
+  createEndpoint,
+} from './endpoint'
 import { FieldBuilder, Fields, FieldsInitial, FieldsWithFieldName, OptionCallback } from './field'
 import { appendFieldNameToFields } from './utils'
 
@@ -142,7 +149,12 @@ export class Builder<
   endpoint<const TApiEndpointSchema extends ApiRouteSchema>(
     args: TApiEndpointSchema,
     handler: ApiRouteHandler<TContext, TApiEndpointSchema>
-  ): ApiRoute<TContext, TApiEndpointSchema> {
-    return createEndpoint(args, handler)
+  ): AppendPrefixPathToApiRoute<ApiRoute<TContext, TApiEndpointSchema>, '/api'> {
+    const prefixPath = '/api'
+    args.path = `${prefixPath}${args.path}`
+    return createEndpoint(args, handler) as AppendPrefixPathToApiRoute<
+      ApiRoute<TContext, TApiEndpointSchema>,
+      '/api'
+    >
   }
 }

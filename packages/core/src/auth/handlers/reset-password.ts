@@ -1,7 +1,6 @@
 import z from 'zod'
 
-import { ApiRoute, ApiRouteHandler, ApiRouteSchema } from '~/core/endpoint'
-
+import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AuthContext } from '../context'
 
 interface InternalRouteOptions {
@@ -11,22 +10,18 @@ interface InternalRouteOptions {
 export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: (options.prefix
-      ? `${options.prefix}/reset-password`
-      : '/reset-password') as TOptions['prefix'] extends string
-      ? `${TOptions['prefix']}/reset-password`
-      : '/reset-password',
-    query: z.interface({
+    path: '/api/auth/reset-password',
+    query: z.object({
       token: z.string(),
     }),
-    body: z.interface({
+    body: z.object({
       password: z.string(),
     }),
     responses: {
-      200: z.interface({
+      200: z.object({
         status: z.string(),
       }),
-      400: z.interface({
+      400: z.object({
         status: z.string(),
       }),
     },
@@ -59,8 +54,9 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
 
     const redirectTo = `${args.context.authConfig.resetPassword?.redirectTo ?? '/auth/login'}`
 
-    const responseHeaders = new Headers()
-    responseHeaders.set('Location', redirectTo)
+    const responseHeaders = {
+      Location: redirectTo,
+    }
 
     return {
       status: 200,
@@ -69,8 +65,5 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
     }
   }
 
-  return {
-    ...schema,
-    handler,
-  } satisfies ApiRoute
+  return createEndpoint(schema, handler)
 }
