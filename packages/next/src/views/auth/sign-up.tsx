@@ -1,8 +1,6 @@
-import React from 'react'
-
 import { ServerConfig } from '@kivotos/core'
 
-import { SubmitButton } from '~/components/submit-button'
+import { SubmitButton } from '../../components/submit-button'
 
 interface SignInViewProps {
   serverConfig: ServerConfig

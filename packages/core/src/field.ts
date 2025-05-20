@@ -22,7 +22,7 @@ export type OptionCallback<
   TContext extends Record<string, unknown> = {},
 > = (args: TContext) => Promise<Array<{ label: string; value: TType }>>
 
-export type FieldsWithFieldName<TFields extends Record<string, Field<any>>> = {
+export type FieldsWithFieldName<TFields extends Record<string, FieldBase>> = {
   [TKey in keyof TFields]: TFields[TKey] & { _: { fieldName: string } }
 }
 
@@ -220,6 +220,11 @@ export type Fields<
 > = FieldsWithFieldName<TFields>
 
 export type FieldClient = Omit<Field, 'options'>
+
+export type FieldsClientInitial = Record<string, FieldClient>
+
+export type FieldsClient<TFields extends FieldsClientInitial = FieldsClientInitial> =
+  FieldsWithFieldName<TFields>
 
 export type FieldColumnOptionsFromTable<
   TColumn extends Column,

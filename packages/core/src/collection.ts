@@ -12,6 +12,7 @@ import {
   FieldRelation,
   FieldRelationCollection,
   Fields,
+  FieldsClient,
   FieldsInitial,
   fieldsToZodObject,
   FieldsWithFieldName,
@@ -255,7 +256,7 @@ export type InferField<TField extends FieldClient> =
  *
  * type UserFields = InferFields<typeof userField> // => { __pk: string; id: string; profile: string; age: number }
  */
-export type InferFields<TFields extends Fields<any>> = SimplifyConditionalExcept<
+export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcept<
   {
     [TKey in keyof TFields]: TFields[TKey] extends FieldClient
       ? Simplify<InferField<TFields[TKey]>>

@@ -302,7 +302,9 @@ describe('ApiHandler', () => {
             data: {
               nameField: postData.name,
               authorField: {
-                nameField: authorData.name,
+                create: {
+                  nameField: authorData.name,
+                },
               },
             },
             context: { db: mockDb as any },
@@ -392,7 +394,9 @@ describe('ApiHandler', () => {
             data: {
               nameField: updatedPostData.name,
               authorField: {
-                nameField: updatedAuthorData.name,
+                create: {
+                  nameField: updatedAuthorData.name,
+                },
               },
             },
           })
@@ -484,15 +488,17 @@ describe('ApiHandler', () => {
             context: { db: mockDb as any },
             data: {
               nameField: postData.name,
-              postsField: [
-                mockPostData[0],
-                mockPostData[1],
-                mockPostData[2],
-                mockPostData[3],
-                mockPostData[4],
-              ].map((post) => ({
-                nameField: post.name,
-              })),
+              postsField: {
+                create: [
+                  mockPostData[0],
+                  mockPostData[1],
+                  mockPostData[2],
+                  mockPostData[3],
+                  mockPostData[4],
+                ].map((post) => ({
+                  nameField: post.name,
+                })),
+              },
             },
           })
 
@@ -671,7 +677,9 @@ describe('ApiHandler', () => {
             context: { db: mockDb as any },
             data: {
               nameField: postData.name,
-              authorField: authorData.id,
+              authorField: {
+                connect: authorData.id,
+              },
             },
           })
 
@@ -846,7 +854,9 @@ describe('ApiHandler', () => {
             context: { db: mockDb as any },
             data: {
               nameField: authorData.name,
-              postsField: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+              postsField: {
+                connect: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+              },
             },
           })
 
@@ -951,7 +961,9 @@ describe('ApiHandler', () => {
             id: updatedAuthorData.id,
             data: {
               nameField: updatedAuthorDataField.nameField,
-              postsField: [1, 2, 3],
+              postsField: {
+                connect: [1, 2, 3],
+              },
             },
           })
           // ====== end user part (field) ======

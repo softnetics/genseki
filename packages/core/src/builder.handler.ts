@@ -106,7 +106,8 @@ export function createDefaultApiHandlers<
       }).create(tx, args.data)
     })
 
-    return id
+    // TODO: It's not correct, fix this
+    return { __pk: id, id: id }
   }
 
   const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
@@ -121,7 +122,8 @@ export function createDefaultApiHandlers<
       }).update(args.id, tx, args.data)
     })
 
-    return args.id
+    // TODO: It's not correct, fix this
+    return { __pk: args.id, id: args.id }
   }
 
   // why not just delete? why _delete?

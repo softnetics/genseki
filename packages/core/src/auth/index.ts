@@ -129,7 +129,7 @@ export type Auth<
   >
 }
 
-export function createAuth<TContext extends MinimalContext = MinimalContext>(
+export function createAuth<TContext extends MinimalContext<any> = MinimalContext<any>>(
   config: AuthConfig,
   context: TContext
 ): Auth<TContext> {
