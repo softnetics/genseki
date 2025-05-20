@@ -22,7 +22,7 @@ import {
   Text,
 } from 'react-aria-components'
 
-import { CaretDown, List, Sidebar as PhosphorSidebar } from '@phosphor-icons/react'
+import { CaretDownIcon, ListIcon, SidebarIcon } from '@phosphor-icons/react'
 import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
@@ -411,7 +411,7 @@ const sidebarItemStyles = tv({
     'group/sidebar-item relative col-span-full cursor-pointer overflow-hidden text-sidebar-fg/70 focus-visible:outline-hidden sm:text-sm',
     '**:data-[slot=menu-trigger]:-mr-1 **:data-[slot=menu-trigger]:absolute **:data-[slot=menu-trigger]:right-0 **:data-[slot=menu-trigger]:flex **:data-[slot=menu-trigger]:h-full **:data-[slot=menu-trigger]:w-[calc(var(--sidebar-width)-90%)] **:data-[slot=menu-trigger]:items-center **:data-[slot=menu-trigger]:justify-end **:data-[slot=menu-trigger]:pr-2.5 **:data-[slot=menu-trigger]:opacity-0 **:data-[slot=menu-trigger]:pressed:opacity-100 pressed:**:data-[slot=menu-trigger]:opacity-100 **:data-[slot=menu-trigger]:has-data-focus:opacity-100 **:data-[slot=menu-trigger]:focus-visible:opacity-100 hover:**:data-[slot=menu-trigger]:opacity-100',
     '**:data-[slot=avatar]:*:size-4 **:data-[slot=avatar]:size-4 **:data-[slot=icon]:size-7 **:data-[slot=avatar]:shrink-0 **:data-[slot=icon]:shrink-0',
-    'bg-bg hover:bg-[--alpha(var(--color-muted-fg)/10%)] hover:text-sidebar-fg py-6! pl-14! first-of-type:rounded-t-md last-of-type:rounded-b-md',
+    'bg-bg hover:bg-[--alpha(var(--color-muted-fg)/10%)] hover:text-sidebar-fg py-6! pl-14! md:first-of-type:rounded-t-md md:last-of-type:rounded-b-md',
   ],
   variants: {
     ghost: {
@@ -629,8 +629,8 @@ const sidebarDisclosureTrigger = tv({
 interface SidebarDisclosureTriggerProps extends ButtonProps {}
 
 const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisclosureTriggerProps>(
-  ({ className, ...props }, ref) => {
-    const { state, isMobile } = useSidebar()
+  ({ className, onClick, ...props }, ref) => {
+    const { state, isMobile, toggleSidebar } = useSidebar()
     const collapsed = state === 'collapsed' && !isMobile
     return (
       <Heading level={3}>
@@ -646,6 +646,10 @@ const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisc
               className,
             })
           )}
+          onClick={(e) => {
+            if (state === 'collapsed' && !isMobile) toggleSidebar()
+            onClick?.(e)
+          }}
           {...props}
         >
           {(values) => (
@@ -653,7 +657,7 @@ const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisc
               {typeof props.children === 'function' ? props.children(values) : props.children}
               {state !== 'collapsed' && (
                 <BaseIcon
-                  icon={CaretDown}
+                  icon={CaretDownIcon}
                   size="sm"
                   weight="regular"
                   className="z-10 ml-auto size-7 transition-transform group-aria-expanded:rotate-180"
@@ -712,13 +716,8 @@ const SidebarTrigger = ({
     >
       {children || (
         <>
-          <BaseIcon
-            icon={PhosphorSidebar}
-            size="md"
-            weight="duotone"
-            className="hidden md:inline"
-          />
-          <BaseIcon icon={List} size="md" weight="duotone" className="inline md:hidden" />
+          <BaseIcon icon={SidebarIcon} size="md" weight="duotone" className="hidden md:inline" />
+          <BaseIcon icon={ListIcon} size="md" weight="duotone" className="inline md:hidden" />
           <span className="sr-only">Toggle Sidebar</span>
         </>
       )}

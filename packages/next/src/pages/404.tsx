@@ -19,7 +19,7 @@ const NotfoundPage = ({
   description = 'The page is not found, please check the URL and try again.',
 }: NotfoundPageProps) => {
   return (
-    <div className="from-bg to-primary/10 grid h-dvh content-center justify-center bg-gradient-to-br from-50%">
+    <div className="from-bg to-primary/10 grid h-dvh content-center justify-center bg-gradient-to-br from-50% px-20">
       <Typography
         style={{
           backgroundImage:
@@ -37,7 +37,7 @@ const NotfoundPage = ({
         <Typography
           weight="semibold"
           type="h4"
-          className="text-text-nontrivial mt-12 min-w-[240px]"
+          className="text-text-nontrivial mt-12 min-w-[120px]"
         >
           {title}
         </Typography>

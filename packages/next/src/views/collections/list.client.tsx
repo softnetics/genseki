@@ -54,8 +54,6 @@ export function ListTable<
 
   const { headers, rows } = tableDataExtract(props.collection, props.data)
 
-  console.log(headers, rows)
-
   return (
     <Table
       bleed

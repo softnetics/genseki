@@ -19,7 +19,7 @@ import { Switch } from '../../intentui/ui/switch'
 
 export default function AppSidebarNav() {
   return (
-    <SidebarNav className="h-[76px] border-b">
+    <SidebarNav className="relative z-10 h-[76px] border-b">
       <span className="flex items-center gap-x-4">
         <SidebarTrigger size="sm" variant="ghost" className="-mx-2" />
         <Separator className="h-6" orientation="vertical" />

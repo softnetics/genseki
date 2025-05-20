@@ -20,6 +20,8 @@ type AppSidebarProps = {
 }
 
 export default async function AppSidebar({ collections }: AppSidebarProps) {
+  const collectionSlugs = collections.map((collection) => collection.slug)
+
   return (
     <Sidebar
       collapsible="dock"
@@ -47,7 +49,7 @@ export default async function AppSidebar({ collections }: AppSidebarProps) {
         <SidebarDisclosureGroup defaultExpandedKeys={[2]} className="mt-4">
           <NavigationSection />
           <PluginSection />
-          <CollectionSection collections={[]} />
+          <CollectionSection slugs={collectionSlugs} />
         </SidebarDisclosureGroup>
       </SidebarContent>
       <SidebarRail />

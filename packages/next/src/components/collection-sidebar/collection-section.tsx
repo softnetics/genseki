@@ -2,8 +2,7 @@
 import React from 'react'
 
 import { DatabaseIcon } from '@phosphor-icons/react'
-
-import { Collection } from '@kivotos/core'
+import { usePathname } from 'next/navigation'
 
 import { SidebarItem } from '~/intentui/ui/sidebar'
 import {
@@ -12,6 +11,7 @@ import {
   SidebarLabel,
 } from '~/intentui/ui/sidebar'
 import { SidebarDisclosure } from '~/intentui/ui/sidebar'
+import { formatSlug } from '~/utils/format-slug'
 
 import BaseIcon from '../primitives/base-icon'
 
@@ -31,10 +31,16 @@ const CurveLine = ({ className }: { className?: string }) => {
 }
 
 type CollectionSectionProps = {
-  collections: Collection[]
+  slugs: string[]
 }
 
-const CollectionSection = ({ collections }: CollectionSectionProps) => {
+const CollectionSection = ({ slugs }: CollectionSectionProps) => {
+  const pathname = usePathname()
+
+  const isCurrentPage = (slug: string) => pathname === `/admin/collections/${slug}`
+
+  const collectionHref = (slug: string) => `/admin/collections/${slug}`
+
   return (
     <SidebarDisclosure id={2}>
       <SidebarDisclosureTrigger className="rounded-md! in-data-[sidebar-state=collapsed]:rounded-none!">
@@ -43,22 +49,22 @@ const CollectionSection = ({ collections }: CollectionSectionProps) => {
       </SidebarDisclosureTrigger>
       <div className="relative">
         <div
-          style={{ '--amount': 3 } as React.CSSProperties}
+          style={{ '--amount': slugs.length } as React.CSSProperties}
           className="bg-primary in-data-[sidebar-state=collapsed]:hidden in-data-expanded:block absolute left-[calc(var(--spacing)*7.2)] top-[calc(var(--spacing)*-5)] z-10 hidden h-[calc((41.14px*var(--amount))-21.14px)] w-px"
         />
         <SidebarDisclosurePanel>
-          <SidebarItem ghost href="#" tooltip="Tickets" isCurrent>
-            <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
-            <SidebarLabel className="ml-6">Posts</SidebarLabel>
-          </SidebarItem>
-          <SidebarItem ghost href="#" tooltip="Tickets">
-            <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
-            <SidebarLabel className="ml-6">Post categories</SidebarLabel>
-          </SidebarItem>
-          <SidebarItem ghost href="#" tooltip="Tickets">
-            <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
-            <SidebarLabel className="ml-6">Users</SidebarLabel>
-          </SidebarItem>
+          {slugs.map((slug) => (
+            <SidebarItem
+              key={slug}
+              ghost
+              isCurrent={isCurrentPage(slug)}
+              href={collectionHref(slug)}
+              tooltip="Tickets"
+            >
+              <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
+              <SidebarLabel className="ml-6">{formatSlug(slug)}</SidebarLabel>
+            </SidebarItem>
+          ))}
         </SidebarDisclosurePanel>
       </div>
     </SidebarDisclosure>

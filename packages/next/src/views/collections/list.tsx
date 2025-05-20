@@ -1,9 +1,13 @@
-import 'server-only'
-
-import { CaretLeft, Cube, Funnel, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
+import {
+  CaretLeftIcon,
+  CubeIcon,
+  FunnelIcon,
+  MagnifyingGlassIcon,
+} from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 
-import { getClientCollection, ServerConfig } from '@kivotos/core'
+import { ServerConfig } from '@kivotos/core'
+import { getClientCollection } from '@kivotos/core'
 
 import badge from '~/../public/badge.svg'
 import BaseIcon from '~/components/primitives/base-icon'
@@ -28,17 +32,17 @@ const Toolbar = ({ slug }: { slug: string }) => {
         href="."
         variant="ghost"
         size="md"
-        leadingIcon={<BaseIcon icon={CaretLeft} size="md" />}
+        leadingIcon={<BaseIcon icon={CaretLeftIcon} size="md" />}
       >
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
         <TextField
           placeholder="Search"
-          prefix={<BaseIcon icon={MagnifyingGlass} size="md" />}
+          prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
           className="w-full"
         />
-        <Button variant="outline" size="md" leadingIcon={<BaseIcon icon={Funnel} size="md" />}>
+        <Button variant="outline" size="md" leadingIcon={<BaseIcon icon={FunnelIcon} size="md" />}>
           Filter
         </Button>
         <ButtonLink variant="primary" size="md" href={`/admin/collections/${slug}/create`}>
@@ -87,7 +91,7 @@ export async function ListView(props: ListViewProps) {
               className="relative z-10 dark:brightness-[40%] dark:contrast-150"
             />
             <BaseIcon
-              icon={Cube}
+              icon={CubeIcon}
               size="xl"
               weight="duotone"
               className="absolute inset-0 z-20 m-auto"

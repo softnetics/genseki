@@ -1,3 +1,5 @@
+import { Suspense } from 'react'
+
 import { ServerConfig } from '@kivotos/core'
 
 import Typography from '~/components/primitives/typography'
@@ -5,6 +7,7 @@ import { formatSlug } from '~/utils/format-slug'
 
 import NotfoundPage from './404'
 import HomePage from './home'
+import LoadingPage from './loading'
 
 import { CreateView } from '../views/collections/create'
 import { ListView } from '../views/collections/list'
@@ -67,7 +70,11 @@ export async function RootCollectionPage(props: RootProps) {
 
   // List Page     ——  /:slug
   if (segments.length === 1) {
-    return <ListView slug={slug} serverConfig={serverConfig} searchParams={searchParams} />
+    return (
+      <Suspense fallback={<LoadingPage />}>
+        <ListView slug={slug} serverConfig={serverConfig} searchParams={searchParams} />
+      </Suspense>
+    )
   }
 
   // Create Page   ——  /:slug/create

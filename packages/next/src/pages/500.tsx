@@ -5,7 +5,7 @@ import Typography from '~/components/primitives/typography'
 
 const ServerErrorPage = () => {
   return (
-    <div className="from-bg to-primary/10 grid h-[calc(100svh-76px-10px)] content-center justify-center bg-gradient-to-br from-50%">
+    <div className="from-bg to-primary/10 grid h-[calc(100svh-76px-10px)] content-center justify-center bg-gradient-to-br from-50% px-20">
       <div className="flex items-center gap-x-2">
         <Typography type="h1" weight="bold" className="text-text-accent">
           500
