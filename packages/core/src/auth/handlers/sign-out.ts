@@ -18,7 +18,7 @@ export function signOut<const TOptions extends InternalRouteOptions>(options: TO
         status: z.string(),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     const cookie = getSessionCookie(args.headers)

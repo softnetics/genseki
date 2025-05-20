@@ -28,7 +28,7 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
         }),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     const account = await args.context.internalHandlers.account.findByUserEmailAndProvider(

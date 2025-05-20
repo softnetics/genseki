@@ -25,7 +25,7 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
         status: z.string(),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     if (!args.context.authConfig.resetPassword?.enabled) {
