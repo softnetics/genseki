@@ -22,7 +22,7 @@ const CollectionCard = ({ collectionName, amounts, description, url }: Collectio
     <div className="bg-overlay border-border relative flex w-full flex-col rounded-xl border p-2 shadow-md">
       <div className="absolute left-6 z-10 -translate-y-1/2">
         <Image
-          priority={false}
+          priority
           src={badge}
           alt="badge"
           width={50}

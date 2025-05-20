@@ -71,7 +71,7 @@ const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
       data-slot="menu-trigger"
       className={composeTailwindRenderProps(
         className,
-        'outline-hidden focus-visible:ring-primary relative inline text-left focus-visible:ring-1'
+        'outline-hidden focus-visible:ring-primary relative inline cursor-pointer text-left focus-visible:ring-1'
       )}
       {...props}
     >

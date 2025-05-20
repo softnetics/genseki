@@ -4,6 +4,7 @@ import { ServerConfig } from '@kivotos/core'
 
 import Typography from '~/components/primitives/typography'
 import { formatSlug } from '~/utils/format-slug'
+import { OneView } from '~/views/collections/one'
 
 import NotfoundPage from './404'
 import HomePage from './home'
@@ -11,7 +12,6 @@ import LoadingPage from './loading'
 
 import { CreateView } from '../views/collections/create'
 import { ListView } from '../views/collections/list'
-import { OneView } from '../views/collections/one'
 import { UpdateView } from '../views/collections/update'
 
 interface RootProps {
@@ -68,7 +68,7 @@ export async function RootCollectionPage(props: RootProps) {
       />
     )
 
-  // List Page     ——  /:slug
+  // List Page    ——  /:slug
   if (segments.length === 1) {
     return (
       <Suspense fallback={<LoadingPage />}>

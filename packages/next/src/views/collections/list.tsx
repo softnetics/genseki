@@ -82,7 +82,7 @@ export async function ListView(props: ListViewProps) {
         <div className="mx-auto grid w-full max-w-[1200px] grid-cols-[auto_1fr] gap-x-12">
           <div className="relative z-10 inline-block">
             <Image
-              priority={false}
+              priority
               src={badge}
               alt="badge"
               width={75}
