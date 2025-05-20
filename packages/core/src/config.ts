@@ -1,4 +1,4 @@
-import { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 

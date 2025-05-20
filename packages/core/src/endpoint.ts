@@ -1,5 +1,5 @@
 import type { IsNever, Simplify, SimplifyDeep, ValueOf } from 'type-fest'
-import { z, ZodType } from 'zod'
+import type { z, ZodType } from 'zod'
 
 import type { MaybePromise } from './collection'
 

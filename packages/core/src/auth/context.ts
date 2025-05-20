@@ -1,4 +1,5 @@
-import { and, type AnyTable, asc, Column, desc, eq } from 'drizzle-orm'
+import type { AnyTable, Column } from 'drizzle-orm'
+import { and, asc, desc, eq } from 'drizzle-orm'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 
 import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'

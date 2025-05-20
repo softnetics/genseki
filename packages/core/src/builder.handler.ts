@@ -1,3 +1,4 @@
+import type { Relation, Table } from 'drizzle-orm'
 import {
   eq,
   getTableColumns,
@@ -6,13 +7,11 @@ import {
   Many,
   One,
   or,
-  Relation,
-  Table,
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
-import { PgTransaction } from 'drizzle-orm/pg-core'
-import { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
+import type { PgTransaction } from 'drizzle-orm/pg-core'
+import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
 import type {
   ApiCreateHandler,

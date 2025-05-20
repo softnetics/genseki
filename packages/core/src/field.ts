@@ -1,14 +1,14 @@
+import type { Column, Relation } from 'drizzle-orm'
 import {
-  Column,
   type FindTableByDBName,
   getTableName,
   is,
   One,
-  Relation,
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { Simplify } from 'type-fest'
-import z, { ZodObject } from 'zod'
+import type { ZodObject } from 'zod'
+import z from 'zod'
 
 import {
   appendFieldNameToFields,

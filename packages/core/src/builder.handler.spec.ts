@@ -1,5 +1,5 @@
 import { eq, or } from 'drizzle-orm'
-import { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as schema from './__mocks__/test-schema'

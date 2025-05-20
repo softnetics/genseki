@@ -1,4 +1,4 @@
-import { Many, Table, type TableRelationalConfig } from 'drizzle-orm'
+import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, Simplify } from 'type-fest'
 import z from 'zod'
 
