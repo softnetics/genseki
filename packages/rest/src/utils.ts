@@ -5,7 +5,7 @@ export function withPathParams(path: string, pathParams?: Record<string, any>) {
     if (key in pathParams) {
       return pathParams[key]
     }
-    throw new Error(`Path parameter ${key} not found in pathParams`)
+    throw new Error(`Path parameter "${key}" not found in pathParams`)
   })
 }
 
