@@ -1,7 +1,5 @@
 import { type Collection, type ServerConfig } from '@kivotos/core'
 
-import type { ServerFunction } from '~/server-function'
-
 import { RootLayout } from './root'
 
 import {
@@ -16,6 +14,7 @@ import {
   SidebarSection,
   SidebarTrigger,
 } from '../intentui/ui/sidebar'
+import type { ServerFunction } from '../server-function'
 import { formatSlug } from '../utils/format-slug'
 
 interface RootLayoutProps<TServerConfig extends ServerConfig<any, any, any, any>> {

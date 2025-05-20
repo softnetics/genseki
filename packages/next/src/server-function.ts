@@ -1,6 +1,6 @@
 import type { Simplify, ValueOf } from 'type-fest'
 
-import {
+import type {
   ApiRoute,
   ApiRouteHandlerPayload,
   ApiRouter,

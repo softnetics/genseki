@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
-import { ApiRoute, ApiRouter, ServerConfig } from '@kivotos/core'
+import type { ApiRoute, ApiRouter, ServerConfig } from '@kivotos/core'
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}

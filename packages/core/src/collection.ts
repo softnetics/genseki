@@ -1,22 +1,29 @@
-import { Many, Simplify, Table, TableRelationalConfig } from 'drizzle-orm'
-import { ConditionalExcept } from 'type-fest'
+import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
+import type { ConditionalExcept, Simplify } from 'type-fest'
 import z from 'zod'
 
-import { MinimalContext } from './config'
-import { ApiRoute, ApiRouteHandler, ApiRouter, ApiRouteSchema, ClientApiRouter } from './endpoint'
+import type { MinimalContext } from './config'
+import type {
+  ApiRoute,
+  ApiRouteHandler,
+  ApiRouter,
+  ApiRouteSchema,
+  ClientApiRouter,
+} from './endpoint'
 import {
-  Field,
-  FieldClient,
-  FieldColumn,
-  FieldMutateModeCollection,
-  FieldRelation,
-  FieldRelationCollection,
-  Fields,
-  FieldsInitial,
+  type Field,
+  type FieldClient,
+  type FieldColumn,
+  type FieldMutateModeCollection,
+  type FieldRelation,
+  type FieldRelationCollection,
+  type Fields,
+  type FieldsClient,
+  type FieldsInitial,
   fieldsToZodObject,
-  FieldsWithFieldName,
+  type FieldsWithFieldName,
 } from './field'
-import { JoinArrays, ToZodObject } from './utils'
+import type { JoinArrays, ToZodObject } from './utils'
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -255,7 +262,7 @@ export type InferField<TField extends FieldClient> =
  *
  * type UserFields = InferFields<typeof userField> // => { __pk: string; id: string; profile: string; age: number }
  */
-export type InferFields<TFields extends Fields<any>> = SimplifyConditionalExcept<
+export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcept<
   {
     [TKey in keyof TFields]: TFields[TKey] extends FieldClient
       ? Simplify<InferField<TFields[TKey]>>

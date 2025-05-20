@@ -20,6 +20,7 @@
   },
   "devDependencies": {
     "@internals/project-config": "workspace:^",
-    "type-fest": "^4.41.0"
+    "type-fest": "^4.41.0",
+    "vitest": "^3.0.9"
   }
 }

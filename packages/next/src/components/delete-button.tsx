@@ -1,7 +1,5 @@
-import { ServerConfig } from '~/core/config'
+import type { ServerConfig } from '@kivotos/core'
 
-export function DeleteButton<TServerConfig extends ServerConfig>(props: {
-  serverConfig: TServerConfig
-}) {
+export function DeleteButton(props: { serverConfig: ServerConfig }) {
   return <button>Delete</button>
 }

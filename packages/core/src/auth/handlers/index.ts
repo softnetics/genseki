@@ -5,7 +5,7 @@ import { signInEmail } from './sign-in-email'
 import { signOut } from './sign-out'
 import { signUp } from './sign-up'
 
-import { AuthConfig } from '..'
+import type { AuthConfig } from '..'
 
 export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuthConfig) {
   const handlers = {

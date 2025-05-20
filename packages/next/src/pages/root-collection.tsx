@@ -1,4 +1,4 @@
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 import { CreateView } from '../views/collections/create'
 import { ListView } from '../views/collections/list'

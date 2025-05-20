@@ -1,7 +1,7 @@
-import { IsNever, Simplify, SimplifyDeep, ValueOf } from 'type-fest'
-import { z, ZodType } from 'zod'
+import type { IsNever, Simplify, SimplifyDeep, ValueOf } from 'type-fest'
+import type { z, ZodType } from 'zod'
 
-import { MaybePromise } from './collection'
+import type { MaybePromise } from './collection'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 

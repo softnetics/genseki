@@ -1,7 +1,14 @@
-import { CSSProperties, ReactNode, RefObject, useEffect, useRef, useState } from 'react'
+import {
+  type CSSProperties,
+  type ReactNode,
+  type RefObject,
+  useEffect,
+  useRef,
+  useState,
+} from 'react'
 
+import type { Column, Header, Table as TanstackTable } from '@tanstack/react-table'
 import { flexRender } from '@tanstack/react-table'
-import { Column, Header, Table as TanstackTable } from '@tanstack/react-table'
 import { twMerge } from 'tailwind-merge'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'

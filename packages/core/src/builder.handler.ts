@@ -1,3 +1,4 @@
+import type { Relation, Table } from 'drizzle-orm'
 import {
   eq,
   getTableColumns,
@@ -6,15 +7,13 @@ import {
   Many,
   One,
   or,
-  Relation,
-  Table,
-  TableRelationalConfig,
+  type TableRelationalConfig,
 } from 'drizzle-orm'
-import { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
-import { PgTransaction } from 'drizzle-orm/pg-core'
-import { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
+import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
+import type { PgTransaction } from 'drizzle-orm/pg-core'
+import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
-import {
+import type {
   ApiCreateHandler,
   ApiDeleteHandler,
   ApiFindManyHandler,
@@ -23,8 +22,8 @@ import {
   CollectionAdminApi,
   InferFields,
 } from './collection'
-import { MinimalContext } from './config'
-import { Field, Fields } from './field'
+import type { MinimalContext } from './config'
+import type { Field, Fields } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,
@@ -106,7 +105,8 @@ export function createDefaultApiHandlers<
       }).create(tx, args.data)
     })
 
-    return id
+    // TODO: It's not correct, fix this
+    return { __pk: id, id: id }
   }
 
   const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
@@ -121,7 +121,8 @@ export function createDefaultApiHandlers<
       }).update(args.id, tx, args.data)
     })
 
-    return args.id
+    // TODO: It's not correct, fix this
+    return { __pk: args.id, id: args.id }
   }
 
   // why not just delete? why _delete?

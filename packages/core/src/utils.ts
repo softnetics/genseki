@@ -1,8 +1,9 @@
-import { Column, is, Table, TableRelationalConfig } from 'drizzle-orm'
-import { IsNever, Simplify, ValueOf } from 'type-fest'
-import z, { ZodObject } from 'zod'
+import type { Column, TableRelationalConfig } from 'drizzle-orm'
+import { is, Table } from 'drizzle-orm'
+import type { IsNever, Simplify, ValueOf } from 'type-fest'
+import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
-import { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
+import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
   return field._.source === 'relations'
@@ -119,6 +120,6 @@ export type JoinArrays<T extends any[]> = Simplify<
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
-    ? z.ZodOptional<z.ZodType<NonNullable<T[Key]>>>
-    : z.ZodType<T[Key]>
+    ? ZodOptional<ZodType<NonNullable<T[Key]>>>
+    : ZodType<T[Key]>
 }>

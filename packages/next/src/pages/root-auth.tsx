@@ -1,6 +1,6 @@
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
-import { SignInView } from '~/views/auth/sign-in'
+import { SignInView } from '../views/auth/sign-in'
 
 interface RootProps {
   serverConfig: ServerConfig
@@ -30,17 +30,17 @@ export async function RootAuthPage(props: RootProps) {
     return <SignInView serverConfig={serverConfig} />
   }
 
-  if (segments[1] === 'sign-up' && segments.length === 2) {
-    return <SignUpView serverConfig={serverConfig} />
-  }
+  // if (segments[1] === 'sign-up' && segments.length === 2) {
+  //   return <SignUpView serverConfig={serverConfig} />
+  // }
 
-  if (segments[1] === 'forgot-password' && segments.length === 2) {
-    return <ForgotPasswordView serverConfig={serverConfig} />
-  }
+  // if (segments[1] === 'forgot-password' && segments.length === 2) {
+  //   return <ForgotPasswordView serverConfig={serverConfig} />
+  // }
 
-  if (segments[1] === 'reset-password' && segments.length === 2) {
-    return <ResetPasswordView serverConfig={serverConfig} />
-  }
+  // if (segments[1] === 'reset-password' && segments.length === 2) {
+  //   return <ResetPasswordView serverConfig={serverConfig} />
+  // }
 
   throw new Error(`Invalid path: ${segments.join('/')}`) // TODO: 404
 }

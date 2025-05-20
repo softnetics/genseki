@@ -3,19 +3,19 @@
 import { useMemo } from 'react'
 
 import {
-  AccessorKeyColumnDef,
+  type AccessorKeyColumnDef,
   createColumnHelper,
   getCoreRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import { ClientCollection, InferFields } from 'node_modules/@kivotos/core/src/core/collection'
-import { BaseField } from 'node_modules/@kivotos/core/src/core/field'
+
+import type { ClientCollection, FieldsClient, InferFields } from '@kivotos/core'
 
 import { CustomTable } from '../../intentui/ui/custom-table'
 import { TableCell } from '../../intentui/ui/table'
 
 export function ListTable<
-  TCollection extends ClientCollection<any, any, any, any, Record<string, BaseField>, any>,
+  TCollection extends ClientCollection<any, any, any, any, FieldsClient, any>,
 >(props: { collection: TCollection; data: InferFields<TCollection['fields']>[] }) {
   const columns = useMemo(() => {
     const columnHelper = createColumnHelper()
