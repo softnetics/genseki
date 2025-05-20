@@ -25,6 +25,7 @@ async function makeFetch(
   const fullPath = withQueryParams(withPathParams(path, payload?.pathParams), payload?.query)
   const response = await fetch(`${config.baseUrl}${fullPath}`, {
     method: method,
+    // TODO: Support uploading file and plain text
     headers: { 'Content-Type': 'application/json', ...payload?.headers },
     body: payload.body ? JSON.stringify(payload.body) : null,
   })
