@@ -194,7 +194,7 @@ const countries = [
 
 export const UIPlayground = () => {
   return (
-    <div className="pb-24">
+    <div className="bg-bg pb-24">
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" category-title="Theme playground">
           <div className="bg-bg border-border rounded-sm border px-8 py-4">
@@ -363,23 +363,6 @@ export const UIPlayground = () => {
           </PlaygroundCard>
           <PlaygroundCard title="Dropdown (group section)" category-title="Dropdown">
             <Select defaultSelectedKey={1} aria-label="Countries" placeholder="Select a country">
-              <SelectTrigger />
-              <SelectList items={countries}>
-                {(country) => (
-                  <SelectSection title={country.name} items={country.cities}>
-                    {(city: any) => <SelectOption textValue={city.name}>{city.name}</SelectOption>}
-                  </SelectSection>
-                )}
-              </SelectList>
-            </Select>
-          </PlaygroundCard>
-          <PlaygroundCard title="Dropdown (group section)" category-title="Dropdown">
-            <Select
-              label="Hello world"
-              defaultSelectedKey={1}
-              aria-label="Countries"
-              placeholder="Select a country"
-            >
               <SelectTrigger />
               <SelectList items={countries}>
                 {(country) => (

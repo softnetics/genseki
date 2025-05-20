@@ -24,7 +24,7 @@ import { Keyboard } from './keyboard'
 const dropdownItemStyles = tv({
   base: [
     'col-span-full min-h-16 grid grid-cols-[auto_1fr_1.5rem_0.5rem_auto] not-has-data-[slot=dropdown-item-details]:items-center has-data-[slot=dropdown-item-details]:**:data-[slot=checked-icon]:mt-[1.5px] supports-[grid-template-columns:subgrid]:grid-cols-subgrid',
-    'group relative cursor-default select-none rounded-[calc(var(--radius-md)-1px)] px-[calc(var(--spacing)*4)] py-[calc(var(--spacing)*3)] forced-color:text-[Highlight] text-base text-secondary-fg outline-0 forced-color-adjust-none text-base forced-colors:text-[LinkText]',
+    'group relative cursor-default select-none rounded-[calc(var(--radius-md)-1px)] px-[calc(var(--spacing)*4)] py-[calc(var(--spacing)*4)] md:px-[calc(var(--spacing)*3)] md:py-[calc(var(--spacing)*1.5)] forced-color:text-[Highlight] text-base text-secondary-fg outline-0 forced-color-adjust-none text-base forced-colors:text-[LinkText]',
     '**:data-[slot=avatar]:*:mr-2 **:data-[slot=avatar]:*:size-8 **:data-[slot=avatar]:mr-2 **:data-[slot=avatar]:size-6 sm:**:data-[slot=avatar]:*:size-5 sm:**:data-[slot=avatar]:size-6',
     'data-danger:**:data-[slot=icon]:text-danger/60 **:data-[slot=icon]:size-8 **:data-[slot=icon]:shrink-0 **:data-[slot=icon]:text-muted-fg focus:data-danger:**:data-[slot=icon]:text-danger',
     'data-[slot=menu-radio]:*:data-[slot=icon]:size-8 *:data-[slot=icon]:mr-3',
@@ -33,7 +33,7 @@ const dropdownItemStyles = tv({
   ],
   variants: {
     isDisabled: {
-      true: 'text-muted-fg  forced-colors:text-[GrayText] opacity-50',
+      true: 'text-muted-fg forced-colors:text-[GrayText] opacity-50',
     },
     isSelected: {
       true: '**:data-[slot=avatar]:*:hidden **:data-[slot=avatar]:hidden **:data-[slot=icon]:hidden',

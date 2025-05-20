@@ -1,7 +1,9 @@
-import { ServerConfig } from '@kivotos/core'
-import { getClientCollection } from '@kivotos/core'
+import 'server-only'
+
 import { CaretLeft, Cube, Funnel, MagnifyingGlass } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
+
+import { getClientCollection, ServerConfig } from '@kivotos/core'
 
 import badge from '~/../public/badge.svg'
 import BaseIcon from '~/components/primitives/base-icon'

@@ -1,6 +1,6 @@
 import { MoonStars } from '@phosphor-icons/react/dist/ssr'
 
-import type { Collection } from '@repo/drizzlify'
+import type { Collection } from '@kivotos/core'
 
 import CollectionSection from './collection-section'
 import NavigationSection from './navigations-section'
@@ -35,10 +35,10 @@ export default async function AppSidebar({ collections }: AppSidebarProps) {
           </div>
           <div className="flex flex-col group-data-[sidebar-state=collapsed]/sidebar-container:hidden group-data-[sidebar-state=collapsed]/sidebar-container:translate-x-full">
             <Typography type="body" weight="semibold" className="text-text-nontrivial">
-              ISHTAR
+              Kivotos
             </Typography>
             <Typography type="label" weight="medium" className="text-text-trivial">
-              V.1.0.1
+              V.1.0.0
             </Typography>
           </div>
         </div>

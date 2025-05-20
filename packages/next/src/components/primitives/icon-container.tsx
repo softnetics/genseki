@@ -5,8 +5,8 @@ import { cn } from '~/utils/cn'
 const iconVariants = cva(null, {
   variants: {
     variant: {
-      normal: `bg-bluegray-100`,
-      'soft-shadow': `bg-gradient-to-b to-bluegray-200 from-bluegray-50`,
+      normal: `bg-secondary`,
+      'soft-shadow': `bg-gradient-to-b to-secondary-fg/20 dark:to-secondary-fg/10 from-secondary`,
       ghost: 'text-text-body',
     },
     size: {

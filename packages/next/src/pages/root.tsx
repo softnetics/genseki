@@ -9,7 +9,7 @@ import { RootAuthPage } from './root-auth'
 import { RootCollectionPage } from './root-collection'
 
 interface RootProps {
-  serverConfig: ServerConfig
+  serverConfig: ServerConfig<any, any, any, any>
   paramsPromise: Promise<{ segments: string[] }>
   searchParamsPromise: Promise<{ [key: string]: string | string[] }>
 }

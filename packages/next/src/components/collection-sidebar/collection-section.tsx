@@ -1,9 +1,9 @@
 'use client'
 import React from 'react'
 
-import { Database } from '@phosphor-icons/react'
+import { DatabaseIcon } from '@phosphor-icons/react'
 
-import { Collection } from '@repo/drizzlify'
+import { Collection } from '@kivotos/core'
 
 import { SidebarItem } from '~/intentui/ui/sidebar'
 import {
@@ -38,7 +38,7 @@ const CollectionSection = ({ collections }: CollectionSectionProps) => {
   return (
     <SidebarDisclosure id={2}>
       <SidebarDisclosureTrigger className="rounded-md! in-data-[sidebar-state=collapsed]:rounded-none!">
-        <BaseIcon icon={Database} size="sm" weight="duotone" className="size-8!" />
+        <BaseIcon icon={DatabaseIcon} size="sm" weight="duotone" className="size-8!" />
         <SidebarLabel className="text-text-body text-sm">Collections</SidebarLabel>
       </SidebarDisclosureTrigger>
       <div className="relative">
