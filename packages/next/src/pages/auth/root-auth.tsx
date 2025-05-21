@@ -1,9 +1,9 @@
-import { ServerConfig } from '@kivotos/core'
-
-import { RegisterPage, ResetPasswordConfirmPage } from '~/index'
+import type { ServerConfig } from '@kivotos/core'
 
 import { ForgotPasswordPage } from './forgot-password'
 import { LoginPage } from './login'
+import { RegisterPage } from './register'
+import { ResetPasswordConfirmPage } from './reset-password'
 
 interface RootProps {
   serverConfig: ServerConfig

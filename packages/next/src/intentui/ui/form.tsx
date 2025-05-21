@@ -1,8 +1,7 @@
 import * as React from 'react'
 import { Label as LabelPrimitive } from 'react-aria-components'
-import {
+import type {
   Control,
-  Controller,
   ControllerProps,
   DeepPartialSkipArrayKey,
   FieldArrayPath,
@@ -10,11 +9,14 @@ import {
   FieldPathValue,
   FieldPathValues,
   FieldValues,
-  FormProvider,
   Path,
-  useFieldArray,
   UseFieldArrayProps,
   UseFieldArrayReturn,
+} from 'react-hook-form'
+import {
+  Controller,
+  FormProvider,
+  useFieldArray,
   useFormContext,
   useFormState,
   useWatch,
@@ -23,9 +25,10 @@ import {
 import { Slot } from '@radix-ui/react-slot'
 import { deepmerge } from 'deepmerge-ts'
 
-import { cn } from '~/utils/cn'
+import type { ButtonProps } from './button'
+import { Button } from './button'
 
-import { Button, ButtonProps } from './button'
+import { cn } from '../../utils/cn'
 
 const Form: typeof FormProvider = FormProvider
 

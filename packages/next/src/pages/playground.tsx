@@ -6,8 +6,8 @@ import { GithubLogo } from '@phosphor-icons/react/dist/ssr'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 
-import { Button } from '~/intentui/ui/button'
-import { Input } from '~/intentui/ui/field'
+import { Button } from '../intentui/ui/button'
+import { Input } from '../intentui/ui/field'
 
 export const RegisterPage: NextPage = () => {
   const [email, setEmail] = useState('')
@@ -49,7 +49,7 @@ export const RegisterPage: NextPage = () => {
               type="email"
               placeholder="name@example.com"
               value={email}
-              onChange={(e) => setEmail(e.target.value)}
+              onChange={(e: any) => setEmail(e.target.value)}
             />
             <Button size="md" variant="primary" className="w-full" onClick={handleEmailSignIn}>
               Sign In with Email
@@ -58,7 +58,6 @@ export const RegisterPage: NextPage = () => {
           <div className="flex items-center justify-center">
             <span className="text-muted-foreground text-xs">OR CONTINUE WITH</span>
           </div>
-          อ
           <Button
             variant="outline"
             size="md"

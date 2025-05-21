@@ -5,7 +5,7 @@ import { headers as nextHeaders } from 'next/headers'
 import type { ServerConfig } from '@kivotos/core'
 
 import { NotfoundPage } from './404'
-import { RootAuthPage } from './root-auth'
+import { RootAuthPage } from './auth/root-auth'
 import { RootCollectionPage } from './root-collection'
 
 import { RootCollectionLayout } from '../layouts/root-collection'
@@ -44,7 +44,6 @@ export async function RootPage(props: RootProps) {
         serverConfig={serverConfig}
         segments={params.segments.slice(1)}
         searchParams={searchParams}
-        headers={headers}
       />
     )
   }
