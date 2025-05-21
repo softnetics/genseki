@@ -1,0 +1,70 @@
+import z from 'zod'
+
+import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
+import { AccountProvider } from '../constant'
+import { type AuthContext } from '../context'
+
+interface InternalRouteOptions {}
+
+export function signUp<const TOptions extends InternalRouteOptions>(options: TOptions) {
+  const schema = {
+    method: 'POST',
+    path: '/api/auth/sign-up',
+    body: z
+      .object({
+        name: z.string(),
+        email: z.string(),
+        password: z.string(),
+        callbackURL: z.string().optional(),
+      })
+      .and(z.record(z.string(), z.any())),
+    responses: {
+      200: z.object({
+        token: z.string().nullable(),
+        user: z.object({
+          id: z.string(),
+          name: z.string(),
+          email: z.string(),
+          image: z.string().nullable(),
+        }),
+      }),
+    },
+  } as const satisfies ApiRouteSchema
+
+  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+    const hasedPassword = args.body.password // TODO: hash password
+
+    const user = await args.context.internalHandlers.user.create({
+      name: args.body.name,
+      email: args.body.email,
+      image: null,
+    })
+
+    await args.context.internalHandlers.account.link({
+      userId: user.id,
+      providerId: AccountProvider.CREDENTIAL,
+      accountId: user.id,
+      password: hasedPassword,
+    })
+
+    // TODO: Check if sending email verification is enabled
+    // NOTE: Callback URL is used for email verification
+
+    // Check if auto login is enabled
+    const session = await args.context.internalHandlers.session.create({
+      userId: user.id,
+      // TODO: Customize expiresAt
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    })
+
+    return {
+      status: 200,
+      body: {
+        token: session.token,
+        user: user,
+      },
+    }
+  }
+
+  return createEndpoint(schema, handler)
+}

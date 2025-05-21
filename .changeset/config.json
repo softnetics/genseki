@@ -3,7 +3,7 @@
 "changelog": ["@changesets/changelog-github", { "repo": "softnetics/kivotos" }],
   "commit": false,
   "fixed": [
-    ["@kivotos/core", "@kivotos/next"]
+    ["@kivotos/core", "@kivotos/next", "@kivotos/rest"]
   ],
   "linked": [],
   "access": "restricted",

@@ -1,17 +1,17 @@
 'use client'
 import React from 'react'
 
-import { Database } from '@phosphor-icons/react'
+import { DatabaseIcon } from '@phosphor-icons/react'
 import { usePathname } from 'next/navigation'
 
-import { SidebarItem } from '~/intentui/ui/sidebar'
 import {
+  SidebarDisclosure,
   SidebarDisclosurePanel,
   SidebarDisclosureTrigger,
+  SidebarItem,
   SidebarLabel,
-} from '~/intentui/ui/sidebar'
-import { SidebarDisclosure } from '~/intentui/ui/sidebar'
-
+} from '../../intentui/ui/sidebar'
+import { formatSlug } from '../../utils/format-slug'
 import BaseIcon from '../primitives/base-icon'
 
 const CurveLine = ({ className }: { className?: string }) => {
@@ -29,34 +29,41 @@ const CurveLine = ({ className }: { className?: string }) => {
   )
 }
 
-const CollectionSection = () => {
+type CollectionSectionProps = {
+  slugs: string[]
+}
+
+const CollectionSection = ({ slugs }: CollectionSectionProps) => {
   const pathname = usePathname()
-  console.log(pathname)
+
+  const isCurrentPage = (slug: string) => pathname === `/admin/collections/${slug}`
+
+  const collectionHref = (slug: string) => `/admin/collections/${slug}`
 
   return (
     <SidebarDisclosure id={2}>
       <SidebarDisclosureTrigger className="rounded-md! in-data-[sidebar-state=collapsed]:rounded-none!">
-        <BaseIcon icon={Database} size="sm" weight="duotone" className="size-8!" />
+        <BaseIcon icon={DatabaseIcon} size="sm" weight="duotone" className="size-8!" />
         <SidebarLabel className="text-text-body text-sm">Collections</SidebarLabel>
       </SidebarDisclosureTrigger>
       <div className="relative">
         <div
-          style={{ '--amount': 3 } as React.CSSProperties}
-          className="bg-primary in-data-[sidebar-state=collapsed]:hidden in-data-expanded:block absolute -top-[calc(var(--spacing)*4)] left-[calc(var(--spacing)*7.2)] z-10 hidden h-[calc((41.14px*var(--amount))-21.14px)] w-px"
+          style={{ '--amount': slugs.length } as React.CSSProperties}
+          className="bg-primary in-data-[sidebar-state=collapsed]:hidden in-data-expanded:block absolute left-[calc(var(--spacing)*7.2)] top-[calc(var(--spacing)*-5)] z-10 hidden h-[calc((41.14px*var(--amount))-21.14px)] w-px"
         />
         <SidebarDisclosurePanel>
-          <SidebarItem ghost href="#" tooltip="Tickets" isCurrent>
-            <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
-            <SidebarLabel className="ml-6">Posts</SidebarLabel>
-          </SidebarItem>
-          <SidebarItem ghost href="#" tooltip="Tickets">
-            <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
-            <SidebarLabel className="ml-6">Post categories</SidebarLabel>
-          </SidebarItem>
-          <SidebarItem ghost href="#" tooltip="Tickets">
-            <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
-            <SidebarLabel className="ml-6">Users</SidebarLabel>
-          </SidebarItem>
+          {slugs.map((slug) => (
+            <SidebarItem
+              key={slug}
+              ghost
+              isCurrent={isCurrentPage(slug)}
+              href={collectionHref(slug)}
+              tooltip="Tickets"
+            >
+              <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
+              <SidebarLabel className="ml-6">{formatSlug(slug)}</SidebarLabel>
+            </SidebarItem>
+          ))}
         </SidebarDisclosurePanel>
       </div>
     </SidebarDisclosure>

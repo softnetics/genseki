@@ -8,28 +8,76 @@ import {
   IconSettings,
   IconSun,
 } from '@intentui/icons'
+import { CubeIcon, DotsThreeIcon } from '@phosphor-icons/react'
+import { usePathname } from 'next/navigation'
 
-import { useTheme } from '~/intentui/theme-provider'
-
+import { useTheme } from '../../intentui/theme-provider'
 import { Breadcrumbs } from '../../intentui/ui/breadcrumbs'
 import { Menu } from '../../intentui/ui/menu'
 import { Separator } from '../../intentui/ui/separator'
 import { SidebarNav, SidebarTrigger } from '../../intentui/ui/sidebar'
 import { Switch } from '../../intentui/ui/switch'
+import { useRootContext } from '../../providers/root'
+import { formatSlug } from '../../utils/format-slug'
+import BaseIcon from '../primitives/base-icon'
+
+const BreadCrumbs = () => {
+  const pathname = usePathname()
+  const leadingPath = '/admin'
+
+  const removeLeadingpath = pathname.split(leadingPath)[1]
+
+  const sanitizedSegments = removeLeadingpath.slice(1).split('/')
+
+  return (
+    <Breadcrumbs separator="slash" className="hidden md:flex">
+      {sanitizedSegments.map((segment, index) => {
+        return (
+          <Breadcrumbs.Item
+            key={segment}
+            href={`${leadingPath}/${sanitizedSegments.slice(0, index + 1).join('/')}`}
+            trailing={
+              sanitizedSegments[0] === 'collections' && index === 1 ? <CollectionMenu /> : null
+            }
+          >
+            {segment ?? 'unknown'}
+          </Breadcrumbs.Item>
+        )
+      })}
+    </Breadcrumbs>
+  )
+}
 
 export default function AppSidebarNav() {
   return (
-    <SidebarNav className="h-[76px] border-b">
+    <SidebarNav className="relative z-10 h-[76px] border-b">
       <span className="flex items-center gap-x-4">
         <SidebarTrigger size="sm" variant="ghost" className="-mx-2" />
         <Separator className="h-6" orientation="vertical" />
-        <Breadcrumbs className="hidden md:flex">
-          <Breadcrumbs.Item href="/blocks/sidebar/sidebar-01">Dashboard</Breadcrumbs.Item>
-          <Breadcrumbs.Item>Newsletter</Breadcrumbs.Item>
-        </Breadcrumbs>
+        <BreadCrumbs />
       </span>
       <UserMenu />
     </SidebarNav>
+  )
+}
+
+function CollectionMenu() {
+  const { clientConfig } = useRootContext()
+
+  return (
+    <Menu>
+      <Menu.Trigger className="ml-auto" aria-label="Open Menu">
+        <BaseIcon icon={DotsThreeIcon} size="md" weight="bold" />
+      </Menu.Trigger>
+      <Menu.Content placement="bottom left" showArrow className="sm:min-w-64">
+        {clientConfig.collections.map((collection) => (
+          <Menu.Item key={collection.slug} href={`/admin/collections/${collection.slug}`}>
+            <BaseIcon icon={CubeIcon} weight="duotone" />
+            <Menu.Label>{formatSlug(collection.slug)}</Menu.Label>
+          </Menu.Item>
+        ))}
+      </Menu.Content>
+    </Menu>
   )
 }
 
@@ -37,8 +85,8 @@ function UserMenu() {
   const { theme, setTheme } = useTheme()
   return (
     <Menu>
-      <Menu.Trigger className="ml-auto md:hidden" aria-label="Open Menu">
-        <p>Option</p>
+      <Menu.Trigger className="ml-auto" aria-label="Open Menu">
+        <BaseIcon icon={DotsThreeIcon} size="md" weight="bold" />
       </Menu.Trigger>
       <Menu.Content placement="bottom" showArrow className="sm:min-w-64">
         <Menu.Section>

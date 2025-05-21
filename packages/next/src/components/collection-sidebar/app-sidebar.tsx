@@ -1,4 +1,4 @@
-import { MoonStars } from '@phosphor-icons/react/dist/ssr'
+import { MoonStarsIcon } from '@phosphor-icons/react/dist/ssr'
 
 import type { Collection } from '@kivotos/core'
 
@@ -20,6 +20,8 @@ type AppSidebarProps = {
 }
 
 export default async function AppSidebar({ collections }: AppSidebarProps) {
+  const collectionSlugs = collections.map((collection) => collection.slug)
+
   return (
     <Sidebar
       collapsible="dock"
@@ -31,14 +33,14 @@ export default async function AppSidebar({ collections }: AppSidebarProps) {
           <div className="bg-primary/15 dark:bg-primary/20 border-primary dark:border-primary/40 relative flex overflow-clip rounded-md border p-4">
             <div className="bg-primary/20 absolute -inset-x-[25%] inset-y-0 m-auto h-2 -translate-x-4 -translate-y-4 -rotate-45 blur-[3px]" />
             <div className="bg-primary/20 absolute -inset-x-[25%] inset-y-0 m-auto h-2 translate-x-4 translate-y-4 -rotate-45 blur-[3px]" />
-            <BaseIcon icon={MoonStars} size="lg" weight="duotone" className="text-primary" />
+            <BaseIcon icon={MoonStarsIcon} size="lg" weight="duotone" className="text-primary" />
           </div>
           <div className="flex flex-col group-data-[sidebar-state=collapsed]/sidebar-container:hidden group-data-[sidebar-state=collapsed]/sidebar-container:translate-x-full">
             <Typography type="body" weight="semibold" className="text-text-nontrivial">
-              ISHTAR
+              Kivotos
             </Typography>
             <Typography type="label" weight="medium" className="text-text-trivial">
-              V.1.0.1
+              V.1.0.0
             </Typography>
           </div>
         </div>
@@ -47,7 +49,7 @@ export default async function AppSidebar({ collections }: AppSidebarProps) {
         <SidebarDisclosureGroup defaultExpandedKeys={[2]} className="mt-4">
           <NavigationSection />
           <PluginSection />
-          <CollectionSection />
+          <CollectionSection slugs={collectionSlugs} />
         </SidebarDisclosureGroup>
       </SidebarContent>
       <SidebarRail />

@@ -5,9 +5,6 @@
     "jsx": "react-jsx",
     "lib": ["dom"],
     "module": "ESNext",
-    "moduleResolution": "bundler",
-    "paths": {
-      "~/*": ["./src/*"]
-    }
+    "moduleResolution": "bundler"
   }
 }

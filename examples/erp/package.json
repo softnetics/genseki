@@ -10,13 +10,13 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
     "db:migrate": "drizzle-kit migrate",
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
     "@kivotos/core": "workspace:^",
     "@kivotos/next": "workspace:^",
+    "@kivotos/rest": "workspace:^",
     "@tailwindcss/postcss": "^4.0.14",
     "drizzle-orm": "^0.41.0",
     "next": "15.2.2",

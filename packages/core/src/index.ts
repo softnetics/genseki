@@ -1,7 +1,8 @@
-export { Builder } from './core/builder'
+export { Builder } from './builder'
 export type {
   ApiReturnType,
   ClientApiArgs,
+  ClientCollection,
   Collection,
   CollectionAdmin,
   CollectionAdminApi,
@@ -11,26 +12,24 @@ export type {
   CollectionConfig,
   InferApiRouterFromCollection,
   InferContextFromCollection,
+  InferField,
+  InferFields,
   InferFieldsFromCollection,
   InferFullSchemaFromCollection,
   InferSlugFromCollection,
   InferTableNameFromCollection,
-} from './core/collection'
-export { ApiDefaultMethod } from './core/collection'
-export {
-  type BaseConfig,
-  type ClientConfig,
-  defineBaseConfig,
-  getClientCollection,
-  getClientConfig,
-  type ServerConfig,
-} from './core/config'
+} from './collection'
+export { ApiDefaultMethod } from './collection'
+export type { BaseConfig, ClientConfig, ServerConfig } from './config'
+export { defineBaseConfig, getClientCollection, getClientConfig } from './config'
 export type {
   ApiRoute,
+  ApiRouteHandler,
   ApiRouteHandlerPayload,
   ApiRouter,
+  ApiRouteResponse,
   ApiRouteSchema,
-  ClientApiRouteHandlerPayload,
+  ClientApiRouter,
   InferApiRouteResponses,
-} from './core/endpoint'
-export { type Field, FieldBuilder } from './core/field'
+} from './endpoint'
+export type { Field, FieldBase, FieldClient, Fields, FieldsClient } from './field'

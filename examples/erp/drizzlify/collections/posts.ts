@@ -1,26 +1,35 @@
 import { builder } from '../helper'
 
-const postsField = builder.fields('posts', (fb) => ({
-  id: fb.columns('id', {
-    type: 'text',
-  }),
-  title: fb.columns('title', {
-    type: 'text',
-  }),
-  content: fb.columns('content', {
-    type: 'text',
-  }),
-  author: fb.relations('author', {
-    type: 'connect',
-    options: builder.options(async ({ db }) => {
-      const result = await db.query.users.findMany({ columns: { id: true, name: true } })
-      return result.map((user) => ({ label: user.name ?? user.id, value: user.id }))
-    }),
-  }),
-}))
-
 export const postsCollection = builder.collection('posts', {
   slug: 'posts',
   primaryField: 'id',
-  fields: postsField,
+  fields: builder.fields('posts', (fb) => ({
+    id: fb.columns('id', {
+      type: 'text',
+    }),
+    title: fb.columns('title', {
+      type: 'text',
+    }),
+    content: fb.columns('content', {
+      type: 'text',
+    }),
+    authorId: fb.relations('author', (fb) => ({
+      type: 'connect',
+      fields: fb.fields('users', (fb) => ({
+        id: fb.columns('id', {
+          type: 'text',
+        }),
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+        email: fb.columns('email', {
+          type: 'text',
+        }),
+      })),
+      options: builder.options(async ({ db }) => {
+        const result = await db.query.users.findMany({ columns: { id: true, name: true } })
+        return result.map((user) => ({ label: user.name, value: user.id }))
+      }),
+    })),
+  })),
 })

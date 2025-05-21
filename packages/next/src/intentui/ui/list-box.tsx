@@ -11,8 +11,6 @@ import {
 import { IconCheck, IconHamburger } from '@intentui/icons'
 import { twMerge } from 'tailwind-merge'
 
-import { cn } from '~/utils/cn'
-
 import {
   DropdownDescription,
   DropdownItemDetails,
@@ -22,12 +20,14 @@ import {
 } from './dropdown'
 import { composeTailwindRenderProps } from './primitive'
 
+import { cn } from '../../utils/cn'
+
 const ListBox = <T extends object>({ className, ...props }: ListBoxProps<T>) => (
   <ListBoxPrimitive
     {...props}
     className={composeTailwindRenderProps(
       className,
-      "outline-hidden *:[[role='group']+[role=group]]:mt-4 *:[[role='group']+[role=separator]]:mt-1 grid max-h-96 w-full min-w-56 grid-cols-[auto_1fr] flex-col gap-y-1 overflow-auto overflow-y-auto rounded-md border p-2 shadow-lg [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5"
+      "outline-hidden *:[[role='group']+[role=group]]:mt-4 *:[[role='group']+[role=separator]]:mt-1 grid max-h-96 w-full grid-cols-[auto_1fr] flex-col gap-y-1 overflow-auto overflow-y-auto rounded-md border p-2 shadow-lg [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5"
     )}
   />
 )

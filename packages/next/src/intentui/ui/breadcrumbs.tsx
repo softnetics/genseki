@@ -28,11 +28,13 @@ const Breadcrumbs = <T extends object>({
 
 interface BreadcrumbsItemProps extends BreadcrumbProps, BreadcrumbsContextProps {
   href?: string
+  trailing?: React.ReactNode
 }
 
 const BreadcrumbsItem = ({
   href,
   separator = true,
+  trailing,
   className,
   ...props
 }: BreadcrumbsItemProps & Partial<Omit<LinkProps, 'className'>>) => {
@@ -48,6 +50,7 @@ const BreadcrumbsItem = ({
       {({ isCurrent }) => (
         <>
           <Link href={href} {...props} />
+          {trailing}
           {!isCurrent && separator !== false && <Separator separator={separatorValue} />}
         </>
       )}

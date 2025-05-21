@@ -198,7 +198,7 @@
     --primary-fg: var(--color-pumpkin-50);
     --primary-emphasis: var(--color-pumpkin-600);
 
-    --secondary: var(--color-bluegray-100);
+    --secondary: var(--color-bluegray-200);
     --secondary-fg: var(--color-bluegray-600);
 
     --overlay: var(--color-white);
@@ -207,7 +207,7 @@
     --accent: var(--color-pumpkin-500);
     --accent-fg: var(--color-bluegray-50);
 
-    --muted: var(--color-bluegray-200);
+    --muted: var(--color-bluegray-100);
     --muted-fg: var(--color-bluegray-600);
 
     --success: var(--color-palm-600);
@@ -250,8 +250,8 @@
 
     --accent: var(--color-pumpkin-500);
     --accent-fg: var(--color-bluegray-50);
-    
-    --muted: var(--color-bluegray-800);
+
+    --muted: var(--color-bluegray-700);
     --muted-fg: var(--color-bluegray-400);
 
     --overlay: var(--color-bluegray-900);
@@ -337,7 +337,7 @@
   }
 
   body {
-    background-color: var(--bg);
+    background-color: var(--sidebar);
     color: var(--color-text-body);
   }
 

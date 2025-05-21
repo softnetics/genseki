@@ -5,14 +5,14 @@ import { Link } from 'react-aria-components'
 import { DiscordLogo, GithubLogo } from '@phosphor-icons/react'
 import { PlusCircle, UserCircle } from '@phosphor-icons/react/dist/ssr'
 
-import PlaygroundCard from '~/components/playground/card'
-import BaseIcon from '~/components/primitives/base-icon'
-import IconContainer from '~/components/primitives/icon-container'
-import Typography from '~/components/primitives/typography'
-import { Button } from '~/intentui/ui/button'
-import { Checkbox, CheckboxGroup } from '~/intentui/ui/checkbox'
-import { ListBox } from '~/intentui/ui/list-box'
-import { Popover } from '~/intentui/ui/popover'
+import PlaygroundCard from '../components/playground/card'
+import BaseIcon from '../components/primitives/base-icon'
+import IconContainer from '../components/primitives/icon-container'
+import Typography from '../components/primitives/typography'
+import { Button } from '../intentui/ui/button'
+import { Checkbox, CheckboxGroup } from '../intentui/ui/checkbox'
+import { ListBox } from '../intentui/ui/list-box'
+import { Popover } from '../intentui/ui/popover'
 import {
   Select,
   SelectLabel,
@@ -21,9 +21,9 @@ import {
   SelectSection,
   SelectSeparator,
   SelectTrigger,
-} from '~/intentui/ui/select'
-import { Switch } from '~/intentui/ui/switch'
-import { TextField } from '~/intentui/ui/text-field'
+} from '../intentui/ui/select'
+import { Switch } from '../intentui/ui/switch'
+import { TextField } from '../intentui/ui/text-field'
 
 const Wrapper = ({ children, title }: { children: React.ReactNode; title: string }) => {
   return (
@@ -192,9 +192,9 @@ const countries = [
   },
 ]
 
-const UIPlayground = () => {
+export const UIPlayground = () => {
   return (
-    <div className="pb-24">
+    <div className="bg-bg pb-24">
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" category-title="Theme playground">
           <div className="bg-bg border-border rounded-sm border px-8 py-4">
@@ -1009,5 +1009,3 @@ const UIPlayground = () => {
     </div>
   )
 }
-
-export default UIPlayground

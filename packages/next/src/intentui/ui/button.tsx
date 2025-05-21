@@ -1,15 +1,15 @@
 'use client'
 import React, { forwardRef } from 'react'
+import type { LinkProps as LinkPrimitiveProps } from 'react-aria-components'
 import {
   Button as ButtonPrimitive,
   type ButtonProps as ButtonPrimitiveProps,
   Link,
-  LinkProps as LinkPrimitiveProps,
 } from 'react-aria-components'
 
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '~/utils/cn'
+import { cn } from '../../utils/cn'
 
 const buttonVariants = cva('cursor-pointer flex items-center justify-center', {
   variants: {
@@ -20,9 +20,9 @@ const buttonVariants = cva('cursor-pointer flex items-center justify-center', {
         shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_2px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]`,
       tertiary: `bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/15 hover:bg-primary/25 [&>*]:text-accent text-accent`,
       naked:
-        '[&>*]:text-secondary-fg text-secondary-fg bg-bg hover:shadow-sm transition-shadow shadow-md dark:shadow-secondary border-b border-stroke-trivial/10',
+        '[&>*]:text-secondary-fg text-secondary-fg bg-bg hover:shadow-sm transition-shadow shadow-md dark:shadow-bg border-b border-stroke-trivial/10',
       outline:
-        '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary shadow-[inset_0_0_0_1px_var(--color-stroke-trivial)] bg-bg [background-image:radial-gradient(90%_80%_at_50%_40%,var(--color-bg)_40%,--alpha(var(--color-secondary-fg)/20%))]',
+        '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary shadow-[inset_0_0_0_1px_var(--color-secondary)] bg-bg [background-image:radial-gradient(150%_90%_at_50%_50%,var(--color-bg)_40%,--alpha(var(--color-secondary-fg)/20%))]',
       ghost: '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary',
       vanish: '[&>*]:text-secondary-fg text-secondary-fg',
       destruction:
@@ -84,7 +84,7 @@ type ButtonLinkProps = LinkPrimitiveProps &
   }
 
 const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
-  { className, variant, size, isDisabled = false, ...props },
+  { className, variant, size, isDisabled = false, children, ...props },
   ref
 ) {
   return (
@@ -93,7 +93,15 @@ const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function Butto
       data-slot="button"
       className={cn(buttonVariants({ variant, size, isDisabled, className }))}
       {...props}
-    />
+    >
+      {(values) => (
+        <>
+          {props.leadingIcon}
+          {typeof children === 'function' ? children(values) : children}
+          {props.trailingIcon}
+        </>
+      )}
+    </Link>
   )
 })
 

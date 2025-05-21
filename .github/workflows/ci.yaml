@@ -38,24 +38,14 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Get turbo filter
-        id: get-turbo-filter
-        run: |
-          if [ "${{ github.event_name }}" == "pull_request" ]; then
-            TURBO_FILTER="--filter=...[origin/${{ github.base_ref }}]"
-            echo "This is a pull request event. Setting turbo filter to '$TURBO_FILTER'"
-          elif [ "${{ github.event_name }}" == "push" ]; then
-            TURBO_FILTER="--filter=...[${{ github.event.before }}]"
-            echo "This is a push event. Setting turbo filter to '$TURBO_FILTER'"
-          else
-            echo "Unsupported event '${{ github.event_name }}' detected. Exiting."
-            exit 1
-          fi
+      - name: Run typecheck
+        run: pnpm turbo typecheck
 
-          echo "TURBO_FILTER=$TURBO_FILTER" >> $GITHUB_OUTPUT
+      - name: Run format:check
+        run: pnpm turbo format:check
 
-      - name: Codegen
-        run: pnpm codegen
+      - name: Run lint
+        run: pnpm turbo lint
 
-      - name: Run all
-        run: pnpm turbo typecheck format:check lint test ${{ steps.get-turbo-filter.outputs.TURBO_FILTER }}
+      - name: Run tests
+        run: pnpm turbo test

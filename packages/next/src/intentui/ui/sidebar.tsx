@@ -22,12 +22,9 @@ import {
   Text,
 } from 'react-aria-components'
 
-import { List, Sidebar as PhosphorSidebar } from '@phosphor-icons/react'
-import { CaretDown } from '@phosphor-icons/react'
+import { CaretDownIcon, ListIcon, SidebarIcon } from '@phosphor-icons/react'
 import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
-
-import BaseIcon from '~/components/primitives/base-icon'
 
 import { Badge } from './badge'
 import { Button } from './button'
@@ -35,6 +32,7 @@ import { composeTailwindRenderProps } from './primitive'
 import { Sheet, SheetBody, SheetContent } from './sheet'
 import { Tooltip, TooltipContent } from './tooltip'
 
+import BaseIcon from '../../components/primitives/base-icon'
 import { useMediaQuery } from '../utils/use-media-query'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar-state'
@@ -412,7 +410,7 @@ const sidebarItemStyles = tv({
     'group/sidebar-item relative col-span-full cursor-pointer overflow-hidden text-sidebar-fg/70 focus-visible:outline-hidden sm:text-sm',
     '**:data-[slot=menu-trigger]:-mr-1 **:data-[slot=menu-trigger]:absolute **:data-[slot=menu-trigger]:right-0 **:data-[slot=menu-trigger]:flex **:data-[slot=menu-trigger]:h-full **:data-[slot=menu-trigger]:w-[calc(var(--sidebar-width)-90%)] **:data-[slot=menu-trigger]:items-center **:data-[slot=menu-trigger]:justify-end **:data-[slot=menu-trigger]:pr-2.5 **:data-[slot=menu-trigger]:opacity-0 **:data-[slot=menu-trigger]:pressed:opacity-100 pressed:**:data-[slot=menu-trigger]:opacity-100 **:data-[slot=menu-trigger]:has-data-focus:opacity-100 **:data-[slot=menu-trigger]:focus-visible:opacity-100 hover:**:data-[slot=menu-trigger]:opacity-100',
     '**:data-[slot=avatar]:*:size-4 **:data-[slot=avatar]:size-4 **:data-[slot=icon]:size-7 **:data-[slot=avatar]:shrink-0 **:data-[slot=icon]:shrink-0',
-    'bg-bg hover:bg-[--alpha(var(--color-muted-fg)/10%)] focus:bg-[--alpha(var(--color-muted-fg)/10%)] hover:text-sidebar-fg py-6! pl-14! first-of-type:rounded-t-md last-of-type:rounded-b-md',
+    'bg-bg hover:bg-[--alpha(var(--color-muted-fg)/10%)] hover:text-sidebar-fg py-6! pl-14! md:first-of-type:rounded-t-md md:last-of-type:rounded-b-md',
   ],
   variants: {
     ghost: {
@@ -427,7 +425,7 @@ const sidebarItemStyles = tv({
       true: 'bg-primary/10 text-text-accent pointer-events-none hover:bg-(--sidebar-accent)/90 hover:text-fg **:data-[slot=menu-trigger]:from-(--sidebar-accent) **:data-[slot=icon]:text-fg [&_.text-muted-fg]:text-fg/80',
     },
     isActive: {
-      true: 'bg-(--sidebar-accent) text-sidebar-fg **:data-[slot=menu-trigger]:flex',
+      true: 'bg-[--alpha(var(--sidebar-accent)/20%)] text-sidebar-fg **:data-[slot=menu-trigger]:flex',
     },
     isDisabled: {
       true: 'cursor-default opacity-50',
@@ -437,7 +435,7 @@ const sidebarItemStyles = tv({
     {
       ghost: true,
       isCurrent: true,
-      className: 'bg-transparent focus:bg-red-500!',
+      className: 'bg-transparent',
     },
   ],
 })
@@ -619,7 +617,7 @@ const sidebarDisclosureTrigger = tv({
       true: 'justify-center',
     },
     isActive: {
-      true: 'bg-(--sidebar-accent) text-sidebar-fg',
+      true: 'bg-[--alpha(var(--sidebar-accent)/20%)] text-sidebar-fg',
     },
     isDisabled: {
       true: 'cursor-default opacity-50',
@@ -630,8 +628,8 @@ const sidebarDisclosureTrigger = tv({
 interface SidebarDisclosureTriggerProps extends ButtonProps {}
 
 const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisclosureTriggerProps>(
-  ({ className, ...props }, ref) => {
-    const { state, isMobile } = useSidebar()
+  ({ className, onClick, ...props }, ref) => {
+    const { state, isMobile, toggleSidebar } = useSidebar()
     const collapsed = state === 'collapsed' && !isMobile
     return (
       <Heading level={3}>
@@ -647,6 +645,10 @@ const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisc
               className,
             })
           )}
+          onClick={(e) => {
+            if (state === 'collapsed' && !isMobile) toggleSidebar()
+            onClick?.(e)
+          }}
           {...props}
         >
           {(values) => (
@@ -654,7 +656,7 @@ const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisc
               {typeof props.children === 'function' ? props.children(values) : props.children}
               {state !== 'collapsed' && (
                 <BaseIcon
-                  icon={CaretDown}
+                  icon={CaretDownIcon}
                   size="sm"
                   weight="regular"
                   className="z-10 ml-auto size-7 transition-transform group-aria-expanded:rotate-180"
@@ -713,13 +715,8 @@ const SidebarTrigger = ({
     >
       {children || (
         <>
-          <BaseIcon
-            icon={PhosphorSidebar}
-            size="sm"
-            weight="duotone"
-            className="hidden md:inline"
-          />
-          <BaseIcon icon={List} size="sm" weight="duotone" className="inline md:hidden" />
+          <BaseIcon icon={SidebarIcon} size="md" weight="duotone" className="hidden md:inline" />
+          <BaseIcon icon={ListIcon} size="md" weight="duotone" className="inline md:hidden" />
           <span className="sr-only">Toggle Sidebar</span>
         </>
       )}

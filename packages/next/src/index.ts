@@ -1,5 +1,4 @@
 export { AutoField } from './components/auto-field'
-export { DeleteButton } from './components/delete-button'
 export { Nav } from './components/nav'
 export { RootCollectionLayout as RootLayout } from './layouts/root-collection'
 export { ForgotPasswordPage } from './pages/auth/forgot-password'

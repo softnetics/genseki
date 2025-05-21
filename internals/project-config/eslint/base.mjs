@@ -53,6 +53,7 @@ const config = tseslint.config(
       ],
       '@typescript-eslint/no-explicit-any': 'off',
       '@typescript-eslint/no-empty-object-type': 'off',
+      '@typescript-eslint/consistent-type-imports': 'error',
     },
   },
   {
@@ -77,10 +78,12 @@ const config = tseslint.config(
             ['^'],
             // Asolute aliases. Anything that starts with `@`.
             ['^@?\\w'],
+            // Absolute imports from `@kivotos/*`.
+            ['^@kivotos?\\w'],
             // Absolute app import.
-            ['^@app?\\w'],
+            ['^@example?\\w'],
             // Internal Packages. Things that start with a letter (or digit or underscore), or `@repo` followed by a letter.
-            ['^@repo?\\w'],
+            ['^@internal?\\w'],
             // Internal aliases. Anything that starts with `~`.
             ['^~'],
             // Relative imports. Anything that starts with a dot.

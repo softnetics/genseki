@@ -71,7 +71,7 @@ const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
       data-slot="menu-trigger"
       className={composeTailwindRenderProps(
         className,
-        'outline-hidden focus-visible:ring-primary relative inline text-left focus-visible:ring-1'
+        'outline-hidden focus-visible:ring-primary relative inline cursor-pointer text-left focus-visible:ring-1'
       )}
       {...props}
     >
@@ -122,7 +122,7 @@ const MenuContent = <T extends object>({
       arrowBoundaryOffset={props.arrowBoundaryOffset}
       className={composeTailwindRenderProps(
         popoverClassName,
-        'shadow-xs outline-hidden z-50 p-0 sm:min-w-40'
+        'shadow-xs outline-hidden z-50 min-w-44 rounded-lg p-0 sm:pb-0'
       )}
     >
       <MenuPrimitive

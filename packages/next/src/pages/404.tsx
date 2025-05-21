@@ -1,0 +1,59 @@
+import React from 'react'
+
+import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
+
+import BaseIcon from '~/components/primitives/base-icon'
+import Typography from '~/components/primitives/typography'
+import { Link } from '~/intentui/ui/link'
+
+type NotfoundPageProps = {
+  title?: string | React.ReactElement
+  redirectSentence?: string
+  redirectURL: string
+  description?: string
+}
+const NotfoundPage = ({
+  redirectURL,
+  redirectSentence = 'Back to home',
+  title = 'Oops! 😵',
+  description = 'The page is not found, please check the URL and try again.',
+}: NotfoundPageProps) => {
+  return (
+    <div className="from-bg to-primary/10 grid h-dvh content-center justify-center bg-gradient-to-br from-50% px-20">
+      <Typography
+        style={{
+          backgroundImage:
+            'radial-gradient(circle, var(--color-accent) 2px,var(--color-accent) 2px,transparent 2px)',
+          backgroundRepeat: 'repeat',
+          backgroundSize: '4px 4px',
+        }}
+        type="h1"
+        weight="bold"
+        className="inline-block w-fit bg-clip-text text-transparent"
+      >
+        404
+      </Typography>
+      {typeof title === 'string' ? (
+        <Typography
+          weight="semibold"
+          type="h4"
+          className="text-text-nontrivial mt-12 min-w-[120px]"
+        >
+          {title}
+        </Typography>
+      ) : (
+        title
+      )}
+      <Typography weight="normal" type="body" className="text-text-body">
+        {description}
+      </Typography>
+      <div className="bg-border mt-6 h-px w-full" />
+      <Link intent="primary" href={redirectURL} className="mt-12 flex items-end gap-x-2">
+        <BaseIcon size="sm" icon={ArrowLeft} className="text-text-accent" weight="bold" />
+        {redirectSentence}
+      </Link>
+    </div>
+  )
+}
+
+export default NotfoundPage
