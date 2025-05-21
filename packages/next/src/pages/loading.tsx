@@ -1,6 +1,6 @@
 import { SpinnerGapIcon } from '@phosphor-icons/react/dist/ssr'
 
-import BaseIcon from '~/components/primitives/base-icon'
+import { BaseIcon } from '../components/primitives/base-icon'
 
 const LoadingPage = () => {
   return (

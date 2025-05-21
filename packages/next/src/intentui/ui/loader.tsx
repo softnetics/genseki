@@ -5,7 +5,7 @@ import { twMerge } from 'tailwind-merge'
 import type { VariantProps } from 'tailwind-variants'
 import { tv } from 'tailwind-variants'
 
-import { cn } from '~/utils/cn'
+import { cn } from '../../utils/cn'
 
 const loaderStyles = tv({
   base: 'relative',

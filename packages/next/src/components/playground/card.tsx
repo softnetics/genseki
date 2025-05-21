@@ -1,15 +1,16 @@
-import { Star } from '@phosphor-icons/react/dist/ssr'
+import { StarIcon } from '@phosphor-icons/react/dist/ssr'
 
-import Typography from '../primitives/typography'
+import { BaseIcon } from '../primitives/base-icon'
+import { Typography } from '../primitives/typography'
 
 type PlaygroundCardProps = React.PropsWithChildren<{
   title: string
-  'category-title'?: string
+  categoryTitle?: string
 }>
 
-const PlaygroundCard = ({
+export const PlaygroundCard = ({
   title,
-  'category-title': categoryTitle = 'Feature',
+  categoryTitle = 'Feature',
   children,
 }: PlaygroundCardProps) => {
   return (
@@ -17,7 +18,7 @@ const PlaygroundCard = ({
       <div className="border-border flex w-full flex-col gap-y-4 border-b px-4 py-6">
         <div className="flex items-center gap-x-2">
           <div className="rounded-md bg-blue-500 p-2">
-            <Star weight="duotone" className="size-6 text-white" />
+            <BaseIcon icon={StarIcon} size="sm" weight="duotone" />
           </div>
           <Typography type="caption" weight="medium" className="text-blue-500">
             {categoryTitle}
@@ -36,5 +37,3 @@ const PlaygroundCard = ({
     </div>
   )
 }
-
-export default PlaygroundCard

@@ -28,7 +28,8 @@ import { Dialog } from './dialog'
 
 import { useMediaQuery } from '../utils/use-media-query'
 
-type PopoverProps = DialogTriggerProps
+interface PopoverProps extends DialogTriggerProps {}
+
 const Popover = (props: PopoverProps) => {
   return <DialogTrigger {...props} />
 }

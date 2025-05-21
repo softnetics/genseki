@@ -120,7 +120,7 @@ export function CustomTable<T>({
                   >
                     <TableHead
                       className={twMerge(
-                        'h-full transition-colors hover:text-text-on-primary-container',
+                        'hover:text-text-on-primary-container h-full transition-colors',
                         classNames?.tableHead
                         // header.column.columnDef.meta?.headContainerClassName,
                         // header.column.columnDef.meta?.headClassName
@@ -129,7 +129,7 @@ export function CustomTable<T>({
                     >
                       <button
                         type="button"
-                        className="w-full h-full flex justify-between items-center gap-2 ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-inset focus-visible:ring-offset-0"
+                        className="ring-offset-background focus-visible:ring-ring flex h-full w-full items-center justify-between gap-2 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-inset focus-visible:ring-offset-0"
                         onClick={header.column.getToggleSortingHandler()}
                       >
                         {children}
@@ -176,7 +176,7 @@ export function CustomTable<T>({
             containerRef={containerRef as any}
             colSpan={table.getAllLeafColumns().length}
           >
-            <div className="h-32 flex items-center justify-center text-center text-system-error">
+            <div className="text-system-error flex h-32 items-center justify-center text-center">
               Error
             </div>
           </TableEmptyState>
@@ -216,7 +216,7 @@ export function CustomTable<T>({
             containerRef={containerRef as any}
             colSpan={table.getAllLeafColumns().length}
           >
-            <div className="h-24 flex flex-col justify-center text-center">ไม่มีข้อมูล</div>
+            <div className="flex h-24 flex-col justify-center text-center">ไม่มีข้อมูล</div>
           </TableEmptyState>
         )}
       </TableBody>
@@ -237,8 +237,8 @@ function TableEmptyState({
   children: ReactNode
 }) {
   return (
-    <TableRow className="relative bg-surface hover:bg-surface z-[1]" ref={containerRef as any}>
-      <TableCell colSpan={colSpan} className="text-center py-10">
+    <TableRow className="bg-surface hover:bg-surface relative z-[1]" ref={containerRef as any}>
+      <TableCell colSpan={colSpan} className="py-10 text-center">
         Empty
       </TableCell>
     </TableRow>
@@ -273,11 +273,11 @@ function PinnedShadow({
   if (!column) return null
   const width = column.getStart(position) + column.getSize() + 0.5
   return (
-    <tbody className="absolute flex top-0 left-0 h-full w-full pointer-events-none">
+    <tbody className="pointer-events-none absolute left-0 top-0 flex h-full w-full">
       {position === 'right' && <tr className="block flex-1" />}
       <tr
         className={twMerge(
-          'sticky block h-full bg-border-outline transition-shadow shadow-none data-[floating=true]:shadow-[0px_10px_20px_0px_#00000033]',
+          'bg-border-outline sticky block h-full shadow-none transition-shadow data-[floating=true]:shadow-[0px_10px_20px_0px_#00000033]',
           position === 'left' ? 'left-0' : 'right-0'
         )}
         data-floating={isFloating}

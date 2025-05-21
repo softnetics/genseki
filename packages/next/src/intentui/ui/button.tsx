@@ -7,11 +7,12 @@ import {
   Link,
 } from 'react-aria-components'
 
-import { cva, type VariantProps } from 'class-variance-authority'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../../utils/cn'
 
-const buttonVariants = cva('cursor-pointer flex items-center justify-center', {
+const buttonVariants = tv({
+  base: 'cursor-pointer flex items-center justify-center',
   variants: {
     variant: {
       primary: `brand-primary-gradient-25% hover:brand-primary-gradient-15% [&>*]:text-white text-white
@@ -48,21 +49,32 @@ const buttonVariants = cva('cursor-pointer flex items-center justify-center', {
 
 type ButtonVariants = VariantProps<typeof buttonVariants>
 
-type ButtonProps = ButtonPrimitiveProps &
-  Required<Omit<ButtonVariants, 'isDisabled'>> &
-  Pick<ButtonVariants, 'isDisabled'> & {
-    leadingIcon?: React.ReactElement
-    trailingIcon?: React.ReactElement
-  }
+interface ButtonProps
+  extends ButtonPrimitiveProps,
+    Required<Omit<ButtonVariants, 'isDisabled'>>,
+    Pick<ButtonVariants, 'isDisabled'> {
+  leadingIcon?: React.ReactElement
+  trailingIcon?: React.ReactElement
+}
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, ...props }, ref) => {
     const { isDisabled } = props
+
     return (
       <ButtonPrimitive
         ref={ref}
         {...props}
-        className={cn(buttonVariants({ variant, size, isDisabled, className }))}
+        className={(value) =>
+          cn(
+            buttonVariants({
+              variant,
+              size,
+              isDisabled,
+              className: typeof className === 'function' ? className(value) : className,
+            })
+          )
+        }
       >
         {(values) => (
           <>
@@ -76,12 +88,13 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 )
 
-type ButtonLinkProps = LinkPrimitiveProps &
-  Required<Omit<ButtonVariants, 'isDisabled'>> &
-  Pick<ButtonVariants, 'isDisabled'> & {
-    leadingIcon?: React.ReactElement
-    trailingIcon?: React.ReactElement
-  }
+interface ButtonLinkProps
+  extends LinkPrimitiveProps,
+    Required<Omit<ButtonVariants, 'isDisabled'>>,
+    Pick<ButtonVariants, 'isDisabled'> {
+  leadingIcon?: React.ReactElement
+  trailingIcon?: React.ReactElement
+}
 
 const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
   { className, variant, size, isDisabled = false, children, ...props },
@@ -91,7 +104,16 @@ const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function Butto
     <Link
       ref={ref}
       data-slot="button"
-      className={cn(buttonVariants({ variant, size, isDisabled, className }))}
+      className={(value) =>
+        cn(
+          buttonVariants({
+            variant,
+            size,
+            isDisabled,
+            className: typeof className === 'function' ? className(value) : className,
+          })
+        )
+      }
       {...props}
     >
       {(values) => (

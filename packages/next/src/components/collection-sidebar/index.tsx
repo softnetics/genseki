@@ -2,9 +2,9 @@ import { MoonStarsIcon } from '@phosphor-icons/react/dist/ssr'
 
 import type { Collection } from '@kivotos/core'
 
-import CollectionSection from './collection-section'
-import NavigationSection from './navigations-section'
-import PluginSection from './plugin-section'
+import { CollectionSection } from './sections/collection-section'
+import { NavigationSection } from './sections/navigations-section'
+import { PluginSection } from './sections/plugin-section'
 
 import {
   Sidebar,
@@ -13,22 +13,19 @@ import {
   SidebarHeader,
   SidebarRail,
 } from '../../intentui/ui/sidebar'
-import BaseIcon from '../primitives/base-icon'
-import Typography from '../primitives/typography'
-type AppSidebarProps = {
-  collections: Collection[]
-}
+import { BaseIcon } from '../primitives/base-icon'
+import { Typography } from '../primitives/typography'
 
-export default async function AppSidebar({ collections }: AppSidebarProps) {
+export async function AppSidebar({ collections }: { collections: Collection[] }) {
   const collectionSlugs = collections.map((collection) => collection.slug)
 
   return (
     <Sidebar
       collapsible="dock"
       intent="inset"
-      className="gap-y-12! flex p-0 py-6 group-[:not([data-sidebar-state=collapsed])]/sidebar-container:p-6"
+      className="flex gap-y-12 p-0 py-6 group-[:not([data-sidebar-state=collapsed])]/sidebar-container:p-6"
     >
-      <SidebarHeader className="border-border size-auto! m-0! border-b pl-6">
+      <SidebarHeader className="border-border m-0 size-auto border-b pl-6">
         <div className="flex h-[68px] items-center gap-x-4">
           <div className="bg-primary/15 dark:bg-primary/20 border-primary dark:border-primary/40 relative flex overflow-clip rounded-md border p-4">
             <div className="bg-primary/20 absolute -inset-x-[25%] inset-y-0 m-auto h-2 -translate-x-4 -translate-y-4 -rotate-45 blur-[3px]" />
@@ -47,9 +44,9 @@ export default async function AppSidebar({ collections }: AppSidebarProps) {
       </SidebarHeader>
       <SidebarContent>
         <SidebarDisclosureGroup defaultExpandedKeys={[2]} className="mt-4">
-          <NavigationSection />
-          <PluginSection />
-          <CollectionSection slugs={collectionSlugs} />
+          <NavigationSection id={0} />
+          <PluginSection id={1} />
+          <CollectionSection id={2} slugs={collectionSlugs} />
         </SidebarDisclosureGroup>
       </SidebarContent>
       <SidebarRail />

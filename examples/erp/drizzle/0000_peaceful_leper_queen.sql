@@ -16,7 +16,7 @@ CREATE TABLE "account" (
 );
 --> statement-breakpoint
 CREATE TABLE "categories" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar NOT NULL,
 	"ownerId" uuid,
 	"updatedAt" timestamp DEFAULT now(),
@@ -25,7 +25,7 @@ CREATE TABLE "categories" (
 );
 --> statement-breakpoint
 CREATE TABLE "categoryTags" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar NOT NULL,
 	"category" uuid,
 	"updatedAt" timestamp DEFAULT now(),
@@ -34,7 +34,7 @@ CREATE TABLE "categoryTags" (
 );
 --> statement-breakpoint
 CREATE TABLE "posts" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar,
 	"content" text,
 	"authorId" uuid,
@@ -58,7 +58,7 @@ CREATE TABLE "session" (
 );
 --> statement-breakpoint
 CREATE TABLE "users" (
-	"id" uuid PRIMARY KEY NOT NULL,
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" text NOT NULL,
 	"email" text NOT NULL,
 	"email_verified" boolean DEFAULT false NOT NULL,

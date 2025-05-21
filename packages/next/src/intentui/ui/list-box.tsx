@@ -11,8 +11,6 @@ import {
 import { IconCheck, IconHamburger } from '@intentui/icons'
 import { twMerge } from 'tailwind-merge'
 
-import { cn } from '~/utils/cn'
-
 import {
   DropdownDescription,
   DropdownItemDetails,
@@ -21,6 +19,8 @@ import {
   DropdownSection,
 } from './dropdown'
 import { composeTailwindRenderProps } from './primitive'
+
+import { cn } from '../../utils/cn'
 
 const ListBox = <T extends object>({ className, ...props }: ListBoxProps<T>) => (
   <ListBoxPrimitive

@@ -4,16 +4,17 @@ import { useState } from 'react'
 import type { InputProps, TextFieldProps as TextFieldPrimitiveProps } from 'react-aria-components'
 import { TextField as TextFieldPrimitive } from 'react-aria-components'
 
-import { Eye, EyeClosed } from '@phosphor-icons/react'
-import { cva, VariantProps } from 'class-variance-authority'
-
-import Typography from '~/components/primitives/typography'
-import { cn } from '~/utils/cn'
+import { EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 import { Button } from './button'
 import type { FieldProps } from './field'
 import { Description, FieldError, FieldGroup, Input, Label } from './field'
 import { Loader } from './loader'
+
+import { BaseIcon } from '../../components/primitives/base-icon'
+import { Typography } from '../../components/primitives/typography'
+import { cn } from '../../utils/cn'
 
 type InputType = Exclude<InputProps['type'], 'password'>
 
@@ -34,7 +35,8 @@ interface NonRevealableTextFieldProps extends BaseTextFieldProps {
   type?: InputType
 }
 
-const fieldgroupVariants = cva('box-content rounded-md', {
+const fieldgroupVariants = tv({
+  base: 'box-content rounded-md',
   variants: {
     size: {
       md: `[&>input]:p-6 [&>[data-slot=prefix]]:pl-4 [&>[data-slot=suffix]]:pr-4`,
@@ -99,7 +101,11 @@ const TextField = ({
                 aria-label="Toggle password visibility"
                 onPress={handleTogglePasswordVisibility}
               >
-                {isPasswordVisible ? <EyeClosed /> : <Eye />}
+                {isPasswordVisible ? (
+                  <BaseIcon icon={EyeClosedIcon} weight="regular" size="md" />
+                ) : (
+                  <BaseIcon icon={EyeIcon} weight="regular" size="md" />
+                )}
               </Button>
             ) : isPending ? (
               <Loader variant="spin" />

@@ -3,10 +3,10 @@ import 'server-only'
 /**
  * @description Home page tends to be a collection of links to other `collections page`
  */
-import { ServerConfig } from '@repo/drizzlify'
+import type { ServerConfig } from '@kivotos/core'
 
-import CollectionCard from '~/components/collection-card'
-import Typography from '~/components/primitives/typography'
+import { CollectionCard } from '../components/collection-card'
+import { Typography } from '../components/primitives/typography'
 
 const greeting = () => {
   const time = new Date().getHours()
@@ -26,7 +26,7 @@ type HomepageProps = {
   serverConfig: ServerConfig
 }
 
-const HomePage = ({ serverConfig }: HomepageProps) => {
+export const HomePage = ({ serverConfig }: HomepageProps) => {
   const collections = serverConfig.collections.map((col) => col.slug)
 
   return (
@@ -60,5 +60,3 @@ const HomePage = ({ serverConfig }: HomepageProps) => {
     </div>
   )
 }
-
-export default HomePage

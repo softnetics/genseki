@@ -9,12 +9,11 @@ import Image from 'next/image'
 import type { ServerConfig } from '@kivotos/core'
 import { getClientCollection } from '@kivotos/core'
 
-import badge from '~/../public/badge.svg'
-
 import { ListTable } from './list.client'
 
-import BaseIcon from '../../components/primitives/base-icon'
-import Typography from '../../components/primitives/typography'
+import badge from '../../../public/badge.svg'
+import { BaseIcon } from '../../components/primitives/base-icon'
+import { Typography } from '../../components/primitives/typography'
 import { Button, ButtonLink } from '../../intentui/ui/button'
 import { TextField } from '../../intentui/ui/text-field'
 import { formatSlug } from '../../utils/format-slug'

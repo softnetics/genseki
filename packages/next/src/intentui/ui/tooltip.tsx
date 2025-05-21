@@ -73,7 +73,7 @@ const TooltipContent = ({
             width={12}
             height={12}
             viewBox="0 0 12 12"
-            className="arx group-data-[placement=left]:-rotate-90 group-data-[placement=bottom]:rotate-180 group-data-[placement=right]:rotate-90 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
+            className="arx group-data-[placement=bottom]:rotate-180 group-data-[placement=left]:-rotate-90 group-data-[placement=right]:rotate-90 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
           >
             <path d="M0 0 L6 6 L12 0" />
           </svg>

@@ -1,18 +1,19 @@
 import React from 'react'
 
-import { ArrowLeft } from '@phosphor-icons/react/dist/ssr'
+import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
-import BaseIcon from '~/components/primitives/base-icon'
-import Typography from '~/components/primitives/typography'
-import { Link } from '~/intentui/ui/link'
+import { BaseIcon } from '../components/primitives/base-icon'
+import { Typography } from '../components/primitives/typography'
+import { Link } from '../intentui/ui/link'
 
-type NotfoundPageProps = {
+interface NotfoundPageProps {
   title?: string | React.ReactElement
   redirectSentence?: string
   redirectURL: string
   description?: string
 }
-const NotfoundPage = ({
+
+export const NotfoundPage = ({
   redirectURL,
   redirectSentence = 'Back to home',
   title = 'Oops! 😵',
@@ -49,11 +50,9 @@ const NotfoundPage = ({
       </Typography>
       <div className="bg-border mt-6 h-px w-full" />
       <Link intent="primary" href={redirectURL} className="mt-12 flex items-end gap-x-2">
-        <BaseIcon size="sm" icon={ArrowLeft} className="text-text-accent" weight="bold" />
+        <BaseIcon size="sm" icon={ArrowLeftIcon} className="text-text-accent" weight="bold" />
         {redirectSentence}
       </Link>
     </div>
   )
 }
-
-export default NotfoundPage

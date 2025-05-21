@@ -75,7 +75,7 @@ const DropdownSection = forwardRef(function DropdownSection<T extends object>(
   )
 })
 
-type DropdownItemProps = ListBoxItemProps
+interface DropdownItemProps extends ListBoxItemProps {}
 
 const DropdownItem = forwardRef(function DropdownItem(
   { className, ...props }: DropdownItemProps,

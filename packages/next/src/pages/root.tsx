@@ -1,12 +1,14 @@
+import 'server-only'
+
 import { headers as nextHeaders } from 'next/headers'
 
 import type { ServerConfig } from '@kivotos/core'
 
-import { RootCollectionLayout } from '~/layouts/root-collection'
-
-import NotfoundPage from './404'
+import { NotfoundPage } from './404'
 import { RootAuthPage } from './root-auth'
 import { RootCollectionPage } from './root-collection'
+
+import { RootCollectionLayout } from '../layouts/root-collection'
 
 interface RootProps {
   serverConfig: ServerConfig<any, any, any, any>
@@ -30,7 +32,11 @@ export async function RootPage(props: RootProps) {
    *      /users/... -> `users`
    *      /plugins/... -> `plugins`
    */
-  const feature = Array.isArray(params.segments) ? params.segments[0] : undefined
+
+  if (!Array.isArray(params.segments))
+    throw new Error(`Make sure there's a "[...segment]" folder one level up from this file.`)
+
+  const feature = params.segments[0]
 
   if (feature === 'auth') {
     return (

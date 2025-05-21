@@ -9,14 +9,13 @@ import {
   Text,
 } from 'react-aria-components'
 
-import { X } from '@phosphor-icons/react'
+import { XIcon } from '@phosphor-icons/react'
 import { twJoin, twMerge } from 'tailwind-merge'
-
-import BaseIcon from '~/components/primitives/base-icon'
 
 import { Button, type ButtonProps } from './button'
 import { composeTailwindRenderProps } from './primitive'
 
+import { BaseIcon } from '../../components/primitives/base-icon'
 import { useMediaQuery } from '../utils/use-media-query'
 
 const Dialog = ({
@@ -219,7 +218,7 @@ const CloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps) => {
         'close hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-primary absolute right-1 top-1 z-50 grid size-12 place-content-center rounded-xl focus-visible:ring-1 sm:right-2 sm:top-2 sm:size-7 sm:rounded-md'
       )}
     >
-      <BaseIcon icon={X} size="sm" weight="bold" />
+      <BaseIcon icon={XIcon} size="sm" weight="bold" />
     </ButtonPrimitive>
   ) : null
 }

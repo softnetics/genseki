@@ -1,23 +1,26 @@
-import React from 'react'
-
-import { CaretRight, Cube, Folder } from '@phosphor-icons/react/dist/ssr'
+import { CaretRightIcon, Cube, Folder } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 
-import badge from '~/../public/badge.svg'
-import { Link } from '~/intentui/ui/link'
+import { BaseIcon } from './primitives/base-icon'
+import { IconContainer } from './primitives/icon-container'
+import { Typography } from './primitives/typography'
 
-import BaseIcon from './primitives/base-icon'
-import IconContainer from './primitives/icon-container'
-import Typography from './primitives/typography'
+import badge from '../../public/badge.svg'
+import { Link } from '../intentui/ui/link'
 
-type CollectionCardProps = {
+interface CollectionCardProps {
   collectionName: string
   amounts: number
   description: string
   url: string
 }
 
-const CollectionCard = ({ collectionName, amounts, description, url }: CollectionCardProps) => {
+export const CollectionCard = ({
+  collectionName,
+  amounts,
+  description,
+  url,
+}: CollectionCardProps) => {
   return (
     <div className="bg-overlay border-border relative flex w-full flex-col rounded-xl border p-2 shadow-md">
       <div className="absolute left-6 z-10 -translate-y-1/2">
@@ -66,7 +69,7 @@ const CollectionCard = ({ collectionName, amounts, description, url }: Collectio
           View collection
         </span>
         <BaseIcon
-          icon={CaretRight}
+          icon={CaretRightIcon}
           size="md"
           weight="regular"
           className="transition-transform group-hover:translate-x-2"
@@ -75,5 +78,3 @@ const CollectionCard = ({ collectionName, amounts, description, url }: Collectio
     </div>
   )
 }
-
-export default CollectionCard

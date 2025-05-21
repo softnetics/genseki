@@ -227,16 +227,17 @@ const MenuKeyboard = DropdownKeyboard
 const MenuLabel = DropdownLabel
 const MenuDescription = DropdownDescription
 
-Menu.Keyboard = MenuKeyboard
-Menu.Content = MenuContent
-Menu.Header = MenuHeader
-Menu.Item = MenuItem
-Menu.Section = MenuSection
-Menu.Separator = MenuSeparator
-Menu.Label = MenuLabel
-Menu.Description = MenuDescription
-Menu.Trigger = MenuTrigger
-Menu.Submenu = MenuSubMenu
-
 export type { MenuContentProps, MenuItemProps, MenuProps, MenuSectionProps, MenuTriggerProps }
-export { Menu }
+export {
+  Menu,
+  MenuContent,
+  MenuDescription,
+  MenuHeader,
+  MenuItem,
+  MenuKeyboard,
+  MenuLabel,
+  MenuSection,
+  MenuSeparator,
+  MenuSubMenu,
+  MenuTrigger,
+}

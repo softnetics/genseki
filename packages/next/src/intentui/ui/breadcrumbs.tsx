@@ -1,5 +1,4 @@
 'use client'
-
 import { createContext, use } from 'react'
 import type { BreadcrumbProps, BreadcrumbsProps, LinkProps } from 'react-aria-components'
 import { Breadcrumb, Breadcrumbs as BreadcrumbsPrimitive } from 'react-aria-components'
@@ -10,7 +9,10 @@ import { twMerge } from 'tailwind-merge'
 import { Link } from './link'
 import { composeTailwindRenderProps } from './primitive'
 
-type BreadcrumbsContextProps = { separator?: 'chevron' | 'slash' | boolean }
+interface BreadcrumbsContextProps {
+  separator?: 'chevron' | 'slash' | boolean
+}
+
 const BreadcrumbsProvider = createContext<BreadcrumbsContextProps>({
   separator: 'chevron',
 })
@@ -70,8 +72,6 @@ const Separator = ({
     </span>
   )
 }
-
-Breadcrumbs.Item = BreadcrumbsItem
 
 export type { BreadcrumbsItemProps, BreadcrumbsProps }
 export { Breadcrumbs, BreadcrumbsItem }
