@@ -1,9 +1,8 @@
 import React from 'react'
 
-import { cva, type VariantProps } from 'class-variance-authority'
-import { ClassValue } from 'class-variance-authority/types'
+import { tv, type VariantProps } from 'tailwind-variants'
 
-import { cn } from '~/utils/cn'
+import { cn } from '../../utils/cn'
 
 type TypographyTag = 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'label' | 'caption'
 
@@ -19,10 +18,8 @@ const nativeElementsMap: Record<TypographyTag, React.ElementType> = {
   label: 'p',
 }
 
-const typographyVariants = cva<{
-  weight: Record<TypographyWeight, ClassValue>
-  type: Record<TypographyTag, ClassValue>
-}>('inline-block', {
+const typographyVariants = tv({
+  base: 'inline-block',
   variants: {
     weight: {
       normal: 'font-normal',
@@ -47,7 +44,7 @@ type TypographyProps = {
 } & React.HTMLAttributes<HTMLElement> &
   Required<VariantProps<typeof typographyVariants>>
 
-const Typography = ({ children, type, weight, className, ...props }: TypographyProps) => {
+export const Typography = ({ children, type, weight, className, ...props }: TypographyProps) => {
   const Component = nativeElementsMap[type]
 
   return (
@@ -56,5 +53,3 @@ const Typography = ({ children, type, weight, className, ...props }: TypographyP
     </Component>
   )
 }
-
-export default Typography

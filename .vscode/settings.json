@@ -42,7 +42,6 @@
   },
   "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",
-  "tailwindCSS.classFunctions": ["cva", "cx"],
   "tailwindCSS.experimental.configFile": {
     "packages/next/src/styles/tailwind.css": "packages/next/**",
     "examples/erp/src/app/global.css": "examples/erp/**",

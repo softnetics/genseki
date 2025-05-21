@@ -10,9 +10,9 @@ import {
   SidebarDisclosureTrigger,
   SidebarItem,
   SidebarLabel,
-} from '../../intentui/ui/sidebar'
-import { formatSlug } from '../../utils/format-slug'
-import BaseIcon from '../primitives/base-icon'
+} from '../../../intentui/ui/sidebar'
+import { formatSlug } from '../../../utils/format-slug'
+import { BaseIcon } from '../../primitives/base-icon'
 
 const CurveLine = ({ className }: { className?: string }) => {
   return (
@@ -29,11 +29,7 @@ const CurveLine = ({ className }: { className?: string }) => {
   )
 }
 
-type CollectionSectionProps = {
-  slugs: string[]
-}
-
-const CollectionSection = ({ slugs }: CollectionSectionProps) => {
+export const CollectionSection = ({ id, slugs }: { id: number; slugs: string[] }) => {
   const pathname = usePathname()
 
   const isCurrentPage = (slug: string) => pathname === `/admin/collections/${slug}`
@@ -41,8 +37,8 @@ const CollectionSection = ({ slugs }: CollectionSectionProps) => {
   const collectionHref = (slug: string) => `/admin/collections/${slug}`
 
   return (
-    <SidebarDisclosure id={2}>
-      <SidebarDisclosureTrigger className="rounded-md! in-data-[sidebar-state=collapsed]:rounded-none!">
+    <SidebarDisclosure id={id}>
+      <SidebarDisclosureTrigger className="in-data-[sidebar-state=collapsed]:rounded-none rounded-md">
         <BaseIcon icon={DatabaseIcon} size="sm" weight="duotone" className="size-8!" />
         <SidebarLabel className="text-text-body text-sm">Collections</SidebarLabel>
       </SidebarDisclosureTrigger>
@@ -69,5 +65,3 @@ const CollectionSection = ({ slugs }: CollectionSectionProps) => {
     </SidebarDisclosure>
   )
 }
-
-export default CollectionSection

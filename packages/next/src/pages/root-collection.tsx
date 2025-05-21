@@ -2,11 +2,11 @@ import { Suspense } from 'react'
 
 import type { ServerConfig } from '@kivotos/core'
 
-import NotfoundPage from './404'
-import HomePage from './home'
+import { NotfoundPage } from './404'
+import { HomePage } from './home'
 import LoadingPage from './loading'
 
-import Typography from '../components/primitives/typography'
+import { Typography } from '../components/primitives/typography'
 import { formatSlug } from '../utils/format-slug'
 import { CreateView } from '../views/collections/create'
 import { ListView } from '../views/collections/list'

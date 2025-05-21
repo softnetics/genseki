@@ -16,8 +16,6 @@ import {
 import { CaretDown } from '@phosphor-icons/react'
 import { tv } from 'tailwind-variants'
 
-import BaseIcon from '~/components/primitives/base-icon'
-
 import {
   DropdownItem,
   DropdownItemDetails,
@@ -29,6 +27,8 @@ import { Description, FieldError, Label } from './field'
 import { ListBox } from './list-box'
 import { PopoverContent, type PopoverContentProps } from './popover'
 import { composeTailwindRenderProps, focusStyles } from './primitive'
+
+import { BaseIcon } from '../../components/primitives/base-icon'
 
 const selectTriggerStyles = tv({
   extend: focusStyles,

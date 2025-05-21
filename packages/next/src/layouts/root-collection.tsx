@@ -2,8 +2,8 @@ import 'server-only'
 
 import type { ServerConfig } from '@kivotos/core'
 
-import AppSidebar from '../components/collection-sidebar/app-sidebar'
-import AppSidebarNav from '../components/collection-sidebar/app-sidebar-nav'
+import { AppSidebar } from '../components/collection-sidebar'
+import { AppSidebarNav } from '../components/collection-sidebar/nav/app-sidebar-nav'
 import { SidebarInset, SidebarProvider } from '../intentui/ui/sidebar'
 
 interface RootLayoutProps<TServerConfig extends ServerConfig<any, any, any, any>> {

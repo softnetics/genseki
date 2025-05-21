@@ -7,8 +7,8 @@ import type { FieldClient } from 'node_modules/@kivotos/core/src/field'
 
 import type { ClientCollection, InferFieldsFromCollection } from '@kivotos/core'
 
-import BaseIcon from '../../components/primitives/base-icon'
-import { Menu } from '../../intentui/ui/menu'
+import { BaseIcon } from '../../components/primitives/base-icon'
+import { Menu, MenuContent, MenuItem, MenuSeparator, MenuTrigger } from '../../intentui/ui/menu'
 import {
   Table,
   TableBody,
@@ -79,15 +79,15 @@ export function ListTable<
             <TableCell className="">
               <div className="grid place-items-center">
                 <Menu>
-                  <Menu.Trigger className="cursor-pointer">
+                  <MenuTrigger className="cursor-pointer">
                     <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
-                  </Menu.Trigger>
-                  <Menu.Content aria-label="Actions" placement="left top">
-                    <Menu.Item>View</Menu.Item>
-                    <Menu.Item>Edit</Menu.Item>
-                    <Menu.Separator />
-                    <Menu.Item isDanger>Delete</Menu.Item>
-                  </Menu.Content>
+                  </MenuTrigger>
+                  <MenuContent aria-label="Actions" placement="left top">
+                    <MenuItem>View</MenuItem>
+                    <MenuItem>Edit</MenuItem>
+                    <MenuSeparator />
+                    <MenuItem isDanger>Delete</MenuItem>
+                  </MenuContent>
                 </Menu>
               </div>
             </TableCell>

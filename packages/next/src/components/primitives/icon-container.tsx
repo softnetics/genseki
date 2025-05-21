@@ -1,9 +1,8 @@
-import type { VariantProps } from 'class-variance-authority'
-import { cva } from 'class-variance-authority'
+import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../../utils/cn'
 
-const iconVariants = cva(null, {
+const iconVariants = tv({
   variants: {
     variant: {
       normal: `bg-secondary`,
@@ -27,8 +26,6 @@ type IconVariants = Required<VariantProps<typeof iconVariants>> & {
   icon: React.ReactElement
 }
 
-const IconContainer = ({ variant, size, icon }: IconVariants) => {
+export const IconContainer = ({ variant, size, icon }: IconVariants) => {
   return <div className={cn(iconVariants({ variant, size }))}>{icon}</div>
 }
-
-export default IconContainer

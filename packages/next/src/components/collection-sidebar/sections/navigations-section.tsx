@@ -9,15 +9,15 @@ import {
   SidebarDisclosureTrigger,
   SidebarItem,
   SidebarLabel,
-} from '../../intentui/ui/sidebar'
-import BaseIcon from '../primitives/base-icon'
+} from '../../../intentui/ui/sidebar'
+import { BaseIcon } from '../../primitives/base-icon'
 
-const NavigationSection = () => {
+export const NavigationSection = ({ id }: { id: number }) => {
   const pathname = usePathname()
 
   return (
-    <SidebarDisclosure id={0}>
-      <SidebarDisclosureTrigger className="rounded-md! in-data-[sidebar-state=collapsed]:rounded-none!">
+    <SidebarDisclosure id={id}>
+      <SidebarDisclosureTrigger className="rounded-md`!` in-data-[sidebar-state=collapsed]:rounded-none!">
         <BaseIcon icon={CompassIcon} size="sm" weight="duotone" className="size-8!" />
         <SidebarLabel className="text-text-body text-sm">Navigations</SidebarLabel>
       </SidebarDisclosureTrigger>
@@ -33,5 +33,3 @@ const NavigationSection = () => {
     </SidebarDisclosure>
   )
 }
-
-export default NavigationSection
