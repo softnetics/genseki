@@ -2,6 +2,7 @@ export { Builder } from './builder'
 export type {
   ApiReturnType,
   ClientApiArgs,
+  ClientCollection,
   Collection,
   CollectionAdmin,
   CollectionAdminApi,
@@ -10,6 +11,8 @@ export type {
   CollectionConfig,
   InferApiRouterFromCollection,
   InferContextFromCollection,
+  InferField,
+  InferFields,
   InferFieldsFromCollection,
   InferFullSchemaFromCollection,
   InferSlugFromCollection,
@@ -25,6 +28,7 @@ export type {
   ApiRouter,
   ApiRouteResponse,
   ApiRouteSchema,
+  ClientApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export { type Field, FieldBuilder } from './field'
+export type { Field, FieldBase, FieldClient, Fields, FieldsClient } from './field'

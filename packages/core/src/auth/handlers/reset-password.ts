@@ -1,7 +1,7 @@
 import z from 'zod'
 
-import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
-import { AuthContext } from '../context'
+import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
+import { type AuthContext } from '../context'
 
 interface InternalRouteOptions {
   prefix?: string
@@ -25,7 +25,7 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
         status: z.string(),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     if (!args.context.authConfig.resetPassword?.enabled) {

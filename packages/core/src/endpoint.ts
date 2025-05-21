@@ -1,8 +1,7 @@
-import { ExtractObjectValues, Simplify } from 'drizzle-orm'
-import { IsNever, SimplifyDeep } from 'type-fest'
-import { z, ZodType } from 'zod'
+import type { IsNever, Simplify, SimplifyDeep, ValueOf } from 'type-fest'
+import type { z, ZodType } from 'zod'
 
-import { MaybePromise } from './collection'
+import type { MaybePromise } from './collection'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 
@@ -26,11 +25,10 @@ type GetBody<TApiRouteSchema extends ApiRouteSchema> =
       : {}
     : {}
 
-type GetHeaders<TApiRouteSchema extends ApiRouteSchema> = {
-  headers: IsNever<Output<TApiRouteSchema['headers']>> extends false
-    ? Output<TApiRouteSchema['headers']> & Record<string, string>
-    : Record<string, string>
-}
+type GetHeaders<TApiRouteSchema extends ApiRouteSchema> =
+  IsNever<Output<TApiRouteSchema['headers']>> extends false
+    ? { headers: Output<TApiRouteSchema['headers']> & Record<string, string> }
+    : { headers?: Record<string, string> }
 
 type GetQuery<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['query']>> extends false
@@ -59,7 +57,7 @@ export type ApiRouteHandlerPayloadWithContext<
 }
 
 export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, InputSchema>>> =
-  ExtractObjectValues<{
+  ValueOf<{
     [TStatus in Extract<keyof TResponses, number>]: TResponses[TStatus] extends InputSchema
       ? {
           status: TStatus
@@ -92,7 +90,7 @@ export interface ApiRouteCommonSchema {
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
 }
 
-export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = ExtractObjectValues<{
+export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = ValueOf<{
   [TStatus in keyof TApiRouteSchema['responses']]: TApiRouteSchema['responses'][TStatus] extends InputSchema
     ? { status: TStatus; data: Output<TApiRouteSchema['responses'][TStatus]> }
     : never
@@ -140,9 +138,8 @@ export interface ClientApiRouter {
 }
 
 export type ToClientApiRouter<TApiRouter extends ApiRouter> = {
-  [TKey in keyof TApiRouter]: Omit<TApiRouter[TKey], 'handler'> extends infer TApiRoute extends
-    ApiRouteSchema
-    ? TApiRoute
+  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, infer TApiRouteSchema>
+    ? TApiRouteSchema
     : never
 }
 

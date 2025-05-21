@@ -1,6 +1,6 @@
-import type { Simplify } from 'type-fest'
+import type { Simplify, ValueOf } from 'type-fest'
 
-import {
+import type {
   ApiRoute,
   ApiRouteHandlerPayload,
   ApiRouter,
@@ -8,8 +8,6 @@ import {
   ApiRouteSchema,
   ServerConfig,
 } from '@kivotos/core'
-
-type ExtractObjectValues<T> = T[keyof T]
 
 export type ServerFunction<TServerConfig extends ServerConfig<any, any, any, any>> = <
   TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
@@ -24,18 +22,17 @@ type GetServerFunctionResponse<
   ? ApiRouteResponse<TApiRoute['schema']['responses']>
   : never
 
-export type GetServerFunctionApiArgs<TApiRouter extends ApiRouter<any> | undefined> =
-  ExtractObjectValues<{
-    [TMethod in Extract<keyof TApiRouter, string>]: TApiRouter[TMethod] extends ApiRoute<
-      any,
-      infer TApiRouteSchema extends ApiRouteSchema
-    >
-      ? Simplify<{ method: TMethod } & ApiRouteHandlerPayload<TApiRouteSchema>>
-      : never
-  }>
+export type GetServerFunctionApiArgs<TApiRouter extends ApiRouter<any> | undefined> = ValueOf<{
+  [TMethod in Extract<keyof TApiRouter, string>]: TApiRouter[TMethod] extends ApiRoute<
+    any,
+    infer TApiRouteSchema extends ApiRouteSchema
+  >
+    ? Simplify<{ method: TMethod } & ApiRouteHandlerPayload<TApiRouteSchema>>
+    : never
+}>
 
 export async function handleServerFunction<
-  TServerConfig extends ServerConfig<any, any, any, any>,
+  TServerConfig extends ServerConfig<any, any, any, ApiRouter<any>>,
   TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
 >(
   serverConfig: TServerConfig,
@@ -45,5 +42,8 @@ export async function handleServerFunction<
   if (!apiRoute) {
     throw new Error(`No API route found for method: ${args.method}`)
   }
-  return apiRoute.handler({ ...args, context: serverConfig.context })
+  return apiRoute.handler({ ...args, context: serverConfig.context }) as GetServerFunctionResponse<
+    TServerConfig,
+    TApiArgs['method']
+  >
 }

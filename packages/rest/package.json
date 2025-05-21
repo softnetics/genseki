@@ -1,0 +1,26 @@
+{
+  "name": "@kivotos/rest",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "dependencies": {
+    "@kivotos/core": "workspace:^"
+  },
+  "devDependencies": {
+    "@internals/project-config": "workspace:^",
+    "type-fest": "^4.41.0",
+    "vitest": "^3.0.9"
+  }
+}

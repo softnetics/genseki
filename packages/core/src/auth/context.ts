@@ -1,11 +1,12 @@
-import { and, AnyTable, asc, Column, desc, eq } from 'drizzle-orm'
-import { UndefinedToOptional } from 'type-fest/source/internal'
+import type { AnyTable, Column } from 'drizzle-orm'
+import { and, asc, desc, eq } from 'drizzle-orm'
+import type { UndefinedToOptional } from 'type-fest/source/internal'
 
-import { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
+import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
 import { AccountProvider } from './constant'
 import { getSessionCookie } from './utils'
 
-import { MinimalContext } from '../config'
+import type { MinimalContext } from '../config'
 
 type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
   [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true
@@ -26,7 +27,7 @@ export type AuthContext<TConfig extends AuthConfig = AuthConfig> = {
   authConfig: TConfig
   internalHandlers: InternalHandlers
 
-  requiredAuthenticated: (headers: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
+  requiredAuthenticated: (headers?: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
 }
 
 export function createAuthContext<TAuthConfig extends AuthConfig, TContext extends MinimalContext>(
@@ -39,7 +40,7 @@ export function createAuthContext<TAuthConfig extends AuthConfig, TContext exten
     authConfig: authConfig,
     internalHandlers: internalHandlers,
 
-    requiredAuthenticated: async (headers: Record<string, string>) => {
+    requiredAuthenticated: async (headers?: Record<string, string>) => {
       const sessionId = getSessionCookie(headers)
       if (!sessionId) throw new Error('Unauthorized')
       const session = await internalHandlers.session.findUserBySessionId(sessionId)

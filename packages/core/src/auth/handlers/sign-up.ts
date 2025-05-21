@@ -1,8 +1,8 @@
 import z from 'zod'
 
-import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
+import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
-import { AuthContext } from '../context'
+import { type AuthContext } from '../context'
 
 interface InternalRouteOptions {}
 
@@ -29,7 +29,7 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
         }),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     const hasedPassword = args.body.password // TODO: hash password

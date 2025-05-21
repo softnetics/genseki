@@ -1,8 +1,8 @@
 import z from 'zod'
 
-import { ApiRouteHandler, ApiRouteSchema, createEndpoint } from '../../endpoint'
+import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
-import { AuthContext } from '../context'
+import { type AuthContext } from '../context'
 import { setSessionCookie } from '../utils'
 
 interface InternalRouteOptions {
@@ -28,7 +28,7 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
         }),
       }),
     },
-  } satisfies ApiRouteSchema
+  } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
     const account = await args.context.internalHandlers.account.findByUserEmailAndProvider(

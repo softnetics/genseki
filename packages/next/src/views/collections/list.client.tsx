@@ -1,16 +1,14 @@
 'use client'
 
-import { Selection } from 'react-aria-components'
+import type { Selection } from 'react-aria-components'
 
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
-import {
-  ClientCollection,
-  InferFieldsFromCollection,
-} from 'node_modules/@kivotos/core/src/collection'
-import { FieldClient } from 'node_modules/@kivotos/core/src/field'
+import type { FieldClient } from 'node_modules/@kivotos/core/src/field'
 
-import BaseIcon from '~/components/primitives/base-icon'
-import { Menu } from '~/intentui/ui/menu'
+import type { ClientCollection, InferFieldsFromCollection } from '@kivotos/core'
+
+import BaseIcon from '../../components/primitives/base-icon'
+import { Menu } from '../../intentui/ui/menu'
 import {
   Table,
   TableBody,
@@ -18,7 +16,7 @@ import {
   TableColumn,
   TableHeader,
   TableRow,
-} from '~/intentui/ui/table'
+} from '../../intentui/ui/table'
 
 // Maybe tanstack-hooks-form is more reasonable for this, but the clock is ticking fr fr nocap
 const tableDataExtract = <

@@ -1,12 +1,12 @@
-import { AnyColumn, AnyTable } from 'drizzle-orm'
+import type { AnyColumn, AnyTable } from 'drizzle-orm'
 import * as R from 'remeda'
-import { Simplify } from 'type-fest'
+import type { Simplify } from 'type-fest'
 
-import { AuthContext, createAuthContext } from './context'
+import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
-import { MinimalContext } from '../config'
-import { ApiRouteHandler } from '../endpoint'
+import type { MinimalContext } from '../config'
+import type { ApiRouteHandler } from '../endpoint'
 
 export type AnyTypedColumn<T> = AnyColumn & { _: { data: T; dialect: 'pg' } }
 export type WithNotNull<T> = T & { _: { notNull: true } }
@@ -129,7 +129,7 @@ export type Auth<
   >
 }
 
-export function createAuth<TContext extends MinimalContext = MinimalContext>(
+export function createAuth<TContext extends MinimalContext<any> = MinimalContext<any>>(
   config: AuthConfig,
   context: TContext
 ): Auth<TContext> {

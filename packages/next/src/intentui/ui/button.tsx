@@ -1,15 +1,15 @@
 'use client'
 import React, { forwardRef } from 'react'
+import type { LinkProps as LinkPrimitiveProps } from 'react-aria-components'
 import {
   Button as ButtonPrimitive,
   type ButtonProps as ButtonPrimitiveProps,
   Link,
-  LinkProps as LinkPrimitiveProps,
 } from 'react-aria-components'
 
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '~/utils/cn'
+import { cn } from '../../utils/cn'
 
 const buttonVariants = cva('cursor-pointer flex items-center justify-center', {
   variants: {

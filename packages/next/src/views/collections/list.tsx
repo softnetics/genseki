@@ -6,17 +6,17 @@ import {
 } from '@phosphor-icons/react/dist/ssr'
 import Image from 'next/image'
 
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 import { getClientCollection } from '@kivotos/core'
 
 import badge from '~/../public/badge.svg'
-import BaseIcon from '~/components/primitives/base-icon'
-import Typography from '~/components/primitives/typography'
-import { Button, ButtonLink } from '~/intentui/ui/button'
-import { TextField } from '~/intentui/ui/text-field'
 
 import { ListTable } from './list.client'
 
+import BaseIcon from '../../components/primitives/base-icon'
+import Typography from '../../components/primitives/typography'
+import { Button, ButtonLink } from '../../intentui/ui/button'
+import { TextField } from '../../intentui/ui/text-field'
 import { formatSlug } from '../../utils/format-slug'
 
 interface ListViewProps {

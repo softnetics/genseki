@@ -8,6 +8,7 @@
     "source.fixAll.eslint": "explicit",
     "source.organizeImports": "never"
   },
+  "typescript.preferences.importModuleSpecifier": "relative",
   "npm.packageManager": "pnpm",
   "editor.defaultFormatter": "esbenp.prettier-vscode",
   "[typescript]": {

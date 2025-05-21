@@ -1,6 +1,6 @@
 import { headers as nextHeaders } from 'next/headers'
 
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 import { RootCollectionLayout } from '~/layouts/root-collection'
 

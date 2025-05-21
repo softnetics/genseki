@@ -1,4 +1,4 @@
-import { Field, ServerConfig } from '@kivotos/core'
+import type { Field, ServerConfig } from '@kivotos/core'
 
 import { AutoField } from '../../components/auto-field'
 import { Form } from '../../components/form'

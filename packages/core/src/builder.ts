@@ -1,29 +1,35 @@
 import {
   createTableRelationsHelpers,
   extractTablesRelationalConfig,
-  ExtractTablesWithRelations,
+  type ExtractTablesWithRelations,
   is,
   Table,
 } from 'drizzle-orm'
-import { Simplify } from 'type-fest'
+import type { Simplify } from 'type-fest'
 
 import { createDefaultApiHandlers } from './builder.handler'
-import {
+import type {
   Collection,
   CollectionConfig,
   FindTableByTableTsName,
   GetAllTableTsNames,
 } from './collection'
-import { MinimalContext } from './config'
+import type { MinimalContext } from './config'
 import {
-  ApiRoute,
-  ApiRouteHandler,
-  ApiRouter,
-  ApiRouteSchema,
-  AppendPrefixPathToApiRoute,
+  type ApiRoute,
+  type ApiRouteHandler,
+  type ApiRouter,
+  type ApiRouteSchema,
+  type AppendPrefixPathToApiRoute,
   createEndpoint,
 } from './endpoint'
-import { FieldBuilder, Fields, FieldsInitial, FieldsWithFieldName, OptionCallback } from './field'
+import {
+  FieldBuilder,
+  type Fields,
+  type FieldsInitial,
+  type FieldsWithFieldName,
+  type OptionCallback,
+} from './field'
 import { appendFieldNameToFields } from './utils'
 
 export class Builder<

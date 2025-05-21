@@ -1,4 +1,4 @@
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {
   id: string
