@@ -5,6 +5,8 @@ import { twMerge } from 'tailwind-merge'
 import type { VariantProps } from 'tailwind-variants'
 import { tv } from 'tailwind-variants'
 
+import { cn } from '../../utils/cn'
+
 const loaderStyles = tv({
   base: 'relative',
   variants: {
@@ -184,7 +186,7 @@ interface LoaderProps
 
 const Loader = ({ isIndeterminate = true, ref, ...props }: LoaderProps) => {
   const { className, variant = DEFAULT_SPINNER, intent, size, ...spinnerProps } = props
-  const LoaderPrimitive = LOADERS[variant in LOADERS ? variant : DEFAULT_SPINNER]
+  const LoaderPrimitive = LOADERS[variant] ?? LOADERS[DEFAULT_SPINNER]
 
   return (
     <ProgressBar
@@ -197,7 +199,7 @@ const Loader = ({ isIndeterminate = true, ref, ...props }: LoaderProps) => {
         className={loaderStyles({
           intent,
           size,
-          className: twMerge([
+          className: cn([
             ['ring'].includes(variant) && 'animate-spin',
             variant === 'spin' && 'stroke-current',
             className,

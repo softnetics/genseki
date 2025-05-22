@@ -2,14 +2,19 @@
 
 import { useState } from 'react'
 import type { InputProps, TextFieldProps as TextFieldPrimitiveProps } from 'react-aria-components'
-import { Button as ButtonPrimitive, TextField as TextFieldPrimitive } from 'react-aria-components'
+import { TextField as TextFieldPrimitive } from 'react-aria-components'
 
-import { IconEye, IconEyeClosed } from '@intentui/icons'
+import { EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
+import { tv, type VariantProps } from 'tailwind-variants'
 
+import { Button } from './button'
 import type { FieldProps } from './field'
 import { Description, FieldError, FieldGroup, Input, Label } from './field'
 import { Loader } from './loader'
-import { composeTailwindRenderProps } from './primitive'
+
+import { BaseIcon } from '../../components/primitives/base-icon'
+import { Typography } from '../../components/primitives/typography'
+import { cn } from '../../utils/cn'
 
 type InputType = Exclude<InputProps['type'], 'password'>
 
@@ -30,7 +35,20 @@ interface NonRevealableTextFieldProps extends BaseTextFieldProps {
   type?: InputType
 }
 
-type TextFieldProps = RevealableTextFieldProps | NonRevealableTextFieldProps
+const fieldgroupVariants = tv({
+  base: 'box-content rounded-md',
+  variants: {
+    size: {
+      md: `[&>input]:p-6 [&>[data-slot=prefix]]:pl-4 [&>[data-slot=suffix]]:pr-4`,
+      sm: `[&>input]:p-4 [&>[data-slot=prefix]]:pl-2 [&>[data-slot=suffix]]:pr-2`,
+      xs: `[&>input]:p-2 [&>[data-slot=prefix]]:pl-2 [&>[data-slot=suffix]]:pr-2`,
+    },
+  },
+  defaultVariants: { size: 'md' },
+})
+
+type TextFieldProps = (RevealableTextFieldProps | NonRevealableTextFieldProps) &
+  VariantProps<typeof fieldgroupVariants>
 
 const TextField = ({
   placeholder,
@@ -50,12 +68,9 @@ const TextField = ({
   const handleTogglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev)
   }
+
   return (
-    <TextFieldPrimitive
-      type={inputType}
-      {...props}
-      className={composeTailwindRenderProps(className, 'group flex flex-col gap-y-1')}
-    >
+    <TextFieldPrimitive type={inputType} {...props} className="group flex flex-col gap-y-1">
       {!props.children ? (
         <>
           {label && <Label>{label}</Label>}
@@ -63,29 +78,49 @@ const TextField = ({
             isDisabled={props.isDisabled}
             isInvalid={!!errorMessage}
             data-loading={isPending ? 'true' : undefined}
+            className={cn(fieldgroupVariants({ size: props.size, className }))}
           >
             {prefix && typeof prefix === 'string' ? (
-              <span className="ml-2 text-muted-fg">{prefix}</span>
+              <Typography
+                data-slot="prefix"
+                type="caption"
+                weight="medium"
+                className="text-text-trivial"
+              >
+                {prefix}
+              </Typography>
             ) : (
-              <>{prefix}</>
+              prefix && <div data-slot="prefix">{prefix}</div>
             )}
             <Input placeholder={placeholder} />
             {isRevealable ? (
-              <ButtonPrimitive
+              <Button
+                variant="vanish"
+                size="md"
                 type="button"
                 aria-label="Toggle password visibility"
                 onPress={handleTogglePasswordVisibility}
-                className="relative mr-1 grid shrink-0 place-content-center rounded-sm border-transparent outline-hidden *:data-[slot=icon]:text-muted-fg focus-visible:*:data-[slot=icon]:text-primary"
               >
-                {isPasswordVisible ? <IconEyeClosed /> : <IconEye />}
-              </ButtonPrimitive>
+                {isPasswordVisible ? (
+                  <BaseIcon icon={EyeClosedIcon} weight="regular" size="md" />
+                ) : (
+                  <BaseIcon icon={EyeIcon} weight="regular" size="md" />
+                )}
+              </Button>
             ) : isPending ? (
               <Loader variant="spin" />
             ) : suffix ? (
               typeof suffix === 'string' ? (
-                <span className="mr-2 text-muted-fg">{suffix}</span>
+                <Typography
+                  data-slot="suffix"
+                  type="caption"
+                  weight="medium"
+                  className="text-text-trivial"
+                >
+                  {suffix}
+                </Typography>
               ) : (
-                <>{suffix}</>
+                <div data-slot="suffix">{suffix}</div>
               )
             ) : null}
           </FieldGroup>

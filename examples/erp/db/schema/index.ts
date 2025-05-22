@@ -1,4 +1,4 @@
-import { relations } from 'drizzle-orm'
+import { relations, sql } from 'drizzle-orm'
 import { boolean, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 
 const timestamps = {
@@ -8,7 +8,9 @@ const timestamps = {
 }
 
 export const users = pgTable('users', {
-  id: text('id').primaryKey(),
+  id: uuid('id')
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
@@ -22,7 +24,7 @@ export const sessions = pgTable('session', {
   token: text('token').notNull().unique(),
   ipAddress: text('ip_address'),
   userAgent: text('user_agent'),
-  userId: text('user_id')
+  userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   ...timestamps,
@@ -32,7 +34,7 @@ export const accounts = pgTable('account', {
   id: text('id').primaryKey(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
-  userId: text('user_id')
+  userId: uuid('user_id')
     .notNull()
     .references(() => users.id, { onDelete: 'cascade' }),
   accessToken: text('access_token'),
@@ -54,7 +56,9 @@ export const verifications = pgTable('verification', {
 })
 
 export const posts = pgTable('posts', {
-  id: uuid().primaryKey(),
+  id: uuid()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   title: varchar(),
   content: text(),
   authorId: uuid().references(() => users.id),
@@ -72,7 +76,9 @@ export const postsRelations = relations(posts, ({ one }) => ({
 }))
 
 export const categories = pgTable('categories', {
-  id: uuid().primaryKey(),
+  id: uuid()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: varchar().notNull(),
   ownerId: uuid().references(() => users.id),
   ...timestamps,
@@ -85,7 +91,9 @@ export const categoriesRelations = relations(categories, ({ many, one }) => ({
 }))
 
 export const categoryTags = pgTable('categoryTags', {
-  id: uuid().primaryKey(),
+  id: uuid()
+    .primaryKey()
+    .default(sql`gen_random_uuid()`),
   name: varchar().notNull(),
   category: uuid().references(() => categories.id),
   ...timestamps,

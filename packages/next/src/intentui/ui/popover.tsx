@@ -28,16 +28,14 @@ import { Dialog } from './dialog'
 
 import { useMediaQuery } from '../utils/use-media-query'
 
-type PopoverProps = DialogTriggerProps
+interface PopoverProps extends DialogTriggerProps {}
+
 const Popover = (props: PopoverProps) => {
   return <DialogTrigger {...props} />
 }
 
-const PopoverTitle = ({ level = 2, className, ...props }: DialogTitleProps) => (
-  <Dialog.Title
-    className={twMerge('sm:leading-none', level === 2 && 'sm:text-lg', className)}
-    {...props}
-  />
+const PopoverTitle = ({ className, ...props }: DialogTitleProps) => (
+  <Dialog.Title className={twMerge('sm:leading-none', className)} {...props} />
 )
 
 const PopoverHeader = ({ className, ...props }: DialogHeaderProps) => (
@@ -54,7 +52,7 @@ const PopoverBody = ({ className, ref, ...props }: DialogBodyProps) => (
 
 const content = tv({
   base: [
-    'peer/popover-content max-w-xs rounded-xl border bg-overlay bg-clip-padding text-overlay-fg shadow-xs transition-transform [scrollbar-width:thin] sm:max-w-3xl sm:text-sm dark:backdrop-saturate-200 forced-colors:bg-[Canvas] [&::-webkit-scrollbar]:size-0.5',
+    'peer/popover-content max-w-xs rounded-md border bg-overlay bg-clip-padding text-overlay-fg shadow-xs transition-transform [scrollbar-width:thin] sm:max-w-3xl sm:text-sm dark:backdrop-saturate-200 forced-colors:bg-[Canvas] [&::-webkit-scrollbar]:size-0.5',
   ],
   variants: {
     isPicker: {
@@ -130,7 +128,7 @@ const PopoverContent = ({
   const effectiveOffset = isSubmenuTrigger ? offset - 5 : offset
   return isMobile && respectScreen ? (
     <ModalOverlay
-      className="fixed top-0 left-0 isolate z-50 h-(--visual-viewport-height) w-full bg-overlay/10 [--visual-viewport-vertical-padding:16px]"
+      className="h-(--visual-viewport-height) bg-overlay/10 fixed left-0 top-0 isolate z-50 w-full [--visual-viewport-vertical-padding:16px]"
       {...props}
       isDismissable
     >
@@ -161,7 +159,7 @@ const PopoverContent = ({
             width={12}
             height={12}
             viewBox="0 0 12 12"
-            className="group-data-[placement=left]:-rotate-90 block fill-overlay stroke-border group-data-[placement=bottom]:rotate-180 group-data-[placement=right]:rotate-90 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
+            className="fill-overlay stroke-border block group-data-[placement=bottom]:rotate-180 group-data-[placement=left]:-rotate-90 group-data-[placement=right]:rotate-90 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
           >
             <path d="M0 0 L6 6 L12 0" />
           </svg>

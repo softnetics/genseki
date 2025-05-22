@@ -12,7 +12,7 @@ import {
   composeRenderProps,
 } from 'react-aria-components'
 
-import { IconCheck, IconMinus } from '@intentui/icons'
+import { Check, Minus } from '@phosphor-icons/react'
 import { twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
@@ -53,7 +53,7 @@ const checkboxStyles = tv({
 })
 
 const boxStyles = tv({
-  base: 'inset-ring inset-ring-fg/10 flex size-4 shrink-0 items-center justify-center rounded text-bg transition *:data-[slot=icon]:size-3',
+  base: 'inset-ring inset-ring-fg/10 flex size-8 shrink-0 items-center justify-center rounded-sm text-bg transition *:data-[slot=icon]:size-6',
   variants: {
     isSelected: {
       false: 'bg-muted',
@@ -101,13 +101,17 @@ const Checkbox = forwardRef(function Checkbox(
               isSelected: isSelected || isIndeterminate,
             })}
           >
-            {isIndeterminate ? <IconMinus /> : isSelected ? <IconCheck /> : null}
+            {isIndeterminate ? (
+              <Minus weight="bold" />
+            ) : isSelected ? (
+              <Check weight="bold" />
+            ) : null}
           </div>
 
           <div className="flex flex-col gap-1">
             <>
               {props.label ? (
-                <Label className={twMerge(props.description && 'font-normal text-sm/4')}>
+                <Label className={twMerge(props.description && 'text-sm/4 font-normal')}>
                   {props.label}
                 </Label>
               ) : (

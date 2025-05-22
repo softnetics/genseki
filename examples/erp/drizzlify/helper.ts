@@ -21,6 +21,7 @@ export const baseConfig = defineBaseConfig({
     verification: { model: schema.verifications },
     secret: 'secret',
   },
+  context: {},
 })
 
 export const builder = new Builder(baseConfig).$context<typeof baseConfig.context>()

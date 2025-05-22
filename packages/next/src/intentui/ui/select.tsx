@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from 'react-aria-components'
 
-import { IconChevronLgDown } from '@intentui/icons'
+import { CaretDown } from '@phosphor-icons/react'
 import { tv } from 'tailwind-variants'
 
 import {
@@ -28,16 +28,18 @@ import { ListBox } from './list-box'
 import { PopoverContent, type PopoverContentProps } from './popover'
 import { composeTailwindRenderProps, focusStyles } from './primitive'
 
+import { BaseIcon } from '../../components/primitives/base-icon'
+
 const selectTriggerStyles = tv({
   extend: focusStyles,
   base: [
-    'btr flex h-10 w-full cursor-default items-center gap-4 gap-x-2 rounded-lg border border-input py-2 pr-2 pl-3 text-start shadow-[inset_0_1px_0_0_rgba(255,255,255,0.1)] transition group-disabled:opacity-50 **:data-[slot=icon]:size-4 dark:shadow-none',
+    'btr flex w-full cursor-default items-center gap-12 gap-x-2 rounded-md border border-input px-6 py-6 text-start shadow-sm transition group-disabled:opacity-50 **:data-[slot=icon]:size-8 min-h-20 dark:shadow-none',
     'group-data-open:border-ring/70 group-data-open:ring-4 group-data-open:ring-ring/20',
     'text-fg group-invalid:border-danger group-invalid:ring-danger/20 forced-colors:group-invalid:border-[Mark]',
   ],
   variants: {
     isDisabled: {
-      true: 'opacity-50 forced-colors:border-[GrayText] forced-colors:text-[GrayText]',
+      true: 'opacity-80 bg-bluegray-100 forced-colors:border-[GrayText] forced-colors:text-[GrayText]',
     },
   },
 })
@@ -92,13 +94,19 @@ const SelectList = <T extends object>({
     <PopoverContent
       showArrow={false}
       respectScreen={false}
-      className={composeTailwindRenderProps(popoverClassName, 'sm:min-w-(--trigger-width)')}
+      className={composeTailwindRenderProps(
+        popoverClassName,
+        'bg-bg min-w-[var(--trigger-width,120px)]'
+      )}
       placement={props.placement}
     >
       <ListBox
         layout="stack"
         orientation="vertical"
-        className={composeTailwindRenderProps(className, 'border-0 shadow-none')}
+        className={composeTailwindRenderProps(
+          className,
+          'max-h-[inherit] min-w-[inherit] border-0 shadow-none'
+        )}
         items={items}
         {...props}
       >
@@ -126,11 +134,11 @@ const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
       {props.prefix && <span className="-mr-1">{props.prefix}</span>}
       <SelectValue
         data-slot="select-value"
-        className="*:data-[slot=icon]:-mx-0.5 *:data-[slot=avatar]:-mx-0.5 *:data-[slot=avatar]:*:-mx-0.5 grid flex-1 grid-cols-[auto_1fr] items-center text-base data-placeholder:text-muted-fg *:data-[slot=avatar]:*:mr-2 *:data-[slot=avatar]:mr-2 *:data-[slot=icon]:mr-2 sm:text-sm [&_[slot=description]]:hidden"
+        className="data-placeholder:text-muted-fg grid flex-1 grid-cols-[auto_1fr] items-center text-base *:data-[slot=avatar]:*:-mx-0.5 *:data-[slot=avatar]:-mx-0.5 *:data-[slot=icon]:-mx-0.5 *:data-[slot=avatar]:*:mr-2 *:data-[slot=avatar]:mr-2 *:data-[slot=icon]:mr-2 [&_[slot=description]]:hidden"
       />
-      <IconChevronLgDown
-        aria-hidden
-        className="size-4 shrink-0 text-muted-fg duration-300 group-disabled:opacity-50 group-data-open:rotate-180 group-data-open:text-fg forced-colors:text-[ButtonText] forced-colors:group-disabled:text-[GrayText]"
+      <BaseIcon
+        icon={CaretDown}
+        className="text-muted-fg group-data-open:rotate-180 group-data-open:text-fg shrink-0 duration-300 group-disabled:opacity-50 forced-colors:text-[ButtonText] forced-colors:group-disabled:text-[GrayText]"
       />
     </Button>
   )

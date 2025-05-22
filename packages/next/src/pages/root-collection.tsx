@@ -1,5 +1,13 @@
+import { Suspense } from 'react'
+
 import type { ServerConfig } from '@kivotos/core'
 
+import { NotfoundPage } from './404'
+import { HomePage } from './home'
+import { LoadingPage } from './loading'
+
+import { Typography } from '../components/primitives/typography'
+import { formatSlug } from '../utils/format-slug'
 import { CreateView } from '../views/collections/create'
 import { ListView } from '../views/collections/list'
 import { OneView } from '../views/collections/one'
@@ -9,15 +17,16 @@ interface RootProps {
   serverConfig: ServerConfig
   segments: string[]
   searchParams: Record<string, string | string[]>
-  headers: Headers
+  headers?: Headers
 }
 
 /**
  * Path Pattern
- * /collections/:slug/:id       Read Page
- * /collections/:slug           List Page
- * /collections/:slug/create    Create Page
- * /collections/:slug/:id/edit  Edit Page
+ * /                Home Page
+ * /:slug           List Page
+ * /:slug/create    Create Page
+ * /:slug/:id       Read Item
+ * /:slug/:id/edit  Update Item
  *
  * Fallback
  * 404                          Not Found
@@ -26,31 +35,63 @@ interface RootProps {
 export async function RootCollectionPage(props: RootProps) {
   const { serverConfig, segments, searchParams } = props
 
+  // No segment -> Home page
+  if (segments.length === 0) {
+    return <HomePage serverConfig={serverConfig} />
+  }
+
   const slug = segments[0]
 
   const collection = serverConfig.collections.find((collection) => collection.slug === slug)
 
-  // TODO: 404
-  if (!collection) throw new Error(`Collection ${slug} not found`)
+  // 404 Collection not found
+  if (!collection)
+    return (
+      <NotfoundPage
+        redirectSentence="Back to collections"
+        description="The collection you are looking for does not exist. Please check the URL and try again."
+        title={
+          <div>
+            <Typography
+              weight="semibold"
+              type="h4"
+              className="text-text-nontrivial mt-12 min-w-[240px]"
+            >
+              Collection{' '}
+              <span className="bg-muted text-muted-fg rounded-sm px-2">{formatSlug(slug)}</span> is
+              not found
+            </Typography>
+          </div>
+        }
+        redirectURL="/admin/collections"
+      />
+    )
 
+  // List Page    ——  /:slug
   if (segments.length === 1) {
-    return <ListView slug={slug} serverConfig={serverConfig} searchParams={searchParams} />
+    return (
+      <Suspense fallback={<LoadingPage />}>
+        <ListView slug={slug} serverConfig={serverConfig} searchParams={searchParams} />
+      </Suspense>
+    )
   }
 
-  // Handle collection CRUD routes
-  if (segments[1] === 'create' && segments.length === 2) {
+  // Create Page   ——  /:slug/create
+  if (segments[1] === 'create') {
     return <CreateView slug={slug} serverConfig={serverConfig} />
   }
 
+  // Read Item     ——  /:slug/:id
   if (segments.length === 2) {
     const id = segments[1]
     return <OneView id={id} slug={slug} serverConfig={serverConfig} />
   }
 
-  if (segments[2] === 'edit' && segments.length === 3) {
+  // Update Item   ——  /:slug/:id/edit
+  if (segments[2] === 'edit') {
     const id = segments[1]
     return <UpdateView id={id} slug={slug} serverConfig={serverConfig} />
   }
 
-  throw new Error(`Invalid path: ${segments.join('/')}`) // TODO: 404
+  return <NotfoundPage redirectURL="/admin/collections" />
 }

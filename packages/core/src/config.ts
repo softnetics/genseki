@@ -126,7 +126,7 @@ export interface ClientConfig<
 
 export function getBaseField<const TField extends Field>(name: string, field: TField): FieldClient {
   if (isRelationField(field)) {
-    if (field.type === 'create' || field.type === 'connectOrCreate') {
+    if (['connect', 'connectOrCreate', 'create'].includes(field.type)) {
       const sanitizedFields = Object.fromEntries(
         Object.entries(field.fields).map(([key, value]) => {
           return [key, getBaseField(key, value)]

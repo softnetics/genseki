@@ -63,7 +63,8 @@ const contentStyles = tv({
   compoundVariants: generateCompoundVariants(['top', 'bottom', 'left', 'right']),
 })
 
-type SheetProps = DialogTriggerProps
+interface SheetProps extends DialogTriggerProps {}
+
 const Sheet = (props: SheetProps) => {
   return <DialogTrigger {...props} />
 }
@@ -126,8 +127,10 @@ const SheetContent = ({
               {typeof children === 'function' ? children(values) : children}
               {closeButton && (
                 <Dialog.CloseIndicator
-                  className="top-2.5 right-2.5"
+                  className="right-4 top-4 p-4"
                   isDismissable={_isDismissable}
+                  variant="outline"
+                  size="md"
                 />
               )}
             </>

@@ -10,6 +10,116 @@
 @plugin 'tailwindcss-react-aria-components';
 
 @theme {
+  /* Override default spacing */
+  --spacing: 2px;
+
+  --radius: initial;
+  --radius-sm: 4px;
+  --radius-md: 6px;
+  --radius-lg: 8px;
+  --radius-xl: 12px;
+  --radius-2xl: 16px;
+  --radius-3xl: 20px;
+  --radius-4xl: 24px;
+
+  --color-pumpkin-50: #fffaf8;
+  --color-pumpkin-100: #feeadd;
+  --color-pumpkin-200: #ffc8ab;
+  --color-pumpkin-300: #ffa778;
+  --color-pumpkin-400: #ff8645;
+  --color-pumpkin-500: #ff6512;
+  --color-pumpkin-600: #d94c00;
+  --color-pumpkin-700: #a13801;
+  --color-pumpkin-800: #692500;
+  --color-pumpkin-900: #311100;
+
+  --color-valencia-50: #f9e3e3;
+  --color-valencia-100: #f7d5d4;
+  --color-valencia-200: #f0b7b7;
+  --color-valencia-300: #e99b99;
+  --color-valencia-400: #e37d7c;
+  --color-valencia-500: #dd5f5e;
+  --color-valencia-600: #d74340;
+  --color-valencia-700: #b12626;
+  --color-valencia-800: #7a1b1a;
+  --color-valencia-900: #430e0e;
+
+  --color-bluegray-50: #f8fafc;
+  --color-bluegray-100: #f1f5f9;
+  --color-bluegray-200: #e2e8f0;
+  --color-bluegray-300: #cbd5e1;
+  --color-bluegray-400: #94a3b8;
+  --color-bluegray-500: #64748b;
+  --color-bluegray-600: #475569;
+  --color-bluegray-700: #334155;
+  --color-bluegray-800: #1e293b;
+  --color-bluegray-900: #0f172a;
+
+  --color-palm-50: #eafceb;
+  --color-palm-100: #d0f8d4;
+  --color-palm-200: #a0f1a9;
+  --color-palm-300: #6fe97b;
+  --color-palm-400: #3ee24f;
+  --color-palm-500: #1cca2f;
+  --color-palm-600: #159924;
+  --color-palm-700: #13711b;
+  --color-palm-800: #0a4910;
+  --color-palm-900: #062108;
+
+  --color-ocean-50: #e5eafa;
+  --color-ocean-100: #d5def9;
+  --color-ocean-200: #b6c4f5;
+  --color-ocean-300: #96abf1;
+  --color-ocean-400: #7792ed;
+  --color-ocean-500: #5779e8;
+  --color-ocean-600: #3860e4;
+  --color-ocean-700: #193fbb;
+  --color-ocean-800: #112a7c;
+  --color-ocean-900: #08153d;
+
+  --color-black-normal: #000000;
+  --color-black-vanish: rgba(0, 0, 0, 0);
+
+  --color-white-normal: #ffffff;
+  --color-white-vanish: rgba(255, 255, 255, 0);
+
+  --opacity-disabled: 80;
+
+  --text-xs: 0.625rem;
+  --text-xs-line-height: 140%;
+  --text-sm: 0.75rem;
+  --text-sm-line-height: 140%;
+  --text-base: 0.875rem;
+  --text-base-line-height: 120%;
+  --text-lg: 1.25rem;
+  --text-lg-line-height: 120%;
+  --text-xl: 1.5rem;
+  --text-xl-line-height: 120%;
+  --text-2xl: 1.875rem;
+  --text-2xl-line-height: 115%;
+  --text-3xl: 2.25rem;
+  --text-3xl-line-height: 115%;
+
+  /* Drizzilify | Senmantic */
+  --color-text-correct: var(--color-palm-600);
+  --color-text-incorrect: var(--color-valencia-600);
+  --color-text-accent: var(--color-pumpkin-500);
+  --color-text-nontrivial: var(--color-bluegray-800);
+  --color-text-body: var(--color-bluegray-600);
+  --color-text-trivial: var(--color-bluegray-500);
+  --color-text-white: var(--color-white-normal);
+
+  --color-stroke-correct: var(--color-palm-400);
+  --color-stroke-incorrect: var(--color-valencia-400);
+  --color-stroke-accent: var(--color-pumpkin-500);
+  --color-stroke-nontrivial: var(--color-bluegray-500);
+  --color-stroke-body: var(--color-bluegray-400);
+  --color-stroke-trivial: var(--color-bluegray-300);
+  --color-stroke-verytrival: var(--color-bluegray-200);
+
+  --color-surface-correct: var(--color-palm-50);
+  --color-surface-incorrect: var(--color-valencia-50);
+
   --font-sans:
     'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
     'Segoe UI Symbol', 'Noto Color Emoji';
@@ -17,6 +127,7 @@
     'Geist Mono', 'ui-monospace', 'SFMono-Regular', 'Menlo', 'Monaco', 'Consolas',
     '"Liberation Mono"', '"Courier New"', 'monospace';
 
+  /* Intent UI | semantics */
   --color-border: var(--border);
   --color-input: var(--input);
 
@@ -27,6 +138,7 @@
 
   --color-primary: var(--primary);
   --color-primary-fg: var(--primary-fg);
+  --color-primary-emphasis: var(--primary-emphasis);
 
   --color-secondary: var(--secondary);
   --color-secondary-fg: var(--secondary-fg);
@@ -63,80 +175,89 @@
 }
 
 @layer base {
+  .dark {
+    --color-text-correct: var(--color-palm-600);
+    --color-text-incorrect: var(--color-valencia-600);
+    --color-text-accent: var(--color-pumpkin-500);
+
+    --color-text-nontrivial: var(--color-bluegray-50);
+    --color-text-body: var(--color-bluegray-200);
+    --color-text-trivial: var(--color-bluegray-400);
+    --color-text-white: var(--color-bluegray-600);
+  }
+
+  /* IntentUI | Theme for used by @theme */
+  /**
+  User need to redefine these variables
+  */
   :root {
     --bg: var(--color-white);
-    --fg: var(--color-slate-950);
+    --fg: var(--color-bluegray-900);
 
-    --primary: var(--color-blue-600);
-    --primary-fg: var(--color-white);
+    --primary: var(--color-pumpkin-500);
+    --primary-fg: var(--color-pumpkin-50);
+    --primary-emphasis: var(--color-pumpkin-600);
 
-    --secondary: var(--color-slate-100);
-    --secondary-fg: var(--color-slate-950);
+    --secondary: var(--color-bluegray-200);
+    --secondary-fg: var(--color-bluegray-600);
 
     --overlay: var(--color-white);
-    --overlay-fg: var(--color-slate-950);
+    --overlay-fg: var(--color-bluegray-900);
 
-    --accent: var(--color-blue-600);
-    --accent-fg: var(--color-white);
+    --accent: var(--color-pumpkin-500);
+    --accent-fg: var(--color-bluegray-50);
 
-    --muted: var(--color-slate-100);
-    --muted-fg: var(--color-slate-600);
+    --muted: var(--color-bluegray-100);
+    --muted-fg: var(--color-bluegray-600);
 
-    --success: var(--color-emerald-600);
-    --success-fg: var(--color-white);
+    --success: var(--color-palm-600);
+    --success-fg: var(--color-white-normal);
 
-    --warning: var(--color-amber-400);
-    --warning-fg: var(--color-amber-950);
+    --warning: oklch(0.828 0.189 84.429);
+    --warning-fg: oklch(0.279 0.077 45.635);
 
-    --danger: var(--color-red-600);
-    --danger-fg: var(--color-red-50);
+    --danger: var(--color-valencia-600);
+    --danger-fg: var(--color-valencia-50);
 
-    --border: var(--color-slate-200);
-    --input: var(--color-slate-300);
-    --ring: var(--color-blue-600);
+    --border: var(--color-bluegray-300);
+    --input: var(--color-bluegray-300);
+    --ring: var(--color-pumpkin-500);
 
-    --navbar: var(--color-slate-50);
-    --navbar-fg: var(--color-slate-950);
+    --navbar: var(--color-bluegray-100);
+    --navbar-fg: var(--color-bluegray-500);
 
-    --sidebar: var(--color-slate-50);
-    --sidebar-fg: var(--color-slate-950);
+    --sidebar: var(--color-bluegray-50);
+    --sidebar-fg: var(--color-bluegray-600);
+    --sidebar-accent: var(--color-pumpkin-500);
 
-    --chart-1: var(--color-blue-600);
-    --chart-2: var(--color-blue-400);
-    --chart-3: var(--color-blue-300);
-    --chart-4: var(--color-blue-200);
-    --chart-5: var(--color-blue-100);
-
-    --radius-lg: 0.5rem;
-    --radius-xs: calc(var(--radius-lg) * 0.5);
-    --radius-sm: calc(var(--radius-lg) * 0.75);
-    --radius-md: calc(var(--radius-lg) * 0.9);
-    --radius-xl: calc(var(--radius-lg) * 1.25);
-    --radius-2xl: calc(var(--radius-lg) * 1.5);
-    --radius-3xl: calc(var(--radius-lg) * 2);
-    --radius-4xl: calc(var(--radius-lg) * 3);
+    --chart-1: oklch(0.546 0.245 262.881);
+    --chart-2: oklch(0.707 0.165 254.624);
+    --chart-3: oklch(0.809 0.105 251.813);
+    --chart-4: oklch(0.882 0.059 254.128);
+    --chart-5: oklch(0.932 0.032 255.585);
   }
 
   .dark {
-    --bg: var(--color-slate-950);
-    --fg: var(--color-slate-50);
+    --bg: var(--color-bluegray-900);
+    --fg: var(--color-bluegray-50);
 
-    --primary: var(--color-blue-600);
+    --primary: var(--color-pumpkin-500);
     --primary-fg: var(--color-white);
+    --primary-emphasis: var(--color-pumpkin-400);
 
-    --secondary: oklch(0.249 0.041 260.031);
-    --secondary-fg: var(--color-slate-50);
+    --secondary: var(--color-bluegray-600);
+    --secondary-fg: var(--color-bluegray-200);
 
-    --accent: var(--color-blue-600);
-    --accent-fg: var(--color-white);
+    --accent: var(--color-pumpkin-500);
+    --accent-fg: var(--color-bluegray-50);
 
-    --muted: var(--color-slate-900);
-    --muted-fg: var(--color-slate-400);
+    --muted: var(--color-bluegray-700);
+    --muted-fg: var(--color-bluegray-400);
 
-    --overlay: oklch(0.168 0.042 265.755);
-    --overlay-fg: var(--color-slate-50);
+    --overlay: var(--color-bluegray-900);
+    --overlay-fg: var(--color-bluegray-50);
 
-    --success: var(--color-emerald-600);
+    --success: var(--color-palm-600);
     --success-fg: var(--color-white);
 
     --warning: var(--color-amber-400);
@@ -145,15 +266,15 @@
     --danger: var(--color-red-600);
     --danger-fg: var(--color-red-50);
 
-    --border: oklch(0.272 0.044 257.287);
-    --input: oklch(0.292 0.044 257.287);
-    --ring: var(--color-blue-600);
+    --border: var(--color-bluegray-700);
+    --input: var(--color-bluegray-700);
+    --ring: var(--color-pumpkin-500);
 
-    --navbar: oklch(0.168 0.042 265.755);
-    --navbar-fg: var(--color-slate-50);
+    --navbar: var(--color-bluegray-500);
+    --navbar-fg: var(--color-bluegray-100);
 
-    --sidebar: oklch(0.158 0.042 265.755);
-    --sidebar-fg: var(--color-slate-50);
+    --sidebar: var(--color-bluegray-800);
+    --sidebar-fg: var(--color-bluegray-100);
 
     --chart-1: var(--color-blue-700);
     --chart-2: var(--color-blue-500);
@@ -163,7 +284,31 @@
   }
 }
 
-@variant dark (&:is(.dark *));
+@custom-variant dark (&:is(.dark *));
+
+@utility brand-primary-gradient-* {
+  background-color: var(--color-pumpkin-500);
+  background-image: linear-gradient(
+    to bottom,
+    --alpha(var(--color-white-normal) / --value(percentage)),
+    --alpha(var(--color-pumpkin-600) / --value(percentage))
+  );
+}
+
+@utility brand-secondary-gradient-* {
+  background-color: var(--color-pumpkin-100);
+  background-image:
+    linear-gradient(
+      to bottom,
+      --alpha(var(--color-white-normal) / --value(percentage)),
+      --alpha(var(--color-pumpkin-600) / --value(percentage))
+    ),
+    linear-gradient(
+      to bottom,
+      --alpha(var(--color-white-normal) / --value(percentage)),
+      --alpha(var(--color-white-vanish) / --value(percentage))
+    );
+}
 
 @layer base {
   *,
@@ -178,6 +323,7 @@
     text-rendering: optimizeLegibility;
     scrollbar-width: thin;
     scrollbar-color: var(--border) transparent;
+    line-height: 1;
   }
 
   html {
@@ -191,8 +337,8 @@
   }
 
   body {
-    background-color: var(--bg);
-    color: var(--fg);
+    background-color: var(--sidebar);
+    color: var(--color-text-body);
   }
 
   ::-webkit-scrollbar {
