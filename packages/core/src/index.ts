@@ -19,7 +19,7 @@ export type {
   InferTableNameFromCollection,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
-export type { BaseConfig, ClientConfig, ServerConfig } from './config'
+export type { BaseConfig, ClientConfig, MinimalContext, ServerConfig } from './config'
 export { defineBaseConfig, getClientCollection, getClientConfig } from './config'
 export type {
   ApiRoute,
