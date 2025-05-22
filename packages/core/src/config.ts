@@ -125,12 +125,15 @@ export interface ClientConfig<
   }
 }
 
-export function getBaseField<const TField extends Field>(name: string, field: TField): FieldClient {
+export function getFieldClient<const TField extends Field>(
+  name: string,
+  field: TField
+): FieldClient {
   if (isRelationField(field)) {
-    if (field.type === 'create' || field.type === 'connectOrCreate') {
+    if (field._.source === 'relations') {
       const sanitizedFields = Object.fromEntries(
         Object.entries(field.fields).map(([key, value]) => {
-          return [key, getBaseField(key, value)]
+          return [key, getFieldClient(key, value)]
         })
       )
 
@@ -169,7 +172,7 @@ export function getClientCollection<const TCollection extends Collection>(
   return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
     ...collection,
     fields: R.mapValues(collection.fields as Record<string, Field>, (value, key) =>
-      getBaseField(key, value)
+      getFieldClient(key, value)
     ),
   })) as unknown as ToClientCollection<TCollection>
 }

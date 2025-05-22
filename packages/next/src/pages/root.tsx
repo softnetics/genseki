@@ -5,7 +5,7 @@ import { NotfoundPage } from './404'
 import type { NextJsServerConfig } from '../config'
 
 interface RootProps {
-  serverConfig: NextJsServerConfig<any, any, any, any>
+  serverConfig: NextJsServerConfig
   paramsPromise: Promise<{ segments: string[] }>
   searchParamsPromise: Promise<{ [key: string]: string | string[] }>
 }
@@ -21,5 +21,6 @@ export async function RootPage(props: RootProps) {
     return <NotfoundPage redirectURL="/admin/collections" />
   }
 
-  return result.view({ ...result.params, serverConfig, searchParams })
+  const page = result.view({ ...result.params, serverConfig, searchParams })
+  return page
 }
