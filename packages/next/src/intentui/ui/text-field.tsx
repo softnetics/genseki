@@ -73,7 +73,12 @@ const TextField = ({
     <TextFieldPrimitive type={inputType} {...props} className="group flex flex-col gap-y-1">
       {!props.children ? (
         <>
-          {label && <Label>{label}</Label>}
+          {label && (
+            <Label>
+              {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+              {/* Fixed isRequire to isRequired */}
+            </Label>
+          )}
           <FieldGroup
             isDisabled={props.isDisabled}
             isInvalid={!!errorMessage}

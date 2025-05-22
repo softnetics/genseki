@@ -1,3 +1,5 @@
+'use client'
+
 interface NavProps {}
 
 export function Nav(props: NavProps) {

@@ -1,14 +1,15 @@
 'use client'
+
 import { CompassIcon } from '@phosphor-icons/react/dist/ssr'
 import { usePathname } from 'next/navigation'
 
 import {
+  SidebarDisclosure,
   SidebarDisclosurePanel,
   SidebarDisclosureTrigger,
+  SidebarItem,
   SidebarLabel,
 } from '../../../intentui/ui/sidebar'
-import { SidebarDisclosure } from '../../../intentui/ui/sidebar'
-import { SidebarItem } from '../../../intentui/ui/sidebar'
 import { BaseIcon } from '../../primitives/base-icon'
 
 export const NavigationSection = ({ id }: { id: number }) => {
