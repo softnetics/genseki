@@ -5,9 +5,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 
-import { Button } from '~/intentui/ui/button'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
-import { InputOTP } from '~/intentui/ui/input-otp'
+import { Button } from '../../../../../intentui/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '../../../../../intentui/ui/form'
+import { InputOTP } from '../../../../../intentui/ui/input-otp'
 
 const otpSchema = z.object({
   otp: z.string().regex(/^[0-9]{6}$/, { message: 'OTP code must be 6 digits' }),

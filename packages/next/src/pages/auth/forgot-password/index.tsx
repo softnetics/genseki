@@ -1,6 +1,6 @@
 'use server'
 
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 import { ForgotPasswordRightPanel } from './_components/right-panel'
 import { setServerConfig } from './server-context'

@@ -1,4 +1,4 @@
-import { Link } from '~/intentui/ui/link'
+import { Link } from '../../../intentui/ui/link'
 
 export const TermAndPrivacy = () => {
   return (

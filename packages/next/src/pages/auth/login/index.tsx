@@ -1,6 +1,6 @@
 'use server'
 
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 import { RightPanel } from './_components/right-panel'
 import { signInAction } from './action'

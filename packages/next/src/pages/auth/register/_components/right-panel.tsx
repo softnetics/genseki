@@ -5,20 +5,19 @@ import { useState } from 'react'
 import { GithubLogo } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
-import { Button } from '~/intentui/ui/button'
-import { Tabs } from '~/intentui/ui/tab'
-import { useRootContext } from '~/providers/root'
-import { cn } from '~/utils/cn'
-
 import { EmailRegisterForm } from './_components/email-form'
 import { PhoneRegisterForm } from './_components/phone-form'
 
+import { Button } from '../../../../intentui/ui/button'
+import { Tabs } from '../../../../intentui/ui/tab'
+import { useRootContext } from '../../../../providers/root'
+import { cn } from '../../../../utils/cn'
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
 
 export function RegisterRightPanel() {
   const { clientConfig } = useRootContext()
-  const emailEnabled = clientConfig.auth?.login?.emailAndPassword?.enabled
-  const phoneEnabled = clientConfig.auth?.login?.phoneNumber?.enabled
+  const emailEnabled = clientConfig.auth.login.emailAndPassword?.enabled
+  const phoneEnabled = clientConfig.auth.login
 
   const isSingleEnabled = (emailEnabled ? 1 : 0) + (phoneEnabled ? 1 : 0) === 1
   const [tabsState, setTabsState] = useState(emailEnabled ? 'email' : 'phone')

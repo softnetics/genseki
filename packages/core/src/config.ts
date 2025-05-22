@@ -2,7 +2,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 
-import { type AuthConfig, createAuth } from './auth'
+import { type AuthClient, type AuthConfig, createAuth } from './auth'
 import {
   type ClientCollection,
   type Collection,
@@ -118,6 +118,7 @@ export interface ClientConfig<
   TCollections extends ClientCollection[] = ClientCollection[],
   TApiRouter extends ClientApiRouter = ClientApiRouter,
 > {
+  auth: AuthClient
   collections: TCollections
   $types: {
     endpoints: TApiRouter
@@ -184,6 +185,8 @@ export function getClientConfig<const TServerConfig extends ServerConfig<any, an
   const collections = serverConfig.collections
 
   return {
+    // TODO: Fix this
+    auth: {},
     collections: collections.map(getClientCollection) as ToClientCollectionList<
       TServerConfig['collections']
     >,

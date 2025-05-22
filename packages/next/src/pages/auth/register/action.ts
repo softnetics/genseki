@@ -11,5 +11,5 @@ export const signInAction = async (formData: FormData) => {
   const context = serverConfig.context
   const signIn = serverConfig.endpoints.signInEmail.handler
 
-  await signIn({ context: context, body: { email, password } })
+  // await signIn({ context: context, body: { email, password } })
 }

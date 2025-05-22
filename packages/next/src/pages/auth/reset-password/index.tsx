@@ -8,11 +8,10 @@ import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
 import z from 'zod'
 
-import { Button } from '~/intentui/ui/button'
-import { Label } from '~/intentui/ui/field'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
-import { TextField } from '~/intentui/ui/text-field'
-
+import { Button } from '../../../intentui/ui/button'
+import { Label } from '../../../intentui/ui/field'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../../../intentui/ui/form'
+import { TextField } from '../../../intentui/ui/text-field'
 import { LeftPanel } from '../_components/left-panel'
 import { TermAndPrivacy } from '../_components/term-and-privacy'
 

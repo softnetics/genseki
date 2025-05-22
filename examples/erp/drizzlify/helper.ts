@@ -27,35 +27,12 @@ export const baseConfig = defineBaseConfig({
     verification: {
       model: schema.verifications,
     },
-    login: {
-      emailAndPassword: {
-        enabled: true,
-        sendEmailVerfication(email) {
-          console.log('sendEmailVerfication', email)
-        },
-        skipEmailVerification: false,
-      },
-      phoneNumber: {
-        enabled: true,
-        getTemporaryEmail(phoneNumber) {
-          console.log('getTemporaryEmail', phoneNumber)
-          return ''
-        },
-        getTemporaryName(phoneNumber) {
-          console.log('getTemporaryName', phoneNumber)
-          return ''
-        },
-        sendSmsOtpVerification(phoneNumber) {
-          console.log('sendSmsOtpVerification', phoneNumber)
-        },
-        skipPhoneVerification: false,
-      },
-    },
-    oauth2: {
-      google: {
-        clientId: '',
-        clientSecret: '',
-      },
+    emailAndPassword: {
+      enabled: true,
+      // sendEmailVerfication(email) {
+      //   console.log('sendEmailVerfication', email)
+      // },
+      // skipEmailVerification: false,
     },
     secret: '',
   },

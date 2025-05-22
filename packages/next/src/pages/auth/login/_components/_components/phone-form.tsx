@@ -6,9 +6,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import z from 'zod'
 
-import { Button } from '~/intentui/ui/button'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
-import { TextField } from '~/intentui/ui/text-field'
+import { Button } from '../../../../../intentui/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '../../../../../intentui/ui/form'
+import { TextField } from '../../../../../intentui/ui/text-field'
 
 const phoneFormSchema = z.object({
   phoneNumber: z.string().min(10, { message: 'Phone number must be at least 10 digits' }),

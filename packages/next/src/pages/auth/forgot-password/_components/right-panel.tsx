@@ -6,15 +6,14 @@ import { GithubLogo } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 
-import { Button } from '~/intentui/ui/button'
-import { Tabs } from '~/intentui/ui/tab'
-import { useRootContext } from '~/providers/root'
-import { cn } from '~/utils/cn'
-
 import { InputEmailSection } from './_components/input-email-section'
 import { InputOtpSection } from './_components/input-otp-section'
 import { InputPhoneSection } from './_components/input-phone-section'
 
+import { Button } from '../../../../intentui/ui/button'
+import { Tabs } from '../../../../intentui/ui/tab'
+import { useRootContext } from '../../../../providers/root'
+import { cn } from '../../../../utils/cn'
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
 import { Step } from '../types'
 
@@ -23,7 +22,8 @@ export function ForgotPasswordRightPanel() {
   const { clientConfig } = useRootContext()
 
   const emailEnabled = clientConfig.auth?.login?.emailAndPassword?.enabled
-  const phoneEnabled = clientConfig.auth?.login?.phoneNumber?.enabled
+  // TODO: Remove this
+  const phoneEnabled = true
   const isSingle = Number(phoneEnabled) + Number(emailEnabled) === 1
 
   const [authType, setAuthType] = useState<'phone' | 'email'>(phoneEnabled ? 'phone' : 'email')

@@ -5,9 +5,15 @@ import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import z from 'zod'
 
-import { Button } from '~/intentui/ui/button'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
-import { TextField } from '~/intentui/ui/text-field'
+import { Button } from '../../../../../intentui/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '../../../../../intentui/ui/form'
+import { TextField } from '../../../../../intentui/ui/text-field'
 
 const schema = z.object({
   phone: z.string().regex(/^[0-9]{10}$/, { message: 'เบอร์โทรศัพท์ไม่ถูกต้อง' }),

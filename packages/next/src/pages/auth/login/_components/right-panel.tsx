@@ -5,14 +5,13 @@ import { useState } from 'react'
 import { GithubLogo } from '@phosphor-icons/react/dist/ssr'
 import Link from 'next/link'
 
-import { Button } from '~/intentui/ui/button'
-import { Tabs } from '~/intentui/ui/tab'
-import { useRootContext } from '~/providers/root'
-import { cn } from '~/utils/cn'
-
 import { EmailLoginForm } from './_components/email-form'
 import { PhoneLoginForm } from './_components/phone-form'
 
+import { Button } from '../../../../intentui/ui/button'
+import { Tabs } from '../../../../intentui/ui/tab'
+import { useRootContext } from '../../../../providers/root'
+import { cn } from '../../../../utils/cn'
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
 
 interface RightPanelProps {
@@ -22,7 +21,8 @@ interface RightPanelProps {
 export function RightPanel({ action }: RightPanelProps) {
   const { clientConfig } = useRootContext()
   const emailAndPasswordEnabled = clientConfig.auth?.login?.emailAndPassword?.enabled
-  const phoneNumberEnabled = clientConfig.auth.login?.phoneNumber?.enabled
+  // TODO: Remove this
+  const phoneNumberEnabled = true
 
   const isSingleEnabled = (emailAndPasswordEnabled ? 1 : 0) + (phoneNumberEnabled ? 1 : 0) === 1
 

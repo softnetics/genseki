@@ -6,9 +6,15 @@ import { zodResolver } from '@hookform/resolvers/zod'
 import Link from 'next/link'
 import z from 'zod'
 
-import { Button } from '~/intentui/ui/button'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '~/intentui/ui/form'
-import { TextField } from '~/intentui/ui/text-field'
+import { Button } from '../../../../../intentui/ui/button'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+} from '../../../../../intentui/ui/form'
+import { TextField } from '../../../../../intentui/ui/text-field'
 
 const emailFormSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),

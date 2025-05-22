@@ -1,4 +1,4 @@
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
 let _config: ServerConfig | null = null
 

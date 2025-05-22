@@ -1,10 +1,11 @@
 'use server'
 
-import { ServerConfig } from '@kivotos/core'
+import type { ServerConfig } from '@kivotos/core'
 
-import { setServerConfig } from './server-context'
-import { LeftPanel } from '../_components/left-panel'
 import { RegisterRightPanel } from './_components/right-panel'
+import { setServerConfig } from './server-context'
+
+import { LeftPanel } from '../_components/left-panel'
 
 interface LoginPageProps {
   serverConfig: ServerConfig
