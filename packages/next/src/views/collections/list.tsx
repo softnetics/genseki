@@ -4,16 +4,15 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
-import Image from 'next/image'
 
 import type { ServerConfig } from '@kivotos/core'
 import { getClientCollection } from '@kivotos/core'
 
 import { ListTable } from './list.client'
 
-import badge from '../../../public/badge.svg'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
+import { Badge } from '../../icons/badge'
 import { Button, ButtonLink } from '../../intentui/ui/button'
 import { TextField } from '../../intentui/ui/text-field'
 import { formatSlug } from '../../utils/format-slug'
@@ -80,13 +79,9 @@ export async function ListView(props: ListViewProps) {
       <div className="w-full px-12 py-24 [background-image:radial-gradient(100%_100%_at_10%_-30%,--alpha(var(--color-primary)/15%),var(--color-secondary))]">
         <div className="mx-auto grid w-full max-w-[1200px] grid-cols-[auto_1fr] gap-x-12">
           <div className="relative z-10 inline-block">
-            <Image
-              priority
-              src={badge}
-              alt="badge"
+            <Badge
               width={75}
               height={75}
-              sizes="20px"
               className="relative z-10 dark:brightness-[40%] dark:contrast-150"
             />
             <BaseIcon
