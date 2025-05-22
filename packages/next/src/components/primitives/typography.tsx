@@ -6,8 +6,6 @@ import { cn } from '../../utils/cn'
 
 type TypographyTag = 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'label' | 'caption'
 
-type TypographyWeight = 'normal' | 'medium' | 'semibold' | 'bold'
-
 const nativeElementsMap: Record<TypographyTag, React.ElementType> = {
   h1: 'h1',
   h2: 'h2',

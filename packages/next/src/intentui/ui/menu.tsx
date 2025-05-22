@@ -212,7 +212,7 @@ interface MenuSectionProps<T> extends MenuSectionPrimitiveProps<T> {
   title?: string
 }
 
-/** TODO: @ts-expect-error The legacy ref here is bastards */
+// TODO: /** @ts-expect-error The legacy ref here is bastards */
 const MenuSection = <T extends object>({ className, ref, ...props }: MenuSectionProps<T>) => {
   return (
     <MenuSectionPrimitive ref={ref} className={section({ className })} {...props}>

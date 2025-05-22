@@ -4,13 +4,13 @@ import React from 'react'
 import { DatabaseIcon } from '@phosphor-icons/react'
 import { usePathname } from 'next/navigation'
 
-import { SidebarItem } from '../../../intentui/ui/sidebar'
 import {
+  SidebarDisclosure,
   SidebarDisclosurePanel,
   SidebarDisclosureTrigger,
+  SidebarItem,
   SidebarLabel,
 } from '../../../intentui/ui/sidebar'
-import { SidebarDisclosure } from '../../../intentui/ui/sidebar'
 import { formatSlug } from '../../../utils/format-slug'
 import { BaseIcon } from '../../primitives/base-icon'
 
