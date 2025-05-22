@@ -98,11 +98,12 @@ const ListBoxItemDetails = DropdownItemDetails
 const ListBoxLabel = DropdownLabel
 const ListBoxDescription = DropdownDescription
 
-ListBox.Section = ListBoxSection
-ListBox.ItemDetails = ListBoxItemDetails
-ListBox.Description = ListBoxDescription
-ListBox.Item = ListBoxItem
-ListBox.Label = ListBoxLabel
-
-export type { ListBoxItemProps, ListBoxSectionProps }
-export { ListBox }
+export type { ListBoxItemProps, ListBoxProps, ListBoxSectionProps }
+export {
+  ListBox,
+  ListBoxDescription,
+  ListBoxItem,
+  ListBoxItemDetails,
+  ListBoxLabel,
+  ListBoxSection,
+}

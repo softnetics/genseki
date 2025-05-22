@@ -15,7 +15,7 @@ import { IconContainer } from '../components/primitives/icon-container'
 import { Typography } from '../components/primitives/typography'
 import { Button } from '../intentui/ui/button'
 import { Checkbox, CheckboxGroup } from '../intentui/ui/checkbox'
-import { ListBox } from '../intentui/ui/list-box'
+import { ListBox, ListBoxItem, ListBoxItemDetails, ListBoxSection } from '../intentui/ui/list-box'
 import { Popover } from '../intentui/ui/popover'
 import {
   Select,
@@ -322,30 +322,29 @@ export const UIPlayground = () => {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Listbox (normal)" categoryTitle="Listbox">
             <ListBox items={MOCK_OPTIONS} selectionMode="single" aria-label="Bands">
-              {(item) => <ListBox.Item id={item.id}>{item.name}</ListBox.Item>}
+              {(item) => <ListBoxItem id={item.id}>{item.name}</ListBoxItem>}
             </ListBox>
           </PlaygroundCard>
           <PlaygroundCard title="Listbox (multiple selection)" categoryTitle="Listbox">
             <ListBox items={MOCK_OPTIONS} selectionMode="multiple" aria-label="Bands">
-              {(item) => <ListBox.Item id={item.id}>{item.name}</ListBox.Item>}
+              {(item) => <ListBoxItem id={item.id}>{item.name}</ListBoxItem>}
             </ListBox>
           </PlaygroundCard>
           <PlaygroundCard title="Listbox (Description)" categoryTitle="Listbox">
             <ListBox selectedKeys={[]} items={MOCK_OPTIONS} aria-label="Bands">
               {(item) => (
-                <ListBox.Item id={item.id} textValue={item.name}>
-                  <ListBox.ItemDetails label={item.name} description={item.description} />
-                </ListBox.Item>
+                <ListBoxItem id={item.id} textValue={item.name}>
+                  <ListBoxItemDetails label={item.name} description={item.description} />
+                </ListBoxItem>
               )}
             </ListBox>
           </PlaygroundCard>
           <PlaygroundCard title="Listbox (Section)" categoryTitle="Listbox">
             <ListBox items={countries} aria-label="Bands" selectionMode="multiple">
               {(country) => (
-                <ListBox.Section items={country.cities} title={country.name} id={country.id}>
-                  {/** @ts-expect-error: ts ^5.5.4 */}
-                  {(country) => <ListBox.Item id={country.id}>{country.name}</ListBox.Item>}
-                </ListBox.Section>
+                <ListBoxSection items={country.cities} title={country.name} id={country.id}>
+                  {(country: any) => <ListBoxItem id={country.id}>{country.name}</ListBoxItem>}
+                </ListBoxSection>
               )}
             </ListBox>
           </PlaygroundCard>
