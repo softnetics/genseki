@@ -1,11 +1,10 @@
 import { CaretRightIcon, Cube, Folder } from '@phosphor-icons/react/dist/ssr'
-import Image from 'next/image'
 
 import { BaseIcon } from './primitives/base-icon'
 import { IconContainer } from './primitives/icon-container'
 import { Typography } from './primitives/typography'
 
-import badge from '../../public/badge.svg'
+import { Badge } from '../icons/badge'
 import { Link } from '../intentui/ui/link'
 
 interface CollectionCardProps {
@@ -24,15 +23,7 @@ export const CollectionCard = ({
   return (
     <div className="bg-overlay border-border relative flex w-full flex-col rounded-xl border p-2 shadow-md">
       <div className="absolute left-6 z-10 -translate-y-1/2">
-        <Image
-          priority
-          src={badge}
-          alt="badge"
-          width={50}
-          height={50}
-          sizes="20px"
-          className="dark:brightness-[40%] dark:contrast-150"
-        />
+        <Badge width={50} height={50} className="dark:brightness-[40%] dark:contrast-150"></Badge>
         <BaseIcon icon={Cube} size="md" weight="duotone" className="absolute inset-0 z-10 m-auto" />
       </div>
       <div className="border-secondary relative flex items-center justify-between overflow-hidden border-b px-8 pb-4 pt-14">

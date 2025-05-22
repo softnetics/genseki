@@ -1,9 +1,7 @@
 ---
-'@example/erp': minor
+"@example/erp": patch
+"@kivotos/core": patch
+"@kivotos/next": minor
 ---
 
-- Base components for the kiotos next app
-
-- [Create a dashboard and simple collection list](https://app.plane.so/softnetics/browse/DRIZZ-54/)
-
-- [See the PR](https://github.com/softnetics/kivotos/pull/6)
+- [[DRIZZ-54] Collection Records Display](https://app.plane.so/softnetics/browse/DRIZZ-54/)

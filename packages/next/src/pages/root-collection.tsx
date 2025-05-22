@@ -4,7 +4,7 @@ import type { ServerConfig } from '@kivotos/core'
 
 import { NotfoundPage } from './404'
 import { HomePage } from './home'
-import LoadingPage from './loading'
+import { LoadingPage } from './loading'
 
 import { Typography } from '../components/primitives/typography'
 import { formatSlug } from '../utils/format-slug'
