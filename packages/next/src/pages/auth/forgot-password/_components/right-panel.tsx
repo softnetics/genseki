@@ -11,7 +11,7 @@ import { InputOtpSection } from './_components/input-otp-section'
 import { InputPhoneSection } from './_components/input-phone-section'
 
 import { Button } from '../../../../intentui/ui/button'
-import { Tabs } from '../../../../intentui/ui/tab'
+import { Tab, TabList, TabPanel, Tabs } from '../../../../intentui/ui/tab'
 import { useRootContext } from '../../../../providers/root'
 import { cn } from '../../../../utils/cn'
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
@@ -60,13 +60,13 @@ export function ForgotPasswordRightPanel() {
                     selectedKey={authType}
                     onSelectionChange={(key) => setAuthType(key.toString() as 'phone' | 'email')}
                   >
-                    <Tabs.List className={cn(isSingle && 'border-0')}>
-                      {phoneEnabled && !isSingle && <Tabs.Tab id="phone">Phone</Tabs.Tab>}
-                      {emailEnabled && !isSingle && <Tabs.Tab id="email">Email</Tabs.Tab>}
-                    </Tabs.List>
+                    <TabList className={cn(isSingle && 'border-0')}>
+                      {phoneEnabled && !isSingle && <Tab id="phone">Phone</Tab>}
+                      {emailEnabled && !isSingle && <Tab id="email">Email</Tab>}
+                    </TabList>
 
                     {phoneEnabled && (
-                      <Tabs.Panel id="phone">
+                      <TabPanel id="phone">
                         <InputPhoneSection
                           onNext={(phone) => {
                             setTarget(phone)
@@ -74,11 +74,11 @@ export function ForgotPasswordRightPanel() {
                             setStep(Step.INPUT_OTP)
                           }}
                         />
-                      </Tabs.Panel>
+                      </TabPanel>
                     )}
 
                     {emailEnabled && (
-                      <Tabs.Panel id="email">
+                      <TabPanel id="email">
                         <InputEmailSection
                           onNext={(email) => {
                             setTarget(email)
@@ -86,7 +86,7 @@ export function ForgotPasswordRightPanel() {
                             setStep(Step.INPUT_OTP)
                           }}
                         />
-                      </Tabs.Panel>
+                      </TabPanel>
                     )}
                   </Tabs>
                 )

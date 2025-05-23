@@ -417,7 +417,7 @@ class ApiHandler {
   private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'columns' && data[field.fieldName]) {
+        if (field._.source === 'column' && data[field.fieldName]) {
           return [[field._.columnTsName, data[field.fieldName]]]
         }
         return []
@@ -430,7 +430,7 @@ class ApiHandler {
 function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Record<string, any> {
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([fieldName, field]) => {
-      if (field._.source === 'columns') {
+      if (field._.source === 'column') {
         const value = result[field._.columnTsName]
         if (!value) return []
         return [[field.fieldName, value]]
