@@ -113,6 +113,10 @@ const FormControl = React.forwardRef<
 >(({ ...props }, ref) => {
   const { error, formItemId, formDescriptionId, formMessageId } = useFormField()
 
+  const reactAriaProps = {
+    isInvalid: !!error,
+  }
+
   return (
     <Slot
       ref={ref}
@@ -120,6 +124,7 @@ const FormControl = React.forwardRef<
       className="peer"
       aria-describedby={!error ? `${formDescriptionId}` : `${formDescriptionId} ${formMessageId}`}
       aria-invalid={!!error}
+      {...reactAriaProps}
       {...props}
     />
   )

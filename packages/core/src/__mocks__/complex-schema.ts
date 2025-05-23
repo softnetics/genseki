@@ -1,8 +1,17 @@
 import { relations } from 'drizzle-orm'
-import { boolean, integer, pgTable, serial, text, timestamp, varchar } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  integer,
+  pgTable,
+  serial,
+  text,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core'
 
 export const users = pgTable('users', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
@@ -12,7 +21,7 @@ export const users = pgTable('users', {
 })
 
 export const sessions = pgTable('session', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   expiresAt: timestamp('expires_at').notNull(),
   token: text('token').notNull().unique(),
   createdAt: timestamp('created_at').notNull(),
@@ -25,7 +34,7 @@ export const sessions = pgTable('session', {
 })
 
 export const accounts = pgTable('account', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
   userId: text('user_id')
@@ -43,7 +52,7 @@ export const accounts = pgTable('account', {
 })
 
 export const verifications = pgTable('verification', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -53,7 +62,7 @@ export const verifications = pgTable('verification', {
 
 // Authors table
 export const authors = pgTable('authors', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 100 }).notNull(),
   email: varchar('email', { length: 255 }).notNull().unique(),
   bio: text('bio'),
@@ -63,7 +72,7 @@ export const authors = pgTable('authors', {
 
 // Categories table
 export const categories = pgTable('categories', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: varchar('name', { length: 50 }).notNull(),
   slug: varchar('slug', { length: 50 }).notNull().unique(),
   description: text('description'),
@@ -73,7 +82,7 @@ export const categories = pgTable('categories', {
 
 // Posts table
 export const posts = pgTable('posts', {
-  id: serial('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   title: varchar('title', { length: 255 }).notNull(),
   slug: varchar('slug', { length: 255 }).notNull().unique(),
   content: text('content').notNull(),

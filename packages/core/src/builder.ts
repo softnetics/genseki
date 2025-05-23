@@ -91,7 +91,9 @@ export class Builder<
         table: table,
         tableConfig: tableRelationalConfig,
       },
-      ...config,
+      slug: config.slug,
+      fields: config.fields,
+      primaryField: config.primaryField,
       admin: {
         ...config.admin,
         api: {

@@ -9,10 +9,10 @@ interface InternalRouteOptions {
   prefix?: string
 }
 
-export function signInEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function loginEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/sign-in-email',
+    path: '/api/auth/login-email',
     body: z.object({
       email: z.string(),
       password: z.string(),
@@ -31,17 +31,6 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    console.log('signInEmail handler', args)
-
-    // return {
-    //   status: 200,
-    //   headers: new Headers(),
-    //   body: {
-    //     token: 'test token',
-    //     user: 'test user',
-    //   },
-    // }
-
     const account = await args.context.internalHandlers.account.findByUserEmailAndProvider(
       args.body.email,
       AccountProvider.CREDENTIAL
@@ -54,7 +43,7 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
     }
 
     const session = await args.context.internalHandlers.session.create({
-      userId: account.userId,
+      userId: account.user.id,
       // TODO: Customize expiresAt
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     })

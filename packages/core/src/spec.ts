@@ -3,7 +3,7 @@ import z from 'zod'
 
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
-import { defineBaseConfig, getClientConfig } from './config'
+import { defineBaseConfig, defineServerConfig, getClientConfig } from './config'
 
 const db = drizzle({
   connection: '',
@@ -41,7 +41,7 @@ const baseConfig = defineBaseConfig({
   },
 })
 
-const builder = new Builder(baseConfig).$context<typeof baseConfig.context>()
+const builder = new Builder({ schema }).$context<typeof baseConfig.context>()
 
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
@@ -63,7 +63,7 @@ export const postCollection = builder.collection('posts', {
   slug: 'posts',
   fields: builder.fields('posts', (fb) => ({
     id: fb.columns('id', {
-      type: 'number',
+      type: 'text',
     }),
     title: fb.columns('title', {
       type: 'text',
@@ -187,7 +187,7 @@ export const postCollection = builder.collection('posts', {
   },
 })
 
-export const serverConfig = baseConfig.toServerConfig({
+export const serverConfig = defineServerConfig(baseConfig, {
   collections: [authorCollection, postCollection],
   endpoints: {
     createWithPosts: builder.endpoint(

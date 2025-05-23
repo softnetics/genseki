@@ -9,7 +9,7 @@ const pool = new Pool({
   connectionString: process.env.DATABASE_URL,
 })
 
-const db = drizzle({ client: pool, schema: schema })
+const db = drizzle({ client: pool, schema: schema, logger: true })
 
 export const baseConfig = defineBaseConfig({
   db: db,

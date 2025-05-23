@@ -1,18 +1,8 @@
+import { parse as parseCookies } from 'cookie-es'
+
 function setCookie(headers: Record<string, string> | undefined, name: string, value: string) {
   if (!headers) return
   headers['Set-Cookie'] = `${name}=${value}; Path=/; HttpOnly; SameSite=Strict`
-}
-
-function getCookie(headers: Record<string, string> | undefined, name: string) {
-  if (!headers) return null
-  const cookie = headers[name]
-  if (!cookie) return null
-  const cookies = cookie.split('; ')
-  for (const c of cookies) {
-    const [key, val] = c.split('=')
-    if (key === name) return val
-  }
-  return null
 }
 
 function deleteCookie(headers: Record<string, string> | undefined, name: string) {
@@ -22,8 +12,9 @@ function deleteCookie(headers: Record<string, string> | undefined, name: string)
 
 const SESSION_COOKIE_NAME = 'SESSION_ID'
 
-export function getSessionCookie(headers: Record<string, string> | undefined) {
-  return getCookie(headers, SESSION_COOKIE_NAME)
+export function getSessionCookie(headers: Record<string, string> | undefined): string | undefined {
+  const cookies = parseCookies(headers?.['cookie'] || '')
+  return cookies[SESSION_COOKIE_NAME]
 }
 
 export function setSessionCookie(headers: Record<string, string> | undefined, value: string) {

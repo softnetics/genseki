@@ -5,11 +5,12 @@ import type { Simplify } from 'type-fest'
 import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
-import type { MinimalContext } from '../config'
+import { getFieldsClient, type MinimalContext } from '../config'
 import type { ApiRouteHandler } from '../endpoint'
-import type { Fields } from '../field'
+import type { Fields, FieldsClient } from '../field'
 
 export type AnyTypedColumn<T> = AnyColumn & { _: { data: T; dialect: 'pg' } }
+export type WithHasDefault<T> = T & { _: { hasDefault: true } }
 export type WithNotNull<T> = T & { _: { notNull: true } }
 export type WithAnyTable<TColumns extends Record<string, AnyColumn>> = AnyTable<{
   dialect: 'pg'
@@ -18,22 +19,15 @@ export type WithAnyTable<TColumns extends Record<string, AnyColumn>> = AnyTable<
   TColumns
 
 export type AnyUserTable = WithAnyTable<{
-  id: WithNotNull<AnyTypedColumn<string>>
+  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
   name: WithNotNull<AnyTypedColumn<string>>
   email: WithNotNull<AnyTypedColumn<string>>
   emailVerified: WithNotNull<AnyTypedColumn<boolean>>
   image: AnyTypedColumn<string>
 }>
 
-export type AnyUserTable2 = WithAnyTable<{
-  id: WithNotNull<AnyTypedColumn<string>>
-  email: WithNotNull<AnyTypedColumn<string>>
-  emailVerified: WithNotNull<AnyTypedColumn<boolean>>
-  roles: AnyTypedColumn<string[]>
-}>
-
 export type AnySessionTable = WithAnyTable<{
-  id: WithNotNull<AnyTypedColumn<string>>
+  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
   expiresAt: WithNotNull<AnyTypedColumn<Date>>
   token: WithNotNull<AnyTypedColumn<string>>
   ipAddress: AnyTypedColumn<string>
@@ -42,7 +36,7 @@ export type AnySessionTable = WithAnyTable<{
 }>
 
 export type AnyAccountTable = WithAnyTable<{
-  id: WithNotNull<AnyTypedColumn<string>>
+  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
   accountId: WithNotNull<AnyTypedColumn<string>>
   providerId: WithNotNull<AnyTypedColumn<string>>
   userId: WithNotNull<AnyTypedColumn<string>>
@@ -56,7 +50,7 @@ export type AnyAccountTable = WithAnyTable<{
 }>
 
 export type AnyVerificationTable = WithAnyTable<{
-  id: WithNotNull<AnyTypedColumn<string>>
+  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
   identifier: WithNotNull<AnyTypedColumn<string>>
   value: AnyTypedColumn<string>
   expiresAt: WithNotNull<AnyTypedColumn<Date>>
@@ -80,8 +74,8 @@ export interface AuthConfig {
   emailAndPassword?: {
     enabled: boolean
     signUp?: {
-      // TODO: Typesafe
-      additionalFields?: Record<string, Fields>
+      autoLogin?: boolean // default: true
+      additionalFields?: Fields<any>
     }
   }
   oauth2?: {
@@ -151,7 +145,11 @@ export type AuthClient = {
   }
   ui: {
     login: {
-      strategies: { style: string; text: string; href: string }[]
+      strategies: { style?: string; text: string; href: string }[]
+    }
+    signUp: {
+      autoLogin?: boolean
+      additionalFields: FieldsClient
     }
   }
 }
@@ -190,5 +188,28 @@ export function createAuth<TContext extends MinimalContext<any> = MinimalContext
     context,
     authContext,
     handlers: prefixedHandlers,
+  }
+}
+
+export function getAuthClient(config: AuthConfig): AuthClient {
+  return {
+    login: {
+      emailAndPassword: {
+        enabled: config.emailAndPassword?.enabled ?? false,
+      },
+    },
+    resetPassword: {
+      enabled: config.resetPassword?.enabled ?? false,
+      redirectTo: config.resetPassword?.redirectTo ?? '/auth/login',
+    },
+    ui: {
+      login: {
+        strategies: config.ui?.login?.strategies ?? [],
+      },
+      signUp: {
+        autoLogin: config.emailAndPassword?.signUp?.autoLogin ?? true,
+        additionalFields: getFieldsClient(config.emailAndPassword?.signUp?.additionalFields ?? {}),
+      },
+    },
   }
 }

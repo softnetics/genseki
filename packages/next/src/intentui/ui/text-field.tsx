@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import type { InputProps, TextFieldProps as TextFieldPrimitiveProps } from 'react-aria-components'
 import { TextField as TextFieldPrimitive } from 'react-aria-components'
+import { useFormStatus } from 'react-dom'
 
 import { EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
@@ -63,14 +64,25 @@ const TextField = ({
   type,
   ...props
 }: TextFieldProps) => {
+  const formStatus = useFormStatus()
+  const disabled = formStatus.pending || props.isDisabled
+
   const [isPasswordVisible, setIsPasswordVisible] = useState(false)
   const inputType = isRevealable ? (isPasswordVisible ? 'text' : 'password') : type
   const handleTogglePasswordVisibility = () => {
     setIsPasswordVisible((prev) => !prev)
   }
 
+  const isInvalid = !!errorMessage || !!props.isInvalid
+
   return (
-    <TextFieldPrimitive type={inputType} {...props} className="group flex flex-col gap-y-1">
+    <TextFieldPrimitive
+      type={inputType}
+      {...props}
+      className="group flex flex-col gap-y-1"
+      isInvalid={isInvalid}
+      isDisabled={disabled}
+    >
       {!props.children ? (
         <>
           {label && (
@@ -80,8 +92,8 @@ const TextField = ({
             </Label>
           )}
           <FieldGroup
-            isDisabled={props.isDisabled}
-            isInvalid={!!errorMessage}
+            isDisabled={disabled}
+            isInvalid={isInvalid}
             data-loading={isPending ? 'true' : undefined}
             className={cn(fieldgroupVariants({ size: props.size, className }))}
           >
@@ -97,7 +109,7 @@ const TextField = ({
             ) : (
               prefix && <div data-slot="prefix">{prefix}</div>
             )}
-            <Input placeholder={placeholder} />
+            <Input placeholder={placeholder} disabled={disabled} />
             {isRevealable ? (
               <Button
                 variant="vanish"

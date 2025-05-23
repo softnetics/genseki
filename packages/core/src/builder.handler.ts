@@ -417,8 +417,8 @@ class ApiHandler {
   private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'columns' && data[field._.fieldName]) {
-          return [[field._.columnTsName, data[field._.fieldName]]]
+        if (field._.source === 'columns' && data[field.fieldName]) {
+          return [[field._.columnTsName, data[field.fieldName]]]
         }
         return []
       })
@@ -433,7 +433,7 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
       if (field._.source === 'columns') {
         const value = result[field._.columnTsName]
         if (!value) return []
-        return [[field._.fieldName, value]]
+        return [[field.fieldName, value]]
       }
       if (isRelationField(field)) {
         const value = result[field._.relationTsName]
@@ -445,15 +445,15 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
         }
 
         if (field.type === 'create') {
-          return [[field._.fieldName, mapResultToFields(field.fields, value)]]
+          return [[field.fieldName, mapResultToFields(field.fields, value)]]
         } else if (field.type === 'connect') {
           const primaryColumnTsName = field._.primaryColumnTsName
           if (Array.isArray(value)) {
             const values = value.map((v) => v[primaryColumnTsName])
-            return [[field._.fieldName, values]]
+            return [[field.fieldName, values]]
           }
 
-          return [[field._.fieldName, value[primaryColumnTsName]]]
+          return [[field.fieldName, value[primaryColumnTsName]]]
         }
       }
       return []

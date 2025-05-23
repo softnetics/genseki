@@ -14,8 +14,7 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
       .object({
         name: z.string(),
         email: z.string(),
-        password: z.string(),
-        callbackURL: z.string().optional(),
+        password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
       })
       .and(z.record(z.string(), z.any())),
     responses: {
@@ -62,6 +61,9 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
       body: {
         token: session.token,
         user: user,
+      },
+      headers: {
+        'Set-Cookie': `kivotosSession=${session.token}; Path=/; HttpOnly; Secure; SameSite=Strict`,
       },
     }
   }
