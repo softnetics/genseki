@@ -10,6 +10,8 @@ import type {
   ServerConfig,
 } from '@kivotos/core'
 
+import { NotAuthorizedPage } from './pages/401'
+import { NotfoundPage } from './pages/404'
 import { createApiResourceRouter } from './resource'
 import type { ServerFunction } from './server-function'
 import { AuthLayout } from './views/auth/layout'
@@ -74,7 +76,12 @@ export function defineNextJsServerConfig<
 >(
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
-  const radixRouter = createRouter<RouterData>()
+  const radixRouter = createRouter<RouterData>({
+    routes: {
+      notFound: { view: () => <NotfoundPage redirectURL="/admin/collections" /> },
+      notAuthorized: { view: () => <NotAuthorizedPage redirectURL="/admin/auth/login" /> },
+    },
+  })
 
   // Collection
   radixRouter.insert(`/collections/:slug`, {
