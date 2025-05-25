@@ -424,7 +424,7 @@ export type CollectionConfig<
   TAppRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
 > = {
   slug: TSlug
-  primaryField: Extract<keyof TFields, string>
+  identifierField: Extract<keyof TFields, string>
   fields: TFields
   admin?: CollectionAdminConfig<TContext, FieldsWithFieldName<TFields>, TAppRouter>
 }
@@ -442,7 +442,7 @@ export type Collection<
     tableConfig: TableRelationalConfig
   }
   slug: TSlug
-  primaryField: Extract<keyof TFields, string>
+  identifierField: Extract<keyof TFields, string>
   fields: TFields
   admin: CollectionAdmin<TContext, TFields, TApiRouter>
 }

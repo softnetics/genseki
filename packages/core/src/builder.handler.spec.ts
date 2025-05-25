@@ -139,7 +139,7 @@ describe('ApiHandler', () => {
           type: 'text',
         }),
       })),
-      primaryField: 'idField',
+      identifierField: 'idField',
     })
 
     it('should (C) create successfully', async () => {
@@ -251,7 +251,7 @@ describe('ApiHandler', () => {
     })
   })
 
-  describe.todo('with relation', () => {
+  describe('with relation', () => {
     describe('with "create" mode', () => {
       describe('with "One" relation', () => {
         const postWithAuthorCreateCollection = builder.collection('postWithAuthorTs', {
@@ -280,7 +280,7 @@ describe('ApiHandler', () => {
               options: async () => [],
             })),
           })),
-          primaryField: 'idField',
+          identifierField: 'idField',
         })
 
         it('should (C) create successfully', async () => {
@@ -437,7 +437,7 @@ describe('ApiHandler', () => {
       describe('with "Many" relation', () => {
         const authorWithPostsCreateCollection = builder.collection('authorTs', {
           slug: 'author',
-          primaryField: 'idField',
+          identifierField: 'idField',
           fields: builder.fields('authorTs', (fb) => ({
             idField: fb.columns('idTs', {
               type: 'number',
@@ -629,7 +629,7 @@ describe('ApiHandler', () => {
       describe('with "One" relation', () => {
         const postWithAuthorConnectCollection = builder.collection('postWithAuthorTs', {
           slug: 'postWithAuthor',
-          primaryField: 'idField',
+          identifierField: 'idField',
           fields: builder.fields('postWithAuthorTs', (fb) => ({
             idField: fb.columns('idTs', {
               type: 'number',
@@ -804,7 +804,7 @@ describe('ApiHandler', () => {
       describe('with "Many" relation', () => {
         const authorWithPostConnectCollection = builder.collection('authorTs', {
           slug: 'authorWithPost',
-          primaryField: 'idField',
+          identifierField: 'idField',
           fields: builder.fields('authorTs', (fb) => ({
             idField: fb.columns('idTs', {
               type: 'number',
@@ -1036,7 +1036,7 @@ describe('ApiHandler', () => {
     //           options: async () => [],
     //         }),
     //       })),
-    //       primaryField: 'idField',
+    //       identifierField: 'idField',
     //     })
 
     //     describe('with "create" mode', () => {
@@ -1448,7 +1448,7 @@ describe('ApiHandler', () => {
     //           },
     //         }),
     //       })),
-    //       primaryField: 'idField',
+    //       identifierField: 'idField',
     //     })
 
     //     describe('with "create" case', () => {
