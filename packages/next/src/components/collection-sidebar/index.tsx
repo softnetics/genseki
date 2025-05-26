@@ -16,8 +16,8 @@ import {
 import { BaseIcon } from '../primitives/base-icon'
 import { Typography } from '../primitives/typography'
 
-export async function AppSidebar({ collections }: { collections: Collection[] }) {
-  const collectionSlugs = collections.map((collection) => collection.slug)
+export async function AppSidebar({ collections }: { collections: Record<string, Collection> }) {
+  const collectionSlugs = Object.values(collections).map((collection) => collection.slug)
 
   return (
     <Sidebar

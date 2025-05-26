@@ -53,14 +53,10 @@ export interface BaseConfig<
 export interface ServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
 > extends BaseConfig<TFullSchema> {
   context: TContext
@@ -95,14 +91,10 @@ export function defineBaseConfig<
 export function defineServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  const TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  const TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   const TEndpoints extends ApiRouter<MinimalContext<TFullSchema, TContext>> = {},
 >(
   baseConfig: BaseConfig<TFullSchema, TContext>,
@@ -134,7 +126,10 @@ export function defineServerConfig<
 }
 
 export interface ClientConfig<
-  TCollections extends ClientCollection[] = ClientCollection[],
+  TCollections extends Record<string, ClientCollection<any, any, any, any, any, any>> = Record<
+    string,
+    ClientCollection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ClientApiRouter = ClientApiRouter,
 > {
   auth: AuthClient
@@ -184,9 +179,9 @@ export function getFieldsClient(fields: Fields<any>): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 
-export function getClientCollection<const TCollection extends Collection>(
-  collection: TCollection
-): ToClientCollection<TCollection> {
+export function getClientCollection<
+  const TCollection extends Collection<any, any, any, any, any, any>,
+>(collection: TCollection): ToClientCollection<TCollection> {
   return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
     ...collection,
     fields: getFieldsClient(collection.fields),
@@ -194,7 +189,7 @@ export function getClientCollection<const TCollection extends Collection>(
 }
 
 export function getClientConfig<
-  TCollections extends Collection<any, any, any, any, any, any>[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
   TApiRouter extends ApiRouter<any>,
 >(
   serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
@@ -209,7 +204,9 @@ export function getClientConfig<
 
   return {
     auth: getAuthClient(serverConfig.auth),
-    collections: collections.map(getClientCollection) as ToClientCollectionList<TCollections>,
+    collections: R.mapValues(collections, (s) =>
+      getClientCollection(s as Collection<any, any, any, any, any, any>)
+    ) as ToClientCollectionList<TCollections>,
     endpoints: clientEndpoints,
     $types: undefined as any,
   }

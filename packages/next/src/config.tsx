@@ -45,14 +45,10 @@ export type RouterData =
 export interface NextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
 > extends ServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   radixRouter: ReturnType<typeof createRouter<RouterData>>
@@ -62,14 +58,10 @@ export interface NextJsServerConfig<
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>

@@ -188,7 +188,10 @@ export const postCollection = builder.collection('posts', {
 })
 
 export const serverConfig = defineServerConfig(baseConfig, {
-  collections: [authorCollection, postCollection],
+  collections: {
+    authors: authorCollection,
+    posts: postCollection,
+  },
   endpoints: {
     createWithPosts: builder.endpoint(
       {
