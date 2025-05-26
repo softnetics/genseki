@@ -80,10 +80,8 @@ export function createDrizzleQuery(fields: Fields<any>): Record<string, any> {
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
       const relationName = field._.relation.fieldName
-      if (field.type === 'create' || field.type === 'connectOrCreate') {
-        return [[relationName, createDrizzleQuery(field.fields) as any]]
-      }
-      return [[relationName, true as const]]
+
+      return [[relationName, createDrizzleQuery(field.fields) as any]]
     })
   )
 
