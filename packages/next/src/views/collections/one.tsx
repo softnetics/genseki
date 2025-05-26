@@ -1,8 +1,8 @@
 import type { ServerConfig } from '@kivotos/core'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {
-  id: string
   slug: string
+  identifier: string
   serverConfig: TServerConfig
 }
 
@@ -18,7 +18,7 @@ export async function OneView<TServerConfig extends ServerConfig>(
     context: { ...props.serverConfig.context, db: props.serverConfig.db },
     slug: props.slug,
     fields: collection.fields,
-    id: props.id,
+    id: props.identifier,
   })
 
   return <div>{JSON.stringify(result)}</div>

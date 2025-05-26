@@ -1,17 +1,11 @@
 import 'server-only'
 
-import { headers as nextHeaders } from 'next/headers'
-
-import type { ServerConfig } from '@kivotos/core'
-
 import { NotfoundPage } from './404'
-import { RootAuthPage } from './auth/root-auth'
-import { RootCollectionPage } from './root-collection'
 
-import { RootCollectionLayout } from '../layouts/root-collection'
+import type { NextJsServerConfig } from '../config'
 
 interface RootProps {
-  serverConfig: ServerConfig<any, any, any, any>
+  serverConfig: NextJsServerConfig
   paramsPromise: Promise<{ segments: string[] }>
   searchParamsPromise: Promise<{ [key: string]: string | string[] }>
 }
@@ -19,46 +13,14 @@ interface RootProps {
 export async function RootPage(props: RootProps) {
   const { serverConfig, paramsPromise, searchParamsPromise } = props
 
-  const [params, searchParams, headers] = await Promise.all([
-    paramsPromise,
-    searchParamsPromise,
-    nextHeaders(),
-  ])
+  const [params, searchParams] = await Promise.all([paramsPromise, searchParamsPromise])
+  const path = `/${params.segments.join('/')}`
+  const result = serverConfig.radixRouter.lookup(path)
 
-  /**
-   * @description First segment is the feature segment, we use this thing for capturing the main route
-   *
-   * i.e. /collections/... -> `collections`
-   *      /users/... -> `users`
-   *      /plugins/... -> `plugins`
-   */
-
-  if (!Array.isArray(params.segments))
-    throw new Error(`Make sure there's a "[...segment]" folder one level up from this file.`)
-
-  const feature = params.segments[0]
-
-  if (feature === 'auth') {
-    return (
-      <RootAuthPage
-        serverConfig={serverConfig}
-        segments={params.segments.slice(1)}
-        searchParams={searchParams}
-      />
-    )
-  }
-  if (feature === 'collections') {
-    return (
-      <RootCollectionLayout serverConfig={serverConfig}>
-        <RootCollectionPage
-          serverConfig={serverConfig}
-          segments={params.segments.slice(1)}
-          searchParams={searchParams}
-          headers={headers}
-        />
-      </RootCollectionLayout>
-    )
+  if (!result) {
+    return <NotfoundPage redirectURL="/admin/collections" />
   }
 
-  return <NotfoundPage redirectURL="/admin/collections" />
+  const page = result.view({ ...result.params, serverConfig, searchParams })
+  return page
 }

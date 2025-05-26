@@ -5,8 +5,8 @@ import { Form } from '../../components/form'
 import { SubmitButton } from '../../components/submit-button'
 
 interface UpdateViewProps<TServerConfig extends ServerConfig> {
-  id: string
   slug: string
+  identifier: string
   serverConfig: TServerConfig
 }
 
@@ -20,7 +20,7 @@ export function UpdateView<TServerConfig extends ServerConfig>(
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   return (
-    <Form slug={props.slug} method="update" id={props.id}>
+    <Form slug={props.slug} method="update" id={props.identifier}>
       {Object.entries(collection.fields).map(([key, field]) => {
         return (
           <AutoField
