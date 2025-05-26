@@ -2,8 +2,13 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 
-import { type AuthClient, type AuthConfig, createAuth, getAuthClient } from './auth'
-import type { AuthHandlers } from './auth/handlers'
+import {
+  type AuthClient,
+  type AuthConfig,
+  type AuthHandlers,
+  createAuth,
+  getAuthClient,
+} from './auth'
 import {
   type ClientCollection,
   type Collection,
@@ -22,6 +27,7 @@ import {
   type ToRecordApiRouteSchema,
 } from './endpoint'
 import type { Field, FieldClient, Fields, FieldsClient } from './field'
+import type { KivotosPlugin, MergePlugins } from './plugins'
 import { isRelationField } from './utils'
 
 export type MinimalContext<
@@ -96,14 +102,15 @@ export function defineServerConfig<
     Collection<any, any, any, any, any, any>
   >,
   const TEndpoints extends ApiRouter<MinimalContext<TFullSchema, TContext>> = {},
+  const TPlugins extends KivotosPlugin<any>[] = [],
 >(
   baseConfig: BaseConfig<TFullSchema, TContext>,
-  config: { collections: TCollections; endpoints?: TEndpoints }
+  config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
   const auth = createAuth(baseConfig.auth, baseConfig.context)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
-  return {
+  let serverConfig = {
     ...baseConfig,
     collections: config.collections,
     endpoints: {
@@ -123,6 +130,12 @@ export function defineServerConfig<
       ExtractAllCollectionCustomEndpoints<TCollections> &
       ExtractAllCollectionDefaultEndpoints<TCollections>
   >
+
+  for (const plugin of config.plugins ?? []) {
+    serverConfig = plugin(serverConfig)
+  }
+
+  return serverConfig as MergePlugins<typeof serverConfig, TPlugins>
 }
 
 export interface ClientConfig<
