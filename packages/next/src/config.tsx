@@ -8,6 +8,7 @@ import { createApiResourceRouter } from './resource'
 import { AuthLayout } from './views/auth/layout'
 import { SignInView } from './views/auth/sign-in'
 import { CreateView } from './views/collections/create'
+import { HomeView } from './views/collections/home'
 import { CollectionLayout } from './views/collections/layout'
 import { ListView } from './views/collections/list'
 import { OneView } from './views/collections/one'
@@ -46,6 +47,16 @@ export function wrapNextJs<
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   const radixRouter = createRouter<{ view: (args: any) => ReactNode }>()
+
+  radixRouter.insert('/collections', {
+    view(args: { serverConfig: ServerConfig }) {
+      return (
+        <CollectionLayout serverConfig={args.serverConfig}>
+          <HomeView serverConfig={args.serverConfig} />
+        </CollectionLayout>
+      )
+    },
+  })
 
   // Collection
   radixRouter.insert(`/collections/:slug`, {
