@@ -87,12 +87,12 @@ beforeEach(() => {
 })
 
 const mockPostData = Array.from({ length: 10 }, (_, i) => ({
-  id: i + 1,
+  id: `post-${i + 1}`,
   name: `Post ${i + 1}`,
 }))
 
 const mockAuthorData = Array.from({ length: 10 }, (_, i) => ({
-  id: i + 1,
+  id: `author-${i + 1}`,
   name: `Author ${i + 1}`,
 }))
 
@@ -131,7 +131,7 @@ describe('ApiHandler', () => {
       slug: 'post',
       fields: builder.fields('postTs', (fb) => ({
         idField: fb.columns('idTs', {
-          type: 'number',
+          type: 'text',
           create: 'hidden',
           update: 'hidden',
         }),
@@ -144,6 +144,11 @@ describe('ApiHandler', () => {
 
     it('should (C) create successfully', async () => {
       const postData = mockPostData[0]
+
+      mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        idTs: postData.id,
+        nameTs: postData.name,
+      })
 
       const { insertMock, valuesMock } = prepareInsertMock(
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
@@ -204,6 +209,11 @@ describe('ApiHandler', () => {
       const postData = mockPostData[0]
       const updatedPostData = mockPostData[1]
 
+      mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        idTs: updatedPostData.id,
+        nameTs: updatedPostData.name,
+      })
+
       const { setMock, updateMock, whereUpdateMock } = prepareUpdateWhereMock(
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
@@ -258,7 +268,7 @@ describe('ApiHandler', () => {
           slug: 'postWithAuthor',
           fields: builder.fields('postWithAuthorTs', (fb) => ({
             idField: fb.columns('idTs', {
-              type: 'number',
+              type: 'text',
               create: 'hidden',
               update: 'hidden',
             }),
@@ -269,7 +279,7 @@ describe('ApiHandler', () => {
               type: 'create',
               fields: fb.fields('authorTs', (fb) => ({
                 idField: fb.columns('idTs', {
-                  type: 'number',
+                  type: 'text',
                   create: 'hidden',
                   update: 'hidden',
                 }),
@@ -296,6 +306,15 @@ describe('ApiHandler', () => {
               .mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
           )
 
+          mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: postData.id,
+            nameTs: postData.name,
+            authorTs: {
+              idTs: authorData.id,
+              nameTs: authorData.name,
+            },
+          })
+
           const result = await postWithAuthorCreateCollection.admin.api.create({
             slug: postWithAuthorCreateCollection.slug,
             fields: postWithAuthorCreateCollection.fields,
@@ -315,7 +334,7 @@ describe('ApiHandler', () => {
           expect(valuesMock).toHaveBeenNthCalledWith(2, [
             { nameTs: postData.name, authorIdTs: authorData.id },
           ])
-          expect(result).toEqual(postData.id)
+          expect(result).toEqual({ __pk: postData.id, id: postData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -381,10 +400,17 @@ describe('ApiHandler', () => {
           )
 
           const { setMock, updateMock, whereUpdateMock } = prepareUpdateWhereMock(
-            vi
-              .fn()
-              .mockResolvedValueOnce([{ idTs: updatedPostData.id, nameTs: updatedPostData.name }])
+            vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: updatedPostData.name }])
           )
+
+          mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: postData.id,
+            nameTs: updatedPostData.name,
+            authorTs: {
+              idTs: updatedAuthorData.id,
+              nameTs: updatedAuthorData.name,
+            },
+          })
 
           const result = await postWithAuthorCreateCollection.admin.api.update({
             slug: postWithAuthorCreateCollection.slug,
@@ -440,9 +466,7 @@ describe('ApiHandler', () => {
           identifierField: 'idField',
           fields: builder.fields('authorTs', (fb) => ({
             idField: fb.columns('idTs', {
-              type: 'number',
-              create: 'hidden',
-              update: 'hidden',
+              type: 'text',
             }),
             nameField: fb.columns('nameTs', {
               type: 'text',
@@ -451,7 +475,7 @@ describe('ApiHandler', () => {
               type: 'create',
               fields: fb.fields('postWithAuthorTs', (fb) => ({
                 idField: fb.columns('idTs', {
-                  type: 'number',
+                  type: 'text',
                   create: 'hidden',
                   update: 'hidden',
                 }),
@@ -482,23 +506,36 @@ describe('ApiHandler', () => {
               .mockResolvedValueOnce([{ idTs: authorWithPostData.id }])
           )
 
+          mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: authorData.id,
+            nameTs: authorData.name,
+            postsTs: [
+              { idTs: mockPostData[0].id, nameTs: mockPostData[0].name },
+              { idTs: mockPostData[1].id, nameTs: mockPostData[1].name },
+              { idTs: mockPostData[2].id, nameTs: mockPostData[2].name },
+              { idTs: mockPostData[3].id, nameTs: mockPostData[3].name },
+              { idTs: mockPostData[4].id, nameTs: mockPostData[4].name },
+            ],
+          })
+
           const result = await authorWithPostsCreateCollection.admin.api.create({
             fields: authorWithPostsCreateCollection.fields,
             slug: authorWithPostsCreateCollection.slug,
             context: { db: mockDb as any },
             data: {
-              nameField: postData.name,
-              postsField: {
-                create: [
-                  mockPostData[0],
-                  mockPostData[1],
-                  mockPostData[2],
-                  mockPostData[3],
-                  mockPostData[4],
-                ].map((post) => ({
+              idField: authorData.id,
+              nameField: authorData.name,
+              postsField: [
+                mockPostData[0],
+                mockPostData[1],
+                mockPostData[2],
+                mockPostData[3],
+                mockPostData[4],
+              ].map((post) => ({
+                create: {
                   nameField: post.name,
-                })),
-              },
+                },
+              })),
             },
           })
 
@@ -517,10 +554,12 @@ describe('ApiHandler', () => {
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
             idTs: authorData.id,
             nameTs: authorData.name,
-            postsTs: {
-              idTs: postData.id,
-              nameTs: postData.name,
-            },
+            postsTs: [
+              {
+                idTs: postData.id,
+                nameTs: postData.name,
+              },
+            ],
           })
 
           const result = await authorWithPostsCreateCollection.admin.api.findOne({
@@ -550,10 +589,12 @@ describe('ApiHandler', () => {
           expect(result).toEqual({
             idField: authorData.id,
             nameField: authorData.name,
-            postsField: {
-              idField: postData.id,
-              nameField: postData.name,
-            },
+            postsField: [
+              {
+                idField: postData.id,
+                nameField: postData.name,
+              },
+            ],
           })
         })
 
@@ -624,7 +665,6 @@ describe('ApiHandler', () => {
       })
     })
 
-    // TODO: complete read, update and delete test case
     describe('with "connect" mode', () => {
       describe('with "One" relation', () => {
         const postWithAuthorConnectCollection = builder.collection('postWithAuthorTs', {
@@ -632,7 +672,7 @@ describe('ApiHandler', () => {
           identifierField: 'idField',
           fields: builder.fields('postWithAuthorTs', (fb) => ({
             idField: fb.columns('idTs', {
-              type: 'number',
+              type: 'text',
               create: 'hidden',
               update: 'hidden',
             }),
@@ -643,7 +683,7 @@ describe('ApiHandler', () => {
               type: 'connect',
               fields: fb.fields('authorTs', (fb) => ({
                 idField: fb.columns('idTs', {
-                  type: 'number',
+                  type: 'text',
                   create: 'hidden',
                   update: 'hidden',
                 }),
@@ -665,6 +705,15 @@ describe('ApiHandler', () => {
         it('should (C) create successfully', async () => {
           const postData = mockPostData[0]
           const authorData = mockAuthorData[0]
+
+          mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: postData.id,
+            nameTs: postData.name,
+            authorTs: {
+              idTs: authorData.id,
+              nameTs: authorData.name,
+            },
+          })
 
           const { valuesMock, insertMock } = prepareInsertMock(
             // Insert post
@@ -688,7 +737,7 @@ describe('ApiHandler', () => {
             expect.objectContaining({ nameTs: postData.name, authorIdTs: authorData.id }),
           ])
           expect(tx.insert).toHaveBeenCalledTimes(1)
-          expect(result).toEqual(postData.id)
+          expect(result).toEqual({ __pk: postData.id, id: postData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -807,7 +856,7 @@ describe('ApiHandler', () => {
           identifierField: 'idField',
           fields: builder.fields('authorTs', (fb) => ({
             idField: fb.columns('idTs', {
-              type: 'number',
+              type: 'text',
               create: 'hidden',
               update: 'hidden',
             }),
@@ -818,7 +867,7 @@ describe('ApiHandler', () => {
               type: 'connect',
               fields: fb.fields('postWithAuthorTs', (fb) => ({
                 idField: fb.columns('idTs', {
-                  type: 'number',
+                  type: 'text',
                   create: 'hidden',
                   update: 'hidden',
                 }),
@@ -830,7 +879,7 @@ describe('ApiHandler', () => {
                 const result = await args.db.query.authorTs.findMany()
                 return result.map((author) => ({
                   label: author.nameTs as string,
-                  value: author.idTs as number,
+                  value: author.idTs,
                 }))
               },
             })),
@@ -848,15 +897,27 @@ describe('ApiHandler', () => {
             vi.fn().mockResolvedValueOnce([])
           )
 
+          mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: authorData.id,
+            nameTs: authorData.name,
+            postsTs: [
+              { idTs: mockPostData[0].id, nameTs: mockPostData[0].name },
+              { idTs: mockPostData[1].id, nameTs: mockPostData[1].name },
+              { idTs: mockPostData[2].id, nameTs: mockPostData[2].name },
+            ],
+          })
+
           const result = await authorWithPostConnectCollection.admin.api.create({
             slug: authorWithPostConnectCollection.slug,
             fields: authorWithPostConnectCollection.fields,
             context: { db: mockDb as any },
             data: {
               nameField: authorData.name,
-              postsField: {
-                connect: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
-              },
+              postsField: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id].map(
+                (postId) => ({
+                  connect: postId,
+                })
+              ),
             },
           })
 
@@ -874,7 +935,7 @@ describe('ApiHandler', () => {
               eq(schema.postWithAuthorTs.idTs, postId)
             )
           })
-          expect(result).toEqual(authorData.id)
+          expect(result).toEqual({ __pk: authorData.id, id: authorData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -961,9 +1022,9 @@ describe('ApiHandler', () => {
             id: updatedAuthorData.id,
             data: {
               nameField: updatedAuthorDataField.nameField,
-              postsField: {
-                connect: [1, 2, 3],
-              },
+              postsField: ['post-1', 'post-2', 'post-3'].map((postId) => ({
+                connect: postId,
+              })),
             },
           })
           // ====== end user part (field) ======

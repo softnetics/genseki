@@ -73,6 +73,7 @@ export class Builder<
     const defaultHandlers = createDefaultApiHandlers({
       schema: this.config.schema,
       fields: config.fields,
+      identifierField: config.identifierField,
       tableTsKey: tableTsName,
       tables: this.tableRelationalConfigByTableTsName,
       tableNamesMap: this.tableTsNameByTableDbName,

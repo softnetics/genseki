@@ -39,16 +39,26 @@ export function createDefaultApiHandlers<
   schema: Record<string, unknown>
   fields: TFields
   tableTsKey: string
+  identifierField: Extract<keyof TFields, string>
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const { fields, tableTsKey, tableNamesMap, tables, schema } = args
+  const { fields, tableTsKey, tableNamesMap, tables, schema, identifierField } = args
 
   const tableRelationalConfig = tables[tableTsKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)
   const tableName = tableRelationalConfig.tsName
   const tableSchema = getTableFromSchema(schema, tableTsKey)
   const queryPayload = createDrizzleQuery(fields)
+
+  const primaryKeyColumnTsName = getColumnTsName(getTableColumns(tableSchema), primaryKeyColumn)
+  const primaryFieldColumnTsName = Object.entries(args.fields).find(([_, field]) => {
+    return field._.source === 'columns' && field._.columnTsName === primaryKeyColumnTsName
+  })?.[0]
+
+  if (!primaryFieldColumnTsName) {
+    throw new Error(`Primary field column "${primaryKeyColumnTsName}" not found in fields`)
+  }
 
   const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
@@ -62,6 +72,8 @@ export function createDefaultApiHandlers<
       // TODO: Custom error
       throw new Error('Record not found')
     }
+
+    console.log('[findOne] result', result, mapResultToFields(fields, result))
 
     return mapResultToFields(fields, result) as InferFields<TFields>
   }
@@ -95,34 +107,72 @@ export function createDefaultApiHandlers<
 
   const create: ApiCreateHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
+    // TODO: Please reuse findOne instead of duplicate logic
+    const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
-    const id = await db.transaction(async (tx) => {
-      return new ApiHandler(tableTsKey, fields, {
+    const [pk, result] = await db.transaction(async (tx) => {
+      const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
         tableRelationalConfigByTableTsName: tables,
         tableTsNameByTableDbName: tableNamesMap,
-      }).create(tx, args.data)
+      })
+
+      const pk = await apiHandler.create(tx, args.data)
+      const result = await query.findFirst({
+        ...queryPayload,
+        where: eq(primaryKeyColumn, pk),
+      })
+
+      return [pk, result]
     })
 
-    // TODO: It's not correct, fix this
-    return { __pk: id, id: id }
+    if (!result) {
+      throw new Error('Record not found after creation')
+    }
+
+    if (identifierField === primaryFieldColumnTsName) {
+      return { __pk: pk, id: pk }
+    }
+
+    const identifierFieldValue = result[identifierField as unknown as keyof typeof result]
+
+    return { __pk: pk, id: identifierFieldValue }
   }
 
   const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
+    // TODO: Please reuse findOne instead of duplicate logic
+    const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
-    await db.transaction(async (tx) => {
-      return new ApiHandler(tableTsKey, fields, {
+    const [pk, result] = await db.transaction(async (tx) => {
+      const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
         tableRelationalConfigByTableTsName: tables,
         tableTsNameByTableDbName: tableNamesMap,
-      }).update(args.id, tx, args.data)
+      })
+
+      const pk = await apiHandler.update(args.id, tx, args.data)
+      const result = await query.findFirst({
+        ...queryPayload,
+        where: eq(primaryKeyColumn, pk),
+      })
+
+      return [pk, result]
     })
 
-    // TODO: It's not correct, fix this
-    return { __pk: args.id, id: args.id }
+    if (!result) {
+      throw new Error('Record not found after updating')
+    }
+
+    if (identifierField === primaryFieldColumnTsName) {
+      return { __pk: pk, id: pk }
+    }
+
+    const identifierFieldValue = result[identifierField as unknown as keyof typeof result]
+
+    return { __pk: pk, id: identifierFieldValue }
   }
 
   // why not just delete? why _delete?
@@ -192,11 +242,8 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
-    console.log('input', input)
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('oneInput', oneInput)
     const fullInput = { ...input, ...oneInput }
-    console.log('fullInput', fullInput)
     const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
     const id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
@@ -238,6 +285,19 @@ class ApiHandler {
       return id
     }
 
+    const disconnect = async (referencedTable: Table, fields: Fields<any>, value: any) => {
+      const primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
+      const primaryColumnTsName = getColumnTsName(
+        getTableColumns(this.config.schema[this.tableTsName] as Table),
+        primaryColumn
+      )
+
+      await tx
+        .update(referencedTable)
+        .set({ [primaryColumnTsName]: null })
+        .where(eq(primaryColumn, value))
+    }
+
     const result = await Promise.all(
       Object.entries(fields).flatMap(async ([fieldName, field]) => {
         if (!isRelationField(field) || !is(field._.relation, One)) return []
@@ -256,25 +316,66 @@ class ApiHandler {
         // Case that call with undefined value of relation like update data without update the relation
         if (value === undefined) return []
 
+        if (value['disconnect']) {
+          // If the value has disconnect, we need to set the relation field to null
+          // and return the relation field name and null value
+          await disconnect(field._.relation.referencedTable, field.fields, value['disconnect'])
+          return [[relationFieldTsName, null]]
+        }
+
         // TODO: map key from field to ts
         switch (field.type) {
           case 'connectOrCreate': {
-            if (typeof value === 'string' || typeof value === 'number') {
-              return [relationFieldTsName, value]
+            // NOTE: Find if connect value exists in the referenced table or not
+            const connectValue = value['connect']
+            const createValue = value['create']
+
+            if (connectValue && createValue) {
+              throw new Error(
+                `Field "${fieldName}" is a connectOrCreate relation, but the value has both "connect" and "create" properties`
+              )
+            }
+
+            if (connectValue) {
+              return [relationFieldTsName, connectValue]
+            }
+
+            // If not exists, create the value
+
+            if (typeof createValue !== 'object') {
+              throw new Error(
+                `Field "${fieldName}" is a connectOrCreate relation, but the value is not an object`
+              )
             }
 
             return [
               relationFieldTsName,
-              await create(field._.relation.referencedTable, field.fields, value),
+              await create(field._.relation.referencedTable, field.fields, createValue),
             ]
           }
           case 'connect': {
-            return [relationFieldTsName, value]
+            const connectValue = value['connect']
+
+            if (typeof connectValue !== 'string' && typeof connectValue !== 'number') {
+              throw new Error(
+                `Field "${fieldName}" is a connect relation, but the value does not have a "connect" property`
+              )
+            }
+
+            return [relationFieldTsName, connectValue]
           }
           case 'create': {
+            const createValue = value['create']
+
+            if (typeof createValue !== 'object') {
+              throw new Error(
+                `Field "${fieldName}" is a create relation, but the value is not an object`
+              )
+            }
+
             return [
               relationFieldTsName,
-              await create(field._.relation.referencedTable, field.fields, value),
+              await create(field._.relation.referencedTable, field.fields, createValue),
             ]
           }
         }
@@ -314,6 +415,20 @@ class ApiHandler {
         .returning()
     }
 
+    const disconnect = async (
+      tableConfig: TableRelationalConfig,
+      relation: Relation,
+      value: string | number
+    ) => {
+      const referencedFieldName = this.findReferencedColumnFromManyRelation(relation)
+      const primaryColumn = getPrimaryColumn(tableConfig)
+
+      await tx
+        .update(this.config.schema[tableConfig.tsName] as Table)
+        .set({ [referencedFieldName]: null })
+        .where(eq(primaryColumn, value))
+    }
+
     const resultPromises = Object.entries(fields).flatMap(async ([fieldName, field]) => {
       // Filter out non-relation fields
       if (!isRelationField(field)) return []
@@ -325,8 +440,16 @@ class ApiHandler {
         const sourceTableRelationalConfig =
           this.config.tableRelationalConfigByTableTsName[field._.referencedTableTsName]
 
-        const _connectFn = () => connect(sourceTableRelationalConfig, field._.relation, value)
-        const _createFn = () => create(sourceTableRelationalConfig, field._.relation, value)
+        const _disconnectFn = () =>
+          disconnect(sourceTableRelationalConfig, field._.relation, value['disconnect'])
+        const _connectFn = () =>
+          connect(sourceTableRelationalConfig, field._.relation, value['connect'])
+        const _createFn = () =>
+          create(sourceTableRelationalConfig, field._.relation, value['create'])
+
+        if (value['disconnect']) {
+          return [[fieldName, await _disconnectFn()]] as const
+        }
 
         switch (field.type) {
           case 'connectOrCreate': {

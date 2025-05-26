@@ -102,6 +102,11 @@ export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
  *          connect: [{ id: "user_1" }, { id: "user_2"}],
  *          disconnect: ["user_3"]
  *        }
+ *        role: [
+ *          { connect: { id: "user_1" } }
+ *          { connect: { id: "user_2" } }
+ *          { disconnect: { id: "user_3" } }
+ *        ]
  *      }
  *    }
  *
@@ -112,22 +117,27 @@ export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
  *    {
  *      id: "post_1",
  *      name: "Post 1",
- *      tags: {
- *        create: [{ tagId: "tag_1" }, { tagId: "tag_2" }],
- *        connect: [{ id: "post_tag_1", __order: string }, { id: "post_tag_2", __order: string }],
- *        disconnect: [{ id: "post_tag_3", __order: string }]
- *      }
+ *      tags: [
+ *        { create: { tagId: "tag_1" } },
+ *        { create: { tagId: "tag_2" } },
+ *        { connect: { id: "post_tag_1" } },
+ *        { connect: {id: "post_tag_2" } },
+ *        { disconnect: { id: "post_tag_3" } },
+ *      ]
  *   }
  *
  *   One Post can have Many PostTags. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferManyRelationMutationField<TField extends FieldRelation<any>> = {
-  create?: TField extends FieldRelationCollection<any>['create' | 'connectOrCreate']
-    ? Array<InferCreateFields<TField['fields']>>
-    : never
-  connect?: Array<TField['_']['primaryColumn']['_']['data']>
-  disconnect?: Array<TField['_']['primaryColumn']['_']['data']>
-}
+export type InferManyRelationMutationField<TField extends FieldRelation<any>> = Array<
+  InferOneRelationMutationField<TField>
+>
+
+type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
+  TArrayOrObject extends Array<any>
+    ? Array<Pick<TArrayOrObject[number], TKeys>>
+    : TArrayOrObject extends Record<string, any>
+      ? Pick<TArrayOrObject, TKeys>
+      : never
 
 export type InferMutationRelationField<TField extends FieldRelation<any>> =
   TField['_']['relation'] extends Many<any>
@@ -137,9 +147,11 @@ export type InferMutationRelationField<TField extends FieldRelation<any>> =
 export type InferUpdateField<TField extends Field<any>> =
   TField extends FieldRelation<any>
     ? TField extends FieldRelationCollection<any>['create']
-      ? Simplify<Pick<InferMutationRelationField<TField>, 'create' | 'disconnect'>>
+      ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'disconnect'>>
       : TField extends FieldRelationCollection<any>['connect']
-        ? Simplify<Pick<InferMutationRelationField<TField>, 'connect' | 'disconnect'>>
+        ? Simplify<
+            PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect' | 'disconnect'>
+          >
         : TField extends FieldRelationCollection<any>['connectOrCreate']
           ? Simplify<InferMutationRelationField<TField>>
           : never
@@ -159,11 +171,13 @@ export type InferUpdateFields<TFields extends Fields<any>> = SimplifyConditional
 export type InferCreateField<TField extends Field<any>> =
   TField extends FieldRelation<any>
     ? TField extends FieldRelationCollection<any>['create']
-      ? Simplify<Pick<InferMutationRelationField<TField>, 'create'>>
+      ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create'>>
       : TField extends FieldRelationCollection<any>['connect']
-        ? Simplify<Pick<InferMutationRelationField<TField>, 'connect'>>
+        ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect'>>
         : TField extends FieldRelationCollection<any>['connectOrCreate']
-          ? Simplify<Pick<InferMutationRelationField<TField>, 'create' | 'connect'>>
+          ? Simplify<
+              PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'connect'>
+            >
           : never
     : TField extends FieldColumn<any>
       ? ActivateFieldMutateMode<TField['_']['column']['_']['data'], TField, 'create'>
