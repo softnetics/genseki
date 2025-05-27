@@ -23,5 +23,3 @@ export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuth
     handlers,
   }
 }
-
-export type AuthHandlers = ReturnType<typeof createAuthHandlers>['handlers']

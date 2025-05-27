@@ -14,9 +14,8 @@ interface UpdateViewProps<TServerConfig extends ServerConfig> {
 export function UpdateView<TServerConfig extends ServerConfig>(
   props: UpdateViewProps<TServerConfig>
 ) {
-  const collection = props.serverConfig.collections.find(
-    (collection) => collection.slug === props.slug
-  )
+  const collection = props.serverConfig.collections[props.slug]
+
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   return (

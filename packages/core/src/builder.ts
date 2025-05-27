@@ -58,7 +58,7 @@ export class Builder<
     TSlug extends string = string,
     TTableKey extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
     TFields extends Fields<TContext> = Fields<TContext>,
-    TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+    TApiRouter extends ApiRouter<TContext> = {},
   >(tableTsName: TTableKey, config: CollectionConfig<TSlug, TContext, TFields, TApiRouter>) {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =

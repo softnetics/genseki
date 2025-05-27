@@ -161,8 +161,8 @@ export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
 }
 
 export function createEndpoint<
-  TApiEndpointSchema extends ApiRouteSchema,
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  const TApiEndpointSchema extends ApiRouteSchema,
+  const TContext extends Record<string, unknown> = Record<string, unknown>,
 >(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
   return {
     schema,

@@ -1,4 +1,3 @@
-import type { AnyColumn, AnyTable } from 'drizzle-orm'
 import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 
@@ -8,15 +7,7 @@ import { createAuthHandlers } from './handlers'
 import { getFieldsClient, type MinimalContext } from '../config'
 import type { ApiRouteHandler } from '../endpoint'
 import type { Fields, FieldsClient } from '../field'
-
-export type AnyTypedColumn<T> = AnyColumn & { _: { data: T; dialect: 'pg' } }
-export type WithHasDefault<T> = T & { _: { hasDefault: true } }
-export type WithNotNull<T> = T & { _: { notNull: true } }
-export type WithAnyTable<TColumns extends Record<string, AnyColumn>> = AnyTable<{
-  dialect: 'pg'
-  columns: TColumns
-}> &
-  TColumns
+import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../table'
 
 export type AnyUserTable = WithAnyTable<{
   id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
@@ -133,6 +124,8 @@ export type Auth<
     >
   >
 }
+
+export type AuthHandlers = Auth<any, any>['handlers']
 
 export type AuthClient = {
   login: {
