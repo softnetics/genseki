@@ -102,6 +102,19 @@ export function appendFieldNameToFields<TFields extends FieldsInitial<any>>(
   ) as FieldsWithFieldName<TFields>
 }
 
+export function mapValueToTsValue(
+  fields: Fields<any>,
+  value: Record<string, any>
+): Record<string, any> {
+  const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
+    if (value[fieldName] === undefined) return []
+    if (field._.source !== 'columns') return []
+    return [[field._.columnTsName, value[fieldName]]]
+  })
+
+  return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
+}
+
 export type JoinArrays<T extends any[]> = Simplify<
   T extends [infer A]
     ? IsNever<A> extends true

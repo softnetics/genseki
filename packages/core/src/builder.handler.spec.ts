@@ -545,7 +545,7 @@ describe('ApiHandler', () => {
           expect(insertMock).toHaveBeenCalledTimes(6)
           expect(valuesInsertMock).toHaveBeenCalledTimes(6)
           expect(valuesInsertMock).toHaveBeenCalledWith([
-            expect.objectContaining({ nameField: postData.name }),
+            expect.objectContaining({ nameTs: postData.name }),
           ])
           expect(result).toEqual({ __pk: authorData.id, id: authorData.id })
         })
@@ -605,7 +605,7 @@ describe('ApiHandler', () => {
         // TODO: should add update their relation
         it('should (U) update successfully', async () => {
           const updatedAuthorData = {
-            id: 1,
+            id: mockAuthorData[0].id,
             name: 'Updated Author Name',
           }
           const updatedAuthorDataTs = {
@@ -617,11 +617,25 @@ describe('ApiHandler', () => {
             nameField: updatedAuthorData.name,
           }
           // // ===== start service part (TS) =====
-          const { setMock, updateMock } = prepareUpdateWhereMock(
+          const { setMock, updateMock, whereUpdateMock } = prepareUpdateWhereMock(
             vi.fn().mockResolvedValueOnce([updatedAuthorDataTs])
           )
 
+          const { valuesMock, insertMock } = prepareInsertMock(
+            vi.fn().mockResolvedValueOnce([]).mockResolvedValueOnce([])
+          )
+
           tx.update = updateMock
+
+          mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: updatedAuthorData.id,
+            nameTs: updatedAuthorData.name,
+            postsTs: [
+              { idTs: 'post-2', nameTs: 'Post 2' },
+              { idTs: 'post-3', nameTs: 'Post 3' },
+            ],
+          })
+
           // // ====== end service part (TS) ======
           // // ===== start user part (field) =====
           const result = await authorWithPostsCreateCollection.admin.api.update({
@@ -634,25 +648,54 @@ describe('ApiHandler', () => {
               postsField: [
                 {
                   create: {
-                    nameField: 'Post 1',
+                    nameField: 'Post 2',
+                  },
+                },
+                {
+                  disconnect: 'post-4',
+                },
+                {
+                  create: {
+                    nameField: 'Post 3',
                   },
                 },
               ],
             },
           })
+
           // // ====== end user part (field) ======
           // // Assertions for author update
-          expect(updateMock).toHaveBeenCalledTimes(1)
-          expect(setMock).toHaveBeenCalledWith([
+          expect(updateMock).toHaveBeenCalledTimes(2)
+          expect(whereUpdateMock).toHaveBeenCalledTimes(2)
+          expect(whereUpdateMock.mock.calls[0][0]).toEqual(
+            eq(authorWithPostsCreateCollection.fields.idField._.column, updatedAuthorData.id)
+          )
+          expect(whereUpdateMock.mock.calls[1][0]).toEqual(
+            eq(authorWithPostsCreateCollection.fields.postsField._.primaryColumn, 'post-4')
+          )
+          expect(setMock).toHaveBeenCalledTimes(2)
+          expect(setMock.mock.calls[0][0]).toEqual([
             expect.objectContaining({
               nameTs: updatedAuthorDataTs.nameTs,
             }),
           ])
-          // Final result
-          expect(result).toEqual(updatedAuthorDataField.idField)
+          expect(setMock.mock.calls[1][0]).toEqual({
+            authorIdTs: null,
+          })
+          expect(insertMock).toHaveBeenCalledTimes(2)
+          expect(valuesMock).toHaveBeenCalledTimes(2)
+          expect(valuesMock.mock.calls[0][0]).toEqual([
+            expect.objectContaining({ nameTs: 'Post 2', authorIdTs: updatedAuthorData.id }),
+          ])
+          expect(valuesMock.mock.calls[1][0]).toEqual([
+            expect.objectContaining({ nameTs: 'Post 3', authorIdTs: updatedAuthorData.id }),
+          ])
+          expect(result).toEqual({
+            __pk: updatedAuthorData.id,
+            id: updatedAuthorData.id,
+          })
         })
 
-        // TODO: Somehow it does not work
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
@@ -802,8 +845,7 @@ describe('ApiHandler', () => {
           })
         })
 
-        // TODO: Need to "update" method
-        it.todo('should (U) update successfully', async () => {
+        it('should (U) update successfully', async () => {
           const postData = mockPostData[0]
           const updatedPostData = {
             id: postData.id,
@@ -820,10 +862,18 @@ describe('ApiHandler', () => {
             nameField: updatedPostData.name,
             authorIdField: updatedPostData.authorId,
           }
-          const { setMock, updateMock } = prepareUpdateWhereMock(
+          const { setMock, updateMock, whereUpdateMock } = prepareUpdateWhereMock(
             vi.fn().mockResolvedValueOnce([postDataTs])
           )
           tx.update = updateMock
+          mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: updatedPostData.id,
+            nameTs: updatedPostData.name,
+            authorTs: {
+              idTs: updatedPostData.authorId,
+              nameTs: 'Author 2',
+            },
+          })
           const result = await postWithAuthorConnectCollection.admin.api.update({
             slug: postWithAuthorConnectCollection.slug,
             fields: postWithAuthorConnectCollection.fields,
@@ -839,11 +889,13 @@ describe('ApiHandler', () => {
           expect(updateMock).toHaveBeenCalledTimes(1)
           expect(setMock).toHaveBeenCalledWith([
             expect.objectContaining({
-              idTs: postDataTs.idTs,
               nameTs: postDataTs.nameTs,
               authorIdTs: postDataTs.authorIdTs,
             }),
           ])
+          expect(whereUpdateMock).toHaveBeenCalledWith(
+            eq(postWithAuthorConnectCollection.fields.idField._.column, postData.id)
+          )
           expect(result).toEqual({ __pk: postDataField.idField, id: postDataField.idField })
         })
 
@@ -1012,7 +1064,7 @@ describe('ApiHandler', () => {
         // TODO: Need to fix "update" method
         it('should (U) update successfully', async () => {
           const updatedAuthorData = {
-            id: 1,
+            id: mockAuthorData[0].id,
             name: 'Updated Author Name',
           }
 
@@ -1027,27 +1079,26 @@ describe('ApiHandler', () => {
           }
 
           // ===== start service part (TS) =====
-          const whereUpdateMock = vi.fn().mockImplementation(() => ({
-            returning: vi.fn().mockResolvedValueOnce([updatedAuthorDataTs]),
-          }))
-
-          const setMock = vi
-            .fn()
-            .mockImplementationOnce(() => ({
-              returning: vi.fn().mockResolvedValueOnce([updatedAuthorDataTs]),
-            }))
-            .mockImplementation(() => ({
-              where: whereUpdateMock,
-            }))
-          const updateMock = vi.fn().mockImplementation(() => ({
-            set: setMock,
-          }))
+          const { setMock, updateMock, whereUpdateMock } = prepareUpdateWhereMock(
+            vi.fn().mockResolvedValueOnce([updatedAuthorDataTs])
+          )
 
           tx.update = updateMock
 
           // ====== end service part (TS) ======
 
           // ===== start user part (field) =====
+
+          mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            idTs: updatedAuthorData.id,
+            nameTs: updatedAuthorData.name,
+            postsTs: [
+              { idTs: 'post-1', nameTs: 'Post 1' },
+              { idTs: 'post-2', nameTs: 'Post 2' },
+              { idTs: 'post-3', nameTs: 'Post 3' },
+            ],
+          })
+
           const result = await authorWithPostConnectCollection.admin.api.update({
             slug: authorWithPostConnectCollection.slug,
             fields: authorWithPostConnectCollection.fields,
@@ -1060,6 +1111,7 @@ describe('ApiHandler', () => {
               })),
             },
           })
+
           // ====== end user part (field) ======
 
           // Assertions
@@ -1071,10 +1123,10 @@ describe('ApiHandler', () => {
             }),
           ])
 
-          // 3 times for post update
-          expect(whereUpdateMock).toHaveBeenCalledTimes(3)
+          // 4 times for post update
+          expect(whereUpdateMock).toHaveBeenCalledTimes(4)
 
-          expect(result).toEqual(updatedAuthorDataField.idField)
+          expect(result).toEqual({ __pk: updatedAuthorData.id, id: updatedAuthorData.id })
         })
 
         it('should (D) delete successfully', async () => {

@@ -30,6 +30,7 @@ import {
   getPrimaryColumn,
   getTableFromSchema,
   isRelationField,
+  mapValueToTsValue,
 } from './utils'
 
 export function createDefaultApiHandlers<
@@ -403,12 +404,18 @@ class ApiHandler {
         .where(eq(primaryColumn, value))
     }
 
-    const create = async (tableConfig: TableRelationalConfig, relation: Relation, value: any) => {
-      const referencedFieldTsName = this.findReferencedColumnFromManyRelation(relation)
+    const create = async (
+      tableConfig: TableRelationalConfig,
+      fields: Fields<any>,
+      relation: Relation,
+      value: any
+    ) => {
+      const referenceFieldName = this.findReferencedColumnFromManyRelation(relation)
       const payload = {
-        ...value,
-        [referencedFieldTsName]: id,
+        ...mapValueToTsValue(fields, value),
+        [referenceFieldName]: id,
       }
+
       await tx
         .insert(this.config.schema[tableConfig.tsName] as Table)
         .values([payload])
@@ -445,7 +452,7 @@ class ApiHandler {
         const _connectFn = () =>
           connect(sourceTableRelationalConfig, field._.relation, value['connect'])
         const _createFn = () =>
-          create(sourceTableRelationalConfig, field._.relation, value['create'])
+          create(sourceTableRelationalConfig, field.fields, field._.relation, value['create'])
 
         if (value['disconnect']) {
           return [[fieldName, await _disconnectFn()]] as const
@@ -474,7 +481,7 @@ class ApiHandler {
   /**
    * This function is designed to find the referenced column from a many-to-one relation.
    * For example,
-   *
+   * ```ts
    * const posts = pgTable('posts', {
    *   id: serial('id').primaryKey(),
    *   authorId: integer('author_id').notNull(),
@@ -494,6 +501,7 @@ class ApiHandler {
    * const authorsRelation = relation(authors, {
    *   posts: many(posts)
    * })
+   * ```
    *
    * In this case, if we call `findReferencedColumnFromManyRelation(authorsConfig, "posts")`,
    * it will return "authorId" of "posts" table as the referenced column.
