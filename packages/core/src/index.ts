@@ -1,4 +1,4 @@
-export type { AuthHandlers } from './auth/handlers'
+export type { AuthHandlers } from './auth'
 export { Builder } from './builder'
 export type {
   ApiReturnType,
