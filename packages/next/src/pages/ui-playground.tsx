@@ -14,9 +14,23 @@ import { BaseIcon } from '../components/primitives/base-icon'
 import { IconContainer } from '../components/primitives/icon-container'
 import { Typography } from '../components/primitives/typography'
 import { Button } from '../intentui/ui/button'
+import { Calendar } from '../intentui/ui/calendar'
 import { Checkbox, CheckboxGroup } from '../intentui/ui/checkbox'
+import { DateField } from '../intentui/ui/date-field'
+import { DatePicker } from '../intentui/ui/date-picker'
 import { ListBox, ListBoxItem, ListBoxItemDetails, ListBoxSection } from '../intentui/ui/list-box'
-import { Popover } from '../intentui/ui/popover'
+import {
+  Popover,
+  PopoverBody,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+} from '../intentui/ui/popover'
+import { RangeCalendar } from '../intentui/ui/range-calendar'
 import {
   Select,
   SelectLabel,
@@ -229,6 +243,26 @@ export const UIPlayground = () => {
           </div>
         </PlaygroundCard>
       </Wrapper>
+      <Wrapper title="Date picker">
+        <div className="flex justify-start">
+          <DatePicker description="Select your birth date" label="Your birth date" isRequired />
+        </div>
+      </Wrapper>
+      <Wrapper title="Range calendar">
+        <div className="flex justify-start">
+          <RangeCalendar />
+        </div>
+      </Wrapper>
+      <Wrapper title="Date field">
+        <div className="flex">
+          <DateField label="Date of birth" size="md" isRequired />
+        </div>
+      </Wrapper>
+      <Wrapper title="Calendar">
+        <div className="w-full flex">
+          <Calendar aria-label="Event date" />
+        </div>
+      </Wrapper>
       <Wrapper title="Popover">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Popover (Form)" categoryTitle="Popover">
@@ -236,13 +270,13 @@ export const UIPlayground = () => {
               <Button variant="primary" size="md">
                 Login
               </Button>
-              <Popover.Content className="sm:min-w-96">
-                <Popover.Header>
-                  <Popover.Title>Login</Popover.Title>
-                  <Popover.Description>Enter your credentials to sign in.</Popover.Description>
-                </Popover.Header>
+              <PopoverContent className="sm:min-w-96">
+                <PopoverHeader>
+                  <PopoverTitle>Login</PopoverTitle>
+                  <PopoverDescription>Enter your credentials to sign in.</PopoverDescription>
+                </PopoverHeader>
                 <form onSubmit={() => {}} className="w-[400px]">
-                  <Popover.Body>
+                  <PopoverBody>
                     <div className="space-y-4">
                       <TextField
                         autoFocus
@@ -277,43 +311,43 @@ export const UIPlayground = () => {
                         </CheckboxGroup>
                       </div>
                     </div>
-                  </Popover.Body>
-                  <Popover.Footer>
-                    <Popover.Close variant="outline" size="sm">
+                  </PopoverBody>
+                  <PopoverFooter>
+                    <PopoverClose variant="outline" size="sm">
                       Cancel
-                    </Popover.Close>
+                    </PopoverClose>
                     <Button type="submit" variant="tertiary" size="sm">
                       Login
                     </Button>
-                  </Popover.Footer>
+                  </PopoverFooter>
                 </form>
-              </Popover.Content>
+              </PopoverContent>
             </Popover>
           </PlaygroundCard>
           <PlaygroundCard title="Popover (normal)" categoryTitle="Popover">
             <Popover>
-              <Popover.Trigger>Open Popover</Popover.Trigger>
-              <Popover.Content className="sm:min-w-72">
-                <Popover.Header>
-                  <Popover.Title level={4}>Popover Title</Popover.Title>
-                  <Popover.Description>
+              <PopoverTrigger>Open Popover</PopoverTrigger>
+              <PopoverContent className="sm:min-w-72">
+                <PopoverHeader>
+                  <PopoverTitle level={4}>Popover Title</PopoverTitle>
+                  <PopoverDescription>
                     Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet consectetur adipisicing
                     elit. Quos, temporibus.
-                  </Popover.Description>
-                </Popover.Header>
-                <Popover.Body>
+                  </PopoverDescription>
+                </PopoverHeader>
+                <PopoverBody>
                   Popover Body | Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet consectetur
                   adipisicing elit. Quos, temporibus.
-                </Popover.Body>
-                <Popover.Footer>
-                  <Popover.Close size="sm" variant="outline">
+                </PopoverBody>
+                <PopoverFooter>
+                  <PopoverClose size="sm" variant="outline">
                     Close
-                  </Popover.Close>
-                  <Popover.Close size="sm" variant="secondary">
+                  </PopoverClose>
+                  <PopoverClose size="sm" variant="secondary">
                     Confirm
-                  </Popover.Close>
-                </Popover.Footer>
-              </Popover.Content>
+                  </PopoverClose>
+                </PopoverFooter>
+              </PopoverContent>
             </Popover>
           </PlaygroundCard>
         </div>

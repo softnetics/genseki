@@ -30,6 +30,7 @@ const buttonVariants = tv({
         '[&>*]:text-white text-white bg-valencia-500 hover:bg-valencia-600 shadow-[inset_0_0_0_1px_var(--color-valencia-600),inset_0_2px_0_0_--alpha(var(--color-white)/20%)]',
     },
     size: {
+      'square-petite': 'size-14 p-0 rounded-md text-base font-medium',
       md: 'p-6 gap-x-2 rounded-md text-base font-medium',
       sm: 'p-4 gap-x-2 rounded-md text-sm font-medium',
       xs: 'p-2 gap-x-1 rounded-sm text-sm font-medium',

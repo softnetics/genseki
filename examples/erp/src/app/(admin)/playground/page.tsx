@@ -5,6 +5,6 @@ interface PlaygroundPageProps {
   searchParams: Promise<{ [key: string]: string | string[] }>
 }
 
-export default async function Playground(props: PlaygroundPageProps) {
+export default async function Playground(_props: PlaygroundPageProps) {
   return <UIPlayground />
 }

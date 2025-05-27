@@ -25,8 +25,8 @@ const tableDataExtract = <
   collection: TCollection,
   data: InferFieldsFromCollection<TCollection>[]
 ) => {
-  const headers = Object.entries(collection.fields).map(([key, column]) => {
-    return { ...column, label: column.label ?? key /* Fallback to key if no label */ }
+  const headers = Object.values(collection.fields).map((column) => {
+    return { ...column, label: column.fieldName /* Fallback to key if no label */ }
   })
 
   headers.sort((a, b) => (b.label === collection.primaryField ? 1 : -1))
@@ -35,7 +35,7 @@ const tableDataExtract = <
     key: record[collection.primaryField],
     rows: headers.map(
       (header) =>
-        record[header.label] ??
+        record[header.fieldName] ??
         'Unknown' /* Unknown meant that it's missing a correct heading label */
     ),
   }))

@@ -180,14 +180,15 @@ const PopoverTrigger = Dialog.Trigger
 const PopoverClose = Dialog.Close
 const PopoverDescription = Dialog.Description
 
-Popover.Trigger = PopoverTrigger
-Popover.Close = PopoverClose
-Popover.Description = PopoverDescription
-Popover.Content = PopoverContent
-Popover.Body = PopoverBody
-Popover.Footer = PopoverFooter
-Popover.Header = PopoverHeader
-Popover.Title = PopoverTitle
-
 export type { PopoverContentProps, PopoverProps }
-export { Popover, PopoverContent }
+export {
+  Popover,
+  PopoverBody,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+}
