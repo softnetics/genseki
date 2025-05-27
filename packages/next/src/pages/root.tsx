@@ -27,7 +27,7 @@ export async function RootPage(props: RootProps) {
   if (result.requiredAuthentication) {
     user = await getUser(props.serverFunction)
     if (!user) {
-      return <NotAuthorizedPage redirectURL="/admin/login" />
+      return <NotAuthorizedPage redirectURL="/admin/auth/login" />
     }
   }
 

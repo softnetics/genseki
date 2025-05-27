@@ -31,7 +31,7 @@ export function LoginClientForm() {
       return
     }
 
-    redirect('../collections/posts')
+    redirect('../collections')
   }
 
   return (
