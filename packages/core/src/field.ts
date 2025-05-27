@@ -23,17 +23,17 @@ export type OptionCallback<
 > = (args: TContext) => Promise<Array<{ label: string; value: TType }>>
 
 export type FieldsWithFieldName<TFields extends Record<string, FieldBase>> = {
-  [TKey in keyof TFields]: TFields[TKey] & { _: { fieldName: string } }
+  [TKey in keyof TFields]: TFields[TKey] & { fieldName: string }
 }
 
 export interface FieldMetadataColumns {
-  source: 'columns'
+  source: 'column'
   columnTsName: string
   column: Column
 }
 
 export interface FieldMetadataRelations {
-  source: 'relations'
+  source: 'relation'
   relation: Relation
   relationTsName: string
   referencedTableTsName: string
@@ -216,7 +216,7 @@ export type FieldsInitial<TContext extends Record<string, unknown> = Record<stri
 
 export type Fields<
   TContext extends Record<string, unknown> = Record<string, unknown>,
-  TFields extends FieldsInitial<TContext> = FieldsInitial<TContext>,
+  TFields extends FieldsInitial<TContext> = FieldsInitial<any>,
 > = FieldsWithFieldName<TFields>
 
 export type FieldClient = Omit<Field, 'options'>
@@ -306,7 +306,7 @@ export class FieldBuilder<
     >,
   >(columnTsName: TColumnTsName, options: TOptions) {
     const fieldMetadata = {
-      source: 'columns',
+      source: 'column',
       columnTsName: columnTsName,
       column: this.tableRelationalConfig['columns'][
         columnTsName
@@ -398,7 +398,7 @@ export class FieldBuilder<
     }
 
     const fieldMetadata = {
-      source: 'relations',
+      source: 'relation',
       relationTsName: relationTsName,
       referencedTableTsName: referencedTableRelationalConfig.tsName,
       sourceTableTsName: sourceTableRelationalConfig.tsName,

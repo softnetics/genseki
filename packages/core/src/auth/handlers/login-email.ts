@@ -1,18 +1,15 @@
 import z from 'zod'
 
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
+import type { AuthConfig } from '..'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
-import { setSessionCookie } from '../utils'
+import { setSessionCookie, verifyPassword } from '../utils'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
-
-export function signInEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function loginEmail<const TOptions extends AuthConfig>(options: TOptions) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/sign-in-email',
+    path: '/api/auth/login-email',
     body: z.object({
       email: z.string(),
       password: z.string(),
@@ -31,30 +28,18 @@ export function signInEmail<const TOptions extends InternalRouteOptions>(options
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    console.log('signInEmail handler', args)
-
-    // return {
-    //   status: 200,
-    //   headers: new Headers(),
-    //   body: {
-    //     token: 'test token',
-    //     user: 'test user',
-    //   },
-    // }
-
     const account = await args.context.internalHandlers.account.findByUserEmailAndProvider(
       args.body.email,
       AccountProvider.CREDENTIAL
     )
 
-    // TODO: Hash password and compare
-    const hashPassword = account.password
-    if (account.password !== hashPassword) {
+    const verifyStatus = await verifyPassword(args.body.password, account.password as string)
+    if (!verifyStatus) {
       throw new Error('Invalid password')
     }
 
     const session = await args.context.internalHandlers.session.create({
-      userId: account.userId,
+      userId: account.user.id,
       // TODO: Customize expiresAt
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     })

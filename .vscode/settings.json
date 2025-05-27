@@ -47,5 +47,8 @@
     "examples/erp/src/app/global.css": "examples/erp/**",
     "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/(admin)/**",
     "examples/erp/src/app/(admin)/playground/tailwind.css": "examples/erp/(admin)/playground/**"
+  },
+  "[sql]": {
+    "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
   }
 }

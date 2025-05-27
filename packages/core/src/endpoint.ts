@@ -1,5 +1,7 @@
+import type { JSONSchema7 } from 'json-schema'
 import type { IsNever, Simplify, SimplifyDeep, ValueOf } from 'type-fest'
 import type { z, ZodType } from 'zod'
+import zodToJsonSchema from 'zod-to-json-schema'
 
 import type { MaybePromise } from './collection'
 
@@ -81,6 +83,12 @@ export type GetApiRouteSchemaFromApiRouteHandler<
     ? TApiRouteSchema
     : never
 
+export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = ValueOf<{
+  [TStatus in keyof TApiRouteSchema['responses']]: TApiRouteSchema['responses'][TStatus] extends InputSchema
+    ? { status: TStatus; data: Output<TApiRouteSchema['responses'][TStatus]> }
+    : never
+}>
+
 export interface ApiRouteCommonSchema {
   path: string
   pathParams?: InputSchema
@@ -89,12 +97,6 @@ export interface ApiRouteCommonSchema {
   description?: string
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
 }
-
-export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = ValueOf<{
-  [TStatus in keyof TApiRouteSchema['responses']]: TApiRouteSchema['responses'][TStatus] extends InputSchema
-    ? { status: TStatus; data: Output<TApiRouteSchema['responses'][TStatus]> }
-    : never
-}>
 
 export interface ApiRouteQuerySchema extends ApiRouteCommonSchema {
   method: 'GET'
@@ -133,14 +135,29 @@ export interface ApiRouter<TContext extends Record<string, unknown> = Record<str
   [key: string]: ApiRoute<TContext, any>
 }
 
-export interface ClientApiRouter {
-  [key: string]: ApiRouteSchema
+export interface ClientApiRouteSchema {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
+  pathParams?: JSONSchema7
+  query?: JSONSchema7
+  headers?: JSONSchema7
+  description?: string
+  body?: JSONSchema7
+  responses: Partial<Record<ApiHttpStatus, JSONSchema7>>
 }
 
-export type ToClientApiRouter<TApiRouter extends ApiRouter> = {
-  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, infer TApiRouteSchema>
-    ? TApiRouteSchema
+export interface ClientApiRouter {
+  [key: string]: ClientApiRouteSchema
+}
+
+export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
+  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, any>
+    ? TApiRouter[TKey]['schema']
     : never
+}
+
+export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
+  [TKey in keyof TApiRouter]: ClientApiRouteSchema
 }
 
 export function createEndpoint<
@@ -151,4 +168,42 @@ export function createEndpoint<
     schema,
     handler,
   }
+}
+
+export function getClientEndpoint(endpoint: ApiRoute<any>): ClientApiRouteSchema {
+  const schema = endpoint.schema
+  const template = {
+    path: schema.path,
+    method: schema.method,
+    ...(schema.headers
+      ? { headers: zodToJsonSchema(schema.headers, { errorMessages: true }) as JSONSchema7 }
+      : {}),
+    ...(schema.pathParams
+      ? {
+          pathParams: zodToJsonSchema(schema.pathParams, {
+            errorMessages: true,
+          }) as JSONSchema7,
+        }
+      : {}),
+    ...(schema.query ? { query: zodToJsonSchema(schema.query) as JSONSchema7 } : {}),
+    responses: Object.fromEntries(
+      Object.entries(schema.responses).map(([key, value]) => {
+        return [
+          key,
+          value ? (zodToJsonSchema(value, { errorMessages: true }) as JSONSchema7) : undefined,
+        ]
+      })
+    ) as Partial<Record<ApiHttpStatus, JSONSchema7>>,
+  }
+
+  if (schema.method === 'GET') {
+    return template as ClientApiRouteSchema
+  }
+
+  return {
+    ...template,
+    body: schema.body
+      ? (zodToJsonSchema(schema.body, { errorMessages: true }) as JSONSchema7)
+      : undefined,
+  } as ClientApiRouteSchema
 }

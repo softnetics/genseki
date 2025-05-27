@@ -41,9 +41,9 @@ export function createAuthContext<TAuthConfig extends AuthConfig, TContext exten
     internalHandlers: internalHandlers,
 
     requiredAuthenticated: async (headers?: Record<string, string>) => {
-      const sessionId = getSessionCookie(headers)
-      if (!sessionId) throw new Error('Unauthorized')
-      const session = await internalHandlers.session.findUserBySessionId(sessionId)
+      const sessionToken = getSessionCookie(headers)
+      if (!sessionToken) throw new Error('Unauthorized')
+      const session = await internalHandlers.session.findUserBySessionToken(sessionToken)
       if (!session) throw new Error('Unauthorized')
       if (session.expiresAt < new Date()) {
         await internalHandlers.session.deleteById(session.id)
@@ -122,7 +122,10 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     },
     findByUserEmailAndProvider: async (email: string, providerId: AccountProvider) => {
       const accounts = await context.db
-        .select()
+        .select({
+          user: config.user.model,
+          password: config.account.model.password,
+        })
         .from(config.account.model)
         .leftJoin(config.user.model, eq(config.account.model.userId, config.user.model.id))
         .where(
@@ -130,7 +133,8 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
         )
       if (accounts.length === 0) throw new Error('Account not found')
       if (accounts.length > 1) throw new Error('Multiple accounts found')
-      return accounts[0] as unknown as InferTableType<AnyAccountTable> & {
+      return accounts[0] as unknown as {
+        password: InferTableType<AnyAccountTable>['password']
         user: InferTableType<AnyUserTable>
       }
     },
@@ -138,7 +142,6 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
   const session = {
     create: async (data: { userId: string; expiresAt: Date }) => {
       const table = config.session.model
-      // TODO: Create token
       const token = crypto.randomUUID()
       const session = await context.db
         .insert(table)
@@ -151,17 +154,23 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       const session = await context.db.update(table).set(data).where(eq(table.id, id)).returning()
       return session[0]
     },
-    findUserBySessionId: async (id: string) => {
+    findUserBySessionToken: async (token: string) => {
       const sessions = await context.db
-        .select()
+        .select({
+          id: config.session.model.id,
+          user: config.user.model,
+          expiresAt: config.session.model.expiresAt,
+        })
         .from(config.session.model)
         .leftJoin(config.user.model, eq(config.session.model.userId, config.user.model.id))
-        .where(eq(config.session.model.id, id))
+        .where(eq(config.session.model.token, token))
       if (sessions.length === 0) throw new Error('Session not found')
       if (sessions.length > 1) throw new Error('Multiple sessions found')
       const session = sessions[0]
-      return session as unknown as InferTableType<AnySessionTable> & {
+      return session as unknown as {
+        id: InferTableType<AnySessionTable>['id']
         user: InferTableType<AnyUserTable>
+        expiresAt: InferTableType<AnySessionTable>['expiresAt']
       }
     },
     deleteById: async (id: string) => {

@@ -27,6 +27,12 @@ export const useCollection = <TCollection extends Collection>(slug: string) => {
   return collection as TCollection // TODO: Fix this to infer from slug
 }
 
+export const useClientConfig = () => {
+  const context = useContext(RootContext)
+  if (!context) throw new Error('useClientConfig must be used within a RootProvider')
+  return context.clientConfig
+}
+
 export const useServerFunction = <TServerConfig extends ServerConfig>() => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useCollectionServerFunctions must be used within a RootProvider')

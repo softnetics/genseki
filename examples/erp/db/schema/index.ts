@@ -1,4 +1,4 @@
-import { relations, sql } from 'drizzle-orm'
+import { relations } from 'drizzle-orm'
 import { boolean, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
 
 const timestamps = {
@@ -8,9 +8,7 @@ const timestamps = {
 }
 
 export const users = pgTable('users', {
-  id: uuid('id')
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
@@ -19,7 +17,7 @@ export const users = pgTable('users', {
 })
 
 export const sessions = pgTable('session', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   expiresAt: timestamp('expires_at').notNull(),
   token: text('token').notNull().unique(),
   ipAddress: text('ip_address'),
@@ -31,7 +29,7 @@ export const sessions = pgTable('session', {
 })
 
 export const accounts = pgTable('account', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
   userId: uuid('user_id')
@@ -48,7 +46,7 @@ export const accounts = pgTable('account', {
 })
 
 export const verifications = pgTable('verification', {
-  id: text('id').primaryKey(),
+  id: uuid('id').primaryKey().defaultRandom(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -56,9 +54,7 @@ export const verifications = pgTable('verification', {
 })
 
 export const posts = pgTable('posts', {
-  id: uuid()
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
+  id: uuid('id').primaryKey().defaultRandom(),
   title: varchar(),
   content: text(),
   authorId: uuid().references(() => users.id),
@@ -76,9 +72,7 @@ export const postsRelations = relations(posts, ({ one }) => ({
 }))
 
 export const categories = pgTable('categories', {
-  id: uuid()
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: varchar().notNull(),
   ownerId: uuid().references(() => users.id),
   ...timestamps,
@@ -91,9 +85,7 @@ export const categoriesRelations = relations(categories, ({ many, one }) => ({
 }))
 
 export const categoryTags = pgTable('categoryTags', {
-  id: uuid()
-    .primaryKey()
-    .default(sql`gen_random_uuid()`),
+  id: uuid('id').primaryKey().defaultRandom(),
   name: varchar().notNull(),
   category: uuid().references(() => categories.id),
   ...timestamps,
