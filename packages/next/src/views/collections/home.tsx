@@ -5,8 +5,8 @@ import 'server-only'
  */
 import type { ServerConfig } from '@kivotos/core'
 
-import { CollectionCard } from '../components/collection-card'
-import { Typography } from '../components/primitives/typography'
+import { CollectionCard } from '../../components/collection-card'
+import { Typography } from '../../components/primitives/typography'
 
 const greeting = () => {
   const time = new Date().getHours()

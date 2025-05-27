@@ -4,12 +4,13 @@ import { defineServerConfig } from '@kivotos/core'
 import { defineNextJsServerConfig } from '@kivotos/next'
 
 import { categoriesCollection } from './collections/categories'
+import { foodsCollection } from './collections/foods'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
 import { baseConfig, builder } from './helper'
 
 const baseServerConfig = defineServerConfig(baseConfig, {
-  collections: [usersCollection, postsCollection, categoriesCollection],
+  collections: [usersCollection, postsCollection, categoriesCollection, foodsCollection],
   endpoints: {
     customOne: builder.endpoint(
       {

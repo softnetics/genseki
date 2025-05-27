@@ -12,7 +12,7 @@ import {
   composeRenderProps,
 } from 'react-aria-components'
 
-import { Check, Minus } from '@phosphor-icons/react'
+import { CheckIcon, MinusIcon } from '@phosphor-icons/react'
 import { twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
@@ -102,9 +102,9 @@ const Checkbox = forwardRef(function Checkbox(
             })}
           >
             {isIndeterminate ? (
-              <Minus weight="bold" />
+              <MinusIcon weight="bold" />
             ) : isSelected ? (
-              <Check weight="bold" />
+              <CheckIcon weight="bold" />
             ) : null}
           </div>
 

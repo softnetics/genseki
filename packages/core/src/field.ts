@@ -20,7 +20,8 @@ import {
 export type OptionCallback<
   TType extends string | number,
   TContext extends Record<string, unknown> = {},
-> = (args: TContext) => Promise<Array<{ label: string; value: TType }>>
+  TReturn extends Array<{ label: string; value: TType }> = Array<{ label: string; value: TType }>,
+> = (args: TContext) => Promise<TReturn> | TReturn
 
 export type FieldsWithFieldName<TFields extends Record<string, FieldBase>> = {
   [TKey in keyof TFields]: TFields[TKey] & { fieldName: string }
@@ -56,6 +57,7 @@ export type FieldMutateMode =
 export type FieldBase = {
   label?: string
   placeholder?: string
+  isRequired?: boolean
   update?: FieldMutateMode
   create?: FieldMutateMode
 }
@@ -77,6 +79,10 @@ export interface FieldColumnStringCollectionOptions<
   } & FieldBase
   time: {
     type: 'time'
+    default?: Date
+  } & FieldBase
+  date: {
+    type: 'date'
     default?: Date
   } & FieldBase
   media: {
@@ -123,6 +129,7 @@ export interface FieldColumnBooleanCollectionOptions {
   checkbox: {
     type: 'checkbox'
     default?: boolean
+    description?: string
   } & FieldBase
   switch: {
     type: 'switch'

@@ -16,6 +16,7 @@ import { AuthLayout } from './views/auth/layout'
 import { LoginView } from './views/auth/login'
 import { SignUpView } from './views/auth/sign-up'
 import { CreateView } from './views/collections/create'
+import { HomePage } from './views/collections/home'
 import { CollectionLayout } from './views/collections/layout'
 import { ListView } from './views/collections/list'
 import { OneView } from './views/collections/one'
@@ -77,6 +78,18 @@ export function defineNextJsServerConfig<
   const radixRouter = createRouter<RouterData>()
 
   // Collection
+  radixRouter.insert(`/collections`, {
+    requiredAuthentication: true,
+    view: (args: {
+      params: { slug: string }
+      serverConfig: ServerConfig
+      searchParams: { [key: string]: string | string[] }
+    }) => (
+      <CollectionLayout serverConfig={args.serverConfig}>
+        <HomePage serverConfig={args.serverConfig} />
+      </CollectionLayout>
+    ),
+  })
   radixRouter.insert(`/collections/:slug`, {
     requiredAuthentication: true,
     view: (args: {

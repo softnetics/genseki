@@ -1,11 +1,9 @@
 import 'server-only'
 
-import { NotAuthorizedPage } from './401'
 import { NotfoundPage } from './404'
 
 import type { NextJsServerConfig } from '../config'
 import type { ServerFunction } from '../server-function'
-import { getUser } from '../utils/get-user'
 
 interface RootProps {
   serverConfig: NextJsServerConfig<any, any, any, any>
@@ -23,13 +21,13 @@ export async function RootPage(props: RootProps) {
     return <NotfoundPage redirectURL="/admin/collections" />
   }
 
-  let user: any = {}
-  if (result.requiredAuthentication) {
-    user = await getUser(props.serverFunction)
-    if (!user) {
-      return <NotAuthorizedPage redirectURL="/admin/login" />
-    }
-  }
+  const user: any = {}
+  // if (result.requiredAuthentication) {
+  //   user = await getUser(props.serverFunction)
+  //   if (!user) {
+  //     return <NotAuthorizedPage redirectURL="/admin/login" />
+  //   }
+  // }
 
   const page = result.view({
     user: user,

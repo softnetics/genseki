@@ -1,5 +1,5 @@
 {
-  "id": "bf9131bb-df6e-47d0-ad81-e80d0b387a87",
+  "id": "0d8c965b-6573-4b45-913d-05b3fcc77e06",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -244,6 +244,66 @@
           "onUpdate": "no action"
         }
       },
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
+    "public.foods": {
+      "name": "foods",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_cooked": {
+          "name": "is_cooked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cookingTypes": {
+          "name": "cookingTypes",
+          "type": "types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'other'"
+        },
+        "cookingDuration": {
+          "name": "cookingDuration",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cookingDate": {
+          "name": "cookingDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "cookingTime": {
+          "name": "cookingTime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {},
       "policies": {},
@@ -565,7 +625,20 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.types": {
+      "name": "types",
+      "schema": "public",
+      "values": [
+        "fruit",
+        "vegetable",
+        "meat",
+        "dairy",
+        "grain",
+        "other"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},
