@@ -108,7 +108,7 @@ export function mapValueToTsValue(
 ): Record<string, any> {
   const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
     if (value[fieldName] === undefined) return []
-    if (field._.source !== 'columns') return []
+    if (field._.source !== 'column') return []
     return [[field._.columnTsName, value[fieldName]]]
   })
 
