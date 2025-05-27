@@ -39,7 +39,7 @@ export class Builder<
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
 
-  constructor(private readonly config: { schema: TFullSchema }) {
+  constructor(private readonly config: { schema: TFullSchema; context?: TContext }) {
     const tablesConfig = extractTablesRelationalConfig(
       this.config.schema,
       createTableRelationsHelpers
