@@ -78,6 +78,7 @@ export function defineNextJsServerConfig<
   const radixRouter = createRouter<RouterData>()
 
   radixRouter.insert('/collections', {
+    requiredAuthentication: true,
     view(args: { serverConfig: ServerConfig }) {
       return (
         <CollectionLayout serverConfig={args.serverConfig}>
