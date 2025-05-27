@@ -16,6 +16,7 @@ import { AuthLayout } from './views/auth/layout'
 import { LoginView } from './views/auth/login'
 import { SignUpView } from './views/auth/sign-up'
 import { CreateView } from './views/collections/create'
+import { HomeView } from './views/collections/home'
 import { CollectionLayout } from './views/collections/layout'
 import { ListView } from './views/collections/list'
 import { OneView } from './views/collections/one'
@@ -75,6 +76,16 @@ export function defineNextJsServerConfig<
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   const radixRouter = createRouter<RouterData>()
+
+  radixRouter.insert('/collections', {
+    view(args: { serverConfig: ServerConfig }) {
+      return (
+        <CollectionLayout serverConfig={args.serverConfig}>
+          <HomeView serverConfig={args.serverConfig} />
+        </CollectionLayout>
+      )
+    },
+  })
 
   // Collection
   radixRouter.insert(`/collections/:slug`, {
