@@ -40,11 +40,19 @@ export function createDefaultApiHandlers<
   schema: Record<string, unknown>
   fields: TFields
   tableTsKey: string
-  identifierField: Extract<keyof TFields, string>
+  identiferColumn: string
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const { fields, tableTsKey, tableNamesMap, tables, schema, identifierField } = args
+  const {
+    fields,
+    tableTsKey,
+    tableNamesMap,
+    tables,
+    schema,
+    // TODO: @miello please help me fix this.
+    identiferColumn: identifierField,
+  } = args
 
   const tableRelationalConfig = tables[tableTsKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)

@@ -139,7 +139,7 @@ describe('ApiHandler', () => {
           type: 'text',
         }),
       })),
-      identifierField: 'idField',
+      identifierColumn: 'idTs',
     })
 
     it('should (C) create successfully', async () => {
@@ -290,7 +290,7 @@ describe('ApiHandler', () => {
               options: async () => [],
             })),
           })),
-          identifierField: 'idField',
+          identifierColumn: 'idTs',
         })
 
         it('should (C) create successfully', async () => {
@@ -464,7 +464,7 @@ describe('ApiHandler', () => {
       describe('with "Many" relation', () => {
         const authorWithPostsCreateCollection = builder.collection('authorTs', {
           slug: 'author',
-          identifierField: 'idField',
+          identifierColumn: 'idTs',
           fields: builder.fields('authorTs', (fb) => ({
             idField: fb.columns('idTs', {
               type: 'text',
@@ -724,7 +724,7 @@ describe('ApiHandler', () => {
       describe('with "One" relation', () => {
         const postWithAuthorConnectCollection = builder.collection('postWithAuthorTs', {
           slug: 'postWithAuthor',
-          identifierField: 'idField',
+          identifierColumn: 'idTs',
           fields: builder.fields('postWithAuthorTs', (fb) => ({
             idField: fb.columns('idTs', {
               type: 'text',
@@ -928,7 +928,7 @@ describe('ApiHandler', () => {
       describe('with "Many" relation', () => {
         const authorWithPostConnectCollection = builder.collection('authorTs', {
           slug: 'authorWithPost',
-          identifierField: 'idField',
+          identifierColumn: 'idTs',
           fields: builder.fields('authorTs', (fb) => ({
             idField: fb.columns('idTs', {
               type: 'text',

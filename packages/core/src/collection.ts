@@ -1,5 +1,5 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
-import type { ConditionalExcept, Simplify } from 'type-fest'
+import type { ConditionalExcept, Simplify, ValueOf } from 'type-fest'
 import z from 'zod'
 
 import type { MinimalContext } from './config'
@@ -23,7 +23,7 @@ import {
   fieldsToZodObject,
   type FieldsWithFieldName,
 } from './field'
-import type { JoinArrays, ToZodObject } from './utils'
+import type { GetTableByTableTsName, JoinArrays, ToZodObject } from './utils'
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -431,14 +431,23 @@ export type CollectionAdmin<
   endpoints: TApiRouter
 }
 
+export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
+  // TODO: Currently, drizzle-orm does not provide a way to get unique and not null columns
+  // This fix this after the PR was merged: https://github.com/drizzle-team/drizzle-orm/pull/4567
+  [TColumnName in keyof TTable['_']['columns'] as TTable['_']['columns'][TColumnName]['_']['notNull'] extends true
+    ? TColumnName
+    : never]: TColumnName
+}>
+
 export type CollectionConfig<
   TSlug extends string = string,
+  TTable extends Table = Table,
   TContext extends MinimalContext = MinimalContext,
   TFields extends FieldsInitial<TContext> = FieldsInitial<TContext>,
   TAppRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
 > = {
   slug: TSlug
-  identifierField: Extract<keyof TFields, string>
+  identifierColumn: GetUniqueNotNullColumnNames<TTable>
   fields: TFields
   admin?: CollectionAdminConfig<TContext, FieldsWithFieldName<TFields>, TAppRouter>
 }
@@ -452,11 +461,11 @@ export type Collection<
   TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
 > = {
   _: {
-    table: TFullSchema[TTableName] extends Table<any> ? TFullSchema[TTableName] : never
+    table: GetTableByTableTsName<TFullSchema, TTableName>
     tableConfig: TableRelationalConfig
   }
   slug: TSlug
-  identifierField: Extract<keyof TFields, string>
+  identifierColumn: string
   fields: TFields
   admin: CollectionAdmin<TContext, TFields, TApiRouter>
 }

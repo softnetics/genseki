@@ -30,7 +30,7 @@ import {
   type FieldsWithFieldName,
   type OptionCallback,
 } from './field'
-import { appendFieldNameToFields } from './utils'
+import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
@@ -56,10 +56,19 @@ export class Builder<
 
   collection<
     TSlug extends string = string,
-    TTableKey extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
+    TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
     TFields extends Fields<TContext> = Fields<TContext>,
     TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
-  >(tableTsName: TTableKey, config: CollectionConfig<TSlug, TContext, TFields, TApiRouter>) {
+  >(
+    tableTsName: TTableTsName,
+    config: CollectionConfig<
+      TSlug,
+      GetTableByTableTsName<TFullSchema, TTableTsName>,
+      TContext,
+      TFields,
+      TApiRouter
+    >
+  ) {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =
       this.tableRelationalConfigByTableTsName[
@@ -73,7 +82,7 @@ export class Builder<
     const defaultHandlers = createDefaultApiHandlers({
       schema: this.config.schema,
       fields: config.fields,
-      identifierField: config.identifierField,
+      identiferColumn: config.identifierColumn as string,
       tableTsKey: tableTsName,
       tables: this.tableRelationalConfigByTableTsName,
       tableNamesMap: this.tableTsNameByTableDbName,
@@ -125,7 +134,7 @@ export class Builder<
       },
     } as Collection<
       TSlug,
-      FindTableByTableTsName<TFullSchema, TTableKey>['_']['name'],
+      FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
       TFullSchema,
       TContext,
       FieldsWithFieldName<TFields>,

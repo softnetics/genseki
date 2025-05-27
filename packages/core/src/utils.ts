@@ -134,3 +134,8 @@ export type ToZodObject<T extends Record<string, any>> = ZodObject<{
     ? ZodOptional<ZodType<NonNullable<T[Key]>>>
     : ZodType<T[Key]>
 }>
+
+export type GetTableByTableTsName<
+  TFullSchema extends Record<string, unknown>,
+  TTableTsName extends keyof TFullSchema,
+> = TFullSchema[TTableTsName] extends Table<any> ? TFullSchema[TTableTsName] : never
