@@ -1,11 +1,17 @@
-import { parse as parseCookies } from 'cookie-es'
+import { parse as parseCookies, serialize } from 'cookie-es'
 
-function setCookie(headers: Record<string, string> | undefined, name: string, value: string) {
+function setCookie(
+  headers: Record<string, string> | undefined,
+  name: string,
+  value: string,
+  options: { expires?: Date } = { expires: new Date(Date.now() + 1000 * 60 * 60 * 24) } // Default to 1 day expiration
+) {
+  serialize
   if (!headers) return
-  headers['Set-Cookie'] = `${name}=${value}; Path=/; HttpOnly; SameSite=Strict`
+  headers['Set-Cookie'] = serialize(name, value, options)
 }
 
-function deleteCookie(headers: Record<string, string> | undefined, name: string) {
+function deleteCookie(headers: Record<string, string> | undefined, name: string, expiresAt?: Date) {
   if (!headers) return
   headers['Set-Cookie'] = `${name}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`
 }

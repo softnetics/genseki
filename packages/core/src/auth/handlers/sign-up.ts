@@ -3,8 +3,11 @@ import z from 'zod'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
+import { setSessionCookie } from '../utils'
 
-interface InternalRouteOptions {}
+interface InternalRouteOptions {
+  autoLogin?: boolean
+}
 
 export function signUp<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
@@ -56,15 +59,19 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     })
 
+    const responseHeaders = {}
+    if (options.autoLogin) {
+      // Set session cookie if auto login is enabled
+      setSessionCookie(responseHeaders, session.token)
+    }
+
     return {
       status: 200,
       body: {
         token: session.token,
         user: user,
       },
-      headers: {
-        'Set-Cookie': `kivotosSession=${session.token}; Path=/; HttpOnly; Secure; SameSite=Strict`,
-      },
+      headers: responseHeaders,
     }
   }
 

@@ -10,7 +10,9 @@ import type { AuthConfig } from '..'
 export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuthConfig) {
   const handlers = {
     //  No authentication required
-    signUp: signUp({}),
+    signUp: signUp({
+      autoLogin: config.emailAndPassword?.signUp?.autoLogin ?? true,
+    }),
     loginEmail: loginEmail({}),
     signOut: signOut({}),
     resetPasswordEmail: resetPasswordEmail({}),
