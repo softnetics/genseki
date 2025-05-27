@@ -460,7 +460,7 @@ class ApiHandler {
 
         switch (field.type) {
           case 'connectOrCreate': {
-            if (typeof value === 'string' || typeof value === 'number') {
+            if ('connect' in value) {
               return [[fieldName, await _connectFn()]] as const
             }
             return [[fieldName, await _createFn()]] as const
