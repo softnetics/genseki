@@ -1,3 +1,4 @@
+export type { AuthHandlers } from './auth'
 export { Builder } from './builder'
 export type {
   ApiReturnType,
@@ -20,7 +21,12 @@ export type {
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export type { BaseConfig, ClientConfig, MinimalContext, ServerConfig } from './config'
-export { defineBaseConfig, getClientCollection, getClientConfig } from './config'
+export {
+  defineBaseConfig,
+  defineServerConfig,
+  getClientCollection,
+  getClientConfig,
+} from './config'
 export type {
   ApiRoute,
   ApiRouteHandler,

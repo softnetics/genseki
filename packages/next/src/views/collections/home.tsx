@@ -27,7 +27,7 @@ type HomepageProps = {
 }
 
 export const HomeView = ({ serverConfig }: HomepageProps) => {
-  const collections = serverConfig.collections.map((col) => col.slug)
+  const collections = Object.values(serverConfig.collections).map((col) => col.slug)
 
   return (
     <div>

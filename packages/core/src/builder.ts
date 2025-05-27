@@ -58,7 +58,7 @@ export class Builder<
     TSlug extends string = string,
     TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
     TFields extends Fields<TContext> = Fields<TContext>,
-    TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+    TApiRouter extends ApiRouter<TContext> = {},
   >(
     tableTsName: TTableTsName,
     config: CollectionConfig<
@@ -101,7 +101,9 @@ export class Builder<
         table: table,
         tableConfig: tableRelationalConfig,
       },
-      ...config,
+      slug: config.slug,
+      fields: config.fields,
+      identifierColumn: config.identifierColumn,
       admin: {
         ...config.admin,
         api: {

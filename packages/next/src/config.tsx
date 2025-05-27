@@ -2,11 +2,19 @@ import type { ReactNode } from 'react'
 
 import { createRouter } from 'radix3'
 
-import type { ApiRouter, Collection, MinimalContext, ServerConfig } from '@kivotos/core'
+import type {
+  ApiRouter,
+  AuthHandlers,
+  Collection,
+  MinimalContext,
+  ServerConfig,
+} from '@kivotos/core'
 
 import { createApiResourceRouter } from './resource'
+import type { ServerFunction } from './server-function'
 import { AuthLayout } from './views/auth/layout'
-import { SignInView } from './views/auth/sign-in'
+import { LoginView } from './views/auth/login'
+import { SignUpView } from './views/auth/sign-up'
 import { CreateView } from './views/collections/create'
 import { HomeView } from './views/collections/home'
 import { CollectionLayout } from './views/collections/layout'
@@ -14,41 +22,55 @@ import { ListView } from './views/collections/list'
 import { OneView } from './views/collections/one'
 import { UpdateView } from './views/collections/update'
 
+export type RouterData =
+  | {
+      view: (args: {
+        user: any // TODO
+        params: any
+        serverConfig: ServerConfig
+        serverFunction: ServerFunction
+        searchParams: { [key: string]: string | string[] }
+      }) => ReactNode
+      requiredAuthentication: true
+    }
+  | {
+      view: (args: {
+        params: any
+        serverConfig: ServerConfig
+        serverFunction: ServerFunction
+        searchParams: { [key: string]: string | string[] }
+      }) => ReactNode
+      requiredAuthentication: false
+    }
+
 export interface NextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
-  TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
+  TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
 > extends ServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
-  radixRouter: ReturnType<typeof createRouter<{ view: (args: any) => ReactNode }>>
+  radixRouter: ReturnType<typeof createRouter<RouterData>>
   resourceRouter: ReturnType<typeof createApiResourceRouter>
 }
 
-export function wrapNextJs<
+export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
-  const radixRouter = createRouter<{ view: (args: any) => ReactNode }>()
+  const radixRouter = createRouter<RouterData>()
 
   radixRouter.insert('/collections', {
+    requiredAuthentication: true,
     view(args: { serverConfig: ServerConfig }) {
       return (
         <CollectionLayout serverConfig={args.serverConfig}>
@@ -60,98 +82,94 @@ export function wrapNextJs<
 
   // Collection
   radixRouter.insert(`/collections/:slug`, {
+    requiredAuthentication: true,
     view: (args: {
-      slug: string
+      params: { slug: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
       <CollectionLayout serverConfig={args.serverConfig}>
-        <ListView {...args} />,
+        <ListView {...args} {...args.params} />,
       </CollectionLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/:identifier`, {
+    requiredAuthentication: true,
     view: (args: {
-      slug: string
-      identifier: string
+      params: { slug: string; identifier: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
       <CollectionLayout serverConfig={args.serverConfig}>
-        <OneView {...args} />
+        <OneView {...args} {...args.params} />
       </CollectionLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/create`, {
+    requiredAuthentication: true,
     view: (args: {
-      slug: string
+      params: { slug: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
       <CollectionLayout serverConfig={args.serverConfig}>
-        <CreateView {...args} />
+        <CreateView {...args} {...args.params} />
       </CollectionLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/update/:identifier`, {
+    requiredAuthentication: true,
     view: (args: {
-      slug: string
-      identifier: string
+      params: { slug: string; identifier: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
       <CollectionLayout serverConfig={args.serverConfig}>
-        <UpdateView {...args} />
+        <UpdateView {...args} {...args.params} />
       </CollectionLayout>
     ),
   })
 
   // Auth
-  radixRouter.insert(`/auth/sign-in`, {
+  radixRouter.insert(`/auth/login`, {
+    requiredAuthentication: false,
     view: (args: {
-      slug: string
+      params: { slug: string; identifier: string }
       serverConfig: ServerConfig
+      serverFunction: ServerFunction
       searchParams: { [key: string]: string | string[] }
     }) => (
       <AuthLayout serverConfig={args.serverConfig}>
-        <SignInView {...args} />
+        <LoginView {...args} {...args.params} />
       </AuthLayout>
     ),
   })
   radixRouter.insert(`/auth/sign-up`, {
+    requiredAuthentication: false,
     view: (args: {
-      slug: string
-      identifier: string
+      params: { slug: string; identifier: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
       <AuthLayout serverConfig={args.serverConfig}>
-        <OneView {...args} />
+        <SignUpView {...args} {...args.params} />
       </AuthLayout>
     ),
   })
   radixRouter.insert(`/auth/forgot-password`, {
+    requiredAuthentication: false,
     view: (args: {
-      slug: string
+      params: { slug: string; identifier: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
-    }) => (
-      <AuthLayout serverConfig={args.serverConfig}>
-        <CreateView {...args} />
-      </AuthLayout>
-    ),
+    }) => <AuthLayout serverConfig={args.serverConfig}>TODO</AuthLayout>,
   })
   radixRouter.insert(`/auth/reset-password`, {
+    requiredAuthentication: false,
     view: (args: {
-      slug: string
-      identifier: string
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
-    }) => (
-      <AuthLayout serverConfig={args.serverConfig}>
-        <UpdateView {...args} />
-      </AuthLayout>
-    ),
+    }) => <AuthLayout serverConfig={args.serverConfig}>TODO</AuthLayout>,
   })
 
   return {

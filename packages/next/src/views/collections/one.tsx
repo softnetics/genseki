@@ -9,9 +9,8 @@ interface OneViewProps<TServerConfig extends ServerConfig> {
 export async function OneView<TServerConfig extends ServerConfig>(
   props: OneViewProps<TServerConfig>
 ) {
-  const collection = props.serverConfig.collections.find(
-    (collection) => collection.slug === props.slug
-  )
+  const collection = props.serverConfig.collections[props.slug]
+
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   const result = await collection.admin.api.findOne({

@@ -1,5 +1,5 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
-import type { ConditionalExcept, Simplify, ValueOf } from 'type-fest'
+import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
 import z from 'zod'
 
 import type { MinimalContext } from './config'
@@ -23,7 +23,7 @@ import {
   fieldsToZodObject,
   type FieldsWithFieldName,
 } from './field'
-import type { GetTableByTableTsName, JoinArrays, ToZodObject } from './utils'
+import type { GetTableByTableTsName, ToZodObject } from './utils'
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -444,7 +444,7 @@ export type CollectionConfig<
   TTable extends Table = Table,
   TContext extends MinimalContext = MinimalContext,
   TFields extends FieldsInitial<TContext> = FieldsInitial<TContext>,
-  TAppRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+  TAppRouter extends ApiRouter<TContext> = {},
 > = {
   slug: TSlug
   identifierColumn: GetUniqueNotNullColumnNames<TTable>
@@ -458,7 +458,7 @@ export type Collection<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext = MinimalContext,
   TFields extends Fields<TContext> = Fields<TContext>,
-  TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+  TApiRouter extends ApiRouter<TContext> = {},
 > = {
   _: {
     table: GetTableByTableTsName<TFullSchema, TTableName>
@@ -481,13 +481,12 @@ export type ToClientCollection<TCollection extends Collection<any, any, any, any
   >
 
 export type ToClientCollectionList<
-  TCollections extends Collection<any, any, any, any, any, any>[],
-> = TCollections extends [infer TCollection, ...infer TCollectionsRest]
-  ? [
-      ToClientCollection<TCollection extends Collection ? TCollection : never>,
-      ...ToClientCollectionList<TCollectionsRest extends Collection[] ? TCollectionsRest : never>,
-    ]
-  : []
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
+> = {
+  [TKey in keyof TCollections]: TCollections[TKey] extends Collection<any, any, any, any, any, any>
+    ? ToClientCollection<TCollections[TKey]>
+    : never
+}
 
 // TODO: proper omit
 export type ClientCollection<
@@ -544,30 +543,31 @@ export type GetAllTableTsNames<TFullSchema extends Record<string, unknown>> = Ex
 export type ExtractCollectionCustomEndpoints<
   TCollection extends Collection<any, any, any, any, any, any>,
 > = TCollection['admin']['endpoints'] extends infer TEndpoints
-  ? TEndpoints extends Record<string, ApiRouteSchema>
+  ? TEndpoints extends Record<string, ApiRoute<any, any>>
     ? {
-        [TEndpoint in Extract<
-          keyof TEndpoints,
-          string
-        > as `${TCollection['slug']}.${TEndpoint}`]: TEndpoints[TEndpoint]
+        [TEndpoint in keyof TEndpoints as TEndpoints[TEndpoint]['schema'] extends ApiRouteSchema
+          ? `${TCollection['slug']}.${TEndpoint extends string ? TEndpoint : never}`
+          : never]: TEndpoints[TEndpoint]
       }
     : never
   : never
 
 export type ExtractAllCollectionCustomEndpoints<
-  TCollections extends Collection<any, any, any, any, any, any>[],
-> = JoinArrays<{
-  [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >
-    ? ExtractCollectionCustomEndpoints<TCollections[TCollectionIndex]>
-    : {}
-}>
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
+> = UnionToIntersection<
+  ValueOf<{
+    [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >
+      ? ExtractCollectionCustomEndpoints<TCollections[TCollectionIndex]>
+      : {}
+  }>
+>
 
 type SuccessResponse<TFunc extends (...args: any) => any> = ToZodObject<Awaited<ReturnType<TFunc>>>
 
@@ -642,25 +642,27 @@ export type ExtractCollectionDefaultEndpoints<
 }
 
 export type ExtractAllCollectionDefaultEndpoints<
-  TCollections extends Collection<any, any, any, any, any, any>[],
-> = JoinArrays<{
-  [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >
-    ? ExtractCollectionDefaultEndpoints<TCollections[TCollectionIndex]>
-    : {}
-}>
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
+> = UnionToIntersection<
+  ValueOf<{
+    [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
+      any,
+      any,
+      any,
+      any,
+      any,
+      any
+    >
+      ? ExtractCollectionDefaultEndpoints<TCollections[TCollectionIndex]>
+      : {}
+  }>
+>
 
 export function getAllCollectionEndpoints<
-  TCollections extends Collection<any, any, any, any, any, ApiRouter<any>>[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
 >(collections: TCollections) {
   const customEndpoints = Object.fromEntries(
-    collections.flatMap((collection) => {
+    Object.values(collections).flatMap((collection) => {
       const endpoints = collection.admin.endpoints
       if (endpoints) {
         return Object.entries(endpoints).map(([key, value]) => {
@@ -672,7 +674,7 @@ export function getAllCollectionEndpoints<
   )
 
   const defaultEndpoints = Object.fromEntries(
-    collections.flatMap((collection) => {
+    Object.values(collections).flatMap((collection) => {
       return Object.entries(collection.admin.api).map(([method, fn]) => {
         const endpointName = `${collection.slug}.${method}`
         const fields = collection.fields

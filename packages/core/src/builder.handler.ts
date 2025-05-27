@@ -552,8 +552,8 @@ class ApiHandler {
   private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'columns' && data[field._.fieldName]) {
-          return [[field._.columnTsName, data[field._.fieldName]]]
+        if (field._.source === 'column' && data[field.fieldName]) {
+          return [[field._.columnTsName, data[field.fieldName]]]
         }
         return []
       })
@@ -565,10 +565,10 @@ class ApiHandler {
 function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Record<string, any> {
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
-      if (field._.source === 'columns') {
+      if (field._.source === 'column') {
         const value = result[field._.columnTsName]
         if (!value) return []
-        return [[field._.fieldName, value]]
+        return [[field.fieldName, value]]
       }
       if (isRelationField(field)) {
         const value = result[field._.relationTsName]
@@ -580,12 +580,12 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
             ...mapResultToFields(field.fields, v),
             __pk: v[primaryColumnTsName],
           }))
-          return [[field._.fieldName, values]]
+          return [[field.fieldName, values]]
         }
 
         return [
           [
-            field._.fieldName,
+            field.fieldName,
             { ...mapResultToFields(field.fields, value), __pk: value[primaryColumnTsName] },
           ],
         ]
