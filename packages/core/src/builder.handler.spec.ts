@@ -240,7 +240,7 @@ describe('ApiHandler', () => {
       expect(whereUpdateMock).toBeCalledWith(
         eq(postCollection.fields.idField._.column, postData.id)
       )
-      expect(setMock).toHaveBeenCalledWith([{ nameTs: updatedPostData.name }])
+      expect(setMock).toHaveBeenCalledWith({ nameTs: updatedPostData.name })
       expect(result).toEqual({ __pk: postData.id, __id: postData.id })
     })
 
@@ -451,9 +451,10 @@ describe('ApiHandler', () => {
           expect(insertMock).toHaveBeenCalledTimes(1)
           expect(updateMock).toHaveBeenCalledTimes(1)
           expect(valuesMock).toHaveBeenCalledWith([{ nameTs: updatedAuthorData.name }])
-          expect(setMock).toHaveBeenCalledWith([
-            { nameTs: updatedPostData.name, authorIdTs: updatedAuthorData.id },
-          ])
+          expect(setMock).toHaveBeenCalledWith({
+            nameTs: updatedPostData.name,
+            authorIdTs: updatedAuthorData.id,
+          })
           expect(whereUpdateMock).toHaveBeenCalledWith(
             eq(postWithAuthorCreateCollection.fields.idField._.column, postData.id)
           )
@@ -706,11 +707,11 @@ describe('ApiHandler', () => {
             eq(authorWithPostsCreateCollection.fields.postsField._.primaryColumn, 'post-4')
           )
           expect(setMock).toHaveBeenCalledTimes(2)
-          expect(setMock.mock.calls[0][0]).toEqual([
+          expect(setMock.mock.calls[0][0]).toEqual(
             expect.objectContaining({
               nameTs: updatedAuthorDataTs.nameTs,
-            }),
-          ])
+            })
+          )
           expect(setMock.mock.calls[1][0]).toEqual({
             authorIdTs: null,
           })
@@ -928,12 +929,12 @@ describe('ApiHandler', () => {
             },
           })
           expect(updateMock).toHaveBeenCalledTimes(1)
-          expect(setMock).toHaveBeenCalledWith([
+          expect(setMock).toHaveBeenCalledWith(
             expect.objectContaining({
               nameTs: postDataTs.nameTs,
               authorIdTs: postDataTs.authorIdTs,
-            }),
-          ])
+            })
+          )
           expect(whereUpdateMock).toHaveBeenCalledWith(
             eq(postWithAuthorConnectCollection.fields.idField._.column, postData.id)
           )
@@ -1185,11 +1186,11 @@ describe('ApiHandler', () => {
           // Assertions
           // main Author update and 3 times for post update
           expect(updateMock).toHaveBeenCalledTimes(4)
-          expect(setMock).toHaveBeenCalledWith([
+          expect(setMock).toHaveBeenCalledWith(
             expect.objectContaining({
               nameTs: updatedAuthorDataTs.nameTs,
-            }),
-          ])
+            })
+          )
 
           // 4 times for post update
           expect(whereUpdateMock).toHaveBeenCalledTimes(4)
@@ -1414,12 +1415,12 @@ describe('ApiHandler', () => {
             // ====== end user part (field) ======
 
             expect(updateMock).toHaveBeenCalledTimes(1)
-            expect(setMock).toHaveBeenCalledWith([
+            expect(setMock).toHaveBeenCalledWith(
               expect.objectContaining({
                 nameTs: updatedPostDataTs.nameTs,
                 authorIdTs: updatedPostDataTs.authorIdTs,
-              }),
-            ])
+              })
+            )
             expect(result).toEqual({
               __pk: updatedPostDataField.idField,
               __id: updatedPostDataField.idField,
@@ -1646,12 +1647,12 @@ describe('ApiHandler', () => {
             // ====== end user part (field) ======
 
             expect(updateMock).toHaveBeenCalledTimes(1)
-            expect(setMock).toHaveBeenCalledWith([
+            expect(setMock).toHaveBeenCalledWith(
               expect.objectContaining({
                 nameTs: updatedPostDataTs.nameTs,
                 authorIdTs: updatedPostDataTs.authorIdTs,
-              }),
-            ])
+              })
+            )
             expect(result).toEqual({
               __pk: updatedPostDataField.idField,
               __id: updatedPostDataField.idField,
@@ -2013,11 +2014,11 @@ describe('ApiHandler', () => {
               )
             )
 
-            expect(setMock).toHaveBeenCalledWith([
+            expect(setMock).toHaveBeenCalledWith(
               expect.objectContaining({
                 nameTs: updatedAuthorDataTs.nameTs,
-              }),
-            ])
+              })
+            )
             expect(valuesMock).toHaveBeenCalledWith([
               expect.objectContaining({
                 nameTs: mockPostData[0].name,
@@ -2275,11 +2276,11 @@ describe('ApiHandler', () => {
             // Assertions
             // main Author update and 3 times for post update
             expect(updateMock).toHaveBeenCalledTimes(4)
-            expect(setMock).toHaveBeenCalledWith([
+            expect(setMock).toHaveBeenCalledWith(
               expect.objectContaining({
                 nameTs: updatedAuthorDataTs.nameTs,
-              }),
-            ])
+              })
+            )
 
             // 3 times for post update + 1 for author update
             expect(whereUpdateMock).toHaveBeenCalledTimes(4)

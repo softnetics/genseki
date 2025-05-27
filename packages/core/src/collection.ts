@@ -774,7 +774,7 @@ export function getAllCollectionEndpoints<
             const body = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/api/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}/${method}/:id`,
               method: 'PATCH',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),

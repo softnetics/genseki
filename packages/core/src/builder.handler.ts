@@ -267,7 +267,7 @@ class ApiHandler {
     const fullInput = { ...input, ...oneInput }
     console.log('[update] fullInput', fullInput)
     const result = (
-      await tx.update(this.table).set([fullInput]).where(eq(this.primaryColumn, id)).returning()
+      await tx.update(this.table).set(fullInput).where(eq(this.primaryColumn, id)).returning()
     )[0]
     id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
