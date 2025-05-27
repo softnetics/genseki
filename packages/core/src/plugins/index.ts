@@ -1,5 +1,3 @@
-import type { admin } from './admin'
-
 import type { ServerConfig } from '../config'
 
 export type KivotosPlugin<TOutput extends ServerConfig> = (input: ServerConfig) => TOutput
@@ -10,8 +8,6 @@ type _MergePlugins<TPlugins extends KivotosPlugin<any>[]> = TPlugins extends [
 ]
   ? TOutput & _MergePlugins<Rest>
   : {}
-
-type X = _MergePlugins<[ReturnType<typeof admin>]>['endpoints']['example']
 
 export type MergePlugins<
   TOriginalServerConfig extends ServerConfig,
