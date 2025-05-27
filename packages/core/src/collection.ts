@@ -51,6 +51,7 @@ export type ActivateFieldMutateMode<
 /**
  * For updating a single relation field. There's 2 scenarios to consider for One relations:
  * 1. User creates a new relation with given data. For example, creating a new role for a user. The payload would be:
+ *    ```ts
  *    {
  *      id: "userid_1",
  *      data: {
@@ -64,12 +65,14 @@ export type ActivateFieldMutateMode<
  *        }
  *      }
  *    }
+ *    ```
  *
  *
  *    Many User can have One Role. This means that the user "userid_1" is creating a new relation with the Role "role_2" and disconnecting the relation with "user_role_1".
  *    It does not mean that user "userid_1" deleted the role.
  *
  * 2. User updates an existing relation with given data. For example, adding a post to a existing category. The payload would be:
+ *    ```ts
  *    {
  *      id: "post_1",
  *      data: {
@@ -80,6 +83,7 @@ export type ActivateFieldMutateMode<
  *        }
  *      }
  *    }
+ *    ```
  *
  *    Many Post can have One Category. This means that the user "post_1" is connecting the relation with "category_1".
  */
@@ -94,6 +98,7 @@ export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
 /**
  * For updating a single relation field. There's 2 scenarios to consider for Many relations:
  * 1. User assigns a new user to a role. The payload would be:
+ * ```ts
  *    {
  *      id: "role_1",
  *      data: {
@@ -109,11 +114,13 @@ export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
  *        ]
  *      }
  *    }
+ * ```
  *
  *    One Role can have Many Users. This means that the user "role_1" is connecting the relation with "user_1"
  *    and "user_2" and disconnecting the relation with "user_3".
  *
  * 2. User assigns new tags to a post. The payload would be:
+ * ```ts
  *    {
  *      id: "post_1",
  *      name: "Post 1",
@@ -125,6 +132,7 @@ export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
  *        { disconnect: { id: "post_tag_3" } },
  *      ]
  *   }
+ * ```
  *
  *   One Post can have Many PostTags. This means that the user "post_1" is connecting the relation with "category_1".
  */
@@ -201,6 +209,7 @@ export type InferRelationField<TField extends FieldRelation<any>> =
  * Infer the type of a field based on the field type and the method.
  * For example,
  *
+ * ```ts
  * const userField = builder.fields('users', (fb) => ({
  *   id: fb.columns('id', { type: 'text' }),
  *   profile: fb.columns('email', { type: 'media' }),
@@ -237,6 +246,7 @@ export type InferRelationField<TField extends FieldRelation<any>> =
  * type UserRoles = InferField<(typeof userField)["roles"],> // => { __pk: string; __order: string; name: string; roleId: string }[]
  * type UserRules = InferField<(typeof userField)["rules"],> // => { __pk: string; name: string; roleId: string }[]
  * type UserOrganization = InferField<(typeof userField)["organization"],> // => { __pk: string; name: string; roleId: string }
+ * ```
  */
 export type InferField<TField extends FieldClient> =
   TField extends FieldRelation<any>
@@ -252,6 +262,7 @@ export type InferField<TField extends FieldClient> =
  * Infer the type of all fields in a collection based on the field type and the method.
  * For example,
  *
+ * ```ts
  * const userField = builder.fields('users', (fb) => ({
  *   id: fb.columns('id', { type: 'text' }),
  *   profile: fb.columns('email', { type: 'media' }),
@@ -274,15 +285,20 @@ export type InferField<TField extends FieldClient> =
  *   })
  * })
  *
- * type UserFields = InferFields<typeof userField> // => { __pk: string; id: string; profile: string; age: number }
+ * type UserFields = InferFields<typeof userField> // => { __pk: string | number; __id: string | number; id: string; profile: string; age: number }
+ * ```
  */
 export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcept<
   {
     [TKey in keyof TFields]: TFields[TKey] extends FieldClient
-      ? Simplify<InferField<TFields[TKey]>>
+      ? TFields[TKey] extends FieldColumn<any>
+        ? Simplify<InferField<TFields[TKey]>>
+        : // NOTE: This is to remove the __id field from the relation fields
+          Simplify<Omit<InferField<TFields[TKey]>, '__id'>>
       : never
   } & {
     __pk: string | number
+    __id: string | number
   },
   never
 >
