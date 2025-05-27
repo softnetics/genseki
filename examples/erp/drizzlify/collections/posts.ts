@@ -2,7 +2,7 @@ import { builder } from '../helper'
 
 export const postsCollection = builder.collection('posts', {
   slug: 'posts',
-  identifierField: 'id',
+  identifierColumn: 'id',
   fields: builder.fields('posts', (fb) => ({
     id: fb.columns('id', {
       type: 'text',

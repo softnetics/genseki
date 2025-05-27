@@ -7,6 +7,7 @@ import {
   Many,
   One,
   or,
+  sql,
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
@@ -44,30 +45,14 @@ export function createDefaultApiHandlers<
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const {
-    fields,
-    tableTsKey,
-    tableNamesMap,
-    tables,
-    schema,
-    // TODO: @miello please help me fix this.
-    identiferColumn: identifierField,
-  } = args
+  const { fields, tableTsKey, tableNamesMap, tables, schema, identiferColumn } = args
 
   const tableRelationalConfig = tables[tableTsKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)
+  const identifierKeyColumn = tableRelationalConfig.columns[identiferColumn]
   const tableName = tableRelationalConfig.tsName
   const tableSchema = getTableFromSchema(schema, tableTsKey)
   const queryPayload = createDrizzleQuery(fields)
-
-  const primaryKeyColumnTsName = getColumnTsName(getTableColumns(tableSchema), primaryKeyColumn)
-  const primaryFieldColumnTsName = Object.entries(args.fields).find(([_, field]) => {
-    return field._.source === 'columns' && field._.columnTsName === primaryKeyColumnTsName
-  })?.[0]
-
-  if (!primaryFieldColumnTsName) {
-    throw new Error(`Primary field column "${primaryKeyColumnTsName}" not found in fields`)
-  }
 
   const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
@@ -119,7 +104,7 @@ export function createDefaultApiHandlers<
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
-    const [pk, result] = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
@@ -131,22 +116,22 @@ export function createDefaultApiHandlers<
       const result = await query.findFirst({
         ...queryPayload,
         where: eq(primaryKeyColumn, pk),
+        extras: {
+          __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
+          __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
+        },
       })
 
-      return [pk, result]
+      return result
     })
 
     if (!result) {
       throw new Error('Record not found after creation')
     }
 
-    if (identifierField === primaryFieldColumnTsName) {
-      return { __pk: pk, id: pk }
-    }
+    const { __pk, __id } = result
 
-    const identifierFieldValue = result[identifierField as unknown as keyof typeof result]
-
-    return { __pk: pk, id: identifierFieldValue }
+    return { __pk, __id }
   }
 
   const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
@@ -154,7 +139,7 @@ export function createDefaultApiHandlers<
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
-    const [pk, result] = await db.transaction(async (tx) => {
+    const result = await db.transaction(async (tx) => {
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
@@ -166,22 +151,22 @@ export function createDefaultApiHandlers<
       const result = await query.findFirst({
         ...queryPayload,
         where: eq(primaryKeyColumn, pk),
+        extras: {
+          __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
+          __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
+        },
       })
 
-      return [pk, result]
+      return result
     })
 
     if (!result) {
       throw new Error('Record not found after updating')
     }
 
-    if (identifierField === primaryFieldColumnTsName) {
-      return { __pk: pk, id: pk }
-    }
+    const { __pk, __id } = result
 
-    const identifierFieldValue = result[identifierField as unknown as keyof typeof result]
-
-    return { __pk: pk, id: identifierFieldValue }
+    return { __pk, __id }
   }
 
   // why not just delete? why _delete?

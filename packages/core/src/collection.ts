@@ -316,13 +316,13 @@ export type ApiReturnType<
   TMethod extends ApiDefaultMethod,
   TFields extends Fields<any>,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
-  ? { __pk: string | number; id: string | number }
+  ? { __pk: string | number; __id: string | number }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? InferFields<TFields>
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
       ? { data: InferFields<TFields>[]; total: number; page: number }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
-        ? { __pk: string | number; id: string | number }
+        ? { __pk: string | number; __id: string | number }
         : TMethod extends typeof ApiDefaultMethod.DELETE
           ? void
           : never
@@ -689,7 +689,7 @@ export function getAllCollectionEndpoints<
               responses: {
                 200: z.object({
                   __pk: z.union([z.string(), z.number()]),
-                  id: z.union([z.string(), z.number()]),
+                  __id: z.union([z.string(), z.number()]),
                 }),
               },
             } satisfies ApiRouteSchema
@@ -784,7 +784,7 @@ export function getAllCollectionEndpoints<
               responses: {
                 200: z.object({
                   __pk: z.union([z.string(), z.number()]),
-                  id: z.union([z.string(), z.number()]),
+                  __id: z.union([z.string(), z.number()]),
                 }),
               },
             } satisfies ApiRouteSchema

@@ -146,6 +146,8 @@ describe('ApiHandler', () => {
       const postData = mockPostData[0]
 
       mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        __pk: postData.id,
+        __id: postData.id,
         idTs: postData.id,
         nameTs: postData.name,
       })
@@ -171,7 +173,7 @@ describe('ApiHandler', () => {
         },
       ])
       expect(tx.insert).toHaveBeenCalledTimes(1)
-      expect(result).toEqual({ __pk: postData.id, id: postData.id })
+      expect(result).toEqual({ __pk: postData.id, __id: postData.id })
     })
 
     it('should (R) read successfully', async () => {
@@ -210,6 +212,8 @@ describe('ApiHandler', () => {
       const updatedPostData = mockPostData[1]
 
       mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        __pk: postData.id,
+        __id: postData.id,
         idTs: updatedPostData.id,
         nameTs: updatedPostData.name,
       })
@@ -233,7 +237,7 @@ describe('ApiHandler', () => {
         eq(postCollection.fields.idField._.column, postData.id)
       )
       expect(setMock).toHaveBeenCalledWith([{ nameTs: updatedPostData.name }])
-      expect(result).toEqual({ __pk: postData.id, id: postData.id })
+      expect(result).toEqual({ __pk: postData.id, __id: postData.id })
     })
 
     it('should (D) delete successfully', async () => {
@@ -307,6 +311,8 @@ describe('ApiHandler', () => {
           )
 
           mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: postData.id,
+            __id: postData.id,
             idTs: postData.id,
             nameTs: postData.name,
             authorTs: {
@@ -334,7 +340,7 @@ describe('ApiHandler', () => {
           expect(valuesMock).toHaveBeenNthCalledWith(2, [
             { nameTs: postData.name, authorIdTs: authorData.id },
           ])
-          expect(result).toEqual({ __pk: postData.id, id: postData.id })
+          expect(result).toEqual({ __pk: postData.id, __id: postData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -405,6 +411,8 @@ describe('ApiHandler', () => {
           )
 
           mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: postData.id,
+            __id: postData.id,
             idTs: postData.id,
             nameTs: updatedPostData.name,
             authorTs: {
@@ -437,7 +445,7 @@ describe('ApiHandler', () => {
           expect(whereUpdateMock).toHaveBeenCalledWith(
             eq(postWithAuthorCreateCollection.fields.idField._.column, postData.id)
           )
-          expect(result).toEqual({ __pk: postData.id, id: postData.id })
+          expect(result).toEqual({ __pk: postData.id, __id: postData.id })
         })
 
         it('should (D) delete successfully', async () => {
@@ -510,6 +518,8 @@ describe('ApiHandler', () => {
           )
 
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: authorData.id,
+            __id: authorData.id,
             idTs: authorData.id,
             nameTs: authorData.name,
             postsTs: [
@@ -547,7 +557,7 @@ describe('ApiHandler', () => {
           expect(valuesInsertMock).toHaveBeenCalledWith([
             expect.objectContaining({ nameTs: postData.name }),
           ])
-          expect(result).toEqual({ __pk: authorData.id, id: authorData.id })
+          expect(result).toEqual({ __pk: authorData.id, __id: authorData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -628,6 +638,8 @@ describe('ApiHandler', () => {
           tx.update = updateMock
 
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: updatedAuthorData.id,
+            __id: updatedAuthorData.id,
             idTs: updatedAuthorData.id,
             nameTs: updatedAuthorData.name,
             postsTs: [
@@ -692,7 +704,7 @@ describe('ApiHandler', () => {
           ])
           expect(result).toEqual({
             __pk: updatedAuthorData.id,
-            id: updatedAuthorData.id,
+            __id: updatedAuthorData.id,
           })
         })
 
@@ -762,6 +774,8 @@ describe('ApiHandler', () => {
           const authorData = mockAuthorData[0]
 
           mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: postData.id,
+            __id: postData.id,
             idTs: postData.id,
             nameTs: postData.name,
             authorTs: {
@@ -792,7 +806,7 @@ describe('ApiHandler', () => {
             expect.objectContaining({ nameTs: postData.name, authorIdTs: authorData.id }),
           ])
           expect(tx.insert).toHaveBeenCalledTimes(1)
-          expect(result).toEqual({ __pk: postData.id, id: postData.id })
+          expect(result).toEqual({ __pk: postData.id, __id: postData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -867,6 +881,8 @@ describe('ApiHandler', () => {
           )
           tx.update = updateMock
           mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: updatedPostData.id,
+            __id: updatedPostData.id,
             idTs: updatedPostData.id,
             nameTs: updatedPostData.name,
             authorTs: {
@@ -896,7 +912,7 @@ describe('ApiHandler', () => {
           expect(whereUpdateMock).toHaveBeenCalledWith(
             eq(postWithAuthorConnectCollection.fields.idField._.column, postData.id)
           )
-          expect(result).toEqual({ __pk: postDataField.idField, id: postDataField.idField })
+          expect(result).toEqual({ __pk: postDataField.idField, __id: postDataField.idField })
         })
 
         it('should (D) delete successfully', async () => {
@@ -973,6 +989,8 @@ describe('ApiHandler', () => {
           )
 
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: authorData.id,
+            __id: authorData.id,
             idTs: authorData.id,
             nameTs: authorData.name,
             postsTs: [
@@ -1010,7 +1028,7 @@ describe('ApiHandler', () => {
               eq(schema.postWithAuthorTs.idTs, postId)
             )
           })
-          expect(result).toEqual({ __pk: authorData.id, id: authorData.id })
+          expect(result).toEqual({ __pk: authorData.id, __id: authorData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -1090,6 +1108,8 @@ describe('ApiHandler', () => {
           // ===== start user part (field) =====
 
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: updatedAuthorData.id,
+            __id: updatedAuthorData.id,
             idTs: updatedAuthorData.id,
             nameTs: updatedAuthorData.name,
             postsTs: [
@@ -1126,7 +1146,7 @@ describe('ApiHandler', () => {
           // 4 times for post update
           expect(whereUpdateMock).toHaveBeenCalledTimes(4)
 
-          expect(result).toEqual({ __pk: updatedAuthorData.id, id: updatedAuthorData.id })
+          expect(result).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
         })
 
         it('should (D) delete successfully', async () => {
@@ -1182,7 +1202,7 @@ describe('ApiHandler', () => {
               options: async () => [],
             })),
           })),
-          identifierField: 'idField',
+          identifierColumn: 'idTs',
         })
 
         describe('with "create" mode', () => {
@@ -1199,6 +1219,8 @@ describe('ApiHandler', () => {
             )
             tx.insert = insertMock
             mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: postData.id,
+              __id: postData.id,
               idTs: postData.id,
               nameTs: postData.name,
               authorTs: {
@@ -1235,7 +1257,7 @@ describe('ApiHandler', () => {
             expect(tx.insert).toHaveBeenCalledTimes(2)
 
             // Field method
-            expect(result).toEqual({ __pk: postData.id, id: postData.id })
+            expect(result).toEqual({ __pk: postData.id, __id: postData.id })
           })
 
           it('should (R) read successfully', async () => {
@@ -1317,6 +1339,8 @@ describe('ApiHandler', () => {
             tx.update = updateMock
 
             mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: updatedPostData.id,
+              __id: updatedPostData.id,
               idTs: updatedPostData.id,
               nameTs: updatedPostData.name,
               authorTs: {
@@ -1350,7 +1374,7 @@ describe('ApiHandler', () => {
             ])
             expect(result).toEqual({
               __pk: updatedPostDataField.idField,
-              id: updatedPostDataField.idField,
+              __id: updatedPostDataField.idField,
             })
           })
           it('should (D) delete successfully', async () => {
@@ -1410,9 +1434,11 @@ describe('ApiHandler', () => {
 
             // ===== start service part (TS) =====
             mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue(authorDataTs)
-            mockDb.query.postWithAuthorTs.findFirst = vi
-              .fn()
-              .mockResolvedValue(postWithAuthorDataTs)
+            mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: postWithAuthorData.id,
+              __id: postWithAuthorData.id,
+              ...postWithAuthorDataTs,
+            })
 
             const { insertMock, valuesMock } = prepareInsertMock(
               vi
@@ -1450,7 +1476,7 @@ describe('ApiHandler', () => {
             // Field method
             expect(result).toEqual({
               __pk: postWithAuthorDataField.idField,
-              id: postWithAuthorDataField.idField,
+              __id: postWithAuthorDataField.idField,
             })
           })
           it('should (R) read successfully', async () => {
@@ -1539,6 +1565,8 @@ describe('ApiHandler', () => {
             tx.update = updateMock
 
             mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: updatedPostData.id,
+              __id: updatedPostData.id,
               idTs: updatedPostData.id,
               nameTs: updatedPostData.name,
               authorTs: {
@@ -1572,7 +1600,7 @@ describe('ApiHandler', () => {
             ])
             expect(result).toEqual({
               __pk: updatedPostDataField.idField,
-              id: updatedPostDataField.idField,
+              __id: updatedPostDataField.idField,
             })
           })
           it('should (D) delete successfully', async () => {
@@ -1636,7 +1664,7 @@ describe('ApiHandler', () => {
               },
             })),
           })),
-          identifierField: 'idField',
+          identifierColumn: 'idTs',
         })
 
         describe('with "create" case', () => {
@@ -1671,7 +1699,11 @@ describe('ApiHandler', () => {
             }
 
             // ===== start service part (TS) =====
-            mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue(authorWithPostDataTs)
+            mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: authorWithPostData.id,
+              __id: authorWithPostData.id,
+              ...authorWithPostDataTs,
+            })
             mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValue(postDataTs)
 
             const { insertMock, valuesMock: valuesInsertMock } = prepareInsertMock(
@@ -1762,7 +1794,7 @@ describe('ApiHandler', () => {
             ])
 
             // Field method
-            expect(result).toEqual({ __pk: authorWithPostData.id, id: authorWithPostData.id })
+            expect(result).toEqual({ __pk: authorWithPostData.id, __id: authorWithPostData.id })
           })
           it('should (R) read successfully', async () => {
             const postData = mockPostData[0]
@@ -1858,6 +1890,8 @@ describe('ApiHandler', () => {
             tx.insert = insertMock
 
             mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: updatedAuthorData.id,
+              __id: updatedAuthorData.id,
               idTs: updatedAuthorData.id,
               nameTs: updatedAuthorData.name,
               postTs: [
@@ -1931,7 +1965,7 @@ describe('ApiHandler', () => {
               }),
             ])
 
-            expect(result).toEqual({ __pk: updatedAuthorData.id, id: updatedAuthorData.id })
+            expect(result).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
           })
           it('should (D) delete successfully', async () => {
             const authorIdsToDelete = [1, 2, 3]
@@ -1969,11 +2003,6 @@ describe('ApiHandler', () => {
               nameTs: postData.name,
             }
 
-            const postDataField = {
-              idField: postData.id,
-              nameField: postData.name,
-            }
-
             const authorWithPostData = { ...mockAuthorData[0], posts: [postData] }
 
             const authorWithPostDataTs = {
@@ -1992,7 +2021,11 @@ describe('ApiHandler', () => {
             }
 
             // ===== start service part (TS) =====
-            mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue(authorWithPostDataTs)
+            mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: authorWithPostData.id,
+              __id: authorWithPostData.id,
+              ...authorWithPostDataTs,
+            })
             mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValue(postDataTs)
 
             const { insertMock, valuesMock: valuesInsertMock } = prepareInsertMock(
@@ -2052,7 +2085,7 @@ describe('ApiHandler', () => {
             // Field method
             expect(result).toEqual({
               __pk: authorWithPostData.id,
-              id: authorWithPostData.id,
+              __id: authorWithPostData.id,
             })
           })
           it('should (R) read successfully', async () => {
@@ -2138,6 +2171,8 @@ describe('ApiHandler', () => {
             tx.update = updateMock
 
             mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValue({
+              __pk: updatedAuthorData.id,
+              __id: updatedAuthorData.id,
               idTs: updatedAuthorData.id,
               nameTs: updatedAuthorData.name,
               postsTs: [
@@ -2209,7 +2244,7 @@ describe('ApiHandler', () => {
               )
             )
 
-            expect(result).toEqual({ __pk: updatedAuthorData.id, id: updatedAuthorData.id })
+            expect(result).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
           })
 
           it('should (D) delete successfully', async () => {
