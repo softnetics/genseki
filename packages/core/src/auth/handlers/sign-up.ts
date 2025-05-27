@@ -31,7 +31,7 @@ export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    const hasedPassword =
+    const hashedPassword =
       (await options.emailAndPassword?.passwordHasher?.(args.body.password)) ??
       (await hashPassword(args.body.password))
 
@@ -45,7 +45,7 @@ export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
       userId: user.id,
       providerId: AccountProvider.CREDENTIAL,
       accountId: user.id,
-      password: hasedPassword,
+      password: hashedPassword,
     })
 
     // TODO: Check if sending email verification is enabled

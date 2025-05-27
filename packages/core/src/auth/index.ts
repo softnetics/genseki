@@ -73,7 +73,7 @@ export interface AuthConfig {
   }
   emailAndPassword?: {
     enabled: boolean
-    passwordHasher?: (password: string) => Promise<string> // default: bcrypt
+    passwordHasher?: (password: string) => Promise<string> // default: scrypt
     signUp?: {
       autoLogin?: boolean // default: true
       additionalFields?: Fields<any>
