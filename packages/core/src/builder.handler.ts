@@ -54,12 +54,20 @@ export function createDefaultApiHandlers<
   const tableSchema = getTableFromSchema(schema, tableTsKey)
   const queryPayload = createDrizzleQuery(fields)
 
+  const extrasQuery = {
+    extras: {
+      __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
+      __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
+    },
+  }
+
   const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const result = await query.findFirst({
       ...queryPayload,
+      ...extrasQuery,
       where: eq(primaryKeyColumn, args.id),
     })
     if (!result) {
@@ -67,9 +75,13 @@ export function createDefaultApiHandlers<
       throw new Error('Record not found')
     }
 
-    console.log('[findOne] result', result, mapResultToFields(fields, result))
+    console.log('[findOne] result', result)
 
-    return mapResultToFields(fields, result) as InferFields<TFields>
+    return {
+      __pk: result.__pk,
+      __id: result.__id,
+      ...mapResultToFields(fields, result),
+    } as InferFields<TFields>
   }
 
   const findMany: ApiFindManyHandler<TContext, TFields> = async (args) => {
@@ -81,6 +93,7 @@ export function createDefaultApiHandlers<
 
     const result = await query.findMany({
       ...queryPayload,
+      ...extrasQuery,
       limit: args.limit,
       offset: args.offset,
       orderBy: orderBy
@@ -92,7 +105,11 @@ export function createDefaultApiHandlers<
     })
 
     return {
-      data: result.map((result) => mapResultToFields(fields, result)) as InferFields<TFields>[],
+      data: result.map((result) => ({
+        __pk: result.__pk,
+        __id: result.__id,
+        ...mapResultToFields(fields, result),
+      })) as InferFields<TFields>[],
       // TODO: Get total from query
       total: 0,
       page: 0,
@@ -104,7 +121,7 @@ export function createDefaultApiHandlers<
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
-    const result = await db.transaction(async (tx) => {
+    const pk = await db.transaction(async (tx) => {
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
@@ -113,16 +130,13 @@ export function createDefaultApiHandlers<
       })
 
       const pk = await apiHandler.create(tx, args.data)
-      const result = await query.findFirst({
-        ...queryPayload,
-        where: eq(primaryKeyColumn, pk),
-        extras: {
-          __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
-          __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
-        },
-      })
+      return pk
+    })
 
-      return result
+    const result = await query.findFirst({
+      ...queryPayload,
+      ...extrasQuery,
+      where: eq(primaryKeyColumn, pk),
     })
 
     if (!result) {
@@ -150,11 +164,8 @@ export function createDefaultApiHandlers<
       const pk = await apiHandler.update(args.id, tx, args.data)
       const result = await query.findFirst({
         ...queryPayload,
+        ...extrasQuery,
         where: eq(primaryKeyColumn, pk),
-        extras: {
-          __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
-          __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
-        },
       })
 
       return result
@@ -175,7 +186,9 @@ export function createDefaultApiHandlers<
 
     await db
       .delete(tableSchema)
-      .where(or(...args.ids.map((id) => eq(primaryKeyColumn, id))))
+      .where(
+        or(...args.ids.flatMap((id) => [eq(primaryKeyColumn, id), eq(identifierKeyColumn, id)]))
+      )
       .returning()
   }
 

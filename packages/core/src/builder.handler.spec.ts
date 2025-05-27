@@ -1,4 +1,4 @@
-import { eq, or } from 'drizzle-orm'
+import { eq, or, sql } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
@@ -180,6 +180,8 @@ describe('ApiHandler', () => {
       const postData = mockPostData[0]
 
       mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        __pk: postData.id,
+        __id: postData.id,
         idTs: postData.id,
         nameTs: postData.name,
       })
@@ -202,6 +204,8 @@ describe('ApiHandler', () => {
         })
       )
       expect(result).toEqual({
+        __pk: postData.id,
+        __id: postData.id,
         idField: postData.id,
         nameField: postData.name,
       })
@@ -257,7 +261,10 @@ describe('ApiHandler', () => {
       expect(whereMock).toHaveBeenCalledWith(
         or(
           eq(postCollection.fields.idField._.column, mockPostData[0].id),
+          eq(postCollection.fields.idField._.column, mockPostData[0].id),
           eq(postCollection.fields.idField._.column, mockPostData[1].id),
+          eq(postCollection.fields.idField._.column, mockPostData[1].id),
+          eq(postCollection.fields.idField._.column, mockPostData[2].id),
           eq(postCollection.fields.idField._.column, mockPostData[2].id)
         )
       )
@@ -348,6 +355,8 @@ describe('ApiHandler', () => {
           const authorData = mockAuthorData[0]
 
           mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: postData.id,
+            __id: postData.id,
             idTs: postData.id,
             nameTs: postData.name,
             authorTs: {
@@ -379,10 +388,16 @@ describe('ApiHandler', () => {
                 },
               },
               where: eq(postWithAuthorCreateCollection.fields.idField._.column, postData.id),
+              extras: {
+                __pk: sql<string | number>`${schema.postWithAuthorTs.idTs}`.as('__pk'),
+                __id: sql<string | number>`${schema.postWithAuthorTs.idTs}`.as('__id'),
+              },
             })
           )
 
           expect(result).toEqual({
+            __pk: postData.id,
+            __id: postData.id,
             idField: postData.id,
             nameField: postData.name,
             authorField: {
@@ -462,7 +477,10 @@ describe('ApiHandler', () => {
           expect(whereMock).toHaveBeenCalledWith(
             or(
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[0].id),
+              eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[0].id),
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[1].id),
+              eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[1].id),
+              eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[2].id),
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[2].id)
             )
           )
@@ -565,6 +583,8 @@ describe('ApiHandler', () => {
           const authorData = mockAuthorData[0]
 
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: authorData.id,
+            __id: authorData.id,
             idTs: authorData.id,
             nameTs: authorData.name,
             postsTs: [
@@ -597,9 +617,15 @@ describe('ApiHandler', () => {
               },
             },
             where: eq(authorWithPostsCreateCollection.fields.idField._.column, authorData.id),
+            extras: {
+              __pk: sql<string | number>`${schema.authorTs.idTs}`.as('__pk'),
+              __id: sql<string | number>`${schema.authorTs.idTs}`.as('__id'),
+            },
           })
 
           expect(result).toEqual({
+            __pk: authorData.id,
+            __id: authorData.id,
             idField: authorData.id,
             nameField: authorData.name,
             postsField: [
@@ -723,7 +749,10 @@ describe('ApiHandler', () => {
           expect(whereMock.mock.calls[0][0]).toEqual(
             or(
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[0].id),
+              eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[0].id),
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[1].id),
+              eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[1].id),
+              eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[2].id),
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[2].id)
             )
           )
@@ -814,9 +843,12 @@ describe('ApiHandler', () => {
           const authorData = mockAuthorData[0]
 
           mockDb.query.postWithAuthorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: postData.id,
+            __id: postData.id,
             idTs: postData.id,
             nameTs: postData.name,
             authorTs: {
+              __pk: authorData.id,
               idTs: authorData.id,
               nameTs: authorData.name,
             },
@@ -849,6 +881,8 @@ describe('ApiHandler', () => {
           )
 
           expect(result).toEqual({
+            __pk: postData.id,
+            __id: postData.id,
             idField: postData.id,
             nameField: postData.name,
             authorField: {
@@ -932,7 +966,10 @@ describe('ApiHandler', () => {
           expect(whereMock).toHaveBeenCalledWith(
             or(
               eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[0].id),
+              eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[0].id),
               eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[1].id),
+              eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[1].id),
+              eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[2].id),
               eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[2].id)
             )
           )
@@ -1035,12 +1072,29 @@ describe('ApiHandler', () => {
           const authorData = mockAuthorData[0]
 
           mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce({
+            __pk: authorData.id,
+            __id: authorData.id,
             idTs: authorData.id,
             nameTs: authorData.name,
             postsTs: [
-              { idTs: mockPostData[0].id, nameTs: mockPostData[0].name },
-              { idTs: mockPostData[1].id, nameTs: mockPostData[1].name },
-              { idTs: mockPostData[2].id, nameTs: mockPostData[2].name },
+              {
+                __pk: mockPostData[0].id,
+                __id: mockPostData[0].id,
+                idTs: mockPostData[0].id,
+                nameTs: mockPostData[0].name,
+              },
+              {
+                __pk: mockPostData[1].id,
+                __id: mockPostData[1].id,
+                idTs: mockPostData[1].id,
+                nameTs: mockPostData[1].name,
+              },
+              {
+                __pk: mockPostData[2].id,
+                __id: mockPostData[2].id,
+                idTs: mockPostData[2].id,
+                nameTs: mockPostData[2].name,
+              },
             ],
           })
 
@@ -1066,9 +1120,15 @@ describe('ApiHandler', () => {
               },
             },
             where: eq(authorWithPostConnectCollection.fields.idField._.column, authorData.id),
+            extras: {
+              __pk: sql<string | number>`${schema.authorTs.idTs}`.as('__pk'),
+              __id: sql<string | number>`${schema.authorTs.idTs}`.as('__id'),
+            },
           })
 
           expect(result).toEqual({
+            __pk: authorData.id,
+            __id: authorData.id,
             idField: authorData.id,
             nameField: authorData.name,
             postsField: [mockPostData[0], mockPostData[1], mockPostData[2]].map((post) => ({
@@ -1164,7 +1224,10 @@ describe('ApiHandler', () => {
           expect(whereMock.mock.calls[0][0]).toEqual(
             or(
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[0].id),
+              eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[0].id),
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[1].id),
+              eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[1].id),
+              eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[2].id),
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[2].id)
             )
           )
@@ -1484,9 +1547,13 @@ describe('ApiHandler', () => {
             const authorData = mockAuthorData[0]
 
             const postWithAuthorDataTs = {
+              __pk: postData.id,
+              __id: postData.id,
               idTs: postData.id,
               nameTs: postData.name,
               authorTs: {
+                __pk: authorData.id,
+                __id: authorData.id,
                 idTs: authorData.id,
                 nameTs: authorData.name,
               },
@@ -1525,6 +1592,8 @@ describe('ApiHandler', () => {
             )
 
             const expectedPostWithAuthorDataField = {
+              __pk: postData.id,
+              __id: postData.id,
               idField: postData.id,
               nameField: postData.name,
               authorField: {
@@ -1801,10 +1870,13 @@ describe('ApiHandler', () => {
             const authorData = mockAuthorData[0]
 
             const authorWithPostDataTs = {
+              __pk: authorData.id,
+              __id: authorData.id,
               idTs: authorData.id,
               nameTs: authorData.name,
               postsTs: [
                 {
+                  __pk: postData.id,
                   idTs: postData.id,
                   nameTs: postData.name,
                 },
@@ -1842,6 +1914,8 @@ describe('ApiHandler', () => {
             )
 
             const expectedAuthorWithPostDataField = {
+              __pk: authorData.id,
+              __id: authorData.id,
               idField: authorData.id,
               nameField: authorData.name,
               postsField: [
@@ -2093,10 +2167,13 @@ describe('ApiHandler', () => {
             const authorData = mockAuthorData[0]
 
             const authorWithPostDataTs = {
+              __pk: authorData.id,
+              __id: authorData.id,
               idTs: authorData.id,
               nameTs: authorData.name,
               postsTs: [
                 {
+                  __pk: postData.id,
                   idTs: postData.id,
                   nameTs: postData.name,
                 },
@@ -2130,6 +2207,8 @@ describe('ApiHandler', () => {
             )
 
             const expectedAuthorWithPostDataField = {
+              __pk: authorData.id,
+              __id: authorData.id,
               idField: authorData.id,
               nameField: authorData.name,
               postsField: [

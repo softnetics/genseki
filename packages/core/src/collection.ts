@@ -806,7 +806,7 @@ export function getAllCollectionEndpoints<
           }
           case ApiDefaultMethod.DELETE: {
             const schema = {
-              path: `/api/${collection.slug}/${method}/:id`,
+              path: `/api/${collection.slug}/${method}`,
               method: 'DELETE',
               body: z.object({
                 ids: z.union([z.string().array(), z.number().array()]),
