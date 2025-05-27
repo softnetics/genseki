@@ -7,6 +7,7 @@ import { createAuthHandlers } from './handlers'
 
 import type { MinimalContext } from '../config'
 import type { ApiRouteHandler } from '../endpoint'
+import type { Fields } from '../field'
 
 export type AnyTypedColumn<T> = AnyColumn & { _: { data: T; dialect: 'pg' } }
 export type WithNotNull<T> = T & { _: { notNull: true } }
@@ -76,13 +77,16 @@ export interface AuthConfig {
   verification: {
     model: AnyVerificationTable
   }
-  login?: {
-    emailAndPassword?: {
-      enabled: boolean
+  emailAndPassword?: {
+    enabled: boolean
+    signUp?: {
+      // TODO: Typesafe
+      additionalFields?: Record<string, Fields>
     }
   }
   oauth2?: {
     google?: {
+      enabled: boolean
       clientId: string
       clientSecret: string
     }
@@ -92,6 +96,12 @@ export interface AuthConfig {
     expiresInMs?: number // default: 1 day (1000 * 60 * 60 * 24)
     resetPasswordUrl?: string // default: `/auth/reset-password`
     redirectTo?: string // default: `/auth/login`
+  }
+  ui?: {
+    login?: {
+      strategies?: { style?: string; text: string; href: string }[]
+    }
+    signUp?: {}
   }
 }
 
@@ -127,6 +137,23 @@ export type Auth<
       'auth'
     >
   >
+}
+
+export type AuthClient = {
+  login: {
+    emailAndPassword: {
+      enabled: boolean
+    }
+  }
+  resetPassword: {
+    enabled: boolean
+    redirectTo: string
+  }
+  ui: {
+    login: {
+      strategies: { style: string; text: string; href: string }[]
+    }
+  }
 }
 
 export function createAuth<TContext extends MinimalContext<any> = MinimalContext<any>>(

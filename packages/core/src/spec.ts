@@ -27,9 +27,14 @@ const baseConfig = defineBaseConfig({
     verification: {
       model: schema.verifications,
     },
-    login: {
-      emailAndPassword: {
+    emailAndPassword: {
+      enabled: true,
+    },
+    oauth2: {
+      google: {
         enabled: true,
+        clientId: '',
+        clientSecret: '',
       },
     },
     secret: '',

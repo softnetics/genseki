@@ -2,7 +2,7 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 
-import { type AuthConfig, createAuth } from './auth'
+import { type AuthClient, type AuthConfig, createAuth } from './auth'
 import {
   type ClientCollection,
   type Collection,
@@ -118,18 +118,22 @@ export interface ClientConfig<
   TCollections extends ClientCollection[] = ClientCollection[],
   TApiRouter extends ClientApiRouter = ClientApiRouter,
 > {
+  auth: AuthClient
   collections: TCollections
   $types: {
     endpoints: TApiRouter
   }
 }
 
-export function getBaseField<const TField extends Field>(name: string, field: TField): FieldClient {
+export function getFieldClient<const TField extends Field>(
+  name: string,
+  field: TField
+): FieldClient {
   if (isRelationField(field)) {
-    if (field.type === 'create' || field.type === 'connectOrCreate') {
+    if (field._.source === 'relations') {
       const sanitizedFields = Object.fromEntries(
         Object.entries(field.fields).map(([key, value]) => {
-          return [key, getBaseField(key, value)]
+          return [key, getFieldClient(key, value)]
         })
       )
 
@@ -168,7 +172,7 @@ export function getClientCollection<const TCollection extends Collection>(
   return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
     ...collection,
     fields: R.mapValues(collection.fields as Record<string, Field>, (value, key) =>
-      getBaseField(key, value)
+      getFieldClient(key, value)
     ),
   })) as unknown as ToClientCollection<TCollection>
 }
@@ -184,6 +188,8 @@ export function getClientConfig<const TServerConfig extends ServerConfig<any, an
   const collections = serverConfig.collections
 
   return {
+    // TODO: Fix this
+    auth: {},
     collections: collections.map(getClientCollection) as ToClientCollectionList<
       TServerConfig['collections']
     >,

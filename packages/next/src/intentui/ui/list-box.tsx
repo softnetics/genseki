@@ -11,15 +11,23 @@ import {
 import { IconCheck, IconHamburger } from '@intentui/icons'
 import { twMerge } from 'tailwind-merge'
 
-import { DropdownItemDetails, dropdownItemStyles, DropdownLabel, DropdownSection } from './dropdown'
+import {
+  DropdownDescription,
+  DropdownItemDetails,
+  dropdownItemStyles,
+  DropdownLabel,
+  DropdownSection,
+} from './dropdown'
 import { composeTailwindRenderProps } from './primitive'
+
+import { cn } from '../../utils/cn'
 
 const ListBox = <T extends object>({ className, ...props }: ListBoxProps<T>) => (
   <ListBoxPrimitive
     {...props}
     className={composeTailwindRenderProps(
       className,
-      "grid max-h-96 w-full min-w-56 grid-cols-[auto_1fr] flex-col gap-y-1 overflow-auto overflow-y-auto rounded-xl border p-1 shadow-lg outline-hidden [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5 *:[[role='group']+[role=group]]:mt-4 *:[[role='group']+[role=separator]]:mt-1"
+      "outline-hidden *:[[role='group']+[role=group]]:mt-4 *:[[role='group']+[role=separator]]:mt-1 grid max-h-96 w-full grid-cols-[auto_1fr] flex-col gap-y-1 overflow-auto overflow-y-auto rounded-md border p-2 shadow-lg [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5"
     )}
   />
 )
@@ -29,6 +37,7 @@ interface ListBoxItemProps<T extends object> extends ListBoxItemPrimitiveProps<T
 }
 
 const ListBoxItem = <T extends object>({ children, className, ...props }: ListBoxItemProps<T>) => {
+  const { isDisabled } = props
   const textValue = typeof children === 'string' ? children : undefined
 
   return (
@@ -36,10 +45,13 @@ const ListBoxItem = <T extends object>({ children, className, ...props }: ListBo
       textValue={textValue}
       {...props}
       className={composeRenderProps(className, (className, renderProps) =>
-        dropdownItemStyles({
-          ...renderProps,
-          className,
-        })
+        cn(
+          dropdownItemStyles({
+            ...renderProps,
+            className,
+          }),
+          isDisabled && 'opacity-50'
+        )
       )}
     >
       {(renderProps) => {
@@ -50,7 +62,7 @@ const ListBoxItem = <T extends object>({ children, className, ...props }: ListBo
             {allowsDragging && (
               <IconHamburger
                 className={twMerge(
-                  'size-4 shrink-0 text-muted-fg transition',
+                  'text-muted-fg size-4 shrink-0 transition',
                   isFocused && 'text-fg',
                   isDragging && 'text-fg',
                   isSelected && 'text-accent-fg/70'
@@ -76,17 +88,22 @@ type ListBoxSectionProps = React.ComponentProps<typeof DropdownSection>
 const ListBoxSection = ({ className, ...props }: ListBoxSectionProps) => {
   return (
     <DropdownSection
-      className={twMerge('[&_.lbi:last-child]:-mb-1.5 gap-y-1', className)}
+      className={twMerge('gap-y-1 [&_.lbi:last-child]:-mb-1.5', className)}
       {...props}
     />
   )
 }
 
 const ListBoxItemDetails = DropdownItemDetails
+const ListBoxLabel = DropdownLabel
+const ListBoxDescription = DropdownDescription
 
-ListBox.Section = ListBoxSection
-ListBox.ItemDetails = ListBoxItemDetails
-ListBox.Item = ListBoxItem
-
-export type { ListBoxItemProps, ListBoxSectionProps }
-export { ListBox }
+export type { ListBoxItemProps, ListBoxProps, ListBoxSectionProps }
+export {
+  ListBox,
+  ListBoxDescription,
+  ListBoxItem,
+  ListBoxItemDetails,
+  ListBoxLabel,
+  ListBoxSection,
+}

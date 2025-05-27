@@ -11,7 +11,7 @@ interface SubmitButtonProps {
 export function SubmitButton(props: SubmitButtonProps) {
   const { pending } = useFormStatus()
   return (
-    <Button type="submit" className="w-full">
+    <Button size="md" variant="primary" type="submit" className="w-full">
       {pending ? 'Submitting...' : <>{props.children}</>}
     </Button>
   )

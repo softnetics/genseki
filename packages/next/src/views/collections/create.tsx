@@ -19,7 +19,7 @@ export async function CreateView<TServerConfig extends ServerConfig>(
 
   return (
     <Form slug={props.slug} method="create">
-      <div className="flex flex-col items-center max-w-md gap-y-4 mx-auto">
+      <div className="mx-auto flex max-w-md flex-col items-center gap-y-4">
         {Object.entries(collection.fields).map(([key, field]) => {
           return (
             <AutoField

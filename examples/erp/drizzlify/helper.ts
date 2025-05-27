@@ -15,11 +15,26 @@ export const baseConfig = defineBaseConfig({
   db: db,
   schema: schema,
   auth: {
-    user: { model: schema.users },
-    account: { model: schema.accounts },
-    session: { model: schema.sessions },
-    verification: { model: schema.verifications },
-    secret: 'secret',
+    user: {
+      model: schema.users,
+    },
+    session: {
+      model: schema.sessions,
+    },
+    account: {
+      model: schema.accounts,
+    },
+    verification: {
+      model: schema.verifications,
+    },
+    emailAndPassword: {
+      enabled: true,
+      // sendEmailVerfication(email) {
+      //   console.log('sendEmailVerfication', email)
+      // },
+      // skipEmailVerification: false,
+    },
+    secret: '',
   },
 })
 

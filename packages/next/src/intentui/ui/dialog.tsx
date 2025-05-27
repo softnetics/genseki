@@ -9,12 +9,13 @@ import {
   Text,
 } from 'react-aria-components'
 
-import { IconX } from '@intentui/icons'
+import { XIcon } from '@phosphor-icons/react'
 import { twJoin, twMerge } from 'tailwind-merge'
 
 import { Button, type ButtonProps } from './button'
 import { composeTailwindRenderProps } from './primitive'
 
+import { BaseIcon } from '../../components/primitives/base-icon'
 import { useMediaQuery } from '../utils/use-media-query'
 
 const Dialog = ({
@@ -26,7 +27,7 @@ const Dialog = ({
     <DialogPrimitive
       role={role}
       className={twMerge(
-        'peer/dialog group/dialog relative flex max-h-[inherit] flex-col overflow-hidden outline-hidden [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5',
+        'peer/dialog group/dialog outline-hidden relative flex max-h-[inherit] flex-col overflow-hidden [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5',
         className
       )}
       {...props}
@@ -92,7 +93,7 @@ interface DialogTitleProps extends Omit<HeadingProps, 'level'> {
   ref?: React.Ref<HTMLHeadingElement>
 }
 const Title = forwardRef<HTMLHeadingElement, DialogTitleProps>(function Title(
-  { level = 2, className, ...props },
+  { level = 3, className, ...props },
   ref
 ) {
   return (
@@ -102,11 +103,11 @@ const Title = forwardRef<HTMLHeadingElement, DialogTitleProps>(function Title(
       ref={ref}
       className={twMerge(
         twJoin(
-          'flex flex-1 items-center text-fg',
-          level === 1 && 'font-semibold text-lg sm:text-xl',
-          level === 2 && 'font-semibold text-lg sm:text-xl',
-          level === 3 && 'font-semibold text-base sm:text-lg',
-          level === 4 && 'font-semibold text-base'
+          'text-fg flex flex-1 items-center',
+          level === 1 && 'text-lg font-semibold sm:text-xl',
+          level === 2 && 'text-lg font-semibold sm:text-lg',
+          level === 3 && 'text-base font-semibold sm:text-base',
+          level === 4 && 'text-base font-semibold sm:text-base'
         ),
         className
       )}
@@ -184,10 +185,12 @@ const Footer = ({ className, ...props }: DialogFooterProps) => {
 }
 
 const Close = forwardRef<HTMLButtonElement, ButtonProps>(function Close(
-  { className, intent = 'outline', ...props },
+  { className, size = 'md', variant = 'vanish', ...props },
   ref
 ) {
-  return <Button slot="close" className={className} ref={ref} intent={intent} {...props} />
+  return (
+    <Button slot="close" className={className} ref={ref} size={size} variant={variant} {...props} />
+  )
 })
 
 interface CloseButtonIndicatorProps extends Omit<ButtonProps, 'children'> {
@@ -212,10 +215,10 @@ const CloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps) => {
       slot="close"
       className={composeTailwindRenderProps(
         className,
-        'close absolute top-1 right-1 z-50 grid size-8 place-content-center rounded-xl hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-1 focus-visible:ring-primary sm:top-2 sm:right-2 sm:size-7 sm:rounded-md'
+        'close hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-primary absolute right-1 top-1 z-50 grid size-12 place-content-center rounded-xl focus-visible:ring-1 sm:right-2 sm:top-2 sm:size-7 sm:rounded-md'
       )}
     >
-      <IconX className="size-4" />
+      <BaseIcon icon={XIcon} size="sm" weight="bold" />
     </ButtonPrimitive>
   ) : null
 }
