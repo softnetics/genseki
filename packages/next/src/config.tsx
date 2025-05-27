@@ -16,7 +16,7 @@ import { AuthLayout } from './views/auth/layout'
 import { LoginView } from './views/auth/login'
 import { SignUpView } from './views/auth/sign-up'
 import { CreateView } from './views/collections/create'
-import { HomePage } from './views/collections/home'
+import { HomeView } from './views/collections/home'
 import { CollectionLayout } from './views/collections/layout'
 import { ListView } from './views/collections/list'
 import { OneView } from './views/collections/one'
@@ -86,7 +86,7 @@ export function defineNextJsServerConfig<
       searchParams: { [key: string]: string | string[] }
     }) => (
       <CollectionLayout serverConfig={args.serverConfig}>
-        <HomePage serverConfig={args.serverConfig} />
+        <HomeView serverConfig={args.serverConfig} />
       </CollectionLayout>
     ),
   })
