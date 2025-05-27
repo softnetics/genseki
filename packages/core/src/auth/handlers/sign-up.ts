@@ -1,15 +1,12 @@
 import z from 'zod'
 
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
+import type { AuthConfig } from '..'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
-import { setSessionCookie } from '../utils'
+import { hashPassword, setSessionCookie } from '../utils'
 
-interface InternalRouteOptions {
-  autoLogin?: boolean
-}
-
-export function signUp<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
   const schema = {
     method: 'POST',
     path: '/api/auth/sign-up',
@@ -34,7 +31,9 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    const hasedPassword = args.body.password // TODO: hash password
+    const hasedPassword =
+      (await options.emailAndPassword?.passwordHasher?.(args.body.password)) ??
+      (await hashPassword(args.body.password))
 
     const user = await args.context.internalHandlers.user.create({
       name: args.body.name,
@@ -60,7 +59,7 @@ export function signUp<const TOptions extends InternalRouteOptions>(options: TOp
     })
 
     const responseHeaders = {}
-    if (options.autoLogin) {
+    if (options.emailAndPassword?.signUp?.autoLogin !== false) {
       // Set session cookie if auto login is enabled
       setSessionCookie(responseHeaders, session.token)
     }

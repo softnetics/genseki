@@ -1,4 +1,8 @@
 import { parse as parseCookies, serialize } from 'cookie-es'
+import crypto, { randomBytes } from 'crypto'
+import { promisify } from 'util'
+
+const scrypt = promisify(crypto.scrypt)
 
 function setCookie(
   headers: Record<string, string> | undefined,
@@ -29,4 +33,17 @@ export function setSessionCookie(headers: Record<string, string> | undefined, va
 
 export function deleteSessionCookie(headers?: Record<string, string>) {
   deleteCookie(headers, SESSION_COOKIE_NAME)
+}
+
+export async function hashPassword(password: string): Promise<string> {
+  const salt = randomBytes(8).toString('hex')
+  const derivedKey = await scrypt(password, salt, 64)
+  return salt + ':' + (derivedKey as Buffer).toString('hex')
+}
+
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+  const [salt, key] = hashedPassword.split(':')
+  const keyBuffer = Buffer.from(key, 'hex')
+  const derivedKey = await scrypt(password, salt, 64)
+  return crypto.timingSafeEqual(keyBuffer, derivedKey as any)
 }
