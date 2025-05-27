@@ -261,10 +261,7 @@ describe('ApiHandler', () => {
       expect(whereMock).toHaveBeenCalledWith(
         or(
           eq(postCollection.fields.idField._.column, mockPostData[0].id),
-          eq(postCollection.fields.idField._.column, mockPostData[0].id),
           eq(postCollection.fields.idField._.column, mockPostData[1].id),
-          eq(postCollection.fields.idField._.column, mockPostData[1].id),
-          eq(postCollection.fields.idField._.column, mockPostData[2].id),
           eq(postCollection.fields.idField._.column, mockPostData[2].id)
         )
       )
@@ -477,10 +474,7 @@ describe('ApiHandler', () => {
           expect(whereMock).toHaveBeenCalledWith(
             or(
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[0].id),
-              eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[0].id),
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[1].id),
-              eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[1].id),
-              eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[2].id),
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[2].id)
             )
           )
@@ -749,10 +743,7 @@ describe('ApiHandler', () => {
           expect(whereMock.mock.calls[0][0]).toEqual(
             or(
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[0].id),
-              eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[0].id),
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[1].id),
-              eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[1].id),
-              eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[2].id),
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[2].id)
             )
           )
@@ -966,10 +957,7 @@ describe('ApiHandler', () => {
           expect(whereMock).toHaveBeenCalledWith(
             or(
               eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[0].id),
-              eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[0].id),
               eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[1].id),
-              eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[1].id),
-              eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[2].id),
               eq(postWithAuthorConnectCollection.fields.idField._.column, mockPostData[2].id)
             )
           )
@@ -1224,10 +1212,7 @@ describe('ApiHandler', () => {
           expect(whereMock.mock.calls[0][0]).toEqual(
             or(
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[0].id),
-              eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[0].id),
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[1].id),
-              eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[1].id),
-              eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[2].id),
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[2].id)
             )
           )

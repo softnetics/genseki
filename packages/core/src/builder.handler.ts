@@ -186,9 +186,7 @@ export function createDefaultApiHandlers<
 
     await db
       .delete(tableSchema)
-      .where(
-        or(...args.ids.flatMap((id) => [eq(primaryKeyColumn, id), eq(identifierKeyColumn, id)]))
-      )
+      .where(or(...args.ids.map((id) => eq(identifierKeyColumn, id))))
       .returning()
   }
 
