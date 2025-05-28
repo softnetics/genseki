@@ -4,17 +4,17 @@ import {
   AutoCheckbox,
   AutoDatePickerField,
   AutoNumberField,
+  AutoSelectField,
   AutoSwitch,
   AutoTextField,
   AutoTimeField,
 } from './fields'
 
-import { Select, SelectList, SelectOption, SelectTrigger } from '../../intentui/ui/select'
-
 interface AutoFieldProps<TServerConfig extends ServerConfig> {
   field: Field
   serverConfig: TServerConfig
   className?: string
+  visibility?: 'hidden' | 'enabled' | 'disabled'
 }
 
 export async function AutoField<TServerConfig extends ServerConfig>(
@@ -22,79 +22,39 @@ export async function AutoField<TServerConfig extends ServerConfig>(
 ) {
   const { field, className } = props
 
+  if (props.visibility === 'hidden') {
+    return null
+  }
+
+  const disabled = props.visibility === 'disabled'
+
+  const commonProps = {
+    label: field.label,
+    className: className,
+    description: field.description,
+    placeholder: field.placeholder,
+  }
+
   switch (field.type) {
     case 'text':
-      return (
-        <AutoTextField
-          name={field._.column.name}
-          label={field.label}
-          className={className}
-          placeholder={field.placeholder}
-          description={field.description}
-        />
-      )
+      return <AutoTextField {...commonProps} isDisabled={disabled} />
     case 'number':
-      return (
-        <AutoNumberField
-          name={field._.column.name}
-          label={field.label}
-          className={className}
-          placeholder={field.placeholder}
-          description={field.description}
-        />
-      )
+      return <AutoNumberField {...commonProps} isDisabled={disabled} />
     case 'time':
-      return <AutoTimeField name={field._.column.name} className={className} label={field.label} />
+      return <AutoTimeField {...commonProps} isDisabled={disabled} />
     case 'date':
-      return (
-        <AutoDatePickerField
-          name={field._.column.name}
-          label={field.label}
-          className={className}
-          description={field.description}
-        />
-      )
+      return <AutoDatePickerField {...commonProps} isDisabled={disabled} />
     case 'checkbox':
-      return (
-        <AutoCheckbox
-          name={field._.column.name}
-          label={field.label}
-          className={className}
-          description={field.description}
-        />
-      )
+      return <AutoCheckbox {...commonProps} isDisabled={disabled} />
     case 'switch':
-      return <AutoSwitch name={field._.column.name} label={field.label} className={className} />
+      return <AutoSwitch {...commonProps} isDisabled={disabled} />
     case 'selectText': {
       const options = await field.options({ db: props.serverConfig.db })
-
-      return (
-        <Select name={field._.column.name} placeholder={field.placeholder} label={field.label}>
-          <SelectTrigger />
-          <SelectList items={options}>
-            {options.map((item) => (
-              <SelectOption key={item.value} id={item.value} textValue={item.label}>
-                {item.label}
-              </SelectOption>
-            ))}
-          </SelectList>
-        </Select>
-      )
+      return <AutoSelectField {...commonProps} items={options} isDisabled={disabled} />
     }
     case 'selectNumber': {
       const options = await field.options({ db: props.serverConfig.db })
-      return (
-        <Select name={field._.column.name} placeholder={field.placeholder} label={field.label}>
-          <SelectTrigger />
-          <SelectList items={options}>
-            {options.map((item) => (
-              <SelectOption key={item.value} id={item.value} textValue={item.label}>
-                {item.label}
-              </SelectOption>
-            ))}
-          </SelectList>
-        </Select>
-      )
+      return <AutoSelectField {...commonProps} items={options} isDisabled={disabled} />
     }
     case 'comboboxText': {
       const options = await field.options({ db: props.serverConfig.db })

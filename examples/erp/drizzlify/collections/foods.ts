@@ -9,6 +9,8 @@ export const foodsCollection = builder.collection('foods', {
       label: 'Food ID',
       placeholder: 'ID',
       default: '123',
+      create: 'hidden',
+      update: 'hidden',
     }),
     name: fb.columns('name', {
       type: 'text',

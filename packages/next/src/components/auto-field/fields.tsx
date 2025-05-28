@@ -1,185 +1,151 @@
 'use client'
 
-import { Controller, type Path, useFormContext } from 'react-hook-form'
-
-import type { CalendarDate, Time } from '@internationalized/date'
-
 import { Checkbox, type CheckboxProps } from '../../intentui/ui/checkbox'
 import { DatePicker, type DatePickerProps } from '../../intentui/ui/date-picker'
 import { FieldError, Label } from '../../intentui/ui/field'
+import { useFormItemController } from '../../intentui/ui/form'
 import { NumberField, type NumberFieldProps } from '../../intentui/ui/number-field'
+import {
+  Select,
+  SelectList,
+  SelectOption,
+  type SelectProps,
+  SelectTrigger,
+} from '../../intentui/ui/select'
 import { Switch, type SwitchProps } from '../../intentui/ui/switch'
 import { TextField, type TextFieldProps } from '../../intentui/ui/text-field'
 import { TimeField, type TimeFieldProps } from '../../intentui/ui/time-field'
 import { cn } from '../../utils/cn'
-import { convertDateToCalendarDate, convertDateToTimeValue } from '../../utils/date'
+import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../utils/date'
 
-/**
- * TODO:
- * - Is required
- */
-
-export const AutoTextField = <TFormType extends Record<string, any>>(
-  props: TextFieldProps & Required<Pick<TextFieldProps, 'name'>>
-) => {
-  const { control } = useFormContext<TFormType>()
+export function AutoTextField(props: TextFieldProps) {
+  const { field, error } = useFormItemController()
 
   return (
-    <Controller
-      name={props.name as Path<TFormType>}
-      control={control}
-      render={({ field, fieldState: { error } }) => {
-        return (
-          <TextField
-            type="text"
-            onChange={(value) => field.onChange(value)}
-            label={props.label}
-            placeholder={props.placeholder}
-            errorMessage={error?.message}
-            {...props}
-            className={cn('w-full', props.className)}
-            name={field.name}
-          />
-        )
-      }}
+    <TextField
+      type="text"
+      {...props}
+      {...field}
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
     />
   )
 }
 
-export const AutoNumberField = <TFormType extends Record<string, any>>(
-  props: NumberFieldProps & Required<Pick<NumberFieldProps, 'name'>>
-) => {
-  const { control } = useFormContext<TFormType>()
+export function AutoNumberField(props: NumberFieldProps) {
+  const { field, error } = useFormItemController()
 
   return (
-    <Controller
-      name={props.name as Path<TFormType>}
-      control={control}
-      render={({ field, fieldState: { error } }) => {
-        return (
-          <NumberField
-            onChange={(value) => field.onChange(value)}
-            label={props.label}
-            placeholder={props.placeholder}
-            errorMessage={error?.message}
-            {...props}
-            className={cn('w-full', props.className)}
-            name={field.name}
-          />
-        )
-      }}
+    <NumberField
+      {...props}
+      {...field}
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
     />
   )
 }
 
-export const AutoSwitch = <TFormType extends Record<string, any>>(
-  props: SwitchProps & Required<Pick<SwitchProps, 'name'>> & { label?: string }
-) => {
-  const { control } = useFormContext<TFormType>()
+export function AutoSwitch(props: SwitchProps & { label?: string }) {
+  const { field, error, formItemId } = useFormItemController()
 
   return (
     <div className="flex items-center gap-x-4 bg-muted p-6 rounded-md">
-      <Controller
-        name={props.name as Path<TFormType>}
-        control={control}
-        render={({ field, fieldState: { error } }) => (
-          <>
-            <Label htmlFor={`switch-${field.name}`} className="select-none">
-              {props.label ?? field.name /* Switch label is requried anyway */}
-            </Label>
-            <Switch
-              id={`switch-${props.name}`}
-              {...props}
-              className={cn('', props.className)}
-              name={field.name}
-            />
-            {error && <FieldError>{error.message}</FieldError>}
-          </>
-        )}
-      />
+      <Label htmlFor={formItemId} className="select-none">
+        {props.label ?? field.name /* Switch label is requried anyway */}
+      </Label>
+      <Switch {...props} {...field} className={cn('', props.className)} />
+      {error && <FieldError>{error.message}</FieldError>}
     </div>
   )
 }
 
-export const AutoCheckbox = <TFormType extends Record<string, any>>(
-  props: CheckboxProps & Required<Pick<CheckboxProps, 'name'>>
-) => {
-  const { control } = useFormContext<TFormType>()
+export function AutoCheckbox(props: CheckboxProps) {
+  const { field } = useFormItemController()
+
   return (
     <div className="py-6">
-      <Controller
-        name={props.name as Path<TFormType>}
-        control={control}
-        render={({ field }) => (
-          <Checkbox
-            label={props.label}
-            {...props}
-            className={cn('', props.className)}
-            name={field.name}
-          />
-        )}
-      />
+      <Checkbox {...props} {...field} className={cn('', props.className)} />
     </div>
   )
 }
 
-export const AutoDatePickerField = <
-  TFormType extends Record<string, any>,
-  TAutoDatePickerFieldProps extends DatePickerProps<CalendarDate>,
->(
-  // I need to hack the defaultValue, becuase server component can't serialize react-aria date object
-  props: Omit<TAutoDatePickerFieldProps, 'defaultValue'> &
-    Required<Pick<TAutoDatePickerFieldProps, 'name'>> & {
-      defaultValue?: Date | CalendarDate
-    }
-) => {
-  const { control } = useFormContext<TFormType>()
-
-  const formattedDefaultValue = convertDateToCalendarDate(props.defaultValue)
+export function AutoDatePickerField(
+  props: Omit<DatePickerProps<any>, 'defaultValue'> & {
+    defaultValue?: string
+  }
+) {
+  const { field, error } = useFormItemController()
 
   return (
-    <Controller
-      name={props.name as Path<TFormType>}
-      control={control}
-      render={({ field, fieldState: { error } }) => (
-        <DatePicker
-          {...props}
-          errorMessage={error?.message}
-          onChange={(value) => field.onChange(value)}
-          value={field.value}
-          defaultValue={formattedDefaultValue}
-        />
-      )}
+    <DatePicker
+      {...props}
+      {...field}
+      errorMessage={error?.message}
+      onChange={(value) => {
+        const dateString = value?.toString() || null
+        if (dateString === null) return field.onChange(null)
+        return field.onChange(dateString)
+      }}
+      value={convertDateStringToCalendarDate(field.value)}
+      defaultValue={convertDateStringToCalendarDate(props.defaultValue)}
     />
   )
 }
 
-export const AutoTimeField = <
-  TFormType extends Record<string, any>,
-  TAutoTimeFieldProps extends TimeFieldProps<Time>,
->(
-  props: Omit<TAutoTimeFieldProps, 'defaultValue'> &
-    Required<Pick<TAutoTimeFieldProps, 'name'>> & {
-      defaultValue?: Date | Time
-    }
-) => {
-  const { control } = useFormContext<TFormType>()
-  const formattedDefaultValue = convertDateToTimeValue(props.defaultValue)
+export function AutoTimeField(
+  props: Omit<TimeFieldProps<any>, 'defaultValue'> & {
+    defaultValue?: string
+  }
+) {
+  const { field, error } = useFormItemController()
 
   return (
-    <Controller
-      name={props.name as Path<TFormType>}
-      control={control}
-      render={({ field, fieldState: { error } }) => (
-        <TimeField
-          label={props.label}
-          errorMessage={error?.message}
-          {...props}
-          onChange={(value) => field.onChange(value)}
-          defaultValue={formattedDefaultValue}
-          value={field.value}
-        />
-      )}
+    <TimeField
+      {...props}
+      {...field}
+      errorMessage={error?.message}
+      onChange={(value) => {
+        const timeString = value?.toString() || null
+        if (timeString === null) return field.onChange(null)
+        field.onChange(timeString)
+      }}
+      defaultValue={convertDateStringToTimeValue(props.defaultValue)}
+      value={convertDateStringToTimeValue(field.value)}
     />
+  )
+}
+
+interface AutoSelectField extends SelectProps<{}> {
+  items: { value: string | number; label: string }[]
+}
+
+export function AutoSelectField(props: AutoSelectField) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <Select
+      {...field}
+      {...props}
+      className={cn('w-full', props.className)}
+      errorMessage={error?.message}
+      onSelectionChange={(value) => {
+        if (value === null) return field.onChange(null)
+        const selectedItem = props.items?.find((item) => item.value === value)
+        if (selectedItem) {
+          field.onChange(selectedItem.value)
+        } else {
+          field.onChange(value)
+        }
+      }}
+    >
+      <SelectTrigger />
+      <SelectList items={props.items}>
+        {(item) => (
+          <SelectOption key={item.value} id={item.value} textValue={item.label}>
+            {item.label}
+          </SelectOption>
+        )}
+      </SelectList>
+    </Select>
   )
 }

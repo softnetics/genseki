@@ -1,8 +1,11 @@
+import type { PropsWithChildren } from 'react'
 import * as React from 'react'
 import { Label as LabelPrimitive } from 'react-aria-components'
 import type {
   Control,
+  ControllerFieldState,
   ControllerProps,
+  ControllerRenderProps,
   DeepPartialSkipArrayKey,
   FieldArrayPath,
   FieldPath,
@@ -12,6 +15,7 @@ import type {
   Path,
   UseFieldArrayProps,
   UseFieldArrayReturn,
+  UseFormStateReturn,
 } from 'react-hook-form'
 import {
   Controller,
@@ -340,6 +344,40 @@ export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitBu
     )
   }
 )
+
+interface FormItemControllerContext {
+  field: ControllerRenderProps<FieldValues>
+  fieldState: ControllerFieldState
+  formState: UseFormStateReturn<FieldValues>
+}
+
+export const FormItemControllerContext = React.createContext<FormItemControllerContext>(
+  {} as FormItemControllerContext
+)
+
+export const useFormItemController = () => {
+  const formField = useFormField()
+  const context = React.useContext(FormItemControllerContext)
+  if (!context) {
+    throw new Error('useFormItemController must be used within a FormItemController')
+  }
+  return {
+    ...context,
+    ...formField,
+  }
+}
+
+export function FormItemController(props: PropsWithChildren<FormItemControllerContext>) {
+  return (
+    <FormItem>
+      <FormItemControllerContext.Provider
+        value={{ field: props.field, fieldState: props.fieldState, formState: props.formState }}
+      >
+        {props.children}
+      </FormItemControllerContext.Provider>
+    </FormItem>
+  )
+}
 
 export {
   Form,
