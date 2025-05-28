@@ -15,6 +15,13 @@ export const baseConfig = defineBaseConfig({
   db: db,
   schema: schema,
   auth: {
+    resetPassword: {
+      enabled: true,
+      async sendEmailResetPassword(email, token) {
+        console.log('sendEmailResetPassword config', email, token)
+        return
+      },
+    },
     user: {
       model: schema.users,
     },

@@ -1,25 +1,43 @@
 'use client'
 
-import Form from 'next/form'
+import { useForm } from 'react-hook-form'
+
+import { zodResolver } from '@hookform/resolvers/zod'
 import { redirect } from 'next/navigation'
+import { z } from 'zod'
 
 import { SubmitButton } from '../../components/submit-button'
+import { Form, FormControl, FormField, FormItem, FormMessage } from '../../intentui/ui/form'
 import { Link } from '../../intentui/ui/link'
 import { TextField } from '../../intentui/ui/text-field'
 import { useServerFunction } from '../../providers/root'
 
+const schema = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters long' })
+    .regex(/[A-Za-z]/, { message: 'Must contain English letters (A-Z, a-z)' })
+    .regex(/[0-9]/, { message: 'Must contain numbers (0-9)' })
+    .trim(),
+})
+
+export const LoginClientFormSchema = z
+
 export function LoginClientForm() {
   const serverFunction = useServerFunction()
 
-  async function login(formData: FormData) {
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
+  const form = useForm({
+    resolver: zodResolver(schema),
+    mode: 'onChange',
+  })
 
+  async function login(data: z.infer<typeof schema>) {
     const response = await serverFunction({
       method: 'auth.loginEmail',
       body: {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
       },
       headers: {},
       query: {},
@@ -27,7 +45,10 @@ export function LoginClientForm() {
     })
 
     if (response.status !== 200) {
-      console.error('Login failed', response)
+      form.setError('email', {
+        type: 'manual',
+        message: response.body.status || 'Failed to login',
+      })
       return
     }
 
@@ -35,19 +56,55 @@ export function LoginClientForm() {
   }
 
   return (
-    <Form className="flex flex-col space-y-8 flex-1" action={login} onSubmit={() => {}}>
-      <TextField name="email" type="email" placeholder="email..." label="Email" />
-      <TextField
-        name="password"
-        type="password"
-        placeholder="password..."
-        label="Password"
-        isRevealable
-      />
-      <SubmitButton>Login</SubmitButton>
-      <Link href="./sign-up" intent="primary" className="text-sm">
-        Create an account?
-      </Link>
+    <Form {...form}>
+      <form className="flex flex-col space-y-8 flex-1" onSubmit={form.handleSubmit(login)}>
+        <FormField
+          control={form.control}
+          name="email"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <TextField
+                  {...field}
+                  name="email"
+                  type="email"
+                  placeholder="email..."
+                  label="Email"
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <FormField
+          control={form.control}
+          name="password"
+          render={({ field }) => (
+            <FormItem>
+              <FormControl>
+                <TextField
+                  {...field}
+                  name="password"
+                  type="password"
+                  placeholder="password..."
+                  label="Password"
+                  isRevealable
+                />
+              </FormControl>
+              <FormMessage />
+            </FormItem>
+          )}
+        />
+        <SubmitButton>Login</SubmitButton>
+        <div className="flex flex-row justify-between">
+          <Link href="./sign-up" intent="primary" className="text-sm">
+            Create an account?
+          </Link>
+          <Link href="./forgot-password" intent="primary" className="text-sm">
+            Forgot Password?
+          </Link>
+        </div>
+      </form>
     </Form>
   )
 }

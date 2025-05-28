@@ -2,6 +2,7 @@ import z from 'zod'
 
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
+import { hashPassword } from '../utils'
 
 interface InternalRouteOptions {
   prefix?: string
@@ -40,7 +41,7 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
     const verification =
       await args.context.internalHandlers.verification.findByIdentifier(identifier)
 
-    if (!verification.value) {
+    if (!verification || !verification.value) {
       return {
         status: 400,
         body: { status: 'invalid reset password value' },
@@ -49,10 +50,10 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
 
     const user = await args.context.internalHandlers.user.findById(verification.value)
 
-    const hashedPassword = args.body.password // TODO: hash password
+    const hashedPassword = await hashPassword(args.body.password)
     await args.context.internalHandlers.account.updatePassword(user.id, hashedPassword)
 
-    const redirectTo = `${args.context.authConfig.resetPassword?.redirectTo ?? '/auth/login'}`
+    const redirectTo = `${args.context.authConfig.resetPassword?.redirectTo ?? '/admin/auth/login'}`
 
     const responseHeaders = {
       Location: redirectTo,

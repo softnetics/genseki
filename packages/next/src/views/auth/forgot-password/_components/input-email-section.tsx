@@ -16,7 +16,10 @@ const schema = z.object({
 export type OutputEmailForm = z.infer<typeof schema>
 
 interface InputEmailSectionProps {
-  onNext: (email: string) => void
+  onNext: (email: string) => Promise<{
+    status: number
+    errormessage?: string
+  }>
 }
 
 export function InputEmailSection({ onNext }: InputEmailSectionProps) {
@@ -29,8 +32,15 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(async (data) => {
-          onNext(data.email)
+          const response = await onNext(data.email)
           // await api.sendOtpToEmail(data.email)
+          if (response.status !== 200) {
+            form.setError('email', {
+              type: 'manual',
+              message: response.errormessage || 'Failed to send OTP',
+            })
+            return
+          }
         })}
         className="flex flex-col gap-4"
       >

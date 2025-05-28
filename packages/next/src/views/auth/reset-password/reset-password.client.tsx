@@ -26,7 +26,11 @@ const formSchema = z
     path: ['confirmPassword'],
   })
 
-export function ResetPasswordClientForm() {
+interface ResetPasswordClientFormProps {
+  token: string
+}
+
+export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps) {
   const serverFunction = useServerFunction()
 
   const form = useForm({
@@ -38,19 +42,22 @@ export function ResetPasswordClientForm() {
 
   const handleResetPassword = async (data: z.infer<typeof formSchema>) => {
     const response = await serverFunction({
-      method: 'auth.resetPassword',
+      method: 'auth.resetPasswordEmail',
       body: {
         password: data.password,
       },
       headers: {},
-      query: {},
+      query: { token },
       pathParams: {},
     })
     if (response.status !== 200) {
-      console.error('Reset password failed', response)
+      form.setError('password', {
+        type: 'manual',
+        message: response.body.status || 'Failed to reset password',
+      })
       return
     }
-    redirect('../login')
+    redirect('./login')
   }
 
   return (

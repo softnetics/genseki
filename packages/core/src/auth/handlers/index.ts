@@ -1,7 +1,7 @@
-import { forgotPasswordEmail } from './forgot-password'
 import { loginEmail } from './login-email'
 import { me } from './me'
 import { resetPasswordEmail } from './reset-password'
+import { sendEmailResetPassword } from './send-email-reset-password'
 import { signOut } from './sign-out'
 import { signUp } from './sign-up'
 
@@ -14,7 +14,7 @@ export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuth
     loginEmail: loginEmail(config),
     signOut: signOut({}),
     resetPasswordEmail: resetPasswordEmail({}),
-    forgotPasswordEmail: forgotPasswordEmail({}),
+    sendEmailResetPassword: sendEmailResetPassword({}),
     // Authentication required
     me: me({}),
   } as const

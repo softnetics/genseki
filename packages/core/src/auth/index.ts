@@ -82,6 +82,7 @@ export interface AuthConfig {
     expiresInMs?: number // default: 1 day (1000 * 60 * 60 * 24)
     resetPasswordUrl?: string // default: `/auth/reset-password`
     redirectTo?: string // default: `/auth/login`
+    sendEmailResetPassword: (email: string, token: string) => Promise<void>
   }
   ui?: {
     login?: {
