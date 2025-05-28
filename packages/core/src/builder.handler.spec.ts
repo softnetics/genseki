@@ -158,10 +158,13 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
+      const context = new Context(mockDb as any, {})
+
       const result = await postCollection.admin.api.create({
         slug: postCollection.slug,
         fields: postCollection.fields,
-        context: { db: mockDb as any },
+        context: context as any,
+        requestContext: context.toRequestContext() as any,
         data: {
           nameField: postData.name,
         },
@@ -201,10 +204,13 @@ describe('ApiHandler', () => {
         nameTs: postData.name,
       })
 
+      const context = new Context(mockDb as any, {})
+
       const result = await postCollection.admin.api.findOne({
         slug: postCollection.slug,
         fields: postCollection.fields,
-        context: { db: mockDb as any },
+        context: context as any,
+        requestContext: context.toRequestContext() as any,
         id: postData.id,
       })
 
@@ -245,9 +251,12 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
+      const context = new Context(mockDb as any, {})
+
       const result = await postCollection.admin.api.update({
         id: postData.id,
-        context: { db: mockDb as any },
+        context: context as any,
+        requestContext: context.toRequestContext() as any,
         slug: postCollection.slug,
         fields: postCollection.fields,
         data: {
@@ -281,10 +290,13 @@ describe('ApiHandler', () => {
       tx.delete = deleteMock
       mockDb.delete = deleteMock
 
+      const context = new Context(mockDb as any, {})
+
       const result = await postCollection.admin.api.delete({
         slug: postCollection.slug,
         fields: postCollection.fields,
-        context: { db: mockDb as any },
+        context: context as any,
+        requestContext: context.toRequestContext() as any,
         ids: [mockPostData[0].name, mockPostData[1].name, mockPostData[2].name],
       })
 
@@ -871,12 +883,16 @@ describe('ApiHandler', () => {
             ],
           })
 
+          const context = new Context(mockDb as any, {})
+
           // // ====== end service part (TS) ======
           // // ===== start user part (field) =====
           const result = await authorWithPostsCreateCollection.admin.api.update({
             slug: authorWithPostsCreateCollection.slug,
             fields: authorWithPostsCreateCollection.fields,
-            context: { db: mockDb as any },
+
+            context: context as any,
+            requestContext: context.toRequestContext() as any,
             id: updatedAuthorData.id,
             data: {
               nameField: updatedAuthorDataField.nameField,
@@ -1127,10 +1143,14 @@ describe('ApiHandler', () => {
               nameTs: 'Author 2',
             },
           })
+          const context = new Context(mockDb as any, {})
+
           const result = await postWithAuthorConnectCollection.admin.api.update({
             slug: postWithAuthorConnectCollection.slug,
             fields: postWithAuthorConnectCollection.fields,
-            context: { db: mockDb as any },
+
+            context: context as any,
+            requestContext: context.toRequestContext() as any,
             id: postData.id,
             data: {
               nameField: postDataField.nameField,
@@ -1505,10 +1525,14 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.create({
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               data: {
                 nameField: postData.name,
                 authorField: {
@@ -1547,10 +1571,13 @@ describe('ApiHandler', () => {
               },
             })
 
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.findOne({
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: postData.id,
             })
             // ====== end user part (field) ======
@@ -1624,6 +1651,8 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.update({
               id: updatedPostData.id,
               data: {
@@ -1632,7 +1661,8 @@ describe('ApiHandler', () => {
                   connect: updatedPostDataField.authorIdField,
                 },
               },
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
             })
@@ -1662,10 +1692,14 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.delete({
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               ids: postIdsToDelete,
             })
             // ====== end user part (field) ======
@@ -1724,10 +1758,14 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.create({
               fields: postWithAuthorConnectOrCreateCollection.fields,
               slug: postWithAuthorConnectOrCreateCollection.slug,
-              context: { db: mockDb as any },
+
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               data: {
                 nameField: postWithAuthorDataField.nameField,
                 authorField: {
@@ -1776,10 +1814,14 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.findOne({
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: postData.id,
             })
             // ====== end user part (field) ======
@@ -1856,10 +1898,13 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.update({
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: updatedPostData.id,
               data: {
                 nameField: updatedPostDataField.nameField,
@@ -1894,10 +1939,13 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await postWithAuthorConnectOrCreateCollection.admin.api.delete({
               slug: postWithAuthorConnectOrCreateCollection.slug,
               fields: postWithAuthorConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               ids: postIdsToDelete,
             })
             // ====== end user part (field) ======
@@ -2021,6 +2069,8 @@ describe('ApiHandler', () => {
 
             // ===== start user part (field) =====
             // change to create Author and make it auto connect to post
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.create({
               // TODO: fix create data shouldn't have primary key
               data: {
@@ -2054,7 +2104,8 @@ describe('ApiHandler', () => {
                   },
                 ],
               },
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               fields: authorWithPostsConnectOrCreateCollection.fields,
               slug: 'author-with-post',
             })
@@ -2098,10 +2149,14 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.findOne({
               slug: authorWithPostsConnectOrCreateCollection.slug,
               fields: authorWithPostsConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: authorData.id,
             })
             // ====== end user part (field) ======
@@ -2192,10 +2247,13 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.update({
               slug: authorWithPostsConnectOrCreateCollection.slug,
               fields: authorWithPostsConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: updatedAuthorData.id,
               data: {
                 nameField: updatedAuthorDataField.nameField,
@@ -2263,10 +2321,13 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.delete({
               slug: authorWithPostsConnectOrCreateCollection.slug,
               fields: authorWithPostsConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               ids: authorIdsToDelete,
             })
             // ====== end user part (field) ======
@@ -2326,10 +2387,13 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.create({
               slug: authorWithPostsConnectOrCreateCollection.slug,
               fields: authorWithPostsConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               data: {
                 nameField: authorWithPostDataField.nameField,
                 postsField: [
@@ -2392,10 +2456,13 @@ describe('ApiHandler', () => {
 
             mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce(authorWithPostDataTs)
 
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.findOne({
               fields: authorWithPostsConnectOrCreateCollection.fields,
               slug: authorWithPostsConnectOrCreateCollection.slug,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: authorData.id,
             })
 
@@ -2483,10 +2550,13 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.update({
               slug: authorWithPostsConnectOrCreateCollection.slug,
               fields: authorWithPostsConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               id: updatedAuthorData.id,
               data: {
                 nameField: updatedAuthorDataField.nameField,
@@ -2545,10 +2615,13 @@ describe('ApiHandler', () => {
             tx.delete = deleteMock
             mockDb.delete = deleteMock
 
+            const context = new Context(mockDb as any, {})
+
             const result = await authorWithPostsConnectOrCreateCollection.admin.api.delete({
               slug: authorWithPostsConnectOrCreateCollection.slug,
               fields: authorWithPostsConnectOrCreateCollection.fields,
-              context: { db: mockDb as any },
+              context: context as any,
+              requestContext: context.toRequestContext() as any,
               ids: authorIdsToDelete,
             })
 
