@@ -206,6 +206,12 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       if (verifications.length > 1) throw new Error('Multiple verifications found')
       return verifications[0]
     },
+    delete: async (id: string) => {
+      const table = config.verification.model
+      const verification = await context.db.delete(table).where(eq(table.id, id)).returning()
+      if (verification.length === 0) throw new Error('Verification not found')
+      return verification[0]
+    },
   }
 
   return {

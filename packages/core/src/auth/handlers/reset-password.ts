@@ -50,6 +50,23 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
 
     const user = await args.context.internalHandlers.user.findById(verification.value)
 
+    if (!user) {
+      return {
+        status: 400,
+        body: { status: 'user not found' },
+      }
+    }
+
+    if (verification.expiresAt < new Date()) {
+      return {
+        status: 400,
+        body: { status: 'reset password token expired' },
+      }
+    }
+
+    // delete the verification token
+    await args.context.internalHandlers.verification.delete(verification.id)
+
     const hashedPassword = await hashPassword(args.body.password)
     await args.context.internalHandlers.account.updatePassword(user.id, hashedPassword)
 
