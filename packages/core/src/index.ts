@@ -27,6 +27,7 @@ export {
   getClientCollection,
   getClientConfig,
 } from './config'
+export { Context, RequestContext } from './context'
 export type {
   ApiRoute,
   ApiRouteHandler,
