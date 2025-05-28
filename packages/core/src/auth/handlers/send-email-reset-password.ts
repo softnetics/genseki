@@ -47,6 +47,11 @@ export function sendEmailResetPassword<const TOptions extends InternalRouteOptio
     // Generate a secure random token
     const token = crypto.randomUUID()
     const identifier = `reset-password:${token}`
+    await args.context.internalHandlers.verification.deleteByUserIdAndIdentifierPrefix(
+      user.id,
+      'reset-password:'
+    )
+
     await args.context.internalHandlers.verification.create({
       identifier,
       value: user.id,
