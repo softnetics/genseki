@@ -5,6 +5,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 import * as schema from './__mocks__/test-schema'
 import { Builder } from './builder'
 
+// TODO: Refactor this to use a more generic mock database setup, maybe create(tx, query)
 const prepareMockDb = () => {
   const tx = {
     findFirst: vi.fn(),
