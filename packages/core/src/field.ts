@@ -60,6 +60,7 @@ export type FieldBase = {
   isRequired?: boolean
   update?: FieldMutateMode
   create?: FieldMutateMode
+  description?: string
 }
 
 export interface FieldColumnStringCollectionOptions<
@@ -129,7 +130,6 @@ export interface FieldColumnBooleanCollectionOptions {
   checkbox: {
     type: 'checkbox'
     default?: boolean
-    description?: string
   } & FieldBase
   switch: {
     type: 'switch'

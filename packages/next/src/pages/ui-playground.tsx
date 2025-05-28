@@ -42,6 +42,7 @@ import {
 } from '../intentui/ui/select'
 import { Switch } from '../intentui/ui/switch'
 import { TextField } from '../intentui/ui/text-field'
+import { TimeField } from '../intentui/ui/time-field'
 
 const Wrapper = ({ children, title }: { children: React.ReactNode; title: string }) => {
   return (
@@ -242,6 +243,11 @@ export const UIPlayground = () => {
             </Typography>
           </div>
         </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Date picker">
+        <div className="flex justify-start">
+          <TimeField label="Time to wake up" description="Select the time you want to wake up" />
+        </div>
       </Wrapper>
       <Wrapper title="Date picker">
         <div className="flex justify-start">

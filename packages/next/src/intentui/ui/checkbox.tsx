@@ -93,7 +93,7 @@ const Checkbox = forwardRef(function Checkbox(
     >
       {({ isSelected, isIndeterminate, ...renderProps }) => (
         <div
-          className={twMerge('flex gap-x-2', props.description ? 'items-start' : 'items-center')}
+          className={twMerge('flex gap-x-4', props.description ? 'items-start' : 'items-center')}
         >
           <div
             className={boxStyles({

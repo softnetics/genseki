@@ -1,6 +1,13 @@
 import type { Field, ServerConfig } from '@kivotos/core'
 
-import { AutoCheckbox, AutoNumberField, AutoSwitch, AutoTextField } from './fields'
+import {
+  AutoCheckbox,
+  AutoDatePickerField,
+  AutoNumberField,
+  AutoSwitch,
+  AutoTextField,
+  AutoTimeField,
+} from './fields'
 
 import { Select, SelectList, SelectOption, SelectTrigger } from '../../intentui/ui/select'
 
@@ -20,60 +27,44 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       return (
         <AutoTextField
           name={field._.column.name}
-          placeholder={field.placeholder}
-          className={className}
           label={field.label}
-          defaultValue={field.default}
+          className={className}
+          placeholder={field.placeholder}
+          description={field.description}
         />
       )
     case 'number':
       return (
         <AutoNumberField
           name={field._.column.name}
-          className={className}
           label={field.label}
-          defaultValue={field.default}
+          className={className}
+          placeholder={field.placeholder}
+          description={field.description}
         />
       )
     case 'time':
-      return (
-        <AutoTextField
-          type="time"
-          name={field._.column.name}
-          className={className}
-          label={field.label}
-          defaultValue={field.default?.toTimeString().split(' ')[0]}
-        />
-      )
+      return <AutoTimeField name={field._.column.name} className={className} label={field.label} />
     case 'date':
       return (
-        <AutoTextField
-          type="date"
+        <AutoDatePickerField
           name={field._.column.name}
-          className={className}
           label={field.label}
-          defaultValue={field.default?.toISOString().split('T')[0]}
+          className={className}
+          description={field.description}
         />
       )
     case 'checkbox':
       return (
         <AutoCheckbox
           name={field._.column.name}
-          className={className}
-          defaultSelected={field.default}
           label={field.label}
+          className={className}
           description={field.description}
         />
       )
     case 'switch':
-      return (
-        <AutoSwitch
-          name={field._.column.name}
-          className={className}
-          label={field.label}
-          defaultSelected={field.default}
-        />
-      )
+      return <AutoSwitch name={field._.column.name} label={field.label} className={className} />
     case 'selectText': {
       const options = await field.options({ db: props.serverConfig.db })
 

@@ -17,7 +17,7 @@ export const foodsCollection = builder.collection('foods', {
       update: 'disabled',
     }),
     isCooked: fb.columns('isCooked', {
-      type: 'switch',
+      type: 'checkbox',
       label: 'Food cooked',
       default: true,
       description: 'Is the food cooked?',
@@ -40,7 +40,7 @@ export const foodsCollection = builder.collection('foods', {
     cookingDate: fb.columns('cookingDate', {
       type: 'date',
       label: 'Cooking date',
-      default: new Date('2025-05-12'),
+      default: new Date('2025-04-24'),
     }),
     cookingTime: fb.columns('cookingTime', {
       type: 'time',

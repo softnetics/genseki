@@ -1,12 +1,18 @@
 'use client'
+
 import { Controller, type Path, useFormContext } from 'react-hook-form'
 
+import type { CalendarDate, Time } from '@internationalized/date'
+
 import { Checkbox, type CheckboxProps } from '../../intentui/ui/checkbox'
-import { Label } from '../../intentui/ui/field'
+import { DatePicker, type DatePickerProps } from '../../intentui/ui/date-picker'
+import { FieldError, Label } from '../../intentui/ui/field'
 import { NumberField, type NumberFieldProps } from '../../intentui/ui/number-field'
 import { Switch, type SwitchProps } from '../../intentui/ui/switch'
 import { TextField, type TextFieldProps } from '../../intentui/ui/text-field'
+import { TimeField, type TimeFieldProps } from '../../intentui/ui/time-field'
 import { cn } from '../../utils/cn'
+import { convertDateToCalendarDate, convertDateToTimeValue } from '../../utils/date'
 
 /**
  * TODO:
@@ -76,7 +82,7 @@ export const AutoSwitch = <TFormType extends Record<string, any>>(
       <Controller
         name={props.name as Path<TFormType>}
         control={control}
-        render={({ field }) => (
+        render={({ field, fieldState: { error } }) => (
           <>
             <Label htmlFor={`switch-${field.name}`} className="select-none">
               {props.label ?? field.name /* Switch label is requried anyway */}
@@ -87,6 +93,7 @@ export const AutoSwitch = <TFormType extends Record<string, any>>(
               className={cn('', props.className)}
               name={field.name}
             />
+            {error && <FieldError>{error.message}</FieldError>}
           </>
         )}
       />
@@ -95,7 +102,7 @@ export const AutoSwitch = <TFormType extends Record<string, any>>(
 }
 
 export const AutoCheckbox = <TFormType extends Record<string, any>>(
-  props: CheckboxProps & Required<Pick<SwitchProps, 'name'>>
+  props: CheckboxProps & Required<Pick<CheckboxProps, 'name'>>
 ) => {
   const { control } = useFormContext<TFormType>()
   return (
@@ -113,5 +120,66 @@ export const AutoCheckbox = <TFormType extends Record<string, any>>(
         )}
       />
     </div>
+  )
+}
+
+export const AutoDatePickerField = <
+  TFormType extends Record<string, any>,
+  TAutoDatePickerFieldProps extends DatePickerProps<CalendarDate>,
+>(
+  // I need to hack the defaultValue, becuase server component can't serialize react-aria date object
+  props: Omit<TAutoDatePickerFieldProps, 'defaultValue'> &
+    Required<Pick<TAutoDatePickerFieldProps, 'name'>> & {
+      defaultValue?: Date | CalendarDate
+    }
+) => {
+  const { control } = useFormContext<TFormType>()
+
+  const formattedDefaultValue = convertDateToCalendarDate(props.defaultValue)
+
+  return (
+    <Controller
+      name={props.name as Path<TFormType>}
+      control={control}
+      render={({ field, fieldState: { error } }) => (
+        <DatePicker
+          {...props}
+          errorMessage={error?.message}
+          onChange={(value) => field.onChange(value)}
+          value={field.value}
+          defaultValue={formattedDefaultValue}
+        />
+      )}
+    />
+  )
+}
+
+export const AutoTimeField = <
+  TFormType extends Record<string, any>,
+  TAutoTimeFieldProps extends TimeFieldProps<Time>,
+>(
+  props: Omit<TAutoTimeFieldProps, 'defaultValue'> &
+    Required<Pick<TAutoTimeFieldProps, 'name'>> & {
+      defaultValue?: Date | Time
+    }
+) => {
+  const { control } = useFormContext<TFormType>()
+  const formattedDefaultValue = convertDateToTimeValue(props.defaultValue)
+
+  return (
+    <Controller
+      name={props.name as Path<TFormType>}
+      control={control}
+      render={({ field, fieldState: { error } }) => (
+        <TimeField
+          label={props.label}
+          errorMessage={error?.message}
+          {...props}
+          onChange={(value) => field.onChange(value)}
+          defaultValue={formattedDefaultValue}
+          value={field.value}
+        />
+      )}
+    />
   )
 }
