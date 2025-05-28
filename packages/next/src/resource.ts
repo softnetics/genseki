@@ -1,7 +1,8 @@
 import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
-import type { ApiRoute, ApiRouter, ServerConfig } from '@kivotos/core'
+import type { Context } from '@kivotos/core'
+import { type ApiRoute, type ApiRouter, type ServerConfig } from '@kivotos/core'
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}
@@ -21,7 +22,7 @@ function extractSearchParams(searchParams: URLSearchParams) {
 
 async function makeApiRoute(
   req: NextRequest,
-  context: Record<string, unknown>,
+  context: Context<any, any>,
   route: ApiRoute,
   pathParams: Record<string, string> | undefined
 ) {
@@ -43,6 +44,7 @@ async function makeApiRoute(
 
   const rawResponse = await route.handler({
     context: context,
+    requestContext: context.toRequestContext(reqHeaders),
     headers: reqHeaders,
     pathParams: pathParams,
     query: reqSearchParams,
@@ -61,7 +63,7 @@ async function makeApiRoute(
 async function lookupRoute(
   radixRouter: ReturnType<typeof createRouter>,
   req: NextRequest,
-  context: Record<string, unknown>
+  context: Context<any, any>
 ) {
   const match = radixRouter.lookup(req.nextUrl.pathname)
   if (!match) return Response.json({ message: 'Not Found' }, { status: 404 })
@@ -74,7 +76,7 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
   const radixGetRouter = createRouter({
     routes: Object.fromEntries(
       Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
+        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context.ctx>]) => {
           if (route.schema.method !== 'GET') return []
           console.log('GET', route.schema.path)
           return [[route.schema.path, { route, methodName }]]
@@ -86,7 +88,7 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
   const radixPostRouter = createRouter({
     routes: Object.fromEntries(
       Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
+        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context.ctx>]) => {
           if (route.schema.method !== 'POST') return []
 
           return [[route.schema.path, { route, methodName }]]
@@ -98,7 +100,7 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
   const radixPutRouter = createRouter({
     routes: Object.fromEntries(
       Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
+        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context.ctx>]) => {
           if (route.schema.method !== 'PUT') return []
           console.log('PUT', route.schema.path)
           return [[route.schema.path, { route, methodName }]]
@@ -110,7 +112,7 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
   const radixPatchRouter = createRouter({
     routes: Object.fromEntries(
       Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
+        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context.ctx>]) => {
           if (route.schema.method !== 'PATCH') return []
           console.log('PATCH', route.schema.path)
           return [[route.schema.path, { route, methodName }]]
@@ -122,7 +124,7 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
   const radixDeleteRouter = createRouter({
     routes: Object.fromEntries(
       Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
+        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context.ctx>]) => {
           if (route.schema.method !== 'DELETE') return []
           console.log('DELETE', route.schema.path)
           return [[route.schema.path, { route, methodName }]]

@@ -28,7 +28,9 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    if (!args.context.authConfig.resetPassword?.enabled) {
+    const authConfig = args.context.get('authConfig')
+    const internalHandlers = args.context.get('internalHandlers')
+    if (!authConfig.resetPassword?.enabled) {
       // TODO: Log not enabled
       return {
         status: 400,
@@ -37,8 +39,7 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
     }
 
     const identifier = `reset-password:${args.query.token}`
-    const verification =
-      await args.context.internalHandlers.verification.findByIdentifier(identifier)
+    const verification = await internalHandlers.verification.findByIdentifier(identifier)
 
     if (!verification.value) {
       return {
@@ -47,12 +48,12 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
       }
     }
 
-    const user = await args.context.internalHandlers.user.findById(verification.value)
+    const user = await internalHandlers.user.findById(verification.value)
 
     const hashedPassword = args.body.password // TODO: hash password
-    await args.context.internalHandlers.account.updatePassword(user.id, hashedPassword)
+    await internalHandlers.account.updatePassword(user.id, hashedPassword)
 
-    const redirectTo = `${args.context.authConfig.resetPassword?.redirectTo ?? '/auth/login'}`
+    const redirectTo = `${authConfig.resetPassword?.redirectTo ?? '/auth/login'}`
 
     const responseHeaders = {
       Location: redirectTo,

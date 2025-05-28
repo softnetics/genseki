@@ -1,4 +1,4 @@
-import type { ServerConfig } from '@kivotos/core'
+import { type ServerConfig } from '@kivotos/core'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {
   slug: string
@@ -14,7 +14,8 @@ export async function OneView<TServerConfig extends ServerConfig>(
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   const result = await collection.admin.api.findOne({
-    context: { ...props.serverConfig.context, db: props.serverConfig.db },
+    context: props.serverConfig.context,
+    requestContext: props.serverConfig.context.toRequestContext(),
     slug: props.slug,
     fields: collection.fields,
     id: props.identifier,

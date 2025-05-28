@@ -63,6 +63,7 @@ export async function ListView(props: ListViewProps) {
 
   const result = await collection.admin.api.findMany({
     context: props.serverConfig.context,
+    requestContext: props.serverConfig.context.toRequestContext(),
     slug: props.slug,
     fields: collection.fields,
     limit,

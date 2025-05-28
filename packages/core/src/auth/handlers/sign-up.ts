@@ -31,17 +31,18 @@ export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+    const internalHandlers = args.context.get('internalHandlers')
     const hashedPassword =
       (await options.emailAndPassword?.passwordHasher?.(args.body.password)) ??
       (await hashPassword(args.body.password))
 
-    const user = await args.context.internalHandlers.user.create({
+    const user = await internalHandlers.user.create({
       name: args.body.name,
       email: args.body.email,
       image: null,
     })
 
-    await args.context.internalHandlers.account.link({
+    await internalHandlers.account.link({
       userId: user.id,
       providerId: AccountProvider.CREDENTIAL,
       accountId: user.id,
@@ -52,7 +53,7 @@ export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
     // NOTE: Callback URL is used for email verification
 
     // Check if auto login is enabled
-    const session = await args.context.internalHandlers.session.create({
+    const session = await internalHandlers.session.create({
       userId: user.id,
       // TODO: Customize expiresAt
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),

@@ -29,11 +29,13 @@ export function signOut<const TOptions extends InternalRouteOptions>(options: TO
       throw new Error('No session cookie found')
     }
 
-    await args.context.internalHandlers.session.deleteById(cookie)
+    const internalHandlers = args.context.get('internalHandlers')
+    await internalHandlers.session.deleteById(cookie)
     deleteSessionCookie(args.headers)
 
     return {
       status: 200,
+      headers: args.headers,
       body: {
         status: 'ok',
       },

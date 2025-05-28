@@ -28,7 +28,8 @@ export function loginEmail<const TOptions extends AuthConfig>(options: TOptions)
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    const account = await args.context.internalHandlers.account.findByUserEmailAndProvider(
+    const internalHandlers = args.context.get('internalHandlers')
+    const account = await internalHandlers.account.findByUserEmailAndProvider(
       args.body.email,
       AccountProvider.CREDENTIAL
     )
@@ -38,7 +39,7 @@ export function loginEmail<const TOptions extends AuthConfig>(options: TOptions)
       throw new Error('Invalid password')
     }
 
-    const session = await args.context.internalHandlers.session.create({
+    const session = await internalHandlers.session.create({
       userId: account.user.id,
       // TODO: Customize expiresAt
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),

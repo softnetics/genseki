@@ -8,7 +8,7 @@ export class Context<
 > {
   constructor(
     public readonly db: NodePgDatabase<TFullSchema>,
-    protected readonly ctx: TContext,
+    public readonly ctx: TContext,
     protected readonly authContext?: AuthContext
   ) {}
 
@@ -30,7 +30,7 @@ export class RequestContext<
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > extends Context<TFullSchema, TContext> {
   private _state: Record<string, unknown> = {}
-  private _user: Awaited<ReturnType<AuthContext['requiredAuthenticated']>> | undefined = undefined
+  private _user: Awaited<ReturnType<AuthContext['requiredAuthenticated']>> | undefined
 
   constructor(
     ctx: TContext,
@@ -49,6 +49,10 @@ export class RequestContext<
     }
 
     const user = await this.authContext?.requiredAuthenticated(this._headers)
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+
     this._user = user
 
     return user
