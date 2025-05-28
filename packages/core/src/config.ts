@@ -18,6 +18,7 @@ import {
   type ToClientCollection,
   type ToClientCollectionList,
 } from './collection'
+import { Context } from './context'
 import {
   type ApiRoute,
   type ApiRouter,
@@ -52,7 +53,7 @@ export interface BaseConfigOptions<
 export interface BaseConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-> extends BaseConfigOptions<TFullSchema, TContext> {
+> extends BaseConfigOptions<TFullSchema> {
   context: TContext
 }
 
@@ -64,8 +65,8 @@ export interface ServerConfig<
     Collection<any, any, any, any, any, any>
   >,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
-> extends BaseConfig<TFullSchema> {
-  context: TContext
+> extends Omit<BaseConfig<TFullSchema, TContext>, 'context'> {
+  context: Context<TFullSchema, TContext>
   collections: TCollections
   endpoints: TApiRouter
 }
@@ -110,9 +111,16 @@ export function defineServerConfig<
   const auth = createAuth(baseConfig.auth, baseConfig.context)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
+  const context = new Context<TFullSchema, TContext>(
+    baseConfig.db,
+    baseConfig.context,
+    auth.authContext
+  )
+
   let serverConfig = {
     ...baseConfig,
     collections: config.collections,
+    context,
     endpoints: {
       ...config.endpoints,
       ...auth.handlers,

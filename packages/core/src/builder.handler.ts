@@ -24,6 +24,7 @@ import type {
   InferFields,
 } from './collection'
 import type { MinimalContext } from './config'
+import type { Context, RequestContext } from './context'
 import type { Field, Fields } from './field'
 import {
   createDrizzleQuery,
@@ -126,6 +127,7 @@ export function createDefaultApiHandlers<
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
+        requestContext: args.requestContext,
         tableRelationalConfigByTableTsName: tables,
         tableTsNameByTableDbName: tableNamesMap,
       })
@@ -158,6 +160,7 @@ export function createDefaultApiHandlers<
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
         context: args.context,
+        requestContext: args.requestContext,
         tableRelationalConfigByTableTsName: tables,
         tableTsNameByTableDbName: tableNamesMap,
       })
@@ -211,7 +214,8 @@ class ApiHandler {
     private readonly fields: Fields<any>,
     private readonly config: {
       schema: Record<string, unknown>
-      context: MinimalContext
+      context: Context<any, MinimalContext>
+      requestContext: RequestContext<any, MinimalContext>
       tableTsNameByTableDbName: Record<string, string>
       tableRelationalConfigByTableTsName: Record<string, TableRelationalConfig>
     }

@@ -3,6 +3,7 @@ import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from '
 import z from 'zod'
 
 import type { MinimalContext } from './config'
+import type { Context, RequestContext } from './context'
 import type {
   ApiRoute,
   ApiRouteHandler,
@@ -309,7 +310,8 @@ export type ServerApiHandlerArgs<
 > = {
   slug: string
   fields: TFields
-  context: TContext
+  context: Context<any, TContext>
+  requestContext: RequestContext<any, TContext>
 }
 
 export type ApiArgs<
@@ -715,10 +717,12 @@ export function getAllCollectionEndpoints<
             const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
               args
             ) => {
+              args.context
               const response = await (fn as ApiCreateHandler<any, any>)({
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
+                requestContext: args.requestContext,
                 data: args.body,
               })
               return { status: 200, body: response }
@@ -748,6 +752,7 @@ export function getAllCollectionEndpoints<
                 fields: collection.fields,
                 context: args.context,
                 id: args.pathParams.id,
+                requestContext: args.requestContext,
               })
               return { status: 200, body: response }
             }
@@ -778,6 +783,7 @@ export function getAllCollectionEndpoints<
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
+                requestContext: args.requestContext,
                 limit: args.query.limit,
                 offset: args.query.offset,
                 orderBy: args.query.orderBy,
@@ -815,6 +821,7 @@ export function getAllCollectionEndpoints<
                 fields: collection.fields,
                 context: args.context,
                 id: args.pathParams.id,
+                requestContext: args.requestContext,
                 data: args.body as any, // TODO: Fix this
               })
               return { status: 200, body: response }
@@ -841,6 +848,7 @@ export function getAllCollectionEndpoints<
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
+                requestContext: args.requestContext,
                 ids: args.body.ids,
               })
               return { status: 200, body: { message: 'ok' } }

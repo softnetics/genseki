@@ -45,9 +45,12 @@ export async function handleServerFunction<
     if (!apiRoute) {
       throw new Error(`No API route found for method: ${args.method as string}`)
     }
+    const requestContext = serverConfig.context.toRequestContext(args.headers)
+
     const response = await apiRoute.handler({
       ...args,
       context: serverConfig.context,
+      requestContext,
     })
 
     if (response.headers?.['Set-Cookie']) {
