@@ -31,9 +31,10 @@ import {
   getPrimaryColumn,
   getTableFromSchema,
   isRelationField,
-  mapValueToTsValue,
+  mapValueToTsValue as mapFieldValueToTsValue,
 } from './utils'
 
+// TODO: Recheck that one-to-one relations are working correctly
 export function createDefaultApiHandlers<
   TContext extends MinimalContext = MinimalContext,
   TFields extends Fields<any> = Fields<any>,
@@ -328,7 +329,6 @@ class ApiHandler {
           return [[relationFieldTsName, null]]
         }
 
-        // TODO: map key from field to ts
         switch (field.type) {
           case 'connectOrCreate': {
             // NOTE: Find if connect value exists in the referenced table or not
@@ -416,7 +416,7 @@ class ApiHandler {
     ) => {
       const referenceFieldName = this.findReferencedColumnFromManyRelation(relation)
       const payload = {
-        ...mapValueToTsValue(fields, value),
+        ...mapFieldValueToTsValue(fields, value),
         [referenceFieldName]: id,
       }
 

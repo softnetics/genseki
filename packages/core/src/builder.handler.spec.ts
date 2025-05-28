@@ -126,6 +126,179 @@ describe('ApiHandler', () => {
     })
   })
 
+  describe('Check for __id field', () => {
+    const postCollection = builder.collection('postTs', {
+      slug: 'post',
+      fields: builder.fields('postTs', (fb) => ({
+        idField: fb.columns('idTs', {
+          type: 'text',
+          create: 'hidden',
+          update: 'hidden',
+        }),
+        nameField: fb.columns('nameTs', {
+          type: 'text',
+        }),
+      })),
+      identifierColumn: 'nameTs',
+    })
+
+    it('should (C) create successfully', async () => {
+      const postData = mockPostData[0]
+
+      mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        __pk: postData.id,
+        __id: postData.name,
+        idTs: postData.id,
+        nameTs: postData.name,
+      })
+
+      const { insertMock, valuesMock } = prepareInsertMock(
+        vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
+      )
+
+      const result = await postCollection.admin.api.create({
+        slug: postCollection.slug,
+        fields: postCollection.fields,
+        context: { db: mockDb as any },
+        data: {
+          nameField: postData.name,
+        },
+      })
+
+      expect(insertMock).toHaveBeenCalledTimes(1)
+      expect(valuesMock).not.toHaveBeenCalledWith([
+        {
+          idTs: expect.anything(),
+          nameTs: postData.name,
+        },
+      ])
+      expect(mockDb.query.postTs.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          columns: {
+            idTs: true,
+            nameTs: true,
+          },
+          where: eq(postCollection.fields.idField._.column, postData.id),
+          extras: {
+            __pk: sql<string | number>`${schema.postTs.idTs}`.as('__pk'),
+            __id: sql<string | number>`${schema.postTs.nameTs}`.as('__id'),
+          },
+        })
+      )
+      expect(tx.insert).toHaveBeenCalledTimes(1)
+      expect(result).toEqual({ __pk: postData.id, __id: postData.name })
+    })
+
+    it('should (R) read successfully', async () => {
+      const postData = mockPostData[0]
+
+      mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        __pk: postData.id,
+        __id: postData.name,
+        idTs: postData.id,
+        nameTs: postData.name,
+      })
+
+      const result = await postCollection.admin.api.findOne({
+        slug: postCollection.slug,
+        fields: postCollection.fields,
+        context: { db: mockDb as any },
+        id: postData.id,
+      })
+
+      expect(mockDb.query.postTs.findFirst).toBeCalledTimes(1)
+      expect(mockDb.query.postTs.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          columns: {
+            idTs: true,
+            nameTs: true,
+          },
+          where: eq(postCollection.fields.idField._.column, postData.id),
+          extras: {
+            __pk: sql<string | number>`${schema.postTs.idTs}`.as('__pk'),
+            __id: sql<string | number>`${schema.postTs.nameTs}`.as('__id'),
+          },
+        })
+      )
+      expect(result).toEqual({
+        __pk: postData.id,
+        __id: postData.name,
+        idField: postData.id,
+        nameField: postData.name,
+      })
+    })
+
+    it('should (U) update successfully', async () => {
+      const postData = mockPostData[0]
+      const updatedPostData = mockPostData[1]
+
+      mockDb.query.postTs.findFirst = vi.fn().mockResolvedValueOnce({
+        __pk: postData.id,
+        __id: postData.name,
+        idTs: updatedPostData.id,
+        nameTs: updatedPostData.name,
+      })
+
+      const { setMock, updateMock, whereUpdateMock } = prepareUpdateWhereMock(
+        vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
+      )
+
+      const result = await postCollection.admin.api.update({
+        id: postData.id,
+        context: { db: mockDb as any },
+        slug: postCollection.slug,
+        fields: postCollection.fields,
+        data: {
+          nameField: updatedPostData.name,
+        },
+      })
+
+      expect(updateMock).toHaveBeenCalledTimes(1)
+      expect(whereUpdateMock).toBeCalledWith(
+        eq(postCollection.fields.idField._.column, postData.id)
+      )
+      expect(mockDb.query.postTs.findFirst).toHaveBeenCalledWith(
+        expect.objectContaining({
+          columns: {
+            idTs: true,
+            nameTs: true,
+          },
+          where: eq(postCollection.fields.idField._.column, postData.id),
+          extras: {
+            __pk: sql<string | number>`${schema.postTs.idTs}`.as('__pk'),
+            __id: sql<string | number>`${schema.postTs.nameTs}`.as('__id'),
+          },
+        })
+      )
+      expect(setMock).toHaveBeenCalledWith({ nameTs: updatedPostData.name })
+      expect(result).toEqual({ __pk: postData.id, __id: postData.name })
+    })
+
+    it('should (D) delete successfully', async () => {
+      const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
+      tx.delete = deleteMock
+      mockDb.delete = deleteMock
+
+      const result = await postCollection.admin.api.delete({
+        slug: postCollection.slug,
+        fields: postCollection.fields,
+        context: { db: mockDb as any },
+        ids: [mockPostData[0].name, mockPostData[1].name, mockPostData[2].name],
+      })
+
+      expect(deleteMock).toHaveBeenCalledTimes(1)
+      expect(whereMock).toHaveBeenCalledTimes(1)
+      expect(whereMock).toHaveBeenCalledWith(
+        or(
+          eq(postCollection.fields.nameField._.column, mockPostData[0].name),
+          eq(postCollection.fields.nameField._.column, mockPostData[1].name),
+          eq(postCollection.fields.nameField._.column, mockPostData[2].name)
+        )
+      )
+      expect(result).toEqual(undefined)
+    })
+  })
+
   describe('with no relation case', () => {
     const postCollection = builder.collection('postTs', {
       slug: 'post',
