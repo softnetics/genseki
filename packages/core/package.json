@@ -16,7 +16,6 @@
     "test": "vitest run"
   },
   "dependencies": {
-    "better-auth": "^1.2.7",
     "cookie-es": "^2.0.0",
     "drizzle-orm": "^0.41.0",
     "remeda": "^2.21.2",
@@ -26,10 +25,6 @@
   },
   "devDependencies": {
     "@types/json-schema": "^7.0.15",
-    "clsx": "^2.1.1",
-    "tailwind-merge": "^3.0.2",
-    "tailwind-variants": "^1.0.0",
-    "tw-animate-css": "^1.2.4",
     "type-fest": "^4.38.0",
     "vitest": "^3.0.9"
   }

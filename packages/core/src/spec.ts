@@ -4,6 +4,7 @@ import z from 'zod'
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
 import { defineBaseConfig, defineServerConfig, getClientConfig } from './config'
+import { admin } from './plugins/admin'
 
 const db = drizzle({
   connection: '',
@@ -188,7 +189,10 @@ export const postCollection = builder.collection('posts', {
 })
 
 export const serverConfig = defineServerConfig(baseConfig, {
-  collections: [authorCollection, postCollection],
+  collections: {
+    authors: authorCollection,
+    posts: postCollection,
+  },
   endpoints: {
     createWithPosts: builder.endpoint(
       {
@@ -214,6 +218,7 @@ export const serverConfig = defineServerConfig(baseConfig, {
       }
     ),
   },
+  plugins: [admin()],
 })
 
 export const clientConfig = getClientConfig(serverConfig)

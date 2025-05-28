@@ -12,9 +12,8 @@ interface CreateViewProps<TServerConfig extends ServerConfig> {
 export async function CreateView<TServerConfig extends ServerConfig>(
   props: CreateViewProps<TServerConfig>
 ) {
-  const collection = props.serverConfig.collections.find(
-    (collection) => collection.slug === props.slug
-  )
+  const collection = props.serverConfig.collections[props.slug]
+
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   console.log(

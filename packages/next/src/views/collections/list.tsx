@@ -52,9 +52,8 @@ const Toolbar = ({ slug }: { slug: string }) => {
 }
 
 export async function ListView(props: ListViewProps) {
-  const collection = props.serverConfig.collections.find(
-    (collection) => collection.slug === props.slug
-  )
+  const collection = props.serverConfig.collections[props.slug]
+
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   const limit = parseInt((props.searchParams['limit'] as string) ?? '10')

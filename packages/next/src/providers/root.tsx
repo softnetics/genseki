@@ -22,7 +22,8 @@ export const useRootContext = <TServerConfig extends ServerConfig>() => {
 export const useCollection = <TCollection extends Collection>(slug: string) => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useCollection must be used within a RootProvider')
-  const collection = context.clientConfig.collections.find((collection) => collection.slug === slug)
+  const collection = context.clientConfig.collections[slug] as TCollection | undefined
+
   if (!collection) throw new Error(`Collection ${slug} not found`)
   return collection as TCollection // TODO: Fix this to infer from slug
 }
