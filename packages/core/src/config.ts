@@ -139,8 +139,8 @@ export function defineServerConfig<
       ExtractAllCollectionDefaultEndpoints<TCollections>
   >
 
-  for (const plugin of config.plugins ?? []) {
-    serverConfig = plugin.plugin(serverConfig) as any
+  for (const { plugin } of config.plugins ?? []) {
+    serverConfig = plugin(serverConfig) as any
   }
 
   return serverConfig as MergePlugins<typeof serverConfig, TPlugins>
