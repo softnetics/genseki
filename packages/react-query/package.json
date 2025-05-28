@@ -1,0 +1,34 @@
+{
+  "name": "@kivotos/react-query",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "main": "./src/index.tsx",
+  "module": "./src/index.tsx",
+  "exports": {
+    ".": "./src/index.tsx"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@internals/project-config": "workspace:^",
+    "@types/node": "^22.15.23",
+    "@types/react": "^19.1.6",
+    "type-fest": "^4.41.0",
+    "vitest": "^3.0.9"
+  },
+  "dependencies": {
+    "@kivotos/core": "workspace:^",
+    "@kivotos/rest": "workspace:^",
+    "@tanstack/react-query": "^5.71.5",
+    "react": "^19.1.0"
+  }
+}
