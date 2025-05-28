@@ -1,6 +1,7 @@
 {
   "name": "@kivotos/react-query",
-  "version": "1.0.0",
+  "private": true,
+  "sideEffects": false,
   "description": "",
   "type": "module",
   "main": "./src/index.tsx",
