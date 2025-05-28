@@ -61,6 +61,11 @@ export interface NextJsServerConfig<
   resourceRouter: ReturnType<typeof createApiResourceRouter>
 }
 
+export interface NextJsUIConfig {
+  notFound?: React.ReactElement
+  notAuthorized?: React.ReactElement
+}
+
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
@@ -74,12 +79,18 @@ export function defineNextJsServerConfig<
   >[],
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(
-  serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
+  serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>,
+  uiConfig?: NextJsUIConfig
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   const radixRouter = createRouter<RouterData>({
     routes: {
-      notFound: { view: () => <NotfoundPage redirectURL="/admin/collections" /> },
-      notAuthorized: { view: () => <NotAuthorizedPage redirectURL="/admin/auth/login" /> },
+      notFound: {
+        view: () => uiConfig?.notFound || <NotfoundPage redirectURL="/admin/collections" />,
+      },
+      notAuthorized: {
+        view: () =>
+          uiConfig?.notAuthorized || <NotAuthorizedPage redirectURL="/admin/auth/login" />,
+      },
     },
   })
 
