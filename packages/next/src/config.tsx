@@ -12,8 +12,10 @@ import type {
 
 import { createApiResourceRouter } from './resource'
 import type { ServerFunction } from './server-function'
+import { ForgotPasswordView } from './views/auth/forgot-password/forgot-password'
 import { AuthLayout } from './views/auth/layout'
 import { LoginView } from './views/auth/login'
+import { ResetPasswordView } from './views/auth/reset-password/reset-password'
 import { SignUpView } from './views/auth/sign-up'
 import { CreateView } from './views/collections/create'
 import { HomeView } from './views/collections/home'
@@ -162,14 +164,22 @@ export function defineNextJsServerConfig<
       params: { slug: string; identifier: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
-    }) => <AuthLayout serverConfig={args.serverConfig}>TODO</AuthLayout>,
+    }) => (
+      <AuthLayout serverConfig={args.serverConfig}>
+        <ForgotPasswordView {...args} {...args.params} />
+      </AuthLayout>
+    ),
   })
   radixRouter.insert(`/auth/reset-password`, {
     requiredAuthentication: false,
     view: (args: {
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
-    }) => <AuthLayout serverConfig={args.serverConfig}>TODO</AuthLayout>,
+    }) => (
+      <AuthLayout serverConfig={args.serverConfig}>
+        <ResetPasswordView {...args} />
+      </AuthLayout>
+    ),
   })
 
   return {
