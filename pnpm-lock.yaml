@@ -38,12 +38,18 @@ importers:
       '@kivotos/next':
         specifier: workspace:^
         version: link:../../packages/next
+      '@kivotos/react-query':
+        specifier: workspace:^
+        version: link:../../packages/react-query
       '@kivotos/rest':
         specifier: workspace:^
         version: link:../../packages/rest
       '@tailwindcss/postcss':
         specifier: ^4.0.14
         version: 4.1.7
+      '@tanstack/react-query':
+        specifier: ^5.71.5
+        version: 5.76.1(react@19.1.0)
       drizzle-orm:
         specifier: ^0.41.0
         version: 0.41.0(@types/pg@8.15.2)(gel@2.1.0)(kysely@0.28.2)(pg@8.16.0)
