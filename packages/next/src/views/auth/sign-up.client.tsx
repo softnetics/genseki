@@ -3,6 +3,7 @@
 import { useForm } from 'react-hook-form'
 
 import { redirect } from 'next/navigation'
+import { toast } from 'sonner'
 
 import { SubmitButton } from '../../components/submit-button'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../../intentui/ui/form'
@@ -38,8 +39,9 @@ export function SignUpClientForm() {
     })
 
     if (response.status !== 200) {
-      console.error('Signup failed', response)
-      // TODO: Show toast
+      toast.error('Failed to sign up', {
+        description: response.body.status || 'Failed to sign up',
+      })
       return
     }
 
@@ -54,13 +56,22 @@ export function SignUpClientForm() {
       })
 
       if (loginResponse.status !== 200) {
-        console.error('Login failed', response)
-        // TODO: Show toast
+        toast.error('Failed to log in after sign up', {
+          description: loginResponse.body.status || 'Failed to log in',
+        })
         return
       }
 
+      toast.success('Successfully signed up and logged in', {
+        description: 'You are now logged in.',
+      })
+
       return redirect('../collections')
     }
+
+    toast.success('Successfully signed up', {
+      description: 'You can now log in with your credentials.',
+    })
 
     return redirect('./login')
   }

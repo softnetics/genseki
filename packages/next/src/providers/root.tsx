@@ -4,6 +4,7 @@ import { createContext, type ReactNode, useContext } from 'react'
 
 import type { ClientConfig, Collection, ServerConfig } from '@kivotos/core'
 
+import { Toast } from '../intentui/ui/toast'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {
@@ -52,6 +53,7 @@ export const RootProvider = (props: {
         serverFunction: props.serverFunction,
       }}
     >
+      <Toast />
       {props.children}
     </RootContext.Provider>
   )

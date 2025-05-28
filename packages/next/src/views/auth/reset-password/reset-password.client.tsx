@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { redirect } from 'next/navigation'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { SubmitButton } from '../../../components/submit-button'
@@ -51,12 +52,18 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
       pathParams: {},
     })
     if (response.status !== 200) {
+      toast.error('Failed to reset password', {
+        description: response.body.status || 'Failed to reset password',
+      })
       form.setError('password', {
         type: 'manual',
         message: response.body.status || 'Failed to reset password',
       })
       return
     }
+    toast.success('Password reset successfully', {
+      description: 'You can now log in with your new password.',
+    })
     redirect('./login')
   }
 

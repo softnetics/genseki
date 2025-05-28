@@ -14,7 +14,7 @@ export function ForgotPasswordView(_props: SignInViewProps) {
       <div className="flex flex-col flex-1 space-y-16 max-w-sm">
         <div className="flex flex-col flex-1 space-y-12">
           <Typography type="h2" weight="semibold" className="text-center">
-            ForgotPassword
+            Forgot Password
           </Typography>
           <ForgotPasswordClientForm />
         </div>

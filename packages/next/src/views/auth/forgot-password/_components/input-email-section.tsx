@@ -56,7 +56,15 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
             </FormItem>
           )}
         />
-        <Button variant="primary" type="submit" className="w-full" size="sm">
+        <Button
+          variant="primary"
+          type="submit"
+          className="w-full"
+          size="sm"
+          onClick={() => {
+            form.clearErrors('email')
+          }}
+        >
           Send OTP
         </Button>
       </form>

@@ -3,6 +3,7 @@
 import { useState } from 'react'
 
 import { useRouter } from 'next/navigation'
+import { toast } from 'sonner'
 
 import { InputEmailSection } from './_components/input-email-section'
 import { Step } from './types'
@@ -35,11 +36,18 @@ export function ForgotPasswordClientForm() {
             })
 
             if (response.status !== 200) {
+              toast.error('Failed to send OTP', {
+                description: response.body.status || 'Failed to send OTP',
+              })
               return {
                 status: response.status,
                 errormessage: response.body.status || 'Failed to send OTP',
               }
             }
+
+            toast.success('OTP sent successfully', {
+              description: 'Please check your email to continue.',
+            })
 
             setEmail(email)
             setStep(Step.COMPLETED)

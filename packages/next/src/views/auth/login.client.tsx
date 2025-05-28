@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
 import { redirect } from 'next/navigation'
+import { toast } from 'sonner'
 import { z } from 'zod'
 
 import { SubmitButton } from '../../components/submit-button'
@@ -33,6 +34,7 @@ export function LoginClientForm() {
   })
 
   async function login(data: z.infer<typeof schema>) {
+    form.clearErrors('email')
     const response = await serverFunction({
       method: 'auth.loginEmail',
       body: {
@@ -45,12 +47,20 @@ export function LoginClientForm() {
     })
 
     if (response.status !== 200) {
+      toast.error('Login failed', {
+        description: response.body.status || 'Failed to login',
+      })
       form.setError('email', {
         type: 'manual',
         message: response.body.status || 'Failed to login',
       })
+
       return
     }
+
+    toast.success('Login successful', {
+      description: 'You have successfully logged in.',
+    })
 
     redirect('../collections')
   }
@@ -95,7 +105,14 @@ export function LoginClientForm() {
             </FormItem>
           )}
         />
-        <SubmitButton>Login</SubmitButton>
+        <SubmitButton
+          onClick={() => {
+            form.clearErrors('email')
+            form.clearErrors('password')
+          }}
+        >
+          Login
+        </SubmitButton>
         <div className="flex flex-row justify-between">
           <Link href="./sign-up" intent="primary" className="text-sm">
             Create an account?
