@@ -300,6 +300,14 @@ export class FieldBuilder<
     this.tableRelationalConfig = tableRelationalConfigByTableTsName[
       tableTsName
     ] as TTableRelationConfigByTableTsName[TTableTsName]
+
+    if (this.tableRelationalConfig === undefined) {
+      throw new Error(
+        `Table ${tableTsName} not found in schema. Available tables: ${Object.keys(
+          tableRelationalConfigByTableTsName
+        ).join(', ')}`
+      )
+    }
   }
 
   columns<

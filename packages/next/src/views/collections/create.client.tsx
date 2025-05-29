@@ -1,30 +1,24 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
 import { redirect } from 'next/navigation'
 
+import { AutoField } from '../../components/auto-field/client'
 import { SubmitButton } from '../../components/submit-button'
-import { Form, FormField, FormItemController } from '../../intentui/ui/form'
-import { useServerFunction } from '../../providers/root'
+import { Form } from '../../intentui/ui/form'
+import { useCollection, useServerFunction } from '../../providers/root'
 
 interface CreateClientViewProps {
   slug: string
-  inputFields: {
-    name: string
-    label?: string
-    description?: string
-    placeholder?: string
-    input: ReactNode
-  }[]
+  optionsRecord: Record<string, any[]>
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
   const form = useForm()
+  const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
 
-  // TODO: remove this
   const w = form.watch()
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
@@ -56,21 +50,17 @@ export function CreateClientView(props: CreateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-4 mt-16"
       >
-        {props.inputFields.map((input) => (
-          <FormField
-            key={input.name}
-            name={input.name}
-            control={form.control}
-            render={({ field, fieldState, formState }) => (
-              <FormItemController field={field} fieldState={fieldState} formState={formState}>
-                {input.input}
-              </FormItemController>
-            )}
+        {Object.values(collection.fields).map((field) => (
+          <AutoField
+            key={field.fieldName}
+            name={field.fieldName}
+            field={field}
+            visibilityField="create"
+            optionsRecord={props.optionsRecord}
           />
         ))}
         <SubmitButton>Create</SubmitButton>
       </form>
-      {/* TODO: Remove this */}
       {JSON.stringify(w, null, 2)}
     </Form>
   )

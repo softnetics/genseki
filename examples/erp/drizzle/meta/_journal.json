@@ -5,15 +5,8 @@
     {
       "idx": 0,
       "version": "7",
-      "when": 1748256471330,
-      "tag": "0000_damp_talon",
-      "breakpoints": true
-    },
-    {
-      "idx": 1,
-      "version": "7",
-      "when": 1748513272149,
-      "tag": "0001_silent_nebula",
+      "when": 1748519655820,
+      "tag": "0000_first_lenny_balinger",
       "breakpoints": true
     }
   ]

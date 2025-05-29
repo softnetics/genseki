@@ -26,6 +26,7 @@ export {
   defineServerConfig,
   getClientCollection,
   getClientConfig,
+  getFieldsClient,
 } from './config'
 export type {
   ApiRoute,
@@ -37,4 +38,4 @@ export type {
   ClientApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export type { Field, FieldBase, FieldClient, Fields, FieldsClient } from './field'
+export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
