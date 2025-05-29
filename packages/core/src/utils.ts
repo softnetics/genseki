@@ -203,12 +203,13 @@ export function withValidator<
     const response = await handler(payload)
 
     const validationError = validateResponseBody(schema, response.status, response.body)
+
     if (validationError) {
       return {
         status: 500,
         body: {
           error: 'Response validation failed',
-          details: validationError.issues,
+          details: validationError,
         },
       }
     }
