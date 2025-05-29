@@ -26,7 +26,7 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   >(
     method: TMethod,
     path: TPath,
-    body: TPayload,
+    payload: TPayload,
     options?: Omit<UseQueryOptions<TResponse, TError, TPayload>, 'queryKey'>
   ) => UseQueryResult<TResponse, TError>
   useMutation: <
@@ -39,7 +39,7 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   >(
     method: TMethod,
     path: TPath,
-    body: TPayload,
+    payload: TPayload,
     options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
   ) => UseMutationResult<TResponse, TError, TPayload, TContext>
   queryOptions: <
@@ -51,7 +51,7 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   >(
     method: TMethod,
     path: TPath,
-    body: TPayload,
+    payload: TPayload,
     options?: Omit<UseQueryOptions<TResponse, TError, TPayload>, 'queryKey'>
   ) => UseQueryOptions<TResponse, TError, TPayload>
   mutationOptions: <
@@ -64,7 +64,7 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   >(
     method: TMethod,
     path: TPath,
-    body: TPayload,
+    payload: TPayload,
     options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
   ) => UseMutationOptions<TResponse, TError, TPayload, TContext>
 }

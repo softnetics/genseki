@@ -20,15 +20,14 @@
   "license": "ISC",
   "devDependencies": {
     "@internals/project-config": "workspace:^",
+    "@kivotos/core": "workspace:^",
+    "@kivotos/rest": "workspace:^",
     "@types/node": "^22.15.23",
     "@types/react": "^19.1.6",
     "type-fest": "^4.41.0",
     "vitest": "^3.0.9"
   },
   "dependencies": {
-    "@kivotos/core": "workspace:^",
-    "@kivotos/rest": "workspace:^",
-    "@tanstack/react-query": "^5.71.5",
-    "react": "^19.1.0"
+    "@tanstack/react-query": "^5.71.5"
   }
 }

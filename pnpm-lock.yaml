@@ -317,22 +317,19 @@ importers:
 
   packages/react-query:
     dependencies:
+      '@tanstack/react-query':
+        specifier: ^5.71.5
+        version: 5.76.1(react@19.1.0)
+    devDependencies:
+      '@internals/project-config':
+        specifier: workspace:^
+        version: link:../../internals/project-config
       '@kivotos/core':
         specifier: workspace:^
         version: link:../core
       '@kivotos/rest':
         specifier: workspace:^
         version: link:../rest
-      '@tanstack/react-query':
-        specifier: ^5.71.5
-        version: 5.76.1(react@19.1.0)
-      react:
-        specifier: ^19.1.0
-        version: 19.1.0
-    devDependencies:
-      '@internals/project-config':
-        specifier: workspace:^
-        version: link:../../internals/project-config
       '@types/node':
         specifier: ^22.15.23
         version: 22.15.23
