@@ -126,6 +126,7 @@ export function AutoSelectField(props: AutoSelectField) {
     <Select
       {...field}
       {...props}
+      selectedKey={field.value}
       className={cn('w-full', props.className)}
       errorMessage={error?.message}
       onSelectionChange={(value) => {

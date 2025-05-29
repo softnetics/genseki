@@ -177,7 +177,6 @@ export function createDefaultApiHandlers<
     }
 
     const { __pk, __id } = result
-
     return { __pk, __id }
   }
 

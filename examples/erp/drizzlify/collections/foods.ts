@@ -2,16 +2,8 @@ import { builder } from '../helper'
 
 export const foodsCollection = builder.collection('foods', {
   slug: 'foods',
-  primaryField: 'id',
+  identifierColumn: 'id',
   fields: builder.fields('foods', (fb) => ({
-    id: fb.columns('id', {
-      type: 'text',
-      label: 'Food ID',
-      placeholder: 'ID',
-      default: '123',
-      create: 'hidden',
-      update: 'hidden',
-    }),
     name: fb.columns('name', {
       type: 'text',
       label: 'Food name',

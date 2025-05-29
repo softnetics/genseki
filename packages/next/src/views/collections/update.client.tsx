@@ -9,7 +9,8 @@ import { SubmitButton } from '../../components/submit-button'
 import { Form, FormField, FormItemController } from '../../intentui/ui/form'
 import { useServerFunction } from '../../providers/root'
 
-interface CreateClientViewProps {
+interface UpdateClientViewProps {
+  identifer: string
   slug: string
   inputFields: {
     name: string
@@ -18,30 +19,32 @@ interface CreateClientViewProps {
     placeholder?: string
     input: ReactNode
   }[]
+  defaultValues?: Record<string, any>
 }
 
-export function CreateClientView(props: CreateClientViewProps) {
-  const form = useForm()
+export function UpdateClientView(props: UpdateClientViewProps) {
+  const form = useForm({
+    defaultValues: props.defaultValues,
+  })
   const serverFunction = useServerFunction()
 
-  // TODO: remove this
   const w = form.watch()
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({
-      method: `${props.slug}.create`,
+      method: `${props.slug}.update`,
       body: data,
       headers: {},
-      pathParams: {},
+      pathParams: { id: props.identifer },
       query: {},
     })
 
     if (result.status === 200) {
-      console.log('Creation successful:', result.body)
-      redirect(`./`) // Redirect to the created item
+      console.log('Update successful:', result.body)
+      redirect(`../`) // Redirect to the list page
     } else {
       // Handle error, e.g., show an error message
-      console.error('Creation failed:', result.body)
+      console.error('Update failed:', result.body)
     }
   }
 
@@ -68,9 +71,8 @@ export function CreateClientView(props: CreateClientViewProps) {
             )}
           />
         ))}
-        <SubmitButton>Create</SubmitButton>
+        <SubmitButton>Update</SubmitButton>
       </form>
-      {/* TODO: Remove this */}
       {JSON.stringify(w, null, 2)}
     </Form>
   )
