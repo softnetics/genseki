@@ -2,15 +2,9 @@ import { cache } from 'react'
 
 import { headers } from 'next/headers'
 
-import type { ServerFunction } from '../server-function'
+import { getHeadersObject } from './headers'
 
-function getHeadersObject(headers: Headers) {
-  const headersObject: Record<string, string> = {}
-  headers.forEach((value, key) => {
-    headersObject[key] = value
-  })
-  return headersObject
-}
+import type { ServerFunction } from '../server-function'
 
 // TODO: Add type for user
 async function _getUser(serverFunction: ServerFunction): Promise<any | null> {

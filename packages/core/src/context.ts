@@ -14,7 +14,7 @@ export class Context<TContext extends Record<string, unknown> = Record<string, u
     this.db = ctx.db as any
   }
 
-  get<TName extends keyof TContext>(name: TName): TContext[TName] {
+  get<TName extends Exclude<keyof TContext, 'db'>>(name: TName): TContext[TName] {
     const value = this.ctx[name]
     if (value === undefined) {
       throw new Error(`Key "${String(name)}" not found in context.`)
@@ -27,12 +27,6 @@ export class Context<TContext extends Record<string, unknown> = Record<string, u
     headers: Record<string, string> = {}
   ): RequestContext<TContext> {
     return new RequestContext<TContext>(ctx.ctx, ctx.authContext, headers)
-  }
-
-  static getCtx<TContext extends Record<string, unknown> = Record<string, unknown>>(
-    ctx: Context<TContext>
-  ): TContext {
-    return ctx.ctx
   }
 }
 
@@ -67,19 +61,18 @@ export class RequestContext<
     return this._headers
   }
 
-  override get<
-    TKey extends string | number | symbol,
-    TValue extends TKey extends keyof TContext ? TContext[TKey] : any,
-  >(name: TKey): TValue {
+  override get<TKey extends Exclude<keyof TContext, 'db'>>(name: TKey): TContext[TKey]
+  override get(name: string): unknown
+  override get(name: string): unknown {
     try {
-      const value = this.ctx[name as keyof TContext]
-      return value as TValue
+      const value = super.get(name as any)
+      return value
     } catch {
       const value = this._state[name as string]
       if (value === undefined) {
         throw new Error(`Key "${String(name)}" not found in context.`)
       }
-      return value as TValue
+      return value
     }
   }
 
