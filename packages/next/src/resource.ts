@@ -28,12 +28,25 @@ async function makeApiRoute(
   const reqHeaders = extractHeaders(req.headers)
   const reqSearchParams = extractSearchParams(req.nextUrl.searchParams)
 
+  // TODO: This logic might not able to handle form data or x-www-form-urlencoded requests correctly
+  let body: any = {}
+  try {
+    if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
+      body = undefined
+    } else {
+      body = await req.json()
+    }
+  } catch {
+    // If the request body is not JSON or empty, we will not parse it
+    // This is useful for file uploads or plain text requests
+  }
+
   const rawResponse = await route.handler({
     context: context,
     headers: reqHeaders,
     pathParams: pathParams,
     query: reqSearchParams,
-    body: req.body,
+    body,
   })
 
   return new Response(JSON.stringify(rawResponse.body) as any, {
