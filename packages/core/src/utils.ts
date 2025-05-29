@@ -1,8 +1,10 @@
 import type { Column, TableRelationalConfig } from 'drizzle-orm'
 import { is, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
-import type { ZodObject, ZodOptional, ZodType } from 'zod'
+import type { ZodError, ZodObject, ZodOptional, ZodType } from 'zod'
 
+import type { MaybePromise } from './collection'
+import type { ApiHttpStatus, ApiRouteHandlerPayloadWithContext, ApiRouteSchema } from './endpoint'
 import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
@@ -113,6 +115,93 @@ export function mapValueToTsValue(
   })
 
   return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
+}
+
+export async function validateRequestBody<
+  TApiRouteSchema extends ApiRouteSchema = any,
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+>(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
+  const zodErrors: ZodError[] = []
+  if (schema.query) {
+    const err = await schema.query.safeParseAsync((payload as any).query)
+    if (!err.success) {
+      zodErrors.push(err.error)
+    }
+  }
+
+  if (schema.pathParams) {
+    const err = await schema.pathParams.safeParseAsync((payload as any).pathParams)
+    if (!err.success) {
+      zodErrors.push(err.error)
+    }
+  }
+
+  if (schema.headers) {
+    const err = await schema.headers.safeParseAsync(payload.headers)
+    if (!err.success) {
+      zodErrors.push(err.error)
+    }
+  }
+
+  if (schema.method !== 'GET' && schema.body) {
+    const err = await schema.body.safeParseAsync((payload as any).body)
+    if (!err.success) {
+      zodErrors.push(err.error)
+    }
+  }
+
+  return zodErrors
+}
+
+export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = any>(
+  schema: TApiRouteSchema,
+  statusCode: ApiHttpStatus,
+  response: any
+) {
+  if (!schema.responses[statusCode]) {
+    throw new Error(`No response schema defined for status code ${statusCode}`)
+  }
+
+  const result = schema.responses[statusCode].safeParse(response)
+  return result.error
+}
+
+export function withValidator<
+  TApiRouteSchema extends ApiRouteSchema,
+  TContext extends Record<string, unknown>,
+>(
+  schema: TApiRouteSchema,
+  handler: (
+    payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>
+  ) => MaybePromise<any>
+): (payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) => MaybePromise<any> {
+  return async (payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) => {
+    const zodErrors = await validateRequestBody(schema, payload)
+    if (zodErrors.length > 0) {
+      return {
+        status: 400,
+        body: {
+          error: 'Validation failed',
+          details: zodErrors.map((e) => e.message),
+        },
+      }
+    }
+
+    const response = await handler(payload)
+
+    const validationError = validateResponseBody(schema, response.status, response.body)
+    if (validationError) {
+      return {
+        status: 500,
+        body: {
+          error: 'Response validation failed',
+          details: validationError.errors.map((e) => e.message),
+        },
+      }
+    }
+
+    return response
+  }
 }
 
 export type JoinArrays<T extends any[]> = Simplify<

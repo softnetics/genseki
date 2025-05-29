@@ -4,6 +4,7 @@ import type { z, ZodType } from 'zod'
 import zodToJsonSchema from 'zod-to-json-schema'
 
 import type { MaybePromise } from './collection'
+import { withValidator } from './utils'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 
@@ -166,7 +167,7 @@ export function createEndpoint<
 >(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
   return {
     schema,
-    handler,
+    handler: withValidator(schema, handler),
   }
 }
 

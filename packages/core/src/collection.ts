@@ -3,12 +3,13 @@ import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from '
 import z from 'zod'
 
 import type { MinimalContext } from './config'
-import type {
-  ApiRoute,
-  ApiRouteHandler,
-  ApiRouter,
-  ApiRouteSchema,
-  ClientApiRouter,
+import {
+  type ApiRoute,
+  type ApiRouteHandler,
+  type ApiRouter,
+  type ApiRouteSchema,
+  type ClientApiRouter,
+  createEndpoint,
 } from './endpoint'
 import {
   type Field,
@@ -23,7 +24,7 @@ import {
   fieldsToZodObject,
   type FieldsWithFieldName,
 } from './field'
-import type { GetTableByTableTsName, ToZodObject } from './utils'
+import { type GetTableByTableTsName, type ToZodObject } from './utils'
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -724,7 +725,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.FIND_ONE: {
             const response = fieldsToZodObject(fields)
@@ -752,7 +756,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.FIND_MANY: {
             const response = fieldsToZodObject(fields)
@@ -786,7 +793,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.UPDATE: {
             const body = fieldsToZodObject(fields)
@@ -820,7 +830,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.DELETE: {
             const schema = {
@@ -846,7 +859,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: { message: 'ok' } }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           default:
             throw new Error(`Unknown method: ${method}`)
