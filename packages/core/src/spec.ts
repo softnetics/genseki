@@ -57,7 +57,7 @@ export const authorCollection = builder.collection('authors', {
       type: 'text',
     }),
   })),
-  primaryField: 'id',
+  identifierColumn: 'id',
 })
 
 export const postCollection = builder.collection('posts', {
@@ -130,7 +130,7 @@ export const postCollection = builder.collection('posts', {
       })),
     })),
   })),
-  primaryField: 'id',
+  identifierColumn: 'id',
   admin: {
     api: {
       // NOTE: user can override some logics

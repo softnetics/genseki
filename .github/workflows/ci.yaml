@@ -21,8 +21,8 @@ jobs:
         with:
           fetch-depth: 0
 
-      - name: Setup GitHub Actions caching for Turbo
-        uses: dtinth/setup-github-actions-caching-for-turbo@v1
+      - name: Cache for Turbo
+        uses: rharkor/caching-for-turbo@v1.5
 
       - name: Setup pnpm
         uses: pnpm/action-setup@v4
