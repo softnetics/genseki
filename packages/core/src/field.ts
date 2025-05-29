@@ -444,6 +444,7 @@ export class FieldBuilder<
   }
 }
 
+// TODO: Add support for relation input fields
 type CastOptionalFieldToZodSchema<
   TField extends Field<any>,
   TSchema extends z.ZodTypeAny,
