@@ -3,8 +3,12 @@ import { is, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import type { ZodError, ZodObject, ZodOptional, ZodType } from 'zod'
 
-import type { MaybePromise } from './collection'
-import type { ApiHttpStatus, ApiRouteHandlerPayloadWithContext, ApiRouteSchema } from './endpoint'
+import type {
+  ApiHttpStatus,
+  ApiRouteHandler,
+  ApiRouteHandlerPayloadWithContext,
+  ApiRouteSchema,
+} from './endpoint'
 import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
@@ -184,11 +188,11 @@ export function withValidator<
   TContext extends Record<string, unknown>,
 >(
   schema: TApiRouteSchema,
-  handler: (
+  handler: ApiRouteHandler<TContext, TApiRouteSchema>
+): ApiRouteHandler<TContext, TApiRouteSchema> {
+  const wrappedHandler = async (
     payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>
-  ) => MaybePromise<any>
-): (payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) => MaybePromise<any> {
-  return async (payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) => {
+  ) => {
     const zodErrors = await validateRequestBody(schema, payload)
     if (zodErrors) {
       return {
@@ -202,7 +206,11 @@ export function withValidator<
 
     const response = await handler(payload)
 
-    const validationError = validateResponseBody(schema, response.status, response.body)
+    const validationError = validateResponseBody(
+      schema,
+      response.status as ApiHttpStatus,
+      response.body
+    )
 
     if (validationError) {
       return {
@@ -216,6 +224,8 @@ export function withValidator<
 
     return response
   }
+
+  return wrappedHandler as ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
 export type JoinArrays<T extends any[]> = Simplify<
