@@ -546,7 +546,6 @@ export function fieldsToZodObject<TFields extends Fields<any>>(
 ): FieldsToZodObject<TFields> {
   const zodObject = Object.entries(fields).reduce(
     (acc, [key, field]) => {
-      console.log(key, field)
       acc[key] = fieldToZodScheama(field)
       return acc
     },
