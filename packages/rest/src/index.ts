@@ -5,7 +5,7 @@ import type { ApiRouteHandlerPayload, ApiRouteSchema } from '@kivotos/core'
 
 import { withPathParams, withQueryParams } from './utils'
 
-interface CreateRestClientConfig {
+export interface CreateRestClientConfig {
   baseUrl: string
 }
 
@@ -54,7 +54,7 @@ export function createRestClient<TServerConfig extends ServerConfig<any, any, an
   }
 }
 
-type ExtractClientApiRouterPath<TApiRouter extends ApiRouter<any>> = ValueOf<{
+export type ExtractClientApiRouterPath<TApiRouter extends ApiRouter<any>> = ValueOf<{
   [TKey in keyof TApiRouter]: TApiRouter[TKey]['schema'] extends {
     path: infer TPath extends string
   }
@@ -62,7 +62,7 @@ type ExtractClientApiRouterPath<TApiRouter extends ApiRouter<any>> = ValueOf<{
     : never
 }>
 
-type RestResponse<TApiRouter extends ApiRouter<any>, TPath extends string> = ValueOf<{
+export type RestResponse<TApiRouter extends ApiRouter<any>, TPath extends string> = ValueOf<{
   [TKey in keyof TApiRouter]: TApiRouter[TKey]['schema'] extends { path: TPath }
     ? TApiRouter[TKey]['schema'] extends infer TApiRouteSchema extends ApiRouteSchema
       ? ApiRouteResponse<TApiRouteSchema['responses']>
@@ -70,7 +70,7 @@ type RestResponse<TApiRouter extends ApiRouter<any>, TPath extends string> = Val
     : never
 }>
 
-type RestPayload<TApiRouter extends ApiRouter<any>, TPath extends string> = ValueOf<{
+export type RestPayload<TApiRouter extends ApiRouter<any>, TPath extends string> = ValueOf<{
   [TKey in keyof TApiRouter]: TApiRouter[TKey]['schema'] extends { path: TPath }
     ? TApiRouter[TKey]['schema'] extends infer TApiRouteSchema extends ApiRouteSchema
       ? ApiRouteHandlerPayload<TApiRouteSchema>
@@ -78,14 +78,14 @@ type RestPayload<TApiRouter extends ApiRouter<any>, TPath extends string> = Valu
     : never
 }>
 
-type RestMethod<TApiRouter extends ApiRouter<any>> = <
+export type RestMethod<TApiRouter extends ApiRouter<any>> = <
   TPath extends ExtractClientApiRouterPath<TApiRouter>,
 >(
   path: TPath,
   payload: RestPayload<TApiRouter, TPath>
 ) => Promise<RestResponse<TApiRouter, TPath>>
 
-type FilterByMethod<TApiRouter extends ApiRouter<any>, TMethod extends string> = {
+export type FilterByMethod<TApiRouter extends ApiRouter<any>, TMethod extends string> = {
   [TKey in keyof TApiRouter as TApiRouter[TKey]['schema'] extends { method: TMethod }
     ? TKey
     : never]: TApiRouter[TKey]
