@@ -104,7 +104,7 @@ export function admin<TContext extends MinimalContext<{ user: AnyUserTable }>>(
 
   const userCollection = builder.collection('user', {
     slug: 'user',
-    primaryField: 'name',
+    identifierColumn: 'id',
     fields: builder.fields('user', (fb) => ({
       name: fb.columns('name', {
         type: 'text',

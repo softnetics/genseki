@@ -8,6 +8,13 @@
       "when": 1747986947161,
       "tag": "0000_freezing_the_order",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1748513272149,
+      "tag": "0001_silent_nebula",
+      "breakpoints": true
     }
   ]
 }
