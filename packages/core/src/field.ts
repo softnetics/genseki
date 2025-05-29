@@ -490,7 +490,7 @@ export function fieldToZodScheama<TField extends Field<any>>(
     // string[] input
     case 'comboboxText':
       if (!field._.column.notNull) {
-        return z.array(z.string()) as FieldToZodScheama<TField>
+        return z.array(z.string()).optional() as FieldToZodScheama<TField>
       }
       return z.array(z.string()) as FieldToZodScheama<TField>
     // number input
