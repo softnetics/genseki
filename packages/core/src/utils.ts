@@ -80,10 +80,8 @@ export function createDrizzleQuery(fields: Fields<any>): Record<string, any> {
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
       const relationName = field._.relation.fieldName
-      if (field.type === 'create' || field.type === 'connectOrCreate') {
-        return [[relationName, createDrizzleQuery(field.fields) as any]]
-      }
-      return [[relationName, true as const]]
+
+      return [[relationName, createDrizzleQuery(field.fields) as any]]
     })
   )
 
@@ -102,6 +100,19 @@ export function appendFieldNameToFields<TFields extends FieldsInitial<any>>(
       return [key, fieldWithName as Field<any> & { fieldName: string }]
     })
   ) as FieldsWithFieldName<TFields>
+}
+
+export function mapValueToTsValue(
+  fields: Fields<any>,
+  value: Record<string, any>
+): Record<string, any> {
+  const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
+    if (value[fieldName] === undefined) return []
+    if (field._.source !== 'column') return []
+    return [[field._.columnTsName, value[fieldName]]]
+  })
+
+  return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
 }
 
 export type JoinArrays<T extends any[]> = Simplify<
@@ -123,3 +134,8 @@ export type ToZodObject<T extends Record<string, any>> = ZodObject<{
     ? ZodOptional<ZodType<NonNullable<T[Key]>>>
     : ZodType<T[Key]>
 }>
+
+export type GetTableByTableTsName<
+  TFullSchema extends Record<string, unknown>,
+  TTableTsName extends keyof TFullSchema,
+> = TFullSchema[TTableTsName] extends Table<any> ? TFullSchema[TTableTsName] : never
