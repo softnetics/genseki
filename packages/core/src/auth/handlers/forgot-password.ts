@@ -1,15 +1,14 @@
 import z from 'zod'
 
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
-import { type AuthContext } from '../context'
+import type { AuthContext } from '../context'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
+export function forgotPasswordEmail<
+  const TAuthContext extends AuthContext,
+  const TContext extends Record<string, unknown>,
+>(authContext: TAuthContext) {
+  const { authConfig, internalHandlers } = authContext
 
-export function forgotPasswordEmail<const TOptions extends InternalRouteOptions>(
-  options: TOptions
-) {
   const schema = {
     method: 'POST',
     path: '/api/auth/forgot-password',
@@ -26,8 +25,8 @@ export function forgotPasswordEmail<const TOptions extends InternalRouteOptions>
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    if (!args.context.authConfig.resetPassword?.enabled) {
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
+    if (!authConfig.resetPassword?.enabled) {
       // TODO: Log not enabled
       return {
         status: 400,
@@ -35,19 +34,19 @@ export function forgotPasswordEmail<const TOptions extends InternalRouteOptions>
       }
     }
 
-    const user = await args.context.internalHandlers.user.findByEmail(args.body.email)
+    const user = await internalHandlers.user.findByEmail(args.body.email)
 
     const token = ''
     const identifier = `reset-password:${token}`
-    await args.context.internalHandlers.verification.create({
+    await internalHandlers.verification.create({
       identifier,
       value: user.id,
       expiresAt: new Date(
-        Date.now() + (args.context.authConfig.resetPassword?.expiresInMs ?? 1000 * 60 * 60 * 24)
+        Date.now() + (authConfig.resetPassword?.expiresInMs ?? 1000 * 60 * 60 * 24)
       ),
     })
 
-    const resetPasswordLink = `${args.context.authConfig.resetPassword?.resetPasswordUrl ?? '/auth/reset-password'}?token=${token}`
+    const resetPasswordLink = `${authConfig.resetPassword?.resetPasswordUrl ?? '/auth/reset-password'}?token=${token}`
     // Send email
 
     return {

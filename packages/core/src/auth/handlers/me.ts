@@ -3,11 +3,12 @@ import z from 'zod'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
+export function me<
+  const TAuthContext extends AuthContext,
+  const TContext extends Record<string, unknown>,
+>(authContext: TAuthContext) {
+  const { requiredAuthenticated } = authContext
 
-export function me<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'GET',
     path: '/api/auth/me',
@@ -24,8 +25,8 @@ export function me<const TOptions extends InternalRouteOptions>(options: TOption
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    const user = await args.context.requiredAuthenticated(args.headers)
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
+    const user = await requiredAuthenticated(args.headers)
 
     return {
       status: 200,

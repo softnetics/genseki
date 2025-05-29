@@ -1,12 +1,18 @@
 import z from 'zod'
 
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
-import type { AuthConfig } from '..'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
 import { hashPassword, setSessionCookie } from '../utils'
 
-export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
+export function signUp<
+  const TAuthContext extends AuthContext,
+  const TContext extends Record<string, unknown>,
+>(authContext: TAuthContext) {
+  const {
+    authConfig: { emailAndPassword },
+    internalHandlers,
+  } = authContext
   const schema = {
     method: 'POST',
     path: '/api/auth/sign-up',
@@ -30,18 +36,18 @@ export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     const hashedPassword =
-      (await options.emailAndPassword?.passwordHasher?.(args.body.password)) ??
+      (await emailAndPassword?.passwordHasher?.(args.body.password)) ??
       (await hashPassword(args.body.password))
 
-    const user = await args.context.internalHandlers.user.create({
+    const user = await internalHandlers.user.create({
       name: args.body.name,
       email: args.body.email,
       image: null,
     })
 
-    await args.context.internalHandlers.account.link({
+    await internalHandlers.account.link({
       userId: user.id,
       providerId: AccountProvider.CREDENTIAL,
       accountId: user.id,
@@ -52,14 +58,14 @@ export function signUp<const TOptions extends AuthConfig>(options: TOptions) {
     // NOTE: Callback URL is used for email verification
 
     // Check if auto login is enabled
-    const session = await args.context.internalHandlers.session.create({
+    const session = await internalHandlers.session.create({
       userId: user.id,
       // TODO: Customize expiresAt
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
     })
 
     const responseHeaders = {}
-    if (options.emailAndPassword?.signUp?.autoLogin !== false) {
+    if (emailAndPassword?.signUp?.autoLogin !== false) {
       // Set session cookie if auto login is enabled
       setSessionCookie(responseHeaders, session.token)
     }

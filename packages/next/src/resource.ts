@@ -1,7 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
-import type { ApiRoute, ApiRouter, ServerConfig } from '@kivotos/core'
+import { type ApiRoute, type ApiRouter, Context, type ServerConfig } from '@kivotos/core'
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}
@@ -41,8 +41,11 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
+  const wrappedContext = new Context(context)
+
   const rawResponse = await route.handler({
-    context: context,
+    context: wrappedContext,
+    requestContext: Context.toRequestContext(wrappedContext, reqHeaders),
     headers: reqHeaders,
     pathParams: pathParams,
     query: reqSearchParams,

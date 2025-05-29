@@ -1,4 +1,4 @@
-import type { Field, ServerConfig } from '@kivotos/core'
+import { Context, type Field, type ServerConfig } from '@kivotos/core'
 
 import { Checkbox } from '../intentui/ui/checkbox'
 import { Select, SelectList, SelectOption, SelectTrigger } from '../intentui/ui/select'
@@ -36,7 +36,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
     case 'switch':
       return <Switch name={name} children={field.label ?? name} />
     case 'selectText': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(new Context({ db: props.serverConfig.db }))
       return (
         <Select name={name} placeholder={field.placeholder ?? name} label={field.label ?? name}>
           <SelectTrigger />
@@ -51,7 +51,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'selectNumber': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(new Context({ db: props.serverConfig.db }))
       return (
         <Select name={name} placeholder={field.placeholder ?? name} label={field.label ?? name}>
           <SelectTrigger />
@@ -66,7 +66,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'comboboxText': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(new Context({ db: props.serverConfig.db }))
       return (
         <select name={name}>
           {options.map((option) => (
@@ -78,7 +78,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'comboboxNumber': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(new Context({ db: props.serverConfig.db }))
       return (
         <select name={name}>
           {options.map((option) => (

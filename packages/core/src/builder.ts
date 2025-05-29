@@ -160,7 +160,9 @@ export class Builder<
     return appendFieldNameToFields(optionsFn(fb))
   }
 
-  options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {
+  options<TType extends string | number>(
+    callback: OptionCallback<TType, TContext>
+  ): OptionCallback<TType, TContext> {
     return callback
   }
 

@@ -2,13 +2,14 @@ import { parseSetCookie } from 'cookie-es'
 import { cookies } from 'next/headers'
 import type { Simplify, ValueOf } from 'type-fest'
 
-import type {
-  ApiRoute,
-  ApiRouteHandlerPayload,
-  ApiRouter,
-  ApiRouteResponse,
-  ApiRouteSchema,
-  ServerConfig,
+import {
+  type ApiRoute,
+  type ApiRouteHandlerPayload,
+  type ApiRouter,
+  type ApiRouteResponse,
+  type ApiRouteSchema,
+  Context,
+  type ServerConfig,
 } from '@kivotos/core'
 
 export type ServerFunction<
@@ -45,9 +46,12 @@ export async function handleServerFunction<
     if (!apiRoute) {
       throw new Error(`No API route found for method: ${args.method as string}`)
     }
+    const context = new Context(serverConfig.context)
+
     const response = await apiRoute.handler({
       ...args,
-      context: serverConfig.context,
+      context,
+      requestContext: Context.toRequestContext(context, args.headers),
     })
 
     if (response.headers?.['Set-Cookie']) {

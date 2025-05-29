@@ -2,15 +2,17 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 
 import type { AuthContext } from './auth/context'
 
-export class Context<
-  TFullSchema extends Record<string, unknown>,
-  TContext extends Record<string, unknown> = Record<string, unknown>,
-> {
+export class Context<TContext extends Record<string, unknown> = Record<string, unknown>> {
+  public readonly db: TContext extends { db: NodePgDatabase<infer TFullSchema> }
+    ? NodePgDatabase<TFullSchema>
+    : never
+
   constructor(
-    public readonly db: NodePgDatabase<TFullSchema>,
     protected readonly ctx: TContext,
     protected readonly authContext?: AuthContext
-  ) {}
+  ) {
+    this.db = ctx.db as any
+  }
 
   get<TName extends keyof TContext>(name: TName): TContext[TName] {
     const value = this.ctx[name]
@@ -20,25 +22,32 @@ export class Context<
     return value
   }
 
-  toRequestContext(headers: Record<string, string> = {}): RequestContext<TFullSchema, TContext> {
-    return new RequestContext<TFullSchema, TContext>(this.ctx, this.db, this.authContext, headers)
+  static toRequestContext<TContext extends Record<string, unknown> = Record<string, unknown>>(
+    ctx: Context<TContext>,
+    headers: Record<string, string> = {}
+  ): RequestContext<TContext> {
+    return new RequestContext<TContext>(ctx.ctx, ctx.authContext, headers)
+  }
+
+  static getCtx<TContext extends Record<string, unknown> = Record<string, unknown>>(
+    ctx: Context<TContext>
+  ): TContext {
+    return ctx.ctx
   }
 }
 
 export class RequestContext<
-  TFullSchema extends Record<string, unknown>,
   TContext extends Record<string, unknown> = Record<string, unknown>,
-> extends Context<TFullSchema, TContext> {
+> extends Context<TContext> {
   private _state: Record<string, unknown> = {}
   private _user: Awaited<ReturnType<AuthContext['requiredAuthenticated']>> | undefined = undefined
 
   constructor(
     ctx: TContext,
-    db: NodePgDatabase<TFullSchema>,
     authContext: AuthContext | undefined,
     private readonly _headers: Record<string, string>
   ) {
-    super(db, ctx, authContext)
+    super(ctx, authContext)
 
     this._headers = _headers || {}
   }

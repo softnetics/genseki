@@ -5,6 +5,7 @@ import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
 import { getFieldsClient, type MinimalContext } from '../config'
+import { Context } from '../context'
 import type { ApiRouteHandler } from '../endpoint'
 import type { Fields, FieldsClient } from '../field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../table'
@@ -112,7 +113,7 @@ export type Auth<
   TAuthConfig extends AuthConfig = AuthConfig,
 > = {
   config: TAuthConfig
-  context: TContext
+  context: Context<TContext>
   authContext: AuthContext
   handlers: Simplify<
     AddObjectKeyPrefix<
@@ -153,11 +154,12 @@ export function createAuth<TContext extends MinimalContext<any> = MinimalContext
   context: TContext
 ): Auth<TContext> {
   const authContext = createAuthContext(config, context)
-  const { handlers: originalHandlers } = createAuthHandlers(config)
+  const { handlers: originalHandlers } = createAuthHandlers(authContext)
+  const wrappedContext = new Context(context, authContext)
 
   const handlers = R.mapValues(originalHandlers, (h) => {
     const handler: ApiRouteHandler<TContext, any> = (args) => {
-      return h.handler({ ...args, context: authContext } as any) as any
+      return h.handler({ ...args, context: wrappedContext } as any) as any
     }
     return { schema: h.schema, handler }
   }) as ChangeAuthHandlerContextToMinimalContext<
@@ -179,7 +181,7 @@ export function createAuth<TContext extends MinimalContext<any> = MinimalContext
 
   return {
     config,
-    context,
+    context: wrappedContext,
     authContext,
     handlers: prefixedHandlers,
   }
