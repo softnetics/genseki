@@ -73,36 +73,36 @@ export function createKivotosQueryClient<TApiRouter extends ApiRouter<any>>(
   restClient: RestClient<TApiRouter>
 ): KivotosQueryClient<TApiRouter> {
   return {
-    useQuery: function (method: string, path: string, body: any, options?: any) {
+    useQuery: function (method: string, path: string, payload: any, options?: any) {
       return useQuery({
-        queryKey: queryKey(method, path, body),
+        queryKey: queryKey(method, path, payload),
         queryFn: () => {
-          return (restClient as any)[method](path, body)
+          return (restClient as any)[method](path, payload)
         },
         ...options,
       }) as UseQueryResult<any, any>
     },
-    useMutation: function (method: string, path: string, body: any, options?: any) {
+    useMutation: function (method: string, path: string, payload: any, options?: any) {
       return useMutation({
-        mutationKey: queryKey(method, path, body),
+        mutationKey: queryKey(method, path, payload),
         mutationFn: (data) => {
           return (restClient as any)[method](path, data)
         },
         ...options,
       }) as UseMutationResult<any, any, any, any>
     },
-    queryOptions: function (method: string, path: string, body: any, options?: any) {
+    queryOptions: function (method: string, path: string, payload: any, options?: any) {
       return {
-        queryKey: queryKey(method, path, body),
+        queryKey: queryKey(method, path, payload),
         queryFn: () => {
-          return (restClient as any)[method](path, body)
+          return (restClient as any)[method](path, payload)
         },
         ...options,
       } as UseQueryOptions<any, any, any>
     },
-    mutationOptions: function (method: string, path: string, body: any, options?: any) {
+    mutationOptions: function (method: string, path: string, payload: any, options?: any) {
       return {
-        mutationKey: queryKey(method, path, body),
+        mutationKey: queryKey(method, path, payload),
         mutationFn: (data) => {
           return (restClient as any)[method](path, data)
         },
@@ -112,6 +112,11 @@ export function createKivotosQueryClient<TApiRouter extends ApiRouter<any>>(
   }
 }
 
-export function queryKey(method: string, path: string | number | symbol, body: any) {
-  return [method, path, body] as const
+export function queryKey(method: string, path: string | number | symbol, payload: any) {
+  const payloadKey = {
+    pathParams: payload?.pathParams ?? {},
+    query: payload?.query ?? {},
+    headers: payload?.headers ?? {},
+  }
+  return [method, path, payloadKey] as const
 }
