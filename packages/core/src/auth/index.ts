@@ -92,18 +92,6 @@ export interface AuthConfig {
   }
 }
 
-type ChangeAuthHandlerContextToMinimalContext<
-  TContext extends MinimalContext,
-  THandlers extends Record<string, { handler: ApiRouteHandler<any, any> }>,
-> = {
-  [K in keyof THandlers]: THandlers[K]['handler'] extends ApiRouteHandler<
-    any,
-    infer TApiRouteSchema
-  >
-    ? { schema: TApiRouteSchema; handler: ApiRouteHandler<TContext, TApiRouteSchema> }
-    : never
-}
-
 type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> = Simplify<{
   [K in keyof T as K extends string ? `${TPrefix}.${K}` : never]: T[K]
 }>
@@ -115,15 +103,7 @@ export type Auth<
   config: TAuthConfig
   context: Context<TContext>
   authContext: AuthContext
-  handlers: Simplify<
-    AddObjectKeyPrefix<
-      ChangeAuthHandlerContextToMinimalContext<
-        TContext,
-        ReturnType<typeof createAuthHandlers>['handlers']
-      >,
-      'auth'
-    >
-  >
+  handlers: Simplify<AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>>
 }
 
 export type AuthHandlers = Auth<any, any>['handlers']
@@ -162,22 +142,13 @@ export function createAuth<TContext extends MinimalContext<any> = MinimalContext
       return h.handler({ ...args, context: wrappedContext } as any) as any
     }
     return { schema: h.schema, handler }
-  }) as ChangeAuthHandlerContextToMinimalContext<
-    TContext,
-    ReturnType<typeof createAuthHandlers>['handlers']
-  >
+  }) as ReturnType<typeof createAuthHandlers>['handlers']
 
   const prefixedHandlers = Object.fromEntries(
     Object.entries(handlers).map(([key, value]) => {
       return [`auth.${key}`, value]
     })
-  ) as unknown as AddObjectKeyPrefix<
-    ChangeAuthHandlerContextToMinimalContext<
-      TContext,
-      ReturnType<typeof createAuthHandlers>['handlers']
-    >,
-    'auth'
-  >
+  ) as unknown as AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>
 
   return {
     config,
