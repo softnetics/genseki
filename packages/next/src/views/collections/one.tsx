@@ -1,4 +1,8 @@
-import type { ServerConfig } from '@kivotos/core'
+import { headers } from 'next/headers'
+
+import { Context, createAuth, type ServerConfig } from '@kivotos/core'
+
+import { getHeadersObject } from '../../utils/headers'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {
   slug: string
@@ -13,8 +17,13 @@ export async function OneView<TServerConfig extends ServerConfig>(
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
+  const headersValue = getHeadersObject(await headers())
+
+  const { context } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const requestContext = Context.toRequestContext(context, headersValue)
+
   const result = await collection.admin.api.findOne({
-    context: { ...props.serverConfig.context, db: props.serverConfig.db },
+    requestContext,
     slug: props.slug,
     fields: collection.fields,
     id: props.identifier,

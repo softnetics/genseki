@@ -3,6 +3,7 @@ import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from '
 import z from 'zod'
 
 import type { MinimalContext } from './config'
+import type { RequestContext } from './context'
 import type {
   ApiRoute,
   ApiRouteHandler,
@@ -309,7 +310,7 @@ export type ServerApiHandlerArgs<
 > = {
   slug: string
   fields: TFields
-  context: TContext
+  requestContext: RequestContext<TContext>
 }
 
 export type ApiArgs<
@@ -718,7 +719,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiCreateHandler<any, any>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                context: args.context,
+                requestContext: args.requestContext,
                 data: args.body,
               })
               return { status: 200, body: response }
@@ -746,7 +747,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiFindOneHandler<any, any>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                context: args.context,
+                requestContext: args.requestContext,
                 id: args.pathParams.id,
               })
               return { status: 200, body: response }
@@ -777,7 +778,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiFindManyHandler<any, any>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                context: args.context,
+                requestContext: args.requestContext,
                 limit: args.query.limit,
                 offset: args.query.offset,
                 orderBy: args.query.orderBy,
@@ -813,7 +814,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiUpdateHandler<any, any>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                context: args.context,
+                requestContext: args.requestContext,
                 id: args.pathParams.id,
                 data: args.body as any, // TODO: Fix this
               })
@@ -840,7 +841,7 @@ export function getAllCollectionEndpoints<
               await (fn as ApiDeleteHandler<any, any>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                context: args.context,
+                requestContext: args.requestContext,
                 ids: args.body.ids,
               })
               return { status: 200, body: { message: 'ok' } }

@@ -4,7 +4,7 @@ import type { z, ZodType } from 'zod'
 import zodToJsonSchema from 'zod-to-json-schema'
 
 import type { MaybePromise } from './collection'
-import type { Context, RequestContext } from './context'
+import type { RequestContext } from './context'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 
@@ -56,7 +56,6 @@ export type ApiRouteHandlerPayloadWithContext<
   TApiRouteSchema extends ApiRouteSchema,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = ApiRouteHandlerPayload<TApiRouteSchema> & {
-  context: Context<TContext>
   requestContext: RequestContext<TContext>
 }
 

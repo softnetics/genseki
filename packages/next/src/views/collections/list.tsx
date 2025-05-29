@@ -4,9 +4,10 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
+import { headers } from 'next/headers'
 
 import type { ServerConfig } from '@kivotos/core'
-import { getClientCollection } from '@kivotos/core'
+import { Context, createAuth, getClientCollection } from '@kivotos/core'
 
 import { ListTable } from './list.client'
 
@@ -16,6 +17,7 @@ import { Badge } from '../../icons/badge'
 import { Button, ButtonLink } from '../../intentui/ui/button'
 import { TextField } from '../../intentui/ui/text-field'
 import { formatSlug } from '../../utils/format-slug'
+import { getHeadersObject } from '../../utils/headers'
 
 interface ListViewProps {
   slug: string
@@ -56,13 +58,18 @@ export async function ListView(props: ListViewProps) {
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
+  const headersValue = getHeadersObject(await headers())
+
   const limit = parseInt((props.searchParams['limit'] as string) ?? '10')
   const offset = parseInt((props.searchParams['offset'] as string) ?? '0')
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
+  const { context } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const requestContext = Context.toRequestContext(context, headersValue)
+
   const result = await collection.admin.api.findMany({
-    context: props.serverConfig.context,
+    requestContext,
     slug: props.slug,
     fields: collection.fields,
     limit,

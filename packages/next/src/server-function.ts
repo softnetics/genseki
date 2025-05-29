@@ -9,6 +9,7 @@ import {
   type ApiRouteResponse,
   type ApiRouteSchema,
   Context,
+  createAuth,
   type ServerConfig,
 } from '@kivotos/core'
 
@@ -46,12 +47,12 @@ export async function handleServerFunction<
     if (!apiRoute) {
       throw new Error(`No API route found for method: ${args.method as string}`)
     }
-    const context = new Context(serverConfig.context)
+    const { context } = createAuth(serverConfig.auth, serverConfig.context)
+    const requestContext = Context.toRequestContext(context, args.headers)
 
     const response = await apiRoute.handler({
       ...args,
-      context,
-      requestContext: Context.toRequestContext(context, args.headers),
+      requestContext,
     })
 
     if (response.headers?.['Set-Cookie']) {

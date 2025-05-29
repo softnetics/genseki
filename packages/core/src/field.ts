@@ -10,7 +10,7 @@ import type { Simplify } from 'type-fest'
 import type { ZodObject } from 'zod'
 import z from 'zod'
 
-import type { Context } from './context'
+import type { RequestContext } from './context'
 import {
   appendFieldNameToFields,
   type GetPrimaryColumn,
@@ -21,7 +21,7 @@ import {
 export type OptionCallback<
   TType extends string | number,
   TContext extends Record<string, unknown> = {},
-> = (args: Context<TContext>) => Promise<Array<{ label: string; value: TType }>>
+> = (args: RequestContext<TContext>) => Promise<Array<{ label: string; value: TType }>>
 
 export type FieldsWithFieldName<TFields extends Record<string, FieldBase>> = {
   [TKey in keyof TFields]: TFields[TKey] & { fieldName: string }
