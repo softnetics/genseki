@@ -121,32 +121,45 @@ export async function validateRequestBody<
   TApiRouteSchema extends ApiRouteSchema = any,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 >(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
-  const zodErrors: ZodError[] = []
+  let zodErrors: Partial<Record<'query' | 'pathParams' | 'headers' | 'body', ZodError>> | undefined
+
   if (schema.query) {
     const err = await schema.query.safeParseAsync((payload as any).query)
     if (!err.success) {
-      zodErrors.push(err.error)
+      zodErrors = {
+        ...zodErrors,
+        query: err.error,
+      }
     }
   }
 
   if (schema.pathParams) {
     const err = await schema.pathParams.safeParseAsync((payload as any).pathParams)
     if (!err.success) {
-      zodErrors.push(err.error)
+      zodErrors = {
+        ...zodErrors,
+        pathParams: err.error,
+      }
     }
   }
 
   if (schema.headers) {
     const err = await schema.headers.safeParseAsync(payload.headers)
     if (!err.success) {
-      zodErrors.push(err.error)
+      zodErrors = {
+        ...zodErrors,
+        headers: err.error,
+      }
     }
   }
 
   if (schema.method !== 'GET' && schema.body) {
     const err = await schema.body.safeParseAsync((payload as any).body)
     if (!err.success) {
-      zodErrors.push(err.error)
+      zodErrors = {
+        ...zodErrors,
+        body: err.error,
+      }
     }
   }
 
@@ -177,12 +190,12 @@ export function withValidator<
 ): (payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) => MaybePromise<any> {
   return async (payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) => {
     const zodErrors = await validateRequestBody(schema, payload)
-    if (zodErrors.length > 0) {
+    if (zodErrors) {
       return {
         status: 400,
         body: {
           error: 'Validation failed',
-          details: zodErrors.map((e) => e.message),
+          details: zodErrors,
         },
       }
     }
@@ -195,7 +208,7 @@ export function withValidator<
         status: 500,
         body: {
           error: 'Response validation failed',
-          details: validationError.errors.map((e) => e.message),
+          details: validationError.issues,
         },
       }
     }

@@ -762,7 +762,12 @@ export function getAllCollectionEndpoints<
             ]
           }
           case ApiDefaultMethod.FIND_MANY: {
-            const response = fieldsToZodObject(fields)
+            const body = fieldsToZodObject(fields)
+            const response = z.object({
+              data: z.array(body),
+              total: z.number(),
+              page: z.number(),
+            })
 
             const schema = {
               path: `/api/${collection.slug}/${method}`,
