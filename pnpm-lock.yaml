@@ -162,6 +162,9 @@ importers:
       cookie-es:
         specifier: ^2.0.0
         version: 2.0.0
+      deepmerge-ts:
+        specifier: ^7.1.5
+        version: 7.1.5
       drizzle-orm:
         specifier: ^0.41.0
         version: 0.41.0(@types/pg@8.15.2)(gel@2.1.0)(kysely@0.28.2)(pg@8.16.0)

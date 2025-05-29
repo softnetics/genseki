@@ -227,7 +227,7 @@ export type FieldsClient<TFields extends FieldsClientInitial = FieldsClientIniti
   FieldsWithFieldName<TFields>
 
 export type FieldColumnOptionsFromTable<
-  TColumn extends Column,
+  TColumn extends Column<any>,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = TColumn['_']['dataType'] extends 'string'
   ? FieldColumnStringCollectionOptions<TContext>[keyof FieldColumnStringCollectionOptions<TContext>]

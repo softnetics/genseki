@@ -1,6 +1,9 @@
-import type { ServerConfig } from '../config'
+import type { AnyServerConfig, ServerConfig } from '../config'
 
-export type KivotosPlugin<TOutput extends ServerConfig> = (input: ServerConfig) => TOutput
+export type KivotosPlugin<out TOutput extends AnyServerConfig> = {
+  name: string
+  plugin: (input: AnyServerConfig) => TOutput
+}
 
 type _MergePlugins<TPlugins extends KivotosPlugin<any>[]> = TPlugins extends [
   KivotosPlugin<infer TOutput>,
@@ -14,8 +17,8 @@ export type MergePlugins<
   TPlugins extends KivotosPlugin<any>[],
 > = _MergePlugins<TPlugins> & TOriginalServerConfig
 
-export function createPlugin<TOutput extends ServerConfig>(
-  plugin: KivotosPlugin<TOutput>
+export function createPlugin<TOutput extends AnyServerConfig>(
+  args: KivotosPlugin<TOutput>
 ): KivotosPlugin<TOutput> {
-  return plugin
+  return args
 }
