@@ -145,7 +145,10 @@ export const postCollection = builder.collection('posts', {
   admin: {
     api: {
       // NOTE: user can override some logics
-      // create: () => {},
+      findOne: async (args) => {
+        const response = await args.defaultApi(args)
+        return response
+      },
     },
     endpoints: {
       // NOTE: user can override
