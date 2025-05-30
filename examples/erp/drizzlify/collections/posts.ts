@@ -3,6 +3,14 @@ import { builder } from '../helper'
 export const postsCollection = builder.collection('posts', {
   slug: 'posts',
   identifierColumn: 'id',
+  admin: {
+    api: {
+      findMany: async (args) => {
+        console.log('Custom findMany for posts collection')
+        return await args.defaultApi(args)
+      },
+    },
+  },
   fields: builder.fields('posts', (fb) => ({
     title: fb.columns('title', {
       type: 'text',

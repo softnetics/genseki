@@ -7,22 +7,13 @@ import {
   Many,
   One,
   or,
-  sql,
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
 import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
-import type {
-  ApiCreateHandler,
-  ApiDeleteHandler,
-  ApiFindManyHandler,
-  ApiFindOneHandler,
-  ApiUpdateHandler,
-  CollectionAdminApi,
-  InferFields,
-} from './collection'
+import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
 import type { MinimalContext } from './config'
 import type { Field, Fields } from './field'
 import {
@@ -42,33 +33,27 @@ export function createDefaultApiHandlers<
   schema: Record<string, unknown>
   fields: TFields
   tableTsKey: string
-  identiferColumn: string
+  identifierColumn: string
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const { fields, tableTsKey, tableNamesMap, tables, schema, identiferColumn } = args
+  const { fields, tableTsKey, tableNamesMap, tables, schema, identifierColumn } = args
 
   const tableRelationalConfig = tables[tableTsKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)
-  const identifierKeyColumn = tableRelationalConfig.columns[identiferColumn]
+  const identifierKeyColumn = tableRelationalConfig.columns[identifierColumn]
   const tableName = tableRelationalConfig.tsName
   const tableSchema = getTableFromSchema(schema, tableTsKey)
-  const queryPayload = createDrizzleQuery(fields)
+  const queryPayload = createDrizzleQuery(fields, tables, tableRelationalConfig, identifierColumn)
 
-  const extrasQuery = {
-    extras: {
-      __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
-      __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
-    },
-  }
-
-  const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
+  const findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> = async (
+    args
+  ) => {
     const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const result = await query.findFirst({
       ...queryPayload,
-      ...extrasQuery,
       where: eq(primaryKeyColumn, args.id),
     })
     if (!result) {
@@ -85,7 +70,9 @@ export function createDefaultApiHandlers<
     } as InferFields<TFields>
   }
 
-  const findMany: ApiFindManyHandler<TContext, TFields> = async (args) => {
+  const findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> = async (
+    args
+  ) => {
     const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -94,7 +81,6 @@ export function createDefaultApiHandlers<
 
     const result = await query.findMany({
       ...queryPayload,
-      ...extrasQuery,
       limit: args.limit,
       offset: args.offset,
       orderBy: orderBy
@@ -117,7 +103,7 @@ export function createDefaultApiHandlers<
     }
   }
 
-  const create: ApiCreateHandler<TContext, TFields> = async (args) => {
+  const create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> = async (args) => {
     const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
@@ -136,7 +122,6 @@ export function createDefaultApiHandlers<
 
     const result = await query.findFirst({
       ...queryPayload,
-      ...extrasQuery,
       where: eq(primaryKeyColumn, pk),
     })
 
@@ -149,7 +134,7 @@ export function createDefaultApiHandlers<
     return { __pk, __id }
   }
 
-  const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
+  const update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> = async (args) => {
     const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
@@ -165,7 +150,6 @@ export function createDefaultApiHandlers<
       const pk = await apiHandler.update(args.id, tx, args.data)
       const result = await query.findFirst({
         ...queryPayload,
-        ...extrasQuery,
         where: eq(primaryKeyColumn, pk),
       })
 
@@ -181,7 +165,7 @@ export function createDefaultApiHandlers<
   }
 
   // why not just delete? why _delete?
-  const _delete: ApiDeleteHandler<TContext, TFields> = async (args) => {
+  const _delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE> = async (args) => {
     const db = args.context.db
 
     await db
@@ -573,11 +557,11 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
         const value = result[field._.relationTsName]
         if (!value) return []
 
-        const primaryColumnTsName = field._.primaryColumnTsName
         if (Array.isArray(value)) {
           const values = value.map((v) => ({
             ...mapResultToFields(field.fields, v),
-            __pk: v[primaryColumnTsName],
+            __pk: v['__pk'],
+            __id: v['__id'],
           }))
           return [[field.fieldName, values]]
         }
@@ -585,7 +569,7 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
         return [
           [
             field.fieldName,
-            { ...mapResultToFields(field.fields, value), __pk: value[primaryColumnTsName] },
+            { ...mapResultToFields(field.fields, value), __pk: value['__pk'], __id: value['__id'] },
           ],
         ]
       }
