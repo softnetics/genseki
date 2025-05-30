@@ -108,7 +108,6 @@ export function createDrizzleQuery(
       if (!isRelationField(field)) return []
       const relationName = field._.relation.fieldName
       const referencedTableName = field._.relation.referencedTableName
-      console.log('Referenced table name: ', referencedTableName, table[referencedTableName])
 
       return [
         [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
