@@ -3,12 +3,13 @@ import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from '
 import z from 'zod'
 
 import type { MinimalContext } from './config'
-import type {
-  ApiRoute,
-  ApiRouteHandler,
-  ApiRouter,
-  ApiRouteSchema,
-  ClientApiRouter,
+import {
+  type ApiRoute,
+  type ApiRouteHandler,
+  type ApiRouter,
+  type ApiRouteSchema,
+  type ClientApiRouter,
+  createEndpoint,
 } from './endpoint'
 import {
   type Field,
@@ -23,7 +24,7 @@ import {
   fieldsToZodObject,
   type FieldsWithFieldName,
 } from './field'
-import type { GetTableByTableTsName, ToZodObject } from './utils'
+import { type GetTableByTableTsName, type ToZodObject } from './utils'
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -348,10 +349,6 @@ export type ApiFindOneArgs = {
   id: string | number
 }
 
-export type ApiFindOneHandler<TContext extends MinimalContext, TFields extends Fields<TContext>> = (
-  args: ApiArgs<typeof ApiDefaultMethod.FIND_ONE, TContext, TFields>
-) => MaybePromise<ApiReturnType<typeof ApiDefaultMethod.FIND_ONE, TFields>>
-
 export type ApiFindManyArgs = {
   limit?: number
   offset?: number
@@ -359,20 +356,15 @@ export type ApiFindManyArgs = {
   orderType?: 'asc' | 'desc'
 }
 
-export type ApiFindManyHandler<
-  TContext extends MinimalContext,
-  TFields extends Fields<TContext>,
-> = (
-  args: ApiArgs<typeof ApiDefaultMethod.FIND_MANY, TContext, TFields>
-) => MaybePromise<ApiReturnType<typeof ApiDefaultMethod.FIND_MANY, TFields>>
-
 export type ApiCreateArgs<TFields extends Fields<any>> = {
   data: InferCreateFields<TFields>
 }
 
-export type ApiCreateHandler<TContext extends MinimalContext, TFields extends Fields<TContext>> = (
-  args: ApiArgs<typeof ApiDefaultMethod.CREATE, TContext, TFields>
-) => MaybePromise<ApiReturnType<typeof ApiDefaultMethod.CREATE, TFields>>
+export type ApiHandlerFn<
+  TContext extends MinimalContext,
+  TFields extends Fields<TContext>,
+  TMethod extends ApiDefaultMethod,
+> = (args: ApiArgs<TMethod, TContext, TFields>) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
 export type ApiUpdateArgs<TFields extends Fields<any>> = {
   // This should be the primary field of the collection e.g. __pk or username
@@ -380,17 +372,9 @@ export type ApiUpdateArgs<TFields extends Fields<any>> = {
   data: InferUpdateFields<TFields>
 }
 
-export type ApiUpdateHandler<TContext extends MinimalContext, TFields extends Fields<TContext>> = (
-  args: ApiArgs<typeof ApiDefaultMethod.UPDATE, TContext, TFields>
-) => MaybePromise<ApiReturnType<typeof ApiDefaultMethod.UPDATE, TFields>>
-
 export type ApiDeleteArgs = {
   ids: string[] | number[]
 }
-
-export type ApiDeleteHandler<TContext extends MinimalContext, TFields extends Fields<TContext>> = (
-  args: ApiArgs<typeof ApiDefaultMethod.DELETE, TContext, TFields>
-) => MaybePromise<ApiReturnType<typeof ApiDefaultMethod.DELETE, TFields>>
 
 export type ClientApiArgs<
   TMethod extends ApiDefaultMethod,
@@ -407,26 +391,36 @@ export type ClientApiArgs<
           ? ApiDeleteArgs
           : never
 
+export type ApiConfigHandlerFn<
+  TContext extends MinimalContext,
+  TFields extends Fields<TContext>,
+  TMethod extends ApiDefaultMethod,
+> = (
+  args: ApiArgs<TMethod, TContext, TFields> & {
+    defaultApi: ApiHandlerFn<TContext, TFields, TMethod>
+  }
+) => MaybePromise<ApiReturnType<TMethod, TFields>>
+
 export type CollectionAdminApiConfig<
   TContext extends MinimalContext = MinimalContext,
   TFields extends Fields<TContext> = Fields<TContext>,
 > = {
-  create?: ApiCreateHandler<TContext, TFields>
-  findOne?: ApiFindOneHandler<TContext, TFields>
-  findMany?: ApiFindManyHandler<TContext, TFields>
-  update?: ApiUpdateHandler<TContext, TFields>
-  delete?: ApiDeleteHandler<TContext, TFields>
+  create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
+  findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
+  findMany?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  update?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
+  delete?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
 }
 
 export type CollectionAdminApi<
   TContext extends MinimalContext = MinimalContext,
   TFields extends Fields<TContext> = Fields<TContext>,
 > = {
-  create: ApiCreateHandler<TContext, TFields>
-  findOne: ApiFindOneHandler<TContext, TFields>
-  findMany: ApiFindManyHandler<TContext, TFields>
-  update: ApiUpdateHandler<TContext, TFields>
-  delete: ApiDeleteHandler<TContext, TFields>
+  create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
+  findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
+  findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
+  delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
 }
 
 export type CollectionAdminConfig<
@@ -715,7 +709,7 @@ export function getAllCollectionEndpoints<
             const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
               args
             ) => {
-              const response = await (fn as ApiCreateHandler<any, any>)({
+              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
@@ -724,7 +718,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.FIND_ONE: {
             const response = fieldsToZodObject(fields)
@@ -743,7 +740,7 @@ export function getAllCollectionEndpoints<
             const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
               args
             ) => {
-              const response = await (fn as ApiFindOneHandler<any, any>)({
+              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
@@ -752,10 +749,18 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.FIND_MANY: {
-            const response = fieldsToZodObject(fields)
+            const body = fieldsToZodObject(fields)
+            const response = z.object({
+              data: z.array(body),
+              total: z.number(),
+              page: z.number(),
+            })
 
             const schema = {
               path: `/api/${collection.slug}/${method}`,
@@ -774,7 +779,7 @@ export function getAllCollectionEndpoints<
             const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
               args
             ) => {
-              const response = await (fn as ApiFindManyHandler<any, any>)({
+              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
@@ -786,7 +791,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.UPDATE: {
             const body = fieldsToZodObject(fields)
@@ -810,7 +818,7 @@ export function getAllCollectionEndpoints<
             const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
               args
             ) => {
-              const response = await (fn as ApiUpdateHandler<any, any>)({
+              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
@@ -820,7 +828,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: response }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           case ApiDefaultMethod.DELETE: {
             const schema = {
@@ -837,7 +848,7 @@ export function getAllCollectionEndpoints<
             const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
               args
             ) => {
-              await (fn as ApiDeleteHandler<any, any>)({
+              await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
                 context: args.context,
@@ -846,7 +857,10 @@ export function getAllCollectionEndpoints<
               return { status: 200, body: { message: 'ok' } }
             }
 
-            return [endpointName, { schema, handler } satisfies ApiRoute<any, typeof schema>]
+            return [
+              endpointName,
+              createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+            ]
           }
           default:
             throw new Error(`Unknown method: ${method}`)

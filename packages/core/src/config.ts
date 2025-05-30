@@ -37,7 +37,7 @@ export type MinimalContext<
   TContext & {
     db: NodePgDatabase<TFullSchema>
   }
->
+> & {}
 
 export interface BaseConfigOptions<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
@@ -70,6 +70,14 @@ export interface ServerConfig<
   endpoints: TApiRouter
 }
 
+export interface AnyServerConfig
+  extends ServerConfig<
+    Record<string, unknown>,
+    MinimalContext<Record<string, unknown>, {}>,
+    {},
+    {}
+  > {}
+
 export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any, any>> =
   TServerConfig extends ServerConfig<any, any, any, infer TApiRouter>
     ? TApiRouter extends ApiRouter<any>
@@ -78,8 +86,8 @@ export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<an
     : never
 
 export function defineBaseConfig<
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  const TContext extends Record<string, unknown> = Record<string, unknown>,
 >(
   config: BaseConfigOptions<TFullSchema, TContext>
 ): BaseConfig<TFullSchema, MinimalContext<TFullSchema, TContext>> {
@@ -95,14 +103,14 @@ export function defineBaseConfig<
 }
 
 export function defineServerConfig<
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  const TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
   const TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
     string,
     Collection<any, any, any, any, any, any>
   >,
   const TEndpoints extends ApiRouter<MinimalContext<TFullSchema, TContext>> = {},
-  const TPlugins extends KivotosPlugin<any>[] = [],
+  const TPlugins extends KivotosPlugin<any>[] = [...KivotosPlugin<any>[]],
 >(
   baseConfig: BaseConfig<TFullSchema, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
@@ -118,7 +126,7 @@ export function defineServerConfig<
       ...auth.handlers,
       ...collectionEndpoints,
     } as TEndpoints &
-      typeof auth.handlers &
+      AuthHandlers &
       ExtractAllCollectionCustomEndpoints<TCollections> &
       ExtractAllCollectionDefaultEndpoints<TCollections>,
   } satisfies ServerConfig<
@@ -126,13 +134,13 @@ export function defineServerConfig<
     MinimalContext<TFullSchema, TContext>,
     TCollections,
     TEndpoints &
-      typeof auth.handlers &
+      AuthHandlers &
       ExtractAllCollectionCustomEndpoints<TCollections> &
       ExtractAllCollectionDefaultEndpoints<TCollections>
   >
 
-  for (const plugin of config.plugins ?? []) {
-    serverConfig = plugin(serverConfig)
+  for (const { plugin } of config.plugins ?? []) {
+    serverConfig = plugin(serverConfig) as any
   }
 
   return serverConfig as MergePlugins<typeof serverConfig, TPlugins>

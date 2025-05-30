@@ -6,7 +6,8 @@
   "main": "./src/index.ts",
   "module": "./src/index.ts",
   "exports": {
-    ".": "./src/index.ts"
+    ".": "./src/index.ts",
+    "./plugins/*": "./src/plugins/*/index.ts"
   },
   "scripts": {
     "lint": "eslint .",
@@ -17,6 +18,7 @@
   },
   "dependencies": {
     "cookie-es": "^2.0.0",
+    "deepmerge-ts": "^7.1.5",
     "drizzle-orm": "^0.41.0",
     "remeda": "^2.21.2",
     "valibot": "^1.0.0",

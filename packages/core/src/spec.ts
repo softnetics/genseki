@@ -4,11 +4,22 @@ import z from 'zod'
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
 import { defineBaseConfig, defineServerConfig, getClientConfig } from './config'
-import { admin } from './plugins/admin'
+import { admin, createAccessControl } from './plugins/admin'
 
 const db = drizzle({
   connection: '',
   schema: schema,
+})
+
+const accessControl = createAccessControl({
+  statements: {
+    project: ['read', 'create', 'update', 'delete'],
+  },
+  roles: {
+    user: {
+      project: ['read', 'delete'],
+    },
+  },
 })
 
 const baseConfig = defineBaseConfig({
@@ -17,16 +28,16 @@ const baseConfig = defineBaseConfig({
   context: { example: 'example' },
   auth: {
     user: {
-      model: schema.users,
+      model: schema.user,
     },
     session: {
-      model: schema.sessions,
+      model: schema.session,
     },
     account: {
-      model: schema.accounts,
+      model: schema.account,
     },
     verification: {
-      model: schema.verifications,
+      model: schema.verification,
     },
     emailAndPassword: {
       enabled: true,
@@ -134,7 +145,10 @@ export const postCollection = builder.collection('posts', {
   admin: {
     api: {
       // NOTE: user can override some logics
-      // create: () => {},
+      findOne: async (args) => {
+        const response = await args.defaultApi(args)
+        return response
+      },
     },
     endpoints: {
       // NOTE: user can override
@@ -218,7 +232,11 @@ export const serverConfig = defineServerConfig(baseConfig, {
       }
     ),
   },
-  plugins: [admin()],
+  plugins: [
+    admin(baseConfig, {
+      accessControl: accessControl,
+    }),
+  ],
 })
 
 export const clientConfig = getClientConfig(serverConfig)
