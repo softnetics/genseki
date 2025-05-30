@@ -2,10 +2,12 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 
 import type { AuthContext } from './auth/context'
 
-export class Context<TContext extends Record<string, unknown> = Record<string, unknown>> {
-  public readonly db: TContext extends { db: NodePgDatabase<infer TFullSchema> }
-    ? NodePgDatabase<TFullSchema>
-    : never
+export class Context<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  _TUser extends Record<string, unknown> = Record<string, unknown>,
+> {
+  public readonly db: NodePgDatabase<TFullSchema>
 
   constructor(
     protected readonly ctx: TContext,
@@ -24,17 +26,20 @@ export class Context<TContext extends Record<string, unknown> = Record<string, u
 
   static toRequestContext<TContext extends Record<string, unknown> = Record<string, unknown>>(
     ctx: Context<TContext>,
+    authContext?: AuthContext,
     headers: Record<string, string> = {}
   ): RequestContext<TContext> {
-    return new RequestContext<TContext>(ctx.ctx, ctx.authContext, headers)
+    return new RequestContext<TContext>(ctx.ctx, ctx.authContext ?? authContext, headers)
   }
 }
 
 export class RequestContext<
   TContext extends Record<string, unknown> = Record<string, unknown>,
-> extends Context<TContext> {
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  TUser extends Record<string, unknown> = Record<string, unknown>,
+> extends Context<TContext, TFullSchema, TUser> {
   private _state: Record<string, unknown> = {}
-  private _user: Awaited<ReturnType<AuthContext['requiredAuthenticated']>> | undefined = undefined
+  private _user: TUser | undefined = undefined
 
   constructor(
     ctx: TContext,
@@ -52,7 +57,10 @@ export class RequestContext<
     }
 
     const user = await this.authContext?.requiredAuthenticated(this._headers)
-    this._user = user
+    if (!user) {
+      throw new Error('Unauthorized')
+    }
+    this._user = user as unknown as TUser
 
     return user
   }
