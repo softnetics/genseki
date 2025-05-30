@@ -1,7 +1,7 @@
 import type { Column, TableRelationalConfig } from 'drizzle-orm'
 import { is, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
-import type { ZodError, ZodObject, ZodOptional, ZodType } from 'zod'
+import type { ZodIssue, ZodObject, ZodOptional, ZodType } from 'zod'
 
 import type {
   ApiHttpStatus,
@@ -125,14 +125,16 @@ export async function validateRequestBody<
   TApiRouteSchema extends ApiRouteSchema = any,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 >(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
-  let zodErrors: Partial<Record<'query' | 'pathParams' | 'headers' | 'body', ZodError>> | undefined
+  let zodErrors:
+    | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', ZodIssue[]>>
+    | undefined
 
   if (schema.query) {
     const err = await schema.query.safeParseAsync((payload as any).query)
     if (!err.success) {
       zodErrors = {
         ...zodErrors,
-        query: err.error,
+        query: err.error.issues,
       }
     }
   }
@@ -142,7 +144,7 @@ export async function validateRequestBody<
     if (!err.success) {
       zodErrors = {
         ...zodErrors,
-        pathParams: err.error,
+        pathParams: err.error.issues,
       }
     }
   }
@@ -152,7 +154,7 @@ export async function validateRequestBody<
     if (!err.success) {
       zodErrors = {
         ...zodErrors,
-        headers: err.error,
+        headers: err.error.issues,
       }
     }
   }
@@ -162,7 +164,7 @@ export async function validateRequestBody<
     if (!err.success) {
       zodErrors = {
         ...zodErrors,
-        body: err.error,
+        body: err.error.issues,
       }
     }
   }
