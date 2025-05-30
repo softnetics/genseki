@@ -311,7 +311,7 @@ export type ServerApiHandlerArgs<
 > = {
   slug: string
   fields: TFields
-  requestContext: RequestContext<TContext>
+  context: RequestContext<TContext>
 }
 
 export type ApiArgs<
@@ -713,7 +713,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                requestContext: args.requestContext,
+                context: args.context,
                 data: args.body,
               })
               return { status: 200, body: response }
@@ -744,7 +744,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                requestContext: args.requestContext,
+                context: args.context,
                 id: args.pathParams.id,
               })
               return { status: 200, body: response }
@@ -783,7 +783,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                requestContext: args.requestContext,
+                context: args.context,
                 limit: args.query.limit,
                 offset: args.query.offset,
                 orderBy: args.query.orderBy,
@@ -822,7 +822,7 @@ export function getAllCollectionEndpoints<
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                requestContext: args.requestContext,
+                context: args.context,
                 id: args.pathParams.id,
                 data: args.body as any, // TODO: Fix this
               })
@@ -852,7 +852,7 @@ export function getAllCollectionEndpoints<
               await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
-                requestContext: args.requestContext,
+                context: args.context,
                 ids: args.body.ids,
               })
               return { status: 200, body: { message: 'ok' } }

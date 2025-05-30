@@ -19,9 +19,9 @@ export async function AutoField<TServerConfig extends ServerConfig>(
 ) {
   const { field, name } = props
   const headersValue = getHeadersObject(await headers())
-  const { context } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
 
-  const requestContext = Context.toRequestContext(context, headersValue)
+  const context = Context.toRequestContext(authContext, headersValue)
 
   switch (field.type) {
     case 'text':
@@ -43,7 +43,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
     case 'switch':
       return <Switch name={name} children={field.label ?? name} />
     case 'selectText': {
-      const options = await field.options(requestContext)
+      const options = await field.options(context)
       return (
         <Select name={name} placeholder={field.placeholder ?? name} label={field.label ?? name}>
           <SelectTrigger />
@@ -58,7 +58,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'selectNumber': {
-      const options = await field.options(requestContext)
+      const options = await field.options(context)
       return (
         <Select name={name} placeholder={field.placeholder ?? name} label={field.label ?? name}>
           <SelectTrigger />
@@ -73,7 +73,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'comboboxText': {
-      const options = await field.options(requestContext)
+      const options = await field.options(context)
       return (
         <select name={name}>
           {options.map((option) => (
@@ -85,7 +85,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'comboboxNumber': {
-      const options = await field.options(requestContext)
+      const options = await field.options(context)
       return (
         <select name={name}>
           {options.map((option) => (

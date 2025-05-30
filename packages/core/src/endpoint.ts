@@ -57,7 +57,7 @@ export type ApiRouteHandlerPayloadWithContext<
   TApiRouteSchema extends ApiRouteSchema,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = ApiRouteHandlerPayload<TApiRouteSchema> & {
-  requestContext: RequestContext<TContext>
+  context: RequestContext<TContext>
 }
 
 export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, InputSchema>>> =

@@ -50,7 +50,7 @@ export function createDefaultApiHandlers<
   const findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> = async (
     args
   ) => {
-    const db = args.requestContext.db
+    const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const result = await query.findFirst({
@@ -74,7 +74,7 @@ export function createDefaultApiHandlers<
   const findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> = async (
     args
   ) => {
-    const db = args.requestContext.db
+    const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const orderType = args.orderType ?? 'asc'
@@ -105,14 +105,14 @@ export function createDefaultApiHandlers<
   }
 
   const create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> = async (args) => {
-    const db = args.requestContext.db
+    const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const pk = await db.transaction(async (tx) => {
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
-        requestContext: args.requestContext,
+        context: args.context,
         tableRelationalConfigByTableTsName: tables,
         tableTsNameByTableDbName: tableNamesMap,
       })
@@ -136,14 +136,14 @@ export function createDefaultApiHandlers<
   }
 
   const update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> = async (args) => {
-    const db = args.requestContext.db
+    const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const result = await db.transaction(async (tx) => {
       const apiHandler = new ApiHandler(tableTsKey, fields, {
         schema,
-        requestContext: args.requestContext,
+        context: args.context,
         tableRelationalConfigByTableTsName: tables,
         tableTsNameByTableDbName: tableNamesMap,
       })
@@ -168,7 +168,7 @@ export function createDefaultApiHandlers<
 
   // why not just delete? why _delete?
   const _delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE> = async (args) => {
-    const db = args.requestContext.db
+    const db = args.context.db
 
     await db
       .delete(tableSchema)
@@ -196,7 +196,7 @@ class ApiHandler {
     private readonly fields: Fields<any>,
     private readonly config: {
       schema: Record<string, unknown>
-      requestContext: RequestContext<MinimalContext>
+      context: RequestContext<MinimalContext>
       tableTsNameByTableDbName: Record<string, string>
       tableRelationalConfigByTableTsName: Record<string, TableRelationalConfig>
     }

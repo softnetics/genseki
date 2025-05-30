@@ -190,10 +190,10 @@ export function admin<TContext extends MinimalContext<{ user: AnyUserTable }>>(
         }),
       },
     },
-    async ({ requestContext, body }) => {
+    async ({ context, body }) => {
       const { userId } = body
 
-      await requestContext.db
+      await context.db
         .update(schema.user)
         .set({
           banned: true,

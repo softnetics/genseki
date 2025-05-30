@@ -165,7 +165,7 @@ export const postCollection = builder.collection('posts', {
             }),
           },
         },
-        ({ requestContext, body }) => {
+        ({ context, body }) => {
           const name = body.name
           return {
             status: 200 as const,
@@ -188,7 +188,7 @@ export const postCollection = builder.collection('posts', {
             }),
           },
         },
-        ({ requestContext, body }) => {
+        ({ context, body }) => {
           const name = body.name
           return {
             status: 200 as const,
@@ -221,7 +221,7 @@ export const serverConfig = defineServerConfig(baseConfig, {
           }),
         },
       },
-      ({ requestContext, body }) => {
+      ({ context, body }) => {
         const name = body.name
         return {
           status: 200 as const,

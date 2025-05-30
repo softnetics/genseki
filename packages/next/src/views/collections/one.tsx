@@ -19,11 +19,11 @@ export async function OneView<TServerConfig extends ServerConfig>(
 
   const headersValue = getHeadersObject(await headers())
 
-  const { context } = createAuth(props.serverConfig.auth, props.serverConfig.context)
-  const requestContext = Context.toRequestContext(context, headersValue)
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(authContext, headersValue)
 
   const result = await collection.admin.api.findOne({
-    requestContext,
+    context,
     slug: props.slug,
     fields: collection.fields,
     id: props.identifier,
