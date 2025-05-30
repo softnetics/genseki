@@ -1,5 +1,5 @@
-import type { Column, TableRelationalConfig } from 'drizzle-orm'
-import { is, Table } from 'drizzle-orm'
+import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
+import { is, sql, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import type { ZodIssue, ZodObject, ZodOptional, ZodType } from 'zod'
 
@@ -9,7 +9,14 @@ import type {
   ApiRouteHandlerPayloadWithContext,
   ApiRouteSchema,
 } from './endpoint'
-import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
+import type {
+  Field,
+  FieldMetadataColumns,
+  FieldRelation,
+  Fields,
+  FieldsInitial,
+  FieldsWithFieldName,
+} from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
   return field._.source === 'relation'
@@ -74,7 +81,43 @@ export function getTableFromSchema(schema: Record<string, unknown>, tableTsName:
   return schema[tableTsName]
 }
 
-export function createDrizzleQuery(fields: Fields<any>): Record<string, any> {
+const getExtraField = (fields: Fields<any>, identifierColumn?: string) => {
+  const firstColumn = Object.values(fields).find((field) => field._.source === 'column')
+    ?._ as FieldMetadataColumns
+
+  if (!firstColumn) {
+    throw new Error('No column fields found in the provided fields')
+  }
+
+  const extraWith: [string, SQL.Aliased<string | number>][] = []
+
+  const table = firstColumn.column.table
+  const tableColumns = Object.values(table)
+  const primaryKeyColumn = tableColumns.find((col) => col.primary)
+
+  extraWith.push(['__pk', sql`${primaryKeyColumn}`.as('__pk') as SQL.Aliased<string | number>])
+
+  if (identifierColumn) {
+    const identifierKeyColumn = tableColumns.find((col) => col.name === identifierColumn)
+
+    if (!identifierKeyColumn) {
+      throw new Error(`Identifier column ${identifierColumn} not found in table ${table._.name}`)
+    }
+
+    if (!primaryKeyColumn) {
+      throw new Error(`Primary key column not found in table ${table._.name}`)
+    }
+
+    extraWith.push(['__id', sql`${identifierKeyColumn}`.as('__id') as SQL.Aliased<string | number>])
+  }
+
+  return Object.fromEntries(extraWith)
+}
+
+export function createDrizzleQuery(
+  fields: Fields<any>,
+  identifierColumn?: string
+): Record<string, any> {
   const queryColumns = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
       if (field._.source !== 'column') return []
@@ -94,6 +137,7 @@ export function createDrizzleQuery(fields: Fields<any>): Record<string, any> {
   return {
     columns: queryColumns,
     with: queryWith,
+    extras: getExtraField(fields, identifierColumn),
   }
 }
 

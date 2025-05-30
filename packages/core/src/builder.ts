@@ -82,7 +82,7 @@ export class Builder<
     const defaultHandlers = createDefaultApiHandlers({
       schema: this.config.schema,
       fields: config.fields,
-      identiferColumn: config.identifierColumn as string,
+      identifierColumn: config.identifierColumn as string,
       tableTsKey: tableTsName,
       tables: this.tableRelationalConfigByTableTsName,
       tableNamesMap: this.tableTsNameByTableDbName,
