@@ -7,7 +7,6 @@ import {
   Many,
   One,
   or,
-  sql,
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
@@ -34,25 +33,18 @@ export function createDefaultApiHandlers<
   schema: Record<string, unknown>
   fields: TFields
   tableTsKey: string
-  identiferColumn: string
+  identifierColumn: string
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const { fields, tableTsKey, tableNamesMap, tables, schema, identiferColumn } = args
+  const { fields, tableTsKey, tableNamesMap, tables, schema, identifierColumn } = args
 
   const tableRelationalConfig = tables[tableTsKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)
-  const identifierKeyColumn = tableRelationalConfig.columns[identiferColumn]
+  const identifierKeyColumn = tableRelationalConfig.columns[identifierColumn]
   const tableName = tableRelationalConfig.tsName
   const tableSchema = getTableFromSchema(schema, tableTsKey)
-  const queryPayload = createDrizzleQuery(fields)
-
-  const extrasQuery = {
-    extras: {
-      __pk: sql<string | number>`${primaryKeyColumn}`.as('__pk'),
-      __id: sql<string | number>`${identifierKeyColumn}`.as('__id'),
-    },
-  }
+  const queryPayload = createDrizzleQuery(fields, tables, tableRelationalConfig, identifierColumn)
 
   const findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> = async (
     args
@@ -62,7 +54,6 @@ export function createDefaultApiHandlers<
 
     const result = await query.findFirst({
       ...queryPayload,
-      ...extrasQuery,
       where: eq(primaryKeyColumn, args.id),
     })
     if (!result) {
@@ -90,7 +81,6 @@ export function createDefaultApiHandlers<
 
     const result = await query.findMany({
       ...queryPayload,
-      ...extrasQuery,
       limit: args.limit,
       offset: args.offset,
       orderBy: orderBy
@@ -132,7 +122,6 @@ export function createDefaultApiHandlers<
 
     const result = await query.findFirst({
       ...queryPayload,
-      ...extrasQuery,
       where: eq(primaryKeyColumn, pk),
     })
 
@@ -161,7 +150,6 @@ export function createDefaultApiHandlers<
       const pk = await apiHandler.update(args.id, tx, args.data)
       const result = await query.findFirst({
         ...queryPayload,
-        ...extrasQuery,
         where: eq(primaryKeyColumn, pk),
       })
 
@@ -570,11 +558,11 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
         const value = result[field._.relationTsName]
         if (!value) return []
 
-        const primaryColumnTsName = field._.primaryColumnTsName
         if (Array.isArray(value)) {
           const values = value.map((v) => ({
             ...mapResultToFields(field.fields, v),
-            __pk: v[primaryColumnTsName],
+            __pk: v['__pk'],
+            __id: v['__id'],
           }))
           return [[field.fieldName, values]]
         }
@@ -582,7 +570,7 @@ function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Re
         return [
           [
             field.fieldName,
-            { ...mapResultToFields(field.fields, value), __pk: value[primaryColumnTsName] },
+            { ...mapResultToFields(field.fields, value), __pk: value['__pk'], __id: value['__id'] },
           ],
         ]
       }
