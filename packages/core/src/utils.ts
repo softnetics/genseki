@@ -9,14 +9,7 @@ import type {
   ApiRouteHandlerPayloadWithContext,
   ApiRouteSchema,
 } from './endpoint'
-import type {
-  Field,
-  FieldMetadataColumns,
-  FieldRelation,
-  Fields,
-  FieldsInitial,
-  FieldsWithFieldName,
-} from './field'
+import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
   return field._.source === 'relation'
@@ -81,32 +74,15 @@ export function getTableFromSchema(schema: Record<string, unknown>, tableTsName:
   return schema[tableTsName]
 }
 
-const getExtraField = (fields: Fields<any>, identifierColumn?: string) => {
-  const firstColumn = Object.values(fields).find((field) => field._.source === 'column')
-    ?._ as FieldMetadataColumns
-
-  if (!firstColumn) {
-    throw new Error('No column fields found in the provided fields')
-  }
-
+const getExtraField = (tableRelational: TableRelationalConfig, identifierColumn?: string) => {
   const extraWith: [string, SQL.Aliased<string | number>][] = []
 
-  const table = firstColumn.column.table
-  const tableColumns = Object.values(table)
-  const primaryKeyColumn = tableColumns.find((col) => col.primary)
+  const primaryKeyColumn = tableRelational.primaryKey[0]
 
   extraWith.push(['__pk', sql`${primaryKeyColumn}`.as('__pk') as SQL.Aliased<string | number>])
 
   if (identifierColumn) {
-    const identifierKeyColumn = tableColumns.find((col) => col.name === identifierColumn)
-
-    if (!identifierKeyColumn) {
-      throw new Error(`Identifier column ${identifierColumn} not found in table ${table._.name}`)
-    }
-
-    if (!primaryKeyColumn) {
-      throw new Error(`Primary key column not found in table ${table._.name}`)
-    }
+    const identifierKeyColumn = tableRelational.columns[identifierColumn]
 
     extraWith.push(['__id', sql`${identifierKeyColumn}`.as('__id') as SQL.Aliased<string | number>])
   }
@@ -116,6 +92,8 @@ const getExtraField = (fields: Fields<any>, identifierColumn?: string) => {
 
 export function createDrizzleQuery(
   fields: Fields<any>,
+  table: Record<string, TableRelationalConfig>,
+  tableRelationalConfig: TableRelationalConfig,
   identifierColumn?: string
 ): Record<string, any> {
   const queryColumns = Object.fromEntries(
@@ -129,15 +107,19 @@ export function createDrizzleQuery(
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
       const relationName = field._.relation.fieldName
+      const referencedTableName = field._.relation.referencedTableName
+      console.log('Referenced table name: ', referencedTableName, table[referencedTableName])
 
-      return [[relationName, createDrizzleQuery(field.fields) as any]]
+      return [
+        [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
+      ]
     })
   )
 
   return {
     columns: queryColumns,
     with: queryWith,
-    extras: getExtraField(fields, identifierColumn),
+    extras: getExtraField(tableRelationalConfig, identifierColumn),
   }
 }
 

@@ -52,7 +52,7 @@ export function createDefaultApiHandlers<
   const identifierKeyColumn = tableRelationalConfig.columns[identifierColumn]
   const tableName = tableRelationalConfig.tsName
   const tableSchema = getTableFromSchema(schema, tableTsKey)
-  const queryPayload = createDrizzleQuery(fields, identifierColumn)
+  const queryPayload = createDrizzleQuery(fields, tables, tableRelationalConfig, identifierColumn)
 
   const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
     const db = args.context.db
