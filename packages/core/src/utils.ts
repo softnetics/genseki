@@ -263,7 +263,7 @@ export function withValidator<
         status: 500,
         body: {
           error: 'Response validation failed',
-          details: validationError,
+          details: validationError.issues,
         },
       }
     }
