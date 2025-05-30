@@ -109,27 +109,45 @@ export class Builder<
         api: {
           create: async (args) => {
             // TODO: Access control
-            const result = await api.create(args)
+            const defaultApi = config.admin?.api?.create
+              ? defaultHandlers.create
+              : (undefined as any)
+            const result = await api.create({
+              ...args,
+              defaultApi,
+            })
             return result
           },
           update: async (args) => {
             // TODO: Access control
-            const result = await api.update(args)
+            const defaultApi = config.admin?.api?.update
+              ? defaultHandlers.update
+              : (undefined as any)
+            const result = await api.update({ ...args, defaultApi })
             return result
           },
           delete: async (args) => {
             // TODO: Access control
-            const result = await api.delete(args)
+            const defaultApi = config.admin?.api?.delete
+              ? defaultHandlers.delete
+              : (undefined as any)
+            const result = await api.delete({ ...args, defaultApi })
             return result
           },
           findOne: async (args) => {
             // TODO: Access control
-            const result = await api.findOne(args)
+            const defaultApi = config.admin?.api?.findOne
+              ? defaultHandlers.findOne
+              : (undefined as any)
+            const result = await api.findOne({ ...args, defaultApi })
             return result
           },
           findMany: async (args) => {
             // TODO: Access control
-            const result = await api.findMany(args)
+            const defaultApi = config.admin?.api?.findMany
+              ? defaultHandlers.findMany
+              : (undefined as any)
+            const result = await api.findMany({ ...args, defaultApi })
             return result
           },
         },

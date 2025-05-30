@@ -14,15 +14,7 @@ import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
 import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
-import type {
-  ApiCreateHandler,
-  ApiDeleteHandler,
-  ApiFindManyHandler,
-  ApiFindOneHandler,
-  ApiUpdateHandler,
-  CollectionAdminApi,
-  InferFields,
-} from './collection'
+import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
 import type { MinimalContext } from './config'
 import type { Field, Fields } from './field'
 import {
@@ -62,7 +54,9 @@ export function createDefaultApiHandlers<
     },
   }
 
-  const findOne: ApiFindOneHandler<TContext, TFields> = async (args) => {
+  const findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> = async (
+    args
+  ) => {
     const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -85,7 +79,9 @@ export function createDefaultApiHandlers<
     } as InferFields<TFields>
   }
 
-  const findMany: ApiFindManyHandler<TContext, TFields> = async (args) => {
+  const findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> = async (
+    args
+  ) => {
     const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -117,7 +113,7 @@ export function createDefaultApiHandlers<
     }
   }
 
-  const create: ApiCreateHandler<TContext, TFields> = async (args) => {
+  const create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> = async (args) => {
     const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
@@ -149,7 +145,7 @@ export function createDefaultApiHandlers<
     return { __pk, __id }
   }
 
-  const update: ApiUpdateHandler<TContext, TFields> = async (args) => {
+  const update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> = async (args) => {
     const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
@@ -182,7 +178,7 @@ export function createDefaultApiHandlers<
   }
 
   // why not just delete? why _delete?
-  const _delete: ApiDeleteHandler<TContext, TFields> = async (args) => {
+  const _delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE> = async (args) => {
     const db = args.context.db
 
     await db
