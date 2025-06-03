@@ -17,7 +17,7 @@ import {
   UserCircleIcon,
 } from '@phosphor-icons/react'
 
-import { Editor } from '../components/editor'
+import { RichTextEditor } from '../components/editor'
 import { PlaygroundCard } from '../components/playground/card'
 import { BaseIcon } from '../components/primitives/base-icon'
 import { IconContainer } from '../components/primitives/icon-container'
@@ -25,6 +25,8 @@ import { Typography } from '../components/primitives/typography'
 import { Button } from '../intentui/ui/button'
 import { Calendar } from '../intentui/ui/calendar'
 import { Checkbox, CheckboxGroup } from '../intentui/ui/checkbox'
+import { ColorField } from '../intentui/ui/color-field'
+import { ColorPicker } from '../intentui/ui/color-picker'
 import { DateField } from '../intentui/ui/date-field'
 import { DatePicker } from '../intentui/ui/date-picker'
 import { Link } from '../intentui/ui/link'
@@ -257,6 +259,17 @@ export const UIPlayground = () => {
           </div>
         </PlaygroundCard>
       </Wrapper>
+      <Wrapper title="Color components">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Color picker" categoryTitle="Color components">
+            <ColorPicker label="Pick a color" eyeDropper />
+            <ColorPicker />
+          </PlaygroundCard>
+          <PlaygroundCard title="Color field" categoryTitle="Color components">
+            <ColorField label="Pick a color" defaultValue="#0d6efd" onChange={(e) => {}} />
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
       <Wrapper title="Toolbar">
         <div className="flex justify-center">
           <Toolbar aria-label="Toolbars" className="flex items-center">
@@ -393,7 +406,7 @@ export const UIPlayground = () => {
         </div>
       </Wrapper>
       <Wrapper title="Rich text">
-        <Editor />
+        <RichTextEditor />
       </Wrapper>
       <Wrapper title="Date picker">
         <div className="flex justify-start">

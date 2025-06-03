@@ -1,160 +1,60 @@
-/**
- * Copyright (c) Meta Platforms, Inc. and affiliates.
- *
- * This source code is licensed under the MIT license found in the
- * LICENSE file in the root directory of this source tree.
- *
- */
+import './tiptap-style.css'
 
-import './style.css'
+import Color from '@tiptap/extension-color'
+import TextAlign from '@tiptap/extension-text-align'
+import TextStyle from '@tiptap/extension-text-style'
+import Underline from '@tiptap/extension-underline'
+import { EditorProvider } from '@tiptap/react'
+import StarterKit from '@tiptap/starter-kit'
 
-import { ListItemNode, ListNode } from '@lexical/list'
-import { AutoFocusPlugin } from '@lexical/react/LexicalAutoFocusPlugin'
-import { type InitialConfigType, LexicalComposer } from '@lexical/react/LexicalComposer'
-import { ContentEditable } from '@lexical/react/LexicalContentEditable'
-import { LexicalErrorBoundary } from '@lexical/react/LexicalErrorBoundary'
-import { HistoryPlugin } from '@lexical/react/LexicalHistoryPlugin'
-import { RichTextPlugin } from '@lexical/react/LexicalRichTextPlugin'
-import { HeadingNode } from '@lexical/rich-text'
-import {
-  //  isHTMLElement,
-  ParagraphNode,
-  TextNode,
-} from 'lexical'
+import { EditorBar } from './components/editor-bar'
+import { BackColor } from './extensions/background-color-extension'
+import Selection from './extensions/selection-extension'
 
-import ToolbarPlugin from './plugins/toolbar-plugin'
-import { exampleTheme } from './theme/example-theme'
+import { useMediaQuery } from '../../intentui/utils/use-media-query'
 
-const placeholder = 'Enter some rich text...'
+const extensions = [
+  StarterKit.configure({
+    heading: {
+      HTMLAttributes: {
+        class: 'heading',
+      },
+    },
+  }),
+  BackColor,
+  Underline,
+  Selection,
+  TextStyle,
+  TextAlign.configure({
+    types: ['heading', 'paragraph'],
+    alignments: ['left', 'center', 'right', 'justify'],
+    defaultAlignment: 'left',
+  }),
+  Color,
+]
 
-// const removeStylesExportDOM = (editor: LexicalEditor, target: LexicalNode): DOMExportOutput => {
-//   const output = target.exportDOM(editor)
-//   if (output && isHTMLElement(output.element)) {
-//     // Remove all inline styles and classes if the element is an HTMLElement
-//     // Children are checked as well since TextNode can be nested
-//     // in i, b, and strong tags.
-//     for (const el of [
-//       output.element,
-//       ...Array.from(output.element.querySelectorAll('[style],[class],[dir="ltr"]')),
-//     ]) {
-//       el.removeAttribute('class')
-//       el.removeAttribute('style')
-//       if (el.getAttribute('dir') === 'ltr') {
-//         el.removeAttribute('dir')
-//       }
-//     }
-//   }
-//   return output
-// }
+export const RichTextEditor = () => {
+  const isMobile = useMediaQuery('(max-width: 600px)')
 
-// const exportMap: DOMExportOutputMap = new Map<
-//   Klass<LexicalNode>,
-//   (editor: LexicalEditor, target: LexicalNode) => DOMExportOutput
-// >([
-//   [ParagraphNode, removeStylesExportDOM],
-//   [TextNode, removeStylesExportDOM],
-// ])
-
-// const getExtraStyles = (element: HTMLElement): string => {
-//   // Parse styles from pasted input, but only if they match exactly the
-//   // sort of styles that would be produced by exportDOM
-//   let extraStyles = ''
-//   const fontSize = parseAllowedFontSize(element.style.fontSize)
-//   const backgroundColor = parseAllowedColor(element.style.backgroundColor)
-//   const color = parseAllowedColor(element.style.color)
-//   if (fontSize !== '' && fontSize !== '15px') {
-//     extraStyles += `font-size: ${fontSize};`
-//   }
-//   if (backgroundColor !== '' && backgroundColor !== 'rgb(255, 255, 255)') {
-//     extraStyles += `background-color: ${backgroundColor};`
-//   }
-//   if (color !== '' && color !== 'rgb(0, 0, 0)') {
-//     extraStyles += `color: ${color};`
-//   }
-//   return extraStyles
-// }
-
-// const constructImportMap = (): DOMConversionMap => {
-//   const importMap: DOMConversionMap = {}
-
-//   // Wrap all TextNode importers with a function that also imports
-//   // the custom styles implemented by the playground
-//   for (const [tag, fn] of Object.entries(TextNode.importDOM() || {})) {
-//     importMap[tag] = (importNode) => {
-//       const importer = fn(importNode)
-//       if (!importer) {
-//         return null
-//       }
-//       return {
-//         ...importer,
-//         conversion: (element) => {
-//           const output = importer.conversion(element)
-//           if (
-//             output === null ||
-//             output.forChild === undefined ||
-//             output.after !== undefined ||
-//             output.node !== null
-//           ) {
-//             return output
-//           }
-//           const extraStyles = getExtraStyles(element)
-//           if (extraStyles) {
-//             const { forChild } = output
-//             return {
-//               ...output,
-//               forChild: (child, parent) => {
-//                 const textNode = forChild(child, parent)
-//                 if ($isTextNode(textNode)) {
-//                   textNode.setStyle(textNode.getStyle() + extraStyles)
-//                 }
-//                 return textNode
-//               },
-//             }
-//           }
-//           return output
-//         },
-//       }
-//     }
-//   }
-
-//   return importMap
-// }
-
-const editorConfig = {
-  html: {
-    // export: exportMap,
-    // import: constructImportMap(),
-  },
-  namespace: 'Kivotos editor',
-  theme: exampleTheme,
-  nodes: [ParagraphNode, TextNode, ListNode, ListItemNode, HeadingNode],
-  onError(error: Error) {
-    throw error
-  },
-} satisfies InitialConfigType
-
-export function Editor() {
   return (
-    <div className="p-4 border rounded-xl">
-      <LexicalComposer initialConfig={editorConfig}>
-        <div>
-          <ToolbarPlugin />
-          <div className="editor-inner">
-            <RichTextPlugin
-              contentEditable={
-                <ContentEditable
-                  className="editor-input"
-                  aria-placeholder={placeholder}
-                  placeholder={<div className="editor-placeholder">{placeholder}</div>}
-                />
-              }
-              ErrorBoundary={LexicalErrorBoundary}
-            />
-            <HistoryPlugin />
-            <AutoFocusPlugin />
-          </div>
-        </div>
-      </LexicalComposer>
+    <div className="bg-bg flex flex-col gap-4 border p-4 rounded-xl">
+      <EditorProvider
+        immediatelyRender={false}
+        shouldRerenderOnTransaction
+        editorContainerProps={{
+          className: 'editor-container',
+        }}
+        editorProps={{
+          attributes: {
+            'aria-label': 'Main content area, start typing to enter text.',
+          },
+        }}
+        slotBefore={<EditorBar />}
+        extensions={extensions}
+        content={`
+          <p>Hello World! 🌎️</p> <p>HELLO</p>
+          <p>xxx</p>`}
+      />
     </div>
   )
 }
