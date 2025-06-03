@@ -29,10 +29,10 @@ const tableDataExtract = <
     return { ...column, label: column.fieldName /* Fallback to key if no label */ }
   })
 
-  headers.sort((a, b) => (b.label === collection.primaryField ? 1 : -1))
+  headers.sort((a, b) => (b.label === collection.identifierColumn ? 1 : -1))
 
   const rows = data.map((record) => ({
-    key: record[collection.primaryField],
+    key: record[collection.identifierColumn],
     rows: headers.map(
       (header) =>
         record[header.fieldName] ??

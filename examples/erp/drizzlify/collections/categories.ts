@@ -2,7 +2,7 @@ import { builder } from '../helper'
 
 export const categoriesCollection = builder.collection('categories', {
   slug: 'categories',
-  primaryField: 'id',
+  identifierColumn: 'id',
   fields: builder.fields('categories', (fb) => ({
     id: fb.columns('id', {
       type: 'text',
@@ -24,7 +24,7 @@ export const categoriesCollection = builder.collection('categories', {
         }),
       })),
       options: builder.options(async ({ db }) => {
-        const result = await db.query.users.findMany({ columns: { id: true, name: true } })
+        const result = await db.query.user.findMany({ columns: { id: true, name: true } })
         return result.map((user) => ({ label: user.name ?? user.id, value: user.id }))
       }),
     })),

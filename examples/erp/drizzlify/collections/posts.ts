@@ -2,7 +2,15 @@ import { builder } from '../helper'
 
 export const postsCollection = builder.collection('posts', {
   slug: 'posts',
-  primaryField: 'id',
+  identifierColumn: 'id',
+  admin: {
+    api: {
+      findMany: async (args) => {
+        console.log('Custom findMany for posts collection')
+        return await args.defaultApi(args)
+      },
+    },
+  },
   fields: builder.fields('posts', (fb) => ({
     id: fb.columns('id', {
       type: 'text',
@@ -15,7 +23,7 @@ export const postsCollection = builder.collection('posts', {
     }),
     authorId: fb.relations('author', (fb) => ({
       type: 'connect',
-      fields: fb.fields('users', (fb) => ({
+      fields: fb.fields('user', (fb) => ({
         id: fb.columns('id', {
           type: 'text',
         }),
@@ -27,7 +35,7 @@ export const postsCollection = builder.collection('posts', {
         }),
       })),
       options: builder.options(async ({ db }) => {
-        const result = await db.query.users.findMany({ columns: { id: true, name: true } })
+        const result = await db.query.user.findMany({ columns: { id: true, name: true } })
         return result.map((user) => ({ label: user.name, value: user.id }))
       }),
     })),

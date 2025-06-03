@@ -10,8 +10,8 @@ import type { AuthConfig } from '..'
 export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuthConfig) {
   const handlers = {
     //  No authentication required
-    signUp: signUp({}),
-    loginEmail: loginEmail({}),
+    signUp: signUp(config),
+    loginEmail: loginEmail(config),
     signOut: signOut({}),
     resetPasswordEmail: resetPasswordEmail({}),
     forgotPasswordEmail: forgotPasswordEmail({}),
@@ -23,5 +23,3 @@ export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuth
     handlers,
   }
 }
-
-export type AuthHandlers = ReturnType<typeof createAuthHandlers>['handlers']

@@ -1,9 +1,9 @@
 import { builder } from '../helper'
 
-export const usersCollection = builder.collection('users', {
+export const usersCollection = builder.collection('user', {
   slug: 'users',
-  primaryField: 'id',
-  fields: builder.fields('users', (fb) => ({
+  identifierColumn: 'id',
+  fields: builder.fields('user', (fb) => ({
     id: fb.columns('id', {
       type: 'text',
     }),
