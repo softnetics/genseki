@@ -366,6 +366,6 @@
     }
   }
   .shake {
-    animation:shake 4 0.1s ease-out both alternate;
+    animation: shake 4 0.1s ease-out both alternate;
   }
 }
