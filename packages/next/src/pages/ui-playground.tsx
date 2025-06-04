@@ -14,6 +14,7 @@ import { PlaygroundCard } from '../components/playground/card'
 import { BaseIcon } from '../components/primitives/base-icon'
 import { IconContainer } from '../components/primitives/icon-container'
 import { Typography } from '../components/primitives/typography'
+import { Badge } from '../intentui/ui/badge'
 import { Button } from '../intentui/ui/button'
 import { Checkbox, CheckboxGroup } from '../intentui/ui/checkbox'
 import { ListBox, ListBoxItem, ListBoxItemDetails, ListBoxSection } from '../intentui/ui/list-box'
@@ -28,6 +29,7 @@ import {
   ModalTitle,
   ModalTrigger,
 } from '../intentui/ui/modal'
+import { MultipleSelect, MultipleSelectItem } from '../intentui/ui/multiple-select'
 import {
   Popover,
   PopoverBody,
@@ -48,6 +50,7 @@ import {
   SelectTrigger,
 } from '../intentui/ui/select'
 import { Switch } from '../intentui/ui/switch'
+import { Tag, TagGroup, TagList } from '../intentui/ui/tag-group'
 import { TextField } from '../intentui/ui/text-field'
 
 const Wrapper = ({ children, title }: { children: React.ReactNode; title: string }) => {
@@ -68,6 +71,29 @@ const MOCK_OPTIONS = [
   { id: 4, name: 'Contributor', description: 'Can contribute content for review' },
   { id: 5, name: 'Guest', description: 'Limited access, mostly for viewing purposes' },
 ]
+const fruits = [
+  { id: 1, name: 'Apple' },
+  { id: 2, name: 'Banana' },
+  { id: 3, name: 'Cherry' },
+  { id: 4, name: 'Date' },
+  { id: 5, name: 'Elderberry' },
+  { id: 6, name: 'Fig' },
+  { id: 7, name: 'Grape' },
+  { id: 8, name: 'Honeydew' },
+  { id: 9, name: 'Kiwi' },
+  { id: 10, name: 'Lemon' },
+  { id: 11, name: 'Mango' },
+  { id: 12, name: 'Nectarine' },
+  { id: 13, name: 'Orange' },
+  { id: 14, name: 'Papaya' },
+  { id: 15, name: 'Quince' },
+  { id: 16, name: 'Raspberry' },
+  { id: 17, name: 'Strawberry' },
+  { id: 18, name: 'Tangerine' },
+  { id: 19, name: 'Ugli Fruit' },
+  { id: 20, name: 'Watermelon' },
+]
+
 const countries = [
   {
     id: 1,
@@ -250,13 +276,99 @@ export const UIPlayground = () => {
           </div>
         </PlaygroundCard>
       </Wrapper>
+      <Wrapper title="Multi select">
+        <PlaygroundCard title="Multi select" categoryTitle="Multi select">
+          <Select label="Design software" placeholder="Select a software">
+            <SelectTrigger />
+            <SelectList
+              items={[
+                { id: 0, name: 'A' },
+                { id: 1, name: 'B' },
+                { id: 2, name: 'C' },
+                { id: 3, name: 'D' },
+              ]}
+            >
+              {(item) => (
+                <SelectOption id={item.id} textValue={item.name}>
+                  {item.name}
+                </SelectOption>
+              )}
+            </SelectList>
+          </Select>
+          <MultipleSelect
+            className="max-w-xs"
+            description="Choose your favorite fruits"
+            label="Fruits"
+            shape="circle"
+            isRequired
+            items={fruits}
+          >
+            {(item) => {
+              return (
+                <MultipleSelectItem id={item.id} textValue={item.name}>
+                  {item.name}
+                </MultipleSelectItem>
+              )
+            }}
+          </MultipleSelect>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Tag group">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Tag group" categoryTitle="Tag group">
+            <TagGroup label="Android Brands" selectionMode="multiple">
+              <TagList
+                items={[
+                  { id: '1', name: 'Samsung', available: false },
+                  { id: '2', name: 'OnePlus', available: true },
+                  { id: '3', name: 'Google', available: true },
+                  { id: '4', name: 'Xiaomi', available: false },
+                ]}
+              >
+                {(item) => <Tag>{item.name}</Tag>}
+              </TagList>
+            </TagGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Tag group with remove" categoryTitle="Tag group">
+            <TagGroup label="Android Brands" selectionMode="multiple" onRemove={() => {}}>
+              <TagList
+                items={[
+                  { id: '1', name: 'Samsung', available: false },
+                  { id: '2', name: 'OnePlus', available: true },
+                  { id: '3', name: 'Google', available: true },
+                  { id: '4', name: 'Xiaomi', available: false },
+                ]}
+              >
+                {(item) => <Tag>{item.name}</Tag>}
+              </TagList>
+            </TagGroup>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+      <Wrapper title="Badge">
+        <PlaygroundCard title="Single badge" categoryTitle="Badge">
+          <div className="flex flex-wrap gap-2">
+            {['primary', 'secondary', 'success', 'info', 'warning', 'danger'].map(
+              (intent, index) => (
+                <Badge key={index} intent={intent as any} shape="circle">
+                  {intent}
+                </Badge>
+              )
+            )}
+          </div>
+        </PlaygroundCard>
+      </Wrapper>
       <Wrapper title="Modal">
         <PlaygroundCard title="Dialog" categoryTitle="Modal">
           <Modal>
             <ModalTrigger size="md" variant="outline">
               Confirm
             </ModalTrigger>
-            <ModalContent role="alertdialog" classNames={{ content: 'w-fit min-w-[16rem]' }}>
+            <ModalContent
+              isBlurred
+              role="alertdialog"
+              classNames={{ content: 'w-fit min-w-[16rem]' }}
+            >
               <ModalHeader className="[&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-12">
                 <ModalTitle level={3}>Delete file</ModalTitle>
                 <ModalDescription>
