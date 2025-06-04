@@ -1,9 +1,11 @@
 'use client'
 
-import { useFormContext } from 'react-hook-form'
+import type { ReactNode } from 'react'
+import { useFieldArray, useFormContext } from 'react-hook-form'
 
 import type { Field, FieldRelation } from '@kivotos/core'
 
+import { Button } from '../../intentui/ui/button'
 import { Checkbox, type CheckboxProps } from '../../intentui/ui/checkbox'
 import { DatePicker, type DatePickerProps } from '../../intentui/ui/date-picker'
 import { FieldError, Label } from '../../intentui/ui/field'
@@ -155,23 +157,8 @@ export function AutoSelectField(props: AutoSelectField) {
   )
 }
 
-interface AutoFieldProps {
-  name: string
-  // NOTE: This should be FieldClient but the type is not correct
-  field: Field & { fieldName: string }
-  optionsRecord: Record<string, any[]>
-  className?: string
-  visibilityField?: 'create' | 'update'
-}
-
-export function AutoField(props: AutoFieldProps) {
+export function AutoFormField(props: { name: string; component: ReactNode }) {
   const { control } = useFormContext()
-
-  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') {
-    return null
-  }
-
   return (
     <FormField
       key={props.name}
@@ -179,14 +166,23 @@ export function AutoField(props: AutoFieldProps) {
       control={control}
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
-          <_AutoField {...props} />
+          {props.component}
         </FormItemController>
       )}
     />
   )
 }
 
-function _AutoField(props: AutoFieldProps) {
+interface AutoFieldProps {
+  // NOTE: This should be FieldClient but the type is not correct
+  field: Field & { fieldName: string }
+  optionsRecord: Record<string, any[]>
+  className?: string
+  visibilityField?: 'create' | 'update'
+  prefix?: string
+}
+
+export function AutoField(props: AutoFieldProps) {
   const { field, className } = props
 
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
@@ -196,7 +192,7 @@ function _AutoField(props: AutoFieldProps) {
   const disabled = visibility === 'disabled'
 
   const commonProps = {
-    name: field.fieldName,
+    name: props.prefix ? `${props.prefix}.${field.fieldName}` : field.fieldName,
     label: field.label,
     className: className,
     description: field.description,
@@ -205,25 +201,72 @@ function _AutoField(props: AutoFieldProps) {
 
   switch (field.type) {
     case 'text':
-      return <AutoTextField {...commonProps} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoTextField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+
     case 'number':
-      return <AutoNumberField {...commonProps} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoNumberField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+
     case 'time':
-      return <AutoTimeField {...commonProps} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoNumberField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+
     case 'date':
-      return <AutoDatePickerField {...commonProps} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoDatePickerField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+
     case 'checkbox':
-      return <AutoCheckbox {...commonProps} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoCheckbox {...commonProps} isDisabled={disabled} />}
+        />
+      )
+
     case 'switch':
-      return <AutoSwitch {...commonProps} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoSwitch {...commonProps} isDisabled={disabled} />}
+        />
+      )
+
+    case 'selectNumber':
     case 'selectText': {
       const options = props.optionsRecord[field.fieldName] ?? []
-      return <AutoSelectField {...commonProps} items={options} isDisabled={disabled} />
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoSelectField {...commonProps} items={options} isDisabled={disabled} />}
+        />
+      )
     }
-    case 'selectNumber': {
-      const options = props.optionsRecord[field.fieldName] ?? []
-      return <AutoSelectField {...commonProps} items={options} isDisabled={disabled} />
-    }
+
+    case 'comboboxNumber':
     case 'comboboxText': {
       const options = props.optionsRecord[field.fieldName] ?? []
       return (
@@ -236,10 +279,7 @@ function _AutoField(props: AutoFieldProps) {
         </select>
       )
     }
-    case 'comboboxNumber': {
-      const options = props.optionsRecord[field.fieldName] ?? []
-      return 'TODO'
-    }
+
     case 'comboboxBoolean': {
       return <p>COMBOBOX BOOLEAN</p>
     }
@@ -249,7 +289,7 @@ function _AutoField(props: AutoFieldProps) {
 
     case 'create':
       return (
-        <AutoRelationShipField
+        <AutoRelationshipField
           name={field.fieldName}
           field={field}
           allowCreate={true}
@@ -260,7 +300,7 @@ function _AutoField(props: AutoFieldProps) {
       )
     case 'connect':
       return (
-        <AutoRelationShipField
+        <AutoRelationshipField
           name={field.fieldName}
           field={field}
           allowConnect={true}
@@ -271,7 +311,7 @@ function _AutoField(props: AutoFieldProps) {
       )
     case 'connectOrCreate':
       return (
-        <AutoRelationShipField
+        <AutoRelationshipField
           name={field.fieldName}
           field={field}
           allowConnect={true}
@@ -286,7 +326,7 @@ function _AutoField(props: AutoFieldProps) {
   }
 }
 
-interface AutoRelationShipFieldProps {
+interface AutoRelationshipFieldProps {
   name: string
   // NOTE: This should be FieldClient but the type is not correct
   field: FieldRelation & { fieldName: string }
@@ -297,12 +337,46 @@ interface AutoRelationShipFieldProps {
   visibilityField?: 'create' | 'update'
 }
 
-export function AutoRelationShipField(props: AutoRelationShipFieldProps) {
-  const { control } = useFormContext()
+export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
   if (visibility === 'hidden') {
     return null
   }
+
+  switch (props.field.mode) {
+    case 'one':
+      return (
+        <AutoOneRelationshipField
+          name={props.name}
+          field={props.field}
+          optionsRecord={props.optionsRecord}
+          className={props.className}
+          allowCreate={props.allowCreate}
+          allowConnect={props.allowConnect}
+          visibilityField={props.visibilityField}
+        />
+      )
+    case 'many':
+      return (
+        <AutoManyRelationshipField
+          name={props.name}
+          field={props.field}
+          optionsRecord={props.optionsRecord}
+          className={props.className}
+          allowCreate={props.allowCreate}
+          allowConnect={props.allowConnect}
+          visibilityField={props.visibilityField}
+        />
+      )
+    default:
+      throw new Error(`Unsupported relationship mode: ${props.field.mode}`)
+  }
+}
+
+export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
+  const { control } = useFormContext()
+  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
+  if (visibility === 'hidden') return null
   const disabled = visibility === 'disabled'
 
   const commonProps = {
@@ -312,38 +386,185 @@ export function AutoRelationShipField(props: AutoRelationShipFieldProps) {
     placeholder: props.field.placeholder,
   }
 
-  return (
-    <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-      {props.allowConnect && (
-        // TODO: Clean up this shit. It's hacked
-        <FormField
-          name={`${props.name}.connect`}
-          control={control}
-          render={({ field, fieldState, formState }) => (
-            <FormItemController field={field} fieldState={fieldState} formState={formState}>
-              <AutoSelectField
-                {...commonProps}
-                items={props.optionsRecord[props.field.fieldName] ?? []}
-                isDisabled={disabled}
-              />
-            </FormItemController>
-          )}
-        />
+  const connectComponent = (
+    <FormField
+      name={props.name}
+      control={control}
+      render={({ field, fieldState, formState }) => (
+        <FormItemController field={field} fieldState={fieldState} formState={formState}>
+          <AutoSelectField
+            {...commonProps}
+            items={props.optionsRecord[props.field.fieldName] ?? []}
+            isDisabled={disabled}
+          />
+        </FormItemController>
       )}
-      {props.allowCreate && (
-        <div className="flex flex-col gap-y-2 bg-yellow-500 p-4  rounded-lg">
-          {Object.entries(props.field.fields).map(([key, field]) => (
-            <AutoField
-              key={key}
-              name={`${props.name}.${field.fieldName}.create`}
-              field={field}
-              className="w-full"
-              optionsRecord={props.optionsRecord}
-              visibilityField={props.visibilityField}
-            />
-          ))}
-        </div>
-      )}
-    </div>
+    />
   )
+
+  const createComponent = Object.entries(props.field.fields).map(([key, originalField]) => (
+    <AutoFormField
+      key={`${props.name}.create.${originalField.fieldName}`}
+      name={`${props.name}.create.${originalField.fieldName}`}
+      component={
+        <AutoField
+          key={key}
+          field={originalField}
+          className="w-full"
+          optionsRecord={props.optionsRecord}
+          visibilityField={props.visibilityField}
+          prefix={`${props.name}.create`}
+        />
+      }
+    />
+  ))
+
+  switch (props.field.type) {
+    case 'connect':
+      return (
+        <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
+          <div>{props.field.label}</div>
+          {connectComponent}
+        </div>
+      )
+    case 'create':
+      return (
+        <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
+          <div>{props.field.label}</div>
+          {createComponent}
+        </div>
+      )
+    case 'connectOrCreate':
+      return (
+        <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
+          {connectComponent}
+          <div className="flex flex-col gap-y-2 bg-yellow-500 p-4 rounded-lg">
+            {createComponent}
+          </div>
+        </div>
+      )
+  }
+}
+
+interface AutoManyRelationshipFieldProps {
+  name: string
+  // NOTE: This should be FieldClient but the type is not correct
+  field: FieldRelation & { fieldName: string }
+  optionsRecord: Record<string, any[]>
+  className?: string
+  allowCreate?: boolean
+  allowConnect?: boolean
+  visibilityField?: 'create' | 'update'
+}
+
+export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
+  const { control } = useFormContext()
+  const fieldArray = useFieldArray({
+    control: control,
+    name: props.name,
+  })
+  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
+  if (visibility === 'hidden') return null
+  const disabled = visibility === 'disabled'
+
+  const connectComponent = (name: string) => {
+    const commonProps = {
+      label: props.field.label,
+      className: props.className,
+      description: props.field.description,
+      placeholder: props.field.placeholder,
+    }
+    return (
+      <AutoFormField
+        name={name}
+        component={
+          <AutoSelectField
+            {...commonProps}
+            items={props.optionsRecord[props.field.fieldName] ?? []}
+            isDisabled={disabled}
+          />
+        }
+      />
+    )
+  }
+
+  const createComponent = (name: string) => {
+    console.log('createComponent', name, props.field.fields)
+    return Object.entries(props.field.fields).map(([key, childField]) => (
+      <AutoFormField
+        key={key}
+        name={name}
+        component={
+          <AutoField
+            field={childField}
+            className="w-full"
+            optionsRecord={props.optionsRecord}
+            visibilityField={props.visibilityField}
+            prefix={name}
+          />
+        }
+      />
+    ))
+  }
+
+  switch (props.field.type) {
+    case 'connect':
+      return (
+        <div className="border border-red-500 p-6">
+          {fieldArray.fields.map((fieldValue, index) => (
+            <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
+              <div>
+                {props.field.label} #{index + 1}
+              </div>
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                connectComponent(`${props.name}.${field.fieldName}.${index}.connect`)
+              )}
+            </div>
+          ))}
+          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+            Add
+          </Button>
+        </div>
+      )
+    case 'create':
+      return (
+        <div className="border border-red-500 p-6">
+          {fieldArray.fields.map((fieldValue, index) => (
+            <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
+              <div>
+                {props.field.label} #{index + 1}
+              </div>
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                createComponent(`${props.name}.${field.fieldName}.${index}.create`)
+              )}
+            </div>
+          ))}
+          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+            Add
+          </Button>
+        </div>
+      )
+
+    case 'connectOrCreate':
+      return (
+        <div className="border border-red-500 p-6">
+          {fieldArray.fields.map((fieldValue, index) => (
+            <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
+              <div>
+                {props.field.label} #{index + 1}
+              </div>
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                connectComponent(`${props.name}.${field.fieldName}.${index}.connect`)
+              )}
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                createComponent(`${props.name}.${field.fieldName}.${index}.create`)
+              )}
+            </div>
+          ))}
+          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+            Add
+          </Button>
+        </div>
+      )
+  }
 }

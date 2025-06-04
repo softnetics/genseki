@@ -23,7 +23,7 @@ export const postsCollection = builder.collection('posts', {
       description: 'The content of the post',
     }),
     author: fb.relations('author', (fb) => ({
-      type: 'connect',
+      type: 'create',
       label: 'Author',
       description: 'The author of the post',
       fields: fb.fields('user', (fb) => ({
@@ -37,6 +37,23 @@ export const postsCollection = builder.collection('posts', {
           label: 'Email',
           description: 'The email of the author',
         }),
+        posts: fb.relations('posts', (fb) => ({
+          type: 'create',
+          label: 'Posts',
+          description: 'Posts written by the author',
+          fields: fb.fields('posts', (fb) => ({
+            title: fb.columns('title', {
+              type: 'text',
+              label: 'Title',
+              description: 'The title of the post',
+            }),
+            content: fb.columns('content', {
+              type: 'text',
+              label: 'Content',
+              description: 'The content of the post',
+            }),
+          })),
+        })),
       })),
       options: builder.options(async ({ db }) => {
         const result = await db.query.user.findMany({ columns: { id: true, name: true } })
