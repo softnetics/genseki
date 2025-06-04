@@ -16,8 +16,8 @@ import {
 import { BaseIcon } from '../primitives/base-icon'
 import { Typography } from '../primitives/typography'
 
-export async function AppSidebar({ collections }: { collections: Collection[] }) {
-  const collectionSlugs = collections.map((collection) => collection.slug)
+export async function AppSidebar({ collections }: { collections: Record<string, Collection> }) {
+  const collectionSlugs = Object.values(collections).map((collection) => collection.slug)
 
   return (
     <Sidebar
@@ -25,7 +25,8 @@ export async function AppSidebar({ collections }: { collections: Collection[] })
       intent="inset"
       className="flex gap-y-12 p-0 py-6 group-[:not([data-sidebar-state=collapsed])]/sidebar-container:p-6"
     >
-      <SidebarHeader className="border-border m-0 size-auto border-b pl-6">
+      {/* TODO: Make sidebar variations, so we won't need an important css flag */}
+      <SidebarHeader className="border-border m-0 size-auto! border-b pl-6 h-auto! w-full!">
         <div className="flex h-[68px] items-center gap-x-4">
           <div className="bg-primary/15 dark:bg-primary/20 border-primary dark:border-primary/40 relative flex overflow-clip rounded-md border p-4">
             <div className="bg-primary/20 absolute -inset-x-[25%] inset-y-0 m-auto h-2 -translate-x-4 -translate-y-4 -rotate-45 blur-[3px]" />

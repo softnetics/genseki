@@ -7,7 +7,7 @@ const timestamps = {
   deletedAt: timestamp(),
 }
 
-export const users = pgTable('users', {
+export const user = pgTable('user', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: text('name').notNull(),
   email: text('email').notNull().unique(),
@@ -16,7 +16,7 @@ export const users = pgTable('users', {
   ...timestamps,
 })
 
-export const sessions = pgTable('session', {
+export const session = pgTable('session', {
   id: uuid('id').primaryKey().defaultRandom(),
   expiresAt: timestamp('expires_at').notNull(),
   token: text('token').notNull().unique(),
@@ -24,17 +24,17 @@ export const sessions = pgTable('session', {
   userAgent: text('user_agent'),
   userId: uuid('user_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => user.id, { onDelete: 'cascade' }),
   ...timestamps,
 })
 
-export const accounts = pgTable('account', {
+export const account = pgTable('account', {
   id: uuid('id').primaryKey().defaultRandom(),
   accountId: text('account_id').notNull(),
   providerId: text('provider_id').notNull(),
   userId: uuid('user_id')
     .notNull()
-    .references(() => users.id, { onDelete: 'cascade' }),
+    .references(() => user.id, { onDelete: 'cascade' }),
   accessToken: text('access_token'),
   refreshToken: text('refresh_token'),
   idToken: text('id_token'),
@@ -45,7 +45,7 @@ export const accounts = pgTable('account', {
   ...timestamps,
 })
 
-export const verifications = pgTable('verification', {
+export const verification = pgTable('verification', {
   id: uuid('id').primaryKey().defaultRandom(),
   identifier: text('identifier').notNull(),
   value: text('value').notNull(),
@@ -57,30 +57,30 @@ export const posts = pgTable('posts', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar(),
   content: text(),
-  authorId: uuid().references(() => users.id),
+  authorId: uuid().references(() => user.id),
   categoryId: uuid().references(() => categories.id),
   ...timestamps,
 })
 
-export const usersRelations = relations(users, ({ many }) => ({
+export const usersRelations = relations(user, ({ many }) => ({
   posts: many(posts),
 }))
 
 export const postsRelations = relations(posts, ({ one }) => ({
-  author: one(users, { fields: [posts.authorId], references: [users.id] }),
+  author: one(user, { fields: [posts.authorId], references: [user.id] }),
   category: one(categories, { fields: [posts.categoryId], references: [categories.id] }),
 }))
 
 export const categories = pgTable('categories', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar().notNull(),
-  ownerId: uuid().references(() => users.id),
+  ownerId: uuid().references(() => user.id),
   ...timestamps,
 })
 
 export const categoriesRelations = relations(categories, ({ many, one }) => ({
   posts: many(posts),
-  owner: one(users, { fields: [categories.ownerId], references: [users.id] }),
+  owner: one(user, { fields: [categories.ownerId], references: [user.id] }),
   tags: many(categoryTags),
 }))
 

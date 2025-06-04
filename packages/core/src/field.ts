@@ -7,7 +7,7 @@ import {
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { Simplify } from 'type-fest'
-import type { ZodObject } from 'zod'
+import type { ZodObject, ZodOptional } from 'zod'
 import z from 'zod'
 
 import {
@@ -227,7 +227,7 @@ export type FieldsClient<TFields extends FieldsClientInitial = FieldsClientIniti
   FieldsWithFieldName<TFields>
 
 export type FieldColumnOptionsFromTable<
-  TColumn extends Column,
+  TColumn extends Column<any>,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = TColumn['_']['dataType'] extends 'string'
   ? FieldColumnStringCollectionOptions<TContext>[keyof FieldColumnStringCollectionOptions<TContext>]
@@ -444,21 +444,31 @@ export class FieldBuilder<
   }
 }
 
+// TODO: Add support for relation input fields
+type CastOptionalFieldToZodSchema<
+  TField extends Field<any>,
+  TSchema extends z.ZodTypeAny,
+> = TField['_'] extends { source: 'column' }
+  ? TField['_']['column']['notNull'] extends true
+    ? ZodOptional<TSchema>
+    : TSchema
+  : TSchema
+
 type FieldToZodScheama<TField extends Field<any>> =
   TField extends FieldColumnStringCollectionOptions<any>[keyof FieldColumnStringCollectionOptions<any>]
-    ? z.ZodString
+    ? CastOptionalFieldToZodSchema<TField, z.ZodString>
     : TField extends FieldColumnStringArrayCollectionOptions<any>[keyof FieldColumnStringArrayCollectionOptions<any>]
-      ? z.ZodArray<z.ZodString>
+      ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodString>>
       : TField extends FieldColumnNumberCollectionOptions<any>[keyof FieldColumnNumberCollectionOptions<any>]
-        ? z.ZodNumber
+        ? CastOptionalFieldToZodSchema<TField, z.ZodNumber>
         : TField extends FieldColumnNumberArrayCollectionOptions<any>[keyof FieldColumnNumberArrayCollectionOptions<any>]
-          ? z.ZodArray<z.ZodNumber>
+          ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodNumber>>
           : TField extends FieldColumnBooleanCollectionOptions[keyof FieldColumnBooleanCollectionOptions]
-            ? z.ZodBoolean
+            ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>
             : TField extends FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
-              ? z.ZodArray<z.ZodBoolean>
+              ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodBoolean>>
               : TField extends FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
-                ? z.ZodDate
+                ? CastOptionalFieldToZodSchema<TField, z.ZodDate>
                 : never
 // TODO: Relation input
 // TODO: Optioanl and default values
@@ -473,26 +483,47 @@ export function fieldToZodScheama<TField extends Field<any>>(
     case 'selectText':
     case 'time':
     case 'media':
+      if (!field._.column.notNull) {
+        return z.string().optional() as FieldToZodScheama<TField>
+      }
       return z.string() as FieldToZodScheama<TField>
     // string[] input
     case 'comboboxText':
+      if (!field._.column.notNull) {
+        return z.array(z.string()).optional() as FieldToZodScheama<TField>
+      }
       return z.array(z.string()) as FieldToZodScheama<TField>
     // number input
     case 'number':
     case 'selectNumber':
+      if (!field._.column.notNull) {
+        return z.number().optional() as FieldToZodScheama<TField>
+      }
       return z.number() as FieldToZodScheama<TField>
     // number[] input
     case 'comboboxNumber':
+      if (!field._.column.notNull) {
+        return z.array(z.number()).optional() as FieldToZodScheama<TField>
+      }
       return z.array(z.number()) as FieldToZodScheama<TField>
     // boolean input
     case 'checkbox':
     case 'switch':
+      if (!field._.column.notNull) {
+        return z.boolean().optional() as FieldToZodScheama<TField>
+      }
       return z.boolean() as FieldToZodScheama<TField>
     // boolean[] input
     case 'comboboxBoolean':
+      if (!field._.column.notNull) {
+        return z.array(z.boolean()).optional() as FieldToZodScheama<TField>
+      }
       return z.array(z.boolean()) as FieldToZodScheama<TField>
     // date input
     case 'date':
+      if (!field._.column.notNull) {
+        return z.date().optional() as FieldToZodScheama<TField>
+      }
       return z.date() as FieldToZodScheama<TField>
     // TODO: relation input
     case 'connect':

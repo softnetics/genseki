@@ -18,6 +18,7 @@ import { AuthLayout } from './views/auth/layout'
 import { LoginView } from './views/auth/login'
 import { SignUpView } from './views/auth/sign-up'
 import { CreateView } from './views/collections/create'
+import { HomeView } from './views/collections/home'
 import { CollectionLayout } from './views/collections/layout'
 import { ListView } from './views/collections/list'
 import { OneView } from './views/collections/one'
@@ -47,14 +48,10 @@ export type RouterData =
 export interface NextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
 > extends ServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   radixRouter: ReturnType<typeof createRouter<RouterData>>
@@ -69,14 +66,10 @@ export interface NextJsUIConfig {
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-  TCollections extends Collection<any, any, any, any, any, any>[] = Collection<
-    any,
-    any,
-    any,
-    any,
-    any,
-    any
-  >[],
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
+    string,
+    Collection<any, any, any, any, any, any>
+  >,
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>,
@@ -91,6 +84,17 @@ export function defineNextJsServerConfig<
         view: () =>
           uiConfig?.notAuthorized || <NotAuthorizedPage redirectURL="/admin/auth/login" />,
       },
+    },
+  })
+
+  radixRouter.insert('/collections', {
+    requiredAuthentication: true,
+    view(args: { serverConfig: ServerConfig }) {
+      return (
+        <CollectionLayout serverConfig={args.serverConfig}>
+          <HomeView serverConfig={args.serverConfig} />
+        </CollectionLayout>
+      )
     },
   })
 

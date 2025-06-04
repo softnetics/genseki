@@ -9,7 +9,11 @@ import { usersCollection } from './collections/users'
 import { baseConfig, builder } from './helper'
 
 const baseServerConfig = defineServerConfig(baseConfig, {
-  collections: [usersCollection, postsCollection, categoriesCollection],
+  collections: {
+    users: usersCollection,
+    posts: postsCollection,
+    categories: categoriesCollection,
+  },
   endpoints: {
     customOne: builder.endpoint(
       {

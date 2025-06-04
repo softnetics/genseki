@@ -1,15 +1,12 @@
 import z from 'zod'
 
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
+import type { AuthConfig } from '..'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
-import { setSessionCookie } from '../utils'
+import { setSessionCookie, verifyPassword } from '../utils'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
-
-export function loginEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function loginEmail<const TOptions extends AuthConfig>(options: TOptions) {
   const schema = {
     method: 'POST',
     path: '/api/auth/login-email',
@@ -36,9 +33,8 @@ export function loginEmail<const TOptions extends InternalRouteOptions>(options:
       AccountProvider.CREDENTIAL
     )
 
-    // TODO: Hash password and compare
-    const hashPassword = account.password
-    if (account.password !== hashPassword) {
+    const verifyStatus = await verifyPassword(args.body.password, account.password as string)
+    if (!verifyStatus) {
       throw new Error('Invalid password')
     }
 

@@ -47,7 +47,7 @@ function CollectionMenu() {
         <BaseIcon icon={DotsThreeIcon} size="md" weight="bold" />
       </MenuTrigger>
       <MenuContent placement="bottom left" showArrow className="sm:min-w-64">
-        {clientConfig.collections.map((collection) => (
+        {Object.values(clientConfig.collections).map((collection) => (
           <MenuItem key={collection.slug} href={`/admin/collections/${collection.slug}`}>
             <BaseIcon icon={CubeIcon} weight="duotone" />
             <MenuLabel>{formatSlug(collection.slug)}</MenuLabel>

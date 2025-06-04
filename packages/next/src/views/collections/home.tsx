@@ -5,8 +5,8 @@ import 'server-only'
  */
 import type { ServerConfig } from '@kivotos/core'
 
-import { CollectionCard } from '../components/collection-card'
-import { Typography } from '../components/primitives/typography'
+import { CollectionCard } from '../../components/collection-card'
+import { Typography } from '../../components/primitives/typography'
 
 const greeting = () => {
   const time = new Date().getHours()
@@ -26,8 +26,8 @@ type HomepageProps = {
   serverConfig: ServerConfig
 }
 
-export const HomePage = ({ serverConfig }: HomepageProps) => {
-  const collections = serverConfig.collections.map((col) => col.slug)
+export const HomeView = ({ serverConfig }: HomepageProps) => {
+  const collections = Object.values(serverConfig.collections).map((col) => col.slug)
 
   return (
     <div>
