@@ -548,6 +548,7 @@ describe('ApiHandler', () => {
             idTs: postData.id,
             nameTs: postData.name,
             authorTs: {
+              __pk: authorData.id,
               idTs: authorData.id,
               nameTs: authorData.name,
             },
@@ -573,6 +574,9 @@ describe('ApiHandler', () => {
                   columns: {
                     idTs: true,
                     nameTs: true,
+                  },
+                  extras: {
+                    __pk: sql<string | number>`${schema.authorTs.idTs}`.as('__pk'),
                   },
                   with: {},
                 },
@@ -781,6 +785,7 @@ describe('ApiHandler', () => {
             nameTs: authorData.name,
             postsTs: [
               {
+                __pk: postData.id,
                 idTs: postData.id,
                 nameTs: postData.name,
               },
@@ -806,6 +811,9 @@ describe('ApiHandler', () => {
                 columns: {
                   idTs: true,
                   nameTs: true,
+                },
+                extras: {
+                  __pk: sql<string | number>`${schema.postWithAuthorTs.idTs}`.as('__pk'),
                 },
                 with: {},
               },
@@ -1069,10 +1077,17 @@ describe('ApiHandler', () => {
                     idTs: true,
                     nameTs: true,
                   },
+                  extras: {
+                    __pk: sql<string | number>`${schema.authorTs.idTs}`.as('__pk'),
+                  },
                   with: {},
                 },
               },
               where: eq(postWithAuthorConnectCollection.fields.idField._.column, postData.id),
+              extras: {
+                __pk: sql<string | number>`${schema.postWithAuthorTs.idTs}`.as('__pk'),
+                __id: sql<string | number>`${schema.postWithAuthorTs.idTs}`.as('__id'),
+              },
             })
           )
 
@@ -1272,19 +1287,16 @@ describe('ApiHandler', () => {
             postsTs: [
               {
                 __pk: mockPostData[0].id,
-                __id: mockPostData[0].id,
                 idTs: mockPostData[0].id,
                 nameTs: mockPostData[0].name,
               },
               {
                 __pk: mockPostData[1].id,
-                __id: mockPostData[1].id,
                 idTs: mockPostData[1].id,
                 nameTs: mockPostData[1].name,
               },
               {
                 __pk: mockPostData[2].id,
-                __id: mockPostData[2].id,
                 idTs: mockPostData[2].id,
                 nameTs: mockPostData[2].name,
               },
@@ -1310,6 +1322,9 @@ describe('ApiHandler', () => {
                 columns: {
                   idTs: true,
                   nameTs: true,
+                },
+                extras: {
+                  __pk: sql<string | number>`${schema.postWithAuthorTs.idTs}`.as('__pk'),
                 },
                 with: {},
               },
@@ -1761,7 +1776,6 @@ describe('ApiHandler', () => {
               nameTs: postData.name,
               authorTs: {
                 __pk: authorData.id,
-                __id: authorData.id,
                 idTs: authorData.id,
                 nameTs: authorData.name,
               },

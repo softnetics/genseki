@@ -1,7 +1,6 @@
 import type { JSONSchema7 } from 'json-schema'
-import type { IsNever, Simplify, SimplifyDeep, ValueOf } from 'type-fest'
-import type { z } from 'zod'
-import { type ZodType } from 'zod'
+import type { ConditionalExcept, IsNever, Simplify, ValueOf } from 'type-fest'
+import type { z, ZodType } from 'zod'
 import zodToJsonSchema from 'zod-to-json-schema'
 
 import type { MaybePromise } from './collection'
@@ -26,32 +25,33 @@ export type InferPathParams<TPath extends string> = Simplify<
 type GetBody<TApiRouteSchema extends ApiRouteSchema> =
   TApiRouteSchema extends ApiRouteMutationSchema
     ? IsNever<TApiRouteSchema['body']> extends false
-      ? { body: Output<TApiRouteSchema['body']> }
-      : {}
-    : {}
+      ? Output<TApiRouteSchema['body']>
+      : never
+    : never
 
 type GetHeaders<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['headers']>> extends false
-    ? { headers: Output<TApiRouteSchema['headers']> & Record<string, string> }
-    : { headers?: Record<string, string> }
+    ? Output<TApiRouteSchema['headers']> & Record<string, string>
+    : Record<string, string> | undefined
 
 type GetQuery<TApiRouteSchema extends ApiRouteSchema> =
-  IsNever<Output<TApiRouteSchema['query']>> extends false
-    ? { query: Output<TApiRouteSchema['query']> }
-    : {}
+  IsNever<Output<TApiRouteSchema['query']>> extends false ? Output<TApiRouteSchema['query']> : never
 
 type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['pathParams']>> extends false
-    ? { pathParams: Output<TApiRouteSchema['pathParams']> }
+    ? Output<TApiRouteSchema['pathParams']>
     : IsNever<InferPathParams<TApiRouteSchema['path']>> extends false
-      ? { pathParams: InferPathParams<TApiRouteSchema['path']> }
-      : {}
+      ? InferPathParams<TApiRouteSchema['path']>
+      : never
 
-export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = SimplifyDeep<
-  GetBody<TApiRouteSchema> &
-    GetHeaders<TApiRouteSchema> &
-    GetQuery<TApiRouteSchema> &
-    GetPathParams<TApiRouteSchema>
+export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExcept<
+  {
+    body: GetBody<TApiRouteSchema>
+    headers: GetHeaders<TApiRouteSchema>
+    query: GetQuery<TApiRouteSchema>
+    pathParams: GetPathParams<TApiRouteSchema>
+  },
+  never
 >
 
 export type ApiRouteHandlerPayloadWithContext<
