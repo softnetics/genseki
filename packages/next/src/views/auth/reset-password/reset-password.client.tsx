@@ -1,6 +1,5 @@
 'use client'
 
-import { useEffect, useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,6 +15,7 @@ import { useServerFunction } from '../../../providers/root'
 
 const formSchema = z
   .object({
+    // TODO: custom password validation
     password: z
       .string()
       .min(8, { message: 'Password must be at least 8 characters long' })
@@ -31,37 +31,11 @@ const formSchema = z
 
 interface ResetPasswordClientFormProps {
   token?: string
+  isErrorToken: boolean
 }
 
-export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps) {
-  const [isErrorToken, setIsErrorToken] = useState<boolean>(false)
-
+export function ResetPasswordClientForm({ token, isErrorToken }: ResetPasswordClientFormProps) {
   const serverFunction = useServerFunction()
-
-  useEffect(() => {
-    async function validateToken() {
-      const tokenResponse = await serverFunction({
-        method: 'auth.validateResetToken',
-        body: {
-          token: token || '',
-        },
-        headers: {},
-        query: {},
-        pathParams: {},
-      })
-
-      console.log('Token validation response:', tokenResponse)
-
-      if (tokenResponse.status !== 200) {
-        setIsErrorToken(true)
-        toast.error('Invalid or expired token', {
-          description: tokenResponse.body.status || 'Failed to validate token',
-        })
-      }
-    }
-
-    validateToken()
-  }, [token])
 
   const form = useForm({
     resolver: zodResolver(formSchema),

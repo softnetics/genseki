@@ -7,15 +7,15 @@ interface ResetPasswordViewProps {
   searchParams: { [key: string]: string | string[] }
 }
 
-export async function ResetPasswordView({ searchParams }: ResetPasswordViewProps) {
+export async function ResetPasswordView({ searchParams, serverConfig }: ResetPasswordViewProps) {
   const token = searchParams['token'] as string | undefined
 
-  // const tokenResponse = await serverFunction({
-  //   method: 'auth.validateResetToken',
-  //   body: {
-  //     token: token || '',
-  //   },
-  // })
+  const validateToken = await serverConfig.endpoints['auth.validateResetToken'].handler({
+    body: {
+      token: token || '',
+    },
+    context: {},
+  })
 
-  return <ResetPasswordClientForm token={token} />
+  return <ResetPasswordClientForm token={token} isErrorToken={!validateToken?.body?.verification} />
 }

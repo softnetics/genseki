@@ -95,24 +95,40 @@ export function validateResetToken<const TOptions extends InternalRouteOptions>(
     }),
     responses: {
       200: z.object({
-        verification: z.object({
-          id: z.string(),
-          identifier: z.string(),
-          value: z.string().nullable(),
-          expiresAt: z.date(),
-        }),
+        verification: z
+          .object({
+            id: z.string(),
+            identifier: z.string(),
+            value: z.string().nullable(),
+            expiresAt: z.date(),
+          })
+          .nullable(),
       }),
     },
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    const verification = await args.context.internalHandlers.verification.findByIdentifier(
-      `reset-password:${args.body.token}`
-    )
+    try {
+      const verification = await args.context.internalHandlers.verification.findByIdentifier(
+        `reset-password:${args.body.token}`
+      )
 
-    return {
-      status: 200,
-      body: { verification },
+      if (!verification || verification.expiresAt < new Date()) {
+        return {
+          status: 200,
+          body: { verification: null },
+        }
+      }
+
+      return {
+        status: 200,
+        body: { verification: verification ?? null },
+      }
+    } catch {
+      return {
+        status: 200,
+        body: { verification: null },
+      }
     }
   }
 

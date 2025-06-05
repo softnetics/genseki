@@ -15,6 +15,7 @@ import { useServerFunction } from '../../providers/root'
 
 const schema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
+  // TODO: custom password validation
   password: z
     .string()
     .min(8, { message: 'Password must be at least 8 characters long' })
