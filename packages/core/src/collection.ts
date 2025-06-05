@@ -552,14 +552,15 @@ export type GetAllTableTsNames<TFullSchema extends Record<string, unknown>> = Ex
 
 export type ExtractCollectionCustomEndpoints<
   TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection['admin']['endpoints'] extends infer TEndpoints
-  ? TEndpoints extends Record<string, ApiRoute<any, any>>
-    ? {
-        [TEndpoint in keyof TEndpoints as TEndpoints[TEndpoint]['schema'] extends ApiRouteSchema
-          ? `${TCollection['slug']}.${TEndpoint extends string ? TEndpoint : never}`
-          : never]: TEndpoints[TEndpoint]
-      }
-    : never
+> = TCollection['admin']['endpoints'] extends infer TEndpoints extends Record<
+  string,
+  ApiRoute<any, any>
+>
+  ? {
+      [TEndpoint in keyof TEndpoints as TEndpoints[TEndpoint]['schema'] extends ApiRouteSchema
+        ? `${TCollection['slug']}.${TEndpoint extends string ? TEndpoint : never}`
+        : never]: TEndpoints[TEndpoint]
+    }
   : never
 
 export type ExtractAllCollectionCustomEndpoints<

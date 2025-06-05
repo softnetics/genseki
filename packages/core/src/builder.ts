@@ -55,10 +55,10 @@ export class Builder<
   }
 
   collection<
-    TSlug extends string = string,
-    TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    TFields extends Fields<TContext, TFullSchema> = Fields<TContext, TFullSchema>,
-    TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+    const TSlug extends string = string,
+    const TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
+    const TFields extends Fields<TContext, TFullSchema> = Fields<TContext, TFullSchema>,
+    const TApiRouter extends ApiRouter<TContext> = {},
   >(
     tableTsName: TTableTsName,
     config: CollectionConfig<
@@ -163,8 +163,8 @@ export class Builder<
   }
 
   fields<
-    TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContext, TFullSchema>,
+    const TTableTsName extends GetAllTableTsNames<TFullSchema>,
+    const TFields extends FieldsInitial<TContext, TFullSchema>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (
