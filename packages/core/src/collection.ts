@@ -2,7 +2,7 @@ import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
 import z from 'zod'
 
-import type { MinimalContext } from './config'
+import type { MinimalContextValue } from './config'
 import type { RequestContext } from './context'
 import {
   type ApiRoute,
@@ -89,8 +89,8 @@ export type ActivateFieldMutateMode<
  *
  *    Many Post can have One Category. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
-  create?: TField extends FieldRelationCollection<any>['create' | 'connectOrCreate']
+export type InferOneRelationMutationField<TField extends FieldRelation<any, any>> = {
+  create?: TField extends FieldRelationCollection<any, any>['create' | 'connectOrCreate']
     ? InferCreateFields<TField['fields']>
     : never
   connect?: TField['_']['primaryColumn']['_']['data']
@@ -138,7 +138,7 @@ export type InferOneRelationMutationField<TField extends FieldRelation<any>> = {
  *
  *   One Post can have Many PostTags. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferManyRelationMutationField<TField extends FieldRelation<any>> = Array<
+export type InferManyRelationMutationField<TField extends FieldRelation<any, any>> = Array<
   InferOneRelationMutationField<TField>
 >
 
@@ -149,42 +149,42 @@ type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
       ? Pick<TArrayOrObject, TKeys>
       : never
 
-export type InferMutationRelationField<TField extends FieldRelation<any>> =
+export type InferMutationRelationField<TField extends FieldRelation<any, any>> =
   TField['_']['relation'] extends Many<any>
     ? Simplify<InferManyRelationMutationField<TField>>
     : Simplify<InferOneRelationMutationField<TField>>
 
-export type InferUpdateField<TField extends Field<any>> =
-  TField extends FieldRelation<any>
-    ? TField extends FieldRelationCollection<any>['create']
+export type InferUpdateField<TField extends Field<any, any>> =
+  TField extends FieldRelation<any, any>
+    ? TField extends FieldRelationCollection<any, any>['create']
       ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'disconnect'>>
-      : TField extends FieldRelationCollection<any>['connect']
+      : TField extends FieldRelationCollection<any, any>['connect']
         ? Simplify<
             PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect' | 'disconnect'>
           >
-        : TField extends FieldRelationCollection<any>['connectOrCreate']
+        : TField extends FieldRelationCollection<any, any>['connectOrCreate']
           ? Simplify<InferMutationRelationField<TField>>
           : never
-    : TField extends FieldColumn<any>
+    : TField extends FieldColumn<any, any>
       ? ActivateFieldMutateMode<TField['_']['column']['_']['data'], TField, 'update'>
       : never
 
-export type InferUpdateFields<TFields extends Fields<any>> = SimplifyConditionalExcept<
+export type InferUpdateFields<TFields extends Fields<any, any>> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends Field<any>
+    [TKey in keyof TFields]: TFields[TKey] extends Field<any, any>
       ? Simplify<InferUpdateField<TFields[TKey]>>
       : never
   },
   never
 >
 
-export type InferCreateField<TField extends Field<any>> =
-  TField extends FieldRelation<any>
-    ? TField extends FieldRelationCollection<any>['create']
+export type InferCreateField<TField extends Field<any, any>> =
+  TField extends FieldRelation<any, any>
+    ? TField extends FieldRelationCollection<any, any>['create']
       ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create'>>
-      : TField extends FieldRelationCollection<any>['connect']
+      : TField extends FieldRelationCollection<any, any>['connect']
         ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect'>>
-        : TField extends FieldRelationCollection<any>['connectOrCreate']
+        : TField extends FieldRelationCollection<any, any>['connectOrCreate']
           ? Simplify<
               PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'connect'>
             >
@@ -193,9 +193,9 @@ export type InferCreateField<TField extends Field<any>> =
       ? ActivateFieldMutateMode<TField['_']['column']['_']['data'], TField, 'create'>
       : never
 
-export type InferCreateFields<TFields extends Fields<any>> = SimplifyConditionalExcept<
+export type InferCreateFields<TFields extends Fields<any, any>> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends Field<any>
+    [TKey in keyof TFields]: TFields[TKey] extends Field<any, any>
       ? InferCreateField<TFields[TKey]>
       : never
   },
@@ -306,17 +306,17 @@ export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcep
 >
 
 export type ServerApiHandlerArgs<
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<TContext> = Fields<TContext>,
+  TContextValue extends MinimalContextValue = MinimalContextValue,
+  TFields extends Fields<TContextValue> = Fields<TContextValue>,
 > = {
   slug: string
   fields: TFields
-  context: RequestContext<TContext>
+  context: RequestContext<TContextValue>
 }
 
 export type ApiArgs<
   TMethod extends ApiDefaultMethod,
-  TContext extends MinimalContext,
+  TContext extends MinimalContextValue,
   TFields extends Fields<TContext>,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? ServerApiHandlerArgs<TContext, TFields> & ApiCreateArgs<TFields>
@@ -357,15 +357,17 @@ export type ApiFindManyArgs = {
   orderType?: 'asc' | 'desc'
 }
 
-export type ApiCreateArgs<TFields extends Fields<any>> = {
+export type ApiCreateArgs<TFields extends Fields<any, any>> = {
   data: InferCreateFields<TFields>
 }
 
 export type ApiHandlerFn<
-  TContext extends MinimalContext,
-  TFields extends Fields<TContext>,
+  TContextValue extends MinimalContextValue,
+  TFields extends Fields<TContextValue>,
   TMethod extends ApiDefaultMethod,
-> = (args: ApiArgs<TMethod, TContext, TFields>) => MaybePromise<ApiReturnType<TMethod, TFields>>
+> = (
+  args: ApiArgs<TMethod, TContextValue, TFields>
+) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
 export type ApiUpdateArgs<TFields extends Fields<any>> = {
   // This should be the primary field of the collection e.g. __pk or username
@@ -393,52 +395,52 @@ export type ClientApiArgs<
           : never
 
 export type ApiConfigHandlerFn<
-  TContext extends MinimalContext,
-  TFields extends Fields<TContext>,
+  TContextValue extends MinimalContextValue,
+  TFields extends Fields<TContextValue>,
   TMethod extends ApiDefaultMethod,
 > = (
-  args: ApiArgs<TMethod, TContext, TFields> & {
-    defaultApi: ApiHandlerFn<TContext, TFields, TMethod>
+  args: ApiArgs<TMethod, TContextValue, TFields> & {
+    defaultApi: ApiHandlerFn<TContextValue, TFields, TMethod>
   }
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
 export type CollectionAdminApiConfig<
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<TContext> = Fields<TContext>,
+  TContextValue extends MinimalContextValue = MinimalContextValue,
+  TFields extends Fields<TContextValue> = Fields<TContextValue>,
 > = {
-  create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
-  findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
-  findMany?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
-  update?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
-  delete?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
+  create?: ApiConfigHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.CREATE>
+  findOne?: ApiConfigHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.FIND_ONE>
+  findMany?: ApiConfigHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  update?: ApiConfigHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.UPDATE>
+  delete?: ApiConfigHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.DELETE>
 }
 
 export type CollectionAdminApi<
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<TContext> = Fields<TContext>,
+  TContextValue extends MinimalContextValue = MinimalContextValue,
+  TFields extends Fields<TContextValue> = Fields<TContextValue>,
 > = {
-  create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
-  findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
-  findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
-  update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
-  delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
+  create: ApiHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.CREATE>
+  findOne: ApiHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.FIND_ONE>
+  findMany: ApiHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  update: ApiHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.UPDATE>
+  delete: ApiHandlerFn<TContextValue, TFields, typeof ApiDefaultMethod.DELETE>
 }
 
 export type CollectionAdminConfig<
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<TContext> = Fields<TContext>,
-  TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+  TContextValue extends MinimalContextValue = MinimalContextValue,
+  TFields extends Fields<TContextValue, any> = Fields<any, any>,
+  TApiRouter extends ApiRouter<TContextValue> = ApiRouter<TContextValue>,
 > = {
-  api?: CollectionAdminApiConfig<TContext, TFields>
+  api?: CollectionAdminApiConfig<TContextValue, TFields>
   endpoints?: TApiRouter
 }
 
 export type CollectionAdmin<
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<TContext> = Fields<TContext>,
-  TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+  TContextValue extends MinimalContextValue = MinimalContextValue,
+  TFields extends Fields<TContextValue, any> = Fields<TContextValue, any>,
+  TApiRouter extends ApiRouter<TContextValue, any> = {},
 > = {
-  api: CollectionAdminApi<TContext, TFields>
+  api: CollectionAdminApi<TContextValue, TFields>
   endpoints: TApiRouter
 }
 
@@ -453,23 +455,23 @@ export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
 export type CollectionConfig<
   TSlug extends string = string,
   TTable extends Table = Table,
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends FieldsInitial<TContext> = FieldsInitial<TContext>,
-  TAppRouter extends ApiRouter<TContext> = {},
+  TContextValue extends MinimalContextValue = any,
+  TFields extends FieldsInitial<TContextValue, any> = FieldsInitial<TContextValue, any>,
+  TAppRouter extends ApiRouter<TContextValue> = ApiRouter<TContextValue>,
 > = {
   slug: TSlug
   identifierColumn: GetUniqueNotNullColumnNames<TTable>
   fields: TFields
-  admin?: CollectionAdminConfig<TContext, FieldsWithFieldName<TFields>, TAppRouter>
+  admin?: CollectionAdminConfig<TContextValue, FieldsWithFieldName<TFields>, TAppRouter>
 }
 
 export type Collection<
   TSlug extends string = string,
   TTableName extends string = string,
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<TContext> = Fields<TContext>,
-  TApiRouter extends ApiRouter<TContext> = {},
+  TContextValue extends MinimalContextValue = any,
+  TFields extends Fields<TContextValue, any> = Fields<any, any>,
+  TApiRouter extends ApiRouter<TContextValue> = {},
 > = {
   _: {
     table: GetTableByTableTsName<TFullSchema, TTableName>
@@ -478,7 +480,7 @@ export type Collection<
   slug: TSlug
   identifierColumn: string
   fields: TFields
-  admin: CollectionAdmin<TContext, TFields, TApiRouter>
+  admin: CollectionAdmin<TContextValue, TFields, TApiRouter>
 }
 
 export type ToClientCollection<TCollection extends Collection<any, any, any, any, any, any>> =
@@ -504,7 +506,7 @@ export type ClientCollection<
   TSlug extends string = string,
   TTableName extends string = any,
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext = any,
+  TContext extends MinimalContextValue = any,
   TFields extends Record<string, FieldClient> = Record<string, FieldClient>,
   TEndpoints extends ClientApiRouter = {},
 > = Simplify<
@@ -707,9 +709,7 @@ export function getAllCollectionEndpoints<
               },
             } satisfies ApiRouteSchema
 
-            const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
-              args
-            ) => {
+            const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
@@ -738,9 +738,7 @@ export function getAllCollectionEndpoints<
               },
             } satisfies ApiRouteSchema
 
-            const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
-              args
-            ) => {
+            const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
@@ -777,9 +775,7 @@ export function getAllCollectionEndpoints<
               },
             } satisfies ApiRouteSchema
 
-            const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
-              args
-            ) => {
+            const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
@@ -816,9 +812,7 @@ export function getAllCollectionEndpoints<
               },
             } satisfies ApiRouteSchema
 
-            const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
-              args
-            ) => {
+            const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
               const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,
@@ -846,9 +840,7 @@ export function getAllCollectionEndpoints<
               },
             } satisfies ApiRouteSchema
 
-            const handler: ApiRouteHandler<Record<string, unknown>, typeof schema> = async (
-              args
-            ) => {
+            const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
               await (fn as ApiHandlerFn<any, any, typeof method>)({
                 slug: collection.slug,
                 fields: collection.fields,

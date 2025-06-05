@@ -231,6 +231,34 @@ export const serverConfig = defineServerConfig(baseConfig, {
         }
       }
     ),
+    getPosts: builder.endpoint(
+      {
+        path: '/test',
+        method: 'GET',
+        query: z.object({
+          authorId: z.string().optional(),
+        }),
+        responses: {
+          200: z.object({
+            posts: z.array(
+              z.object({
+                id: z.string(),
+                title: z.string(),
+                content: z.string(),
+              })
+            ),
+          }),
+        },
+      },
+      async ({ context, query }) => {
+        return {
+          status: 200 as const,
+          body: {
+            posts: [],
+          },
+        }
+      }
+    ),
   },
   plugins: [
     admin(baseConfig, {

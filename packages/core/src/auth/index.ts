@@ -4,8 +4,8 @@ import type { Simplify } from 'type-fest'
 import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
-import { getFieldsClient, type MinimalContext } from '../config'
-import { Context } from '../context'
+import { getFieldsClient, type MinimalContextValue } from '../config'
+import { Context, type ContextToRequestContext } from '../context'
 import type { ApiRouteHandler } from '../endpoint'
 import type { Fields, FieldsClient } from '../field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../table'
@@ -109,11 +109,11 @@ type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> =
 }>
 
 export type Auth<
-  TContext extends MinimalContext = MinimalContext,
+  TContext extends Context<MinimalContextValue> = Context<MinimalContextValue>,
   TAuthConfig extends AuthConfig = AuthConfig,
 > = {
   config: TAuthConfig
-  context: Context<TContext>
+  context: ContextToRequestContext<TContext>
   authContext: AuthContext
   handlers: Simplify<AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>>
 }
@@ -141,16 +141,16 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<TContext extends MinimalContext<any> = MinimalContext<any>>(
-  config: AuthConfig,
-  context: TContext
-): Auth<TContext> {
+export function createAuth<
+  TContextValue extends MinimalContextValue<any> = MinimalContextValue<any>,
+  const TContext extends Context<TContextValue> = Context<TContextValue>,
+>(config: AuthConfig, context: TContext): Auth<TContext> {
   const authContext = createAuthContext(config, context)
   const { handlers: originalHandlers } = createAuthHandlers(authContext)
-  const wrappedContext = new Context(context, authContext)
+  const wrappedContext = Context.toRequestContext(context, { authContext })
 
   const handlers = R.mapValues(originalHandlers, (h) => {
-    const handler: ApiRouteHandler<TContext, any> = (args) => {
+    const handler: ApiRouteHandler<ContextToRequestContext<TContext>, any> = (args) => {
       return h.handler({ ...args, context: wrappedContext } as any) as any
     }
     return { schema: h.schema, handler }
@@ -164,7 +164,7 @@ export function createAuth<TContext extends MinimalContext<any> = MinimalContext
 
   return {
     config,
-    context: wrappedContext,
+    context: wrappedContext as ContextToRequestContext<TContext>,
     authContext,
     handlers: prefixedHandlers,
   }

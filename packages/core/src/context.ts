@@ -26,10 +26,16 @@ export class Context<
 
   static toRequestContext<TContext extends Record<string, unknown> = Record<string, unknown>>(
     ctx: Context<TContext>,
-    authContext?: AuthContext,
-    headers: Record<string, string> = {}
+    config?: {
+      authContext?: AuthContext
+      headers?: Record<string, string>
+    }
   ): RequestContext<TContext> {
-    return new RequestContext<TContext>(ctx.ctx, ctx.authContext ?? authContext, headers)
+    return new RequestContext<TContext>(
+      ctx.ctx,
+      ctx.authContext ?? config?.authContext,
+      config?.headers ?? {}
+    )
   }
 }
 
@@ -88,3 +94,11 @@ export class RequestContext<
     this._state[key] = value
   }
 }
+
+export type ContextToRequestContext<TContext extends Context = Context> =
+  TContext extends Context<infer TContextValue, infer TFullSchema, infer TUser>
+    ? RequestContext<TContextValue, TFullSchema, TUser>
+    : never
+
+export type GetContextValueFromContext<TContext extends Context> =
+  TContext extends Context<infer TContextValue, any, any> ? TContextValue : never

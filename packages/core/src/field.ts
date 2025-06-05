@@ -20,8 +20,9 @@ import {
 
 export type OptionCallback<
   TType extends string | number,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Record<string, unknown> = {},
-> = (args: RequestContext<TContext>) => Promise<Array<{ label: string; value: TType }>>
+> = (args: RequestContext<TContext, TFullSchema>) => Promise<Array<{ label: string; value: TType }>>
 
 export type FieldsWithFieldName<TFields extends Record<string, FieldBase>> = {
   [TKey in keyof TFields]: TFields[TKey] & { fieldName: string }
@@ -63,6 +64,7 @@ export type FieldBase = {
 
 export interface FieldColumnStringCollectionOptions<
   TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
 > {
   text: {
     type: 'text'
@@ -73,7 +75,7 @@ export interface FieldColumnStringCollectionOptions<
   } & FieldBase
   selectText: {
     type: 'selectText'
-    options: OptionCallback<string, TContext>
+    options: OptionCallback<string, TFullSchema, TContext>
     default?: string
   } & FieldBase
   time: {
@@ -88,16 +90,18 @@ export interface FieldColumnStringCollectionOptions<
 
 export interface FieldColumnStringArrayCollectionOptions<
   TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
 > {
   comboboxText: {
     type: 'comboboxText'
-    options: OptionCallback<string, TContext>
+    options: OptionCallback<string, TFullSchema, TContext>
     label?: string
   } & FieldBase
 }
 
 export interface FieldColumnNumberCollectionOptions<
   TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
 > {
   number: {
     type: 'number'
@@ -105,17 +109,18 @@ export interface FieldColumnNumberCollectionOptions<
   } & FieldBase
   selectNumber: {
     type: 'selectNumber'
-    options: OptionCallback<number, TContext>
+    options: OptionCallback<number, TFullSchema, TContext>
     default?: number
   } & FieldBase
 }
 
 export interface FieldColumnNumberArrayCollectionOptions<
   TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
 > {
   comboboxNumber: {
     type: 'comboboxNumber'
-    options: OptionCallback<number, TContext>
+    options: OptionCallback<number, TFullSchema, TContext>
     label?: string
   } & FieldBase
 }
@@ -147,60 +152,70 @@ export interface FieldColumnDateCollectionOptions {
 
 export type FieldRelationCollectionOptions<
   TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TInputType extends string | number = string | number,
 > = {
   connect: {
     type: 'connect'
     fields: FieldsInitial<TContext>
-    options: OptionCallback<TInputType, TContext>
+    options: OptionCallback<TInputType, TFullSchema, TContext>
   } & FieldBase
   create: {
     type: 'create'
-    fields: FieldsInitial<TContext>
+    fields: FieldsInitial<TContext, TFullSchema>
   } & FieldBase
   connectOrCreate: {
     type: 'connectOrCreate'
-    fields: FieldsInitial<TContext>
-    options: OptionCallback<TInputType, TContext>
+    fields: FieldsInitial<TContext, TFullSchema>
+    options: OptionCallback<TInputType, TFullSchema, TContext>
   } & FieldBase
 }
 
 export type FieldColumnCollection<
   TContext extends Record<string, unknown> = Record<string, unknown>,
-> = FieldColumnStringCollectionOptions<TContext> &
-  FieldColumnStringArrayCollectionOptions<TContext> &
-  FieldColumnNumberCollectionOptions<TContext> &
-  FieldColumnNumberArrayCollectionOptions<TContext> &
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+> = FieldColumnStringCollectionOptions<TContext, TFullSchema> &
+  FieldColumnStringArrayCollectionOptions<TContext, TFullSchema> &
+  FieldColumnNumberCollectionOptions<TContext, TFullSchema> &
+  FieldColumnNumberArrayCollectionOptions<TContext, TFullSchema> &
   FieldColumnBooleanCollectionOptions &
   FieldColumnBooleanArrayCollectionOptions &
   FieldColumnDateCollectionOptions
 
-export type FieldColumn<TContext extends Record<string, unknown> = Record<string, unknown>> =
-  FieldColumnCollection<TContext>[keyof FieldColumnCollection<TContext>] & {
-    _: FieldMetadataColumns
-  }
+export type FieldColumn<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+> = FieldColumnCollection<TContext, TFullSchema>[keyof FieldColumnCollection<
+  TContext,
+  TFullSchema
+>] & {
+  _: FieldMetadataColumns
+}
 
 export type FieldRelationCollection<
   TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
 > = Simplify<
-  FieldRelationCollectionOptions<TContext> & {
+  FieldRelationCollectionOptions<TContext, TFullSchema> & {
     connect: {
-      fields: Fields<TContext>
+      fields: Fields<TContext, TFullSchema>
     }
     create: {
-      fields: Fields<TContext>
+      fields: Fields<TContext, TFullSchema>
     }
     connectOrCreate: {
-      fields: Fields<TContext>
+      fields: Fields<TContext, TFullSchema>
     }
   }
 >
 
-export type FieldRelation<TContext extends Record<string, unknown> = Record<string, unknown>> =
-  FieldRelationCollection<TContext>[keyof FieldRelationCollection<TContext>] & {
-    _: FieldMetadataRelations
-    mode: 'one' | 'many'
-  }
+export type FieldRelation<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+> = FieldRelationCollection<TContext, TFullSchema>[keyof FieldRelationCollection<TContext>] & {
+  _: FieldMetadataRelations
+  mode: 'one' | 'many'
+}
 
 export type FieldCollection<TContext extends Record<string, unknown> = Record<string, unknown>> =
   FieldColumnCollection<TContext> & FieldRelationCollection<TContext>
@@ -208,16 +223,20 @@ export type FieldCollection<TContext extends Record<string, unknown> = Record<st
 export type FieldOptions<TContext extends Record<string, unknown> = Record<string, unknown>> =
   FieldCollection<TContext>[keyof FieldCollection<TContext>]
 
-export type Field<TContext extends Record<string, unknown> = Record<string, unknown>> =
-  | FieldColumn<TContext>
-  | FieldRelation<TContext>
+export type Field<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+> = FieldColumn<TContext, TFullSchema> | FieldRelation<TContext, TFullSchema>
 
-export type FieldsInitial<TContext extends Record<string, unknown> = Record<string, unknown>> =
-  Record<string, Field<TContext>>
+export type FieldsInitial<
+  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+> = Record<string, Field<TContext, TFullSchema>>
 
 export type Fields<
   TContext extends Record<string, unknown> = Record<string, unknown>,
-  TFields extends FieldsInitial<TContext> = FieldsInitial<any>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  TFields extends FieldsInitial<TContext, TFullSchema> = FieldsInitial<TContext, TFullSchema>,
 > = FieldsWithFieldName<TFields>
 
 export type FieldClient = Omit<Field, 'options'>
@@ -229,20 +248,33 @@ export type FieldsClient<TFields extends FieldsClientInitial = FieldsClientIniti
 
 export type FieldColumnOptionsFromTable<
   TColumn extends Column<any>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = TColumn['_']['dataType'] extends 'string'
-  ? FieldColumnStringCollectionOptions<TContext>[keyof FieldColumnStringCollectionOptions<TContext>]
+  ? FieldColumnStringCollectionOptions<
+      TContext,
+      TFullSchema
+    >[keyof FieldColumnStringCollectionOptions<TContext, TFullSchema>]
   : TColumn['_']['dataType'] extends 'number'
-    ? FieldColumnNumberCollectionOptions<TContext>[keyof FieldColumnNumberCollectionOptions<TContext>]
+    ? FieldColumnNumberCollectionOptions<
+        TContext,
+        TFullSchema
+      >[keyof FieldColumnNumberCollectionOptions<TContext, TFullSchema>]
     : TColumn['_']['dataType'] extends 'boolean'
       ? FieldColumnBooleanCollectionOptions[keyof FieldColumnBooleanCollectionOptions]
       : TColumn['_']['dataType'] extends 'date'
         ? FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
         : TColumn['_']['dataType'] extends 'array'
           ? TColumn['_']['data'] extends string[]
-            ? FieldColumnStringArrayCollectionOptions<TContext>[keyof FieldColumnStringArrayCollectionOptions<TContext>]
+            ? FieldColumnStringArrayCollectionOptions<
+                TContext,
+                TFullSchema
+              >[keyof FieldColumnStringArrayCollectionOptions<TContext, TFullSchema>]
             : TColumn['_']['data'] extends number[]
-              ? FieldColumnNumberArrayCollectionOptions<TContext>[keyof FieldColumnNumberArrayCollectionOptions<TContext>]
+              ? FieldColumnNumberArrayCollectionOptions<
+                  TContext,
+                  TFullSchema
+                >[keyof FieldColumnNumberArrayCollectionOptions<TContext, TFullSchema>]
               : TColumn['_']['data'] extends boolean[]
                 ? FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
                 : never
@@ -250,9 +282,13 @@ export type FieldColumnOptionsFromTable<
 
 type RelationFieldOptionsFromTable<
   TRelationPrimaryColumn extends Column,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Record<string, unknown> = {},
 > = TRelationPrimaryColumn['_']['data'] extends infer TType extends string | number
-  ? FieldRelationCollectionOptions<TContext, TType>['connect' | 'create' | 'connectOrCreate']
+  ? FieldRelationCollectionOptions<TContext, TFullSchema, TType>[
+      | 'connect'
+      | 'create'
+      | 'connectOrCreate']
   : TRelationPrimaryColumn
 
 type GetReferencedPrimaryColumn<
@@ -283,7 +319,7 @@ export class FieldBuilder<
   TFullSchema extends Record<string, unknown>,
   TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
   TTableTsName extends string,
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TContextValue extends Record<string, unknown> = Record<string, unknown>,
 > {
   private readonly tableRelationalConfig: TTableRelationConfigByTableTsName[TTableTsName]
 
@@ -303,7 +339,8 @@ export class FieldBuilder<
     >,
     const TOptions extends FieldColumnOptionsFromTable<
       TTableRelationConfigByTableTsName[TTableTsName]['columns'][TColumnTsName],
-      TContext
+      TFullSchema,
+      TContextValue
     >,
   >(columnTsName: TColumnTsName, options: TOptions) {
     const fieldMetadata = {
@@ -330,7 +367,8 @@ export class FieldBuilder<
         TTableRelationConfigByTableTsName,
         TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
       >,
-      TContext
+      TFullSchema,
+      TContextValue
     >,
   >(
     relationTsName: TRelationTsName,
@@ -342,7 +380,7 @@ export class FieldBuilder<
           TTableRelationConfigByTableTsName,
           TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
         >,
-        TContext
+        TContextValue
       >
     ) => TOptions
   ) {
@@ -389,7 +427,7 @@ export class FieldBuilder<
         TTableRelationConfigByTableTsName,
         TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
       >,
-      TContext
+      TContextValue
     >
 
     const options = optionsFn(fb)
@@ -428,16 +466,18 @@ export class FieldBuilder<
       mode,
     } as Simplify<
       Result &
-        (Result extends FieldRelationCollection<any>['connectOrCreate' | 'create']
+        (Result extends FieldRelationCollection<TContextValue, TFullSchema>[
+          | 'connectOrCreate'
+          | 'create']
           ? { fields: FieldsWithFieldName<Result['fields']> }
           : {})
     >
   }
 
-  fields<TFields extends FieldsInitial<TContext>>(
+  fields<TFields extends FieldsInitial<TContextValue, TFullSchema>>(
     tableTsName: TTableTsName,
     optionsFn: (
-      fb: FieldBuilder<TFullSchema, TTableRelationConfigByTableTsName, TTableTsName, TContext>
+      fb: FieldBuilder<TFullSchema, TTableRelationConfigByTableTsName, TTableTsName, TContextValue>
     ) => TFields
   ): Simplify<FieldsWithFieldName<TFields>> {
     const fb = new FieldBuilder(tableTsName, this.tableRelationalConfigByTableTsName)

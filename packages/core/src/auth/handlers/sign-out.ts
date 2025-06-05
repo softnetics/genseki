@@ -1,12 +1,13 @@
 import z from 'zod'
 
+import type { RequestContext } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
 import { deleteSessionCookie, getSessionCookie } from '../utils'
 
 export function signOut<
   const TAuthContext extends AuthContext,
-  const TContext extends Record<string, unknown>,
+  const TContext extends RequestContext,
 >(authContext: TAuthContext) {
   const { internalHandlers } = authContext
 

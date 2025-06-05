@@ -3,6 +3,7 @@ import { is, sql, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import type { ZodIssue, ZodObject, ZodOptional, ZodType } from 'zod'
 
+import type { RequestContext } from './context'
 import type {
   ApiHttpStatus,
   ApiRouteHandler,
@@ -122,7 +123,7 @@ export function createDrizzleQuery(
   }
 }
 
-export function appendFieldNameToFields<TFields extends FieldsInitial<any>>(
+export function appendFieldNameToFields<TFields extends FieldsInitial<any, any>>(
   fields: TFields
 ): Simplify<FieldsWithFieldName<TFields>> {
   return Object.fromEntries(
@@ -148,7 +149,8 @@ export function mapValueToTsValue(
 
 export async function validateRequestBody<
   TApiRouteSchema extends ApiRouteSchema = any,
-  TContext extends Record<string, unknown> = Record<string, unknown>,
+  TContextValue extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
 >(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
   let zodErrors:
     | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', ZodIssue[]>>
@@ -212,7 +214,8 @@ export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = an
 
 export function withValidator<
   TApiRouteSchema extends ApiRouteSchema,
-  TContext extends Record<string, unknown>,
+  TContextValue extends Record<string, unknown>,
+  TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
 >(
   schema: TApiRouteSchema,
   handler: ApiRouteHandler<TContext, TApiRouteSchema>

@@ -1,11 +1,12 @@
 import z from 'zod'
 
+import type { RequestContext } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
 
 export function resetPasswordEmail<
   const TAuthContext extends AuthContext,
-  const TContext extends Record<string, unknown>,
+  const TContext extends RequestContext,
 >(authContext: TAuthContext) {
   const { authConfig, internalHandlers } = authContext
   const schema = {

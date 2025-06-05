@@ -18,6 +18,7 @@ import {
   type ToClientCollection,
   type ToClientCollectionList,
 } from './collection'
+import { Context } from './context'
 import {
   type ApiRoute,
   type ApiRouter,
@@ -30,7 +31,7 @@ import type { Field, FieldClient, Fields, FieldsClient } from './field'
 import type { KivotosPlugin, MergePlugins } from './plugins'
 import { isRelationField } from './utils'
 
-export type MinimalContext<
+export type MinimalContextValue<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Record<string, unknown> = Record<string, unknown>,
 > = Simplify<
@@ -51,19 +52,21 @@ export interface BaseConfigOptions<
 
 export interface BaseConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
-> extends BaseConfigOptions<TFullSchema, TContext> {
+  TContextValue extends MinimalContextValue<TFullSchema> = MinimalContextValue<TFullSchema>,
+  TContext extends Context<TContextValue, TFullSchema> = Context<TContextValue, TFullSchema>,
+> extends Omit<BaseConfigOptions<TFullSchema, TContextValue>, 'context'> {
   context: TContext
 }
 
 export interface ServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  TContextValue extends MinimalContextValue<TFullSchema> = MinimalContextValue<TFullSchema>,
   TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
     string,
     Collection<any, any, any, any, any, any>
   >,
-  TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
+  TApiRouter extends ApiRouter<TContextValue, TFullSchema> = AuthHandlers & ApiRouter<any, any>,
+  TContext extends Context<TContextValue, TFullSchema> = Context<TContextValue, TFullSchema>,
 > extends BaseConfig<TFullSchema> {
   context: TContext
   collections: TCollections
@@ -73,28 +76,33 @@ export interface ServerConfig<
 export interface AnyServerConfig
   extends ServerConfig<
     Record<string, unknown>,
-    MinimalContext<Record<string, unknown>, {}>,
+    MinimalContextValue<Record<string, unknown>, {}>,
     {},
     {}
   > {}
 
 export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any, any>> =
   TServerConfig extends ServerConfig<any, any, any, infer TApiRouter>
-    ? TApiRouter extends ApiRouter<any>
+    ? TApiRouter extends ApiRouter<any, any>
       ? TApiRouter
       : never
     : never
 
 export function defineBaseConfig<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  const TContext extends Record<string, unknown> = Record<string, unknown>,
+  const TContextValue extends Record<string, unknown> = Record<string, unknown>,
 >(
-  config: BaseConfigOptions<TFullSchema, TContext>
-): BaseConfig<TFullSchema, MinimalContext<TFullSchema, TContext>> {
-  const context = {
+  config: BaseConfigOptions<TFullSchema, TContextValue>
+): BaseConfig<TFullSchema, MinimalContextValue<TFullSchema, TContextValue>> {
+  const contextValue = {
     ...config.context,
     db: config.db,
-  } as MinimalContext<TFullSchema, TContext>
+  } as MinimalContextValue<TFullSchema, TContextValue>
+
+  const context = new Context(contextValue) as Context<
+    MinimalContextValue<TFullSchema, TContextValue>,
+    TFullSchema
+  >
 
   return {
     ...config,
@@ -104,15 +112,16 @@ export function defineBaseConfig<
 
 export function defineServerConfig<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  const TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  const TContextValue extends MinimalContextValue<TFullSchema> = MinimalContextValue<TFullSchema>,
   const TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
     string,
     Collection<any, any, any, any, any, any>
   >,
-  const TEndpoints extends ApiRouter<MinimalContext<TFullSchema, TContext>> = {},
+  const TEndpoints extends ApiRouter<TContextValue> = ApiRouter<TContextValue>,
   const TPlugins extends KivotosPlugin<any>[] = [...KivotosPlugin<any>[]],
+  const TContext extends Context<TContextValue, TFullSchema> = Context<TContextValue, TFullSchema>,
 >(
-  baseConfig: BaseConfig<TFullSchema, TContext>,
+  baseConfig: BaseConfig<TFullSchema, TContextValue, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
   const auth = createAuth(baseConfig.auth, baseConfig.context)
@@ -131,7 +140,7 @@ export function defineServerConfig<
       ExtractAllCollectionDefaultEndpoints<TCollections>,
   } satisfies ServerConfig<
     TFullSchema,
-    MinimalContext<TFullSchema, TContext>,
+    MinimalContextValue<TFullSchema, TContextValue>,
     TCollections,
     TEndpoints &
       AuthHandlers &
@@ -211,16 +220,16 @@ export function getClientCollection<
 
 export function getClientConfig<
   TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
-  TApiRouter extends ApiRouter<any>,
+  TApiRouter extends ApiRouter<any, any>,
 >(
-  serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
+  serverConfig: ServerConfig<any, any, TCollections, TApiRouter, any>
 ): ClientConfig<ToClientCollectionList<TCollections>, ToClientApiRouteSchema<TApiRouter>> & {
   $types: ToRecordApiRouteSchema<TApiRouter>
 } {
   const collections = serverConfig.collections
 
   const clientEndpoints = R.mapValues(serverConfig.endpoints, (value) =>
-    getClientEndpoint(value as ApiRoute<any>)
+    getClientEndpoint(value as ApiRoute<any, any>)
   ) as ToClientApiRouteSchema<TApiRouter>
 
   return {

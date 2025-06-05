@@ -6,7 +6,8 @@ import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from 
 import { AccountProvider } from './constant'
 import { getSessionCookie } from './utils'
 
-import type { MinimalContext } from '../config'
+import type { MinimalContextValue } from '../config'
+import type { Context } from '../context'
 
 type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
   [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true
@@ -30,10 +31,10 @@ export type AuthContext<TConfig extends AuthConfig = AuthConfig> = {
   requiredAuthenticated: (headers?: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
 }
 
-export function createAuthContext<TAuthConfig extends AuthConfig, TContext extends MinimalContext>(
-  authConfig: TAuthConfig,
-  context: TContext
-): AuthContext<TAuthConfig> {
+export function createAuthContext<
+  TAuthConfig extends AuthConfig,
+  TContext extends Context<MinimalContextValue>,
+>(authConfig: TAuthConfig, context: TContext): AuthContext<TAuthConfig> {
   const internalHandlers = createInternalHandlers(authConfig, context)
 
   return {
@@ -62,7 +63,7 @@ export function createAuthContext<TAuthConfig extends AuthConfig, TContext exten
 
 function createInternalHandlers<TAuthConfig extends AuthConfig>(
   config: TAuthConfig,
-  context: MinimalContext
+  context: Context<MinimalContextValue>
 ) {
   const user = {
     findById: async (id: string) => {

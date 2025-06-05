@@ -1,5 +1,6 @@
 import z from 'zod'
 
+import type { RequestContext } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
@@ -7,7 +8,7 @@ import { hashPassword, setSessionCookie } from '../utils'
 
 export function signUp<
   const TAuthContext extends AuthContext,
-  const TContext extends Record<string, unknown>,
+  const TContext extends RequestContext,
 >(authContext: TAuthContext) {
   const {
     authConfig: { emailAndPassword },

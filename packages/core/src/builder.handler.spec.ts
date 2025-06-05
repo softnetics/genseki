@@ -1,5 +1,4 @@
 import { eq, or, sql } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as schema from './__mocks__/test-schema'
@@ -98,7 +97,7 @@ const mockAuthorData = Array.from({ length: 10 }, (_, i) => ({
   name: `Author ${i + 1}`,
 }))
 
-const builder = new Builder({ schema }).$context<{ db: NodePgDatabase<typeof schema> }>()
+const builder = new Builder({ schema }).$context<RequestContext<any, typeof schema>>()
 
 describe('ApiHandler', () => {
   describe('with initial and utils', () => {
@@ -1016,7 +1015,6 @@ describe('ApiHandler', () => {
           )
 
           const context = new RequestContext({ db: mockDb as any }, undefined, {})
-
           const result = await postWithAuthorConnectCollection.admin.api.create({
             slug: postWithAuthorConnectCollection.slug,
             fields: postWithAuthorConnectCollection.fields,
