@@ -85,3 +85,36 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
 
   return createEndpoint(schema, handler)
 }
+
+export function validateResetToken<const TOptions extends InternalRouteOptions>(options: TOptions) {
+  const schema = {
+    method: 'POST',
+    path: '/api/auth/validate-reset-password-token',
+    body: z.object({
+      token: z.string(),
+    }),
+    responses: {
+      200: z.object({
+        verification: z.object({
+          id: z.string(),
+          identifier: z.string(),
+          value: z.string().nullable(),
+          expiresAt: z.date(),
+        }),
+      }),
+    },
+  } as const satisfies ApiRouteSchema
+
+  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+    const verification = await args.context.internalHandlers.verification.findByIdentifier(
+      `reset-password:${args.body.token}`
+    )
+
+    return {
+      status: 200,
+      body: { verification },
+    }
+  }
+
+  return createEndpoint(schema, handler)
+}

@@ -35,6 +35,7 @@ export function LoginClientForm() {
 
   async function login(data: z.infer<typeof schema>) {
     form.clearErrors('email')
+    form.clearErrors('password')
     const response = await serverFunction({
       method: 'auth.loginEmail',
       body: {
@@ -105,6 +106,9 @@ export function LoginClientForm() {
             </FormItem>
           )}
         />
+        <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
+          Forgot Password?
+        </Link>
         <SubmitButton
           onClick={() => {
             form.clearErrors('email')
@@ -113,14 +117,9 @@ export function LoginClientForm() {
         >
           Login
         </SubmitButton>
-        <div className="flex flex-row justify-between">
-          <Link href="./sign-up" intent="primary" className="text-sm">
-            Create an account?
-          </Link>
-          <Link href="./forgot-password" intent="primary" className="text-sm">
-            Forgot Password?
-          </Link>
-        </div>
+        <Link href="./sign-up" intent="primary" className="text-sm mx-auto">
+          Create an account?
+        </Link>
       </form>
     </Form>
   )
