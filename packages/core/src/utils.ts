@@ -174,7 +174,7 @@ export async function validateRequestBody<
   }
 
   if (schema.headers) {
-    const err = await schema.headers.safeParseAsync(payload.headers)
+    const err = await schema.headers.safeParseAsync((payload as any).headers)
     if (!err.success) {
       zodErrors = {
         ...zodErrors,
