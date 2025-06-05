@@ -96,11 +96,13 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
     redirect('./login')
   }
 
-  if (!token && isErrorToken) {
-    redirect('./forgot-password')
-    return null
+  const onError = () => {
+    toast.error('Failed to reset password', {
+      description: 'Please fill out the form correctly.',
+    })
   }
-  if (isErrorToken) {
+
+  if (!token || isErrorToken) {
     return (
       <div className="p-12 md:p-16 flex-1 flex items-center justify-center mx-auto">
         <div className="flex flex-col flex-1 space-y-16 max-w-sm text-center">
@@ -122,7 +124,7 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
         </Typography>
         <Form {...form}>
           <form
-            onSubmit={handleSubmit(handleResetPassword)}
+            onSubmit={handleSubmit(handleResetPassword, onError)}
             className="flex flex-col space-y-8 flex-1"
           >
             <FormField

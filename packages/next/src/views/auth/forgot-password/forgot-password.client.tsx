@@ -24,7 +24,6 @@ export function ForgotPasswordClientForm() {
       return (
         <InputEmailSection
           onNext={async (email) => {
-            console.log('Email submitted:', email)
             const response = await serverFunction({
               method: 'auth.sendEmailResetPassword',
               body: {
@@ -60,11 +59,9 @@ export function ForgotPasswordClientForm() {
       )
     case Step.COMPLETED:
       return (
-        <div>
-          <p className="text-center text-md text-gray-500">
-            An OTP has been sent to <strong>{email}</strong>. Please check your email to continue.
-          </p>
-        </div>
+        <p className="text-center text-md text-gray-500">
+          An OTP has been sent to <strong>{email}</strong>. Please check your email to continue.
+        </p>
       )
     default:
       return null

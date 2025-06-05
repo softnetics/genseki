@@ -23,8 +23,6 @@ const schema = z.object({
     .trim(),
 })
 
-export const LoginClientFormSchema = z
-
 export function LoginClientForm() {
   const serverFunction = useServerFunction()
 
@@ -109,14 +107,7 @@ export function LoginClientForm() {
         <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
           Forgot Password?
         </Link>
-        <SubmitButton
-          onClick={() => {
-            form.clearErrors('email')
-            form.clearErrors('password')
-          }}
-        >
-          Login
-        </SubmitButton>
+        <SubmitButton>Login</SubmitButton>
         <Link href="./sign-up" intent="primary" className="text-sm mx-auto">
           Create an account?
         </Link>

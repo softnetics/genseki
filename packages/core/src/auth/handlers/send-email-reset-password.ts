@@ -71,7 +71,7 @@ export function sendEmailResetPassword<const TOptions extends InternalRouteOptio
     } else {
       // Fallback to console log for development
       console.warn(
-        'No sendEmailResetPassword function provided, using console.log for development purposes.'
+        'No "auth.resetPassword.sendEmailResetPassword" function provided, using console.log for development purposes.'
       )
     }
 
