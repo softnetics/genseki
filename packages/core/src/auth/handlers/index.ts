@@ -5,14 +5,12 @@ import { resetPasswordEmail } from './reset-password'
 import { signOut } from './sign-out'
 import { signUp } from './sign-up'
 
-import type { MinimalContextValue } from '../../config'
-import type { RequestContext } from '../../context'
+import type { Context } from '../../context'
 import { type AuthContext } from '../context'
 
-export function createAuthHandlers<
-  TAuthContext extends AuthContext,
-  TContext extends RequestContext<MinimalContextValue>,
->(authContext: TAuthContext) {
+export function createAuthHandlers<TAuthContext extends AuthContext, TContext extends Context>(
+  authContext: TAuthContext
+) {
   const handlers = {
     //  No authentication required
     signUp: signUp<TAuthContext, TContext>(authContext),

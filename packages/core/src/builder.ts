@@ -14,8 +14,7 @@ import type {
   FindTableByTableTsName,
   GetAllTableTsNames,
 } from './collection'
-import type { MinimalContextValue } from './config'
-import type { Context, GetContextValueFromContext, RequestContext } from './context'
+import type { Context } from './context'
 import {
   type ApiRoute,
   type ApiRouteHandler,
@@ -35,11 +34,7 @@ import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
-  TContextValue extends MinimalContextValue<TFullSchema> = any,
-  TContext extends RequestContext<TContextValue, TFullSchema> = RequestContext<
-    TContextValue,
-    TFullSchema
-  >,
+  TContext extends Context = Context,
 > {
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
@@ -55,26 +50,21 @@ export class Builder<
     this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
   }
 
-  $context<
-    TContext extends Context<MinimalContextValue<TFullSchema>> = Context<
-      MinimalContextValue<TFullSchema>
-    >,
-    TContextValue extends MinimalContextValue<TFullSchema> = GetContextValueFromContext<TContext>,
-  >(): Builder<TFullSchema, TContextValue> {
-    return new Builder<TFullSchema, TContextValue>({ schema: this.config.schema })
+  $context<TContext extends Context = Context>(): Builder<TFullSchema, TContext> {
+    return new Builder<TFullSchema, TContext>({ schema: this.config.schema })
   }
 
   collection<
     TSlug extends string = string,
     TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    TFields extends Fields<TContextValue, TFullSchema> = Fields<TContextValue, TFullSchema>,
-    TApiRouter extends ApiRouter<TContextValue> = ApiRouter<TContextValue>,
+    TFields extends Fields<TContext, TFullSchema> = Fields<TContext, TFullSchema>,
+    TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
   >(
     tableTsName: TTableTsName,
     config: CollectionConfig<
       TSlug,
       GetTableByTableTsName<TFullSchema, TTableTsName>,
-      TContextValue,
+      TContext,
       TFields,
       TApiRouter
     >
@@ -166,7 +156,7 @@ export class Builder<
       TSlug,
       FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
       TFullSchema,
-      TContextValue,
+      TContext,
       FieldsWithFieldName<TFields>,
       TApiRouter
     >
@@ -174,33 +164,23 @@ export class Builder<
 
   fields<
     TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContextValue, TFullSchema>,
+    TFields extends FieldsInitial<TContext, TFullSchema>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (
-      fb: FieldBuilder<
-        TFullSchema,
-        ExtractTablesWithRelations<TFullSchema>,
-        TTableTsName,
-        TContextValue
-      >
+      fb: FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
     ) => TFields
   ): Simplify<FieldsWithFieldName<TFields>> {
     const fb = new FieldBuilder(
       tableTsName,
       this.tableRelationalConfigByTableTsName
-    ) as FieldBuilder<
-      TFullSchema,
-      ExtractTablesWithRelations<TFullSchema>,
-      TTableTsName,
-      TContextValue
-    >
+    ) as FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
     return appendFieldNameToFields(optionsFn(fb))
   }
 
   options<TType extends string | number>(
-    callback: OptionCallback<TType, TFullSchema, TContextValue>
-  ): OptionCallback<TType, TFullSchema, TContextValue> {
+    callback: OptionCallback<TType, TContext>
+  ): OptionCallback<TType, TContext> {
     return callback
   }
 

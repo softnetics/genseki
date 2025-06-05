@@ -5,7 +5,7 @@ import { type ZodType } from 'zod'
 import zodToJsonSchema from 'zod-to-json-schema'
 
 import type { MaybePromise } from './collection'
-import type { RequestContext } from './context'
+import type { Context, ContextToRequestContext } from './context'
 import { withValidator } from './utils'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
@@ -56,9 +56,9 @@ export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = Sim
 
 export type ApiRouteHandlerPayloadWithContext<
   TApiRouteSchema extends ApiRouteSchema,
-  TContext extends RequestContext = RequestContext,
+  TContext extends Context = Context,
 > = ApiRouteHandlerPayload<TApiRouteSchema> & {
-  context: TContext
+  context: ContextToRequestContext<TContext>
 }
 
 export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, InputSchema>>> =
@@ -73,10 +73,10 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContextValue extends RequestContext = RequestContext,
+  TContext extends Context = Context,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
-  payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContextValue>
+  payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<
@@ -113,11 +113,11 @@ export interface ApiRouteMutationSchema extends ApiRouteCommonSchema {
 export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
 
 export type ApiRoute<
-  TContext extends RequestContext = RequestContext,
+  TContext extends Context = Context,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
-  handler: ApiRouteHandler<TContext, TApiRouteSchema>
+  handler: ApiRouteHandler<ContextToRequestContext<TContext>, TApiRouteSchema>
 }
 
 export type AppendPrefixPathToApiRoute<
@@ -134,11 +134,8 @@ export type AppendPrefixPathToApiRoute<
       : never
     : never
 
-export interface ApiRouter<
-  TContextValue extends Record<string, unknown> = Record<string, unknown>,
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-> {
-  [key: string]: ApiRoute<RequestContext<TContextValue, TFullSchema>, any>
+export interface ApiRouter<TContext extends Context = Context> {
+  [key: string]: ApiRoute<TContext, any>
 }
 
 export interface ClientApiRouteSchema {
@@ -168,8 +165,7 @@ export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
 
 export function createEndpoint<
   const TApiEndpointSchema extends ApiRouteSchema,
-  const TContextValue extends Record<string, unknown> = Record<string, unknown>,
-  const TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
+  const TContext extends Context = Context,
 >(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
   return {
     schema,

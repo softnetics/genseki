@@ -4,7 +4,7 @@ import type { Simplify } from 'type-fest'
 import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
-import { getFieldsClient, type MinimalContextValue } from '../config'
+import { getFieldsClient } from '../config'
 import { Context, type ContextToRequestContext } from '../context'
 import type { ApiRouteHandler } from '../endpoint'
 import type { Fields, FieldsClient } from '../field'
@@ -109,7 +109,7 @@ type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> =
 }>
 
 export type Auth<
-  TContext extends Context<MinimalContextValue> = Context<MinimalContextValue>,
+  TContext extends Context = Context,
   TAuthConfig extends AuthConfig = AuthConfig,
 > = {
   config: TAuthConfig
@@ -141,16 +141,16 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<
-  TContextValue extends MinimalContextValue<any> = MinimalContextValue<any>,
-  const TContext extends Context<TContextValue> = Context<TContextValue>,
->(config: AuthConfig, context: TContext): Auth<TContext> {
+export function createAuth<const TContext extends Context>(
+  config: AuthConfig,
+  context: TContext
+): Auth<TContext> {
   const authContext = createAuthContext(config, context)
   const { handlers: originalHandlers } = createAuthHandlers(authContext)
   const wrappedContext = Context.toRequestContext(context, { authContext })
 
   const handlers = R.mapValues(originalHandlers, (h) => {
-    const handler: ApiRouteHandler<ContextToRequestContext<TContext>, any> = (args) => {
+    const handler: ApiRouteHandler<TContext, any> = (args) => {
       return h.handler({ ...args, context: wrappedContext } as any) as any
     }
     return { schema: h.schema, handler }

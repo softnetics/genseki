@@ -1,12 +1,12 @@
 import z from 'zod'
 
-import type { RequestContext } from '../../context'
+import type { Context } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import type { AuthContext } from '../context'
 
 export function forgotPasswordEmail<
   const TAuthContext extends AuthContext,
-  const TContext extends RequestContext,
+  const TContext extends Context,
 >(authContext: TAuthContext) {
   const { authConfig, internalHandlers } = authContext
 

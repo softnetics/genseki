@@ -3,7 +3,7 @@ import { is, sql, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import type { ZodIssue, ZodObject, ZodOptional, ZodType } from 'zod'
 
-import type { RequestContext } from './context'
+import type { Context, RequestContext } from './context'
 import type {
   ApiHttpStatus,
   ApiRouteHandler,
@@ -214,8 +214,7 @@ export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = an
 
 export function withValidator<
   TApiRouteSchema extends ApiRouteSchema,
-  TContextValue extends Record<string, unknown>,
-  TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
+  TContext extends Context = Context,
 >(
   schema: TApiRouteSchema,
   handler: ApiRouteHandler<TContext, TApiRouteSchema>

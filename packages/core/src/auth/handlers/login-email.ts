@@ -1,15 +1,14 @@
 import z from 'zod'
 
-import type { RequestContext } from '../../context'
+import type { Context } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
 import { setSessionCookie, verifyPassword } from '../utils'
 
-export function loginEmail<
-  const TAuthContext extends AuthContext,
-  const TContext extends RequestContext,
->(authContext: TAuthContext) {
+export function loginEmail<const TAuthContext extends AuthContext, const TContext extends Context>(
+  authContext: TAuthContext
+) {
   const { internalHandlers } = authContext
 
   const schema = {
