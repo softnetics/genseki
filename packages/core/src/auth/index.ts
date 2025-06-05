@@ -4,7 +4,8 @@ import type { Simplify } from 'type-fest'
 import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
-import { getFieldsClient, type MinimalContext } from '../config'
+import { getFieldsClient } from '../config'
+import { Context, type ContextToRequestContext } from '../context'
 import type { ApiRouteHandler } from '../endpoint'
 import type { Fields, FieldsClient } from '../field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../table'
@@ -103,38 +104,18 @@ export interface AuthConfig {
   }
 }
 
-type ChangeAuthHandlerContextToMinimalContext<
-  TContext extends MinimalContext,
-  THandlers extends Record<string, { handler: ApiRouteHandler<any, any> }>,
-> = {
-  [K in keyof THandlers]: THandlers[K]['handler'] extends ApiRouteHandler<
-    any,
-    infer TApiRouteSchema
-  >
-    ? { schema: TApiRouteSchema; handler: ApiRouteHandler<TContext, TApiRouteSchema> }
-    : never
-}
-
 type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> = Simplify<{
   [K in keyof T as K extends string ? `${TPrefix}.${K}` : never]: T[K]
 }>
 
 export type Auth<
-  TContext extends MinimalContext = MinimalContext,
+  TContext extends Context = Context,
   TAuthConfig extends AuthConfig = AuthConfig,
 > = {
   config: TAuthConfig
-  context: TContext
+  context: ContextToRequestContext<TContext>
   authContext: AuthContext
-  handlers: Simplify<
-    AddObjectKeyPrefix<
-      ChangeAuthHandlerContextToMinimalContext<
-        TContext,
-        ReturnType<typeof createAuthHandlers>['handlers']
-      >,
-      'auth'
-    >
-  >
+  handlers: Simplify<AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>>
 }
 
 export type AuthHandlers = Auth<any, any>['handlers']
@@ -160,38 +141,30 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<TContext extends MinimalContext<any> = MinimalContext<any>>(
+export function createAuth<const TContext extends Context>(
   config: AuthConfig,
   context: TContext
 ): Auth<TContext> {
   const authContext = createAuthContext(config, context)
-  const { handlers: originalHandlers } = createAuthHandlers(config)
+  const { handlers: originalHandlers } = createAuthHandlers(authContext)
+  const wrappedContext = Context.toRequestContext(context, { authContext })
 
   const handlers = R.mapValues(originalHandlers, (h) => {
     const handler: ApiRouteHandler<TContext, any> = (args) => {
-      return h.handler({ ...args, context: authContext } as any) as any
+      return h.handler({ ...args, context: wrappedContext } as any) as any
     }
     return { schema: h.schema, handler }
-  }) as ChangeAuthHandlerContextToMinimalContext<
-    TContext,
-    ReturnType<typeof createAuthHandlers>['handlers']
-  >
+  }) as ReturnType<typeof createAuthHandlers>['handlers']
 
   const prefixedHandlers = Object.fromEntries(
     Object.entries(handlers).map(([key, value]) => {
       return [`auth.${key}`, value]
     })
-  ) as unknown as AddObjectKeyPrefix<
-    ChangeAuthHandlerContextToMinimalContext<
-      TContext,
-      ReturnType<typeof createAuthHandlers>['handlers']
-    >,
-    'auth'
-  >
+  ) as unknown as AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>
 
   return {
     config,
-    context,
+    context: wrappedContext as ContextToRequestContext<TContext>,
     authContext,
     handlers: prefixedHandlers,
   }

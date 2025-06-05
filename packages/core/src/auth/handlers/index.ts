@@ -5,18 +5,21 @@ import { resetPasswordEmail } from './reset-password'
 import { signOut } from './sign-out'
 import { signUp } from './sign-up'
 
-import type { AuthConfig } from '..'
+import type { Context } from '../../context'
+import { type AuthContext } from '../context'
 
-export function createAuthHandlers<TAuthConfig extends AuthConfig>(config: TAuthConfig) {
+export function createAuthHandlers<TAuthContext extends AuthContext, TContext extends Context>(
+  authContext: TAuthContext
+) {
   const handlers = {
     //  No authentication required
-    signUp: signUp(config),
-    loginEmail: loginEmail(config),
-    signOut: signOut({}),
-    resetPasswordEmail: resetPasswordEmail({}),
-    forgotPasswordEmail: forgotPasswordEmail({}),
+    signUp: signUp<TAuthContext, TContext>(authContext),
+    loginEmail: loginEmail<TAuthContext, TContext>(authContext),
+    signOut: signOut<TAuthContext, TContext>(authContext),
+    resetPasswordEmail: resetPasswordEmail<TAuthContext, TContext>(authContext),
+    forgotPasswordEmail: forgotPasswordEmail<TAuthContext, TContext>(authContext),
     // Authentication required
-    me: me({}),
+    me: me<TAuthContext, TContext>(authContext),
   } as const
 
   return {

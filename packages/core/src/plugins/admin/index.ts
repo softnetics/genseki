@@ -5,7 +5,8 @@ import { z } from 'zod'
 
 import type { AnyUserTable as BaseAnyUserTable } from '../../auth'
 import { Builder } from '../../builder'
-import type { BaseConfig, MinimalContext } from '../../config'
+import type { BaseConfig } from '../../config'
+import type { Context } from '../../context'
 import type { AnyTypedColumn, WithAnyTable, WithNotNull } from '../../table'
 import { createPlugin } from '..'
 
@@ -95,7 +96,7 @@ export function mergeAccessControl<
 }
 
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function admin<TContext extends MinimalContext<{ user: AnyUserTable }>>(
+export function admin<TContext extends Context<{ user: AnyUserTable }>>(
   baseConfig: BaseConfig<{ user: AnyUserTable }, TContext>,
   options: AdminPluginOptions
 ) {
