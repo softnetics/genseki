@@ -31,7 +31,7 @@ type GetBody<TApiRouteSchema extends ApiRouteSchema> =
 type GetHeaders<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['headers']>> extends false
     ? Output<TApiRouteSchema['headers']> & Record<string, string>
-    : Record<string, string> | never
+    : Record<string, string> | undefined
 
 type GetQuery<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['query']>> extends false ? Output<TApiRouteSchema['query']> : never
