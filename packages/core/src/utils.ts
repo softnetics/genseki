@@ -76,7 +76,6 @@ export function getTableFromSchema(schema: Record<string, unknown>, tableTsName:
 
 const getExtraField = (tableRelational: TableRelationalConfig, identifierColumn?: string) => {
   const extraWith: [string, SQL.Aliased<string | number>][] = []
-
   const primaryKeyColumn = tableRelational.primaryKey[0]
 
   extraWith.push(['__pk', sql`${primaryKeyColumn}`.as('__pk') as SQL.Aliased<string | number>])
@@ -107,7 +106,7 @@ export function createDrizzleQuery(
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
       const relationName = field._.relation.fieldName
-      const referencedTableName = field._.relation.referencedTableName
+      const referencedTableName = field._.referencedTableTsName
 
       return [
         [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
