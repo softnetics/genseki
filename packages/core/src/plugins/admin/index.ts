@@ -96,8 +96,11 @@ export function mergeAccessControl<
 }
 
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function admin<TContext extends Context<{ user: AnyUserTable }>>(
-  baseConfig: BaseConfig<{ user: AnyUserTable }, TContext>,
+export function admin<
+  TContextValue extends Record<string, unknown>,
+  TContext extends Context<{ user: AnyUserTable }, TContextValue>,
+>(
+  baseConfig: BaseConfig<{ user: AnyUserTable }, TContextValue, TContext>,
   options: AdminPluginOptions
 ) {
   const schema = baseConfig.schema

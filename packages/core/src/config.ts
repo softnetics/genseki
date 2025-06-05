@@ -3,6 +3,7 @@ import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 
 import {
+  type Auth,
   type AuthClient,
   type AuthConfig,
   type AuthHandlers,
@@ -50,14 +51,44 @@ export interface BaseConfigOptions<
   auth: AuthConfig
 }
 
-export interface BaseConfig<
+export class BaseConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
-> extends Omit<BaseConfigOptions<TFullSchema>, 'context'> {
-  context: TContext
+  TContextValue extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends Context<TFullSchema, TContextValue> = Context<TFullSchema, TContextValue>,
+> {
+  public readonly schema: TFullSchema
+  public readonly context: TContext
+  public readonly auth: Auth<TContext>
+
+  constructor(options: BaseConfigOptions<TFullSchema, TContextValue>) {
+    this.schema = options.schema
+    this.context = new Context<TFullSchema, TContextValue>(options.db, options.context) as TContext
+    this.auth = createAuth(options.auth, this.context)
+  }
+
+  $user<TUser extends Record<string, unknown>>(): BaseConfig<
+    TFullSchema,
+    TContextValue,
+    Context<TFullSchema, TContextValue, TUser>
+  > {
+    return this as BaseConfig<
+      TFullSchema,
+      TContextValue,
+      Context<TFullSchema, TContextValue, TUser>
+    >
+  }
 }
 
-export interface ServerConfig<
+export function defineBaseConfig<
+  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  const TContextValue extends Record<string, unknown> = Record<string, unknown>,
+>(
+  options: BaseConfigOptions<TFullSchema, TContextValue>
+): BaseConfig<TFullSchema, TContextValue, Context<TFullSchema, TContextValue>> {
+  return new BaseConfig<TFullSchema, TContextValue, Context<TFullSchema, TContextValue>>(options)
+}
+
+export class ServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Context<TFullSchema> = Context<TFullSchema>,
   TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
@@ -65,10 +96,26 @@ export interface ServerConfig<
     Collection<any, any, any, any, any, any>
   >,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
-> extends BaseConfig<TFullSchema> {
-  context: TContext
-  collections: TCollections
-  endpoints: TApiRouter
+> {
+  public readonly schema: TFullSchema
+  public readonly context: TContext
+  public readonly auth: Auth<TContext>
+  public readonly collections: TCollections
+  public readonly endpoints: TApiRouter
+
+  constructor(options: {
+    schema: TFullSchema
+    context: TContext
+    auth: Auth<TContext>
+    collections: TCollections
+    endpoints: TApiRouter
+  }) {
+    this.schema = options.schema
+    this.context = options.context
+    this.auth = options.auth
+    this.collections = options.collections
+    this.endpoints = options.endpoints
+  }
 }
 
 export interface AnyServerConfig extends ServerConfig<Record<string, unknown>, Context, {}, {}> {}
@@ -80,23 +127,6 @@ export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<an
       : never
     : never
 
-export function defineBaseConfig<
-  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  const TContextValue extends Record<string, unknown> = Record<string, unknown>,
->(
-  config: BaseConfigOptions<TFullSchema, TContextValue>
-): BaseConfig<TFullSchema, Context<TFullSchema, TContextValue>> {
-  const context = new Context(config.db, { ...config.context }) as Context<
-    TFullSchema,
-    TContextValue
-  >
-
-  return {
-    ...config,
-    context,
-  }
-}
-
 export function defineServerConfig<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   const TContext extends Context<TFullSchema> = Context<TFullSchema>,
@@ -107,32 +137,23 @@ export function defineServerConfig<
   const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
   const TPlugins extends KivotosPlugin<any>[] = [...KivotosPlugin<any>[]],
 >(
-  baseConfig: BaseConfig<TFullSchema, TContext>,
+  baseConfig: BaseConfig<TFullSchema, any, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
-  const auth = createAuth(baseConfig.auth, baseConfig.context)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
-  let serverConfig = {
+  let serverConfig = new ServerConfig({
     ...baseConfig,
     collections: config.collections,
     endpoints: {
       ...config.endpoints,
-      ...auth.handlers,
+      ...baseConfig.auth.handlers,
       ...collectionEndpoints,
     } as TEndpoints &
       AuthHandlers &
       ExtractAllCollectionCustomEndpoints<TCollections> &
       ExtractAllCollectionDefaultEndpoints<TCollections>,
-  } satisfies ServerConfig<
-    TFullSchema,
-    TContext,
-    TCollections,
-    TEndpoints &
-      AuthHandlers &
-      ExtractAllCollectionCustomEndpoints<TCollections> &
-      ExtractAllCollectionDefaultEndpoints<TCollections>
-  >
+  })
 
   for (const { plugin } of config.plugins ?? []) {
     serverConfig = plugin(serverConfig) as any
@@ -219,7 +240,7 @@ export function getClientConfig<
   ) as ToClientApiRouteSchema<TApiRouter>
 
   return {
-    auth: getAuthClient(serverConfig.auth),
+    auth: getAuthClient(serverConfig.auth.config),
     collections: R.mapValues(collections, (s) =>
       getClientCollection(s as Collection<any, any, any, any, any, any>)
     ) as ToClientCollectionList<TCollections>,

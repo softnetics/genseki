@@ -5,12 +5,11 @@ import type { AuthContext } from './auth/context'
 export class Context<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   const TContextValue extends Record<string, unknown> = Record<string, unknown>,
-  const TUser extends Record<string, unknown> = Record<string, unknown>,
+  const TType extends Record<string, unknown> = Record<string, unknown>,
 > {
   constructor(
     public readonly db: NodePgDatabase<TFullSchema>,
-    protected readonly ctx?: TContextValue,
-    protected readonly authContext?: AuthContext
+    protected readonly ctx?: TContextValue
   ) {}
 
   get<TName extends Exclude<keyof TContextValue, 'db'>>(name: TName): TContextValue[TName] {
@@ -35,7 +34,7 @@ export class Context<
     return new RequestContext<TFullSchema, TContextValue, TUser>(
       ctx.db,
       (ctx.ctx ?? {}) as TContextValue,
-      ctx.authContext ?? config?.authContext,
+      config?.authContext,
       config?.headers || {}
     )
   }
@@ -55,7 +54,7 @@ export class RequestContext<
     protected readonly authContext?: AuthContext,
     private readonly _headers?: Record<string, string>
   ) {
-    super(db, ctx, authContext)
+    super(db, ctx)
 
     this._headers = _headers || {}
   }
@@ -71,7 +70,7 @@ export class RequestContext<
     }
     this._user = user as unknown as TUser
 
-    return user
+    return this._user
   }
 
   get headers() {

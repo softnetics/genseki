@@ -51,7 +51,7 @@ const baseConfig = defineBaseConfig({
     },
     secret: '',
   },
-})
+}).$user<{ id: string; name: number }>()
 
 const builder = new Builder({ schema }).$context<typeof baseConfig.context>()
 
@@ -96,8 +96,9 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async ({ db }) => {
-        const result = await db.query.authors.findMany()
+      options: async (args) => {
+        const x = await args.requiredAuthenticated()
+        const result = await args.db.query.authors.findMany()
         return result.map((author) => ({
           label: author.name,
           value: author.id,
