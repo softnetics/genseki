@@ -16,7 +16,7 @@ import {
 import { InputOTP } from '../../../../../intentui/ui/input-otp'
 
 const otpSchema = z.object({
-  otp: z.string().regex(/^[0-9]{6}$/, { message: 'OTP code must be 6 digits' }),
+  otp: z.string().regex(/^[0-9]{6}$/, { error: 'OTP code must be 6 digits' }),
 })
 
 export type OutputOtpForm = z.infer<typeof otpSchema>

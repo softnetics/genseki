@@ -20,7 +20,7 @@ export function signUp<const TAuthContext extends AuthContext, const TContext ex
       .object({
         name: z.string(),
         email: z.string(),
-        password: z.string().min(6, { message: 'Password must be at least 6 characters' }),
+        password: z.string().min(6, { error: 'Password must be at least 6 characters' }),
       })
       .and(z.record(z.string(), z.any())),
     responses: {

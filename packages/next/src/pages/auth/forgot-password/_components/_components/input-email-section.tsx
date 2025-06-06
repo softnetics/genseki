@@ -16,7 +16,7 @@ import {
 import { TextField } from '../../../../../intentui/ui/text-field'
 
 const schema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
+  email: z.email({ error: 'Invalid email address' }),
 })
 
 export type OutputEmailForm = z.infer<typeof schema>
