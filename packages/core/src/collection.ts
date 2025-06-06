@@ -677,7 +677,7 @@ export function getAllCollectionEndpoints<
       const endpoints = collection.admin.endpoints
       if (endpoints) {
         return Object.entries(endpoints).map(([key, value]) => {
-          return [[`${collection.slug}.${key}`, value]]
+          return [`${collection.slug}.${key}`, value]
         })
       }
       return []
