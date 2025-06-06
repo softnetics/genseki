@@ -2,11 +2,11 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import z from 'zod'
+import z from 'zod/v4'
 
 import { Button } from '../../../intentui/ui/button'
 import { Label } from '../../../intentui/ui/field'
@@ -35,8 +35,8 @@ export const ResetPasswordConfirmPage: NextPage = () => {
   const searchParams = useSearchParams()
   const phone = searchParams.get('phone') || ''
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ResetPasswordOutput>({
+    resolver: standardSchemaResolver(formSchema),
     mode: 'all',
   })
 

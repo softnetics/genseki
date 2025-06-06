@@ -2,8 +2,8 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import z from 'zod/v4'
 
 import { Button } from '../../../../../intentui/ui/button'
 import {
@@ -22,8 +22,8 @@ const otpSchema = z.object({
 export type OutputOtpForm = z.infer<typeof otpSchema>
 
 export function InputOtpSection({ onSuccess }: { onSuccess: () => void }) {
-  const form = useForm({
-    resolver: zodResolver(otpSchema),
+  const form = useForm<OutputOtpForm>({
+    resolver: standardSchemaResolver(otpSchema),
     mode: 'onChange',
   })
 

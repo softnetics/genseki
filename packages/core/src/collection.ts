@@ -1,6 +1,6 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
-import z from 'zod'
+import z from 'zod/v4'
 
 import type { Context, RequestContext } from './context'
 import {
@@ -677,7 +677,7 @@ export function getAllCollectionEndpoints<
       const endpoints = collection.admin.endpoints
       if (endpoints) {
         return Object.entries(endpoints).map(([key, value]) => {
-          return [[`${collection.slug}.${key}`, value]]
+          return [`${collection.slug}.${key}`, value]
         })
       }
       return []
