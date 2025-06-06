@@ -12,8 +12,7 @@ import {
 import {
   type ClientCollection,
   type Collection,
-  type ExtractAllCollectionCustomEndpoints,
-  type ExtractAllCollectionDefaultEndpoints,
+  type ExtractAllCollectionEndpoint,
   getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
@@ -120,18 +119,12 @@ export function defineServerConfig<
       ...config.endpoints,
       ...auth.handlers,
       ...collectionEndpoints,
-    } as TEndpoints &
-      AuthHandlers &
-      ExtractAllCollectionCustomEndpoints<TCollections> &
-      ExtractAllCollectionDefaultEndpoints<TCollections>,
+    } as TEndpoints & AuthHandlers & ExtractAllCollectionEndpoint<TCollections>,
   } satisfies ServerConfig<
     TFullSchema,
     TContext,
     TCollections,
-    TEndpoints &
-      AuthHandlers &
-      ExtractAllCollectionCustomEndpoints<TCollections> &
-      ExtractAllCollectionDefaultEndpoints<TCollections>
+    TEndpoints & AuthHandlers & ExtractAllCollectionEndpoint<TCollections>
   >
 
   for (const { plugin } of config.plugins ?? []) {

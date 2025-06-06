@@ -68,7 +68,14 @@ export class Builder<
       TFields,
       TApiRouter
     >
-  ) {
+  ): Collection<
+    TSlug,
+    FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
+    TFullSchema,
+    TContext,
+    FieldsWithFieldName<TFields>,
+    TApiRouter
+  > {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =
       this.tableRelationalConfigByTableTsName[
@@ -95,18 +102,22 @@ export class Builder<
       findOne: config.admin?.api?.findOne ?? defaultHandlers.findOne,
       findMany: config.admin?.api?.findMany ?? defaultHandlers.findMany,
     }
+    const endpoints: TApiRouter = config.admin?.endpoints ?? ({} as TApiRouter)
 
     return {
       _: {
-        table: table,
+        table: table as GetTableByTableTsName<
+          TFullSchema,
+          FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name']
+        >,
         tableConfig: tableRelationalConfig,
       },
       slug: config.slug,
       fields: config.fields,
-      identifierColumn: config.identifierColumn,
+      identifierColumn: config.identifierColumn as string,
       admin: {
-        ...config.admin,
-        api: {
+        endpoints: {
+          ...endpoints,
           create: async (args) => {
             // TODO: Access control
             const defaultApi = config.admin?.api?.create
@@ -152,19 +163,12 @@ export class Builder<
           },
         },
       },
-    } as Collection<
-      TSlug,
-      FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
-      TFullSchema,
-      TContext,
-      FieldsWithFieldName<TFields>,
-      TApiRouter
-    >
+    }
   }
 
   fields<
-    const TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    const TFields extends FieldsInitial<TContext, TFullSchema>,
+    TTableTsName extends GetAllTableTsNames<TFullSchema>,
+    TFields extends FieldsInitial<TContext>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (
@@ -178,9 +182,7 @@ export class Builder<
     return appendFieldNameToFields(optionsFn(fb))
   }
 
-  options<TType extends string | number>(
-    callback: OptionCallback<TType, TContext>
-  ): OptionCallback<TType, TContext> {
+  options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {
     return callback
   }
 
