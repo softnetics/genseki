@@ -183,9 +183,6 @@ importers:
       zod:
         specifier: 3.25.53
         version: 3.25.53
-      zod-to-json-schema:
-        specifier: ^3.24.5
-        version: 3.24.5(zod@3.25.53)
     devDependencies:
       '@types/json-schema':
         specifier: ^7.0.15
@@ -6718,7 +6715,7 @@ snapshots:
 
   '@types/pg@8.15.2':
     dependencies:
-      '@types/node': 22.15.18
+      '@types/node': 22.15.23
       pg-protocol: 1.10.0
       pg-types: 4.0.2
 
