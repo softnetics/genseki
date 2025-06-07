@@ -1,9 +1,12 @@
-import type { Fields, ServerConfig } from '@kivotos/core'
+import { headers } from 'next/headers'
+
+import { Context, createAuth, type Fields, type ServerConfig } from '@kivotos/core'
 
 import { UpdateClientView } from './update.client'
 
 import { AutoField } from '../../components/auto-field'
 import { Typography } from '../../components/primitives/typography'
+import { getHeadersObject } from '../../utils/headers'
 
 interface UpdateViewProps<TServerConfig extends ServerConfig> {
   identifier: string
@@ -17,8 +20,12 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const collection = props.serverConfig.collections[props.slug]
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
+  const headersValue = getHeadersObject(await headers())
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(authContext, headersValue)
+
   const result = await collection.admin.api.findOne({
-    context: { ...props.serverConfig.context, db: props.serverConfig.db },
+    context: context,
     slug: props.slug,
     fields: collection.fields,
     id: props.identifier,
