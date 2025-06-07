@@ -103,7 +103,8 @@
   }
 
   img {
-    max-width: 100%;
+    width:100%;
+    max-width: 500px;
     height: auto;
     margin: 1em 0;
   }
@@ -112,5 +113,59 @@
     border: none;
     border-top: 1px solid var(--border-color);
     margin: 1em 0;
+  }
+
+  .ProseMirror-selectednode:has(.tiptap-image-upload) > .tiptap-image-upload {
+    outline: 2px solid var(--color-primary);
+  }
+
+  .tiptap-image-upload {
+    --outside-padding: calc(var(--spacing) * 4);
+    --outside-border-radius: var(--radius-4xl);
+    background-color: var(--color-bluegray-200);
+    padding: var(--outside-padding);
+    border-radius: var(--outside-border-radius);
+    cursor: pointer;
+
+    & > div {
+      padding: calc(var(--spacing) * 12);
+      border-radius: calc(var(--outside-border-radius) - var(--outside-padding));
+      border: 1px dashed var(--color-bluegray-400);
+      background-color: var(--color-white);
+      display: flex;
+      justify-content: center;
+
+      input {
+        display: none;
+      }
+
+      .tiptap-image-upload-dragger {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: calc(var(--spacing) * 12);
+
+        .tiptap-image-upload-dropzone {
+        }
+
+        .tiptap-image-upload-content {
+          display: flex;
+          flex-direction: column;
+          align-items: center;
+          gap: calc(var(--spacing) * 4);
+
+          .tiptap-image-upload-text {
+            color: var(--color-text-nontrivial);
+            em {
+              text-decoration: underline dashed;
+            }
+          }
+
+          .tiptap-image-upload-subtext {
+            color: var(--color-text-trivial);
+          }
+        }
+      }
+    }
   }
 }
