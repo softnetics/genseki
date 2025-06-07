@@ -19,11 +19,11 @@ const badgeIntents = {
     'bg-red-500/15 text-red-700 group-hover:bg-red-500/25 dark:bg-red-500/10 dark:text-red-400 dark:group-hover:bg-red-500/20',
 }
 const badgeShapes = {
-  square: 'rounded-md px-1.5',
-  circle: 'px-2 rounded-full',
+  square: 'px-3 py-2 rounded-md ',
+  circle: 'px-3 py-2 rounded-full',
 }
 const badgeStyles = tv({
-  base: 'inline-flex items-center gap-x-1.5 py-0.5 font-medium text-xs/5 **:data-[slot=icon]:size-3 forced-colors:outline',
+  base: 'inline-flex items-center gap-x-1.5 py-0.5 font-medium text-sm/6 **:data-[slot=icon]:size-3 forced-colors:outline',
   variants: {
     intent: { ...badgeIntents },
     shape: { ...badgeShapes },

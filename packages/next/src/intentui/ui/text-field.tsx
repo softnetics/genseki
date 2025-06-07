@@ -88,7 +88,6 @@ const TextField = ({
           {label && (
             <Label>
               {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
-              {/* Fixed isRequire to isRequired */}
             </Label>
           )}
           <FieldGroup
