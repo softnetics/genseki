@@ -1,3 +1,5 @@
+import { z } from 'zod'
+
 import { builder } from '../helper'
 
 export const postsCollection = builder.collection('posts', {
@@ -9,6 +11,31 @@ export const postsCollection = builder.collection('posts', {
         console.log('Custom findMany for posts collection')
         return await args.defaultApi(args)
       },
+    },
+    endpoints: {
+      customOne: builder.endpoint(
+        {
+          path: '/custom-one',
+          method: 'POST',
+          body: z.object({
+            name: z.string(),
+          }),
+          responses: {
+            200: z.object({
+              message: z.string(),
+            }),
+          },
+        },
+        async ({ body }) => {
+          const name = body.name
+          return {
+            status: 200 as const,
+            body: {
+              message: `Hello, ${name}! This is a custom endpoint for posts.`,
+            },
+          }
+        }
+      ),
     },
   },
   fields: builder.fields('posts', (fb) => ({

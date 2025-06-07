@@ -14,7 +14,7 @@ import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
-import type { MinimalContext } from './config'
+import type { Context, RequestContext } from './context'
 import type { Field, Fields } from './field'
 import {
   createDrizzleQuery,
@@ -25,10 +25,9 @@ import {
   mapValueToTsValue as mapFieldValueToTsValue,
 } from './utils'
 
-// TODO: Recheck that one-to-one relations are working correctly
 export function createDefaultApiHandlers<
-  TContext extends MinimalContext = MinimalContext,
-  TFields extends Fields<any> = Fields<any>,
+  TContext extends Context,
+  TFields extends Fields<any, any>,
 >(args: {
   schema: Record<string, unknown>
   fields: TFields
@@ -194,7 +193,7 @@ class ApiHandler {
     private readonly fields: Fields<any>,
     private readonly config: {
       schema: Record<string, unknown>
-      context: MinimalContext
+      context: RequestContext
       tableTsNameByTableDbName: Record<string, string>
       tableRelationalConfigByTableTsName: Record<string, TableRelationalConfig>
     }
