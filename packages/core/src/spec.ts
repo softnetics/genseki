@@ -96,8 +96,8 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async (args) => {
-        const result = await args.db.query.authors.findMany()
+      options: async ({ db }) => {
+        const result = await db.query.authors.findMany()
         return result.map((author) => ({
           label: author.name,
           value: author.id,
@@ -114,8 +114,8 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async (args) => {
-        const result = await args.db.query.categories.findMany()
+      options: async ({ db }) => {
+        const result = await db.query.categories.findMany()
         return result.map((category) => ({
           label: category.name,
           value: category.id,
@@ -130,8 +130,8 @@ export const postCollection = builder.collection('posts', {
         }),
         tagId: fb.columns('tagId', {
           type: 'selectNumber',
-          options: async (context) => {
-            const result = await context.db.query.tags.findMany()
+          options: async ({ db }) => {
+            const result = await db.query.tags.findMany()
             return result.map((tag) => ({
               label: tag.name,
               value: tag.id,
@@ -227,6 +227,34 @@ export const serverConfig = defineServerConfig(baseConfig, {
           status: 200 as const,
           body: {
             hello: name,
+          },
+        }
+      }
+    ),
+    getPosts: builder.endpoint(
+      {
+        path: '/test',
+        method: 'GET',
+        query: z.object({
+          authorId: z.string().optional(),
+        }),
+        responses: {
+          200: z.object({
+            posts: z.array(
+              z.object({
+                id: z.string(),
+                title: z.string(),
+                content: z.string(),
+              })
+            ),
+          }),
+        },
+      },
+      async ({ context, query }) => {
+        return {
+          status: 200 as const,
+          body: {
+            posts: [],
           },
         }
       }

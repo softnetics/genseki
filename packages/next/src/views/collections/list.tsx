@@ -1,7 +1,8 @@
-import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
+import { CubeIcon } from '@phosphor-icons/react'
+import { headers } from 'next/headers'
 
 import type { ServerConfig } from '@kivotos/core'
-import { getClientCollection } from '@kivotos/core'
+import { Context, createAuth, getClientCollection } from '@kivotos/core'
 
 import { ListTable } from './list.client'
 
@@ -9,6 +10,7 @@ import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
 import { formatSlug } from '../../utils/format-slug'
+import { getHeadersObject } from '../../utils/headers'
 
 interface ListViewProps {
   slug: string
@@ -21,13 +23,18 @@ export async function ListView(props: ListViewProps) {
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
+  const headersValue = getHeadersObject(await headers())
+
   const limit = parseInt((props.searchParams['limit'] as string) ?? '10')
   const offset = parseInt((props.searchParams['offset'] as string) ?? '0')
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(authContext, headersValue)
+
   const result = await collection.admin.api.findMany({
-    context: props.serverConfig.context,
+    context,
     slug: props.slug,
     fields: collection.fields,
     limit,
