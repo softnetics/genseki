@@ -17,8 +17,8 @@ export const EditorBar = () => {
   if (!editor) throw new Error('Editor not found')
 
   return (
-    <div className="flex items-stretch overflow-x-auto">
-      <Toolbar>
+    <div className="overflow-x-auto sticky p-2 top-1 m-1 z-10 bg-bg rounded-xl">
+      <Toolbar className="flex items-stretch overflow-x-auto">
         <ToolbarGroup>
           <EditorColorPicker
             onPopupClose={(color) => {
