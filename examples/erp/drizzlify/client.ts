@@ -6,4 +6,5 @@ import type { serverConfig } from './config'
 export const restClient = createRestClient<typeof serverConfig>({
   baseUrl: '',
 })
+
 export const queryClient = createKivotosQueryClient(restClient)

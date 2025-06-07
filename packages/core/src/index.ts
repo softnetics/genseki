@@ -1,4 +1,4 @@
-export type { AuthHandlers } from './auth'
+export { type AuthHandlers, createAuth } from './auth'
 export { Builder } from './builder'
 export type {
   ApiReturnType,
@@ -20,13 +20,19 @@ export type {
   InferTableNameFromCollection,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
-export type { BaseConfig, ClientConfig, MinimalContext, ServerConfig } from './config'
+export type {
+  BaseConfig,
+  ClientConfig,
+  MinimalContextValue as MinimalContext,
+  ServerConfig,
+} from './config'
 export {
   defineBaseConfig,
   defineServerConfig,
   getClientCollection,
   getClientConfig,
 } from './config'
+export { Context, RequestContext } from './context'
 export type {
   ApiRoute,
   ApiRouteHandler,

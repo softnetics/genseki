@@ -14,7 +14,7 @@ import type {
   FindTableByTableTsName,
   GetAllTableTsNames,
 } from './collection'
-import type { MinimalContext } from './config'
+import type { Context } from './context'
 import {
   type ApiRoute,
   type ApiRouteHandler,
@@ -34,7 +34,7 @@ import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  TContext extends Context = Context,
 > {
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
@@ -50,15 +50,15 @@ export class Builder<
     this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
   }
 
-  $context<TContext extends MinimalContext<TFullSchema>>(): Builder<TFullSchema, TContext> {
+  $context<TContext extends Context = Context>(): Builder<TFullSchema, TContext> {
     return new Builder<TFullSchema, TContext>({ schema: this.config.schema })
   }
 
   collection<
-    TSlug extends string = string,
-    TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    TFields extends Fields<TContext> = Fields<TContext>,
-    TApiRouter extends ApiRouter<TContext> = {},
+    const TSlug extends string = string,
+    const TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
+    const TFields extends Fields<TContext, TFullSchema> = Fields<TContext, TFullSchema>,
+    const TApiRouter extends ApiRouter<TContext> = {},
   >(
     tableTsName: TTableTsName,
     config: CollectionConfig<
@@ -163,8 +163,8 @@ export class Builder<
   }
 
   fields<
-    TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContext>,
+    const TTableTsName extends GetAllTableTsNames<TFullSchema>,
+    const TFields extends FieldsInitial<TContext, TFullSchema>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (
@@ -178,7 +178,9 @@ export class Builder<
     return appendFieldNameToFields(optionsFn(fb))
   }
 
-  options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {
+  options<TType extends string | number>(
+    callback: OptionCallback<TType, TContext>
+  ): OptionCallback<TType, TContext> {
     return callback
   }
 
