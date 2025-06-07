@@ -1,9 +1,12 @@
-import type { ServerConfig } from '@kivotos/core'
+import { headers } from 'next/headers'
+
+import { Context, createAuth, type ServerConfig } from '@kivotos/core'
 
 import { CreateClientView } from './create.client'
 
 import { createOptionsRecord } from '../../components/auto-field'
 import { Typography } from '../../components/primitives/typography'
+import { getHeadersObject } from '../../utils/headers'
 
 interface CreateViewProps<TServerConfig extends ServerConfig> {
   slug: string
@@ -17,7 +20,11 @@ export async function CreateView<TServerConfig extends ServerConfig>(
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
-  const optionsRecord = await createOptionsRecord(props.serverConfig, collection.fields)
+  const headersValue = getHeadersObject(await headers())
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(authContext, headersValue)
+
+  const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
     <div className="mx-auto flex max-w-md w-full flex-col gap-y-4 mt-24">

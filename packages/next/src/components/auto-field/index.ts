@@ -1,7 +1,8 @@
-import type { Fields, ServerConfig } from '@kivotos/core'
+import type { RequestContext } from '@kivotos/core'
+import { type Fields } from '@kivotos/core'
 
 export async function createOptionsRecord(
-  serverConfig: ServerConfig,
+  context: RequestContext,
   fields: Fields,
   prefix: string = ''
 ): Promise<Record<string, any[]>> {
@@ -9,12 +10,12 @@ export async function createOptionsRecord(
     if ('options' in field) {
       if (field.type === 'connect' || field.type === 'connectOrCreate') {
         const childOptions = await createOptionsRecord(
-          serverConfig,
+          context,
           field.fields,
           `${prefix}${field.fieldName}.`
         )
 
-        const options = await field.options({ db: serverConfig.db })
+        const options = await field.options(context)
 
         return [
           [`${prefix}${field.fieldName}`, options],
@@ -25,7 +26,7 @@ export async function createOptionsRecord(
         ]
       }
 
-      const options = await field.options({ db: serverConfig.db })
+      const options = await field.options(context)
       return [[`${prefix}${field.fieldName}`, options]]
     }
 
