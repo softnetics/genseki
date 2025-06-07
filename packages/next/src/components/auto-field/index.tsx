@@ -1,4 +1,6 @@
-import type { Field, ServerConfig } from '@kivotos/core'
+import { headers } from 'next/headers'
+
+import { Context, createAuth, type Field, type ServerConfig } from '@kivotos/core'
 
 import {
   AutoCheckbox,
@@ -9,6 +11,8 @@ import {
   AutoTextField,
   AutoTimeField,
 } from './fields'
+
+import { getHeadersObject } from '../../utils/headers'
 
 interface AutoFieldProps<TServerConfig extends ServerConfig> {
   field: Field
@@ -21,6 +25,11 @@ export async function AutoField<TServerConfig extends ServerConfig>(
   props: AutoFieldProps<TServerConfig>
 ) {
   const { field, className } = props
+
+  const headersValue = getHeadersObject(await headers())
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+
+  const context = Context.toRequestContext(authContext, headersValue)
 
   if (props.visibility === 'hidden') {
     return null
@@ -49,15 +58,15 @@ export async function AutoField<TServerConfig extends ServerConfig>(
     case 'switch':
       return <AutoSwitch {...commonProps} isDisabled={disabled} />
     case 'selectText': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(context)
       return <AutoSelectField {...commonProps} items={options} isDisabled={disabled} />
     }
     case 'selectNumber': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(context)
       return <AutoSelectField {...commonProps} items={options} isDisabled={disabled} />
     }
     case 'comboboxText': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(context)
       return (
         <select name={field._.column.name}>
           {options.map((option) => (
@@ -69,7 +78,7 @@ export async function AutoField<TServerConfig extends ServerConfig>(
       )
     }
     case 'comboboxNumber': {
-      const options = await field.options({ db: props.serverConfig.db })
+      const options = await field.options(context)
       return (
         <select name={field._.column.name}>
           {options.map((option) => (
