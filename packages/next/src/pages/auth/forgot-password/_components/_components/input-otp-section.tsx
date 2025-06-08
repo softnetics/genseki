@@ -2,8 +2,8 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import z from 'zod/v4'
 
 import { Button } from '../../../../../intentui/ui/button'
 import {
@@ -16,14 +16,14 @@ import {
 import { InputOTP } from '../../../../../intentui/ui/input-otp'
 
 const otpSchema = z.object({
-  otp: z.string().regex(/^[0-9]{6}$/, { message: 'OTP code must be 6 digits' }),
+  otp: z.string().regex(/^[0-9]{6}$/, { error: 'OTP code must be 6 digits' }),
 })
 
 export type OutputOtpForm = z.infer<typeof otpSchema>
 
 export function InputOtpSection({ onSuccess }: { onSuccess: () => void }) {
-  const form = useForm({
-    resolver: zodResolver(otpSchema),
+  const form = useForm<OutputOtpForm>({
+    resolver: standardSchemaResolver(otpSchema),
     mode: 'onChange',
   })
 

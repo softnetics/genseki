@@ -2,11 +2,11 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import type { NextPage } from 'next'
 import Link from 'next/link'
 import { useSearchParams } from 'next/navigation'
-import z from 'zod'
+import z from 'zod/v4'
 
 import { Button } from '../../../intentui/ui/button'
 import { Label } from '../../../intentui/ui/field'
@@ -19,9 +19,9 @@ const formSchema = z
   .object({
     password: z
       .string()
-      .min(8, { message: '❌ Password must be at least 8 characters long' })
-      .regex(/[A-Za-z]/, { message: '❌ Must contain English letters (A-Z, a-z)' })
-      .regex(/[0-9]/, { message: '❌ Must contain numbers (0-9)' }),
+      .min(8, { error: '❌ Password must be at least 8 characters long' })
+      .regex(/[A-Za-z]/, { error: '❌ Must contain English letters (A-Z, a-z)' })
+      .regex(/[0-9]/, { error: '❌ Must contain numbers (0-9)' }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {
@@ -35,8 +35,8 @@ export const ResetPasswordConfirmPage: NextPage = () => {
   const searchParams = useSearchParams()
   const phone = searchParams.get('phone') || ''
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<ResetPasswordOutput>({
+    resolver: standardSchemaResolver(formSchema),
     mode: 'all',
   })
 

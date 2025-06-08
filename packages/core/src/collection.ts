@@ -1,6 +1,6 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
-import z from 'zod'
+import z from 'zod/v4'
 
 import type { Context, RequestContext } from './context'
 import {
