@@ -4,6 +4,8 @@ import { createRouter } from 'radix3'
 
 import type { ApiRouter, AuthHandlers, Collection, Context, ServerConfig } from '@kivotos/core'
 
+import { NotAuthorizedPage } from './pages/401'
+import { NotfoundPage } from './pages/404'
 import { createApiResourceRouter } from './resource'
 import type { ServerFunction } from './server-function'
 import { AuthLayout } from './views/auth/layout'
@@ -50,6 +52,11 @@ export interface NextJsServerConfig<
   resourceRouter: ReturnType<typeof createApiResourceRouter>
 }
 
+export interface NextJsUIConfig {
+  notFound?: React.ReactElement
+  notAuthorized?: React.ReactElement
+}
+
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Context<TFullSchema> = Context<TFullSchema>,
@@ -59,9 +66,20 @@ export function defineNextJsServerConfig<
   >,
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(
-  serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
+  serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>,
+  uiConfig?: NextJsUIConfig
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
-  const radixRouter = createRouter<RouterData>()
+  const radixRouter = createRouter<RouterData>({
+    routes: {
+      notFound: {
+        view: () => uiConfig?.notFound || <NotfoundPage redirectURL="/admin/collections" />,
+      },
+      notAuthorized: {
+        view: () =>
+          uiConfig?.notAuthorized || <NotAuthorizedPage redirectURL="/admin/auth/login" />,
+      },
+    },
+  })
 
   radixRouter.insert('/collections', {
     requiredAuthentication: true,
