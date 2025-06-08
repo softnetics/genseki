@@ -23,7 +23,7 @@ const buttonVariants = tv({
       naked:
         '[&>*]:text-secondary-fg text-secondary-fg bg-bg hover:shadow-sm transition-shadow shadow-md dark:shadow-bg border-b border-stroke-trivial/10',
       outline:
-        '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary shadow-[inset_0_0_0_1px_var(--color-secondary)] bg-bg [background-image:radial-gradient(150%_90%_at_50%_50%,var(--color-bg)_40%,--alpha(var(--color-secondary-fg)/20%))]',
+        '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary bg-bg border border-input',
       ghost: '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary',
       vanish: '[&>*]:text-secondary-fg text-secondary-fg',
       destruction:
