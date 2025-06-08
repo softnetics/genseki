@@ -13,21 +13,19 @@ import { ImageUploadNode } from './extensions/image-upload-node-extension'
 import { Selection } from './extensions/selection-extension'
 import { uploadAction } from './file-upload-adapters/upload-actions'
 
-import { useMediaQuery } from '../../../hooks/use-media-query'
-
 const MAX_FILE_SIZE = 1024 * 1024 * 10 // 10MB
 
 const handleUploadSuccess = (url: string) => {
-  console.log('🎉 Upload sucessfully', url)
+  // TODO: Wait to be merged with Nonmasternon's PR, so the `Sooner` component will be able to handle this error
+  console.log('🎉 Upload sucessfully I will show to toast', url)
 }
 
 const handleUploadError = (error: Error) => {
-  console.error('Upload failed:', error)
+  // TODO: Wait to be merged with Nonmasternon's PR, so the `Sooner` component will be able to handle this error
+  console.error('Upload failed I will show the toast:', error.message)
 }
 
 export const RichTextEditor = () => {
-  const isMobile = useMediaQuery('(min-width: 600px)')
-
   return (
     <div className="bg-bg flex flex-col border rounded-xl ">
       <EditorProvider

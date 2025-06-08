@@ -1,14 +1,14 @@
 import 'server-only'
 
 import {
+  GetObjectCommand,
   PutObjectCommand,
   S3Client,
   type S3ClientConfig,
-  S3ServiceException,
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
-import { GenericUploadAdapter, type UploadActionResponse } from '../upload-adapter'
+import { GenericUploadAdapter, type UploadActionResponse } from '../generic-adapter'
 
 export class UploadAdapterS3 extends GenericUploadAdapter {
   private static S3UploadAdapter: UploadAdapterS3
@@ -22,6 +22,7 @@ export class UploadAdapterS3 extends GenericUploadAdapter {
     this.bucket = options.bucket
   }
 
+  // Incase where you need to create the client automatically
   public static createClient(options: { bucket: string; clientConfig: S3ClientConfig }) {
     if (!UploadAdapterS3.S3UploadAdapter) {
       UploadAdapterS3.S3UploadAdapter = new UploadAdapterS3(options)
@@ -30,25 +31,30 @@ export class UploadAdapterS3 extends GenericUploadAdapter {
     return UploadAdapterS3.S3UploadAdapter
   }
 
-  public async getReadObjectSignedUrl(): Promise<UploadActionResponse<{ readObjectUrl: string }>> {
-    try {
-      // ...
-      return {
-        success: true,
-        message: 'Fail to request signed URL',
-        data: { readObjectUrl: '...' },
-      }
-    } catch (error) {
-      if (error instanceof S3ServiceException) {
-        console.error(`S3 Service error: ${error.name}`, error.message)
-      } else {
-        console.error(error)
-      }
+  /**
+   * @description Get the signed URL for reading the object from S3
+   */
+  public async getReadObjectSignedUrl(
+    key: string
+  ): Promise<UploadActionResponse<{ readObjectUrl: string }>> {
+    const getCommand = new GetObjectCommand({
+      Bucket: this.bucket,
+      Key: key,
+    })
 
-      return { success: false, message: 'Fail to request read object signed URL' }
+    const url = await getSignedUrl(this.AWSClient, getCommand, {
+      expiresIn: 3600,
+    })
+
+    return {
+      message: 'Requested signed URL successfully',
+      data: { readObjectUrl: url },
     }
   }
 
+  /**
+   * @description Get the signed URL for uploading the object to S3
+   */
   public async getPutObjectSignedUrl(
     file: File
   ): Promise<UploadActionResponse<{ putObjectUrl: string }>> {
@@ -57,47 +63,30 @@ export class UploadAdapterS3 extends GenericUploadAdapter {
       Key: file.name,
     })
 
-    try {
-      const uploadSignedUrl = await getSignedUrl(this.AWSClient, putCommand, { expiresIn: 3600 })
+    const uploadSignedUrl = await getSignedUrl(this.AWSClient, putCommand, { expiresIn: 3600 })
 
-      return {
-        success: true,
-        message: 'File upload signed URL request success',
-        data: { putObjectUrl: uploadSignedUrl },
-      }
-    } catch (error) {
-      if (error instanceof S3ServiceException) {
-        console.error(`S3 Service error: ${error.name}`, error.message)
-      } else {
-        console.error(error)
-      }
-      return { success: false, message: 'Fail to request put object signed URL' }
-      /**
-       * todo:
-       * move error return to the expected case only for unknown case throw
-       */
+    return {
+      message: 'File upload signed URL request success',
+      data: { putObjectUrl: uploadSignedUrl },
     }
   }
 
-  public async putObjectBySignedUrl(file: File, url: string): Promise<UploadActionResponse<any>> {
-    try {
-      await fetch(url, {
-        method: 'PUT',
-        body: file,
-        headers: {
-          'Content-Type': file.type,
-          'Content-Length': file.size.toString(),
-        },
-      })
+  /**
+   * @description Upload the object to S3 using the signed URL
+   */
+  public async putObjectBySignedUrl(
+    file: File,
+    url: string
+  ): Promise<UploadActionResponse<boolean>> {
+    await fetch(url, {
+      method: 'PUT',
+      body: file,
+      headers: {
+        'Content-Type': file.type,
+        'Content-Length': file.size.toString(),
+      },
+    })
 
-      return { success: true, message: 'Image upload successfully', data: null }
-    } catch (error) {
-      if (error instanceof S3ServiceException) {
-        console.error(`S3 Service error: ${error.name}`, error.message)
-      } else {
-        console.error(error)
-      }
-      return { success: false, message: 'Fail to upload a new item to S3 with signed url' }
-    }
+    return { message: 'File uploaded successfully', data: true }
   }
 }

@@ -4,16 +4,25 @@ import { FileArrowUpIcon, XIcon } from '@phosphor-icons/react'
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
 
-import type { UploadFunction } from '../file-upload-adapters/upload-adapter'
+import { cn } from '../../../utils/cn'
+import type { UploadFunction } from '../file-upload-adapters/generic-adapter'
 
-export interface FileItem {
-  id: string
-  file: File
-  progress: number
-  status: 'uploading' | 'success' | 'error'
-  url?: string
-  abortController?: AbortController
-}
+export type FileItem =
+  | {
+      id: string
+      file: File
+      progress: number
+      status: 'uploading' | 'success' | 'error'
+      url?: string
+      abortController?: AbortController
+    }
+  | {
+      id: string
+      file: File
+      status: 'uploading-no-progress'
+      url?: string
+      abortController?: AbortController
+    }
 
 interface UploadOptions {
   maxSize: number
@@ -22,6 +31,7 @@ interface UploadOptions {
   upload: UploadFunction
   onSuccess?: (url: string) => void
   onError?: (error: Error) => void
+  showProgress?: boolean
 }
 
 function useFileUpload(options: UploadOptions) {
@@ -38,13 +48,20 @@ function useFileUpload(options: UploadOptions) {
 
     const abortController = new AbortController()
 
-    const newFileItem: FileItem = {
-      id: crypto.randomUUID(),
-      file,
-      progress: 0,
-      status: 'uploading',
-      abortController,
-    }
+    const newFileItem: FileItem = options.showProgress
+      ? {
+          id: crypto.randomUUID(),
+          file,
+          progress: 0,
+          status: 'uploading',
+          abortController,
+        }
+      : {
+          id: crypto.randomUUID(),
+          file,
+          status: 'uploading-no-progress',
+          abortController,
+        }
 
     setFileItem(newFileItem)
 
@@ -198,19 +215,20 @@ const ImageUploadDragArea: React.FC<ImageUploadDragAreaProps> = ({ onFile, child
   )
 }
 
-interface ImageUploadPreviewProps {
-  file: File
-  progress: number
-  status: 'uploading' | 'success' | 'error'
-  onRemove: () => void
-}
+type ImageUploadPreviewProps =
+  | {
+      file: File
+      progress: number
+      status: 'uploading' | 'success' | 'error'
+      onRemove: () => void
+    }
+  | {
+      file: File
+      status: 'uploading-no-progress'
+      onRemove: () => void
+    }
 
-const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
-  file,
-  progress,
-  status,
-  onRemove,
-}) => {
+const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = (props) => {
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
     const k = 1024
@@ -221,35 +239,38 @@ const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = ({
 
   return (
     <div className="tiptap-image-upload-preview">
-      {status === 'uploading' && (
-        <div className="tiptap-image-upload-progress" style={{ width: `${progress}%` }} />
-      )}
-
       <div className="tiptap-image-upload-preview-content">
         <div className="tiptap-image-upload-file-info">
           <div className="tiptap-image-upload-file-icon">
             <CloudUploadIcon />
           </div>
           <div className="tiptap-image-upload-details">
-            <span className="tiptap-image-upload-text">{file.name}</span>
-            <span className="tiptap-image-upload-subtext">{formatFileSize(file.size)}</span>
+            <span className="tiptap-image-upload-text">{props.file.name}</span>
+            <span className="tiptap-image-upload-subtext">{formatFileSize(props.file.size)}</span>
           </div>
         </div>
         <div className="tiptap-image-upload-actions">
-          {status === 'uploading' && (
-            <span className="tiptap-image-upload-progress-text">{progress}%</span>
+          {props.status === 'uploading' && (
+            <span className="tiptap-image-upload-progress-text">{props.progress}%</span>
+          )}
+          {props.status === 'uploading-no-progress' && (
+            <span className="tiptap-image-upload-progress-text">Uploading...</span>
           )}
           <button
             className="tiptap-image-upload-close-btn"
             onClick={(e) => {
               e.stopPropagation()
-              onRemove()
+              props.onRemove()
             }}
           >
             <XIcon />
           </button>
         </div>
       </div>
+
+      {props.status == 'uploading' && (
+        <div className="tiptap-image-upload-progress" style={{ width: `${props.progress}%` }} />
+      )}
     </div>
   )
 }
@@ -279,11 +300,6 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   const inputRef = React.useRef<HTMLInputElement>(null)
   const extension = props.extension
 
-  /**
-   * We can access `props` and use `props.extension` here to access options
-   */
-  console.log('image-upload-node:', props)
-
   const uploadOptions: UploadOptions = {
     maxSize,
     limit,
@@ -291,6 +307,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     upload: extension.options.upload,
     onSuccess: extension.options.onSuccess,
     onError: extension.options.onError,
+    showProgress: extension.options.showProgress,
   }
 
   const { fileItem, uploadFiles, clearFileItem } = useFileUpload(uploadOptions)
@@ -333,21 +350,36 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   }
 
   return (
-    <NodeViewWrapper className="tiptap-image-upload" tabIndex={0} onClick={handleClick}>
-      <div>
+    <NodeViewWrapper
+      className={cn(
+        'tiptap-image-upload',
+        fileItem?.status === 'error' && 'tiptap-image-upload-error'
+      )}
+      tabIndex={0}
+      onClick={handleClick}
+    >
+      <div className="padder">
         {!fileItem && (
           <ImageUploadDragArea onFile={handleUpload}>
             <DropZoneContent maxSize={maxSize} />
           </ImageUploadDragArea>
         )}
 
-        {fileItem && (
+        {fileItem && fileItem.status === 'uploading-no-progress' ? (
           <ImageUploadPreview
             file={fileItem.file}
-            progress={fileItem.progress}
-            status={fileItem.status}
+            status="uploading-no-progress"
             onRemove={clearFileItem}
           />
+        ) : (
+          fileItem && (
+            <ImageUploadPreview
+              file={fileItem.file}
+              progress={fileItem.progress}
+              status={fileItem.status}
+              onRemove={clearFileItem}
+            />
+          )
         )}
 
         <input

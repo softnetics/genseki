@@ -1,7 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/react'
 import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import type { UploadFunction } from '../file-upload-adapters/upload-adapter'
+import type { UploadFunction } from '../file-upload-adapters/generic-adapter'
 import { ImageUploadNode as ImageUploadNodeComponent } from '../nodes/image-upload-node'
 
 export interface ImageUploadNodeOptions {
@@ -32,9 +32,11 @@ export interface ImageUploadNodeOptions {
    * Callback for successful uploads.
    */
   onSuccess?: (url: string) => void
+
   /**
-   * @remarks Maybe we can attach some upload adapter here?
+   * Whether to show the progress bar or not.
    */
+  showProgress?: boolean
 }
 
 declare module '@tiptap/react' {
@@ -68,6 +70,7 @@ export const ImageUploadNode = Node.create<ImageUploadNodeOptions>({
       upload: undefined,
       onError: undefined,
       onSuccess: undefined,
+      showProgress: true,
     }
   },
   addAttributes() {
