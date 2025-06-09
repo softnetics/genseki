@@ -1,7 +1,7 @@
 import z from 'zod/v4'
 
-import { defineServerConfig } from '@kivotos/core'
-import { defineNextJsServerConfig } from '@kivotos/next'
+import { defineServerConfig } from '@genseki/react'
+import { defineNextJsServerConfig } from '@genseki/next'
 
 import { categoriesCollection } from './collections/categories'
 import { foodsCollection } from './collections/foods'

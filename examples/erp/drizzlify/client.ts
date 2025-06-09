@@ -1,5 +1,5 @@
-import { createKivotosQueryClient } from '@kivotos/react-query'
-import { createRestClient } from '@kivotos/rest'
+import { createKivotosQueryClient } from '@genseki/react-query'
+import { createRestClient } from '@genseki/rest'
 
 import type { serverConfig } from './config'
 

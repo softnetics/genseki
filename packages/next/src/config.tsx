@@ -2,19 +2,25 @@ import type { ReactNode } from 'react'
 
 import { createRouter } from 'radix3'
 
-import type { ApiRouter, AuthHandlers, Collection, Context, ServerConfig } from '@kivotos/core'
+import {
+  type ApiRouter,
+  type AuthHandlers,
+  AuthLayout,
+  type Collection,
+  CollectionLayout,
+  type Context,
+  CreateView,
+  HomeView,
+  ListView,
+  LoginView,
+  OneView,
+  type ServerConfig,
+  type ServerFunction,
+  SignUpView,
+  UpdateView,
+} from '@genseki/react'
 
 import { createApiResourceRouter } from './resource'
-import type { ServerFunction } from './server-function'
-import { AuthLayout } from './views/auth/layout'
-import { LoginView } from './views/auth/login'
-import { SignUpView } from './views/auth/sign-up'
-import { CreateView } from './views/collections/create'
-import { HomeView } from './views/collections/home'
-import { CollectionLayout } from './views/collections/layout'
-import { ListView } from './views/collections/list'
-import { OneView } from './views/collections/one'
-import { UpdateView } from './views/collections/update'
 
 export type RouterData =
   | {

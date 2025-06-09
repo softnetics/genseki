@@ -14,10 +14,10 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@kivotos/core": "workspace:^",
-    "@kivotos/next": "workspace:^",
-    "@kivotos/react-query": "workspace:^",
-    "@kivotos/rest": "workspace:^",
+    "@genseki/react": "workspace:^",
+    "@genseki/next": "workspace:^",
+    "@genseki/react-query": "workspace:^",
+    "@genseki/rest": "workspace:^",
     "@tailwindcss/postcss": "^4.0.14",
     "@tanstack/react-query": "^5.71.5",
     "drizzle-orm": "^0.41.0",

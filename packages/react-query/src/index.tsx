@@ -1,3 +1,10 @@
+import type { ApiRouter } from '@genseki/react'
+import {
+  type FilterByMethod,
+  type RestClient,
+  type RestPayload,
+  type RestResponse,
+} from '@genseki/rest'
 import type {
   DefaultError,
   UseMutationOptions,
@@ -7,14 +14,6 @@ import type {
 } from '@tanstack/react-query'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import type { ValueOf } from 'type-fest'
-
-import type { ApiRouter } from '@kivotos/core'
-import {
-  type FilterByMethod,
-  type RestClient,
-  type RestPayload,
-  type RestResponse,
-} from '@kivotos/rest'
 
 export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   useQuery: <

@@ -1,15 +1,18 @@
 import { cache } from 'react'
 
-import { headers } from 'next/headers'
+import type { ServerFunction } from '@genseki/react'
 
-import { getHeadersObject } from './headers'
-
-import type { ServerFunction } from '../server-function'
+const getHeadersObject = (headers: Headers): Record<string, string> => {
+  const headersRecord: Record<string, string> = {}
+  headers.forEach((value, key) => {
+    headersRecord[key] = value
+  })
+  return headersRecord
+}
 
 // TODO: Add type for user
-async function _getUser(serverFunction: ServerFunction): Promise<any | null> {
-  const h = await headers()
-  const reqHeaders = getHeadersObject(h)
+async function _getUser(serverFunction: ServerFunction, headers: Headers): Promise<any | null> {
+  const reqHeaders = getHeadersObject(headers)
   const response = await serverFunction({
     method: 'auth.me',
     headers: reqHeaders,

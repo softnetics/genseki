@@ -1,10 +1,10 @@
 import 'server-only'
 
-import { NotAuthorizedPage } from './401'
-import { NotfoundPage } from './404'
+import { headers } from 'next/headers'
+
+import { NotAuthorizedPage, NotfoundPage, type ServerFunction } from '@genseki/react'
 
 import type { NextJsServerConfig } from '../config'
-import type { ServerFunction } from '../server-function'
 import { getUser } from '../utils/get-user'
 
 interface RootProps {
@@ -25,7 +25,7 @@ export async function RootPage(props: RootProps) {
 
   let user: any = {}
   if (result.requiredAuthentication) {
-    user = await getUser(props.serverFunction)
+    user = await getUser(props.serverFunction, await headers())
     if (!user) {
       return <NotAuthorizedPage redirectURL="/admin/auth/login" />
     }
@@ -38,5 +38,6 @@ export async function RootPage(props: RootProps) {
     searchParams: searchParams,
     serverFunction: props.serverFunction,
   })
+
   return page
 }

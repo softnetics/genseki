@@ -1,4 +1,4 @@
-import { RootPage } from '@kivotos/next'
+import { RootPage } from '@genseki/next'
 
 import { serverConfig } from '~/drizzlify/config'
 

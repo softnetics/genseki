@@ -1,1 +1,1 @@
-export { default } from '@kivotos/next/postcss.config'
+export { default } from '@genseki/next/postcss.config'

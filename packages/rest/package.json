@@ -1,5 +1,5 @@
 {
-  "name": "@kivotos/rest",
+  "name": "@genseki/rest",
   "private": true,
   "sideEffects": false,
   "type": "module",
@@ -15,10 +15,9 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run"
   },
-  "dependencies": {
-    "@kivotos/core": "workspace:^"
-  },
+  "dependencies": {},
   "devDependencies": {
+    "@genseki/react": "workspace:^",
     "@internals/project-config": "workspace:^",
     "type-fest": "^4.41.0",
     "vitest": "^3.0.9"

@@ -1,0 +1,33 @@
+{
+  "name": "@genseki/plugins",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "diagnostics": "tsc --noEmit --extendedDiagnostics"
+  },
+  "dependencies": {
+    "cookie-es": "^2.0.0",
+    "deepmerge-ts": "^7.1.5",
+    "drizzle-orm": "^0.41.0",
+    "remeda": "^2.21.2",
+    "valibot": "^1.0.0",
+    "zod": "3.25.53"
+  },
+  "devDependencies": {
+    "@genseki/react": "workspace:^",
+    "@types/json-schema": "^7.0.15",
+    "type-fest": "^4.38.0",
+    "vitest": "^3.0.9"
+  }
+}

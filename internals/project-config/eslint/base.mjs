@@ -78,8 +78,8 @@ const config = tseslint.config(
             ['^'],
             // Asolute aliases. Anything that starts with `@`.
             ['^@?\\w'],
-            // Absolute imports from `@kivotos/*`.
-            ['^@kivotos?\\w'],
+            // Absolute imports from `@genseki/*`.
+            ['^@genseki?\\w'],
             // Absolute app import.
             ['^@example?\\w'],
             // Internal Packages. Things that start with a letter (or digit or underscore), or `@repo` followed by a letter.
