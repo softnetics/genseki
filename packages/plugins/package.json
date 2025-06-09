@@ -13,7 +13,6 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics"
   },
   "dependencies": {
