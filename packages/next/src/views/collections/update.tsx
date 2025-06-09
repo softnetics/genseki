@@ -1,10 +1,10 @@
 import { headers } from 'next/headers'
 
-import { Context, createAuth, type Fields, type ServerConfig } from '@kivotos/core'
+import { Context, createAuth, type ServerConfig } from '@kivotos/core'
 
 import { UpdateClientView } from './update.client'
 
-import { AutoField } from '../../components/auto-field'
+import { createOptionsRecord } from '../../components/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
 
@@ -31,23 +31,7 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
     id: props.identifier,
   })
 
-  const inputFieldsPromises = Object.values(collection.fields as Fields<any>).flatMap(
-    async (field) => {
-      if (field.update === 'hidden') return []
-      return [
-        {
-          name: field.fieldName,
-          input: await AutoField({
-            field,
-            serverConfig: props.serverConfig,
-            visibility: field.update,
-          }),
-        },
-      ]
-    }
-  )
-
-  const inputFields = (await Promise.all(inputFieldsPromises)).flat()
+  const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
     <div className="mx-auto flex max-w-md w-full flex-col gap-y-4 mt-24">
@@ -57,8 +41,8 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
       <UpdateClientView
         identifer={props.identifier}
         slug={props.slug}
-        inputFields={inputFields}
         defaultValues={result}
+        optionsRecord={optionsRecord}
       />
     </div>
   )

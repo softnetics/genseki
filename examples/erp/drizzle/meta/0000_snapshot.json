@@ -1,5 +1,5 @@
 {
-  "id": "0d8c965b-6573-4b45-913d-05b3fcc77e06",
+  "id": "405ae38d-63a2-4a16-8ef6-f9b315d5d53c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -98,10 +98,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "account_user_id_users_id_fk": {
-          "name": "account_user_id_users_id_fk",
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -164,10 +164,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "categories_ownerId_users_id_fk": {
-          "name": "categories_ownerId_users_id_fk",
+        "categories_ownerId_user_id_fk": {
+          "name": "categories_ownerId_user_id_fk",
           "tableFrom": "categories",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "ownerId"
           ],
@@ -368,10 +368,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "posts_authorId_users_id_fk": {
-          "name": "posts_authorId_users_id_fk",
+        "posts_authorId_user_id_fk": {
+          "name": "posts_authorId_user_id_fk",
           "tableFrom": "posts",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "authorId"
           ],
@@ -465,10 +465,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "session_user_id_users_id_fk": {
-          "name": "session_user_id_users_id_fk",
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -493,8 +493,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
-      "name": "users",
+    "public.user": {
+      "name": "user",
       "schema": "",
       "columns": {
         "id": {
@@ -554,8 +554,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
+        "user_email_unique": {
+          "name": "user_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"

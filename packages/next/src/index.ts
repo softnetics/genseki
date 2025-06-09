@@ -1,4 +1,4 @@
-export { AutoField } from './components/auto-field'
+export { AutoField } from './components/auto-field/client'
 export { Nav } from './components/nav'
 export { defineNextJsServerConfig } from './config'
 export { RootLayout } from './layouts/root'

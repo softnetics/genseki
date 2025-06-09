@@ -1,24 +1,18 @@
 'use client'
 
-import type { ReactNode } from 'react'
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
 import { redirect } from 'next/navigation'
 
+import { AutoField } from '../../components/auto-field/client'
 import { SubmitButton } from '../../components/submit-button'
-import { Form, FormField, FormItemController } from '../../intentui/ui/form'
-import { useServerFunction } from '../../providers/root'
+import { Form } from '../../intentui/ui/form'
+import { useCollection, useServerFunction } from '../../providers/root'
 
 interface UpdateClientViewProps {
   identifer: string
   slug: string
-  inputFields: {
-    name: string
-    label?: string
-    description?: string
-    placeholder?: string
-    input: ReactNode
-  }[]
+  optionsRecord: Record<string, any[]>
   defaultValues?: Record<string, any>
 }
 
@@ -26,6 +20,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   const form = useForm({
     defaultValues: props.defaultValues,
   })
+  const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
 
   const w = form.watch()
@@ -59,16 +54,12 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-4 mt-16"
       >
-        {props.inputFields.map((input) => (
-          <FormField
-            key={input.name}
-            name={input.name}
-            control={form.control}
-            render={({ field, fieldState, formState }) => (
-              <FormItemController field={field} fieldState={fieldState} formState={formState}>
-                {input.input}
-              </FormItemController>
-            )}
+        {Object.values(collection.fields).map((field) => (
+          <AutoField
+            key={field.fieldName}
+            field={field}
+            visibilityField="update"
+            optionsRecord={props.optionsRecord}
           />
         ))}
         <SubmitButton>Update</SubmitButton>
