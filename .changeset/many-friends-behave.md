@@ -1,7 +1,6 @@
 ---
 '@internals/project-config': minor
 '@example/erp': minor
-'@genseki/react': minor
 '@genseki/next': minor
 '@genseki/react': minor
 ---
