@@ -111,6 +111,7 @@ export const foods = pgTable('foods', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar().notNull(),
   isCooked: boolean('is_cooked').notNull(),
+  description: text(),
   cookingTypes: typesEnum().notNull().default('other'),
   cookingDuration: decimal({ mode: 'number' }).notNull(),
   // TODO: Make type infer for {mode:"string" | "date"}
