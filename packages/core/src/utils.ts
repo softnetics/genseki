@@ -1,7 +1,7 @@
 import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
 import { is, sql, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
-import type { ZodIssue, ZodObject, ZodOptional, ZodType } from 'zod'
+import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
 import type { Context, RequestContext } from './context'
 import type {
@@ -152,7 +152,7 @@ export async function validateRequestBody<
   TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
 >(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
   let zodErrors:
-    | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', ZodIssue[]>>
+    | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', z.core.$ZodIssue[]>>
     | undefined
 
   if (schema.query) {

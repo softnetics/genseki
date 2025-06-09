@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod/v4'
 
 import { defineServerConfig } from '@kivotos/core'
 import { defineNextJsServerConfig } from '@kivotos/next'
@@ -66,5 +66,4 @@ const baseServerConfig = defineServerConfig(baseConfig, {
 
 const serverConfig = defineNextJsServerConfig(baseServerConfig)
 
-export type ServerConfig = typeof serverConfig
 export { serverConfig }
