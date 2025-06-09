@@ -2,10 +2,13 @@
 
 import { Link, TextField } from '../../components'
 import { SubmitButton } from '../../components/compound/submit-button'
+import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
 
 export function LoginClientForm() {
   const serverFunction = useServerFunction()
+
+  const { navigate } = useNavigation()
 
   async function login(formData: FormData) {
     const email = formData.get('email') as string
@@ -27,8 +30,7 @@ export function LoginClientForm() {
       return
     }
 
-    // TODO: Pass redirect from context
-    // redirect('../collections')
+    navigate('../collections')
   }
 
   return (

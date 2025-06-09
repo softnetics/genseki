@@ -4,6 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { SubmitButton, TextField } from '../../components'
 import { Form, FormControl, FormField, FormItem, FormMessage } from '../../components'
+import { useNavigation } from '../../providers'
 import { useClientConfig, useServerFunction } from '../../providers/root'
 
 interface SignUpFormData {
@@ -16,6 +17,7 @@ interface SignUpFormData {
 export function SignUpClientForm() {
   const clientConfig = useClientConfig()
   const serverFunction = useServerFunction()
+  const { navigate } = useNavigation()
 
   // TODO: Add validation
   const form = useForm<SignUpFormData>({})
@@ -56,12 +58,10 @@ export function SignUpClientForm() {
         return
       }
 
-      // TODO: Pass redirect from context
-      // return redirect('../collections')
+      return navigate('../collections')
     }
 
-    // TODO: Pass redirect from context
-    // return redirect('./login')
+    return navigate('../auth/sign-in')
   }
 
   return (

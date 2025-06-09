@@ -27,6 +27,7 @@ export type RouterData =
       view: (args: {
         user: any // TODO
         params: any
+        headers: Headers
         serverConfig: ServerConfig
         serverFunction: ServerFunction
         searchParams: { [key: string]: string | string[] }
@@ -85,6 +86,7 @@ export function defineNextJsServerConfig<
   radixRouter.insert(`/collections/:slug`, {
     requiredAuthentication: true,
     view: (args: {
+      headers: Headers
       params: { slug: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
@@ -98,6 +100,7 @@ export function defineNextJsServerConfig<
     requiredAuthentication: true,
     view: (args: {
       params: { slug: string; identifier: string }
+      headers: Headers
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
@@ -109,6 +112,7 @@ export function defineNextJsServerConfig<
   radixRouter.insert(`/collections/:slug/create`, {
     requiredAuthentication: true,
     view: (args: {
+      headers: Headers
       params: { slug: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
@@ -122,6 +126,7 @@ export function defineNextJsServerConfig<
     requiredAuthentication: true,
     view: (args: {
       params: { slug: string; identifier: string }
+      headers: Headers
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (

@@ -27,7 +27,7 @@ export const useCollection = <TCollection extends Collection>(slug: string) => {
   const collection = context.clientConfig.collections[slug] as TCollection | undefined
 
   if (!collection) throw new Error(`Collection ${slug} not found`)
-  return collection as TCollection // TODO: Fix this to infer from slug
+  return collection as TCollection
 }
 
 export const useClientConfig = () => {

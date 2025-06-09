@@ -9,12 +9,14 @@ import { InputOtpSection } from './_components/input-otp-section'
 import { InputPhoneSection } from './_components/input-phone-section'
 
 import { Button, Link, Tab, TabList, TabPanel, Tabs } from '../../../../components'
+import { useNavigation } from '../../../../providers'
 import { useRootContext } from '../../../../providers/root'
 import { cn } from '../../../../utils/cn'
 import { TermAndPrivacy } from '../../_components/term-and-privacy'
 import { Step } from '../types'
 
 export function ForgotPasswordRightPanel() {
+  const { navigate } = useNavigation()
   const { clientConfig } = useRootContext()
 
   const emailEnabled = clientConfig.auth?.login?.emailAndPassword?.enabled
@@ -90,8 +92,7 @@ export function ForgotPasswordRightPanel() {
                 return (
                   <InputOtpSection
                     onSuccess={() => {
-                      // TODO: use redirect from context
-                      // router.push(`./reset-password?${authType}=${target}`)
+                      navigate(`./reset-password?${authType}=${target}`)
                     }}
                   />
                 )

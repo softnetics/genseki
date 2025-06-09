@@ -5,6 +5,7 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
+import { useNavigation } from '../../providers'
 import { useCollection, useServerFunction } from '../../providers/root'
 
 interface CreateClientViewProps {
@@ -16,6 +17,7 @@ export function CreateClientView(props: CreateClientViewProps) {
   const form = useForm()
   const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
+  const { navigate } = useNavigation()
 
   const w = form.watch()
 
@@ -30,8 +32,7 @@ export function CreateClientView(props: CreateClientViewProps) {
 
     if (result.status === 200) {
       console.log('Creation successful:', result.body)
-      // TODO: Pass redirect from context
-      // redirect(`./`) // Redirect to the created item
+      return navigate(`./`)
     } else {
       // Handle error, e.g., show an error message
       console.error('Creation failed:', result.body)

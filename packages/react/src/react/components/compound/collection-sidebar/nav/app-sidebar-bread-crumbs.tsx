@@ -1,6 +1,8 @@
 'use client'
+
 import { CubeIcon, DotsThreeIcon } from '@phosphor-icons/react'
 
+import { useNavigation } from '../../../../providers'
 import { useRootContext } from '../../../../providers/root'
 import { formatSlug } from '../../../../utils/format-slug'
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuTrigger } from '../../../primitives'
@@ -10,13 +12,12 @@ import {
 } from '../../../primitives'
 import { BaseIcon } from '../../../primitives/base-icon'
 
-// TODO: pass pathname as prop
-export const AppSidebarBreadCrumbs = () => {
-  const pathname = ''
+export function AppSidebarBreadCrumbs() {
+  const { getPathname } = useNavigation()
+  const pathname = getPathname()
+
   const leadingPath = '/admin'
-
   const removeLeadingpath = pathname.split(leadingPath)[1]
-
   const sanitizedSegments = removeLeadingpath.slice(1).split('/')
 
   return (

@@ -4,6 +4,7 @@ import { getHeadersObject } from '../../utils/headers'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {
   slug: string
+  headers: Headers
   identifier: string
   serverConfig: TServerConfig
 }
@@ -15,8 +16,7 @@ export async function OneView<TServerConfig extends ServerConfig>(
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
-  // TODO: Pass headers from props
-  const headersValue = getHeadersObject(new Headers())
+  const headersValue = getHeadersObject(props.headers)
 
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)

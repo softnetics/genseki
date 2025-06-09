@@ -1,5 +1,5 @@
 export * from './components'
 export * from './pages'
-export * from './providers/root'
+export * from './providers'
 export * from './server-function'
 export * from './views'

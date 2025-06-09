@@ -13,6 +13,7 @@ import { getHeadersObject } from '../../utils/headers'
 
 interface ListViewProps {
   slug: string
+  headers: Headers
   serverConfig: ServerConfig
   searchParams: Record<string, string | string[]>
 }
@@ -22,8 +23,7 @@ export async function ListView(props: ListViewProps) {
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
-  // TODO: Pass headers from props
-  const headersValue = getHeadersObject(new Headers())
+  const headersValue = getHeadersObject(props.headers)
 
   const limit = parseInt((props.searchParams['limit'] as string) ?? '10')
   const offset = parseInt((props.searchParams['offset'] as string) ?? '0')

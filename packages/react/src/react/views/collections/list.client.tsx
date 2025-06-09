@@ -10,8 +10,7 @@ import {
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
 
-import type { ClientCollection, FieldsClient, InferFieldsFromCollection } from '@genseki/react'
-
+import type { ClientCollection, FieldsClient, InferFieldsFromCollection } from '../../../core'
 import {
   Button,
   ButtonLink,
@@ -29,6 +28,7 @@ import {
   TextField,
 } from '../../components'
 import { BaseIcon } from '../../components/primitives/base-icon'
+import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
 
 // Maybe tanstack-hooks-form is more reasonable for this, but the clock is ticking fr fr nocap
@@ -61,7 +61,7 @@ const Toolbar = (props: {
   selection: string[]
   setSelection: (args: string[]) => void
 }) => {
-  // const router = useRouter()
+  const { refresh } = useNavigation()
   const serverFunction = useServerFunction()
 
   return (
@@ -89,8 +89,7 @@ const Toolbar = (props: {
                 query: {},
               })
               props.setSelection([])
-              // TODO: Find the another way to refresh the page
-              // router.refresh()
+              refresh()
             }}
           >
             Delete

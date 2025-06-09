@@ -7,8 +7,9 @@ import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
 
 interface UpdateViewProps<TServerConfig extends ServerConfig> {
-  identifier: string
   slug: string
+  headers: Headers
+  identifier: string
   serverConfig: TServerConfig
 }
 
@@ -18,8 +19,7 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const collection = props.serverConfig.collections[props.slug]
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
-  // TODO: Pass headers from props
-  const headersValue = getHeadersObject(new Headers())
+  const headersValue = getHeadersObject(props.headers)
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 

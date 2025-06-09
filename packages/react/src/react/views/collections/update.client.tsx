@@ -4,21 +4,21 @@ import { Form, type SubmitErrorHandler, type SubmitHandler, useForm } from 'reac
 
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
+import { useNavigation } from '../../providers'
 import { useCollection, useServerFunction } from '../../providers/root'
 
 interface UpdateClientViewProps {
-  identifer: string
   slug: string
+  identifer: string
   optionsRecord: Record<string, any[]>
   defaultValues?: Record<string, any>
 }
 
 export function UpdateClientView(props: UpdateClientViewProps) {
-  const form = useForm({
-    defaultValues: props.defaultValues,
-  })
+  const form = useForm({ defaultValues: props.defaultValues })
   const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
+  const { navigate } = useNavigation()
 
   const w = form.watch()
 
@@ -33,8 +33,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
 
     if (result.status === 200) {
       console.log('Update successful:', result.body)
-      // TODO: Pass redirect from context
-      // redirect(`../`) // Redirect to the list page
+      return navigate(`../`) // Redirect to the list page
     } else {
       // Handle error, e.g., show an error message
       console.error('Update failed:', result.body)
