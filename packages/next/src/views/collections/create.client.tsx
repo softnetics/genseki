@@ -50,11 +50,6 @@ export function CreateClientView(props: CreateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-4 mt-16"
       >
-        {/* <AutoFormField
-          key={`posts.content.0.create`}
-          name={`posts.content.0.create`}
-          component={<AutoTextField />}
-        /> */}
         {Object.values(collection.fields).map((field) => (
           <AutoField
             key={field.fieldName}
