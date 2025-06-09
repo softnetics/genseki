@@ -1,4 +1,4 @@
-import { CaretRightIcon, CubeIcon, FolderIcon } from '@phosphor-icons/react'
+import { CaretRightIcon, CubeIcon, FolderIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { Badge } from '../../icons/badge'
 import { BaseIcon } from '../primitives/base-icon'

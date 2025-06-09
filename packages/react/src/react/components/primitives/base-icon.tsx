@@ -1,5 +1,5 @@
 import type { Icon } from '@phosphor-icons/react'
-import { PlusCircleIcon } from '@phosphor-icons/react'
+import { PlusCircleIcon } from '@phosphor-icons/react/dist/ssr'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../../utils/cn'

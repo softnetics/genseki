@@ -1,3 +1,5 @@
+'use client'
+
 import { ProgressBar } from 'react-aria-components'
 
 import { IconLoader } from '@intentui/icons'

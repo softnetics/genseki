@@ -1,5 +1,3 @@
-import 'server-only'
-
 import type { ServerConfig } from '@genseki/react'
 
 import { AppSidebarNav, SidebarInset, SidebarProvider } from '../../components'

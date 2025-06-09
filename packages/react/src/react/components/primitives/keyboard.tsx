@@ -1,3 +1,5 @@
+'use client'
+
 import { forwardRef } from 'react'
 import { Keyboard as KeyboardPrimitive } from 'react-aria-components'
 

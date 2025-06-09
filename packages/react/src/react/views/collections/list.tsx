@@ -1,4 +1,4 @@
-import { CubeIcon } from '@phosphor-icons/react'
+import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 
 import type { ServerConfig } from '@genseki/react'
 import { Context, createAuth, getClientCollection } from '@genseki/react'

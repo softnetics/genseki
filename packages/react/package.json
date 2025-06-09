@@ -7,7 +7,7 @@
   "module": "./src/index.ts",
   "exports": {
     ".": "./src/index.ts",
-    "./plugins/*": "./src/plugins/*/index.ts"
+    "./tailwind.css": "./src/react/styles/tailwind.css"
   },
   "scripts": {
     "lint": "eslint .",
@@ -36,10 +36,13 @@
     "react": "^19.1.0",
     "react-aria-components": "^1.7.1",
     "react-dom": "^19.1.0",
-    "react-hook-form": "^7.55.0",
+    "react-hook-form": "^7.56.3",
     "remeda": "^2.21.2",
     "tailwind-merge": "^3.0.2",
     "tailwind-variants": "^1.0.0",
+    "tailwindcss": "^4.1.7",
+    "tailwindcss-react-aria-components": "^2.0.0",
+    "tw-animate-css": "^1.3.4",
     "zod": "3.25.53"
   },
   "devDependencies": {

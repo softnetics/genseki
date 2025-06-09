@@ -481,7 +481,7 @@ type FieldToZodScheama<TField extends Field<any>> =
             : TField extends FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
               ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodBoolean>>
               : TField extends FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
-                ? CastOptionalFieldToZodSchema<TField, z.ZodDate>
+                ? CastOptionalFieldToZodSchema<TField, z.ZodISODate>
                 : never
 // TODO: Relation input
 // TODO: Optioanl and default values
@@ -535,9 +535,9 @@ export function fieldToZodScheama<TField extends Field<any>>(
     // date input
     case 'date':
       if (!field._.column.notNull) {
-        return z.date().optional() as FieldToZodScheama<TField>
+        return z.iso.date().optional() as FieldToZodScheama<TField>
       }
-      return z.date() as FieldToZodScheama<TField>
+      return z.iso.date() as FieldToZodScheama<TField>
     // TODO: relation input
     case 'connect':
       return z.any() as unknown as FieldToZodScheama<TField>

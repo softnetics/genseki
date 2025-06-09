@@ -1,6 +1,6 @@
 'use server'
 
-import { handleServerFunction, type ServerFunction } from '@genseki/react'
+import { handleServerFunction, type ServerFunction } from '@genseki/next'
 
 import { serverConfig } from '~/drizzlify/config'
 

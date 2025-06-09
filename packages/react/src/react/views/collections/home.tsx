@@ -1,5 +1,3 @@
-import 'server-only'
-
 /**
  * @description Home page tends to be a collection of links to other `collections page`
  */

@@ -1,3 +1,3 @@
-@import '@genseki/next/tailwind.css';
+@import '@genseki/react/tailwind.css';
 
-@source "../../../../node_modules/@genseki/next";
+@source "../../../../node_modules/@genseki/react";

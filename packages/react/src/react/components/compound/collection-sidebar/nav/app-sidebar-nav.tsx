@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { AppSidebarBreadCrumbs } from './app-sidebar-bread-crumbs'
 
 import { Separator, SidebarNav, SidebarTrigger } from '../../../primitives'

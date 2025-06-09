@@ -45,7 +45,7 @@ importers:
         specifier: workspace:^
         version: link:../../packages/rest
       '@tailwindcss/postcss':
-        specifier: ^4.0.14
+        specifier: ^4.1.7
         version: 4.1.7
       '@tanstack/react-query':
         specifier: ^5.71.5
@@ -72,7 +72,7 @@ importers:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
       tailwindcss:
-        specifier: ^4.0.14
+        specifier: ^4.1.7
         version: 4.1.7
       zod:
         specifier: 3.25.53
@@ -165,6 +165,9 @@ importers:
       '@genseki/react':
         specifier: workspace:^
         version: link:../react
+      cookie-es:
+        specifier: ^2.0.0
+        version: 2.0.0
       next:
         specifier: 15.2.2
         version: 15.2.2(@babel/core@7.27.1)(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
@@ -288,7 +291,7 @@ importers:
         specifier: ^19.1.0
         version: 19.1.0(react@19.1.0)
       react-hook-form:
-        specifier: ^7.55.0
+        specifier: ^7.56.3
         version: 7.56.3(react@19.1.0)
       remeda:
         specifier: ^2.21.2
@@ -299,6 +302,15 @@ importers:
       tailwind-variants:
         specifier: ^1.0.0
         version: 1.0.0(tailwindcss@4.1.7)
+      tailwindcss:
+        specifier: ^4.1.7
+        version: 4.1.7
+      tailwindcss-react-aria-components:
+        specifier: ^2.0.0
+        version: 2.0.0(tailwindcss@4.1.7)
+      tw-animate-css:
+        specifier: ^1.3.4
+        version: 1.3.4
       zod:
         specifier: 3.25.53
         version: 3.25.53
@@ -4056,6 +4068,11 @@ packages:
     peerDependencies:
       tailwindcss: '*'
 
+  tailwindcss-react-aria-components@2.0.0:
+    resolution: {integrity: sha512-l8YdpXX//qx0Mz2bW3YKLjboTQxR3zLrFhlHniAIn+mTwVM1yvT0Jp7Pn3eFrqi+qtOMmcJzXaF2rsKezSr0SQ==}
+    peerDependencies:
+      tailwindcss: ^4.0.0
+
   tailwindcss@4.1.7:
     resolution: {integrity: sha512-kr1o/ErIdNhTz8uzAYL7TpaUuzKIE6QPQ4qmSdxnoX/lo+5wmUHQA6h3L5yIqEImSRnAAURDirLu/BgiXGPAhg==}
 
@@ -4160,6 +4177,9 @@ packages:
   turbo@2.5.3:
     resolution: {integrity: sha512-iHuaNcq5GZZnr3XDZNuu2LSyCzAOPwDuo5Qt+q64DfsTP1i3T2bKfxJhni2ZQxsvAoxRbuUK5QetJki4qc5aYA==}
     hasBin: true
+
+  tw-animate-css@1.3.4:
+    resolution: {integrity: sha512-dd1Ht6/YQHcNbq0znIT6dG8uhO7Ce+VIIhZUhjsryXsMPJQz3bZg7Q2eNzLwipb25bRZslGb2myio5mScd1TFg==}
 
   type-check@0.4.0:
     resolution: {integrity: sha512-XleUoc9uwGXqjWwXaUTZAmzMcFZ5858QA2vvx1Ur5xIcixXIP+8LnFDgRplU30us6teqdlskFfu+ae4K79Ooew==}
@@ -8669,6 +8689,10 @@ snapshots:
       tailwind-merge: 3.0.2
       tailwindcss: 4.1.7
 
+  tailwindcss-react-aria-components@2.0.0(tailwindcss@4.1.7):
+    dependencies:
+      tailwindcss: 4.1.7
+
   tailwindcss@4.1.7: {}
 
   tapable@2.2.1: {}
@@ -8747,6 +8771,8 @@ snapshots:
       turbo-linux-arm64: 2.5.3
       turbo-windows-64: 2.5.3
       turbo-windows-arm64: 2.5.3
+
+  tw-animate-css@1.3.4: {}
 
   type-check@0.4.0:
     dependencies:
