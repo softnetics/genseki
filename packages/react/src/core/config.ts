@@ -20,7 +20,7 @@ import {
   type ToRecordApiRouteSchema,
 } from './endpoint'
 import type { Field, FieldClient, Fields, FieldsClient } from './field'
-import type { KivotosPlugin, MergePlugins } from './plugins'
+import type { GensekiPlugin, MergePlugins } from './plugins'
 import { isRelationField } from './utils'
 
 import {
@@ -96,7 +96,7 @@ export function defineServerConfig<
     Collection<any, any, any, any, any, any>
   >,
   const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
-  const TPlugins extends KivotosPlugin<any>[] = [...KivotosPlugin<any>[]],
+  const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 >(
   baseConfig: BaseConfig<TFullSchema, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }

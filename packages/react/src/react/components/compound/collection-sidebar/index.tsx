@@ -34,7 +34,7 @@ export async function AppSidebar({ collections }: { collections: Record<string, 
           </div>
           <div className="flex flex-col group-data-[sidebar-state=collapsed]/sidebar-container:hidden group-data-[sidebar-state=collapsed]/sidebar-container:translate-x-full">
             <Typography type="body" weight="semibold" className="text-text-nontrivial">
-              Kivotos
+              Genseki
             </Typography>
             <Typography type="label" weight="medium" className="text-text-trivial">
               V.1.0.0

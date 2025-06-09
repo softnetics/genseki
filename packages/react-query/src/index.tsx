@@ -16,7 +16,7 @@ import {
   type RestResponse,
 } from '@genseki/rest'
 
-export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
+export interface QueryClient<TApiRouter extends ApiRouter> {
   useQuery: <
     const TMethod extends keyof RestClient<TApiRouter>,
     const TPath extends ValueOf<FilterByMethod<TApiRouter, TMethod>>['schema']['path'],
@@ -69,9 +69,9 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   ) => UseMutationOptions<TResponse, TError, TPayload, TContext>
 }
 
-export function createKivotosQueryClient<TApiRouter extends ApiRouter<any>>(
+export function createQueryClient<TApiRouter extends ApiRouter<any>>(
   restClient: RestClient<TApiRouter>
-): KivotosQueryClient<TApiRouter> {
+): QueryClient<TApiRouter> {
   return {
     useQuery: function (method: string, path: string, payload: any, options?: any) {
       return useQuery({

@@ -40,5 +40,5 @@ export type {
   InferApiRouteResponses,
 } from './endpoint'
 export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
-export { createPlugin, type KivotosPlugin } from './plugins'
+export { createPlugin, type GensekiPlugin } from './plugins'
 export type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from './table'
