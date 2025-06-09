@@ -79,7 +79,7 @@ const TextField = ({
     <TextFieldPrimitive
       type={inputType}
       {...props}
-      className="group flex flex-col gap-y-1"
+      className="group flex flex-col gap-y-1.5"
       isInvalid={isInvalid}
       isDisabled={disabled}
     >

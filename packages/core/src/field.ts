@@ -57,8 +57,10 @@ export type FieldMutateMode =
 export type FieldBase = {
   label?: string
   placeholder?: string
+  isRequired?: boolean
   update?: FieldMutateMode
   create?: FieldMutateMode
+  description?: string
 }
 
 export interface FieldColumnStringCollectionOptions<TContext extends Context = Context> {
@@ -76,6 +78,10 @@ export interface FieldColumnStringCollectionOptions<TContext extends Context = C
   } & FieldBase
   time: {
     type: 'time'
+    default?: Date
+  } & FieldBase
+  date: {
+    type: 'date'
     default?: Date
   } & FieldBase
   media: {

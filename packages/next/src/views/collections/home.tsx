@@ -22,11 +22,11 @@ const greeting = () => {
   return 'Good evening 👋'
 }
 
-type HomepageProps = {
+type HomeViewProps = {
   serverConfig: ServerConfig
 }
 
-export const HomeView = ({ serverConfig }: HomepageProps) => {
+export const HomeView = ({ serverConfig }: HomeViewProps) => {
   const collections = Object.values(serverConfig.collections).map((col) => col.slug)
 
   return (

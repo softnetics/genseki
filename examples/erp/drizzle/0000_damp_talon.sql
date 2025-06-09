@@ -1,3 +1,4 @@
+CREATE TYPE "public"."types" AS ENUM('fruit', 'vegetable', 'meat', 'dairy', 'grain', 'other');--> statement-breakpoint
 CREATE TABLE "account" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"account_id" text NOT NULL,
@@ -31,6 +32,16 @@ CREATE TABLE "categoryTags" (
 	"updatedAt" timestamp DEFAULT now(),
 	"createdAt" timestamp DEFAULT now() NOT NULL,
 	"deletedAt" timestamp
+);
+--> statement-breakpoint
+CREATE TABLE "foods" (
+	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
+	"name" varchar NOT NULL,
+	"is_cooked" boolean NOT NULL,
+	"cookingTypes" "types" DEFAULT 'other' NOT NULL,
+	"cookingDuration" numeric NOT NULL,
+	"cookingDate" date DEFAULT now() NOT NULL,
+	"cookingTime" time DEFAULT now() NOT NULL
 );
 --> statement-breakpoint
 CREATE TABLE "posts" (

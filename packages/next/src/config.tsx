@@ -63,18 +63,19 @@ export function defineNextJsServerConfig<
 ): NextJsServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   const radixRouter = createRouter<RouterData>()
 
-  radixRouter.insert('/collections', {
-    requiredAuthentication: true,
-    view(args: { serverConfig: ServerConfig }) {
-      return (
-        <CollectionLayout serverConfig={args.serverConfig}>
-          <HomeView serverConfig={args.serverConfig} />
-        </CollectionLayout>
-      )
-    },
-  })
-
   // Collection
+  radixRouter.insert(`/collections`, {
+    requiredAuthentication: true,
+    view: (args: {
+      params: { slug: string }
+      serverConfig: ServerConfig
+      searchParams: { [key: string]: string | string[] }
+    }) => (
+      <CollectionLayout serverConfig={args.serverConfig}>
+        <HomeView serverConfig={args.serverConfig} />
+      </CollectionLayout>
+    ),
+  })
   radixRouter.insert(`/collections/:slug`, {
     requiredAuthentication: true,
     view: (args: {
