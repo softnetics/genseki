@@ -35,9 +35,7 @@ const Dialog = ({
   )
 }
 
-const Trigger = (props: React.ComponentProps<typeof ButtonPrimitive>) => (
-  <ButtonPrimitive {...props} />
-)
+const Trigger = (props: ButtonProps) => <Button {...props} />
 
 type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   title?: string
@@ -71,7 +69,7 @@ const Header = ({ className, ...props }: DialogHeaderProps) => {
       data-slot="dialog-header"
       ref={headerRef}
       className={twMerge(
-        'relative flex flex-col gap-0.5 p-4 sm:gap-1 sm:p-6 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0',
+        'relative flex flex-col gap-0.5 p-4 sm:gap-1 sm:p-6 sm:pb-10 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0',
         className
       )}
     >
@@ -176,7 +174,7 @@ const Footer = ({ className, ...props }: DialogFooterProps) => {
       ref={footerRef}
       data-slot="dialog-footer"
       className={twMerge(
-        'isolate mt-auto flex flex-col-reverse justify-between gap-3 p-4 pt-3 sm:flex-row sm:p-6 sm:pt-5',
+        'isolate mt-auto flex flex-col-reverse justify-between gap-3 p-4 pt-3 sm:flex-row sm:p-6 sm:pt-6',
         className
       )}
       {...props}
@@ -223,14 +221,31 @@ const CloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps) => {
   ) : null
 }
 
-Dialog.Trigger = Trigger
-Dialog.Header = Header
-Dialog.Title = Title
-Dialog.Description = Description
-Dialog.Body = Body
-Dialog.Footer = Footer
-Dialog.Close = Close
-Dialog.CloseIndicator = CloseIndicator
+const DialogCloseIcon = ({ className, ...props }: CloseButtonIndicatorProps) => {
+  const isMobile = useMediaQuery('(max-width: 600px)')
+  const buttonRef = useRef<HTMLButtonElement>(null)
+
+  useEffect(() => {
+    if (isMobile && buttonRef.current) {
+      buttonRef.current.focus()
+    }
+  }, [isMobile])
+  return props.isDismissable ? (
+    <Button
+      ref={buttonRef}
+      {...(isMobile ? { autoFocus: true } : {})}
+      aria-label="Close"
+      slot="close"
+      className={composeTailwindRenderProps(
+        className,
+        'close absolute top-4 right-4 z-50 grid size-8 place-content-center rounded-full hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-1 focus-visible:ring-primary sm:top-5 sm:right-5 sm:size-8 sm:rounded-md'
+      )}
+      {...props}
+    >
+      <BaseIcon icon={XIcon} size="sm" weight="bold" />
+    </Button>
+  ) : null
+}
 
 export type {
   CloseButtonIndicatorProps,
@@ -240,4 +255,16 @@ export type {
   DialogHeaderProps,
   DialogTitleProps,
 }
-export { Dialog }
+
+export {
+  Dialog,
+  Body as DialogBody,
+  Close as DialogClose,
+  DialogCloseIcon,
+  CloseIndicator as DialogCloseIndicator,
+  Description as DialogDescription,
+  Footer as DialogFooter,
+  Header as DialogHeader,
+  Title as DialogTitle,
+  Trigger as DialogTrigger,
+}

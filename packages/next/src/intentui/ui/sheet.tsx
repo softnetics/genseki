@@ -3,7 +3,16 @@ import { composeRenderProps, DialogTrigger, Modal, ModalOverlay } from 'react-ar
 
 import { tv, type VariantProps } from 'tailwind-variants'
 
-import { Dialog } from './dialog'
+import {
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogCloseIndicator,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog'
 
 const overlayStyles = tv({
   base: [
@@ -126,7 +135,7 @@ const SheetContent = ({
             <>
               {typeof children === 'function' ? children(values) : children}
               {closeButton && (
-                <Dialog.CloseIndicator
+                <DialogCloseIndicator
                   className="right-4 top-4 p-4"
                   isDismissable={_isDismissable}
                   variant="outline"
@@ -141,13 +150,13 @@ const SheetContent = ({
   )
 }
 
-const SheetTrigger = Dialog.Trigger
-const SheetFooter = Dialog.Footer
-const SheetHeader = Dialog.Header
-const SheetTitle = Dialog.Title
-const SheetDescription = Dialog.Description
-const SheetBody = Dialog.Body
-const SheetClose = Dialog.Close
+const SheetTrigger = DialogTrigger
+const SheetFooter = DialogFooter
+const SheetHeader = DialogHeader
+const SheetTitle = DialogTitle
+const SheetDescription = DialogDescription
+const SheetBody = DialogBody
+const SheetClose = DialogClose
 
 export type { SheetContentProps, SheetProps, Sides }
 export {

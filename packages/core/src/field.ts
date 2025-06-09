@@ -7,8 +7,8 @@ import {
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { Simplify } from 'type-fest'
-import type { ZodObject, ZodOptional } from 'zod'
-import z from 'zod'
+import type { ZodObject, ZodOptional } from 'zod/v4'
+import z from 'zod/v4'
 
 import type { MaybePromise } from './collection'
 import type { Context, ContextToRequestContext } from './context'

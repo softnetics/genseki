@@ -13,7 +13,7 @@ import {
   SelectValue,
 } from 'react-aria-components'
 
-import { CaretDown } from '@phosphor-icons/react'
+import { CaretDownIcon } from '@phosphor-icons/react'
 import { tv } from 'tailwind-variants'
 
 import {
@@ -66,7 +66,11 @@ const Select = <T extends object>({
     >
       {(values) => (
         <>
-          {label && <Label>{label}</Label>}
+          {label && (
+            <Label>
+              {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+            </Label>
+          )}
           {typeof props.children === 'function' ? props.children(values) : props.children}
           {description && <Description>{description}</Description>}
           <FieldError>{errorMessage}</FieldError>
@@ -137,7 +141,7 @@ const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
         className="data-placeholder:text-muted-fg grid flex-1 grid-cols-[auto_1fr] items-center text-base *:data-[slot=avatar]:*:-mx-0.5 *:data-[slot=avatar]:-mx-0.5 *:data-[slot=icon]:-mx-0.5 *:data-[slot=avatar]:*:mr-2 *:data-[slot=avatar]:mr-2 *:data-[slot=icon]:mr-2 [&_[slot=description]]:hidden"
       />
       <BaseIcon
-        icon={CaretDown}
+        icon={CaretDownIcon}
         className="text-muted-fg group-data-open:rotate-180 group-data-open:text-fg shrink-0 duration-300 group-disabled:opacity-50 forced-colors:text-[ButtonText] forced-colors:group-disabled:text-[GrayText]"
       />
     </Button>

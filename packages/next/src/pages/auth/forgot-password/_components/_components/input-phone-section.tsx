@@ -2,8 +2,8 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import z from 'zod/v4'
 
 import { Button } from '../../../../../intentui/ui/button'
 import {
@@ -16,7 +16,7 @@ import {
 import { TextField } from '../../../../../intentui/ui/text-field'
 
 const schema = z.object({
-  phone: z.string().regex(/^[0-9]{10}$/, { message: 'เบอร์โทรศัพท์ไม่ถูกต้อง' }),
+  phone: z.string().regex(/^[0-9]{10}$/, { error: 'เบอร์โทรศัพท์ไม่ถูกต้อง' }),
 })
 
 export type OutputPhoneForm = z.output<typeof schema>
@@ -26,8 +26,8 @@ interface InputPhoneSectionProps {
 }
 
 export function InputPhoneSection({ onNext }: InputPhoneSectionProps) {
-  const form = useForm({
-    resolver: zodResolver(schema),
+  const form = useForm<OutputPhoneForm>({
+    resolver: standardSchemaResolver(schema),
     mode: 'onChange',
   })
 

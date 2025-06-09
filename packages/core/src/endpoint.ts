@@ -1,16 +1,14 @@
-import type { JSONSchema7 } from 'json-schema'
 import type { ConditionalExcept, IsNever, Simplify, ValueOf } from 'type-fest'
-import type { z, ZodType } from 'zod'
-import zodToJsonSchema from 'zod-to-json-schema'
+import { z, type ZodType } from 'zod/v4'
 
 import type { MaybePromise } from './collection'
 import type { Context, ContextToRequestContext } from './context'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 
-export type InputSchema = ZodType<unknown, any, unknown> | undefined
+export type InputSchema = ZodType<unknown, unknown> | undefined
 export type Output<T extends InputSchema> =
-  T extends ZodType<unknown, any, unknown> ? z.output<T> : never
+  T extends ZodType<unknown, unknown> ? z.output<T> : never
 
 export type InferPathParams<TPath extends string> = Simplify<
   TPath extends `${string}/:${infer TRest}`
@@ -140,12 +138,12 @@ export interface ApiRouter<TContext extends Context = Context> {
 export interface ClientApiRouteSchema {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
-  pathParams?: JSONSchema7
-  query?: JSONSchema7
-  headers?: JSONSchema7
+  pathParams?: z.core.JSONSchema.BaseSchema
+  query?: z.core.JSONSchema.BaseSchema
+  headers?: z.core.JSONSchema.BaseSchema
   description?: string
-  body?: JSONSchema7
-  responses: Partial<Record<ApiHttpStatus, JSONSchema7>>
+  body?: z.core.JSONSchema.BaseSchema
+  responses: Partial<Record<ApiHttpStatus, z.core.JSONSchema.BaseSchema>>
 }
 
 export interface ClientApiRouter {
@@ -178,25 +176,18 @@ export function getClientEndpoint(endpoint: ApiRoute<any>): ClientApiRouteSchema
   const template = {
     path: schema.path,
     method: schema.method,
-    ...(schema.headers
-      ? { headers: zodToJsonSchema(schema.headers, { errorMessages: true }) as JSONSchema7 }
-      : {}),
+    ...(schema.headers ? { headers: z.toJSONSchema(schema.headers) } : {}),
     ...(schema.pathParams
       ? {
-          pathParams: zodToJsonSchema(schema.pathParams, {
-            errorMessages: true,
-          }) as JSONSchema7,
+          pathParams: z.toJSONSchema(schema.pathParams),
         }
       : {}),
-    ...(schema.query ? { query: zodToJsonSchema(schema.query) as JSONSchema7 } : {}),
+    ...(schema.query ? { query: z.toJSONSchema(schema.query) } : {}),
     responses: Object.fromEntries(
       Object.entries(schema.responses).map(([key, value]) => {
-        return [
-          key,
-          value ? (zodToJsonSchema(value, { errorMessages: true }) as JSONSchema7) : undefined,
-        ]
+        return [key, value ? z.toJSONSchema(value) : undefined]
       })
-    ) as Partial<Record<ApiHttpStatus, JSONSchema7>>,
+    ) as Partial<Record<ApiHttpStatus, z.core.JSONSchema.BaseSchema>>,
   }
 
   if (schema.method === 'GET') {
@@ -205,8 +196,6 @@ export function getClientEndpoint(endpoint: ApiRoute<any>): ClientApiRouteSchema
 
   return {
     ...template,
-    body: schema.body
-      ? (zodToJsonSchema(schema.body, { errorMessages: true }) as JSONSchema7)
-      : undefined,
+    body: schema.body ? z.toJSONSchema(schema.body) : undefined,
   } as ClientApiRouteSchema
 }
