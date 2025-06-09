@@ -5,6 +5,7 @@ import {
   type DatePickerProps as DatePickerPrimitiveProps,
   type DateValue,
   type DialogProps,
+  I18nProvider,
   type PopoverProps,
   type ValidationResult,
 } from 'react-aria-components'
@@ -93,24 +94,29 @@ const DatePicker = <T extends DateValue>({
 }: DatePickerProps<T>) => {
   const isInvalid = !!errorMessage || !!props.isInvalid
   return (
-    <DatePickerPrimitive
-      {...props}
-      isInvalid={isInvalid}
-      className={composeTailwindRenderProps(className, 'group/date-picker flex flex-col gap-y-1.5')}
-    >
-      {label && (
-        <Label>
-          {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
-        </Label>
-      )}
-      <FieldGroup className="min-w-40">
-        <DateInput size="md" className="w-full pr-16" />
-        <DatePickerIcon />
-      </FieldGroup>
-      {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
-      <DatePickerOverlay />
-    </DatePickerPrimitive>
+    <I18nProvider locale="en-GB">
+      <DatePickerPrimitive
+        {...props}
+        isInvalid={isInvalid}
+        className={composeTailwindRenderProps(
+          className,
+          'group/date-picker flex flex-col gap-y-1.5'
+        )}
+      >
+        {label && (
+          <Label>
+            {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+          </Label>
+        )}
+        <FieldGroup className="min-w-40">
+          <DateInput size="md" className="w-full pr-16" />
+          <DatePickerIcon />
+        </FieldGroup>
+        {description && <Description>{description}</Description>}
+        <FieldError>{errorMessage}</FieldError>
+        <DatePickerOverlay />
+      </DatePickerPrimitive>
+    </I18nProvider>
   )
 }
 export type { DatePickerProps, DateValue, ValidationResult }

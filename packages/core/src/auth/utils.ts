@@ -15,7 +15,7 @@ function setCookie(
   headers['Set-Cookie'] = serialize(name, value, options)
 }
 
-function deleteCookie(headers: Record<string, string> | undefined, name: string, expiresAt?: Date) {
+function deleteCookie(headers: Record<string, string> | undefined, name: string) {
   if (!headers) return
   headers['Set-Cookie'] = `${name}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`
 }

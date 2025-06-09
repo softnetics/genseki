@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod/v4'
 
 import { defineServerConfig } from '@kivotos/core'
 import { defineNextJsServerConfig } from '@kivotos/next'
@@ -13,6 +13,7 @@ const baseServerConfig = defineServerConfig(baseConfig, {
     users: usersCollection,
     posts: postsCollection,
     categories: categoriesCollection,
+    foods: foodsCollection,
   },
   endpoints: {
     customOne: builder.endpoint(
@@ -64,5 +65,4 @@ const baseServerConfig = defineServerConfig(baseConfig, {
 
 const serverConfig = defineNextJsServerConfig(baseServerConfig)
 
-export type ServerConfig = typeof serverConfig
 export { serverConfig }

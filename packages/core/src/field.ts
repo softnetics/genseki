@@ -7,8 +7,8 @@ import {
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import type { Simplify } from 'type-fest'
-import type { ZodObject, ZodOptional } from 'zod'
-import z from 'zod'
+import type { ZodObject, ZodOptional } from 'zod/v4'
+import z from 'zod/v4'
 
 import type { MaybePromise } from './collection'
 import type { Context, ContextToRequestContext } from './context'
@@ -298,6 +298,14 @@ export class FieldBuilder<
     this.tableRelationalConfig = tableRelationalConfigByTableTsName[
       tableTsName
     ] as TTableRelationConfigByTableTsName[TTableTsName]
+
+    if (this.tableRelationalConfig === undefined) {
+      throw new Error(
+        `Table ${tableTsName} not found in schema. Available tables: ${Object.keys(
+          tableRelationalConfigByTableTsName
+        ).join(', ')}`
+      )
+    }
   }
 
   columns<

@@ -1,6 +1,6 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
-import z from 'zod'
+import z from 'zod/v4'
 
 import type { Context, RequestContext } from './context'
 import {
@@ -695,7 +695,7 @@ export function getAllCollectionEndpoints<
             const body = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/api/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}`,
               method: 'POST',
               // TODO: fieldToZodObject but create fields
               body: body,
@@ -726,7 +726,7 @@ export function getAllCollectionEndpoints<
             const response = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/api/${collection.slug}/${method}/:id`,
+              path: `/api/${collection.slug}/:id`,
               method: 'GET',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),
@@ -760,7 +760,7 @@ export function getAllCollectionEndpoints<
             })
 
             const schema = {
-              path: `/api/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}`,
               method: 'GET',
               query: z.object({
                 limit: z.number().optional(),
@@ -795,7 +795,7 @@ export function getAllCollectionEndpoints<
             const body = fieldsToZodObject(fields)
 
             const schema = {
-              path: `/api/${collection.slug}/${method}/:id`,
+              path: `/api/${collection.slug}/:id`,
               method: 'PATCH',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),
@@ -828,7 +828,7 @@ export function getAllCollectionEndpoints<
           }
           case ApiDefaultMethod.DELETE: {
             const schema = {
-              path: `/api/${collection.slug}/${method}`,
+              path: `/api/${collection.slug}`,
               method: 'DELETE',
               body: z.object({
                 ids: z.union([z.string().array(), z.number().array()]),

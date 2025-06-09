@@ -1,5 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
-import z from 'zod'
+import z from 'zod/v4'
 
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'

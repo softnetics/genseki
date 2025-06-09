@@ -1,9 +1,4 @@
-import {
-  CaretLeftIcon,
-  CubeIcon,
-  FunnelIcon,
-  MagnifyingGlassIcon,
-} from '@phosphor-icons/react/dist/ssr'
+import { CubeIcon } from '@phosphor-icons/react'
 import { headers } from 'next/headers'
 
 import type { ServerConfig } from '@kivotos/core'
@@ -14,8 +9,6 @@ import { ListTable } from './list.client'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
-import { Button, ButtonLink } from '../../intentui/ui/button'
-import { TextField } from '../../intentui/ui/text-field'
 import { formatSlug } from '../../utils/format-slug'
 import { getHeadersObject } from '../../utils/headers'
 
@@ -23,34 +16,6 @@ interface ListViewProps {
   slug: string
   serverConfig: ServerConfig
   searchParams: Record<string, string | string[]>
-}
-
-const Toolbar = ({ slug }: { slug: string }) => {
-  return (
-    <div className="flex items-center justify-between gap-x-3">
-      <ButtonLink
-        href="."
-        variant="ghost"
-        size="md"
-        leadingIcon={<BaseIcon icon={CaretLeftIcon} size="md" />}
-      >
-        Back
-      </ButtonLink>
-      <div className="flex items-center gap-x-4">
-        <TextField
-          placeholder="Search"
-          prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
-          className="w-full"
-        />
-        <Button variant="outline" size="md" leadingIcon={<BaseIcon icon={FunnelIcon} size="md" />}>
-          Filter
-        </Button>
-        <ButtonLink variant="primary" size="md" href={`/admin/collections/${slug}/create`}>
-          Create
-        </ButtonLink>
-      </div>
-    </div>
-  )
 }
 
 export async function ListView(props: ListViewProps) {
@@ -110,7 +75,6 @@ export async function ListView(props: ListViewProps) {
       </div>
       <div className="p-12">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-y-12">
-          <Toolbar slug={props.slug} />
           <ListTable collection={clientCollection} data={result.data} />
         </div>
       </div>

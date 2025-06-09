@@ -1,7 +1,7 @@
 import { deepmerge } from 'deepmerge-ts'
 import { eq } from 'drizzle-orm'
 import type { SimplifyDeep, ValueOf } from 'type-fest'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import type { AnyUserTable as BaseAnyUserTable } from '../../auth'
 import { Builder } from '../../builder'

@@ -1,4 +1,4 @@
-import z from 'zod'
+import z from 'zod/v4'
 
 import type { Context } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'

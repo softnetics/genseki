@@ -1,8 +1,12 @@
-import type { Field, ServerConfig } from '@kivotos/core'
+import { headers } from 'next/headers'
 
-import { AutoField } from '../../components/auto-field'
-import { Form } from '../../components/form'
-import { SubmitButton } from '../../components/submit-button'
+import { Context, createAuth, type ServerConfig } from '@kivotos/core'
+
+import { CreateClientView } from './create.client'
+
+import { createOptionsRecord } from '../../components/auto-field'
+import { Typography } from '../../components/primitives/typography'
+import { getHeadersObject } from '../../utils/headers'
 
 interface CreateViewProps<TServerConfig extends ServerConfig> {
   slug: string
@@ -16,19 +20,18 @@ export async function CreateView<TServerConfig extends ServerConfig>(
 
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
-  console.log(
-    Object.entries(collection.fields).map(([fName, fValue]) => [fName, fValue]),
-    'Form fields 📝'
-  )
+  const headersValue = getHeadersObject(await headers())
+  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(authContext, headersValue)
+
+  const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
-    <Form slug={props.slug} method="create">
-      <div className="mx-auto flex max-w-md flex-col gap-y-4 mt-24">
-        {Object.entries(collection.fields).map(([key, field]) => {
-          return <AutoField key={key} field={field as Field} serverConfig={props.serverConfig} />
-        })}
-        <SubmitButton>Create</SubmitButton>
-      </div>
-    </Form>
+    <div className="mx-auto flex max-w-md w-full flex-col gap-y-4 mt-24">
+      <Typography type="h1" weight="semibold">
+        Create new {props.slug}
+      </Typography>
+      <CreateClientView slug={props.slug} optionsRecord={optionsRecord} />
+    </div>
   )
 }

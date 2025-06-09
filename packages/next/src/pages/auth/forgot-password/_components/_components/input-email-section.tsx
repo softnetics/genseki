@@ -2,8 +2,8 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
-import z from 'zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import z from 'zod/v4'
 
 import { Button } from '../../../../../intentui/ui/button'
 import {
@@ -16,7 +16,7 @@ import {
 import { TextField } from '../../../../../intentui/ui/text-field'
 
 const schema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
+  email: z.email({ error: 'Invalid email address' }),
 })
 
 export type OutputEmailForm = z.infer<typeof schema>
@@ -26,8 +26,8 @@ interface InputEmailSectionProps {
 }
 
 export function InputEmailSection({ onNext }: InputEmailSectionProps) {
-  const form = useForm({
-    resolver: zodResolver(schema),
+  const form = useForm<OutputEmailForm>({
+    resolver: standardSchemaResolver(schema),
     mode: 'onChange',
   })
 
