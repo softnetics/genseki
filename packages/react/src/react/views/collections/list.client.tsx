@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import type { ClientCollection, FieldsClient, InferFieldsFromCollection } from '@genseki/react'
 import { TrashIcon } from '@phosphor-icons/react'
 import {
   CaretLeftIcon,
@@ -10,6 +9,8 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
+
+import type { ClientCollection, FieldsClient, InferFieldsFromCollection } from '@genseki/react'
 
 import {
   Button,

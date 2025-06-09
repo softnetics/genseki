@@ -1,6 +1,7 @@
+import { CubeIcon } from '@phosphor-icons/react'
+
 import type { ServerConfig } from '@genseki/react'
 import { Context, createAuth, getClientCollection } from '@genseki/react'
-import { CubeIcon } from '@phosphor-icons/react'
 
 import { ListTable } from './list.client'
 

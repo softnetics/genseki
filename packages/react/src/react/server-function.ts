@@ -1,3 +1,6 @@
+import { parseSetCookie, type SetCookie } from 'cookie-es'
+import type { Simplify, ValueOf } from 'type-fest'
+
 import {
   type ApiRoute,
   type ApiRouteHandlerPayload,
@@ -8,8 +11,6 @@ import {
   createAuth,
   type ServerConfig,
 } from '@genseki/react'
-import { parseSetCookie, type SetCookie } from 'cookie-es'
-import type { Simplify, ValueOf } from 'type-fest'
 
 export type ServerFunction<
   TServerConfig extends ServerConfig<any, any, any, any> = ServerConfig<any, any, any, any>,

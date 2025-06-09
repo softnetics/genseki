@@ -1,7 +1,7 @@
 import z from 'zod/v4'
 
-import { defineServerConfig } from '@genseki/react'
 import { defineNextJsServerConfig } from '@genseki/next'
+import { defineServerConfig } from '@genseki/react'
 
 import { categoriesCollection } from './collections/categories'
 import { foodsCollection } from './collections/foods'
