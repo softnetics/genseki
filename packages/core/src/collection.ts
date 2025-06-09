@@ -429,14 +429,6 @@ export type CollectionAdminConfig<
   endpoints?: TApiRouter
 }
 
-export type CollectionAdmin<
-  TContext extends Context = Context,
-  TFields extends Fields<TContext, any> = Fields<TContext, any>,
-  TApiRouter extends ApiRouter<TContext> = {},
-> = {
-  endpoints: TApiRouter & CollectionAdminApi<TContext, TFields>
-}
-
 export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
   // TODO: Currently, drizzle-orm does not provide a way to get unique and not null columns
   // This fix this after the PR was merged: https://github.com/drizzle-team/drizzle-orm/pull/4567
@@ -473,7 +465,13 @@ export type Collection<
   slug: TSlug
   identifierColumn: string
   fields: TFields
-  admin: CollectionAdmin<TContext, TFields, TApiRouter>
+  admin: CollectionAdminApiRouter<
+    TSlug,
+    TFields,
+    CollectionAdminApiConfig<TContext, TFields>,
+    TApiRouter,
+    TContext
+  >
 }
 
 export type ToClientCollection<TCollection extends Collection<any, any, any, any, any, any>> =
@@ -546,7 +544,7 @@ export type GetAllTableTsNames<TFullSchema extends Record<string, unknown>> = Ex
   string
 >
 
-export type ExtractCollectionCustomEndpoints<
+export type ExtractCollectionEndpoints<
   TCollection extends Collection<any, any, any, any, any, any>,
 > = TCollection['admin']['endpoints'] extends infer TEndpoints extends Record<
   string,
@@ -559,7 +557,7 @@ export type ExtractCollectionCustomEndpoints<
     }
   : never
 
-export type ExtractAllCollectionCustomEndpoints<
+export type ExtractAllCollectionEndpoints<
   TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
 > = UnionToIntersection<
   ValueOf<{
@@ -571,7 +569,7 @@ export type ExtractAllCollectionCustomEndpoints<
       any,
       any
     >
-      ? ExtractCollectionCustomEndpoints<TCollections[TCollectionIndex]>
+      ? ExtractCollectionEndpoints<TCollections[TCollectionIndex]>
       : {}
   }>
 >
@@ -579,29 +577,31 @@ export type ExtractAllCollectionCustomEndpoints<
 type SuccessResponse<TFunc extends (...args: any) => any> = ToZodObject<Awaited<ReturnType<TFunc>>>
 
 export type ConvertCollectionDefaultApiToApiRouteSchema<
-  TCollection extends Collection<any, any, any, any, any, any>,
+  TSlug extends string,
+  TFields extends Fields<any, any>,
+  TEndpoints extends CollectionAdminApiConfig<any, TFields>,
   TMethod extends ApiDefaultMethod,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? {
-      path: `/api/${TCollection['slug']}/${TMethod}`
+      path: `/api/${TSlug}/${TMethod}`
       method: 'POST'
-      body: ToZodObject<InferCreateFields<TCollection['fields']>>
+      body: ToZodObject<InferCreateFields<TFields>>
       responses: {
-        200: SuccessResponse<TCollection['admin']['endpoints'][TMethod]>
+        200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
       }
     }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? {
-        path: `/api/${TCollection['slug']}/${TMethod}/:id`
+        path: `/api/${TSlug}/${TMethod}/:id`
         method: 'GET'
         pathParams: ToZodObject<{ id: string }>
         responses: {
-          200: SuccessResponse<TCollection['admin']['endpoints'][TMethod]>
+          200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
         }
       }
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
       ? {
-          path: `/api/${TCollection['slug']}/${TMethod}`
+          path: `/api/${TSlug}/${TMethod}`
           method: 'GET'
           query: ToZodObject<{
             limit?: number
@@ -610,242 +610,293 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
             orderType?: 'asc' | 'desc'
           }>
           responses: {
-            200: SuccessResponse<TCollection['admin']['endpoints'][TMethod]>
+            200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
           }
         }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? {
-            path: `/api/${TCollection['slug']}/${TMethod}/:id`
+            path: `/api/${TSlug}/${TMethod}/:id`
             method: 'PATCH'
             pathParams: ToZodObject<{ id: string }>
-            body: ToZodObject<InferUpdateFields<TCollection['fields']>>
+            body: ToZodObject<InferUpdateFields<TFields>>
             responses: {
-              200: SuccessResponse<TCollection['admin']['endpoints'][TMethod]>
+              200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
             }
           }
         : TMethod extends typeof ApiDefaultMethod.DELETE
           ? {
-              path: `/api/${TCollection['slug']}/${TMethod}`
+              path: `/api/${TSlug}/${TMethod}`
               method: 'DELETE'
               body: ToZodObject<{ ids: string[] | number[] }>
               responses: {
-                200: SuccessResponse<TCollection['admin']['endpoints'][TMethod]>
+                200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
               }
             }
           : never
 
-export type ExtractCollectionEndpoint<
-  TCollection extends Collection<any, any, any, any, any, any>,
+export type CollectionDefaultAdminApiRouter<
+  TSlug extends string,
+  TContext extends Context,
+  TFields extends Fields<any, any>,
+  TEndpoints extends CollectionAdminApiConfig<TContext, TFields>,
 > = {
-  [TMethod in Extract<
-    keyof TCollection['admin']['endpoints'],
-    string
-  > as `${TCollection['slug']}.${TMethod}`]: TMethod extends ApiDefaultMethod
-    ? ApiRoute<
-        InferContextFromCollection<TCollection>,
-        ConvertCollectionDefaultApiToApiRouteSchema<TCollection, TMethod>
-      >
-    : ExtractCollectionCustomEndpoints<TCollection>
+  create: ApiRoute<
+    TContext,
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      TSlug,
+      TFields,
+      TEndpoints,
+      typeof ApiDefaultMethod.CREATE
+    >
+  >
+  findOne: ApiRoute<
+    TContext,
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      TSlug,
+      TFields,
+      TEndpoints,
+      typeof ApiDefaultMethod.FIND_ONE
+    >
+  >
+  findMany: ApiRoute<
+    TContext,
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      TSlug,
+      TFields,
+      TEndpoints,
+      typeof ApiDefaultMethod.FIND_MANY
+    >
+  >
+  update: ApiRoute<
+    TContext,
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      TSlug,
+      TFields,
+      TEndpoints,
+      typeof ApiDefaultMethod.UPDATE
+    >
+  >
+  delete: ApiRoute<
+    TContext,
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      TSlug,
+      TFields,
+      TEndpoints,
+      typeof ApiDefaultMethod.DELETE
+    >
+  >
 }
 
-export type ExtractAllCollectionEndpoint<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
-> = UnionToIntersection<
-  ValueOf<{
-    [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
-      ? ExtractCollectionEndpoint<TCollections[TCollectionIndex]>
-      : {}
-  }>
->
+export type CollectionAdminApiRouter<
+  TSlug extends string = string,
+  TFields extends Fields<any, any> = Fields<any, any>,
+  TEndpoints extends CollectionAdminApiConfig<TContext, TFields> = CollectionAdminApiConfig<
+    any,
+    TFields
+  >,
+  TApiRouter extends ApiRouter<Context> = {},
+  TContext extends Context = any,
+> = {
+  endpoints: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields, TEndpoints>
+}
+
+export function getDefaultCollectionAdminApiRouter<
+  TSlug extends string = string,
+  TContext extends Context = Context,
+  TFields extends Fields<any, any> = Fields<any, any>,
+  TDefaultHandler extends CollectionAdminApiConfig<TContext, TFields> = CollectionAdminApiConfig<
+    TContext,
+    TFields
+  >,
+>(
+  slug: TSlug,
+  fields: TFields,
+  defaultHandler: TDefaultHandler
+): CollectionDefaultAdminApiRouter<TSlug, TContext, TFields, TDefaultHandler> {
+  return Object.fromEntries(
+    Object.entries(defaultHandler).map(([method, fn]) => {
+      const endpointName = `${slug}.${method}`
+      switch (method) {
+        case ApiDefaultMethod.CREATE: {
+          // TODO: Create ApiRouteSchema from fields and method
+          const body = fieldsToZodObject(fields as any)
+
+          const schema = {
+            path: `/api/${slug}/${method}`,
+            method: 'POST',
+            // TODO: fieldToZodObject but create fields
+            body: body,
+            responses: {
+              200: z.object({
+                __pk: z.union([z.string(), z.number()]),
+                __id: z.union([z.string(), z.number()]),
+              }),
+            },
+          } satisfies ApiRouteSchema
+
+          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+            const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              slug: slug,
+              fields: fields,
+              context: args.context,
+              data: args.body,
+            })
+            return { status: 200, body: response }
+          }
+
+          return [
+            endpointName,
+            createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+          ]
+        }
+        case ApiDefaultMethod.FIND_ONE: {
+          const response = fieldsToZodObject(fields as any)
+
+          const schema = {
+            path: `/api/${slug}/${method}/:id`,
+            method: 'GET',
+            pathParams: z.object({
+              id: z.union([z.string(), z.number()]),
+            }),
+            responses: {
+              200: response,
+            },
+          } satisfies ApiRouteSchema
+
+          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+            const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              slug: slug,
+              fields: fields,
+              context: args.context,
+              id: args.pathParams.id,
+            })
+            return { status: 200, body: response }
+          }
+
+          return [
+            endpointName,
+            createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+          ]
+        }
+        case ApiDefaultMethod.FIND_MANY: {
+          const body = fieldsToZodObject(fields as any)
+          const response = z.object({
+            data: z.array(body),
+            total: z.number(),
+            page: z.number(),
+          })
+
+          const schema = {
+            path: `/api/${slug}/${method}`,
+            method: 'GET',
+            query: z.object({
+              limit: z.number().optional(),
+              offset: z.number().optional(),
+              orderBy: z.string().optional(),
+              orderType: z.enum(['asc', 'desc']).optional(),
+            }),
+            responses: {
+              200: response,
+            },
+          } satisfies ApiRouteSchema
+
+          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+            const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              slug: slug,
+              fields: fields,
+              context: args.context,
+              limit: args.query.limit,
+              offset: args.query.offset,
+              orderBy: args.query.orderBy,
+              orderType: args.query.orderType,
+            })
+            return { status: 200, body: response }
+          }
+
+          return [
+            endpointName,
+            createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+          ]
+        }
+        case ApiDefaultMethod.UPDATE: {
+          const body = fieldsToZodObject(fields as any)
+
+          const schema = {
+            path: `/api/${slug}/${method}/:id`,
+            method: 'PATCH',
+            pathParams: z.object({
+              id: z.union([z.string(), z.number()]),
+            }),
+            // TODO: fieldToZodObject but update fields
+            body: body,
+            responses: {
+              200: z.object({
+                __pk: z.union([z.string(), z.number()]),
+                __id: z.union([z.string(), z.number()]),
+              }),
+            },
+          } satisfies ApiRouteSchema
+
+          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+            const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              slug: slug,
+              fields: fields,
+              context: args.context,
+              id: args.pathParams.id,
+              data: args.body as any, // TODO: Fix this
+            })
+            return { status: 200, body: response }
+          }
+
+          return [
+            endpointName,
+            createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+          ]
+        }
+        case ApiDefaultMethod.DELETE: {
+          const schema = {
+            path: `/api/${slug}/${method}`,
+            method: 'DELETE',
+            body: z.object({
+              ids: z.union([z.string().array(), z.number().array()]),
+            }),
+            responses: {
+              200: z.object({ message: z.string() }),
+            },
+          } satisfies ApiRouteSchema
+
+          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+            await (fn as ApiHandlerFn<any, any, typeof method>)({
+              slug,
+              fields,
+              context: args.context,
+              ids: args.body.ids,
+            })
+            return { status: 200, body: { message: 'ok' } }
+          }
+
+          return [
+            endpointName,
+            createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
+          ]
+        }
+        default: {
+          throw new Error(`Unknown method ${method} for collection ${slug}`)
+        }
+      }
+    })
+  )
+}
 
 export function getAllCollectionEndpoints<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
->(collections: TCollections): ExtractAllCollectionEndpoint<TCollections> {
-  const endpoints = Object.fromEntries(
-    Object.values(collections).flatMap((collection) => {
-      const endpoints = collection.admin.endpoints
-      if (endpoints) {
-        return Object.entries(endpoints).map(([method, fn]) => {
-          const endpointName = `${collection.slug}.${method}`
-          const fields = collection.fields
-          // TODO: Create ApiRouteSchema from fields and method
-          switch (method) {
-            case ApiDefaultMethod.CREATE: {
-              const body = fieldsToZodObject(fields)
-
-              const schema = {
-                path: `/api/${collection.slug}/${method}`,
-                method: 'POST',
-                // TODO: fieldToZodObject but create fields
-                body: body,
-                responses: {
-                  200: z.object({
-                    __pk: z.union([z.string(), z.number()]),
-                    __id: z.union([z.string(), z.number()]),
-                  }),
-                },
-              } satisfies ApiRouteSchema
-
-              const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
-                const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
-                  slug: collection.slug,
-                  fields: collection.fields,
-                  context: args.context,
-                  data: args.body,
-                })
-                return { status: 200, body: response }
-              }
-
-              return [
-                endpointName,
-                createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
-              ]
-            }
-            case ApiDefaultMethod.FIND_ONE: {
-              const response = fieldsToZodObject(fields)
-
-              const schema = {
-                path: `/api/${collection.slug}/${method}/:id`,
-                method: 'GET',
-                pathParams: z.object({
-                  id: z.union([z.string(), z.number()]),
-                }),
-                responses: {
-                  200: response,
-                },
-              } satisfies ApiRouteSchema
-
-              const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
-                const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
-                  slug: collection.slug,
-                  fields: collection.fields,
-                  context: args.context,
-                  id: args.pathParams.id,
-                })
-                return { status: 200, body: response }
-              }
-
-              return [
-                endpointName,
-                createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
-              ]
-            }
-            case ApiDefaultMethod.FIND_MANY: {
-              const body = fieldsToZodObject(fields)
-              const response = z.object({
-                data: z.array(body),
-                total: z.number(),
-                page: z.number(),
-              })
-
-              const schema = {
-                path: `/api/${collection.slug}/${method}`,
-                method: 'GET',
-                query: z.object({
-                  limit: z.number().optional(),
-                  offset: z.number().optional(),
-                  orderBy: z.string().optional(),
-                  orderType: z.enum(['asc', 'desc']).optional(),
-                }),
-                responses: {
-                  200: response,
-                },
-              } satisfies ApiRouteSchema
-
-              const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
-                const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
-                  slug: collection.slug,
-                  fields: collection.fields,
-                  context: args.context,
-                  limit: args.query.limit,
-                  offset: args.query.offset,
-                  orderBy: args.query.orderBy,
-                  orderType: args.query.orderType,
-                })
-                return { status: 200, body: response }
-              }
-
-              return [
-                endpointName,
-                createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
-              ]
-            }
-            case ApiDefaultMethod.UPDATE: {
-              const body = fieldsToZodObject(fields)
-
-              const schema = {
-                path: `/api/${collection.slug}/${method}/:id`,
-                method: 'PATCH',
-                pathParams: z.object({
-                  id: z.union([z.string(), z.number()]),
-                }),
-                // TODO: fieldToZodObject but update fields
-                body: body,
-                responses: {
-                  200: z.object({
-                    __pk: z.union([z.string(), z.number()]),
-                    __id: z.union([z.string(), z.number()]),
-                  }),
-                },
-              } satisfies ApiRouteSchema
-
-              const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
-                const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
-                  slug: collection.slug,
-                  fields: collection.fields,
-                  context: args.context,
-                  id: args.pathParams.id,
-                  data: args.body as any, // TODO: Fix this
-                })
-                return { status: 200, body: response }
-              }
-
-              return [
-                endpointName,
-                createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
-              ]
-            }
-            case ApiDefaultMethod.DELETE: {
-              const schema = {
-                path: `/api/${collection.slug}/${method}`,
-                method: 'DELETE',
-                body: z.object({
-                  ids: z.union([z.string().array(), z.number().array()]),
-                }),
-                responses: {
-                  200: z.object({ message: z.string() }),
-                },
-              } satisfies ApiRouteSchema
-
-              const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
-                await (fn as ApiHandlerFn<any, any, typeof method>)({
-                  slug: collection.slug,
-                  fields: collection.fields,
-                  context: args.context,
-                  ids: args.body.ids,
-                })
-                return { status: 200, body: { message: 'ok' } }
-              }
-
-              return [
-                endpointName,
-                createEndpoint(schema, handler) satisfies ApiRoute<any, typeof schema>,
-              ]
-            }
-            default:
-              return [`${collection.slug}.${method}`, method]
-          }
+  TCollection extends Collection<any, any, any, any, any, any>,
+>(collection: TCollection): ExtractCollectionEndpoints<TCollection> {
+  const endpoints: any = Object.fromEntries(
+    collection.admin.endpoints
+      ? Object.entries(collection.admin.endpoints).map(([method, value]) => {
+          return [`${collection.slug}.${method}`, value]
         })
-      }
-      return []
-    })
+      : []
   )
 
   return endpoints
