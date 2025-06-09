@@ -19,8 +19,6 @@ export function Form<TServerConfig extends ServerConfig>(props: {
   })
   const serverFunction = useServerFunction<TServerConfig>()
 
-  console.log(methods.watch())
-
   const submitAction = async (formData: FormData) => {
     // @ts-expect-error TODO: Form data type
     console.log(Object.fromEntries(formData))
