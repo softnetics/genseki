@@ -1,4 +1,4 @@
-import { CubeIcon } from '@phosphor-icons/react'
+import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 import { headers } from 'next/headers'
 
 import type { ServerConfig } from '@kivotos/core'

@@ -535,9 +535,10 @@ export function fieldToZodScheama<TField extends Field<any>>(
     // date input
     case 'date':
       if (!field._.column.notNull) {
-        return z.date().optional() as FieldToZodScheama<TField>
+        // TODO: fix the date validation
+        return z.iso.date().optional() as unknown as FieldToZodScheama<TField>
       }
-      return z.date() as FieldToZodScheama<TField>
+      return z.iso.date() as unknown as FieldToZodScheama<TField>
     // TODO: relation input
     case 'connect':
       return z.any() as unknown as FieldToZodScheama<TField>
