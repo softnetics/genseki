@@ -76,20 +76,6 @@ export function ResetPasswordClientForm({ token, isErrorToken }: ResetPasswordCl
     })
   }
 
-  if (!token || isErrorToken) {
-    return (
-      <div className="p-12 md:p-16 flex-1 flex items-center justify-center mx-auto">
-        <div className="flex flex-col flex-1 space-y-16 max-w-sm text-center">
-          <Typography type="h2" weight="normal">
-            Invalid or expired token
-          </Typography>
-          <a href="./forgot-password" className="text-primary hover:underline">
-            Click here to request a new password reset link
-          </a>
-        </div>
-      </div>
-    )
-  }
   return (
     <div className="p-12 md:p-16 flex-1 flex items-center justify-center mx-auto">
       <div className="flex flex-col flex-1 space-y-16 max-w-sm">
