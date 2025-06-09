@@ -1,6 +1,7 @@
 import type { ServerConfig } from '@genseki/react'
 
 import { AppSidebarNav, SidebarInset, SidebarProvider } from '../../components'
+import { AppSidebar } from '../../components/compound/collection-sidebar'
 
 interface RootLayoutProps {
   serverConfig: ServerConfig
@@ -13,8 +14,7 @@ interface RootLayoutProps {
 export function CollectionLayout(props: RootLayoutProps) {
   return (
     <SidebarProvider>
-      {/* TODO: Why is this missing */}
-      {/* <AppSidebar collections={props.serverConfig.collections} /> */}
+      <AppSidebar collections={props.serverConfig.collections} />
       <SidebarInset>
         <AppSidebarNav />
         {props.children}
