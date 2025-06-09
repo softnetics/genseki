@@ -24,7 +24,15 @@ import type {
   DialogHeaderProps,
   DialogTitleProps,
 } from './dialog'
-import { Dialog } from './dialog'
+import {
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+} from './dialog'
 
 import { useMediaQuery } from '../utils/use-media-query'
 
@@ -35,19 +43,19 @@ const Popover = (props: PopoverProps) => {
 }
 
 const PopoverTitle = ({ className, ...props }: DialogTitleProps) => (
-  <Dialog.Title className={twMerge('sm:leading-none', className)} {...props} />
+  <DialogTitle className={twMerge('sm:leading-none', className)} {...props} />
 )
 
 const PopoverHeader = ({ className, ...props }: DialogHeaderProps) => (
-  <Dialog.Header className={twMerge('sm:p-4', className)} {...props} />
+  <DialogHeader className={twMerge('sm:p-4', className)} {...props} />
 )
 
 const PopoverFooter = ({ className, ...props }: DialogFooterProps) => (
-  <Dialog.Footer className={twMerge('sm:p-4', className)} {...props} />
+  <DialogFooter className={twMerge('sm:p-4', className)} {...props} />
 )
 
 const PopoverBody = ({ className, ref, ...props }: DialogBodyProps) => (
-  <Dialog.Body ref={ref} className={twMerge('sm:px-4 sm:pt-0', className)} {...props} />
+  <DialogBody ref={ref} className={twMerge('sm:px-4 sm:pt-2', className)} {...props} />
 )
 
 const content = tv({
@@ -176,18 +184,19 @@ const PopoverContent = ({
   )
 }
 
-const PopoverTrigger = Dialog.Trigger
-const PopoverClose = Dialog.Close
-const PopoverDescription = Dialog.Description
-
-Popover.Trigger = PopoverTrigger
-Popover.Close = PopoverClose
-Popover.Description = PopoverDescription
-Popover.Content = PopoverContent
-Popover.Body = PopoverBody
-Popover.Footer = PopoverFooter
-Popover.Header = PopoverHeader
-Popover.Title = PopoverTitle
+const PopoverTrigger = DialogTrigger
+const PopoverClose = DialogClose
+const PopoverDescription = DialogDescription
 
 export type { PopoverContentProps, PopoverProps }
-export { Popover, PopoverContent }
+export {
+  Popover,
+  PopoverBody,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
+}

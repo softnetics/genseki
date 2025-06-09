@@ -1,4 +1,4 @@
-import type { ServerConfig } from '@kivotos/core'
+import { createAuth, type ServerConfig } from '@kivotos/core'
 
 import { ResetPasswordClientForm } from './reset-password.client'
 
@@ -12,14 +12,17 @@ interface ResetPasswordViewProps {
 export async function ResetPasswordView({ searchParams, serverConfig }: ResetPasswordViewProps) {
   const token = searchParams['token'] as string | undefined
 
+  const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
+
   const validateToken = await serverConfig.endpoints['auth.validateResetToken'].handler({
     body: {
       token: token || '',
     },
-    context: {},
+    headers: {},
+    context: authContext,
   })
 
-  if (!token || !validateToken?.body?.verification)
+  if (!token || !validateToken?.body?.verification) {
     return (
       <div className="p-12 md:p-16 flex-1 flex items-center justify-center mx-auto">
         <div className="flex flex-col flex-1 space-y-16 max-w-sm text-center">
@@ -32,6 +35,7 @@ export async function ResetPasswordView({ searchParams, serverConfig }: ResetPas
         </div>
       </div>
     )
+  }
 
   return <ResetPasswordClientForm token={token} isErrorToken={!validateToken?.body?.verification} />
 }

@@ -1,8 +1,15 @@
-import type { Column, TableRelationalConfig } from 'drizzle-orm'
-import { is, Table } from 'drizzle-orm'
+import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
+import { is, sql, Table } from 'drizzle-orm'
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
-import type { ZodObject, ZodOptional, ZodType } from 'zod'
+import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
+import type { Context, RequestContext } from './context'
+import type {
+  ApiHttpStatus,
+  ApiRouteHandler,
+  ApiRouteHandlerPayloadWithContext,
+  ApiRouteSchema,
+} from './endpoint'
 import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
 
 export function isRelationField(field: Field): field is FieldRelation {
@@ -68,7 +75,27 @@ export function getTableFromSchema(schema: Record<string, unknown>, tableTsName:
   return schema[tableTsName]
 }
 
-export function createDrizzleQuery(fields: Fields<any>): Record<string, any> {
+const getExtraField = (tableRelational: TableRelationalConfig, identifierColumn?: string) => {
+  const extraWith: [string, SQL.Aliased<string | number>][] = []
+  const primaryKeyColumn = tableRelational.primaryKey[0]
+
+  extraWith.push(['__pk', sql`${primaryKeyColumn}`.as('__pk') as SQL.Aliased<string | number>])
+
+  if (identifierColumn) {
+    const identifierKeyColumn = tableRelational.columns[identifierColumn]
+
+    extraWith.push(['__id', sql`${identifierKeyColumn}`.as('__id') as SQL.Aliased<string | number>])
+  }
+
+  return Object.fromEntries(extraWith)
+}
+
+export function createDrizzleQuery(
+  fields: Fields<any>,
+  table: Record<string, TableRelationalConfig>,
+  tableRelationalConfig: TableRelationalConfig,
+  identifierColumn?: string
+): Record<string, any> {
   const queryColumns = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
       if (field._.source !== 'column') return []
@@ -80,20 +107,22 @@ export function createDrizzleQuery(fields: Fields<any>): Record<string, any> {
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
       const relationName = field._.relation.fieldName
-      if (field.type === 'create' || field.type === 'connectOrCreate') {
-        return [[relationName, createDrizzleQuery(field.fields) as any]]
-      }
-      return [[relationName, true as const]]
+      const referencedTableName = field._.referencedTableTsName
+
+      return [
+        [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
+      ]
     })
   )
 
   return {
     columns: queryColumns,
     with: queryWith,
+    extras: getExtraField(tableRelationalConfig, identifierColumn),
   }
 }
 
-export function appendFieldNameToFields<TFields extends FieldsInitial<any>>(
+export function appendFieldNameToFields<TFields extends FieldsInitial<any, any>>(
   fields: TFields
 ): Simplify<FieldsWithFieldName<TFields>> {
   return Object.fromEntries(
@@ -102,6 +131,129 @@ export function appendFieldNameToFields<TFields extends FieldsInitial<any>>(
       return [key, fieldWithName as Field<any> & { fieldName: string }]
     })
   ) as FieldsWithFieldName<TFields>
+}
+
+export function mapValueToTsValue(
+  fields: Fields<any>,
+  value: Record<string, any>
+): Record<string, any> {
+  const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
+    if (value[fieldName] === undefined) return []
+    if (field._.source !== 'column') return []
+    return [[field._.columnTsName, value[fieldName]]]
+  })
+
+  return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
+}
+
+export async function validateRequestBody<
+  TApiRouteSchema extends ApiRouteSchema = any,
+  TContextValue extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
+>(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
+  let zodErrors:
+    | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', z.core.$ZodIssue[]>>
+    | undefined
+
+  if (schema.query) {
+    const err = await schema.query.safeParseAsync((payload as any).query)
+    if (!err.success) {
+      zodErrors = {
+        ...zodErrors,
+        query: err.error.issues,
+      }
+    }
+  }
+
+  if (schema.pathParams) {
+    const err = await schema.pathParams.safeParseAsync((payload as any).pathParams)
+    if (!err.success) {
+      zodErrors = {
+        ...zodErrors,
+        pathParams: err.error.issues,
+      }
+    }
+  }
+
+  if (schema.headers) {
+    const err = await schema.headers.safeParseAsync((payload as any).headers)
+    if (!err.success) {
+      zodErrors = {
+        ...zodErrors,
+        headers: err.error.issues,
+      }
+    }
+  }
+
+  if (schema.method !== 'GET' && schema.body) {
+    const err = await schema.body.safeParseAsync((payload as any).body)
+    if (!err.success) {
+      zodErrors = {
+        ...zodErrors,
+        body: err.error.issues,
+      }
+    }
+  }
+
+  return zodErrors
+}
+
+export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = any>(
+  schema: TApiRouteSchema,
+  statusCode: ApiHttpStatus,
+  response: any
+) {
+  if (!schema.responses[statusCode]) {
+    throw new Error(`No response schema defined for status code ${statusCode}`)
+  }
+
+  const result = schema.responses[statusCode].safeParse(response)
+  return result.error
+}
+
+export function withValidator<
+  TApiRouteSchema extends ApiRouteSchema,
+  TContext extends Context = Context,
+>(
+  schema: TApiRouteSchema,
+  handler: ApiRouteHandler<TContext, TApiRouteSchema>
+): ApiRouteHandler<TContext, TApiRouteSchema> {
+  const wrappedHandler = async (
+    payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>
+  ) => {
+    const zodErrors = await validateRequestBody(schema, payload)
+    if (zodErrors) {
+      return {
+        status: 400,
+        body: {
+          error: 'Validation failed',
+          details: zodErrors,
+        },
+      }
+    }
+
+    const response = await handler(payload)
+
+    const validationError = validateResponseBody(
+      schema,
+      response.status as ApiHttpStatus,
+      response.body
+    )
+
+    if (validationError) {
+      return {
+        status: 500,
+        body: {
+          error: 'Response validation failed',
+          details: validationError.issues,
+        },
+      }
+    }
+
+    return response
+  }
+
+  return wrappedHandler as ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
 export type JoinArrays<T extends any[]> = Simplify<
@@ -123,3 +275,8 @@ export type ToZodObject<T extends Record<string, any>> = ZodObject<{
     ? ZodOptional<ZodType<NonNullable<T[Key]>>>
     : ZodType<T[Key]>
 }>
+
+export type GetTableByTableTsName<
+  TFullSchema extends Record<string, unknown>,
+  TTableTsName extends keyof TFullSchema,
+> = TFullSchema[TTableTsName] extends Table<any> ? TFullSchema[TTableTsName] : never

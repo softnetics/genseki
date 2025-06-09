@@ -2,13 +2,7 @@ import type { ReactNode } from 'react'
 
 import { createRouter } from 'radix3'
 
-import type {
-  ApiRouter,
-  AuthHandlers,
-  Collection,
-  MinimalContext,
-  ServerConfig,
-} from '@kivotos/core'
+import type { ApiRouter, AuthHandlers, Collection, Context, ServerConfig } from '@kivotos/core'
 
 import { createApiResourceRouter } from './resource'
 import type { ServerFunction } from './server-function'
@@ -47,7 +41,7 @@ export type RouterData =
 
 export interface NextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  TContext extends Context<TFullSchema> = Context<TFullSchema>,
   TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
     string,
     Collection<any, any, any, any, any, any>
@@ -60,7 +54,7 @@ export interface NextJsServerConfig<
 
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  TContext extends Context<TFullSchema> = Context<TFullSchema>,
   TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
     string,
     Collection<any, any, any, any, any, any>

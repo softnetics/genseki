@@ -1,14 +1,25 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
-import z from 'zod'
+import z from 'zod/v4'
 
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
 import { defineBaseConfig, defineServerConfig, getClientConfig } from './config'
-import { admin } from './plugins/admin'
+import { admin, createAccessControl } from './plugins/admin'
 
 const db = drizzle({
   connection: '',
   schema: schema,
+})
+
+const accessControl = createAccessControl({
+  statements: {
+    project: ['read', 'create', 'update', 'delete'],
+  },
+  roles: {
+    user: {
+      project: ['read', 'delete'],
+    },
+  },
 })
 
 const baseConfig = defineBaseConfig({
@@ -17,16 +28,16 @@ const baseConfig = defineBaseConfig({
   context: { example: 'example' },
   auth: {
     user: {
-      model: schema.users,
+      model: schema.user,
     },
     session: {
-      model: schema.sessions,
+      model: schema.session,
     },
     account: {
-      model: schema.accounts,
+      model: schema.account,
     },
     verification: {
-      model: schema.verifications,
+      model: schema.verification,
     },
     emailAndPassword: {
       enabled: true,
@@ -57,7 +68,7 @@ export const authorCollection = builder.collection('authors', {
       type: 'text',
     }),
   })),
-  primaryField: 'id',
+  identifierColumn: 'id',
 })
 
 export const postCollection = builder.collection('posts', {
@@ -85,8 +96,8 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async (args) => {
-        const result = await args.db.query.authors.findMany()
+      options: async ({ db }) => {
+        const result = await db.query.authors.findMany()
         return result.map((author) => ({
           label: author.name,
           value: author.id,
@@ -103,8 +114,8 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async (args) => {
-        const result = await args.db.query.categories.findMany()
+      options: async ({ db }) => {
+        const result = await db.query.categories.findMany()
         return result.map((category) => ({
           label: category.name,
           value: category.id,
@@ -119,8 +130,8 @@ export const postCollection = builder.collection('posts', {
         }),
         tagId: fb.columns('tagId', {
           type: 'selectNumber',
-          options: async (context) => {
-            const result = await context.db.query.tags.findMany()
+          options: async ({ db }) => {
+            const result = await db.query.tags.findMany()
             return result.map((tag) => ({
               label: tag.name,
               value: tag.id,
@@ -130,11 +141,14 @@ export const postCollection = builder.collection('posts', {
       })),
     })),
   })),
-  primaryField: 'id',
+  identifierColumn: 'id',
   admin: {
     api: {
       // NOTE: user can override some logics
-      // create: () => {},
+      findOne: async (args) => {
+        const response = await args.defaultApi(args)
+        return response
+      },
     },
     endpoints: {
       // NOTE: user can override
@@ -217,8 +231,40 @@ export const serverConfig = defineServerConfig(baseConfig, {
         }
       }
     ),
+    getPosts: builder.endpoint(
+      {
+        path: '/test',
+        method: 'GET',
+        query: z.object({
+          authorId: z.string().optional(),
+        }),
+        responses: {
+          200: z.object({
+            posts: z.array(
+              z.object({
+                id: z.string(),
+                title: z.string(),
+                content: z.string(),
+              })
+            ),
+          }),
+        },
+      },
+      async ({ context, query }) => {
+        return {
+          status: 200 as const,
+          body: {
+            posts: [],
+          },
+        }
+      }
+    ),
   },
-  plugins: [admin()],
+  plugins: [
+    admin(baseConfig, {
+      accessControl: accessControl,
+    }),
+  ],
 })
 
 export const clientConfig = getClientConfig(serverConfig)

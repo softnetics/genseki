@@ -48,6 +48,11 @@
     "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/(admin)/**",
     "examples/erp/src/app/(admin)/playground/tailwind.css": "examples/erp/(admin)/playground/**"
   },
+  "tailwindCSS.experimental.classRegex": [
+    ["clsx\\(.*?\\)(?!\\])", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"],
+    ["(?:twMerge|twJoin|cn)\\(([^;]*)[\\);]", "[`'\"`]([^'\"`;]*)[`'\"`]"],
+    ["tv\\(([^)]*)\\)", "{?\\s?[\\w].*:\\s*?[\"'`]([^\"'`]*).*?,?\\s?}?"]
+  ],
   "[sql]": {
     "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
   }

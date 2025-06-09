@@ -2,7 +2,6 @@
 
 import { useState } from 'react'
 
-import { useRouter } from 'next/navigation'
 import { toast } from 'sonner'
 
 import { InputEmailSection } from './_components/input-email-section'
@@ -12,8 +11,6 @@ import { useServerFunction } from '../../../providers/root'
 
 export function ForgotPasswordClientForm() {
   const serverFunction = useServerFunction()
-
-  const router = useRouter()
 
   const [step, setStep] = useState<Step>(Step.INPUT_EMAIL)
 

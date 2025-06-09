@@ -1,11 +1,12 @@
 'use client'
 
-import { Link } from 'react-aria-components'
+import { Form, Link } from 'react-aria-components'
 
 import {
   DiscordLogoIcon,
   GithubLogoIcon,
   PlusCircleIcon,
+  TrashIcon,
   UserCircleIcon,
 } from '@phosphor-icons/react'
 
@@ -13,10 +14,32 @@ import { PlaygroundCard } from '../components/playground/card'
 import { BaseIcon } from '../components/primitives/base-icon'
 import { IconContainer } from '../components/primitives/icon-container'
 import { Typography } from '../components/primitives/typography'
+import { Badge } from '../intentui/ui/badge'
 import { Button } from '../intentui/ui/button'
 import { Checkbox, CheckboxGroup } from '../intentui/ui/checkbox'
 import { ListBox, ListBoxItem, ListBoxItemDetails, ListBoxSection } from '../intentui/ui/list-box'
-import { Popover } from '../intentui/ui/popover'
+import {
+  Modal,
+  ModalBody,
+  ModalClose,
+  ModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+  ModalTrigger,
+} from '../intentui/ui/modal'
+import { MultipleSelect, MultipleSelectItem } from '../intentui/ui/multiple-select'
+import {
+  Popover,
+  PopoverBody,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTitle,
+} from '../intentui/ui/popover'
 import {
   Select,
   SelectLabel,
@@ -27,6 +50,7 @@ import {
   SelectTrigger,
 } from '../intentui/ui/select'
 import { Switch } from '../intentui/ui/switch'
+import { Tag, TagGroup, TagList } from '../intentui/ui/tag-group'
 import { TextField } from '../intentui/ui/text-field'
 
 const Wrapper = ({ children, title }: { children: React.ReactNode; title: string }) => {
@@ -47,6 +71,29 @@ const MOCK_OPTIONS = [
   { id: 4, name: 'Contributor', description: 'Can contribute content for review' },
   { id: 5, name: 'Guest', description: 'Limited access, mostly for viewing purposes' },
 ]
+const fruits = [
+  { id: 1, name: 'Apple' },
+  { id: 2, name: 'Banana' },
+  { id: 3, name: 'Cherry' },
+  { id: 4, name: 'Date' },
+  { id: 5, name: 'Elderberry' },
+  { id: 6, name: 'Fig' },
+  { id: 7, name: 'Grape' },
+  { id: 8, name: 'Honeydew' },
+  { id: 9, name: 'Kiwi' },
+  { id: 10, name: 'Lemon' },
+  { id: 11, name: 'Mango' },
+  { id: 12, name: 'Nectarine' },
+  { id: 13, name: 'Orange' },
+  { id: 14, name: 'Papaya' },
+  { id: 15, name: 'Quince' },
+  { id: 16, name: 'Raspberry' },
+  { id: 17, name: 'Strawberry' },
+  { id: 18, name: 'Tangerine' },
+  { id: 19, name: 'Ugli Fruit' },
+  { id: 20, name: 'Watermelon' },
+]
+
 const countries = [
   {
     id: 1,
@@ -229,6 +276,152 @@ export const UIPlayground = () => {
           </div>
         </PlaygroundCard>
       </Wrapper>
+      <Wrapper title="Multi select">
+        <PlaygroundCard title="Multi select" categoryTitle="Multi select">
+          <Select label="Design software" placeholder="Select a software">
+            <SelectTrigger />
+            <SelectList
+              items={[
+                { id: 0, name: 'A' },
+                { id: 1, name: 'B' },
+                { id: 2, name: 'C' },
+                { id: 3, name: 'D' },
+              ]}
+            >
+              {(item) => (
+                <SelectOption id={item.id} textValue={item.name}>
+                  {item.name}
+                </SelectOption>
+              )}
+            </SelectList>
+          </Select>
+          <MultipleSelect
+            className="max-w-xs"
+            description="Choose your favorite fruits"
+            label="Fruits"
+            shape="circle"
+            isRequired
+            items={fruits}
+          >
+            {(item) => {
+              return (
+                <MultipleSelectItem id={item.id} textValue={item.name}>
+                  {item.name}
+                </MultipleSelectItem>
+              )
+            }}
+          </MultipleSelect>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Tag group">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Tag group" categoryTitle="Tag group">
+            <TagGroup label="Android Brands" selectionMode="multiple">
+              <TagList
+                items={[
+                  { id: '1', name: 'Samsung', available: false },
+                  { id: '2', name: 'OnePlus', available: true },
+                  { id: '3', name: 'Google', available: true },
+                  { id: '4', name: 'Xiaomi', available: false },
+                ]}
+              >
+                {(item) => <Tag>{item.name}</Tag>}
+              </TagList>
+            </TagGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Tag group with remove" categoryTitle="Tag group">
+            <TagGroup label="Android Brands" selectionMode="multiple" onRemove={() => {}}>
+              <TagList
+                items={[
+                  { id: '1', name: 'Samsung', available: false },
+                  { id: '2', name: 'OnePlus', available: true },
+                  { id: '3', name: 'Google', available: true },
+                  { id: '4', name: 'Xiaomi', available: false },
+                ]}
+              >
+                {(item) => <Tag>{item.name}</Tag>}
+              </TagList>
+            </TagGroup>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+      <Wrapper title="Badge">
+        <PlaygroundCard title="Single badge" categoryTitle="Badge">
+          <div className="flex flex-wrap gap-2">
+            {['primary', 'secondary', 'success', 'info', 'warning', 'danger'].map(
+              (intent, index) => (
+                <Badge key={index} intent={intent as any} shape="circle">
+                  {intent}
+                </Badge>
+              )
+            )}
+          </div>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Modal">
+        <PlaygroundCard title="Dialog" categoryTitle="Modal">
+          <Modal>
+            <ModalTrigger size="md" variant="outline">
+              Confirm
+            </ModalTrigger>
+            <ModalContent
+              isBlurred
+              role="alertdialog"
+              classNames={{ content: 'w-fit min-w-[16rem]' }}
+            >
+              <ModalHeader className="[&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-12">
+                <ModalTitle level={3}>Delete file</ModalTitle>
+                <ModalDescription>
+                  This will permanently delete the selected file. Continue?
+                </ModalDescription>
+              </ModalHeader>
+              <ModalFooter className="flex justify-between">
+                <ModalClose variant="outline" size="sm">
+                  Cancel
+                </ModalClose>
+                <ModalClose variant="destruction" size="sm">
+                  Delete
+                  <BaseIcon icon={TrashIcon} size="sm" />
+                </ModalClose>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
+        </PlaygroundCard>
+        <PlaygroundCard title="Modal confirm" categoryTitle="Modal">
+          <Modal>
+            <ModalTrigger size="md" variant="outline">
+              Turn on 2FA
+            </ModalTrigger>
+            <ModalContent>
+              <ModalHeader>
+                <ModalTitle>Nice! Let's beef up your account.</ModalTitle>
+                <ModalDescription>
+                  2FA beefs up your account's defense. Pop in your password to keep going.
+                </ModalDescription>
+              </ModalHeader>
+              <Form onSubmit={() => {}}>
+                <ModalBody>
+                  <TextField
+                    isRequired
+                    autoFocus
+                    label="Password"
+                    type="password"
+                    placeholder="Enter your password"
+                  />
+                </ModalBody>
+                <ModalFooter>
+                  <ModalClose variant="naked" size="sm">
+                    Cancel
+                  </ModalClose>
+                  <Button size="sm" variant="primary" type="submit">
+                    Turn on 2FA
+                  </Button>
+                </ModalFooter>
+              </Form>
+            </ModalContent>
+          </Modal>
+        </PlaygroundCard>
+      </Wrapper>
       <Wrapper title="Popover">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Popover (Form)" categoryTitle="Popover">
@@ -236,17 +429,18 @@ export const UIPlayground = () => {
               <Button variant="primary" size="md">
                 Login
               </Button>
-              <Popover.Content className="sm:min-w-96">
-                <Popover.Header>
-                  <Popover.Title>Login</Popover.Title>
-                  <Popover.Description>Enter your credentials to sign in.</Popover.Description>
-                </Popover.Header>
+              <PopoverContent className="sm:min-w-96">
+                <PopoverHeader>
+                  <PopoverTitle>Login</PopoverTitle>
+                  <PopoverDescription>Enter your credentials to sign in.</PopoverDescription>
+                </PopoverHeader>
                 <form onSubmit={() => {}} className="w-[400px]">
-                  <Popover.Body>
+                  <PopoverBody>
                     <div className="space-y-4">
                       <TextField
                         autoFocus
                         isRequired
+                        size="sm"
                         type="email"
                         label="Email"
                         placeholder="Enter your email"
@@ -254,6 +448,7 @@ export const UIPlayground = () => {
                       <TextField
                         isRequired
                         isRevealable
+                        size="sm"
                         label="Password"
                         type="password"
                         placeholder="Enter your password"
@@ -277,43 +472,55 @@ export const UIPlayground = () => {
                         </CheckboxGroup>
                       </div>
                     </div>
-                  </Popover.Body>
-                  <Popover.Footer>
-                    <Popover.Close variant="outline" size="sm">
+                  </PopoverBody>
+                  <PopoverFooter>
+                    <PopoverClose variant="outline" size="sm">
                       Cancel
-                    </Popover.Close>
+                    </PopoverClose>
                     <Button type="submit" variant="tertiary" size="sm">
                       Login
                     </Button>
-                  </Popover.Footer>
+                  </PopoverFooter>
                 </form>
-              </Popover.Content>
+              </PopoverContent>
             </Popover>
           </PlaygroundCard>
-          <PlaygroundCard title="Popover (normal)" categoryTitle="Popover">
+          <PlaygroundCard title="Popover (normal-1)" categoryTitle="Popover">
             <Popover>
-              <Popover.Trigger>Open Popover</Popover.Trigger>
-              <Popover.Content className="sm:min-w-72">
-                <Popover.Header>
-                  <Popover.Title level={4}>Popover Title</Popover.Title>
-                  <Popover.Description>
-                    Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet consectetur adipisicing
-                    elit. Quos, temporibus.
-                  </Popover.Description>
-                </Popover.Header>
-                <Popover.Body>
+              <Button size="sm" variant="outline">
+                Forgot Password
+              </Button>
+              <PopoverContent className="sm:max-w-72">
+                <PopoverHeader>
+                  <PopoverTitle>Email</PopoverTitle>
+                  <PopoverDescription>We'll send you an email to log in.</PopoverDescription>
+                </PopoverHeader>
+              </PopoverContent>
+            </Popover>
+          </PlaygroundCard>
+          <PlaygroundCard title="Popover (normal-2)" categoryTitle="Popover">
+            <Popover>
+              <Button size="sm" variant="outline">
+                Open popover
+              </Button>
+              <PopoverContent className="sm:w-[16rem]">
+                <PopoverHeader>
+                  <PopoverTitle level={4}>Popover Title</PopoverTitle>
+                  <PopoverDescription>Lorem ipsum dolor sit amet</PopoverDescription>
+                </PopoverHeader>
+                <PopoverBody>
                   Popover Body | Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet consectetur
                   adipisicing elit. Quos, temporibus.
-                </Popover.Body>
-                <Popover.Footer>
-                  <Popover.Close size="sm" variant="outline">
+                </PopoverBody>
+                <PopoverFooter>
+                  <PopoverClose size="sm" variant="outline">
                     Close
-                  </Popover.Close>
-                  <Popover.Close size="sm" variant="secondary">
+                  </PopoverClose>
+                  <PopoverClose size="sm" variant="secondary">
                     Confirm
-                  </Popover.Close>
-                </Popover.Footer>
-              </Popover.Content>
+                  </PopoverClose>
+                </PopoverFooter>
+              </PopoverContent>
             </Popover>
           </PlaygroundCard>
         </div>

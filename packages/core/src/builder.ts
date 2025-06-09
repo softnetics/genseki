@@ -14,7 +14,7 @@ import type {
   FindTableByTableTsName,
   GetAllTableTsNames,
 } from './collection'
-import type { MinimalContext } from './config'
+import type { Context } from './context'
 import {
   type ApiRoute,
   type ApiRouteHandler,
@@ -30,11 +30,11 @@ import {
   type FieldsWithFieldName,
   type OptionCallback,
 } from './field'
-import { appendFieldNameToFields } from './utils'
+import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
-  TContext extends MinimalContext<TFullSchema> = MinimalContext<TFullSchema>,
+  TContext extends Context = Context,
 > {
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
@@ -50,16 +50,25 @@ export class Builder<
     this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
   }
 
-  $context<TContext extends MinimalContext<TFullSchema>>(): Builder<TFullSchema, TContext> {
+  $context<TContext extends Context = Context>(): Builder<TFullSchema, TContext> {
     return new Builder<TFullSchema, TContext>({ schema: this.config.schema })
   }
 
   collection<
-    TSlug extends string = string,
-    TTableKey extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    TFields extends Fields<TContext> = Fields<TContext>,
-    TApiRouter extends ApiRouter<TContext> = {},
-  >(tableTsName: TTableKey, config: CollectionConfig<TSlug, TContext, TFields, TApiRouter>) {
+    const TSlug extends string = string,
+    const TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
+    const TFields extends Fields<TContext, TFullSchema> = Fields<TContext, TFullSchema>,
+    const TApiRouter extends ApiRouter<TContext> = {},
+  >(
+    tableTsName: TTableTsName,
+    config: CollectionConfig<
+      TSlug,
+      GetTableByTableTsName<TFullSchema, TTableTsName>,
+      TContext,
+      TFields,
+      TApiRouter
+    >
+  ) {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =
       this.tableRelationalConfigByTableTsName[
@@ -73,6 +82,7 @@ export class Builder<
     const defaultHandlers = createDefaultApiHandlers({
       schema: this.config.schema,
       fields: config.fields,
+      identifierColumn: config.identifierColumn as string,
       tableTsKey: tableTsName,
       tables: this.tableRelationalConfigByTableTsName,
       tableNamesMap: this.tableTsNameByTableDbName,
@@ -93,40 +103,58 @@ export class Builder<
       },
       slug: config.slug,
       fields: config.fields,
-      primaryField: config.primaryField,
+      identifierColumn: config.identifierColumn,
       admin: {
         ...config.admin,
         api: {
           create: async (args) => {
             // TODO: Access control
-            const result = await api.create(args)
+            const defaultApi = config.admin?.api?.create
+              ? defaultHandlers.create
+              : (undefined as any)
+            const result = await api.create({
+              ...args,
+              defaultApi,
+            })
             return result
           },
           update: async (args) => {
             // TODO: Access control
-            const result = await api.update(args)
+            const defaultApi = config.admin?.api?.update
+              ? defaultHandlers.update
+              : (undefined as any)
+            const result = await api.update({ ...args, defaultApi })
             return result
           },
           delete: async (args) => {
             // TODO: Access control
-            const result = await api.delete(args)
+            const defaultApi = config.admin?.api?.delete
+              ? defaultHandlers.delete
+              : (undefined as any)
+            const result = await api.delete({ ...args, defaultApi })
             return result
           },
           findOne: async (args) => {
             // TODO: Access control
-            const result = await api.findOne(args)
+            const defaultApi = config.admin?.api?.findOne
+              ? defaultHandlers.findOne
+              : (undefined as any)
+            const result = await api.findOne({ ...args, defaultApi })
             return result
           },
           findMany: async (args) => {
             // TODO: Access control
-            const result = await api.findMany(args)
+            const defaultApi = config.admin?.api?.findMany
+              ? defaultHandlers.findMany
+              : (undefined as any)
+            const result = await api.findMany({ ...args, defaultApi })
             return result
           },
         },
       },
     } as Collection<
       TSlug,
-      FindTableByTableTsName<TFullSchema, TTableKey>['_']['name'],
+      FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
       TFullSchema,
       TContext,
       FieldsWithFieldName<TFields>,
@@ -135,8 +163,8 @@ export class Builder<
   }
 
   fields<
-    TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContext>,
+    const TTableTsName extends GetAllTableTsNames<TFullSchema>,
+    const TFields extends FieldsInitial<TContext, TFullSchema>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (
@@ -150,7 +178,9 @@ export class Builder<
     return appendFieldNameToFields(optionsFn(fb))
   }
 
-  options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {
+  options<TType extends string | number>(
+    callback: OptionCallback<TType, TContext>
+  ): OptionCallback<TType, TContext> {
     return callback
   }
 

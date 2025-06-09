@@ -1,7 +1,13 @@
 import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
-import type { ApiRoute, ApiRouter, ServerConfig } from '@kivotos/core'
+import {
+  type ApiRoute,
+  type ApiRouter,
+  Context,
+  createAuth,
+  type ServerConfig,
+} from '@kivotos/core'
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}
@@ -21,19 +27,35 @@ function extractSearchParams(searchParams: URLSearchParams) {
 
 async function makeApiRoute(
   req: NextRequest,
-  context: Record<string, unknown>,
+  serverConfig: ServerConfig<any, any, any, ApiRouter<any>>,
   route: ApiRoute,
   pathParams: Record<string, string> | undefined
 ) {
   const reqHeaders = extractHeaders(req.headers)
   const reqSearchParams = extractSearchParams(req.nextUrl.searchParams)
 
+  // TODO: This logic might not able to handle form data or x-www-form-urlencoded requests correctly
+  let body: any = {}
+  try {
+    if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
+      body = undefined
+    } else {
+      body = await req.json()
+    }
+  } catch {
+    // If the request body is not JSON or empty, we will not parse it
+    // This is useful for file uploads or plain text requests
+  }
+
+  const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
+  const context = Context.toRequestContext(authContext, reqHeaders)
+
   const rawResponse = await route.handler({
-    context: context,
+    context,
     headers: reqHeaders,
     pathParams: pathParams,
     query: reqSearchParams,
-    body: req.body,
+    body,
   })
 
   return new Response(JSON.stringify(rawResponse.body) as any, {
@@ -48,13 +70,13 @@ async function makeApiRoute(
 async function lookupRoute(
   radixRouter: ReturnType<typeof createRouter>,
   req: NextRequest,
-  context: Record<string, unknown>
+  serverConfig: ServerConfig<any, any, any, ApiRouter<any>>
 ) {
   const match = radixRouter.lookup(req.nextUrl.pathname)
   if (!match) return Response.json({ message: 'Not Found' }, { status: 404 })
   const pathParams = match.params
   const route = match.route as ApiRoute<any>
-  return makeApiRoute(req, context, route, pathParams)
+  return makeApiRoute(req, serverConfig, route, pathParams)
 }
 
 export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any, ApiRouter<any>>) {
@@ -120,19 +142,19 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
 
   return {
     GET: async (req: NextRequest) => {
-      return lookupRoute(radixGetRouter, req, serverConfig.context)
+      return lookupRoute(radixGetRouter, req, serverConfig)
     },
     POST: async (req: NextRequest) => {
-      return lookupRoute(radixPostRouter, req, serverConfig.context)
+      return lookupRoute(radixPostRouter, req, serverConfig)
     },
     PUT: async (req: NextRequest) => {
-      return lookupRoute(radixPutRouter, req, serverConfig.context)
+      return lookupRoute(radixPutRouter, req, serverConfig)
     },
     DELETE: async (req: NextRequest) => {
-      return lookupRoute(radixDeleteRouter, req, serverConfig.context)
+      return lookupRoute(radixDeleteRouter, req, serverConfig)
     },
     PATCH: async (req: NextRequest) => {
-      return lookupRoute(radixPatchRouter, req, serverConfig.context)
+      return lookupRoute(radixPatchRouter, req, serverConfig)
     },
   }
 }

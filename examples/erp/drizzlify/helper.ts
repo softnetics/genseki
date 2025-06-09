@@ -23,16 +23,16 @@ export const baseConfig = defineBaseConfig({
       },
     },
     user: {
-      model: schema.users,
+      model: schema.user,
     },
     session: {
-      model: schema.sessions,
+      model: schema.session,
     },
     account: {
-      model: schema.accounts,
+      model: schema.account,
     },
     verification: {
-      model: schema.verifications,
+      model: schema.verification,
     },
     emailAndPassword: {
       enabled: true,

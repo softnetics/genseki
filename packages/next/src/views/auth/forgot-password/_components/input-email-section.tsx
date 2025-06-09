@@ -32,7 +32,6 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(async (data) => {
-          form.clearErrors('email')
           const response = await onNext(data.email)
           // await api.sendOtpToEmail(data.email)
           if (response.status !== 200) {
@@ -57,7 +56,13 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
             </FormItem>
           )}
         />
-        <Button variant="primary" type="submit" className="w-full" size="sm">
+        <Button
+          variant="primary"
+          type="submit"
+          className="w-full"
+          size="sm"
+          onPress={() => form.clearErrors('email')}
+        >
           Send OTP
         </Button>
       </form>

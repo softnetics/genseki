@@ -1,14 +1,15 @@
-import z from 'zod'
+import z from 'zod/v4'
 
+import type { Context } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
 import { hashPassword } from '../utils'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
-
-export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function resetPasswordEmail<
+  const TAuthContext extends AuthContext,
+  const TContext extends Context,
+>(authContext: TAuthContext) {
+  const { authConfig, internalHandlers } = authContext
   const schema = {
     method: 'POST',
     path: '/api/auth/reset-password',
@@ -28,8 +29,8 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    if (!args.context.authConfig.resetPassword?.enabled) {
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
+    if (!authConfig.resetPassword?.enabled) {
       // TODO: Log not enabled
       return {
         status: 400,
@@ -38,8 +39,7 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
     }
 
     const identifier = `reset-password:${args.query.token}`
-    const verification =
-      await args.context.internalHandlers.verification.findByIdentifier(identifier)
+    const verification = await internalHandlers.verification.findByIdentifier(identifier)
 
     if (!verification || !verification.value) {
       return {
@@ -48,7 +48,7 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
       }
     }
 
-    const user = await args.context.internalHandlers.user.findById(verification.value)
+    const user = await internalHandlers.user.findById(verification.value)
 
     if (!user) {
       return {
@@ -65,12 +65,12 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
     }
 
     // delete the verification token
-    await args.context.internalHandlers.verification.delete(verification.id)
+    await internalHandlers.verification.delete(verification.id)
 
     const hashedPassword = await hashPassword(args.body.password)
-    await args.context.internalHandlers.account.updatePassword(user.id, hashedPassword)
+    await internalHandlers.account.updatePassword(user.id, hashedPassword)
 
-    const redirectTo = `${args.context.authConfig.resetPassword?.redirectTo ?? '/admin/auth/login'}`
+    const redirectTo = `${authConfig.resetPassword?.redirectTo ?? '/auth/login'}`
 
     const responseHeaders = {
       Location: redirectTo,
@@ -86,7 +86,12 @@ export function resetPasswordEmail<const TOptions extends InternalRouteOptions>(
   return createEndpoint(schema, handler)
 }
 
-export function validateResetToken<const TOptions extends InternalRouteOptions>(options: TOptions) {
+export function validateResetToken<
+  const TAuthContext extends AuthContext,
+  const TContext extends Context,
+>(authContext: TAuthContext) {
+  const { internalHandlers } = authContext
+
   const schema = {
     method: 'POST',
     path: '/api/auth/validate-reset-password-token',
@@ -100,16 +105,16 @@ export function validateResetToken<const TOptions extends InternalRouteOptions>(
             id: z.string(),
             identifier: z.string(),
             value: z.string().nullable(),
-            expiresAt: z.date(),
+            expiresAt: z.string(),
           })
           .nullable(),
       }),
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     try {
-      const verification = await args.context.internalHandlers.verification.findByIdentifier(
+      const verification = await internalHandlers.verification.findByIdentifier(
         `reset-password:${args.body.token}`
       )
 
@@ -122,7 +127,11 @@ export function validateResetToken<const TOptions extends InternalRouteOptions>(
 
       return {
         status: 200,
-        body: { verification: verification ?? null },
+        body: {
+          verification: verification
+            ? { ...verification, expiresAt: verification.expiresAt.toISOString() }
+            : null,
+        },
       }
     } catch {
       return {

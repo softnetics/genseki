@@ -2,8 +2,8 @@
   "$schema": "https://turbo.build/schema.json",
   "ui": "tui",
   "remoteCache": {
-    "timeout": 600,
-    "uploadTimeout": 600
+    "timeout": 300,
+    "uploadTimeout": 300
   },
   "tasks": {
     "build": {

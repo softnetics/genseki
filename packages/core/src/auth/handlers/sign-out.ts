@@ -1,14 +1,15 @@
-import z from 'zod'
+import z from 'zod/v4'
 
+import type { Context } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
 import { deleteSessionCookie, getSessionCookie } from '../utils'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
+export function signOut<const TAuthContext extends AuthContext, const TContext extends Context>(
+  authContext: TAuthContext
+) {
+  const { internalHandlers } = authContext
 
-export function signOut<const TOptions extends InternalRouteOptions>(options: TOptions) {
   const schema = {
     method: 'POST',
     path: '/api/auth/sign-out',
@@ -20,7 +21,7 @@ export function signOut<const TOptions extends InternalRouteOptions>(options: TO
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     const cookie = getSessionCookie(args.headers)
 
     if (!cookie) {
@@ -29,7 +30,7 @@ export function signOut<const TOptions extends InternalRouteOptions>(options: TO
       throw new Error('No session cookie found')
     }
 
-    await args.context.internalHandlers.session.deleteById(cookie)
+    await internalHandlers.session.deleteById(cookie)
     deleteSessionCookie(args.headers)
 
     return {

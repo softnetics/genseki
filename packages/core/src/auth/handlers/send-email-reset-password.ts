@@ -1,15 +1,15 @@
-import z from 'zod'
+import z from 'zod/v4'
 
+import type { Context } from '../../context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../endpoint'
 import { type AuthContext } from '../context'
 
-interface InternalRouteOptions {
-  prefix?: string
-}
+export function sendEmailResetPassword<
+  const TAuthContext extends AuthContext,
+  const TContext extends Context,
+>(authContext: TAuthContext) {
+  const { authConfig, internalHandlers } = authContext
 
-export function sendEmailResetPassword<const TOptions extends InternalRouteOptions>(
-  options: TOptions
-) {
   const schema = {
     method: 'POST',
     path: '/api/auth/send-otp-forgot-password',
@@ -26,8 +26,9 @@ export function sendEmailResetPassword<const TOptions extends InternalRouteOptio
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<AuthContext, typeof schema> = async (args) => {
-    if (!args.context.authConfig.resetPassword?.enabled) {
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
+    console.log('sendEmailResetPassword called with args:', args)
+    if (!authConfig.resetPassword?.enabled) {
       // TODO: Log not enabled
       return {
         status: 400,
@@ -36,7 +37,8 @@ export function sendEmailResetPassword<const TOptions extends InternalRouteOptio
     }
     let user
     try {
-      user = await args.context.internalHandlers.user.findByEmail(args.body.email)
+      console.log('Finding user by email:', args.body.email)
+      user = await internalHandlers.user.findByEmail(args.body.email)
     } catch {
       return {
         status: 400,
@@ -47,27 +49,24 @@ export function sendEmailResetPassword<const TOptions extends InternalRouteOptio
     // Generate a secure random token
     const token = crypto.randomUUID()
     const identifier = `reset-password:${token}`
-    await args.context.internalHandlers.verification.deleteByUserIdAndIdentifierPrefix(
+    await internalHandlers.verification.deleteByUserIdAndIdentifierPrefix(
       user.id,
       'reset-password:'
     )
 
-    await args.context.internalHandlers.verification.create({
+    await internalHandlers.verification.create({
       identifier,
       value: user.id,
       expiresAt: new Date(
-        Date.now() + (args.context.authConfig.resetPassword?.expiresInMs ?? 1000 * 60 * 60 * 24) // TODO; make config always set default
+        Date.now() + (authConfig.resetPassword?.expiresInMs ?? 1000 * 60 * 60 * 24) // TODO; make config always set default
       ),
     })
 
     // TODO: change this to domain config websiteURL
-    const resetPasswordLink = `${args.context.authConfig.resetPassword?.resetPasswordUrl ?? 'http://localhost:3000/admin/auth/reset-password'}?token=${token}`
+    const resetPasswordLink = `${authConfig.resetPassword?.resetPasswordUrl ?? 'http://localhost:3000/admin/auth/reset-password'}?token=${token}`
     // Send email
-    if (args.context.authConfig.resetPassword?.sendEmailResetPassword) {
-      await args.context.authConfig.resetPassword.sendEmailResetPassword(
-        user.email,
-        resetPasswordLink
-      )
+    if (authConfig.resetPassword?.sendEmailResetPassword) {
+      await authConfig.resetPassword.sendEmailResetPassword(user.email, resetPasswordLink)
     } else {
       // Fallback to console log for development
       console.warn(

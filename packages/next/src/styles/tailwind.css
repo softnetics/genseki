@@ -354,3 +354,18 @@
     border-radius: 4px;
   }
 }
+
+@layer utilities {
+  @keyframes shake {
+    from {
+      rotate: -4deg;
+    }
+
+    to {
+      rotate: 4deg;
+    }
+  }
+  .shake {
+    animation: shake 4 0.1s ease-out both alternate;
+  }
+}
