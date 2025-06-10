@@ -1,6 +1,6 @@
 import './tailwind.css'
 
-import { RootLayout } from '@kivotos/next'
+import { RootLayout } from '@genseki/next'
 
 import { serverConfig } from '../../../../drizzlify/config'
 import { serverFunction } from '../_helper/server'

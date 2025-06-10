@@ -1,0 +1,8 @@
+{
+  "extends": "@internals/project-config/tsconfig/reactjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler"
+  }
+}

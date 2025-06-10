@@ -1,11 +1,10 @@
 import { type ReactNode } from 'react'
 
-import { getClientConfig } from '@kivotos/core'
+import { getClientConfig, RootProvider, type ServerFunction } from '@genseki/react'
+
+import { NextNavigationProvider } from './navigation'
 
 import type { NextJsServerConfig } from '../config'
-import { UiProviders } from '../intentui/providers'
-import { RootProvider } from '../providers/root'
-import type { ServerFunction } from '../server-function'
 
 interface RootLayoutProps {
   serverConfig: NextJsServerConfig<any, any, any, any>
@@ -16,8 +15,10 @@ interface RootLayoutProps {
 export function RootLayout(props: RootLayoutProps) {
   const clientConfig = getClientConfig(props.serverConfig)
   return (
-    <RootProvider clientConfig={clientConfig} serverFunction={props.serverFunction}>
-      <UiProviders>{props.children}</UiProviders>
-    </RootProvider>
+    <NextNavigationProvider>
+      <RootProvider clientConfig={clientConfig} serverFunction={props.serverFunction}>
+        {props.children}
+      </RootProvider>
+    </NextNavigationProvider>
   )
 }

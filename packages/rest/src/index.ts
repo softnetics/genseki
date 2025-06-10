@@ -1,7 +1,12 @@
 import type { ValueOf } from 'type-fest'
 
-import type { ApiRouter, ApiRouteResponse, ServerConfig } from '@kivotos/core'
-import type { ApiRouteHandlerPayload, ApiRouteSchema } from '@kivotos/core'
+import type {
+  ApiRouteHandlerPayload,
+  ApiRouter,
+  ApiRouteResponse,
+  ApiRouteSchema,
+  ServerConfig,
+} from '@genseki/react'
 
 import { withPathParams, withQueryParams } from './utils'
 
