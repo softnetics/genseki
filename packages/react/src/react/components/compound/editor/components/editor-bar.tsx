@@ -7,9 +7,9 @@ import { RedoButton, UndoButton } from './redo-undo-buttons'
 import { SelectTextStyle } from './select-text-style'
 import { TextAlignButton, TextAlignButtonsGroup } from './text-align-buttons'
 
-import { ToggleGroup } from '../../../intentui/ui/toggle'
-import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../../../intentui/ui/toolbar'
-import { BaseIcon } from '../../primitives/base-icon'
+import { BaseIcon } from '../../../primitives/base-icon'
+import { ToggleGroup } from '../../../primitives/toggle'
+import { Toolbar, ToolbarGroup, ToolbarSeparator } from '../../../primitives/toolbar'
 
 export const EditorBar = () => {
   const { editor } = useCurrentEditor()

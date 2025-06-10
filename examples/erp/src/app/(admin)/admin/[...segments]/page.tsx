@@ -1,6 +1,5 @@
-import { headers } from 'next/headers'
-
 import { RootPage } from '@genseki/next'
+import { headers } from 'next/headers'
 
 import { serverConfig } from '~/drizzlify/config'
 

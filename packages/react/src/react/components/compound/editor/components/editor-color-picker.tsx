@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { type Color as ReactAriaColor, parseColor } from 'react-aria-components'
 
-import { ColorPicker, type ColorPickerProps } from '../../../intentui/ui/color-picker'
+import { ColorPicker, type ColorPickerProps } from '../../../primitives/color-picker'
 
 export const EditorColorPicker = ({
   onPopupClose,

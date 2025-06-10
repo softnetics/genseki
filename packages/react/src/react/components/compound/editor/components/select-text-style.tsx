@@ -12,8 +12,8 @@ import {
 import type { Editor } from '@tiptap/core'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { Select, SelectList, SelectOption, SelectTrigger } from '../../../intentui/ui/select'
-import { BaseIcon } from '../../primitives/base-icon'
+import { BaseIcon } from '../../../primitives/base-icon'
+import { Select, SelectList, SelectOption, SelectTrigger } from '../../../primitives/select'
 
 const textStylesList = [
   { icon: ParagraphIcon, label: 'Normal', value: 'p', type: 'paragraph' },

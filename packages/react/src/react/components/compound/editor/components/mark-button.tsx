@@ -10,8 +10,8 @@ import {
 } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { ToolbarItem } from '../../../intentui/ui/toolbar'
-import { BaseIcon } from '../../primitives/base-icon'
+import { BaseIcon } from '../../../primitives/base-icon'
+import { ToolbarItem } from '../../../primitives/toolbar'
 
 type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList'
 

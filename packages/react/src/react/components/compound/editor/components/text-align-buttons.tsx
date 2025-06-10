@@ -9,9 +9,9 @@ import {
 } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { ToggleGroup } from '../../../intentui/ui/toggle'
-import { ToolbarItem } from '../../../intentui/ui/toolbar'
-import { BaseIcon } from '../../primitives/base-icon'
+import { BaseIcon } from '../../../primitives/base-icon'
+import { ToggleGroup } from '../../../primitives/toggle'
+import { ToolbarItem } from '../../../primitives/toolbar'
 
 type TextAlignType = 'left' | 'center' | 'right' | 'justify'
 
