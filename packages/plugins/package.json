@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "tsup"
+    "bundle": "tsup",
+    "bundle:watch": "tsup --watch"
   },
   "dependencies": {
     "cookie-es": "^2.0.0",

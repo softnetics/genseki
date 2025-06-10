@@ -19,7 +19,8 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "bundle": "tsup"
+    "bundle": "tsup",
+    "bundle:watch": "tsup --watch"
   },
   "devDependencies": {
     "@genseki/react": "workspace:^",

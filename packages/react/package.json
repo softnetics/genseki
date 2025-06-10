@@ -21,7 +21,8 @@
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "tsup"
+    "bundle": "tsup",
+    "bundle:watch": "tsup --watch"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
