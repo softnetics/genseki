@@ -6,7 +6,7 @@
     ["@genseki/react", "@genseki/next", "@genseki/rest", "@genseki/react-query", "@genseki/plugins"]
   ],
   "linked": [],
-  "access": "restricted",
+  "access": "public",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
   "ignore": ["@example/erp", "@internal/project-config"],
