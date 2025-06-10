@@ -1,19 +1,26 @@
 {
   "name": "@genseki/plugins",
-  "private": true,
+  "version": "0.0.0",
   "sideEffects": false,
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
-    "diagnostics": "tsc --noEmit --extendedDiagnostics"
+    "diagnostics": "tsc --noEmit --extendedDiagnostics",
+    "bundle": "tsup",
+    "bundle:watch": "tsup --watch"
   },
   "dependencies": {
     "cookie-es": "^2.0.0",
@@ -26,6 +33,7 @@
   "devDependencies": {
     "@genseki/react": "workspace:^",
     "@types/json-schema": "^7.0.15",
+    "tsup": "^8.5.0",
     "type-fest": "^4.38.0",
     "vitest": "^3.0.9"
   }

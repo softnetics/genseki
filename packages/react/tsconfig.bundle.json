@@ -1,0 +1,25 @@
+{
+  "extends": "@internal/project-config/tsconfig/reactjs.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "outDir": "dist",
+    "declaration": true,
+    "declarationMap": true,
+    "esModuleInterop": true,
+    "sourceMap": true
+  },
+  "exclude": [
+    "dist",
+    "node_modules",
+    "test",
+    "tests",
+    "coverage",
+    "playground",
+    "examples",
+    "**/*.test.{ts,tsx,js,jsx}",
+    "**/*.spec.{ts,tsx,js,jsx}"
+  ]
+}

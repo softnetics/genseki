@@ -1,7 +1,8 @@
 {
-  "name": "@internals/project-config",
+  "name": "@internal/project-config",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write ."
@@ -18,6 +19,10 @@
     "./tsconfig/*": {
       "import": "./tsconfig/*",
       "require": "./tsconfig/*"
+    },
+    "./tsup/*": {
+      "import": "./tsup/*",
+      "require": "./tsup/*"
     }
   },
   "dependencies": {
@@ -36,6 +41,7 @@
     "eslint-plugin-simple-import-sort": "^12.1.1",
     "eslint-plugin-unused-imports": "4.1.4",
     "prettier": "^3.5.3",
+    "tsup": "^8.5.0",
     "typescript-eslint": "^8.26.1"
   }
 }

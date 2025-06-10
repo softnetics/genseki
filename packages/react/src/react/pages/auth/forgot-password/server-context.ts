@@ -1,4 +1,4 @@
-import type { ServerConfig } from '@genseki/react'
+import type { ServerConfig } from '../../../../core'
 
 let _config: ServerConfig | null = null
 
