@@ -16,6 +16,8 @@
     "diagnostics": "tsc --noEmit --extendedDiagnostics"
   },
   "dependencies": {
+    "@tiptap/react": "^2.12.0",
+    "@tiptap/starter-kit": "^2.12.0",
     "cookie-es": "^2.0.0",
     "deepmerge-ts": "^7.1.5",
     "drizzle-orm": "^0.41.0",

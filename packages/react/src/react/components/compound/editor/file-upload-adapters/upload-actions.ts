@@ -29,13 +29,20 @@ export const uploadAction: UploadFunction = async (file) => {
   )
 
   // Get signed URL frm AWS for uploading
-  const putObjectSignedUrl = await actions.getPutObjectSignedUrl(file)
+  const putObjectSignedUrl = await actions.getPutObjectSignedUrl({ key: file.name })
 
   // Upload the object
-  await actions.putObjectBySignedUrl(file, putObjectSignedUrl.data.putObjectUrl)
+  await fetch(putObjectSignedUrl.data.putObjectUrl, {
+    method: 'PUT',
+    body: file,
+    headers: {
+      'Content-Type': file.type,
+      'Content-Length': file.size.toString(),
+    },
+  })
 
   // Get signed URL for reading
-  const readObjectUrl = await actions.getReadObjectSignedUrl(file.name)
+  const readObjectUrl = await actions.getReadObjectSignedUrl({ key: file.name })
 
   return readObjectUrl.data.readObjectUrl
 }

@@ -34,12 +34,12 @@ export class UploadAdapterS3 extends GenericUploadAdapter {
   /**
    * @description Get the signed URL for reading the object from S3
    */
-  public async getReadObjectSignedUrl(
+  public async getReadObjectSignedUrl(arg: {
     key: string
-  ): Promise<UploadActionResponse<{ readObjectUrl: string }>> {
+  }): Promise<UploadActionResponse<{ readObjectUrl: string }>> {
     const getCommand = new GetObjectCommand({
       Bucket: this.bucket,
-      Key: key,
+      Key: arg.key,
     })
 
     const url = await getSignedUrl(this.AWSClient, getCommand, {
@@ -55,12 +55,12 @@ export class UploadAdapterS3 extends GenericUploadAdapter {
   /**
    * @description Get the signed URL for uploading the object to S3
    */
-  public async getPutObjectSignedUrl(
-    file: File
-  ): Promise<UploadActionResponse<{ putObjectUrl: string }>> {
+  public async getPutObjectSignedUrl(arg: {
+    key: string
+  }): Promise<UploadActionResponse<{ putObjectUrl: string }>> {
     const putCommand = new PutObjectCommand({
       Bucket: this.bucket,
-      Key: file.name,
+      Key: arg.key,
     })
 
     const uploadSignedUrl = await getSignedUrl(this.AWSClient, putCommand, { expiresIn: 3600 })
@@ -69,24 +69,5 @@ export class UploadAdapterS3 extends GenericUploadAdapter {
       message: 'File upload signed URL request success',
       data: { putObjectUrl: uploadSignedUrl },
     }
-  }
-
-  /**
-   * @description Upload the object to S3 using the signed URL
-   */
-  public async putObjectBySignedUrl(
-    file: File,
-    url: string
-  ): Promise<UploadActionResponse<boolean>> {
-    await fetch(url, {
-      method: 'PUT',
-      body: file,
-      headers: {
-        'Content-Type': file.type,
-        'Content-Length': file.size.toString(),
-      },
-    })
-
-    return { message: 'File uploaded successfully', data: true }
   }
 }

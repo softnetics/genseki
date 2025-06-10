@@ -1,3 +1,4 @@
+import type { EditorProviderProps } from '@tiptap/react'
 import type { Column, Relation } from 'drizzle-orm'
 import {
   type FindTableByDBName,
@@ -63,13 +64,21 @@ export type FieldBase = {
   description?: string
 }
 
+export interface RichTextOptions {
+  richTextOptions?: EditorProviderProps & {}
+}
+
 export interface FieldColumnStringCollectionOptions<TContext extends Context = Context> {
+  richText: {
+    type: 'richText'
+    default?: string
+  } & RichTextOptions &
+    FieldBase
   text: {
     type: 'text'
     default?: string
     label?: string
     placeholder?: string
-    // editor?: Editor // TODO: Support rich text editor
   } & FieldBase
   selectText: {
     type: 'selectText'
@@ -89,7 +98,6 @@ export interface FieldColumnStringCollectionOptions<TContext extends Context = C
     mimeTypes: string[]
   } & FieldBase
 }
-
 export interface FieldColumnStringArrayCollectionOptions<TContext extends Context = Context> {
   comboboxText: {
     type: 'comboboxText'
@@ -491,6 +499,9 @@ export function fieldToZodScheama<TField extends Field<any>>(
 ): FieldToZodScheama<TField> {
   // TODO: More options
   switch (field.type) {
+    // Richtext JSON
+    case 'richText':
+      return z.object({}) as unknown as FieldToZodScheama<TField>
     // string input
     case 'text':
     case 'selectText':
@@ -499,6 +510,7 @@ export function fieldToZodScheama<TField extends Field<any>>(
       if (!field._.column.notNull) {
         return z.string().optional() as FieldToZodScheama<TField>
       }
+
       return z.string() as FieldToZodScheama<TField>
     // string[] input
     case 'comboboxText':

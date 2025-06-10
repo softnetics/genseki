@@ -31,6 +31,7 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
+import type { RichTextOptions } from '../../../../core/field'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 
@@ -167,6 +168,10 @@ export function AutoSelectField(props: AutoSelectField) {
   )
 }
 
+const AutoRichTextField = (props: RichTextOptions) => {
+  return <div>AUTO RICH TEXT</div>
+}
+
 export function AutoFormField(props: { name: string; component: ReactNode }) {
   const { control } = useFormContext()
   return (
@@ -210,6 +215,17 @@ export function AutoField(props: AutoFieldProps) {
   }
 
   switch (field.type) {
+    case 'richText':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoRichTextField richTextOptions={{ content: '<p>CONTENT</p>' }} {...commonProps} />
+          }
+        />
+      )
+    // return <EditorProvider />
     case 'text':
       return (
         <AutoFormField

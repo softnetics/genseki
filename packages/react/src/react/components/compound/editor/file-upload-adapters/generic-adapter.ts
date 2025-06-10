@@ -9,31 +9,28 @@ export type UploadFunction = (
   abortSignal: AbortSignal
 ) => Promise<string>
 
-export interface AdapterMethods<TGetPutUrl = any, TPutObject = any, TGetReadUrl = any> {
-  getPutObjectSignedUrl(file: File): Promise<UploadActionResponse<TGetPutUrl>>
-  putObjectBySignedUrl(file: File, url: string): Promise<UploadActionResponse<TPutObject>>
-  getReadObjectSignedUrl(key: string): Promise<UploadActionResponse<TGetReadUrl>>
+export interface AdapterMethods<TGetPutUrl = any, TGetReadUrl = any> {
+  getPutObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetPutUrl>>
+  getReadObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetReadUrl>>
 }
 
 // Use this abstract class to create a new `UploadAdapter`
-export abstract class GenericUploadAdapter<TGetPutUrl = any, TPutObject = any, TGetReadUrl = any>
-  implements AdapterMethods<TGetPutUrl, TPutObject, TGetReadUrl>
+export abstract class GenericUploadAdapter<TGetPutUrl = any, TGetReadUrl = any>
+  implements AdapterMethods<TGetPutUrl, TGetReadUrl>
 {
   adapterName: string
   constructor(parameters: { adapterName: string }) {
     this.adapterName = parameters.adapterName
   }
 
-  abstract getPutObjectSignedUrl(file: File): Promise<UploadActionResponse<TGetPutUrl>>
+  abstract getPutObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetPutUrl>>
 
-  abstract putObjectBySignedUrl(file: File, url: string): Promise<UploadActionResponse<TPutObject>>
-
-  abstract getReadObjectSignedUrl(key: string): Promise<UploadActionResponse<TGetReadUrl>>
+  abstract getReadObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetReadUrl>>
 }
 
-export const handleUploadAdapter = <TGetPutUrl, TPutObject, TGetReadUrl>(
-  adaptee: GenericUploadAdapter<TGetPutUrl, TPutObject, TGetReadUrl>
-): AdapterMethods<TGetPutUrl, TPutObject, TGetReadUrl> => {
+export const handleUploadAdapter = <TGetPutUrl, TGetReadUrl>(
+  adaptee: GenericUploadAdapter<TGetPutUrl, TGetReadUrl>
+): AdapterMethods<TGetPutUrl, TGetReadUrl> => {
   // Middle ware
   const methods: AdapterMethods = {
     getPutObjectSignedUrl(...args) {
@@ -41,9 +38,6 @@ export const handleUploadAdapter = <TGetPutUrl, TPutObject, TGetReadUrl>(
     },
     getReadObjectSignedUrl(...args) {
       return adaptee.getReadObjectSignedUrl(...args)
-    },
-    putObjectBySignedUrl(...args) {
-      return adaptee.putObjectBySignedUrl(...args)
     },
   }
 

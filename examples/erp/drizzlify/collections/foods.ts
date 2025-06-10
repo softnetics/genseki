@@ -10,6 +10,11 @@ export const foodsCollection = builder.collection('foods', {
       create: 'enabled',
       update: 'disabled',
     }),
+    description: fb.columns('description', {
+      type: 'richText',
+      label: 'Food description',
+      richTextOptions: {},
+    }),
     isCooked: fb.columns('isCooked', {
       type: 'checkbox',
       label: 'Food cooked',
