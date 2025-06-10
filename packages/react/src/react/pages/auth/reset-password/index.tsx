@@ -23,9 +23,9 @@ const formSchema = z
   .object({
     password: z
       .string()
-      .min(8, { error: '❌ Password must be at least 8 characters long' })
-      .regex(/[A-Za-z]/, { error: '❌ Must contain English letters (A-Z, a-z)' })
-      .regex(/[0-9]/, { error: '❌ Must contain numbers (0-9)' }),
+      .min(8, { error: 'Password must be at least 8 characters long' })
+      .regex(/[A-Za-z]/, { error: 'Must contain English letters (A-Z, a-z)' })
+      .regex(/[0-9]/, { error: 'Must contain numbers (0-9)' }),
     confirmPassword: z.string(),
   })
   .refine((data) => data.password === data.confirmPassword, {

@@ -35,7 +35,7 @@ export function LoginClientForm() {
 
   const form = useForm({
     resolver: zodResolver(schema),
-    mode: 'onChange',
+    mode: 'onSubmit',
   })
   const { navigate } = useNavigation()
 
@@ -73,53 +73,55 @@ export function LoginClientForm() {
   }
 
   return (
-    <Form {...form}>
-      <form className="flex flex-col space-y-8 flex-1" onSubmit={form.handleSubmit(login)}>
-        <FormField
-          control={form.control}
-          name="email"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <TextField
-                  {...field}
-                  name="email"
-                  type="email"
-                  placeholder="email..."
-                  label="Email"
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <FormField
-          control={form.control}
-          name="password"
-          render={({ field }) => (
-            <FormItem>
-              <FormControl>
-                <TextField
-                  {...field}
-                  name="password"
-                  type="password"
-                  placeholder="password..."
-                  label="Password"
-                  isRevealable
-                />
-              </FormControl>
-              <FormMessage />
-            </FormItem>
-          )}
-        />
-        <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
-          Forgot Password?
-        </Link>
-        <SubmitButton>Login</SubmitButton>
-        <Link href="./sign-up" intent="primary" className="text-sm mx-auto">
-          Create an account?
-        </Link>
-      </form>
-    </Form>
+    <div className="flex flex-col space-y-8">
+      <Form {...form}>
+        <form className="flex flex-col space-y-8 flex-1" onSubmit={form.handleSubmit(login)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <TextField
+                    {...field}
+                    name="email"
+                    type="email"
+                    placeholder="email..."
+                    label="Email"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <TextField
+                    {...field}
+                    name="password"
+                    type="password"
+                    placeholder="password..."
+                    label="Password"
+                    isRevealable
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
+            Forgot Password?
+          </Link>
+          <SubmitButton>Login</SubmitButton>
+        </form>
+      </Form>
+      <Link href="./sign-up" intent="primary" className="text-sm mx-auto">
+        Create an account?
+      </Link>
+    </div>
   )
 }

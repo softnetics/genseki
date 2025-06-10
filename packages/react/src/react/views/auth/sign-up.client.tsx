@@ -2,7 +2,9 @@
 
 import { useForm } from 'react-hook-form'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { toast } from 'sonner'
+import { z } from 'zod'
 
 import {
   Form,
@@ -16,27 +18,35 @@ import {
 import { useNavigation } from '../../providers'
 import { useClientConfig, useServerFunction } from '../../providers/root'
 
-interface SignUpFormData {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-}
+const schema = z
+  .object({
+    name: z.string().min(1, { message: 'Full name is required' }).trim(),
+    email: z.string().email({ message: 'Invalid email address' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters long' })
+      .regex(/[A-Za-z]/, { message: 'Must contain English letters (A-Z, a-z)' })
+      .regex(/[0-9]/, { message: 'Must contain numbers (0-9)' })
+      .trim(),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match',
+  })
+
+type SignUpFormData = z.infer<typeof schema>
 
 export function SignUpClientForm() {
   const clientConfig = useClientConfig()
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
-  // TODO: Add validation
-  const form = useForm<SignUpFormData>({})
+  const form = useForm<SignUpFormData>({
+    resolver: zodResolver(schema),
+  })
 
   const onValid = async (data: SignUpFormData) => {
-    if (data.password !== data.confirmPassword) {
-      form.setError('confirmPassword', { type: 'manual', message: 'Passwords do not match' })
-      return
-    }
-
     const response = await serverFunction({
       method: 'auth.signUp',
       body: data,
@@ -53,7 +63,6 @@ export function SignUpClientForm() {
     }
 
     if (clientConfig.auth.ui.signUp.autoLogin) {
-      // return
       const loginResponse = await serverFunction({
         method: 'auth.loginEmail',
         body: { email: data.email, password: data.password },
@@ -85,10 +94,7 @@ export function SignUpClientForm() {
 
   return (
     <Form {...form}>
-      <form
-        className="flex flex-col space-y-8 flex-1"
-        onSubmit={form.handleSubmit(onValid, (errors) => console.error(errors))}
-      >
+      <form className="flex flex-col space-y-8 flex-1" onSubmit={form.handleSubmit(onValid)}>
         <FormField
           name="name"
           control={form.control}
@@ -97,6 +103,7 @@ export function SignUpClientForm() {
               <FormControl>
                 <TextField {...field} placeholder="full name..." label="Full Name" />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -133,7 +140,7 @@ export function SignUpClientForm() {
         <FormField
           name="confirmPassword"
           control={form.control}
-          render={({ field, formState }) => (
+          render={({ field }) => (
             <FormItem>
               <FormControl>
                 <TextField
