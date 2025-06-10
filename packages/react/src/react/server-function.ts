@@ -15,7 +15,7 @@ export type ServerFunction<
   args: TApiArgs
 ) => Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>>
 
-type GetServerFunctionResponse<
+export type GetServerFunctionResponse<
   TServerConfig extends ServerConfig<any, any, any, ApiRouter>,
   TMethod extends keyof TServerConfig['endpoints'],
 > = TServerConfig['endpoints'][TMethod] extends infer TApiRoute extends ApiRoute<any, any>
