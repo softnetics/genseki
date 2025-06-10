@@ -1,6 +1,6 @@
 import { parseSetCookie } from 'cookie-es'
 import { cookies } from 'next/headers'
-import type { Simplify, ValueOf } from 'type-fest'
+import type { ValueOf } from 'type-fest'
 
 import {
   type ApiRoute,
@@ -11,13 +11,7 @@ import {
   Context,
   createAuth,
   type ServerConfig,
-} from '@kivotos/core'
-
-export type ServerFunction<
-  TServerConfig extends ServerConfig<any, any, any, any> = ServerConfig<any, any, any, any>,
-> = <TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>>(
-  args: TApiArgs
-) => Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>>
+} from '@genseki/react'
 
 type GetServerFunctionResponse<
   TServerConfig extends ServerConfig<any, any, any, ApiRouter>,
@@ -31,7 +25,7 @@ export type GetServerFunctionApiArgs<TApiRouter extends ApiRouter<any> | undefin
     any,
     infer TApiRouteSchema extends ApiRouteSchema
   >
-    ? Simplify<{ method: TMethod } & ApiRouteHandlerPayload<TApiRouteSchema>>
+    ? { method: TMethod } & ApiRouteHandlerPayload<TApiRouteSchema>
     : never
 }>
 
@@ -56,9 +50,9 @@ export async function handleServerFunction<
     })
 
     if (response.headers?.['Set-Cookie']) {
+      const setCookieData = parseSetCookie(response.headers['Set-Cookie'])
       const c = await cookies()
-      const cookieData = parseSetCookie(response.headers['Set-Cookie'])
-      c.set(cookieData.name, cookieData.value, { ...cookieData })
+      c.set(setCookieData.name, setCookieData.value, setCookieData)
     }
 
     return response as GetServerFunctionResponse<TServerConfig, TApiArgs['method']>

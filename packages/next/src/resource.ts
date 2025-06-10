@@ -7,7 +7,7 @@ import {
   Context,
   createAuth,
   type ServerConfig,
-} from '@kivotos/core'
+} from '@genseki/react'
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}

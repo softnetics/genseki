@@ -1,7 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 
-import { Builder, defineBaseConfig } from '@kivotos/core'
+import { Builder, defineBaseConfig } from '@genseki/react'
 
 import * as schema from '~/db/schema'
 

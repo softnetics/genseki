@@ -1,5 +1,5 @@
 ---
-'@kivotos/core': patch
+'@genseki/react': patch
 ---
 
 [[DRIZZ-86] Embed __pk to relation field](https://app.plane.so/softnetics/browse/DRIZZ-86/)
