@@ -719,7 +719,7 @@ export function getDefaultCollectionAdminApiRouter<
       switch (method) {
         case ApiDefaultMethod.CREATE: {
           // TODO: Create ApiRouteSchema from fields and method
-          const body = fieldsToZodObject(fields as any)
+          const body = fieldsToZodObject(fields as any, ApiDefaultMethod.CREATE)
 
           const schema = {
             path: `/api/${slug}/${method}`,
@@ -819,7 +819,7 @@ export function getDefaultCollectionAdminApiRouter<
           ]
         }
         case ApiDefaultMethod.UPDATE: {
-          const body = fieldsToZodObject(fields as any)
+          const body = fieldsToZodObject(fields as any, ApiDefaultMethod.UPDATE)
 
           const schema = {
             path: `/api/${slug}/${method}/:id`,
