@@ -6,6 +6,7 @@ import type { ClientConfig, Collection, ServerConfig } from '@genseki/react'
 
 import { UiProviders } from './ui'
 
+import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {
@@ -54,6 +55,8 @@ export const RootProvider = (props: {
         serverFunction: props.serverFunction,
       }}
     >
+      <Toast />
+      {props.children}
       <UiProviders>{props.children}</UiProviders>
     </RootContext.Provider>
   )

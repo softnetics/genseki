@@ -2,32 +2,51 @@
 
 import { useForm } from 'react-hook-form'
 
-import { SubmitButton, TextField } from '../../components'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '../../components'
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  SubmitButton,
+  TextField,
+} from '../../components'
 import { useNavigation } from '../../providers'
 import { useClientConfig, useServerFunction } from '../../providers/root'
 
-interface SignUpFormData {
-  name: string
-  email: string
-  password: string
-  confirmPassword: string
-}
+const schema = z
+  .object({
+    name: z.string().min(1, { message: 'Full name is required' }).trim(),
+    email: z.string().email({ message: 'Invalid email address' }),
+    password: z
+      .string()
+      .min(8, { message: 'Password must be at least 8 characters long' })
+      .regex(/[A-Za-z]/, { message: 'Must contain English letters (A-Z, a-z)' })
+      .regex(/[0-9]/, { message: 'Must contain numbers (0-9)' })
+      .trim(),
+    confirmPassword: z.string(),
+  })
+  .refine((data) => data.password === data.confirmPassword, {
+    path: ['confirmPassword'],
+    message: 'Passwords do not match',
+  })
+
+type SignUpFormData = z.infer<typeof schema>
 
 export function SignUpClientForm() {
   const clientConfig = useClientConfig()
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
-  // TODO: Add validation
-  const form = useForm<SignUpFormData>({})
+  const form = useForm<SignUpFormData>({
+    resolver: zodResolver(schema),
+  })
 
   const onValid = async (data: SignUpFormData) => {
-    if (data.password !== data.confirmPassword) {
-      form.setError('confirmPassword', { type: 'manual', message: 'Passwords do not match' })
-      return
-    }
-
     const response = await serverFunction({
       method: 'auth.signUp',
       body: data,
@@ -37,13 +56,13 @@ export function SignUpClientForm() {
     })
 
     if (response.status !== 200) {
-      console.error('Signup failed', response)
-      // TODO: Show toast
+      toast.error('Failed to sign up', {
+        description: response.body.status || 'Failed to sign up',
+      })
       return
     }
 
     if (clientConfig.auth.ui.signUp.autoLogin) {
-      // return
       const loginResponse = await serverFunction({
         method: 'auth.loginEmail',
         body: { email: data.email, password: data.password },
@@ -53,23 +72,29 @@ export function SignUpClientForm() {
       })
 
       if (loginResponse.status !== 200) {
-        console.error('Login failed', response)
-        // TODO: Show toast
+        toast.error('Failed to log in after sign up', {
+          description: loginResponse.body.status || 'Failed to log in',
+        })
         return
       }
 
+      toast.success('Successfully signed up and logged in', {
+        description: 'You are now logged in.',
+      })
+
       return navigate('../collections')
     }
+
+    toast.success('Successfully signed up', {
+      description: 'You can now log in with your credentials.',
+    })
 
     return navigate('../auth/sign-in')
   }
 
   return (
     <Form {...form}>
-      <form
-        className="flex flex-col space-y-8 flex-1"
-        onSubmit={form.handleSubmit(onValid, (errors) => console.error(errors))}
-      >
+      <form className="flex flex-col space-y-8 flex-1" onSubmit={form.handleSubmit(onValid)}>
         <FormField
           name="name"
           control={form.control}
@@ -78,6 +103,7 @@ export function SignUpClientForm() {
               <FormControl>
                 <TextField {...field} placeholder="full name..." label="Full Name" />
               </FormControl>
+              <FormMessage />
             </FormItem>
           )}
         />
@@ -114,7 +140,7 @@ export function SignUpClientForm() {
         <FormField
           name="confirmPassword"
           control={form.control}
-          render={({ field, formState }) => (
+          render={({ field }) => (
             <FormItem>
               <FormControl>
                 <TextField
