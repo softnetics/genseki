@@ -1,5 +1,4 @@
 ---
-'@example/erp': minor
 '@genseki/react': minor
 ---
 

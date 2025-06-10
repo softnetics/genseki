@@ -1,5 +1,5 @@
 ---
-'@genseki/core': patch
+'@genseki/react': patch
 '@genseki/next': patch
 ---
 

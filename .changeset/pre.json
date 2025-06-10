@@ -3,9 +3,12 @@
   "tag": "alpha",
   "initialVersions": {
     "@example/erp": "0.0.0",
-    "@internal/project-config": "0.0.1",
+    "@internal/project-config": "0.0.0",
     "@genseki/next": "0.0.0",
-    "@genseki/plugins": "0.0.0"
+    "@genseki/plugins": "0.0.0",
+    "@genseki/react": "0.0.0",
+    "@genseki/react-query": "0.0.0",
+    "@genseki/rest": "0.0.0"
   },
   "changesets": []
 }
