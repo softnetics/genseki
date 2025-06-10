@@ -63,3 +63,4 @@ jobs:
           publish: changeset release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}

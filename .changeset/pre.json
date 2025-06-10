@@ -1,0 +1,11 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@example/erp": "0.0.0",
+    "@internal/project-config": "0.0.1",
+    "@genseki/next": "0.0.0",
+    "@genseki/plugins": "0.0.0"
+  },
+  "changesets": []
+}
