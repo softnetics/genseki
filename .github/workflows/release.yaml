@@ -45,9 +45,6 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
-      - name: Install changeset
-        run: pnpm install -g changeset
-
       - name: Install dependencies
         run: pnpm install --prefer-offline --frozen-lockfile
 
@@ -59,8 +56,8 @@ jobs:
         uses: changesets/action@v1.5.2
         with:
           createGithubReleases: true
-          version: changeset version
-          publish: changeset release
+          version: pnpm changeset version
+          publish: pnpm changeset release
         env:
           NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
           GITHUB_TOKEN: ${{ github.token }}
