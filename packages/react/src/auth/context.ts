@@ -76,10 +76,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     findByEmail: async (email: string) => {
       const table = config.user.model
 
-      console.log('findByEmail 1:')
       const users = await context.db.select().from(table).where(eq(table.email, email))
-      console.log('findByEmail 2:')
-      console.log('response users:', users)
       if (users.length === 0) throw new Error('User not found')
       if (users.length > 1) throw new Error('Multiple users found')
       const user = users[0]
