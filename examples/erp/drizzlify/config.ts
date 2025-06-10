@@ -1,9 +1,10 @@
 import z from 'zod/v4'
 
-import { defineServerConfig } from '@kivotos/core'
-import { defineNextJsServerConfig } from '@kivotos/next'
+import { defineNextJsServerConfig } from '@genseki/next'
+import { defineServerConfig } from '@genseki/react'
 
 import { categoriesCollection } from './collections/categories'
+import { foodsCollection } from './collections/foods'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
 import { baseConfig, builder } from './helper'
@@ -13,6 +14,7 @@ const baseServerConfig = defineServerConfig(baseConfig, {
     users: usersCollection,
     posts: postsCollection,
     categories: categoriesCollection,
+    foods: foodsCollection,
   },
   endpoints: {
     customOne: builder.endpoint(

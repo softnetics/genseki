@@ -1,8 +1,6 @@
-import { createAuth, type ServerConfig } from '@kivotos/core'
+import { createAuth, type ServerConfig, Typography } from '@genseki/react'
 
 import { ResetPasswordClientForm } from './reset-password.client'
-
-import { Typography } from '../../../components/primitives/typography'
 
 interface ResetPasswordViewProps {
   serverConfig: ServerConfig

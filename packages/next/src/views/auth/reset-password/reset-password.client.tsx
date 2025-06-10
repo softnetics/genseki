@@ -7,11 +7,17 @@ import { redirect } from 'next/navigation'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { Typography } from '../../../components/primitives/typography'
-import { SubmitButton } from '../../../components/submit-button'
-import { Form, FormControl, FormField, FormItem, FormMessage } from '../../../intentui/ui/form'
-import { TextField } from '../../../intentui/ui/text-field'
-import { useServerFunction } from '../../../providers/root'
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  SubmitButton,
+  TextField,
+  Typography,
+  useServerFunction,
+} from '@genseki/react'
 
 const formSchema = z
   .object({

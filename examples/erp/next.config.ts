@@ -1,7 +1,7 @@
 import type { NextConfig } from 'next'
 
 const nextConfig: NextConfig = {
-  transpilePackages: ['@kivotos/core', '@kivotos/next'],
+  transpilePackages: ['@genseki/react', '@genseki/next'],
   eslint: {
     ignoreDuringBuilds: true,
   },

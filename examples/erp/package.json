@@ -14,11 +14,11 @@
     "db:generate": "drizzle-kit generate"
   },
   "dependencies": {
-    "@kivotos/core": "workspace:^",
-    "@kivotos/next": "workspace:^",
-    "@kivotos/react-query": "workspace:^",
-    "@kivotos/rest": "workspace:^",
-    "@tailwindcss/postcss": "^4.0.14",
+    "@genseki/next": "workspace:^",
+    "@genseki/react": "workspace:^",
+    "@genseki/react-query": "workspace:^",
+    "@genseki/rest": "workspace:^",
+    "@tailwindcss/postcss": "^4.1.7",
     "@tanstack/react-query": "^5.71.5",
     "drizzle-orm": "^0.41.0",
     "next": "15.2.2",
@@ -27,7 +27,7 @@
     "postcss": "^8.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
-    "tailwindcss": "^4.0.14",
+    "tailwindcss": "^4.1.7",
     "zod": "3.25.53"
   },
   "devDependencies": {

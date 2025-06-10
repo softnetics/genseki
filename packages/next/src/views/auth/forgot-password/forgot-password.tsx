@@ -1,8 +1,6 @@
-import type { ServerConfig } from '@kivotos/core'
+import { type ServerConfig, Typography } from '@genseki/react'
 
 import { ForgotPasswordClientForm } from './forgot-password.client'
-
-import { Typography } from '../../../components/primitives/typography'
 
 interface ForgotPasswordViewProps {
   serverConfig: ServerConfig

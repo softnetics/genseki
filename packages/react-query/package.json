@@ -1,5 +1,5 @@
 {
-  "name": "@kivotos/react-query",
+  "name": "@genseki/react-query",
   "private": true,
   "sideEffects": false,
   "description": "",
@@ -20,8 +20,8 @@
   "license": "ISC",
   "devDependencies": {
     "@internals/project-config": "workspace:^",
-    "@kivotos/core": "workspace:^",
-    "@kivotos/rest": "workspace:^",
+    "@genseki/react": "workspace:^",
+    "@genseki/rest": "workspace:^",
     "@types/node": "^22.15.23",
     "@types/react": "^19.1.6",
     "type-fest": "^4.41.0",

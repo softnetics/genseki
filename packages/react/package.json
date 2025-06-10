@@ -1,0 +1,56 @@
+{
+  "name": "@genseki/react",
+  "private": true,
+  "sideEffects": false,
+  "type": "module",
+  "main": "./src/index.ts",
+  "module": "./src/index.ts",
+  "exports": {
+    ".": "./src/index.ts",
+    "./tailwind.css": "./src/react/styles/tailwind.css"
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit",
+    "test": "vitest run",
+    "diagnostics": "tsc --noEmit --extendedDiagnostics"
+  },
+  "dependencies": {
+    "@hookform/resolvers": "^5.0.1",
+    "@intentui/icons": "^1.10.31",
+    "@internationalized/date": "^3.8.1",
+    "@phosphor-icons/react": "^2.1.8",
+    "@radix-ui/react-slot": "^1.2.0",
+    "@react-aria/i18n": "^3.12.9",
+    "@react-aria/visually-hidden": "^3.8.23",
+    "@react-stately/calendar": "^3.8.1",
+    "clsx": "^2.1.1",
+    "cookie-es": "^2.0.0",
+    "deepmerge-ts": "^7.1.5",
+    "drizzle-orm": "^0.41.0",
+    "input-otp": "^1.4.2",
+    "motion": "^12.7.4",
+    "radix3": "^1.1.2",
+    "react": "^19.1.0",
+    "react-aria-components": "^1.7.1",
+    "react-dom": "^19.1.0",
+    "react-hook-form": "^7.56.3",
+    "remeda": "^2.21.2",
+    "sonner": "^2.0.3",
+    "tailwind-merge": "^3.0.2",
+    "tailwind-variants": "^1.0.0",
+    "tailwindcss": "^4.1.7",
+    "tailwindcss-react-aria-components": "^2.0.0",
+    "tw-animate-css": "^1.3.4",
+    "zod": "3.25.53"
+  },
+  "devDependencies": {
+    "@types/json-schema": "^7.0.15",
+    "@types/react": "^19.1.6",
+    "@types/react-dom": "^19.1.6",
+    "type-fest": "^4.38.0",
+    "vitest": "^3.0.9"
+  }
+}
