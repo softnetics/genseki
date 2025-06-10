@@ -49,3 +49,6 @@ jobs:
 
       - name: Run tests
         run: pnpm turbo test
+
+      - name: Run tests
+        run: pnpm turbo bundle
