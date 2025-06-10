@@ -1,7 +1,6 @@
 ---
-"@example/erp": patch
-"@kivotos/core": minor
-"@kivotos/next": minor
+'@genseki/react': minor
+'@genseki/next': minor
 ---
 
 [[DRIZZ-31] Register Page](https://app.plane.so/softnetics/browse/DRIZZ-31/)

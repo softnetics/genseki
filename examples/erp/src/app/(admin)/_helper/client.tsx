@@ -1,4 +1,4 @@
-import { getClientConfig } from '@kivotos/core'
+import { getClientConfig } from '@genseki/react'
 
 import { serverConfig } from '~/drizzlify/config'
 

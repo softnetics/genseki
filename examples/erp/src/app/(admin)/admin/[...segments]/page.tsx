@@ -1,4 +1,6 @@
-import { RootPage } from '@kivotos/next'
+import { headers } from 'next/headers'
+
+import { RootPage } from '@genseki/next'
 
 import { serverConfig } from '~/drizzlify/config'
 
@@ -14,6 +16,7 @@ export default async function AdminPage(props: AdminPageProps) {
     <RootPage
       serverConfig={serverConfig}
       serverFunction={serverFunction}
+      headersPromise={headers()}
       paramsPromise={props.params}
       searchParamsPromise={props.searchParams}
     />

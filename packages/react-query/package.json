@@ -1,29 +1,37 @@
 {
-  "name": "@kivotos/react-query",
-  "private": true,
-  "sideEffects": false,
+  "name": "@genseki/react-query",
   "description": "",
+  "sideEffects": false,
+  "version": "0.1.0-alpha.0",
   "type": "module",
-  "main": "./src/index.tsx",
-  "module": "./src/index.tsx",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./src/index.tsx"
+    ".": {
+      "require": "./dist/index.cjs",
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
   },
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "bundle": "tsup",
+    "bundle:watch": "tsup --watch"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@internals/project-config": "workspace:^",
-    "@kivotos/core": "workspace:^",
-    "@kivotos/rest": "workspace:^",
+    "@genseki/react": "workspace:^",
+    "@genseki/rest": "workspace:^",
+    "@internal/project-config": "workspace:^",
     "@types/node": "^22.15.23",
     "@types/react": "^19.1.6",
+    "tsup": "^8.5.0",
     "type-fest": "^4.41.0",
     "vitest": "^3.0.9"
   },

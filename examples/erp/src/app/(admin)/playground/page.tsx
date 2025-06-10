@@ -1,7 +1,5 @@
 'use client'
 
-import { UIPlayground } from '@kivotos/next'
-
 import { queryClient } from '../../../../drizzlify/client'
 
 interface PlaygroundPageProps {
@@ -10,7 +8,8 @@ interface PlaygroundPageProps {
 }
 
 export default function Playground(props: PlaygroundPageProps) {
-  const result = queryClient.useQuery('GET', '/api/hello2', {})
+  const result = queryClient.useQuery('GET', '/api/hello2', { query: {} })
   console.log(result.data)
-  return <UIPlayground />
+  // return <UIPlayground />
+  return null
 }

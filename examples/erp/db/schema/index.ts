@@ -1,5 +1,16 @@
 import { relations } from 'drizzle-orm'
-import { boolean, pgTable, text, timestamp, uuid, varchar } from 'drizzle-orm/pg-core'
+import {
+  boolean,
+  date,
+  decimal,
+  pgEnum,
+  pgTable,
+  text,
+  time,
+  timestamp,
+  uuid,
+  varchar,
+} from 'drizzle-orm/pg-core'
 
 const timestamps = {
   updatedAt: timestamp().defaultNow(),
@@ -94,3 +105,15 @@ export const categoryTags = pgTable('categoryTags', {
 export const categoryTagsRelations = relations(categoryTags, ({ one }) => ({
   category: one(categories, { fields: [categoryTags.category], references: [categories.id] }),
 }))
+
+export const typesEnum = pgEnum('types', ['fruit', 'vegetable', 'meat', 'dairy', 'grain', 'other'])
+export const foods = pgTable('foods', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar().notNull(),
+  isCooked: boolean('is_cooked').notNull(),
+  cookingTypes: typesEnum().notNull().default('other'),
+  cookingDuration: decimal({ mode: 'number' }).notNull(),
+  // TODO: Make type infer for {mode:"string" | "date"}
+  cookingDate: date().notNull().defaultNow(), // YYYY-MM-DD
+  cookingTime: time().notNull().defaultNow(), // 00:00:00 - 24:00:00
+})

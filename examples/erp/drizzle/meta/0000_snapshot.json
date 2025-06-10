@@ -1,5 +1,5 @@
 {
-  "id": "bf9131bb-df6e-47d0-ad81-e80d0b387a87",
+  "id": "405ae38d-63a2-4a16-8ef6-f9b315d5d53c",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -98,10 +98,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "account_user_id_users_id_fk": {
-          "name": "account_user_id_users_id_fk",
+        "account_user_id_user_id_fk": {
+          "name": "account_user_id_user_id_fk",
           "tableFrom": "account",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -164,10 +164,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "categories_ownerId_users_id_fk": {
-          "name": "categories_ownerId_users_id_fk",
+        "categories_ownerId_user_id_fk": {
+          "name": "categories_ownerId_user_id_fk",
           "tableFrom": "categories",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "ownerId"
           ],
@@ -250,6 +250,66 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
+    "public.foods": {
+      "name": "foods",
+      "schema": "",
+      "columns": {
+        "id": {
+          "name": "id",
+          "type": "uuid",
+          "primaryKey": true,
+          "notNull": true,
+          "default": "gen_random_uuid()"
+        },
+        "name": {
+          "name": "name",
+          "type": "varchar",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "is_cooked": {
+          "name": "is_cooked",
+          "type": "boolean",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cookingTypes": {
+          "name": "cookingTypes",
+          "type": "types",
+          "typeSchema": "public",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "'other'"
+        },
+        "cookingDuration": {
+          "name": "cookingDuration",
+          "type": "numeric",
+          "primaryKey": false,
+          "notNull": true
+        },
+        "cookingDate": {
+          "name": "cookingDate",
+          "type": "date",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        },
+        "cookingTime": {
+          "name": "cookingTime",
+          "type": "time",
+          "primaryKey": false,
+          "notNull": true,
+          "default": "now()"
+        }
+      },
+      "indexes": {},
+      "foreignKeys": {},
+      "compositePrimaryKeys": {},
+      "uniqueConstraints": {},
+      "policies": {},
+      "checkConstraints": {},
+      "isRLSEnabled": false
+    },
     "public.posts": {
       "name": "posts",
       "schema": "",
@@ -308,10 +368,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "posts_authorId_users_id_fk": {
-          "name": "posts_authorId_users_id_fk",
+        "posts_authorId_user_id_fk": {
+          "name": "posts_authorId_user_id_fk",
           "tableFrom": "posts",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "authorId"
           ],
@@ -405,10 +465,10 @@
       },
       "indexes": {},
       "foreignKeys": {
-        "session_user_id_users_id_fk": {
-          "name": "session_user_id_users_id_fk",
+        "session_user_id_user_id_fk": {
+          "name": "session_user_id_user_id_fk",
           "tableFrom": "session",
-          "tableTo": "users",
+          "tableTo": "user",
           "columnsFrom": [
             "user_id"
           ],
@@ -433,8 +493,8 @@
       "checkConstraints": {},
       "isRLSEnabled": false
     },
-    "public.users": {
-      "name": "users",
+    "public.user": {
+      "name": "user",
       "schema": "",
       "columns": {
         "id": {
@@ -494,8 +554,8 @@
       "foreignKeys": {},
       "compositePrimaryKeys": {},
       "uniqueConstraints": {
-        "users_email_unique": {
-          "name": "users_email_unique",
+        "user_email_unique": {
+          "name": "user_email_unique",
           "nullsNotDistinct": false,
           "columns": [
             "email"
@@ -565,7 +625,20 @@
       "isRLSEnabled": false
     }
   },
-  "enums": {},
+  "enums": {
+    "public.types": {
+      "name": "types",
+      "schema": "public",
+      "values": [
+        "fruit",
+        "vegetable",
+        "meat",
+        "dairy",
+        "grain",
+        "other"
+      ]
+    }
+  },
   "schemas": {},
   "sequences": {},
   "roles": {},

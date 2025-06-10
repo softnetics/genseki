@@ -1,4 +1,4 @@
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import { builder } from '../helper'
 
@@ -39,27 +39,48 @@ export const postsCollection = builder.collection('posts', {
     },
   },
   fields: builder.fields('posts', (fb) => ({
-    id: fb.columns('id', {
-      type: 'text',
-    }),
     title: fb.columns('title', {
       type: 'text',
+      label: 'Title',
+      description: 'The title of the post',
     }),
     content: fb.columns('content', {
       type: 'text',
+      label: 'Content',
+      description: 'The content of the post',
     }),
-    authorId: fb.relations('author', (fb) => ({
-      type: 'connect',
+    author: fb.relations('author', (fb) => ({
+      type: 'create',
+      label: 'Author',
+      description: 'The author of the post',
       fields: fb.fields('user', (fb) => ({
-        id: fb.columns('id', {
-          type: 'text',
-        }),
         name: fb.columns('name', {
           type: 'text',
+          label: 'Name',
+          description: 'The name of the author',
         }),
         email: fb.columns('email', {
           type: 'text',
+          label: 'Email',
+          description: 'The email of the author',
         }),
+        posts: fb.relations('posts', (fb) => ({
+          type: 'create',
+          label: 'Posts',
+          description: 'Posts written by the author',
+          fields: fb.fields('posts', (fb) => ({
+            title: fb.columns('title', {
+              type: 'text',
+              label: 'Title',
+              description: 'The title of the post',
+            }),
+            content: fb.columns('content', {
+              type: 'text',
+              label: 'Content',
+              description: 'The content of the post',
+            }),
+          })),
+        })),
       })),
       options: builder.options(async ({ db }) => {
         const result = await db.query.user.findMany({ columns: { id: true, name: true } })
