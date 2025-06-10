@@ -10,10 +10,12 @@ import {
   CollectionLayout,
   type Context,
   CreateView,
+  ForgotPasswordView,
   HomeView,
   ListView,
   LoginView,
   OneView,
+  ResetPasswordView,
   type ServerConfig,
   type ServerFunction,
   SignUpView,
@@ -21,8 +23,6 @@ import {
 } from '@genseki/react'
 
 import { createApiResourceRouter } from './resource'
-import { ForgotPasswordView } from './views/auth/forgot-password/forgot-password'
-import { ResetPasswordView } from './views/auth/reset-password/reset-password'
 
 export type RouterData =
   | {

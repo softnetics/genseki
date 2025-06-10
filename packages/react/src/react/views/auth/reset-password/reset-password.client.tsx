@@ -14,10 +14,10 @@ import {
   FormMessage,
   SubmitButton,
   TextField,
-} from '../../../components'
-import { Typography } from '../../../components/primitives/typography'
-import { useNavigation } from '../../../providers'
-import { useServerFunction } from '../../../providers/root'
+  Typography,
+  useNavigation,
+  useServerFunction,
+} from '@genseki/react'
 
 const formSchema = z
   .object({
@@ -37,13 +37,12 @@ const formSchema = z
 
 interface ResetPasswordClientFormProps {
   token?: string
-  isErrorToken: boolean
 }
 
-export function ResetPasswordClientForm({ token, isErrorToken }: ResetPasswordClientFormProps) {
-  const serverFunction = useServerFunction()
-
+export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps) {
   const { navigate } = useNavigation()
+
+  const serverFunction = useServerFunction()
 
   const form = useForm({
     resolver: zodResolver(formSchema),

@@ -4,10 +4,10 @@ import { useState } from 'react'
 
 import { toast } from 'sonner'
 
+import { useServerFunction } from '@genseki/react'
+
 import { InputEmailSection } from './_components/input-email-section'
 import { Step } from './types'
-
-import { useServerFunction } from '../../../providers/root'
 
 export function ForgotPasswordClientForm() {
   const serverFunction = useServerFunction()
