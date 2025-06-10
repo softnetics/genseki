@@ -31,7 +31,7 @@
     "zod": "3.25.53"
   },
   "devDependencies": {
-    "@internals/project-config": "workspace:^",
+    "@internal/project-config": "workspace:^",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
     "@types/react": "19.1.4",

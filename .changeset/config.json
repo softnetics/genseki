@@ -2,7 +2,9 @@
   "$schema": "https://unpkg.com/@changesets/config@3.1.1/schema.json",
   "changelog": ["@changesets/changelog-github", { "repo": "softnetics/genseki" }],
   "commit": false,
-  "fixed": [["@genseki/react", "@genseki/next", "@genseki/rest"]],
+  "fixed": [
+    ["@genseki/react", "@genseki/next", "@genseki/rest", "@genseki/react-query", "@genseki/plugins"]
+  ],
   "linked": [],
   "access": "restricted",
   "baseBranch": "main",

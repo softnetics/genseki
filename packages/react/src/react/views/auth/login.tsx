@@ -1,7 +1,6 @@
-import type { ServerConfig } from '@genseki/react'
-
 import { LoginClientForm } from './login.client'
 
+import type { ServerConfig } from '../../../core'
 import { ButtonLink } from '../../components'
 import { Typography } from '../../components/primitives/typography'
 

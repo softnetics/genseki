@@ -4,26 +4,29 @@
   "sideEffects": false,
   "description": "",
   "type": "module",
-  "main": "./src/index.tsx",
-  "module": "./src/index.tsx",
-  "exports": {
-    ".": "./src/index.tsx"
-  },
+  "files": [
+    "dist"
+  ],
+  "main": "dist/index.cjs",
+  "module": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc --noEmit",
+    "bundle": "tsup"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "@internals/project-config": "workspace:^",
     "@genseki/react": "workspace:^",
     "@genseki/rest": "workspace:^",
+    "@internal/project-config": "workspace:^",
     "@types/node": "^22.15.23",
     "@types/react": "^19.1.6",
+    "tsup": "^8.5.0",
     "type-fest": "^4.41.0",
     "vitest": "^3.0.9"
   },

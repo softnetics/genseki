@@ -1,5 +1,5 @@
 ---
-'@internals/project-config': minor
+'@internal/project-config': minor
 '@example/erp': minor
 ---
 

@@ -1,7 +1,6 @@
-import type { ServerConfig } from '@genseki/react'
-
 import { SignUpClientForm } from './sign-up.client'
 
+import type { ServerConfig } from '../../../core'
 import { Typography } from '../../components/primitives/typography'
 
 interface SignInViewProps {

@@ -2,10 +2,9 @@
 
 import { createContext, type ReactNode, useContext } from 'react'
 
-import type { ClientConfig, Collection, ServerConfig } from '@genseki/react'
-
 import { UiProviders } from './ui'
 
+import type { ClientConfig, Collection, ServerConfig } from '../../core'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {

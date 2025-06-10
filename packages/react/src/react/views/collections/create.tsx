@@ -1,7 +1,6 @@
-import { Context, createAuth, type ServerConfig } from '@genseki/react'
-
 import { CreateClientView } from './create.client'
 
+import { Context, createAuth, type ServerConfig } from '../../../core'
 import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'

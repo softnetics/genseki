@@ -1,5 +1,3 @@
-import 'server-only'
-
 import { NotAuthorizedPage, NotfoundPage, type ServerFunction } from '@genseki/react'
 
 import type { NextJsServerConfig } from '../config'

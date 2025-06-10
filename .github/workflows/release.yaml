@@ -51,8 +51,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --prefer-offline --frozen-lockfile
 
-      - name: Build artifacts
-        run: pnpm build
+      - name: Bundle artifacts
+        run: pnpm bundle
 
       - name: Create Versioning Pull Request
         id: changesets
