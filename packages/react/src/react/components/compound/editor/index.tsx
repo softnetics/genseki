@@ -1,5 +1,4 @@
-import './tiptap-style.css'
-
+'use client'
 import Color from '@tiptap/extension-color'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'

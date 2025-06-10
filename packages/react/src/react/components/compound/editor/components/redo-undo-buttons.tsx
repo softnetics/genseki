@@ -1,3 +1,4 @@
+'use client'
 import { ArrowClockwiseIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 

@@ -1,0 +1,25 @@
+{
+  "extends": "@internals/project-config/tsconfig/reactjs.json",
+  "compilerOptions": {
+    "baseUrl": ".",
+    "jsx": "preserve",
+    "lib": ["dom"],
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "declaration": false,
+    "declarationMap": false,
+    "paths": {
+      "~/*": ["./*"]
+    },
+    "target": "ES2017",
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
+  },
+  "include": ["next-env.d.ts", ".next/types/**/*.ts", "**/*.ts", "**/*.tsx"]
+}

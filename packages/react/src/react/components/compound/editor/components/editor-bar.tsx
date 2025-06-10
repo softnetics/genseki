@@ -1,3 +1,4 @@
+'use client'
 import { SelectionBackgroundIcon, TextAaIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 

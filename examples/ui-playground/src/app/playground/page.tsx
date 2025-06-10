@@ -79,17 +79,7 @@ import {
 } from '@phosphor-icons/react'
 
 import { PlaygroundCard } from './_components/card'
-
-const Wrapper = ({ children, title }: { children: React.ReactNode; title: string }) => {
-  return (
-    <div className="flex flex-col space-y-6 p-8">
-      <Typography type="h4" weight="semibold" className="text-text-nontrivial">
-        {title}
-      </Typography>
-      {children}
-    </div>
-  )
-}
+import { Wrapper } from './_components/wrapper'
 
 const MOCK_OPTIONS = [
   { id: 1, name: 'Admin', description: 'Has full access to all resources' },
@@ -270,7 +260,7 @@ const countries = [
   },
 ]
 
-export const UIPlayground = () => {
+export default function UIPlayground() {
   return (
     <div className="bg-bg pb-24">
       <Wrapper title="Theme playground">
