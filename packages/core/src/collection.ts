@@ -715,7 +715,7 @@ export function getDefaultCollectionAdminApiRouter<
 ): CollectionDefaultAdminApiRouter<TSlug, TContext, TFields, TDefaultHandler> {
   return Object.fromEntries(
     Object.entries(defaultHandler).map(([method, fn]) => {
-      const endpointName = `${slug}.${method}`
+      const endpointName = method
       switch (method) {
         case ApiDefaultMethod.CREATE: {
           // TODO: Create ApiRouteSchema from fields and method
@@ -889,14 +889,14 @@ export function getDefaultCollectionAdminApiRouter<
 }
 
 export function getAllCollectionEndpoints<
-  TCollection extends Collection<any, any, any, any, any, any>,
->(collection: TCollection): ExtractCollectionEndpoints<TCollection> {
+  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
+>(collections: TCollections): ExtractAllCollectionEndpoints<TCollections> {
   const endpoints: any = Object.fromEntries(
-    collection.admin.endpoints
-      ? Object.entries(collection.admin.endpoints).map(([method, value]) => {
-          return [`${collection.slug}.${method}`, value]
-        })
-      : []
+    Object.entries(collections).flatMap(([_, collection]) => {
+      return Object.entries(collection.admin.endpoints ?? {}).map(([method, value]) => {
+        return [`${collection.slug}.${method}`, value]
+      })
+    })
   )
 
   return endpoints

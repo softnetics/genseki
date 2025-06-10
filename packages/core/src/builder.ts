@@ -12,7 +12,6 @@ import {
   type Collection,
   type CollectionConfig,
   type FindTableByTableTsName,
-  getAllCollectionEndpoints,
   type GetAllTableTsNames,
   getDefaultCollectionAdminApiRouter,
 } from './collection'
@@ -105,73 +104,63 @@ export class Builder<
       findMany: config.admin?.api?.findMany ?? defaultHandlers.findMany,
     }
     const endpoints: TApiRouter = config.admin?.endpoints ?? ({} as TApiRouter)
-    const defaultEndpoint = getDefaultCollectionAdminApiRouter<TSlug, TContext, TFields>(
-      config.slug,
-      config.fields,
-      {
-        create: async (args) => {
-          // TODO: Access control
-          const defaultApi = config.admin?.api?.create ? defaultHandlers.create : (undefined as any)
-          const result = await api.create({
-            ...args,
-            defaultApi,
-          })
-          return result
-        },
-        update: async (args) => {
-          // TODO: Access control
-          const defaultApi = config.admin?.api?.update ? defaultHandlers.update : (undefined as any)
-          const result = await api.update({ ...args, defaultApi })
-          return result
-        },
-        delete: async (args) => {
-          // TODO: Access control
-          const defaultApi = config.admin?.api?.delete ? defaultHandlers.delete : (undefined as any)
-          const result = await api.delete({ ...args, defaultApi })
-          return result
-        },
-        findOne: async (args) => {
-          // TODO: Access control
-          const defaultApi = config.admin?.api?.findOne
-            ? defaultHandlers.findOne
-            : (undefined as any)
-          const result = await api.findOne({ ...args, defaultApi })
-          return result
-        },
-        findMany: async (args) => {
-          // TODO: Access control
-          const defaultApi = config.admin?.api?.findMany
-            ? defaultHandlers.findMany
-            : (undefined as any)
-          const result = await api.findMany({ ...args, defaultApi })
-          return result
-        },
-      }
-    )
+    const defaultEndpoint = getDefaultCollectionAdminApiRouter<
+      TSlug,
+      TContext,
+      FieldsWithFieldName<TFields>
+    >(config.slug, config.fields, {
+      create: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.create ? defaultHandlers.create : (undefined as any)
+        const result = await api.create({
+          ...args,
+          defaultApi,
+        })
+        return result
+      },
+      update: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.update ? defaultHandlers.update : (undefined as any)
+        const result = await api.update({ ...args, defaultApi })
+        return result
+      },
+      delete: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.delete ? defaultHandlers.delete : (undefined as any)
+        const result = await api.delete({ ...args, defaultApi })
+        return result
+      },
+      findOne: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.findOne ? defaultHandlers.findOne : (undefined as any)
+        const result = await api.findOne({ ...args, defaultApi })
+        return result
+      },
+      findMany: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.findMany
+          ? defaultHandlers.findMany
+          : (undefined as any)
+        const result = await api.findMany({ ...args, defaultApi })
+        return result
+      },
+    })
 
-    const collection = {
+    return {
       _: {
-        table: table,
+        table: table as GetTableByTableTsName<TFullSchema, TTableTsName>,
         tableConfig: tableRelationalConfig,
       },
       slug: config.slug,
       fields: config.fields,
-      identifierColumn: config.identifierColumn,
-      admin: {
-        endpoints,
-      },
-    }
-    const customEndpoints = getAllCollectionEndpoints(collection)
-
-    return {
-      ...collection,
+      identifierColumn: config.identifierColumn as string,
       admin: {
         endpoints: {
+          ...endpoints,
           ...defaultEndpoint,
-          ...customEndpoints,
         },
       },
-    } as any
+    }
   }
 
   fields<

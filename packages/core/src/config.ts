@@ -12,6 +12,7 @@ import {
 import {
   type ClientCollection,
   type Collection,
+  getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
 } from './collection'
@@ -108,14 +109,16 @@ export function defineServerConfig<
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
   const auth = createAuth(baseConfig.auth, baseConfig.context)
+  const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
   let serverConfig = {
     ...baseConfig,
     collections: config.collections,
     endpoints: {
-      ...config.endpoints,
+      ...collectionEndpoints,
       ...auth.handlers,
-    },
+      ...config.endpoints,
+    } as TEndpoints & AuthHandlers & typeof collectionEndpoints,
   }
 
   for (const { plugin } of config.plugins ?? []) {

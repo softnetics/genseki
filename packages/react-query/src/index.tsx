@@ -20,9 +20,9 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   useQuery: <
     const TMethod extends keyof RestClient<TApiRouter>,
     const TPath extends ValueOf<FilterByMethod<TApiRouter, TMethod>>['schema']['path'],
-    const TPayload = RestPayload<TApiRouter, TPath>,
-    const TResponse = RestResponse<TApiRouter, TPath>,
-    const TError = DefaultError,
+    const TPayload extends RestPayload<TApiRouter, TPath> = RestPayload<TApiRouter, TPath>,
+    const TResponse extends RestResponse<TApiRouter, TPath> = RestResponse<TApiRouter, TPath>,
+    const TError extends DefaultError = DefaultError,
   >(
     method: TMethod,
     path: TPath,
@@ -32,9 +32,9 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   useMutation: <
     const TMethod extends keyof RestClient<TApiRouter>,
     const TPath extends ValueOf<FilterByMethod<TApiRouter, TMethod>>['schema']['path'],
-    const TPayload = RestPayload<TApiRouter, TPath>,
-    const TResponse = RestResponse<TApiRouter, TPath>,
-    const TError = DefaultError,
+    const TPayload extends RestPayload<TApiRouter, TPath> = RestPayload<TApiRouter, TPath>,
+    const TResponse extends RestResponse<TApiRouter, TPath> = RestResponse<TApiRouter, TPath>,
+    const TError extends DefaultError = DefaultError,
     const TContext = unknown,
   >(
     method: TMethod,
@@ -45,8 +45,8 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   queryOptions: <
     const TMethod extends keyof RestClient<TApiRouter>,
     const TPath extends ValueOf<FilterByMethod<TApiRouter, TMethod>>['schema']['path'],
-    const TPayload = RestPayload<TApiRouter, TPath>,
-    const TResponse = RestResponse<TApiRouter, TPath>,
+    const TPayload extends RestPayload<TApiRouter, TPath> = RestPayload<TApiRouter, TPath>,
+    const TResponse extends RestResponse<TApiRouter, TPath> = RestResponse<TApiRouter, TPath>,
     const TError = DefaultError,
   >(
     method: TMethod,
@@ -57,9 +57,9 @@ export interface KivotosQueryClient<TApiRouter extends ApiRouter> {
   mutationOptions: <
     const TMethod extends keyof RestClient<TApiRouter>,
     const TPath extends ValueOf<FilterByMethod<TApiRouter, TMethod>>['schema']['path'],
-    const TPayload = RestPayload<TApiRouter, TPath>,
-    const TResponse = RestResponse<TApiRouter, TPath>,
-    const TError = DefaultError,
+    const TPayload extends RestPayload<TApiRouter, TPath> = RestPayload<TApiRouter, TPath>,
+    const TResponse extends RestResponse<TApiRouter, TPath> = RestResponse<TApiRouter, TPath>,
+    const TError extends DefaultError = DefaultError,
     const TContext = unknown,
   >(
     method: TMethod,

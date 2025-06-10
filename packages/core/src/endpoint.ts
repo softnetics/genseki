@@ -1,5 +1,5 @@
 import type { JSONSchema7 } from 'json-schema'
-import type { ConditionalExcept, IsNever, Simplify, ValueOf } from 'type-fest'
+import type { ConditionalExcept, IsNever, Merge, Simplify, ValueOf } from 'type-fest'
 import type { z, ZodType } from 'zod'
 import zodToJsonSchema from 'zod-to-json-schema'
 
@@ -29,10 +29,10 @@ type GetBody<TApiRouteSchema extends ApiRouteSchema> =
       : never
     : never
 
-type GetHeaders<TApiRouteSchema extends ApiRouteSchema> =
+type GetHeadersObject<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['headers']>> extends false
-    ? Output<TApiRouteSchema['headers']> & Record<string, string>
-    : Record<string, string> | undefined
+    ? { headers: Output<TApiRouteSchema['headers']> & Record<string, string> }
+    : { headers?: Record<string, string> }
 
 type GetQuery<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['query']>> extends false ? Output<TApiRouteSchema['query']> : never
@@ -44,13 +44,17 @@ type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
       ? InferPathParams<TApiRouteSchema['path']>
       : never
 
-export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExcept<
+type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = Merge<
   {
     body: GetBody<TApiRouteSchema>
-    headers: GetHeaders<TApiRouteSchema>
     query: GetQuery<TApiRouteSchema>
     pathParams: GetPathParams<TApiRouteSchema>
   },
+  GetHeadersObject<TApiRouteSchema>
+>
+
+export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExcept<
+  ApiRouteHandlerBasePayload<TApiRouteSchema>,
   never
 >
 
