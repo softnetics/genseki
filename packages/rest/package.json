@@ -1,6 +1,5 @@
 {
   "name": "@genseki/rest",
-  "private": true,
   "sideEffects": false,
   "type": "module",
   "files": [

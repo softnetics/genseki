@@ -1,6 +1,5 @@
 {
   "name": "@genseki/react",
-  "private": true,
   "sideEffects": false,
   "type": "module",
   "files": [

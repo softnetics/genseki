@@ -1,6 +1,5 @@
 {
   "name": "@genseki/react-query",
-  "private": true,
   "sideEffects": false,
   "description": "",
   "type": "module",
