@@ -9,7 +9,7 @@
   "access": "restricted",
   "baseBranch": "main",
   "updateInternalDependencies": "patch",
-  "ignore": [],
+  "ignore": ["@example/erp", "@internal/project-config"],
   "privatePackages": {
     "tag": true,
     "version": true
