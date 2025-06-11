@@ -2,8 +2,8 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 
 import {
+  type AnyCollection,
   type ClientCollection,
-  type Collection,
   getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
@@ -49,10 +49,7 @@ export interface BaseConfig<
 export interface ServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
-    string,
-    Collection<any, any, any, any, any, any>
-  >,
+  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
 > extends BaseConfig<TFullSchema> {
   context: TContext
@@ -89,10 +86,7 @@ export function defineBaseConfig<
 export function defineServerConfig<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   const TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  const TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
-    string,
-    Collection<any, any, any, any, any, any>
-  >,
+  const TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
   const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 >(
@@ -178,9 +172,9 @@ export function getFieldsClient(fields: Fields<any>): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 
-export function getClientCollection<
-  const TCollection extends Collection<any, any, any, any, any, any>,
->(collection: TCollection): ToClientCollection<TCollection> {
+export function getClientCollection<const TCollection extends AnyCollection>(
+  collection: TCollection
+): ToClientCollection<TCollection> {
   return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
     ...collection,
     fields: getFieldsClient(collection.fields),
@@ -188,7 +182,7 @@ export function getClientCollection<
 }
 
 export function getClientConfig<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
+  TCollections extends Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<any>,
 >(
   serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
@@ -204,8 +198,8 @@ export function getClientConfig<
   return {
     auth: getAuthClient(serverConfig.auth),
     collections: R.mapValues(collections, (s) =>
-      getClientCollection(s as Collection<any, any, any, any, any, any>)
-    ) as ToClientCollectionList<TCollections>,
+      getClientCollection(s as AnyCollection)
+    ) as unknown as ToClientCollectionList<TCollections>,
     endpoints: clientEndpoints,
     $types: undefined as any,
   }

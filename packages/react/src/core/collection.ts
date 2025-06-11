@@ -553,14 +553,7 @@ export type ExtractCollectionEndpoints<TCollection extends AnyCollection> =
 export type ExtractAllCollectionEndpoints<TCollections extends Record<string, AnyCollection>> =
   UnionToIntersection<
     ValueOf<{
-      [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
-        any,
-        any,
-        any,
-        any,
-        any,
-        any
-      >
+      [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends AnyCollection
         ? ExtractCollectionEndpoints<TCollections[TCollectionIndex]>
         : {}
     }>
