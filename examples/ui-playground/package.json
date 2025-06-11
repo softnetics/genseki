@@ -1,0 +1,43 @@
+{
+  "name": "@example/ui-playground",
+  "version": "0.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "NODE_OPTIONS='--inspect' next dev --port 3003 --turbopack",
+    "build": "next build",
+    "start": "next start",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@genseki/next": "workspace:^",
+    "@genseki/react": "workspace:^",
+    "@genseki/react-query": "workspace:^",
+    "@genseki/rest": "workspace:^",
+    "@intentui/icons": "^1.10.31",
+    "@phosphor-icons/react": "^2.1.8",
+    "@tailwindcss/postcss": "^4.1.7",
+    "@tanstack/react-query": "^5.71.5",
+    "next": "15.2.2",
+    "next-themes": "^0.4.6",
+    "postcss": "^8.5.3",
+    "react": "19.1.0",
+    "react-dom": "19.1.0",
+    "tailwindcss": "^4.1.7",
+    "zod": "3.25.53"
+  },
+  "devDependencies": {
+    "@internal/project-config": "workspace:^",
+    "@types/node": "^22.13.10",
+    "@types/pg": "^8.11.11",
+    "@types/react": "19.1.4",
+    "@types/react-dom": "19.1.5",
+    "@vitejs/plugin-react": "^4.3.4",
+    "drizzle-kit": "^0.30.6",
+    "type-fest": "^4.38.0",
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.0.9"
+  }
+}
