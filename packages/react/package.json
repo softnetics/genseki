@@ -20,7 +20,7 @@
         "import": "./dist/src/index.js",
         "types": "./dist/src/index.d.ts"
       },
-      "./tailwind.css": "./dis/src/react/styles/tailwind.css"
+      "./tailwind.css": "./dist/src/react/styles/tailwind.css"
     }
   },
   "scripts": {
