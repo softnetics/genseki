@@ -31,7 +31,7 @@
     "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
     "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json && pnpm copy-tailwind",
-    "copy-tailwind": "mkdir -p dist/src/react/styles && cp src/react/styles/tailwind.css \"$_\""
+    "copy-tailwind": "mkdir -p dist/src/react/styles && cp src/react/styles/tailwind.css dist/src/react/styles"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
