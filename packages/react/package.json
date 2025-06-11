@@ -8,9 +8,8 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
     },
     "./tailwind.css": "./src/react/styles/tailwind.css"
   },
@@ -18,11 +17,11 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "tsup",
-    "bundle:watch": "tsup --watch"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
+    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
