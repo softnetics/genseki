@@ -102,7 +102,12 @@ export function defineServerConfig<
   const auth = createAuth(baseConfig.auth, baseConfig.context)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
-  let serverConfig = {
+  let serverConfig: ServerConfig<
+    TFullSchema,
+    TContext,
+    TCollections,
+    TEndpoints & AuthHandlers & typeof collectionEndpoints
+  > = {
     ...baseConfig,
     collections: config.collections,
     endpoints: {

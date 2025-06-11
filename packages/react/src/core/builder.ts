@@ -104,7 +104,7 @@ export class Builder<
       findMany: config.admin?.api?.findMany ?? defaultHandlers.findMany,
     }
     const endpoints: TApiRouter = config.admin?.endpoints ?? ({} as TApiRouter)
-    const defaultEndpoint = getDefaultCollectionAdminApiRouter<
+    const defaultEndpoints = getDefaultCollectionAdminApiRouter<
       TSlug,
       TContext,
       FieldsWithFieldName<TFields>
@@ -157,7 +157,7 @@ export class Builder<
       admin: {
         endpoints: {
           ...endpoints,
-          ...defaultEndpoint,
+          ...defaultEndpoints,
         },
       },
     }

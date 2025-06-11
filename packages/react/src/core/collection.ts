@@ -465,7 +465,7 @@ export type Collection<
   slug: TSlug
   identifierColumn: string
   fields: TFields
-  admin: CollectionAdminApiRouter<
+  admin: CollectionAdmin<
     TSlug,
     TFields,
     CollectionAdminApiConfig<TContext, TFields>,
@@ -687,7 +687,7 @@ export type CollectionDefaultAdminApiRouter<
   >
 }
 
-export type CollectionAdminApiRouter<
+export type CollectionAdmin<
   TSlug extends string = string,
   TFields extends Fields<any, any> = Fields<any, any>,
   TEndpoints extends CollectionAdminApiConfig<TContext, TFields> = CollectionAdminApiConfig<

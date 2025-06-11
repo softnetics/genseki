@@ -1,4 +1,4 @@
-import type { ConditionalExcept, IsNever, Merge, Simplify, ValueOf } from 'type-fest'
+import type { ConditionalExcept, IsNever, Simplify, ValueOf } from 'type-fest'
 import { z, type ZodType } from 'zod/v4'
 
 import type { MaybePromise } from './collection'
@@ -41,14 +41,11 @@ type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
       ? InferPathParams<TApiRouteSchema['path']>
       : never
 
-type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = Merge<
-  {
-    body: GetBody<TApiRouteSchema>
-    query: GetQuery<TApiRouteSchema>
-    pathParams: GetPathParams<TApiRouteSchema>
-  },
-  GetHeadersObject<TApiRouteSchema>
->
+type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
+  body: GetBody<TApiRouteSchema>
+  query: GetQuery<TApiRouteSchema>
+  pathParams: GetPathParams<TApiRouteSchema>
+} & GetHeadersObject<TApiRouteSchema>
 
 export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExcept<
   ApiRouteHandlerBasePayload<TApiRouteSchema>,

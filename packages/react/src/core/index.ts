@@ -5,6 +5,7 @@ export type {
   ClientApiArgs,
   ClientCollection,
   Collection,
+  CollectionAdmin,
   CollectionAdminApi,
   CollectionAdminApiConfig,
   CollectionAdminConfig,
