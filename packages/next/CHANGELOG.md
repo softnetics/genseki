@@ -1,5 +1,18 @@
 # @genseki/next
 
+## 0.1.0-alpha.1
+
+### Minor Changes
+
+- [#36](https://github.com/softnetics/genseki/pull/36) [`70d8d5e`](https://github.com/softnetics/genseki/commit/70d8d5ec78cd8537734021aaae3ad433f5870f88) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - [[DRIZZ-7] Create a new richtext editor](https://app.plane.so/softnetics/browse/DRIZZ-7/)
+
+### Patch Changes
+
+- [#42](https://github.com/softnetics/genseki/pull/42) [`7dcadee`](https://github.com/softnetics/genseki/commit/7dcadee442dc5d2b2a0c5233dd6a1e59316ad224) Thanks [@miello](https://github.com/miello)! - [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+
+- Updated dependencies [[`1277e45`](https://github.com/softnetics/genseki/commit/1277e45195e468830575c37cf05f3fc2ac537ce2), [`7dcadee`](https://github.com/softnetics/genseki/commit/7dcadee442dc5d2b2a0c5233dd6a1e59316ad224)]:
+  - @genseki/react@0.1.0-alpha.1
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes
