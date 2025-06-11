@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.2
+
+### Patch Changes
+
+- [#45](https://github.com/softnetics/genseki/pull/45) [`82272fc`](https://github.com/softnetics/genseki/commit/82272fcb7c752619b5929819ee694078eb26b340) Thanks [@miello](https://github.com/miello)! - [[DRIZZ-102] Improve DX in genseki](https://app.plane.so/softnetics/browse/DRIZZ-102/)
+
 ## 0.1.0-alpha.1
 
 ### Patch Changes
