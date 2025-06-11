@@ -474,20 +474,20 @@ export type Collection<
   >
 }
 
-export type ToClientCollection<TCollection extends Collection<any, any, any, any, any, any>> =
-  ClientCollection<
-    InferSlugFromCollection<TCollection>,
-    InferTableNameFromCollection<TCollection>,
-    InferFullSchemaFromCollection<TCollection>,
-    InferContextFromCollection<TCollection>,
-    InferFieldsFromCollection<TCollection>,
-    InferApiRouterFromCollection<TCollection>
-  >
+export type DefaultCollection = Collection
+export type AnyCollection = Collection<string, string, any, any, any, any>
 
-export type ToClientCollectionList<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
-> = {
-  [TKey in keyof TCollections]: TCollections[TKey] extends Collection<any, any, any, any, any, any>
+export type ToClientCollection<TCollection extends AnyCollection> = ClientCollection<
+  InferSlugFromCollection<TCollection>,
+  InferTableNameFromCollection<TCollection>,
+  InferFullSchemaFromCollection<TCollection>,
+  InferContextFromCollection<TCollection>,
+  InferFieldsFromCollection<TCollection>,
+  InferApiRouterFromCollection<TCollection>
+>
+
+export type ToClientCollectionList<TCollections extends Record<string, AnyCollection>> = {
+  [TKey in keyof TCollections]: TCollections[TKey] extends AnyCollection
     ? ToClientCollection<TCollections[TKey]>
     : never
 }
@@ -509,28 +509,22 @@ export type ClientCollection<
   }
 >
 
-export type InferSlugFromCollection<TCollection extends Collection<any, any, any, any, any, any>> =
-  TCollection['slug']
+export type InferSlugFromCollection<TCollection extends AnyCollection> = TCollection['slug']
 
-export type InferTableNameFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection extends Collection<any, infer TTableName, any, any, any, any> ? TTableName : never
+export type InferTableNameFromCollection<TCollection extends AnyCollection> =
+  TCollection extends Collection<any, infer TTableName, any, any, any, any> ? TTableName : never
 
-export type InferFullSchemaFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection extends Collection<any, any, infer TFullSchema, any, any, any> ? TFullSchema : never
+export type InferFullSchemaFromCollection<TCollection extends AnyCollection> =
+  TCollection extends Collection<any, any, infer TFullSchema, any, any, any> ? TFullSchema : never
 
-export type InferContextFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection extends Collection<any, any, any, infer TContext, any, any> ? TContext : never
+export type InferContextFromCollection<TCollection extends AnyCollection> =
+  TCollection extends Collection<any, any, any, infer TContext, any, any> ? TContext : never
 
-export type InferFieldsFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection extends Collection<any, any, any, any, infer TFields, any> ? TFields : never
+export type InferFieldsFromCollection<TCollection extends AnyCollection> =
+  TCollection extends Collection<any, any, any, any, infer TFields, any> ? TFields : never
 
-export type InferApiRouterFromCollection<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection extends Collection<any, any, any, any, any, infer TApiRouter> ? TApiRouter : never
+export type InferApiRouterFromCollection<TCollection extends AnyCollection> =
+  TCollection extends Collection<any, any, any, any, any, infer TApiRouter> ? TApiRouter : never
 
 export type FindTableByTableTsName<
   TFullSchema extends Record<string, unknown>,
@@ -544,35 +538,33 @@ export type GetAllTableTsNames<TFullSchema extends Record<string, unknown>> = Ex
   string
 >
 
-export type ExtractCollectionEndpoints<
-  TCollection extends Collection<any, any, any, any, any, any>,
-> = TCollection['admin']['endpoints'] extends infer TEndpoints extends Record<
-  string,
-  ApiRoute<any, any>
->
-  ? {
-      [TEndpoint in keyof TEndpoints as TEndpoints[TEndpoint]['schema'] extends ApiRouteSchema
-        ? `${TCollection['slug']}.${TEndpoint extends string ? TEndpoint : never}`
-        : never]: TEndpoints[TEndpoint]
-    }
-  : never
+export type ExtractCollectionEndpoints<TCollection extends AnyCollection> =
+  TCollection['admin']['endpoints'] extends infer TEndpoints extends Record<
+    string,
+    ApiRoute<any, any>
+  >
+    ? {
+        [TEndpoint in keyof TEndpoints as TEndpoints[TEndpoint]['schema'] extends ApiRouteSchema
+          ? `${TCollection['slug']}.${TEndpoint extends string ? TEndpoint : never}`
+          : never]: TEndpoints[TEndpoint]
+      }
+    : never
 
-export type ExtractAllCollectionEndpoints<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
-> = UnionToIntersection<
-  ValueOf<{
-    [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
-      any,
-      any,
-      any,
-      any,
-      any,
-      any
-    >
-      ? ExtractCollectionEndpoints<TCollections[TCollectionIndex]>
-      : {}
-  }>
->
+export type ExtractAllCollectionEndpoints<TCollections extends Record<string, AnyCollection>> =
+  UnionToIntersection<
+    ValueOf<{
+      [TCollectionIndex in keyof TCollections]: TCollections[TCollectionIndex] extends Collection<
+        any,
+        any,
+        any,
+        any,
+        any,
+        any
+      >
+        ? ExtractCollectionEndpoints<TCollections[TCollectionIndex]>
+        : {}
+    }>
+  >
 
 type SuccessResponse<TFunc extends (...args: any) => any> = ToZodObject<Awaited<ReturnType<TFunc>>>
 
@@ -888,9 +880,9 @@ export function getDefaultCollectionAdminApiRouter<
   )
 }
 
-export function getAllCollectionEndpoints<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
->(collections: TCollections): ExtractAllCollectionEndpoints<TCollections> {
+export function getAllCollectionEndpoints<TCollections extends Record<string, AnyCollection>>(
+  collections: TCollections
+): ExtractAllCollectionEndpoints<TCollections> {
   const endpoints: any = Object.fromEntries(
     Object.entries(collections).flatMap(([_, collection]) => {
       return Object.entries(collection.admin.endpoints ?? {}).map(([method, value]) => {

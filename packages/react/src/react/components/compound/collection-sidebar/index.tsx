@@ -4,7 +4,7 @@ import { CollectionSection } from './sections/collection-section'
 import { NavigationSection } from './sections/navigations-section'
 import { PluginSection } from './sections/plugin-section'
 
-import type { Collection } from '../../../../core'
+import type { AnyCollection } from '../../../../core/collection'
 import {
   BaseIcon,
   Sidebar,
@@ -15,11 +15,7 @@ import {
   Typography,
 } from '../../primitives'
 
-export async function AppSidebar({
-  collections,
-}: {
-  collections: Record<string, Collection<any, any, any, any, any, any>>
-}) {
+export async function AppSidebar({ collections }: { collections: Record<string, AnyCollection> }) {
   const collectionSlugs = Object.values(collections).map((collection) => collection.slug)
 
   return (
