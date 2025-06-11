@@ -9,8 +9,17 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/src/index.js",
+        "types": "./dist/src/index.d.ts"
+      }
     }
   },
   "scripts": {
@@ -18,8 +27,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc",
-    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
-    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
   },
   "dependencies": {
     "@genseki/react": "workspace:^",
