@@ -1,6 +1,6 @@
 ---
 '@example/ui-playground': minor
-"@genseki/react": patch
+'@genseki/react': patch
 ---
 
 [[DRIZZ-99] Split the UIPlayground package to standalone package](https://app.plane.so/softnetics/browse/DRIZZ-99/)

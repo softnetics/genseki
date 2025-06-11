@@ -34,7 +34,7 @@ export function CreateClientView(props: CreateClientViewProps) {
       console.log('Creation successful:', result.body)
       return navigate(`./`)
     } else {
-      // Handle error, e.g., show an error message
+      // TODO: Handle error, e.g., show an error message
       console.error('Creation failed:', result.body)
     }
   }

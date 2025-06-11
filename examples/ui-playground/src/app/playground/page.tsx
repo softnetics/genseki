@@ -2,6 +2,23 @@
 
 import { Suspense } from 'react'
 
+import { IconGallery, IconGrid4, IconLink, IconRedo, IconUndo } from '@intentui/icons'
+import {
+  CaretDownIcon,
+  DiscordLogoIcon,
+  GithubLogoIcon,
+  PlusCircleIcon,
+  TextAlignCenterIcon,
+  TextAlignJustifyIcon,
+  TextAlignLeftIcon,
+  TextAlignRightIcon,
+  TextBIcon,
+  TextItalicIcon,
+  TextStrikethroughIcon,
+  TextUnderlineIcon,
+  TrashIcon,
+} from '@phosphor-icons/react'
+
 import {
   Link,
   Switch,
@@ -61,22 +78,6 @@ import {
   SelectSeparator,
   SelectTrigger,
 } from '@genseki/react'
-import { IconGallery, IconGrid4, IconLink, IconRedo, IconUndo } from '@intentui/icons'
-import {
-  CaretDownIcon,
-  DiscordLogoIcon,
-  GithubLogoIcon,
-  PlusCircleIcon,
-  TextAlignCenterIcon,
-  TextAlignJustifyIcon,
-  TextAlignLeftIcon,
-  TextAlignRightIcon,
-  TextBIcon,
-  TextItalicIcon,
-  TextStrikethroughIcon,
-  TextUnderlineIcon,
-  TrashIcon,
-} from '@phosphor-icons/react'
 
 import { PlaygroundCard } from './_components/card'
 import { Wrapper } from './_components/wrapper'

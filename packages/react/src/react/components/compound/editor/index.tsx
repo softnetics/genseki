@@ -57,7 +57,10 @@ export const RichTextEditor = () => {
             accept: 'image/*',
             maxSize: MAX_FILE_SIZE,
             limit: 3,
-            upload: uploadAction,
+            upload: async (file) => {
+              console.log(file)
+              return 'https://placehold.co/600x400'
+            },
             onSuccess: handleUploadSuccess,
             onError: handleUploadError,
           }),

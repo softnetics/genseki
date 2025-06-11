@@ -1,23 +1,31 @@
 {
   "name": "@genseki/react",
-  "private": true,
   "sideEffects": false,
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
+  "version": "0.1.0-alpha.1",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./src/index.ts",
+    ".": {
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    },
     "./tailwind.css": "./src/react/styles/tailwind.css"
   },
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc",
     "test": "vitest run",
-    "diagnostics": "tsc --noEmit --extendedDiagnostics"
+    "diagnostics": "tsc --noEmit --extendedDiagnostics",
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
+    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
   },
   "dependencies": {
+    "@aws-sdk/client-s3": "^3.826.0",
+    "@aws-sdk/s3-request-presigner": "^3.826.0",
     "@hookform/resolvers": "^5.0.1",
     "@intentui/icons": "^1.10.31",
     "@internationalized/date": "^3.8.1",
@@ -60,6 +68,7 @@
     "@types/json-schema": "^7.0.15",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
+    "tsup": "^8.5.0",
     "type-fest": "^4.38.0",
     "vitest": "^3.0.9"
   }

@@ -4,7 +4,7 @@ import { FileArrowUpIcon, XIcon } from '@phosphor-icons/react'
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper } from '@tiptap/react'
 
-import { cn } from '../../../utils/cn'
+import { cn } from '../../../../utils/cn'
 import type { UploadFunction } from '../file-upload-adapters/generic-adapter'
 
 export type FileItem =

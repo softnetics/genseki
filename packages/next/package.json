@@ -1,18 +1,25 @@
 {
   "name": "@genseki/next",
-  "private": true,
+  "description": "Next.js integration for Genseki",
+  "version": "0.1.0-alpha.1",
   "sideEffects": false,
   "type": "module",
-  "main": "./src/index.ts",
-  "module": "./src/index.ts",
+  "files": [
+    "dist"
+  ],
   "exports": {
-    ".": "./src/index.ts"
+    ".": {
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
+    }
   },
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit"
+    "typecheck": "tsc",
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
+    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
   },
   "dependencies": {
     "@genseki/react": "workspace:^",
@@ -27,6 +34,7 @@
   "devDependencies": {
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
+    "tsup": "^8.5.0",
     "type-fest": "^4.41.0",
     "vitest": "^3.0.9"
   }

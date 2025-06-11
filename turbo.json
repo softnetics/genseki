@@ -7,21 +7,31 @@
   },
   "tasks": {
     "build": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["bundle", "^build"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
       "outputs": [".next/**", "!.next/cache/**"]
     },
+    "bundle": {
+      "dependsOn": ["^bundle"],
+      "outputs": ["dist"]
+    },
+    "bundle:watch": {
+      "dependsOn": ["^bundle:watch"]
+    },
     "lint": {
-      "dependsOn": ["^lint"]
+      "dependsOn": ["bundle", "^lint"]
     },
     "typecheck": {
-      "dependsOn": ["^typecheck"]
+      "dependsOn": ["bundle", "^typecheck"]
     },
     "dev": {
+      "dependsOn": ["bundle"],
       "cache": false,
       "persistent": true
     },
-    "test": {},
+    "test": {
+      "dependsOn": ["bundle"]
+    },
     "format:check": {}
   }
 }

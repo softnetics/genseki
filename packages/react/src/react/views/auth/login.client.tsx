@@ -27,6 +27,7 @@ export function LoginClientForm() {
 
     if (response.status !== 200) {
       console.error('Login failed', response)
+      // TODO: add error handling
       return
     }
 

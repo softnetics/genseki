@@ -1,8 +1,8 @@
 import { ImageIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { Button } from '../../../intentui/ui/button'
-import { BaseIcon } from '../../primitives/base-icon'
+import { Button } from '../../../primitives/button'
+import { BaseIcon } from '../../../primitives/base-icon'
 
 const UploadImageButton = () => {
   const { editor } = useCurrentEditor()

@@ -1,6 +1,6 @@
 {
   "name": "@example/ui-playground",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev --port 3003 --turbopack",
@@ -29,7 +29,7 @@
     "zod": "3.25.53"
   },
   "devDependencies": {
-    "@internals/project-config": "workspace:^",
+    "@internal/project-config": "workspace:^",
     "@types/node": "^22.13.10",
     "@types/pg": "^8.11.11",
     "@types/react": "19.1.4",

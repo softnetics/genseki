@@ -1,5 +1,4 @@
-import { Context, createAuth, type ServerConfig } from '@genseki/react'
-
+import { Context, createAuth, type ServerConfig } from '../../../core'
 import { getHeadersObject } from '../../utils/headers'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {

@@ -1,0 +1,40 @@
+{
+  "mode": "pre",
+  "tag": "alpha",
+  "initialVersions": {
+    "@example/erp": "0.0.0",
+    "@internal/project-config": "0.0.0",
+    "@genseki/next": "0.0.0",
+    "@genseki/plugins": "0.0.0",
+    "@genseki/react": "0.0.0",
+    "@genseki/react-query": "0.0.0",
+    "@genseki/rest": "0.0.0",
+    "@example/ui-playground": "0.0.0"
+  },
+  "changesets": [
+    "blue-ghosts-rush",
+    "blue-seals-care",
+    "brown-pens-ring",
+    "calm-cows-smoke",
+    "cool-knives-appear",
+    "easy-hats-post",
+    "empty-worms-applaud",
+    "good-cities-cut",
+    "itchy-peaches-peel",
+    "kind-rivers-obey",
+    "late-adults-hammer",
+    "many-friends-behave",
+    "orange-worms-stare",
+    "polite-games-help",
+    "popular-tips-draw",
+    "proud-olives-lie",
+    "rude-walls-hug",
+    "short-coats-wonder",
+    "shy-hats-tease",
+    "shy-rice-grow",
+    "six-moose-sneeze",
+    "swift-points-wait",
+    "thick-groups-greet",
+    "tidy-mice-cheer"
+  ]
+}
