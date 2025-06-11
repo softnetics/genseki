@@ -16,7 +16,7 @@
       "outputs": ["dist"]
     },
     "bundle:watch": {
-      "dependsOn": ["^bundle"]
+      "dependsOn": ["^bundle:watch"]
     },
     "lint": {
       "dependsOn": ["^lint"]

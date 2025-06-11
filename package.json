@@ -4,7 +4,7 @@
   "scripts": {
     "build": "turbo run build",
     "bundle": "turbo run bundle",
-    "bundle:watch": "turbo run bundle:watch",
+    "bundle:watch": "turbo run bundle:watch --parallel",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",

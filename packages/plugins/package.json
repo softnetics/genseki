@@ -8,19 +8,18 @@
   ],
   "exports": {
     ".": {
-      "require": "./dist/index.cjs",
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
+      "import": "./dist/src/index.js",
+      "types": "./dist/src/index.d.ts"
     }
   },
   "scripts": {
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc --noEmit",
+    "typecheck": "tsc -p tsconfig.check.json",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "tsup",
-    "bundle:watch": "tsup --watch"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
+    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
   },
   "dependencies": {
     "cookie-es": "^2.0.0",
