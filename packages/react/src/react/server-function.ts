@@ -1,3 +1,5 @@
+import type { ValueOf } from 'type-fest'
+
 import {
   type ApiRoute,
   type ApiRouteHandlerPayload,

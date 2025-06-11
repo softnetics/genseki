@@ -1,6 +1,7 @@
+import { StarIcon } from '@phosphor-icons/react/dist/ssr'
+
 import { BaseIcon } from '@genseki/react'
 import { Typography } from '@genseki/react'
-import { StarIcon } from '@phosphor-icons/react/dist/ssr'
 
 type PlaygroundCardProps = React.PropsWithChildren<{
   title: string
