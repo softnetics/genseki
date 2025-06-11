@@ -8,10 +8,20 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
     },
     "./tailwind.css": "./src/react/styles/tailwind.css"
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/src/index.js",
+        "types": "./dist/src/index.d.ts"
+      },
+      "./tailwind.css": "./dis/src/react/styles/tailwind.css"
+    }
   },
   "scripts": {
     "lint": "eslint .",
@@ -20,8 +30,8 @@
     "typecheck": "tsc",
     "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
-    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json && pnpm copy-tailwind",
+    "copy-tailwind": "mkdir -p dist/src/react/styles && cp src/react/styles/tailwind.css \"$_\""
   },
   "dependencies": {
     "@hookform/resolvers": "^5.0.1",
