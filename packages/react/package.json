@@ -53,7 +53,7 @@
     "motion": "^12.7.4",
     "radix3": "^1.1.2",
     "react": "^19.1.0",
-    "react-aria-components": "^1.7.1",
+    "react-aria-components": "^1.9.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.3",
     "remeda": "^2.21.2",
