@@ -17,7 +17,7 @@
     "lint": "eslint .",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "typecheck": "tsc -p tsconfig.check.json",
+    "typecheck": "tsc",
     "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
     "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
