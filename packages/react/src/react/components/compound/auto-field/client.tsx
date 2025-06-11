@@ -3,7 +3,6 @@
 import type { ReactNode } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import type { Field, FieldRelation } from '../../../../core'
 import {
   Button,
   Checkbox,
@@ -30,6 +29,7 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
+import type { Field, FieldRelation } from '../../../../core'
 import type { RichTextOptions } from '../../../../core/field'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
