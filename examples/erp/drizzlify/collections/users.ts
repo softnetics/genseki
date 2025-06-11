@@ -6,6 +6,8 @@ export const usersCollection = builder.collection('user', {
   fields: builder.fields('user', (fb) => ({
     id: fb.columns('id', {
       type: 'text',
+      create: 'hidden',
+      update: 'disabled',
     }),
     name: fb.columns('name', {
       type: 'text',

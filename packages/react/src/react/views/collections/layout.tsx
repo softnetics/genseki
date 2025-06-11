@@ -1,5 +1,4 @@
-import type { ServerConfig } from '@genseki/react'
-
+import type { ServerConfig } from '../../../core'
 import { AppSidebarNav, SidebarInset, SidebarProvider } from '../../components'
 import { AppSidebar } from '../../components/compound/collection-sidebar'
 

@@ -1,4 +1,4 @@
-import type { AnyServerConfig, ServerConfig } from '@genseki/react'
+import type { AnyServerConfig, ServerConfig } from '../core'
 
 export type GensekiPlugin<out TOutput extends AnyServerConfig> = {
   name: string

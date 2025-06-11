@@ -1,6 +1,7 @@
 {
-  "extends": "@internals/project-config/tsconfig/reactjs.json",
+  "extends": "@internal/project-config/tsconfig/reactjs.json",
   "compilerOptions": {
+    "rootDir": ".",
     "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler"

@@ -1,9 +1,9 @@
-import type { ServerConfig } from '@genseki/react'
-import { Context, createAuth, getClientCollection } from '@genseki/react'
 import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { ListTable } from './list.client'
 
+import type { ServerConfig } from '../../../core'
+import { Context, createAuth, getClientCollection } from '../../../core'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'

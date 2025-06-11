@@ -5,8 +5,7 @@ import {
   type ApiRouteResponse,
   type ApiRouteSchema,
   type ServerConfig,
-} from '@genseki/react'
-import type { ValueOf } from 'type-fest'
+} from '../core'
 
 export type ServerFunction<
   TServerConfig extends ServerConfig<any, any, any, any> = ServerConfig<any, any, any, any>,

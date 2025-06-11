@@ -1,1 +1,1 @@
-export { default } from '@internals/project-config/eslint/next.mjs'
+export { default } from '@internal/project-config/eslint/next.mjs'

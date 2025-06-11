@@ -1,8 +1,7 @@
 /**
  * @description Home page tends to be a collection of links to other `collections page`
  */
-import type { ServerConfig } from '@genseki/react'
-
+import type { ServerConfig } from '../../../core'
 import { CollectionCard } from '../../components/compound/collection-card'
 import { Typography } from '../../components/primitives/typography'
 

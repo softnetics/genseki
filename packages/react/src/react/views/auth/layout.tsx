@@ -1,4 +1,4 @@
-import type { ServerConfig } from '@genseki/react'
+import type { ServerConfig } from '../../../core'
 
 interface AuthLayoutProps {
   serverConfig: ServerConfig

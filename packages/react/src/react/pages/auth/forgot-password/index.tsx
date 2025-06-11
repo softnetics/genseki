@@ -1,10 +1,9 @@
 'use server'
 
-import type { ServerConfig } from '@genseki/react'
-
 import { ForgotPasswordRightPanel } from './_components/right-panel'
 import { setServerConfig } from './server-context'
 
+import type { ServerConfig } from '../../../../core'
 import { LeftPanel } from '../_components/left-panel'
 
 interface ForgotPasswordPageProps {

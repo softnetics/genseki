@@ -3,15 +3,16 @@
 import type { ReactNode } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import type { Field, FieldRelation } from '../../../../core'
+import { cn } from '../../../utils/cn'
+import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 import {
   Button,
   Checkbox,
   type CheckboxProps,
   DatePicker,
   type DatePickerProps,
-  type Field,
   FieldError,
-  type FieldRelation,
   FormField,
   FormItemController,
   Label,
@@ -29,10 +30,7 @@ import {
   TimeField,
   type TimeFieldProps,
   useFormItemController,
-} from '@genseki/react'
-
-import { cn } from '../../../utils/cn'
-import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
+} from '../../primitives'
 
 export function AutoTextField(props: TextFieldProps) {
   const { field, error } = useFormItemController()

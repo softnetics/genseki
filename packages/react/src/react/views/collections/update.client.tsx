@@ -1,7 +1,8 @@
 'use client'
 
-import { Form, type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
+import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
@@ -35,7 +36,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       console.log('Update successful:', result.body)
       return navigate(`../`) // Redirect to the list page
     } else {
-      // Handle error, e.g., show an error message
+      // TODO: Handle error, e.g., show an error message
       console.error('Update failed:', result.body)
     }
   }
