@@ -8,12 +8,15 @@
     "@genseki/plugins": "0.0.0",
     "@genseki/react": "0.0.0",
     "@genseki/react-query": "0.0.0",
-    "@genseki/rest": "0.0.0"
+    "@genseki/rest": "0.0.0",
+    "@example/ui-playground": "0.0.0"
   },
   "changesets": [
     "blue-ghosts-rush",
     "blue-seals-care",
+    "brown-pens-ring",
     "calm-cows-smoke",
+    "cool-knives-appear",
     "easy-hats-post",
     "empty-worms-applaud",
     "good-cities-cut",
@@ -23,6 +26,7 @@
     "many-friends-behave",
     "orange-worms-stare",
     "polite-games-help",
+    "popular-tips-draw",
     "proud-olives-lie",
     "rude-walls-hug",
     "short-coats-wonder",

@@ -1,5 +1,14 @@
 # @genseki/react
 
+## 0.1.0-alpha.1
+
+### Patch Changes
+
+- [#36](https://github.com/softnetics/genseki/pull/36) [`1277e45`](https://github.com/softnetics/genseki/commit/1277e45195e468830575c37cf05f3fc2ac537ce2) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - [[DRIZZ-99] Split the UIPlayground package to standalone package](https://app.plane.so/softnetics/browse/DRIZZ-99/)
+  [[DRIZZ-100] Reconfigure components after large codebase restructure](https://app.plane.so/softnetics/browse/DRIZZ-100/)
+
+- [#42](https://github.com/softnetics/genseki/pull/42) [`7dcadee`](https://github.com/softnetics/genseki/commit/7dcadee442dc5d2b2a0c5233dd6a1e59316ad224) Thanks [@miello](https://github.com/miello)! - [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+
 ## 0.1.0-alpha.0
 
 ### Minor Changes
