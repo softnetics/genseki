@@ -43,10 +43,9 @@
   "editor.formatOnSaveMode": "file",
   "typescript.tsdk": "node_modules/typescript/lib",
   "tailwindCSS.experimental.configFile": {
-    "packages/next/src/styles/tailwind.css": "packages/next/**",
-    "examples/erp/src/app/global.css": "examples/erp/**",
-    "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/(admin)/**",
-    "examples/erp/src/app/(admin)/playground/tailwind.css": "examples/erp/(admin)/playground/**"
+    "packages/react/src/react/styles/tailwind.css": "packages/react/**",
+    "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/src/app/(admin)/admin/**",
+    "examples/ui-playground/src/app/playground/tailwind.css": "examples/ui-playground/**"
   },
   "tailwindCSS.experimental.classRegex": [
     ["clsx\\(.*?\\)(?!\\])", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"],
