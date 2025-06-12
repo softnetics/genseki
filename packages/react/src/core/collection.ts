@@ -2,7 +2,7 @@ import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
 import z from 'zod/v4'
 
-import type { Context, RequestContext } from './context'
+import type { AnyContext, Context, RequestContext } from './context'
 import {
   type ApiRoute,
   type ApiRouteHandler,
@@ -10,8 +10,10 @@ import {
   type ApiRouteSchema,
   type ClientApiRouter,
   createEndpoint,
+  type ToClientApiRouteSchema,
 } from './endpoint'
 import {
+  type AnyFields,
   type Field,
   type FieldClient,
   type FieldColumn,
@@ -302,8 +304,8 @@ export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcep
 > & { __pk: string | number; __id: string | number }
 
 export interface ServerApiHandlerArgs<
-  TContextValue extends Context = Context,
-  TFields extends Fields<TContextValue> = Fields<TContextValue>,
+  TContext extends Context<any> = Context<any>,
+  TFields extends Fields<any, TContext> = Fields<any, TContext>,
 > {
   slug: string
   fields: TFields
@@ -312,8 +314,8 @@ export interface ServerApiHandlerArgs<
 
 export type ApiArgs<
   TMethod extends ApiDefaultMethod,
-  TContext extends Context,
-  TFields extends Fields<TContext>,
+  TContext extends Context<any>,
+  TFields extends Fields<any, TContext>,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? ServerApiHandlerArgs<TContext, TFields> & ApiCreateArgs<TFields>
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
@@ -328,7 +330,7 @@ export type ApiArgs<
 
 export type ApiReturnType<
   TMethod extends ApiDefaultMethod,
-  TFields extends Fields<any>,
+  TFields extends Fields<any, any>,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? { __pk: string | number; __id: string | number }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
@@ -358,12 +360,12 @@ export type ApiCreateArgs<TFields extends Fields<any, any>> = {
 }
 
 export type ApiHandlerFn<
-  TContext extends Context,
-  TFields extends Fields<TContext>,
+  TContext extends Context<any>,
+  TFields extends Fields<any, TContext>,
   TMethod extends ApiDefaultMethod,
 > = (args: ApiArgs<TMethod, TContext, TFields>) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
-export type ApiUpdateArgs<TFields extends Fields<any>> = {
+export type ApiUpdateArgs<TFields extends Fields<any, any>> = {
   // This should be the primary field of the collection e.g. __pk or username
   id: string | number
   data: InferUpdateFields<TFields>
@@ -375,7 +377,7 @@ export type ApiDeleteArgs = {
 
 export type ClientApiArgs<
   TMethod extends ApiDefaultMethod,
-  TFields extends Fields<any>,
+  TFields extends AnyFields,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? ApiCreateArgs<TFields>
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
@@ -389,8 +391,8 @@ export type ClientApiArgs<
           : never
 
 export type ApiConfigHandlerFn<
-  TContext extends Context,
-  TFields extends Fields<TContext>,
+  TContext extends Context<any>,
+  TFields extends Fields<any, TContext>,
   TMethod extends ApiDefaultMethod,
 > = (
   args: ApiArgs<TMethod, TContext, TFields> & {
@@ -399,8 +401,8 @@ export type ApiConfigHandlerFn<
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
 export type CollectionAdminApiConfig<
-  TContext extends Context = Context,
-  TFields extends Fields<TContext> = Fields<TContext>,
+  TContext extends Context<any>,
+  TFields extends Fields<any, TContext>,
 > = {
   create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
   findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
@@ -410,8 +412,8 @@ export type CollectionAdminApiConfig<
 }
 
 export type CollectionAdminApi<
-  TContext extends Context = Context,
-  TFields extends Fields<TContext> = Fields<TContext>,
+  TContext extends Context<any>,
+  TFields extends Fields<any, TContext>,
 > = {
   create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
   findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
@@ -421,9 +423,9 @@ export type CollectionAdminApi<
 }
 
 export type CollectionAdminConfig<
-  TContext extends Context = Context,
-  TFields extends Fields<TContext, any> = Fields<any, any>,
-  TApiRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
+  TContext extends Context<any>,
+  TFields extends Fields<any, TContext>,
+  TApiRouter extends ApiRouter<TContext>,
 > = {
   api?: CollectionAdminApiConfig<TContext, TFields>
   endpoints?: TApiRouter
@@ -437,27 +439,27 @@ export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
     : never]: TColumnName
 }>
 
-export type CollectionConfig<
-  TSlug extends string = string,
-  TTable extends Table = Table,
-  TContext extends Context = Context,
-  TFields extends FieldsInitial<TContext, any> = FieldsInitial<TContext, any>,
-  TAppRouter extends ApiRouter<TContext> = ApiRouter<TContext>,
-> = {
+export interface CollectionConfig<
+  TSlug extends string,
+  TTable extends Table,
+  TContext extends Context,
+  TFields extends FieldsInitial<any, TContext>,
+  TAppRouter extends ApiRouter<TContext>,
+> {
   slug: TSlug
   identifierColumn: GetUniqueNotNullColumnNames<TTable>
   fields: TFields
   admin?: CollectionAdminConfig<TContext, FieldsWithFieldName<TFields>, TAppRouter>
 }
 
-export type Collection<
-  TSlug extends string = string,
-  TTableName extends string = string,
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  in TContext extends Context = Context,
-  TFields extends Fields<TContext, any> = Fields<any, any>,
+export interface Collection<
+  TSlug extends string,
+  TTableName extends string,
+  TFullSchema extends Record<string, unknown>,
+  in TContext extends Context<TFullSchema>,
+  TFields extends Fields<TFullSchema, TContext>,
   TApiRouter extends ApiRouter<TContext> = {},
-> = {
+> {
   _: {
     table: GetTableByTableTsName<TFullSchema, TTableName>
     tableConfig: TableRelationalConfig
@@ -465,13 +467,25 @@ export type Collection<
   slug: TSlug
   identifierColumn: string
   fields: TFields
-  admin: CollectionAdmin<
-    TApiRouter & NoInfer<CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>>
-  >
+  admin: CollectionAdmin<TApiRouter>
 }
 
-export type DefaultCollection = Collection
-export type AnyCollection = Collection<string, string, any, any, Fields<any, any>, ApiRouter<any>>
+export type DefaultCollection = Collection<
+  string,
+  string,
+  Record<string, unknown>,
+  Context<any>,
+  AnyFields,
+  ApiRouter<any>
+>
+export type AnyCollection = Collection<
+  string,
+  string,
+  any,
+  AnyContext,
+  AnyFields,
+  ApiRouter<AnyContext>
+>
 
 export type ToClientCollection<TCollection extends AnyCollection> = ClientCollection<
   InferSlugFromCollection<TCollection>,
@@ -479,7 +493,7 @@ export type ToClientCollection<TCollection extends AnyCollection> = ClientCollec
   InferFullSchemaFromCollection<TCollection>,
   InferContextFromCollection<TCollection>,
   InferFieldsFromCollection<TCollection>,
-  InferApiRouterFromCollection<TCollection>
+  ToClientApiRouteSchema<InferApiRouterFromCollection<TCollection>>
 >
 
 export type ToClientCollectionList<TCollections extends Record<string, AnyCollection>> = {
@@ -490,17 +504,17 @@ export type ToClientCollectionList<TCollections extends Record<string, AnyCollec
 
 // TODO: proper omit
 export type ClientCollection<
-  TSlug extends string = string,
-  TTableName extends string = any,
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context = any,
-  TFields extends Record<string, FieldClient> = Record<string, FieldClient>,
-  TEndpoints extends ClientApiRouter = {},
+  TSlug extends string,
+  TTableName extends string,
+  TFullSchema extends Record<string, unknown>,
+  TContext extends Context<TFullSchema>,
+  TFields extends Record<string, FieldClient>,
+  TApiRouter extends ClientApiRouter = {},
 > = Simplify<
   Omit<Collection<TSlug, TTableName, TFullSchema, TContext, any>, 'fields'> & {
     fields: TFields
     _: {
-      $endpoints: TEndpoints
+      $endpoints: TApiRouter
     }
   }
 >
@@ -520,7 +534,9 @@ export type InferFieldsFromCollection<TCollection extends AnyCollection> =
   TCollection extends Collection<any, any, any, any, infer TFields, any> ? TFields : never
 
 export type InferApiRouterFromCollection<TCollection extends AnyCollection> =
-  TCollection extends Collection<any, any, any, any, any, infer TApiRouter> ? TApiRouter : never
+  TCollection extends Collection<any, any, any, any, any, infer TApiRouter extends ApiRouter>
+    ? TApiRouter
+    : never
 
 export type FindTableByTableTsName<
   TFullSchema extends Record<string, unknown>,
@@ -640,7 +656,7 @@ export type CollectionDefaultAdminApiRouter<
   >
 }
 
-export type CollectionAdmin<TApiRouter extends ApiRouter = {}> = {
+export type CollectionAdmin<TApiRouter extends ApiRouter<any>> = {
   endpoints: TApiRouter
 }
 

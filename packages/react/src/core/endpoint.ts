@@ -53,8 +53,8 @@ export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = Con
 >
 
 export type ApiRouteHandlerPayloadWithContext<
+  TContext extends Context<any>,
   TApiRouteSchema extends ApiRouteSchema,
-  TContext extends Context = Context,
 > = ApiRouteHandlerPayload<TApiRouteSchema> & {
   context: ContextToRequestContext<TContext>
 }
@@ -71,10 +71,10 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContext extends Context = Context,
+  TContext extends Context<any>,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
-  payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>
+  payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<
@@ -111,8 +111,8 @@ export interface ApiRouteMutationSchema extends ApiRouteCommonSchema {
 export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
 
 export type ApiRoute<
-  in TContext extends Context = Context,
-  in out TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
+  TContext extends Context = Context,
+  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
   handler: ApiRouteHandler<ContextToRequestContext<TContext>, TApiRouteSchema>
