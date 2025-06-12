@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.3
+
+### Patch Changes
+
+- [#32](https://github.com/softnetics/genseki/pull/32) [`3912698`](https://github.com/softnetics/genseki/commit/391269852c302a3c3ce273346786d751e4e7e4da) Thanks [@miello](https://github.com/miello)! - [[DRIZZ-98] Simplify endpoints logic in collection builder for type simplicity](https://app.plane.so/softnetics/browse/DRIZZ-98/)
+
 ## 0.1.0-alpha.2
 
 ### Patch Changes
