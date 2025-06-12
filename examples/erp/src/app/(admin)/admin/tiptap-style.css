@@ -4,6 +4,7 @@
     background-color: var(--color-bluegray-50);
     min-height: 10rem;
     color: black;
+    border-radius:0 0 var(--radius-sm) var(--radius-sm);
   
     h1 {
       font-size: 2em;

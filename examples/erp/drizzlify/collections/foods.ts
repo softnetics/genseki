@@ -6,14 +6,23 @@ export const foodsCollection = builder.collection('foods', {
   fields: builder.fields('foods', (fb) => ({
     name: fb.columns('name', {
       type: 'text',
+      isRequired: true,
       label: 'Food name',
       create: 'enabled',
+      description: 'A food name',
       update: 'disabled',
     }),
     description: fb.columns('description', {
       type: 'richText',
+      isRequired: true,
+      description: 'A food and recipe description',
       label: 'Food description',
-      richTextOptions: {},
+      placeholder: '',
+      editorProviderOptions: {
+        immediatelyRender: false,
+        content: '<h2>This came from foods field</h2>',
+        shouldRerenderOnTransaction: true,
+      },
     }),
     isCooked: fb.columns('isCooked', {
       type: 'checkbox',

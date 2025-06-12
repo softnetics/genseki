@@ -1,3 +1,6 @@
+import { parseSetCookie } from 'cookie-es'
+import { cookies } from 'next/headers'
+
 import {
   type ApiRouter,
   Context,
@@ -6,8 +9,6 @@ import {
   type GetServerFunctionResponse,
   type ServerConfig,
 } from '@genseki/react'
-import { parseSetCookie } from 'cookie-es'
-import { cookies } from 'next/headers'
 
 export async function handleServerFunction<
   TServerConfig extends ServerConfig<any, any, any, ApiRouter<any>>,

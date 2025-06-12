@@ -83,7 +83,7 @@
   --color-white-normal: #ffffff;
   --color-white-vanish: rgba(255, 255, 255, 0);
 
-  --opacity-disabled: 80;
+  --opacity-disabled: 0.8;
 
   --text-xs: 0.625rem;
   --text-xs-line-height: 140%;

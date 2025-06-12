@@ -65,7 +65,7 @@ export type FieldBase = {
 }
 
 export interface RichTextOptions {
-  richTextOptions?: EditorProviderProps & {}
+  editorProviderOptions: EditorProviderProps
 }
 
 export interface FieldColumnStringCollectionOptions<TContext extends Context = Context> {
@@ -78,7 +78,6 @@ export interface FieldColumnStringCollectionOptions<TContext extends Context = C
     type: 'text'
     default?: string
     label?: string
-    placeholder?: string
   } & FieldBase
   selectText: {
     type: 'selectText'

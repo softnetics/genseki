@@ -3,6 +3,8 @@
 import type { ReactNode } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import * as R from 'remeda'
+
 import {
   Button,
   Checkbox,
@@ -15,6 +17,8 @@ import {
   Label,
   NumberField,
   type NumberFieldProps,
+  RichTextEditor,
+  type RichTextEditorProps,
   Select,
   SelectList,
   SelectOption,
@@ -26,11 +30,11 @@ import {
   type TextFieldProps,
   TimeField,
   type TimeFieldProps,
+  useClientConfig,
   useFormItemController,
 } from '@genseki/react'
 
 import type { Field, FieldRelation } from '../../../../core'
-import type { RichTextOptions } from '../../../../core/field'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 
@@ -167,8 +171,39 @@ export function AutoSelectField(props: AutoSelectField) {
   )
 }
 
-const AutoRichTextField = (props: RichTextOptions) => {
-  return <div>AUTO RICH TEXT</div>
+const AutoRichTextField = (
+  props: {
+    name: string
+    description?: string
+    label?: string
+    isRequired?: boolean
+    placeholder?: string
+  } & RichTextEditorProps
+) => {
+  const { field, error } = useFormItemController()
+  const clientConfig = useClientConfig()
+
+  const mergedEditorConfig = R.mergeDeep(
+    clientConfig.editor?.editorProviderOptions ?? {},
+    props.editorProviderOptions
+  ) as RichTextEditorProps['editorProviderOptions']
+
+  return (
+    <div className="flex flex-col gap-y-1.5">
+      <RichTextEditor
+        errorMessage={error?.message}
+        isRequired={props.isRequired}
+        isDisabled={props.isDisabled}
+        description={props.description}
+        editorProviderOptions={{
+          ...mergedEditorConfig,
+          onTransaction({ editor }) {
+            field.onChange(editor.getJSON())
+          },
+        }}
+      />
+    </div>
+  )
 }
 
 export function AutoFormField(props: { name: string; component: ReactNode }) {
@@ -211,6 +246,7 @@ export function AutoField(props: AutoFieldProps) {
     className: className,
     description: field.description,
     placeholder: field.placeholder,
+    isRequired: field.isRequired,
   }
 
   switch (field.type) {
@@ -220,11 +256,14 @@ export function AutoField(props: AutoFieldProps) {
           key={commonProps.name}
           name={commonProps.name}
           component={
-            <AutoRichTextField richTextOptions={{ content: '<p>CONTENT</p>' }} {...commonProps} />
+            <AutoRichTextField
+              editorProviderOptions={field.editorProviderOptions}
+              {...commonProps}
+              isDisabled={disabled}
+            />
           }
         />
       )
-    // return <EditorProvider />
     case 'text':
       return (
         <AutoFormField

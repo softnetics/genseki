@@ -19,7 +19,7 @@ import {
   type ToClientApiRouteSchema,
   type ToRecordApiRouteSchema,
 } from './endpoint'
-import type { Field, FieldClient, Fields, FieldsClient } from './field'
+import type { Field, FieldClient, Fields, FieldsClient, RichTextOptions } from './field'
 import type { GensekiPlugin, MergePlugins } from './plugins'
 import { isRelationField } from './utils'
 
@@ -39,6 +39,7 @@ export interface BaseConfigOptions<
   schema: TFullSchema
   context?: TContextValue
   auth: AuthConfig
+  editor?: RichTextOptions
 }
 
 export interface BaseConfig<
@@ -142,6 +143,7 @@ export interface ClientConfig<
   auth: AuthClient
   collections: TCollections
   endpoints: TApiRouter
+  editor?: RichTextOptions
 }
 
 export function getFieldClient(name: string, field: Field): FieldClient & { fieldName: string } {
@@ -210,6 +212,7 @@ export function getClientConfig<
   ) as ToClientApiRouteSchema<TApiRouter>
 
   return {
+    editor: serverConfig.editor,
     auth: getAuthClient(serverConfig.auth),
     collections: R.mapValues(collections, (s) =>
       getClientCollection(s as Collection<any, any, any, any, any, any>)
