@@ -454,7 +454,7 @@ export type Collection<
   TSlug extends string = string,
   TTableName extends string = string,
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context = any,
+  in TContext extends Context = Context,
   TFields extends Fields<TContext, any> = Fields<any, any>,
   TApiRouter extends ApiRouter<TContext> = {},
 > = {
@@ -466,16 +466,12 @@ export type Collection<
   identifierColumn: string
   fields: TFields
   admin: CollectionAdmin<
-    TSlug,
-    TFields,
-    CollectionAdminApiConfig<TContext, TFields>,
-    TApiRouter,
-    TContext
+    TApiRouter & NoInfer<CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>>
   >
 }
 
 export type DefaultCollection = Collection
-export type AnyCollection = Collection<string, string, any, any, any, any>
+export type AnyCollection = Collection<string, string, any, any, Fields<any, any>, ApiRouter<any>>
 
 export type ToClientCollection<TCollection extends AnyCollection> = ClientCollection<
   InferSlugFromCollection<TCollection>,
@@ -559,20 +555,17 @@ export type ExtractAllCollectionEndpoints<TCollections extends Record<string, An
     }>
   >
 
-type SuccessResponse<TFunc extends (...args: any) => any> = ToZodObject<Awaited<ReturnType<TFunc>>>
-
 export type ConvertCollectionDefaultApiToApiRouteSchema<
   TSlug extends string,
-  TFields extends Fields<any, any>,
-  TEndpoints extends CollectionAdminApiConfig<any, TFields>,
   TMethod extends ApiDefaultMethod,
+  TFields extends Fields<any, any>,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? {
       path: `/api/${TSlug}/${TMethod}`
       method: 'POST'
       body: ToZodObject<InferCreateFields<TFields>>
       responses: {
-        200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
+        200: ToZodObject<ApiReturnType<TMethod, TFields>>
       }
     }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
@@ -581,7 +574,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
         method: 'GET'
         pathParams: ToZodObject<{ id: string }>
         responses: {
-          200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
+          200: ToZodObject<ApiReturnType<TMethod, TFields>>
         }
       }
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
@@ -595,7 +588,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
             orderType?: 'asc' | 'desc'
           }>
           responses: {
-            200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
+            200: ToZodObject<ApiReturnType<TMethod, TFields>>
           }
         }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
@@ -605,7 +598,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
             pathParams: ToZodObject<{ id: string }>
             body: ToZodObject<InferUpdateFields<TFields>>
             responses: {
-              200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
+              200: ToZodObject<ApiReturnType<TMethod, TFields>>
             }
           }
         : TMethod extends typeof ApiDefaultMethod.DELETE
@@ -614,7 +607,8 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
               method: 'DELETE'
               body: ToZodObject<{ ids: string[] | number[] }>
               responses: {
-                200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
+                // TODO: recheck this
+                200: ToZodObject<{}>
               }
             }
           : never
@@ -623,81 +617,42 @@ export type CollectionDefaultAdminApiRouter<
   TSlug extends string,
   TContext extends Context,
   TFields extends Fields<any, any>,
-  TEndpoints extends CollectionAdminApiConfig<TContext, TFields>,
 > = {
   create: ApiRoute<
     TContext,
-    ConvertCollectionDefaultApiToApiRouteSchema<
-      TSlug,
-      TFields,
-      TEndpoints,
-      typeof ApiDefaultMethod.CREATE
-    >
+    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.CREATE, TFields>
   >
   findOne: ApiRoute<
     TContext,
-    ConvertCollectionDefaultApiToApiRouteSchema<
-      TSlug,
-      TFields,
-      TEndpoints,
-      typeof ApiDefaultMethod.FIND_ONE
-    >
+    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.FIND_ONE, TFields>
   >
   findMany: ApiRoute<
     TContext,
-    ConvertCollectionDefaultApiToApiRouteSchema<
-      TSlug,
-      TFields,
-      TEndpoints,
-      typeof ApiDefaultMethod.FIND_MANY
-    >
+    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.FIND_MANY, TFields>
   >
   update: ApiRoute<
     TContext,
-    ConvertCollectionDefaultApiToApiRouteSchema<
-      TSlug,
-      TFields,
-      TEndpoints,
-      typeof ApiDefaultMethod.UPDATE
-    >
+    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.UPDATE, TFields>
   >
   delete: ApiRoute<
     TContext,
-    ConvertCollectionDefaultApiToApiRouteSchema<
-      TSlug,
-      TFields,
-      TEndpoints,
-      typeof ApiDefaultMethod.DELETE
-    >
+    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.DELETE, TFields>
   >
 }
 
-export type CollectionAdmin<
-  TSlug extends string = string,
-  TFields extends Fields<any, any> = Fields<any, any>,
-  TEndpoints extends CollectionAdminApiConfig<TContext, TFields> = CollectionAdminApiConfig<
-    any,
-    TFields
-  >,
-  TApiRouter extends ApiRouter<Context> = {},
-  TContext extends Context = any,
-> = {
-  endpoints: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields, TEndpoints>
+export type CollectionAdmin<TApiRouter extends ApiRouter = {}> = {
+  endpoints: TApiRouter
 }
 
 export function getDefaultCollectionAdminApiRouter<
   TSlug extends string = string,
   TContext extends Context = Context,
   TFields extends Fields<any, any> = Fields<any, any>,
-  TDefaultHandler extends CollectionAdminApiConfig<TContext, TFields> = CollectionAdminApiConfig<
-    TContext,
-    TFields
-  >,
 >(
   slug: TSlug,
   fields: TFields,
-  defaultHandler: TDefaultHandler
-): CollectionDefaultAdminApiRouter<TSlug, TContext, TFields, TDefaultHandler> {
+  defaultHandler: CollectionAdminApiConfig<TContext, TFields>
+): CollectionDefaultAdminApiRouter<TSlug, TContext, TFields> {
   return Object.fromEntries(
     Object.entries(defaultHandler).map(([method, fn]) => {
       const endpointName = method

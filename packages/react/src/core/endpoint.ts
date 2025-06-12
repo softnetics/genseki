@@ -111,8 +111,8 @@ export interface ApiRouteMutationSchema extends ApiRouteCommonSchema {
 export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
 
 export type ApiRoute<
-  TContext extends Context = Context,
-  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
+  in TContext extends Context = Context,
+  in out TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
   handler: ApiRouteHandler<ContextToRequestContext<TContext>, TApiRouteSchema>
@@ -132,7 +132,7 @@ export type AppendPrefixPathToApiRoute<
       : never
     : never
 
-export interface ApiRouter<TContext extends Context = Context> {
+export interface ApiRouter<in TContext extends Context = Context> {
   [key: string]: ApiRoute<TContext, any>
 }
 
