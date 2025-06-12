@@ -1,6 +1,7 @@
 export { type AuthHandlers, createAuth } from '../auth'
 export { Builder } from './builder'
 export type {
+  AnyCollection,
   ApiReturnType,
   ClientApiArgs,
   ClientCollection,
@@ -10,6 +11,7 @@ export type {
   CollectionAdminApiConfig,
   CollectionAdminConfig,
   CollectionConfig,
+  DefaultCollection,
   InferApiRouterFromCollection,
   InferContextFromCollection,
   InferField,

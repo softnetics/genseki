@@ -3,10 +3,10 @@ import type { ReactNode } from 'react'
 import { createRouter } from 'radix3'
 
 import {
+  type AnyCollection,
   type ApiRouter,
   type AuthHandlers,
   AuthLayout,
-  type Collection,
   CollectionLayout,
   type Context,
   CreateView,
@@ -47,10 +47,7 @@ export type RouterData =
 export interface NextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
-    string,
-    Collection<any, any, any, any, any, any>
-  >,
+  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
 > extends ServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
   radixRouter: ReturnType<typeof createRouter<RouterData>>
@@ -60,10 +57,7 @@ export interface NextJsServerConfig<
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
-    string,
-    Collection<any, any, any, any, any, any>
-  >,
+  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(
   serverConfig: ServerConfig<TFullSchema, TContext, TCollections, TApiRouter>
