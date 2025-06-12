@@ -3,9 +3,6 @@
 import type { ReactNode } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import type { Field, FieldRelation } from '../../../../core'
-import { cn } from '../../../utils/cn'
-import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 import {
   Button,
   Checkbox,
@@ -30,7 +27,12 @@ import {
   TimeField,
   type TimeFieldProps,
   useFormItemController,
-} from '../../primitives'
+} from '@genseki/react'
+
+import type { Field, FieldRelation } from '../../../../core'
+import type { RichTextOptions } from '../../../../core/field'
+import { cn } from '../../../utils/cn'
+import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 
 export function AutoTextField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
@@ -165,6 +167,10 @@ export function AutoSelectField(props: AutoSelectField) {
   )
 }
 
+const AutoRichTextField = (props: RichTextOptions) => {
+  return <div>AUTO RICH TEXT</div>
+}
+
 export function AutoFormField(props: { name: string; component: ReactNode }) {
   const { control } = useFormContext()
   return (
@@ -208,6 +214,17 @@ export function AutoField(props: AutoFieldProps) {
   }
 
   switch (field.type) {
+    case 'richText':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoRichTextField richTextOptions={{ content: '<p>CONTENT</p>' }} {...commonProps} />
+          }
+        />
+      )
+    // return <EditorProvider />
     case 'text':
       return (
         <AutoFormField

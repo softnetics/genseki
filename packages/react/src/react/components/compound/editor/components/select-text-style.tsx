@@ -49,7 +49,7 @@ export const SelectTextStyle = () => {
   const { editor } = useCurrentEditor()
   if (!editor) throw new Error('Editor provider is missing')
 
-  const selectChange = (value: Key) => {
+  const selectChange = (value: Key | null) => {
     const selectedStyle = textStylesList.find((textStyle) => textStyle.value === value)
 
     if (!selectedStyle) {

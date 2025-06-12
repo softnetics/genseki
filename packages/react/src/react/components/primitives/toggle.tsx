@@ -108,7 +108,7 @@ const toggleStyles = tv({
   base: [
     'inset-ring inset-ring-border cursor-default items-center gap-x-2 rounded-lg outline-hidden sm:text-sm',
     'forced-colors:[--button-icon:ButtonText] forced-colors:hover:[--button-icon:ButtonText]',
-    '*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-1 *:data-[slot=icon]:size-8 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:text-current/60 pressed:*:data-[slot=icon]:text-current hover:*:data-[slot=icon]:text-current/90',
+    '*:data-[slot=icon]:-mx-0.5 *:data-[slot=icon]:my-0 *:data-[slot=icon]:size-8 *:data-[slot=icon]:shrink-0 *:data-[slot=icon]:text-current/60 pressed:*:data-[slot=icon]:text-current hover:*:data-[slot=icon]:text-current/90',
   ],
   variants: {
     isDisabled: {

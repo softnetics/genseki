@@ -7,6 +7,7 @@ import { MarkButton } from './mark-button'
 import { RedoButton, UndoButton } from './redo-undo-buttons'
 import { SelectTextStyle } from './select-text-style'
 import { TextAlignButton, TextAlignButtonsGroup } from './text-align-buttons'
+import UploadImageButton from './upload-image-button'
 
 import { BaseIcon } from '../../../primitives/base-icon'
 import { ToggleGroup } from '../../../primitives/toggle'
@@ -61,6 +62,8 @@ export const EditorBar = () => {
             <TextAlignButton type="justify" />
           </TextAlignButtonsGroup>
         </ToolbarGroup>
+        <ToolbarSeparator />
+        <UploadImageButton />
       </Toolbar>
     </div>
   )

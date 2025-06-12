@@ -13,15 +13,14 @@ export const EditorColorPicker = ({
   const [color, setColor] = useState(parseColor('#000000'))
 
   return (
-    <>
-      <ColorPicker
-        onPopupOpenChange={(isOpen) => {
-          if (!isOpen) onPopupClose(color)
-        }}
-        eyeDropper
-        onChange={setColor}
-        {...props}
-      />
-    </>
+    <ColorPicker
+      onPopupOpenChange={(isOpen) => {
+        if (!isOpen) onPopupClose(color)
+      }}
+      // value={parseColor('#AAABBB')} // TODO
+      eyeDropper
+      onChange={setColor}
+      {...props}
+    />
   )
 }

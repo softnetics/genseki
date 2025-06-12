@@ -39,20 +39,25 @@ export const postsCollection = builder.collection('posts', {
     },
   },
   fields: builder.fields('posts', (fb) => ({
+    id: fb.columns('id', {
+      label: 'ID',
+      type: 'text',
+      create: 'hidden',
+      update: 'hidden',
+    }),
     title: fb.columns('title', {
       type: 'text',
       label: 'Title',
-      description: 'The title of the post',
+      description: "Post's title name",
     }),
     content: fb.columns('content', {
-      type: 'text',
+      type: 'richText',
       label: 'Content',
-      description: 'The content of the post',
+      richTextOptions: {},
     }),
-    author: fb.relations('author', (fb) => ({
-      type: 'create',
+    authorId: fb.relations('author', (fb) => ({
+      type: 'connect',
       label: 'Author',
-      description: 'The author of the post',
       fields: fb.fields('user', (fb) => ({
         name: fb.columns('name', {
           type: 'text',
