@@ -1,6 +1,6 @@
 {
   "name": "@genseki/plugins",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.2",
   "sideEffects": false,
   "type": "module",
   "files": [
@@ -8,8 +8,17 @@
   ],
   "exports": {
     ".": {
-      "import": "./dist/src/index.js",
-      "types": "./dist/src/index.d.ts"
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/src/index.js",
+        "types": "./dist/src/index.d.ts"
+      }
     }
   },
   "scripts": {
@@ -18,8 +27,7 @@
     "format:check": "prettier --check .",
     "typecheck": "tsc",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
-    "bundle:watch": "tsc -p tsconfig.bundle.json --watch"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
   },
   "dependencies": {
     "@tiptap/react": "^2.12.0",
