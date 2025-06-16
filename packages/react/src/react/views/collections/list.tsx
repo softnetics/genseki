@@ -1,10 +1,9 @@
 import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 
-import type { ServerConfig } from '@genseki/react'
-import { Context, createAuth, getClientCollection } from '@genseki/react'
-
 import { ListTable } from './list.client'
 
+import type { ServerConfig } from '../../../core'
+import { Context, createAuth, getClientCollection } from '../../../core'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
@@ -33,7 +32,7 @@ export async function ListView(props: ListViewProps) {
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.api.findMany({
+  const result = await collection.admin.endpoints.findMany({
     context,
     slug: props.slug,
     fields: collection.fields,

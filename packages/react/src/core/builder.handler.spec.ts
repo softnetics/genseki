@@ -157,15 +157,14 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.create({
-        slug: postCollection.slug,
-        fields: postCollection.fields,
+      const result = await postCollection.admin.endpoints.create.handler({
         context,
-        data: {
+        body: {
           nameField: postData.name,
         },
+        headers: {},
       })
 
       expect(insertMock).toHaveBeenCalledTimes(1)
@@ -189,7 +188,7 @@ describe('ApiHandler', () => {
         })
       )
       expect(tx.insert).toHaveBeenCalledTimes(1)
-      expect(result).toEqual({ __pk: postData.id, __id: postData.name })
+      expect(result.body).toEqual({ __pk: postData.id, __id: postData.name })
     })
 
     it('should (R) read successfully', async () => {
@@ -202,13 +201,14 @@ describe('ApiHandler', () => {
         nameTs: postData.name,
       })
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.findOne({
-        slug: postCollection.slug,
-        fields: postCollection.fields,
+      const result = await postCollection.admin.endpoints.findOne.handler({
         context,
-        id: postData.id,
+        pathParams: {
+          id: postData.id,
+        },
+        headers: {},
       })
 
       expect(mockDb.query.postTs.findFirst).toBeCalledTimes(1)
@@ -225,7 +225,7 @@ describe('ApiHandler', () => {
           },
         })
       )
-      expect(result).toEqual({
+      expect(result.body).toEqual({
         __pk: postData.id,
         __id: postData.name,
         idField: postData.id,
@@ -248,16 +248,17 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.update({
-        id: postData.id,
+      const result = await postCollection.admin.endpoints.update.handler({
         context,
-        slug: postCollection.slug,
-        fields: postCollection.fields,
-        data: {
+        pathParams: {
+          id: postData.id,
+        },
+        body: {
           nameField: updatedPostData.name,
         },
+        headers: {},
       })
 
       expect(updateMock).toHaveBeenCalledTimes(1)
@@ -278,7 +279,7 @@ describe('ApiHandler', () => {
         })
       )
       expect(setMock).toHaveBeenCalledWith({ nameTs: updatedPostData.name })
-      expect(result).toEqual({ __pk: postData.id, __id: postData.name })
+      expect(result.body).toEqual({ __pk: postData.id, __id: postData.name })
     })
 
     it('should (D) delete successfully', async () => {
@@ -286,13 +287,14 @@ describe('ApiHandler', () => {
       tx.delete = deleteMock
       mockDb.delete = deleteMock
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.delete({
-        slug: postCollection.slug,
-        fields: postCollection.fields,
+      const result = await postCollection.admin.endpoints.delete.handler({
         context,
-        ids: [mockPostData[0].name, mockPostData[1].name, mockPostData[2].name],
+        body: {
+          ids: [mockPostData[0].name, mockPostData[1].name, mockPostData[2].name],
+        },
+        headers: {},
       })
 
       expect(deleteMock).toHaveBeenCalledTimes(1)
@@ -304,7 +306,7 @@ describe('ApiHandler', () => {
           eq(postCollection.fields.nameField._.column, mockPostData[2].name)
         )
       )
-      expect(result).toEqual(undefined)
+      expect(result.body).toEqual({ message: 'ok' })
     })
   })
 
@@ -338,15 +340,14 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.create({
-        slug: postCollection.slug,
-        fields: postCollection.fields,
+      const result = await postCollection.admin.endpoints.create.handler({
         context,
-        data: {
+        body: {
           nameField: postData.name,
         },
+        headers: {},
       })
 
       expect(insertMock).toHaveBeenCalledTimes(1)
@@ -357,7 +358,7 @@ describe('ApiHandler', () => {
         },
       ])
       expect(tx.insert).toHaveBeenCalledTimes(1)
-      expect(result).toEqual({ __pk: postData.id, __id: postData.id })
+      expect(result.body).toEqual({ __pk: postData.id, __id: postData.id })
     })
 
     it('should (R) read successfully', async () => {
@@ -370,13 +371,14 @@ describe('ApiHandler', () => {
         nameTs: postData.name,
       })
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.findOne({
-        slug: postCollection.slug,
-        fields: postCollection.fields,
+      const result = await postCollection.admin.endpoints.findOne.handler({
         context,
-        id: postData.id,
+        pathParams: {
+          id: postData.id,
+        },
+        headers: {},
       })
 
       expect(mockDb.query.postTs.findFirst).toBeCalledTimes(1)
@@ -389,7 +391,7 @@ describe('ApiHandler', () => {
           where: eq(postCollection.fields.idField._.column, postData.id),
         })
       )
-      expect(result).toEqual({
+      expect(result.body).toEqual({
         __pk: postData.id,
         __id: postData.id,
         idField: postData.id,
@@ -412,16 +414,17 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.update({
-        id: postData.id,
+      const result = await postCollection.admin.endpoints.update.handler({
         context,
-        slug: postCollection.slug,
-        fields: postCollection.fields,
-        data: {
+        pathParams: {
+          id: postData.id,
+        },
+        body: {
           nameField: updatedPostData.name,
         },
+        headers: {},
       })
 
       expect(updateMock).toHaveBeenCalledTimes(1)
@@ -429,7 +432,7 @@ describe('ApiHandler', () => {
         eq(postCollection.fields.idField._.column, postData.id)
       )
       expect(setMock).toHaveBeenCalledWith({ nameTs: updatedPostData.name })
-      expect(result).toEqual({ __pk: postData.id, __id: postData.id })
+      expect(result.body).toEqual({ __pk: postData.id, __id: postData.id })
     })
 
     it('should (D) delete successfully', async () => {
@@ -437,13 +440,14 @@ describe('ApiHandler', () => {
       tx.delete = deleteMock
       mockDb.delete = deleteMock
 
-      const context = new RequestContext(mockDb as any, undefined, {} as any)
+      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-      const result = await postCollection.admin.api.delete({
-        slug: postCollection.slug,
-        fields: postCollection.fields,
+      const result = await postCollection.admin.endpoints.delete.handler({
         context,
-        ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+        body: {
+          ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+        },
+        headers: {},
       })
 
       expect(deleteMock).toHaveBeenCalledTimes(1)
@@ -455,7 +459,7 @@ describe('ApiHandler', () => {
           eq(postCollection.fields.idField._.column, mockPostData[2].id)
         )
       )
-      expect(result).toEqual(undefined)
+      expect(result.body).toEqual({ message: 'ok' })
     })
   })
 
@@ -514,12 +518,11 @@ describe('ApiHandler', () => {
               nameTs: authorData.name,
             },
           })
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorCreateCollection.admin.api.create({
-            slug: postWithAuthorCreateCollection.slug,
-            fields: postWithAuthorCreateCollection.fields,
-            data: {
+          const result = await postWithAuthorCreateCollection.admin.endpoints.create.handler({
+            context,
+            body: {
               nameField: postData.name,
               authorField: {
                 create: {
@@ -527,7 +530,7 @@ describe('ApiHandler', () => {
                 },
               },
             },
-            context,
+            headers: {},
           })
 
           expect(insertMock).toHaveBeenCalledTimes(2)
@@ -535,7 +538,7 @@ describe('ApiHandler', () => {
           expect(valuesMock).toHaveBeenNthCalledWith(2, [
             { nameTs: postData.name, authorIdTs: authorData.id },
           ])
-          expect(result).toEqual({ __pk: postData.id, __id: postData.id })
+          expect(result.body).toEqual({ __pk: postData.id, __id: postData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -554,13 +557,14 @@ describe('ApiHandler', () => {
             },
           })
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorCreateCollection.admin.api.findOne({
-            slug: postWithAuthorCreateCollection.slug,
-            fields: postWithAuthorCreateCollection.fields,
-            id: postData.id,
+          const result = await postWithAuthorCreateCollection.admin.endpoints.findOne.handler({
             context,
+            headers: {},
+            pathParams: {
+              id: postData.id,
+            },
           })
 
           expect(mockDb.query.postWithAuthorTs.findFirst).toHaveBeenCalledWith(
@@ -589,7 +593,7 @@ describe('ApiHandler', () => {
             })
           )
 
-          expect(result).toEqual({
+          expect(result.body).toEqual({
             __pk: postData.id,
             __id: postData.id,
             idField: postData.id,
@@ -629,14 +633,14 @@ describe('ApiHandler', () => {
               nameTs: updatedAuthorData.name,
             },
           })
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorCreateCollection.admin.api.update({
-            slug: postWithAuthorCreateCollection.slug,
-            fields: postWithAuthorCreateCollection.fields,
+          const result = await postWithAuthorCreateCollection.admin.endpoints.update.handler({
             context,
-            id: postData.id,
-            data: {
+            pathParams: {
+              id: postData.id,
+            },
+            body: {
               nameField: updatedPostData.name,
               authorField: {
                 create: {
@@ -644,6 +648,7 @@ describe('ApiHandler', () => {
                 },
               },
             },
+            headers: {},
           })
 
           expect(insertMock).toHaveBeenCalledTimes(1)
@@ -656,19 +661,20 @@ describe('ApiHandler', () => {
           expect(whereUpdateMock).toHaveBeenCalledWith(
             eq(postWithAuthorCreateCollection.fields.idField._.column, postData.id)
           )
-          expect(result).toEqual({ __pk: postData.id, __id: postData.id })
+          expect(result.body).toEqual({ __pk: postData.id, __id: postData.id })
         })
 
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorCreateCollection.admin.api.delete({
-            slug: postWithAuthorCreateCollection.slug,
-            fields: postWithAuthorCreateCollection.fields,
+          const result = await postWithAuthorCreateCollection.admin.endpoints.delete.handler({
             context,
-            ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+            body: {
+              ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+            },
+            headers: {},
           })
 
           expect(deleteMock).toHaveBeenCalledTimes(1)
@@ -679,7 +685,7 @@ describe('ApiHandler', () => {
               eq(postWithAuthorCreateCollection.fields.idField._.column, mockPostData[2].id)
             )
           )
-          expect(result).toEqual(undefined)
+          expect(result.body).toEqual({ message: 'ok' })
         })
       })
       describe('with "Many" relation', () => {
@@ -743,13 +749,11 @@ describe('ApiHandler', () => {
               { idTs: mockPostData[4].id, nameTs: mockPostData[4].name },
             ],
           })
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostsCreateCollection.admin.api.create({
-            fields: authorWithPostsCreateCollection.fields,
-            slug: authorWithPostsCreateCollection.slug,
+          const result = await authorWithPostsCreateCollection.admin.endpoints.create.handler({
             context,
-            data: {
+            body: {
               nameField: authorData.name,
               postsField: [
                 mockPostData[0],
@@ -764,6 +768,7 @@ describe('ApiHandler', () => {
                 },
               })),
             },
+            headers: {},
           })
 
           expect(insertMock).toHaveBeenCalledTimes(6)
@@ -771,7 +776,7 @@ describe('ApiHandler', () => {
           expect(valuesInsertMock).toHaveBeenCalledWith([
             expect.objectContaining({ nameTs: postData.name }),
           ])
-          expect(result).toEqual({ __pk: authorData.id, __id: authorData.id })
+          expect(result.body).toEqual({ __pk: authorData.id, __id: authorData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -792,13 +797,14 @@ describe('ApiHandler', () => {
             ],
           })
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostsCreateCollection.admin.api.findOne({
-            slug: authorWithPostsCreateCollection.slug,
-            fields: authorWithPostsCreateCollection.fields,
-            id: authorData.id,
+          const result = await authorWithPostsCreateCollection.admin.endpoints.findOne.handler({
             context,
+            pathParams: {
+              id: authorData.id,
+            },
+            headers: {},
           })
 
           expect(mockDb.query.authorTs.findFirst).toHaveBeenCalledWith({
@@ -825,7 +831,7 @@ describe('ApiHandler', () => {
             },
           })
 
-          expect(result).toEqual({
+          expect(result.body).toEqual({
             __pk: authorData.id,
             __id: authorData.id,
             idField: authorData.id,
@@ -876,17 +882,16 @@ describe('ApiHandler', () => {
             ],
           })
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           // // ====== end service part (TS) ======
           // // ===== start user part (field) =====
-          const result = await authorWithPostsCreateCollection.admin.api.update({
-            slug: authorWithPostsCreateCollection.slug,
-            fields: authorWithPostsCreateCollection.fields,
-
+          const result = await authorWithPostsCreateCollection.admin.endpoints.update.handler({
             context,
-            id: updatedAuthorData.id,
-            data: {
+            pathParams: {
+              id: updatedAuthorData.id,
+            },
+            body: {
               nameField: updatedAuthorDataField.nameField,
               postsField: [
                 {
@@ -904,6 +909,7 @@ describe('ApiHandler', () => {
                 },
               ],
             },
+            headers: {},
           })
 
           // // ====== end user part (field) ======
@@ -933,7 +939,7 @@ describe('ApiHandler', () => {
           expect(valuesMock.mock.calls[1][0]).toEqual([
             expect.objectContaining({ nameTs: 'Post 3', authorIdTs: updatedAuthorData.id }),
           ])
-          expect(result).toEqual({
+          expect(result.body).toEqual({
             __pk: updatedAuthorData.id,
             __id: updatedAuthorData.id,
           })
@@ -942,13 +948,14 @@ describe('ApiHandler', () => {
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostsCreateCollection.admin.api.delete({
-            slug: authorWithPostsCreateCollection.slug,
-            fields: authorWithPostsCreateCollection.fields,
+          const result = await authorWithPostsCreateCollection.admin.endpoints.delete.handler({
             context,
-            ids: [mockAuthorData[0].id, mockAuthorData[1].id, mockAuthorData[2].id],
+            body: {
+              ids: [mockAuthorData[0].id, mockAuthorData[1].id, mockAuthorData[2].id],
+            },
+            headers: {},
           })
 
           expect(deleteMock).toHaveBeenCalledTimes(1)
@@ -960,7 +967,7 @@ describe('ApiHandler', () => {
               eq(authorWithPostsCreateCollection.fields.idField._.column, mockAuthorData[2].id)
             )
           )
-          expect(result).toEqual(undefined)
+          expect(result.body).toEqual({ message: 'ok' })
         })
       })
     })
@@ -1019,17 +1026,16 @@ describe('ApiHandler', () => {
             vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
           )
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
-          const result = await postWithAuthorConnectCollection.admin.api.create({
-            slug: postWithAuthorConnectCollection.slug,
-            fields: postWithAuthorConnectCollection.fields,
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
+          const result = await postWithAuthorConnectCollection.admin.endpoints.create.handler({
             context,
-            data: {
+            body: {
               nameField: postData.name,
               authorField: {
                 connect: authorData.id,
               },
             },
+            headers: {},
           })
 
           expect(insertMock).toHaveBeenCalledTimes(1)
@@ -1037,7 +1043,7 @@ describe('ApiHandler', () => {
             expect.objectContaining({ nameTs: postData.name, authorIdTs: authorData.id }),
           ])
           expect(tx.insert).toHaveBeenCalledTimes(1)
-          expect(result).toEqual({ __pk: postData.id, __id: postData.id })
+          expect(result.body).toEqual({ __pk: postData.id, __id: postData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -1056,13 +1062,14 @@ describe('ApiHandler', () => {
             },
           })
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorConnectCollection.admin.api.findOne({
-            slug: postWithAuthorConnectCollection.slug,
-            fields: postWithAuthorConnectCollection.fields,
-            id: postData.id,
+          const result = await postWithAuthorConnectCollection.admin.endpoints.findOne.handler({
             context,
+            pathParams: {
+              id: postData.id,
+            },
+            headers: {},
           })
 
           expect(mockDb.query.postWithAuthorTs.findFirst).toHaveBeenCalledWith(
@@ -1091,7 +1098,7 @@ describe('ApiHandler', () => {
             })
           )
 
-          expect(result).toEqual({
+          expect(result.body).toEqual({
             __pk: postData.id,
             __id: postData.id,
             idField: postData.id,
@@ -1135,20 +1142,20 @@ describe('ApiHandler', () => {
               nameTs: 'Author 2',
             },
           })
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorConnectCollection.admin.api.update({
-            slug: postWithAuthorConnectCollection.slug,
-            fields: postWithAuthorConnectCollection.fields,
-
+          const result = await postWithAuthorConnectCollection.admin.endpoints.update.handler({
             context,
-            id: postData.id,
-            data: {
+            pathParams: {
+              id: postData.id,
+            },
+            body: {
               nameField: postDataField.nameField,
               authorField: {
                 connect: postDataField.authorIdField,
               },
             },
+            headers: {},
           })
           expect(updateMock).toHaveBeenCalledTimes(1)
           expect(setMock).toHaveBeenCalledWith(
@@ -1160,7 +1167,7 @@ describe('ApiHandler', () => {
           expect(whereUpdateMock).toHaveBeenCalledWith(
             eq(postWithAuthorConnectCollection.fields.idField._.column, postData.id)
           )
-          expect(result).toEqual({ __pk: postDataField.idField, __id: postDataField.idField })
+          expect(result.body).toEqual({ __pk: postDataField.idField, __id: postDataField.idField })
         })
 
         it('should (D) delete successfully', async () => {
@@ -1168,13 +1175,14 @@ describe('ApiHandler', () => {
             vi.fn().mockResolvedValueOnce([])
           )
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await postWithAuthorConnectCollection.admin.api.delete({
-            slug: postWithAuthorConnectCollection.slug,
-            fields: postWithAuthorConnectCollection.fields,
+          const result = await postWithAuthorConnectCollection.admin.endpoints.delete.handler({
             context,
-            ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+            body: {
+              ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
+            },
+            headers: {},
           })
 
           expect(deleteMock).toHaveBeenCalledTimes(1)
@@ -1187,7 +1195,7 @@ describe('ApiHandler', () => {
             )
           )
           expect(returningMock).toHaveBeenCalledTimes(1)
-          expect(result).toEqual(undefined)
+          expect(result.body).toEqual({ message: 'ok' })
         })
       })
 
@@ -1243,13 +1251,11 @@ describe('ApiHandler', () => {
               { idTs: mockPostData[2].id, nameTs: mockPostData[2].name },
             ],
           })
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostConnectCollection.admin.api.create({
-            slug: authorWithPostConnectCollection.slug,
-            fields: authorWithPostConnectCollection.fields,
+          const result = await authorWithPostConnectCollection.admin.endpoints.create.handler({
             context,
-            data: {
+            body: {
               nameField: authorData.name,
               postsField: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id].map(
                 (postId) => ({
@@ -1257,6 +1263,7 @@ describe('ApiHandler', () => {
                 })
               ),
             },
+            headers: {},
           })
 
           expect(insertMock).toHaveBeenCalledTimes(1)
@@ -1273,7 +1280,7 @@ describe('ApiHandler', () => {
               eq(schema.postWithAuthorTs.idTs, postId)
             )
           })
-          expect(result).toEqual({ __pk: authorData.id, __id: authorData.id })
+          expect(result.body).toEqual({ __pk: authorData.id, __id: authorData.id })
         })
 
         it('should (R) read successfully', async () => {
@@ -1303,13 +1310,14 @@ describe('ApiHandler', () => {
             ],
           })
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostConnectCollection.admin.api.findOne({
-            slug: authorWithPostConnectCollection.slug,
-            fields: authorWithPostConnectCollection.fields,
-            id: authorData.id,
+          const result = await authorWithPostConnectCollection.admin.endpoints.findOne.handler({
             context,
+            pathParams: {
+              id: authorData.id,
+            },
+            headers: {},
           })
 
           expect(mockDb.query.authorTs.findFirst).toHaveBeenCalledWith({
@@ -1336,7 +1344,7 @@ describe('ApiHandler', () => {
             },
           })
 
-          expect(result).toEqual({
+          expect(result.body).toEqual({
             __pk: authorData.id,
             __id: authorData.id,
             idField: authorData.id,
@@ -1388,19 +1396,20 @@ describe('ApiHandler', () => {
               { idTs: 'post-3', nameTs: 'Post 3' },
             ],
           })
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostConnectCollection.admin.api.update({
-            slug: authorWithPostConnectCollection.slug,
-            fields: authorWithPostConnectCollection.fields,
+          const result = await authorWithPostConnectCollection.admin.endpoints.update.handler({
             context,
-            id: updatedAuthorData.id,
-            data: {
+            pathParams: {
+              id: updatedAuthorData.id,
+            },
+            body: {
               nameField: updatedAuthorDataField.nameField,
               postsField: ['post-1', 'post-2', 'post-3'].map((postId) => ({
                 connect: postId,
               })),
             },
+            headers: {},
           })
 
           // ====== end user part (field) ======
@@ -1417,19 +1426,20 @@ describe('ApiHandler', () => {
           // 4 times for post update
           expect(whereUpdateMock).toHaveBeenCalledTimes(4)
 
-          expect(result).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
+          expect(result.body).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
         })
 
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
-          const context = new RequestContext(mockDb as any, undefined, {} as any)
+          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-          const result = await authorWithPostConnectCollection.admin.api.delete({
-            slug: authorWithPostConnectCollection.slug,
-            fields: authorWithPostConnectCollection.fields,
+          const result = await authorWithPostConnectCollection.admin.endpoints.delete.handler({
             context,
-            ids: [mockAuthorData[0].id, mockAuthorData[1].id, mockAuthorData[2].id],
+            body: {
+              ids: [mockAuthorData[0].id, mockAuthorData[1].id, mockAuthorData[2].id],
+            },
+            headers: {},
           })
 
           expect(deleteMock).toHaveBeenCalledTimes(1)
@@ -1441,7 +1451,7 @@ describe('ApiHandler', () => {
               eq(authorWithPostConnectCollection.fields.idField._.column, mockAuthorData[2].id)
             )
           )
-          expect(result).toEqual(undefined)
+          expect(result.body).toEqual({ message: 'ok' })
         })
       })
     })
@@ -1505,22 +1515,21 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.create({
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-
-              context,
-              data: {
-                nameField: postData.name,
-                authorField: {
-                  create: {
-                    nameField: mockAuthorData[0].name,
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.create.handler({
+                context,
+                body: {
+                  nameField: postData.name,
+                  authorField: {
+                    create: {
+                      nameField: mockAuthorData[0].name,
+                    },
                   },
                 },
-              },
-            })
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             // TS method
@@ -1533,7 +1542,7 @@ describe('ApiHandler', () => {
             expect(tx.insert).toHaveBeenCalledTimes(2)
 
             // Field method
-            expect(result).toEqual({ __pk: postData.id, __id: postData.id })
+            expect(result.body).toEqual({ __pk: postData.id, __id: postData.id })
           })
 
           it('should (R) read successfully', async () => {
@@ -1550,14 +1559,16 @@ describe('ApiHandler', () => {
               },
             })
 
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.findOne({
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-              context,
-              id: postData.id,
-            })
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.findOne.handler({
+                context,
+                pathParams: {
+                  id: postData.id,
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(mockDb.query.postWithAuthorTs.findFirst).toHaveBeenCalledWith(
@@ -1588,7 +1599,7 @@ describe('ApiHandler', () => {
             }
 
             // Field method
-            expect(result).toEqual(expectedPostWithAuthorDataField)
+            expect(result.body).toEqual(expectedPostWithAuthorDataField)
           })
           it('should (U) update successfully', async () => {
             const updatedPostData = {
@@ -1629,20 +1640,22 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.update({
-              id: updatedPostData.id,
-              data: {
-                nameField: updatedPostDataField.nameField,
-                authorField: {
-                  connect: updatedPostDataField.authorIdField,
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.update.handler({
+                context,
+                pathParams: {
+                  id: updatedPostData.id,
                 },
-              },
-              context,
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-            })
+                body: {
+                  nameField: updatedPostDataField.nameField,
+                  authorField: {
+                    connect: updatedPostDataField.authorIdField,
+                  },
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(updateMock).toHaveBeenCalledTimes(1)
@@ -1652,7 +1665,7 @@ describe('ApiHandler', () => {
                 authorIdTs: updatedPostDataTs.authorIdTs,
               })
             )
-            expect(result).toEqual({
+            expect(result.body).toEqual({
               __pk: updatedPostDataField.idField,
               __id: updatedPostDataField.idField,
             })
@@ -1669,21 +1682,22 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.delete({
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-
-              context,
-              ids: postIdsToDelete,
-            })
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.delete.handler({
+                context,
+                body: {
+                  ids: postIdsToDelete,
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(deleteMock).toHaveBeenCalledTimes(1)
             expect(whereMock).toHaveBeenCalledTimes(1)
             expect(returningMock).toHaveBeenCalledTimes(1)
-            expect(result).toEqual(undefined)
+            expect(result.body).toEqual({ message: 'ok' })
           })
         })
 
@@ -1734,20 +1748,19 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.create({
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-
-              context,
-              data: {
-                nameField: postWithAuthorDataField.nameField,
-                authorField: {
-                  connect: authorDataField.idField,
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.create.handler({
+                context,
+                body: {
+                  nameField: postWithAuthorDataField.nameField,
+                  authorField: {
+                    connect: authorDataField.idField,
+                  },
                 },
-              },
-            })
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             // TS method
@@ -1760,7 +1773,7 @@ describe('ApiHandler', () => {
             expect(tx.insert).toHaveBeenCalledTimes(1)
 
             // Field method
-            expect(result).toEqual({
+            expect(result.body).toEqual({
               __pk: postWithAuthorDataField.idField,
               __id: postWithAuthorDataField.idField,
             })
@@ -1788,15 +1801,16 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.findOne({
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-
-              context,
-              id: postData.id,
-            })
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.findOne.handler({
+                context,
+                pathParams: {
+                  id: postData.id,
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(mockDb.query.postWithAuthorTs.findFirst).toHaveBeenCalledWith(
@@ -1829,9 +1843,9 @@ describe('ApiHandler', () => {
             }
 
             // Field method
-            expect(result).toEqual(expectedPostWithAuthorDataField)
+            expect(result.body).toEqual(expectedPostWithAuthorDataField)
             // bypass
-            // expect(result).toEqual(postWithAuthorDataTs)
+            // expect(result.body).toEqual(postWithAuthorDataTs)
           })
           it('should (U) update successfully', async () => {
             const updatedPostData = {
@@ -1871,20 +1885,22 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.update({
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-              context,
-              id: updatedPostData.id,
-              data: {
-                nameField: updatedPostDataField.nameField,
-                authorField: {
-                  connect: updatedPostDataField.authorIdField,
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.update.handler({
+                context,
+                pathParams: {
+                  id: updatedPostData.id,
                 },
-              },
-            })
+                body: {
+                  nameField: updatedPostDataField.nameField,
+                  authorField: {
+                    connect: updatedPostDataField.authorIdField,
+                  },
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(updateMock).toHaveBeenCalledTimes(1)
@@ -1894,7 +1910,7 @@ describe('ApiHandler', () => {
                 authorIdTs: updatedPostDataTs.authorIdTs,
               })
             )
-            expect(result).toEqual({
+            expect(result.body).toEqual({
               __pk: updatedPostDataField.idField,
               __id: updatedPostDataField.idField,
             })
@@ -1911,20 +1927,22 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await postWithAuthorConnectOrCreateCollection.admin.api.delete({
-              slug: postWithAuthorConnectOrCreateCollection.slug,
-              fields: postWithAuthorConnectOrCreateCollection.fields,
-              context,
-              ids: postIdsToDelete,
-            })
+            const result =
+              await postWithAuthorConnectOrCreateCollection.admin.endpoints.delete.handler({
+                context,
+                body: {
+                  ids: postIdsToDelete,
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(deleteMock).toHaveBeenCalledTimes(1)
             expect(whereMock).toHaveBeenCalledTimes(1)
             expect(returningMock).toHaveBeenCalledTimes(1)
-            expect(result).toEqual(undefined)
+            expect(result.body).toEqual({ message: 'ok' })
           })
         })
       })
@@ -2034,45 +2052,45 @@ describe('ApiHandler', () => {
 
             // ===== start user part (field) =====
             // change to create Author and make it auto connect to post
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.create({
-              // TODO: fix create data shouldn't have primary key
-              data: {
-                nameField: authorWithPostDataField.nameField,
-                postsField: [
-                  // TODO: fix this should be able to crete with object
-                  {
-                    create: {
-                      nameField: postDataField.nameField,
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.create.handler({
+                // TODO: fix create data shouldn't have primary key
+                context,
+                body: {
+                  nameField: authorWithPostDataField.nameField,
+                  postsField: [
+                    // TODO: fix this should be able to crete with object
+                    {
+                      create: {
+                        nameField: postDataField.nameField,
+                      },
                     },
-                  },
-                  {
-                    create: {
-                      nameField: 'Post 2',
+                    {
+                      create: {
+                        nameField: 'Post 2',
+                      },
                     },
-                  },
-                  {
-                    create: {
-                      nameField: 'Post 3',
+                    {
+                      create: {
+                        nameField: 'Post 3',
+                      },
                     },
-                  },
-                  {
-                    create: {
-                      nameField: 'Post 4',
+                    {
+                      create: {
+                        nameField: 'Post 4',
+                      },
                     },
-                  },
-                  {
-                    create: {
-                      nameField: 'Post 5',
+                    {
+                      create: {
+                        nameField: 'Post 5',
+                      },
                     },
-                  },
-                ],
-              },
-              context,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              slug: 'author-with-post',
-            })
+                  ],
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(insertMock).toHaveBeenCalledTimes(6)
@@ -2088,7 +2106,10 @@ describe('ApiHandler', () => {
             ])
 
             // Field method
-            expect(result).toEqual({ __pk: authorWithPostData.id, __id: authorWithPostData.id })
+            expect(result.body).toEqual({
+              __pk: authorWithPostData.id,
+              __id: authorWithPostData.id,
+            })
           })
           it('should (R) read successfully', async () => {
             const postData = mockPostData[0]
@@ -2113,14 +2134,16 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.findOne({
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              context,
-              id: authorData.id,
-            })
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.findOne.handler({
+                context,
+                pathParams: {
+                  id: authorData.id,
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(mockDb.query.authorTs.findFirst).toHaveBeenCalledWith(
@@ -2155,9 +2178,9 @@ describe('ApiHandler', () => {
             }
 
             // Field method
-            expect(result).toEqual(expectedAuthorWithPostDataField)
+            expect(result.body).toEqual(expectedAuthorWithPostDataField)
             // bypass
-            // expect(result).toEqual(authorWithPostDataTs)
+            // expect(result.body).toEqual(authorWithPostDataTs)
           })
           it('should (U) update successfully', async () => {
             const updatedAuthorData = {
@@ -2209,30 +2232,32 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.update({
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              context,
-              id: updatedAuthorData.id,
-              data: {
-                nameField: updatedAuthorDataField.nameField,
-                postsField: [
-                  {
-                    create: {
-                      nameField: mockPostData[0].name,
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.update.handler({
+                context,
+                pathParams: {
+                  id: updatedAuthorData.id,
+                },
+                body: {
+                  nameField: updatedAuthorDataField.nameField,
+                  postsField: [
+                    {
+                      create: {
+                        nameField: mockPostData[0].name,
+                      },
                     },
-                  },
-                  {
-                    connect: mockPostData[1].id,
-                  },
-                  {
-                    disconnect: mockPostData[2].id,
-                  },
-                ],
-              },
-            })
+                    {
+                      connect: mockPostData[1].id,
+                    },
+                    {
+                      disconnect: mockPostData[2].id,
+                    },
+                  ],
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
             expect(setMock).toHaveBeenCalledTimes(3)
             expect(updateMock).toHaveBeenCalledTimes(3)
@@ -2268,7 +2293,7 @@ describe('ApiHandler', () => {
               }),
             ])
 
-            expect(result).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
+            expect(result.body).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
           })
           it('should (D) delete successfully', async () => {
             const authorIdsToDelete = [1, 2, 3]
@@ -2282,20 +2307,22 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.delete({
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              context,
-              ids: authorIdsToDelete,
-            })
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.delete.handler({
+                context,
+                body: {
+                  ids: authorIdsToDelete,
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(deleteMock).toHaveBeenCalledTimes(1)
             expect(whereMock).toHaveBeenCalledTimes(1)
             expect(returningMock).toHaveBeenCalledTimes(1)
-            expect(result).toEqual(undefined)
+            expect(result.body).toEqual({ message: 'ok' })
           })
         })
 
@@ -2347,27 +2374,27 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.create({
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              context,
-              data: {
-                nameField: authorWithPostDataField.nameField,
-                postsField: [
-                  'post-1',
-                  'post-2',
-                  'post-3',
-                  'post-4',
-                  'post-5',
-                  'post-6',
-                  'post-7',
-                ].map((postId) => ({
-                  connect: postId,
-                })),
-              },
-            })
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.create.handler({
+                context,
+                body: {
+                  nameField: authorWithPostDataField.nameField,
+                  postsField: [
+                    'post-1',
+                    'post-2',
+                    'post-3',
+                    'post-4',
+                    'post-5',
+                    'post-6',
+                    'post-7',
+                  ].map((postId) => ({
+                    connect: postId,
+                  })),
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             expect(insertMock).toHaveBeenCalledTimes(1)
@@ -2390,7 +2417,7 @@ describe('ApiHandler', () => {
             )
 
             // Field method
-            expect(result).toEqual({
+            expect(result.body).toEqual({
               __pk: authorWithPostData.id,
               __id: authorWithPostData.id,
             })
@@ -2415,14 +2442,16 @@ describe('ApiHandler', () => {
 
             mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce(authorWithPostDataTs)
 
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.findOne({
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              context,
-              id: authorData.id,
-            })
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.findOne.handler({
+                context,
+                pathParams: {
+                  id: authorData.id,
+                },
+                headers: {},
+              })
 
             expect(mockDb.query.authorTs.findFirst).toHaveBeenCalledWith(
               expect.objectContaining({
@@ -2456,9 +2485,9 @@ describe('ApiHandler', () => {
             }
 
             // Field method
-            expect(result).toEqual(expectedAuthorWithPostDataField)
+            expect(result.body).toEqual(expectedAuthorWithPostDataField)
             // bypass
-            // expect(result).toEqual(authorWithPostDataTs)
+            // expect(result.body).toEqual(authorWithPostDataTs)
           })
 
           it('should (U) update successfully', async () => {
@@ -2508,20 +2537,22 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.update({
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              context,
-              id: updatedAuthorData.id,
-              data: {
-                nameField: updatedAuthorDataField.nameField,
-                postsField: ['post-1', 'post-2', 'post-3'].map((postId) => ({
-                  connect: postId,
-                })),
-              },
-            })
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.update.handler({
+                context,
+                pathParams: {
+                  id: updatedAuthorData.id,
+                },
+                body: {
+                  nameField: updatedAuthorDataField.nameField,
+                  postsField: ['post-1', 'post-2', 'post-3'].map((postId) => ({
+                    connect: postId,
+                  })),
+                },
+                headers: {},
+              })
             // ====== end user part (field) ======
 
             // Assertions
@@ -2560,7 +2591,7 @@ describe('ApiHandler', () => {
               )
             )
 
-            expect(result).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
+            expect(result.body).toEqual({ __pk: updatedAuthorData.id, __id: updatedAuthorData.id })
           })
 
           it('should (D) delete successfully', async () => {
@@ -2572,19 +2603,21 @@ describe('ApiHandler', () => {
             tx.delete = deleteMock
             mockDb.delete = deleteMock
 
-            const context = new RequestContext(mockDb as any, undefined, {} as any)
+            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
-            const result = await authorWithPostsConnectOrCreateCollection.admin.api.delete({
-              slug: authorWithPostsConnectOrCreateCollection.slug,
-              fields: authorWithPostsConnectOrCreateCollection.fields,
-              context,
-              ids: authorIdsToDelete,
-            })
+            const result =
+              await authorWithPostsConnectOrCreateCollection.admin.endpoints.delete.handler({
+                context,
+                body: {
+                  ids: authorIdsToDelete,
+                },
+                headers: {},
+              })
 
             expect(deleteMock).toHaveBeenCalledTimes(1)
             expect(whereMock).toHaveBeenCalledTimes(1)
             expect(returningMock).toHaveBeenCalledTimes(1)
-            expect(result).toEqual(undefined)
+            expect(result.body).toEqual({ message: 'ok' })
           })
         })
       })

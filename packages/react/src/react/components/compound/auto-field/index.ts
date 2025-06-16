@@ -1,5 +1,5 @@
-import type { RequestContext } from '@genseki/react'
-import { type Fields } from '@genseki/react'
+import type { RequestContext } from '../../../../core'
+import { type Fields } from '../../../../core'
 
 export async function createOptionsRecord(
   context: RequestContext,

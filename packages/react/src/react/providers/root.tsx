@@ -2,10 +2,9 @@
 
 import { createContext, type ReactNode, useContext } from 'react'
 
-import type { ClientConfig, Collection, ServerConfig } from '@genseki/react'
-
 import { UiProviders } from './ui'
 
+import type { ClientConfig, DefaultCollection, ServerConfig } from '../../core'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
@@ -22,7 +21,7 @@ export const useRootContext = <TServerConfig extends ServerConfig>() => {
   return context as unknown as RootContextValue<TServerConfig>
 }
 
-export const useCollection = <TCollection extends Collection>(slug: string) => {
+export const useCollection = <TCollection extends DefaultCollection>(slug: string) => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useCollection must be used within a RootProvider')
   const collection = context.clientConfig.collections[slug] as TCollection | undefined

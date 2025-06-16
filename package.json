@@ -1,8 +1,9 @@
 {
-  "name": "ttc",
+  "name": "genseki",
   "private": true,
   "scripts": {
     "build": "turbo run build",
+    "bundle": "turbo run bundle",
     "dev": "turbo run dev",
     "lint": "turbo run lint",
     "lint:fix": "turbo run lint -- --fix",
@@ -14,7 +15,7 @@
   "devDependencies": {
     "@changesets/changelog-github": "^0.5.1",
     "@changesets/cli": "^2.28.1",
-    "@internals/project-config": "workspace:^",
+    "@internal/project-config": "workspace:^",
     "eslint": "^9.22.0",
     "prettier": "^3.5.3",
     "turbo": "^2.4.4",

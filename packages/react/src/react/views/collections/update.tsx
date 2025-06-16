@@ -1,7 +1,6 @@
-import { Context, createAuth, type ServerConfig } from '@genseki/react'
-
 import { UpdateClientView } from './update.client'
 
+import { Context, createAuth, type ServerConfig } from '../../../core'
 import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
@@ -23,7 +22,7 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.api.findOne({
+  const result = await collection.admin.endpoints.findOne({
     context: context,
     slug: props.slug,
     fields: collection.fields,

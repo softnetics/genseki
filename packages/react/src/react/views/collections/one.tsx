@@ -1,5 +1,4 @@
-import { Context, createAuth, type ServerConfig } from '@genseki/react'
-
+import { Context, createAuth, type ServerConfig } from '../../../core'
 import { getHeadersObject } from '../../utils/headers'
 
 interface OneViewProps<TServerConfig extends ServerConfig> {
@@ -21,7 +20,7 @@ export async function OneView<TServerConfig extends ServerConfig>(
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.api.findOne({
+  const result = await collection.admin.endpoints.findOne({
     context,
     slug: props.slug,
     fields: collection.fields,
