@@ -22,11 +22,11 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.endpoints.findOne({
+  const result = await collection.admin.endpoints.findOne.handler({
     context: context,
-    slug: props.slug,
-    fields: collection.fields,
-    id: props.identifier,
+    pathParams: {
+      id: props.identifier,
+    },
   })
 
   const optionsRecord = await createOptionsRecord(context, collection.fields)

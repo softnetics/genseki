@@ -475,7 +475,7 @@ export type Collection<
 }
 
 export type DefaultCollection = Collection
-export type AnyCollection = Collection<string, string, any, any, any, any>
+export type AnyCollection = Collection<string, string, any, any, any>
 
 export type ToClientCollection<TCollection extends AnyCollection> = ClientCollection<
   InferSlugFromCollection<TCollection>,
