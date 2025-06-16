@@ -56,7 +56,6 @@ export const RootProvider = (props: {
       }}
     >
       <Toast />
-      {props.children}
       <UiProviders>{props.children}</UiProviders>
     </RootContext.Provider>
   )
