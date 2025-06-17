@@ -182,6 +182,7 @@ const AutoRichTextField = (props: {
   editorProviderProps: ClientEditorProviderProps
 }) => {
   const { field, error } = useFormItemController()
+
   const storageAdapter = useStorageAdapter()
 
   const editorProviderProps = useMemo(
@@ -189,14 +190,6 @@ const AutoRichTextField = (props: {
     []
   )
 
-  const content = useMemo(() => {
-    // Initail value case
-    if (typeof field.value === 'string') return JSON.parse(field.value)
-    // These content and placeholder came from user defined in config
-    return editorProviderProps.content ?? props.placeholder ?? ''
-  }, [field.value])
-
-  // TODO: Maybe we need to stores as a JSON not a serialized object
   return (
     <RichTextEditor
       label={props.label}
@@ -210,7 +203,7 @@ const AutoRichTextField = (props: {
           startTransition(() => field.onChange(JSON.stringify(updateCb.editor.getJSON())))
           editorProviderProps.onUpdate?.(updateCb)
         },
-        content,
+        content: field.value,
       }}
     />
   )
