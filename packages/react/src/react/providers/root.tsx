@@ -5,6 +5,7 @@ import { createContext, type ReactNode, useContext } from 'react'
 import { UiProviders } from './ui'
 
 import type { ClientConfig, DefaultCollection, ServerConfig } from '../../core'
+import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {
@@ -53,6 +54,7 @@ export const RootProvider = (props: {
         serverFunction: props.serverFunction,
       }}
     >
+      <Toast />
       <UiProviders>{props.children}</UiProviders>
     </RootContext.Provider>
   )

@@ -37,7 +37,7 @@
     "react": "^19.1.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.55.0",
-    "zod": "3.25.53"
+    "tailwindcss": "^4.1.3"
   },
   "devDependencies": {
     "@types/react": "^19.1.6",

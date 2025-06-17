@@ -1,5 +1,5 @@
 import type { AnyTable, Column } from 'drizzle-orm'
-import { and, asc, desc, eq } from 'drizzle-orm'
+import { and, asc, desc, eq, like } from 'drizzle-orm'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 
 import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
@@ -75,6 +75,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     },
     findByEmail: async (email: string) => {
       const table = config.user.model
+
       const users = await context.db.select().from(table).where(eq(table.email, email))
       if (users.length === 0) throw new Error('User not found')
       if (users.length > 1) throw new Error('Multiple users found')
@@ -205,6 +206,19 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       if (verifications.length === 0) throw new Error('Verification not found')
       if (verifications.length > 1) throw new Error('Multiple verifications found')
       return verifications[0]
+    },
+    delete: async (id: string) => {
+      const table = config.verification.model
+      const verification = await context.db.delete(table).where(eq(table.id, id)).returning()
+      if (verification.length === 0) throw new Error('Verification not found')
+      return verification[0]
+    },
+    deleteByUserIdAndIdentifierPrefix: async (userId: string, identifierPrefix: string) => {
+      const table = config.verification.model
+      return await context.db
+        .delete(table)
+        .where(and(eq(table.value, userId), like(table.identifier, `${identifierPrefix}%`)))
+        .returning()
     },
   }
 

@@ -10,10 +10,12 @@ import {
   CollectionLayout,
   type Context,
   CreateView,
+  ForgotPasswordView,
   HomeView,
   ListView,
   LoginView,
   OneView,
+  ResetPasswordView,
   type ServerConfig,
   type ServerFunction,
   SignUpView,
@@ -162,14 +164,22 @@ export function defineNextJsServerConfig<
       params: { slug: string; identifier: string }
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
-    }) => <AuthLayout serverConfig={args.serverConfig}>TODO</AuthLayout>,
+    }) => (
+      <AuthLayout serverConfig={args.serverConfig}>
+        <ForgotPasswordView {...args} {...args.params} />
+      </AuthLayout>
+    ),
   })
   radixRouter.insert(`/auth/reset-password`, {
     requiredAuthentication: false,
     view: (args: {
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
-    }) => <AuthLayout serverConfig={args.serverConfig}>TODO</AuthLayout>,
+    }) => (
+      <AuthLayout serverConfig={args.serverConfig}>
+        <ResetPasswordView {...args} />
+      </AuthLayout>
+    ),
   })
 
   return {
