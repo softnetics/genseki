@@ -26,10 +26,10 @@ type GetBody<TApiRouteSchema extends ApiRouteSchema> =
       : never
     : never
 
-type GetHeaders<TApiRouteSchema extends ApiRouteSchema> =
+type GetHeadersObject<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['headers']>> extends false
-    ? Output<TApiRouteSchema['headers']> & Record<string, string>
-    : Record<string, string> | undefined
+    ? { headers: Output<TApiRouteSchema['headers']> & Record<string, string> }
+    : { headers?: Record<string, string> }
 
 type GetQuery<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['query']>> extends false ? Output<TApiRouteSchema['query']> : never
@@ -41,13 +41,14 @@ type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
       ? InferPathParams<TApiRouteSchema['path']>
       : never
 
+type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
+  body: GetBody<TApiRouteSchema>
+  query: GetQuery<TApiRouteSchema>
+  pathParams: GetPathParams<TApiRouteSchema>
+} & GetHeadersObject<TApiRouteSchema>
+
 export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExcept<
-  {
-    body: GetBody<TApiRouteSchema>
-    headers: GetHeaders<TApiRouteSchema>
-    query: GetQuery<TApiRouteSchema>
-    pathParams: GetPathParams<TApiRouteSchema>
-  },
+  ApiRouteHandlerBasePayload<TApiRouteSchema>,
   never
 >
 

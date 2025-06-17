@@ -2,10 +2,9 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 
 import {
+  type AnyCollection,
   type ClientCollection,
   type Collection,
-  type ExtractAllCollectionCustomEndpoints,
-  type ExtractAllCollectionDefaultEndpoints,
   getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
@@ -59,10 +58,7 @@ export interface BaseConfig<
 export interface ServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
-    string,
-    Collection<any, any, any, any, any, any>
-  >,
+  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
 > extends BaseConfig<TFullSchema> {
   context: TContext
@@ -99,10 +95,7 @@ export function defineBaseConfig<
 export function defineServerConfig<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   const TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  const TCollections extends Record<string, Collection<any, any, any, any, any, any>> = Record<
-    string,
-    Collection<any, any, any, any, any, any>
-  >,
+  const TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
   const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 >(
@@ -113,22 +106,24 @@ export function defineServerConfig<
   const fileUploadHandlers = createFileUploadHandlers<TContext>(baseConfig.storageAdapter)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
-  const endpoints = {
-    ...config.endpoints,
-    ...auth.handlers,
-    ...collectionEndpoints,
-    ...fileUploadHandlers.handlers,
-  } as TEndpoints &
-    typeof auth.handlers &
-    ExtractAllCollectionCustomEndpoints<TCollections> &
-    ExtractAllCollectionDefaultEndpoints<TCollections> &
-    typeof fileUploadHandlers.handlers
-
-  let serverConfig = {
+  let serverConfig: ServerConfig<
+    TFullSchema,
+    TContext,
+    TCollections,
+    TEndpoints & AuthHandlers & typeof collectionEndpoints & typeof fileUploadHandlers.handlers
+  > = {
     ...baseConfig,
     collections: config.collections,
-    endpoints,
-  } satisfies ServerConfig<TFullSchema, TContext, TCollections, typeof endpoints>
+    endpoints: {
+      ...config.endpoints,
+      ...auth.handlers,
+      ...collectionEndpoints,
+      ...fileUploadHandlers.handlers,
+    } as TEndpoints &
+      typeof auth.handlers &
+      typeof collectionEndpoints &
+      typeof fileUploadHandlers.handlers,
+  }
 
   for (const { plugin } of config.plugins ?? []) {
     serverConfig = plugin(serverConfig) as any
@@ -225,7 +220,7 @@ export function getClientCollection<
 }
 
 export function getClientConfig<
-  TCollections extends Record<string, Collection<any, any, any, any, any, any>>,
+  TCollections extends Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<any>,
 >(
   serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
@@ -241,8 +236,8 @@ export function getClientConfig<
   return {
     auth: getAuthClient(serverConfig.auth),
     collections: R.mapValues(collections, (s) =>
-      getClientCollection(s as Collection<any, any, any, any, any, any>)
-    ) as ToClientCollectionList<TCollections>,
+      getClientCollection(s as AnyCollection)
+    ) as unknown as ToClientCollectionList<TCollections>,
     endpoints: clientEndpoints,
     $types: undefined as any,
     ...(serverConfig.storageAdapter && {

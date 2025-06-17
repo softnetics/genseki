@@ -11,7 +11,7 @@ import type { Simplify } from 'type-fest'
 import type { ZodObject, ZodOptional } from 'zod/v4'
 import z from 'zod/v4'
 
-import type { MaybePromise } from './collection'
+import { ApiDefaultMethod, type MaybePromise } from './collection'
 import type { Context, ContextToRequestContext } from './context'
 import {
   appendFieldNameToFields,
@@ -575,10 +575,25 @@ type FieldsToZodObject<TFields extends Fields<any>> = ZodObject<{
 }>
 
 export function fieldsToZodObject<TFields extends Fields<any>>(
-  fields: TFields
+  fields: TFields,
+  method?: typeof ApiDefaultMethod.CREATE | typeof ApiDefaultMethod.UPDATE
 ): FieldsToZodObject<TFields> {
   const zodObject = Object.entries(fields).reduce(
     (acc, [key, field]) => {
+      if (method) {
+        if (
+          method === ApiDefaultMethod.UPDATE &&
+          field.update !== FieldMutateModeCollection.ENABLED
+        ) {
+          return acc
+        }
+        if (
+          method === ApiDefaultMethod.CREATE &&
+          field.create !== FieldMutateModeCollection.ENABLED
+        ) {
+          return acc
+        }
+      }
       acc[key] = fieldToZodScheama(field)
       return acc
     },

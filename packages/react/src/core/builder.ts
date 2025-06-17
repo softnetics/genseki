@@ -8,11 +8,12 @@ import {
 import type { Simplify } from 'type-fest'
 
 import { createDefaultApiHandlers } from './builder.handler'
-import type {
-  Collection,
-  CollectionConfig,
-  FindTableByTableTsName,
-  GetAllTableTsNames,
+import {
+  type Collection,
+  type CollectionConfig,
+  type FindTableByTableTsName,
+  type GetAllTableTsNames,
+  getDefaultCollectionAdminApiRouter,
 } from './collection'
 import type { Context } from './context'
 import {
@@ -68,7 +69,14 @@ export class Builder<
       TFields,
       TApiRouter
     >
-  ) {
+  ): Collection<
+    TSlug,
+    FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
+    TFullSchema,
+    TContext,
+    FieldsWithFieldName<TFields>,
+    TApiRouter
+  > {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =
       this.tableRelationalConfigByTableTsName[
@@ -95,76 +103,69 @@ export class Builder<
       findOne: config.admin?.api?.findOne ?? defaultHandlers.findOne,
       findMany: config.admin?.api?.findMany ?? defaultHandlers.findMany,
     }
+    const endpoints: TApiRouter = config.admin?.endpoints ?? ({} as TApiRouter)
+    const defaultEndpoints = getDefaultCollectionAdminApiRouter<
+      TSlug,
+      TContext,
+      FieldsWithFieldName<TFields>
+    >(config.slug, config.fields, {
+      create: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.create ? defaultHandlers.create : (undefined as any)
+        const result = await api.create({
+          ...args,
+          defaultApi,
+        })
+        return result
+      },
+      update: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.update ? defaultHandlers.update : (undefined as any)
+        const result = await api.update({ ...args, defaultApi })
+        return result
+      },
+      delete: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.delete ? defaultHandlers.delete : (undefined as any)
+        const result = await api.delete({ ...args, defaultApi })
+        return result
+      },
+      findOne: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.findOne ? defaultHandlers.findOne : (undefined as any)
+        const result = await api.findOne({ ...args, defaultApi })
+        return result
+      },
+      findMany: async (args) => {
+        // TODO: Access control
+        const defaultApi = config.admin?.api?.findMany
+          ? defaultHandlers.findMany
+          : (undefined as any)
+        const result = await api.findMany({ ...args, defaultApi })
+        return result
+      },
+    })
 
     return {
       _: {
-        table: table,
+        table: table as GetTableByTableTsName<TFullSchema, TTableTsName>,
         tableConfig: tableRelationalConfig,
       },
       slug: config.slug,
       fields: config.fields,
-      identifierColumn: config.identifierColumn,
+      identifierColumn: config.identifierColumn as string,
       admin: {
-        ...config.admin,
-        api: {
-          create: async (args) => {
-            // TODO: Access control
-            const defaultApi = config.admin?.api?.create
-              ? defaultHandlers.create
-              : (undefined as any)
-            const result = await api.create({
-              ...args,
-              defaultApi,
-            })
-            return result
-          },
-          update: async (args) => {
-            // TODO: Access control
-            const defaultApi = config.admin?.api?.update
-              ? defaultHandlers.update
-              : (undefined as any)
-            const result = await api.update({ ...args, defaultApi })
-            return result
-          },
-          delete: async (args) => {
-            // TODO: Access control
-            const defaultApi = config.admin?.api?.delete
-              ? defaultHandlers.delete
-              : (undefined as any)
-            const result = await api.delete({ ...args, defaultApi })
-            return result
-          },
-          findOne: async (args) => {
-            // TODO: Access control
-            const defaultApi = config.admin?.api?.findOne
-              ? defaultHandlers.findOne
-              : (undefined as any)
-            const result = await api.findOne({ ...args, defaultApi })
-            return result
-          },
-          findMany: async (args) => {
-            // TODO: Access control
-            const defaultApi = config.admin?.api?.findMany
-              ? defaultHandlers.findMany
-              : (undefined as any)
-            const result = await api.findMany({ ...args, defaultApi })
-            return result
-          },
+        endpoints: {
+          ...endpoints,
+          ...defaultEndpoints,
         },
       },
-    } as Collection<
-      TSlug,
-      FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
-      TFullSchema,
-      TContext,
-      FieldsWithFieldName<TFields>,
-      TApiRouter
-    >
+    }
   }
 
   fields<
-    const TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    const TFields extends FieldsInitial<TContext, TFullSchema>,
+    TTableTsName extends GetAllTableTsNames<TFullSchema>,
+    TFields extends FieldsInitial<TContext>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (
@@ -178,9 +179,7 @@ export class Builder<
     return appendFieldNameToFields(optionsFn(fb))
   }
 
-  options<TType extends string | number>(
-    callback: OptionCallback<TType, TContext>
-  ): OptionCallback<TType, TContext> {
+  options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {
     return callback
   }
 

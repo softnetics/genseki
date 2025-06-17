@@ -32,7 +32,7 @@ export async function ListView(props: ListViewProps) {
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.api.findMany({
+  const result = await collection.admin.endpoints.findMany({
     context,
     slug: props.slug,
     fields: collection.fields,
