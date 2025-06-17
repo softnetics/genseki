@@ -5,7 +5,7 @@ import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
 import { getFieldsClient } from '../core/config'
-import { Context, type ContextToRequestContext } from '../core/context'
+import { type AnyContext, Context, type ContextToRequestContext } from '../core/context'
 import type { ApiRouteHandler } from '../core/endpoint'
 import type { Fields, FieldsClient } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
@@ -80,7 +80,7 @@ export interface AuthConfig {
     passwordHasher?: (password: string) => Promise<string> // default: scrypt
     signUp?: {
       autoLogin?: boolean // default: true
-      additionalFields?: Fields<any>
+      additionalFields?: Fields<any, AnyContext>
     }
   }
   oauth2?: {

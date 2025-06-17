@@ -215,7 +215,7 @@ export type Field<
   TContext extends Context<TFullSchema>,
 > = FieldColumn<TContext> | FieldRelation<TFullSchema, TContext>
 
-export type AnyField = Field<any, any>
+export type AnyField = Field<any, AnyContext>
 
 export type FieldsInitial<
   TFullSchema extends Record<string, unknown>,
@@ -230,7 +230,7 @@ export type Fields<
   TFields extends FieldsInitial<TFullSchema, TContext> = FieldsInitial<TFullSchema, TContext>,
 > = FieldsWithFieldName<TFields>
 
-export type AnyFields = Fields<any, AnyContext, AnyFieldsInitial>
+export type AnyFields = Fields<any, AnyContext, any>
 
 export type FieldClient = Omit<AnyField, 'options'>
 

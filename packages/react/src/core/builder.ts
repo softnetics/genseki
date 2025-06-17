@@ -79,7 +79,7 @@ export class Builder<
     TFullSchema,
     TContext,
     FieldsWithFieldName<TFields>,
-    TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>
+    TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, FieldsWithFieldName<TFields>>
   > {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =

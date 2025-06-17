@@ -151,13 +151,13 @@ export interface ClientApiRouter {
   [key: string]: ClientApiRouteSchema
 }
 
-export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
+export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<Context<any>>> = {
   [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, any>
     ? TApiRouter[TKey]['schema']
     : never
 }
 
-export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
+export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<Context<any>>> = {
   [TKey in keyof TApiRouter]: ClientApiRouteSchema
 }
 

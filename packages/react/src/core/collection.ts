@@ -467,7 +467,7 @@ export interface Collection<
   slug: TSlug
   identifierColumn: string
   fields: TFields
-  admin: CollectionAdmin<TApiRouter>
+  admin: CollectionAdmin<TContext, TApiRouter>
 }
 
 export type DefaultCollection = Collection<
@@ -476,7 +476,7 @@ export type DefaultCollection = Collection<
   Record<string, unknown>,
   Context<any>,
   AnyFields,
-  ApiRouter<any>
+  ApiRouter<any> & CollectionDefaultAdminApiRouter<string, AnyContext, AnyFields>
 >
 export type AnyCollection = Collection<
   string,
@@ -656,7 +656,7 @@ export type CollectionDefaultAdminApiRouter<
   >
 }
 
-export type CollectionAdmin<TApiRouter extends ApiRouter<any>> = {
+export type CollectionAdmin<TContext extends Context, TApiRouter extends ApiRouter<TContext>> = {
   endpoints: TApiRouter
 }
 

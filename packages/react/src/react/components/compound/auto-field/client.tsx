@@ -4,6 +4,7 @@ import type { ReactNode } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
 import type { Field, FieldRelation } from '../../../../core'
+import type { AnyContext } from '../../../../core/context'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 import {
@@ -183,7 +184,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 
 interface AutoFieldProps {
   // NOTE: This should be FieldClient but the type is not correct
-  field: Field & { fieldName: string }
+  field: Field<any, AnyContext> & { fieldName: string }
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'
