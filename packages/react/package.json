@@ -12,6 +12,8 @@
       "require": "./src/index.ts",
       "types": "./src/index.ts"
     },
+    "./richtext-plugins": "./src/react/components/compound/editor/extensions/index.ts",
+    "./storage-upload-adapters": "./src/core/file-storage-adapters/index.ts",
     "./tailwind.css": "./src/react/styles/tailwind.css"
   },
   "publishConfig": {
@@ -20,6 +22,8 @@
         "import": "./dist/src/index.js",
         "types": "./dist/src/index.d.ts"
       },
+      "./richtext-plugins": "./dist/src/react/components/compound/editor/extensions/index.js",
+      "./storage-upload-adapters": "./dist/src/core/file-storage-adapters/index.js",
       "./tailwind.css": "./dist/src/react/styles/tailwind.css"
     }
   },

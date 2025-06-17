@@ -1,3 +1,4 @@
+import StarterKit from '@tiptap/starter-kit'
 import { z } from 'zod/v4'
 
 import { builder } from '../helper'
@@ -52,8 +53,14 @@ export const postsCollection = builder.collection('posts', {
     }),
     content: fb.columns('content', {
       type: 'richText',
-      label: 'Content',
-      richTextOptions: {},
+      isRequired: true,
+      label: 'Food description',
+      editorProviderProps: {
+        extensions: [StarterKit.configure({})],
+        immediatelyRender: false,
+        shouldRerenderOnTransaction: true,
+        content: '<h2>This came from content field (posts collection)</h2>',
+      },
     }),
     authorId: fb.relations('author', (fb) => ({
       type: 'connect',

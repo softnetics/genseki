@@ -228,7 +228,6 @@
 
     --sidebar: var(--color-bluegray-50);
     --sidebar-fg: var(--color-bluegray-600);
-    --sidebar-accent: var(--color-pumpkin-500);
 
     --chart-1: oklch(0.546 0.245 262.881);
     --chart-2: oklch(0.707 0.165 254.624);
@@ -238,7 +237,7 @@
   }
 
   .dark {
-    --bg: var(--color-bluegray-900);
+    --bg: var(--color-bluegray-800);
     --fg: var(--color-bluegray-50);
 
     --primary: var(--color-pumpkin-500);
@@ -273,7 +272,7 @@
     --navbar: var(--color-bluegray-500);
     --navbar-fg: var(--color-bluegray-100);
 
-    --sidebar: var(--color-bluegray-800);
+    --sidebar: var(--color-bluegray-900);
     --sidebar-fg: var(--color-bluegray-100);
 
     --chart-1: var(--color-blue-700);

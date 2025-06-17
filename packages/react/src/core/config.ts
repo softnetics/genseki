@@ -19,9 +19,16 @@ import {
   type ToClientApiRouteSchema,
   type ToRecordApiRouteSchema,
 } from './endpoint'
-import type { Field, FieldClient, Fields, FieldsClient, RichTextOptions } from './field'
+import type { Field, FieldClient, Fields, FieldsClient } from './field'
+import {
+  getStorageAdapterClient,
+  type StorageAdapter,
+  type StorageAdapterClient,
+} from './file-storage-adapters/generic-adapter'
+import { createFileUploadHandlers } from './file-storage-adapters/handlers'
 import type { GensekiPlugin, MergePlugins } from './plugins'
-import { isRelationField } from './utils'
+import { getClientEditorProviderProps } from './richtext'
+import { isRelationField, isRichTextField } from './utils'
 
 import {
   type AuthClient,
@@ -38,8 +45,8 @@ export interface BaseConfigOptions<
   db: NodePgDatabase<TFullSchema>
   schema: TFullSchema
   context?: TContextValue
+  storageAdapter?: StorageAdapter
   auth: AuthConfig
-  editor?: RichTextOptions
 }
 
 export interface BaseConfig<
@@ -102,29 +109,26 @@ export function defineServerConfig<
   baseConfig: BaseConfig<TFullSchema, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
-  const auth = createAuth(baseConfig.auth, baseConfig.context)
+  const auth = createAuth<TContext>(baseConfig.auth, baseConfig.context)
+  const fileUploadHandlers = createFileUploadHandlers<TContext>(baseConfig.storageAdapter)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
+
+  const endpoints = {
+    ...config.endpoints,
+    ...auth.handlers,
+    ...collectionEndpoints,
+    ...fileUploadHandlers.handlers,
+  } as TEndpoints &
+    typeof auth.handlers &
+    ExtractAllCollectionCustomEndpoints<TCollections> &
+    ExtractAllCollectionDefaultEndpoints<TCollections> &
+    typeof fileUploadHandlers.handlers
 
   let serverConfig = {
     ...baseConfig,
     collections: config.collections,
-    endpoints: {
-      ...config.endpoints,
-      ...auth.handlers,
-      ...collectionEndpoints,
-    } as TEndpoints &
-      AuthHandlers &
-      ExtractAllCollectionCustomEndpoints<TCollections> &
-      ExtractAllCollectionDefaultEndpoints<TCollections>,
-  } satisfies ServerConfig<
-    TFullSchema,
-    TContext,
-    TCollections,
-    TEndpoints &
-      AuthHandlers &
-      ExtractAllCollectionCustomEndpoints<TCollections> &
-      ExtractAllCollectionDefaultEndpoints<TCollections>
-  >
+    endpoints,
+  } satisfies ServerConfig<TFullSchema, TContext, TCollections, typeof endpoints>
 
   for (const { plugin } of config.plugins ?? []) {
     serverConfig = plugin(serverConfig) as any
@@ -143,7 +147,7 @@ export interface ClientConfig<
   auth: AuthClient
   collections: TCollections
   endpoints: TApiRouter
-  editor?: RichTextOptions
+  storageAdapter?: StorageAdapterClient
 }
 
 export function getFieldClient(name: string, field: Field): FieldClient & { fieldName: string } {
@@ -174,6 +178,22 @@ export function getFieldClient(name: string, field: Field): FieldClient & { fiel
     ) as FieldClient & { fieldName: string }
   }
 
+  if (isRichTextField(field)) {
+    const sanitizedBaseField = R.omit(
+      {
+        ...field,
+        label: field.label ?? name,
+      },
+      ['_', 'options' as any]
+    ) as FieldClient & { fieldName: string }
+
+    const sanitizedRichTextField = {
+      ...sanitizedBaseField,
+      editorProviderProps: getClientEditorProviderProps(field.editorProviderProps),
+    }
+    return sanitizedRichTextField
+  }
+
   return R.omit(
     {
       ...field,
@@ -185,16 +205,23 @@ export function getFieldClient(name: string, field: Field): FieldClient & { fiel
 }
 
 export function getFieldsClient(fields: Fields<any>): FieldsClient {
-  return R.mapValues(fields, (value, key) => getFieldClient(key, value))
+  return R.mapValues(fields, (value, key) => {
+    return getFieldClient(key, value)
+  })
 }
 
 export function getClientCollection<
   const TCollection extends Collection<any, any, any, any, any, any>,
 >(collection: TCollection): ToClientCollection<TCollection> {
-  return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
-    ...collection,
-    fields: getFieldsClient(collection.fields),
-  })) as unknown as ToClientCollection<TCollection>
+  return R.pipe(
+    collection,
+    R.omit(['_', 'admin']),
+    (collection) =>
+      ({
+        ...collection,
+        fields: getFieldsClient(collection.fields),
+      }) as unknown as ToClientCollection<TCollection>
+  )
 }
 
 export function getClientConfig<
@@ -212,12 +239,19 @@ export function getClientConfig<
   ) as ToClientApiRouteSchema<TApiRouter>
 
   return {
-    editor: serverConfig.editor,
     auth: getAuthClient(serverConfig.auth),
     collections: R.mapValues(collections, (s) =>
       getClientCollection(s as Collection<any, any, any, any, any, any>)
     ) as ToClientCollectionList<TCollections>,
     endpoints: clientEndpoints,
     $types: undefined as any,
+    ...(serverConfig.storageAdapter && {
+      storageAdapter: getStorageAdapterClient({
+        storageAdapter: serverConfig.storageAdapter,
+        grabPutObjectSignedUrlApiRoute: clientEndpoints['file.grabPutObjSignedUrl'],
+        grabGetObjectSignedUrlApiRoute: clientEndpoints['file.grabGetObjSignedUrl'],
+        grabPermanentObjApiRoute: clientEndpoints['file.grabPermanentObj'],
+      }),
+    }),
   }
 }

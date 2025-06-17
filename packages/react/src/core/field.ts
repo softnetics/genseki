@@ -64,16 +64,25 @@ export type FieldBase = {
   description?: string
 }
 
-export interface RichTextOptions {
-  editorProviderOptions: EditorProviderProps
-}
-
 export interface FieldColumnStringCollectionOptions<TContext extends Context = Context> {
   richText: {
     type: 'richText'
     default?: string
-  } & RichTextOptions &
-    FieldBase
+    editorProviderProps: Omit<
+      EditorProviderProps,
+      | 'onBeforeCreate'
+      | 'onCreate'
+      | 'onContentError'
+      | 'onUpdate'
+      | 'onSelectionUpdate'
+      | 'onTransaction'
+      | 'onFocus'
+      | 'onBlur'
+      | 'onDestroy'
+      | 'onPaste'
+      | 'onDrop'
+    >
+  } & FieldBase
   text: {
     type: 'text'
     default?: string

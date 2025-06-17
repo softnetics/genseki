@@ -1,11 +1,13 @@
+'use client'
+
 import * as React from 'react'
 
 import { FileArrowUpIcon, XIcon } from '@phosphor-icons/react'
 import type { NodeViewProps } from '@tiptap/react'
-import { NodeViewWrapper } from '@tiptap/react'
+import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
 
+import type { UploadFunction } from '../../../../../core/file-storage-adapters/generic-adapter'
 import { cn } from '../../../../utils/cn'
-import type { UploadFunction } from '../file-upload-adapters/generic-adapter'
 
 export type FileItem =
   | {
@@ -394,3 +396,5 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
     </NodeViewWrapper>
   )
 }
+
+export const ImageUploadNodeWithRenderer = ReactNodeViewRenderer(ImageUploadNode)

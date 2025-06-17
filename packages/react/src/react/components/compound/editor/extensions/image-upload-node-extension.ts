@@ -1,8 +1,7 @@
 import { mergeAttributes, Node } from '@tiptap/react'
-import { ReactNodeViewRenderer } from '@tiptap/react'
 
-import type { UploadFunction } from '../file-upload-adapters/generic-adapter'
-import { ImageUploadNode as ImageUploadNodeComponent } from '../nodes/image-upload-node'
+import type { UploadFunction } from '../../../../../core/file-storage-adapters/generic-adapter'
+import { ImageUploadNodeWithRenderer } from '../nodes/image-upload-node'
 
 export interface ImageUploadNodeOptions {
   /**
@@ -51,9 +50,8 @@ declare module '@tiptap/react' {
  * A TipTap node extension that creates an image upload component.
  * @see registry/tiptap-node/image-upload-node/image-upload-node
  */
-export const ImageUploadNode = Node.create<ImageUploadNodeOptions>({
+export const ImageUploadNodeExtension = Node.create<ImageUploadNodeOptions>({
   name: 'imageUpload',
-
   group: 'block',
 
   draggable: true,
@@ -96,7 +94,7 @@ export const ImageUploadNode = Node.create<ImageUploadNodeOptions>({
   },
 
   addNodeView() {
-    return ReactNodeViewRenderer(ImageUploadNodeComponent)
+    return ImageUploadNodeWithRenderer
   },
 
   addCommands() {

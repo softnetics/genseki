@@ -114,7 +114,7 @@ export type ApiRoute<
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
-  handler: ApiRouteHandler<ContextToRequestContext<TContext>, TApiRouteSchema>
+  handler: ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
 export type AppendPrefixPathToApiRoute<
@@ -161,9 +161,12 @@ export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<any>> = {
 }
 
 export function createEndpoint<
-  const TApiEndpointSchema extends ApiRouteSchema,
-  const TContext extends Context = Context,
->(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
+  TContext extends Context = Context,
+  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
+>(
+  schema: TApiRouteSchema,
+  handler: ApiRouteHandler<TContext, TApiRouteSchema>
+): ApiRoute<TContext, TApiRouteSchema> {
   return {
     schema,
     handler: handler,

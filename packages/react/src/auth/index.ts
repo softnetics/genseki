@@ -115,7 +115,12 @@ export type Auth<
   config: TAuthConfig
   context: ContextToRequestContext<TContext>
   authContext: AuthContext
-  handlers: Simplify<AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>>
+  handlers: Simplify<
+    AddObjectKeyPrefix<
+      ReturnType<typeof createAuthHandlers<any, Context<any, any, any>>>['handlers'],
+      'auth'
+    >
+  >
 }
 
 export type AuthHandlers = Auth<any, any>['handlers']
@@ -141,7 +146,7 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<const TContext extends Context>(
+export function createAuth<TContext extends Context>(
   config: AuthConfig,
   context: TContext
 ): Auth<TContext> {
@@ -153,8 +158,9 @@ export function createAuth<const TContext extends Context>(
     const handler: ApiRouteHandler<TContext, any> = (args) => {
       return h.handler({ ...args, context: wrappedContext } as any) as any
     }
-    return { schema: h.schema, handler }
-  }) as ReturnType<typeof createAuthHandlers>['handlers']
+    h.handler
+    return { schema: h.schema, handler } as any
+  }) as ReturnType<typeof createAuthHandlers<typeof authContext, TContext>>['handlers']
 
   const prefixedHandlers = Object.fromEntries(
     Object.entries(handlers).map(([key, value]) => {

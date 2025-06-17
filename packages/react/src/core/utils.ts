@@ -16,6 +16,10 @@ export function isRelationField(field: Field): field is FieldRelation {
   return field._.source === 'relation'
 }
 
+export function isRichTextField(field: Field): field is Extract<Field, { type: 'richText' }> {
+  return field.type === 'richText'
+}
+
 export type GetPrimaryColumn<TTableRelationalConfig extends TableRelationalConfig> = ValueOf<{
   [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
     ? TTableRelationalConfig['columns'][K]

@@ -1,10 +1,11 @@
+'use client'
 import { ImageIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
 import { BaseIcon } from '../../../primitives/base-icon'
 import { Button } from '../../../primitives/button'
 
-const UploadImageButton = () => {
+export const UploadImageButton = () => {
   const { editor } = useCurrentEditor()
 
   if (!editor) throw new Error('Editor provider is missing')
@@ -22,5 +23,3 @@ const UploadImageButton = () => {
     </Button>
   )
 }
-
-export default UploadImageButton

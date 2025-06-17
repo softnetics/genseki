@@ -1,9 +1,7 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { type ReactNode, startTransition, useMemo } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
-
-import * as R from 'remeda'
 
 import {
   Button,
@@ -18,7 +16,6 @@ import {
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
-  type RichTextEditorProps,
   Select,
   SelectList,
   SelectOption,
@@ -30,11 +27,13 @@ import {
   type TextFieldProps,
   TimeField,
   type TimeFieldProps,
-  useClientConfig,
   useFormItemController,
 } from '@genseki/react'
 
 import type { Field, FieldRelation } from '../../../../core'
+import { constructEditorProviderProps } from '../../../../core/richtext'
+import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
+import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 
@@ -171,38 +170,49 @@ export function AutoSelectField(props: AutoSelectField) {
   )
 }
 
-const AutoRichTextField = (
-  props: {
-    name: string
-    description?: string
-    label?: string
-    isRequired?: boolean
-    placeholder?: string
-  } & RichTextEditorProps
-) => {
+const AutoRichTextField = (props: {
+  name: string
+  label?: string
+  description?: string
+  isRequired?: boolean
+  placeholder?: string
+  isDisabled?: boolean
+  isPending?: boolean
+  errorMessage?: string
+  editorProviderProps: ClientEditorProviderProps
+}) => {
   const { field, error } = useFormItemController()
-  const clientConfig = useClientConfig()
+  const storageAdapter = useStorageAdapter()
 
-  const mergedEditorConfig = R.mergeDeep(
-    clientConfig.editor?.editorProviderOptions ?? {},
-    props.editorProviderOptions
-  ) as RichTextEditorProps['editorProviderOptions']
+  const editorProviderProps = useMemo(
+    () => constructEditorProviderProps(props.editorProviderProps, storageAdapter),
+    []
+  )
 
+  const content = useMemo(() => {
+    // Initail value case
+    if (typeof field.value === 'string') return JSON.parse(field.value)
+    // These content and placeholder came from user defined in config
+    return editorProviderProps.content ?? props.placeholder ?? ''
+  }, [field.value])
+
+  // TODO: Maybe we need to stores as a JSON not a serialized object
   return (
-    <div className="flex flex-col gap-y-1.5">
-      <RichTextEditor
-        errorMessage={error?.message}
-        isRequired={props.isRequired}
-        isDisabled={props.isDisabled}
-        description={props.description}
-        editorProviderOptions={{
-          ...mergedEditorConfig,
-          onTransaction({ editor }) {
-            field.onChange(editor.getJSON())
-          },
-        }}
-      />
-    </div>
+    <RichTextEditor
+      label={props.label}
+      errorMessage={error?.message}
+      isRequired={props.isRequired}
+      isDisabled={props.isDisabled}
+      description={props.description}
+      editorProviderProps={{
+        ...editorProviderProps,
+        onUpdate(updateCb) {
+          startTransition(() => field.onChange(JSON.stringify(updateCb.editor.getJSON())))
+          editorProviderProps.onUpdate?.(updateCb)
+        },
+        content,
+      }}
+    />
   )
 }
 
@@ -257,8 +267,8 @@ export function AutoField(props: AutoFieldProps) {
           name={commonProps.name}
           component={
             <AutoRichTextField
-              editorProviderOptions={field.editorProviderOptions}
               {...commonProps}
+              editorProviderProps={field.editorProviderProps as ClientEditorProviderProps}
               isDisabled={disabled}
             />
           }
@@ -553,7 +563,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 
   const createComponent = (name: string) => {
-    console.log('createComponent', name, props.field.fields)
     return Object.entries(props.field.fields).map(([key, childField]) => (
       <AutoFormField
         key={key}
