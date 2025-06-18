@@ -1,5 +1,5 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
-import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
+import type { ConditionalExcept, IsEqual, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
 import z from 'zod/v4'
 
 import type { AnyContext, Context, RequestContext } from './context'
@@ -467,7 +467,7 @@ export interface Collection<
   slug: TSlug
   identifierColumn: string
   fields: TFields
-  admin: CollectionAdmin<TContext, TApiRouter>
+  admin: CollectionAdmin<TSlug, TContext, TFields, TApiRouter>
 }
 
 export type DefaultCollection = Collection<
@@ -476,7 +476,7 @@ export type DefaultCollection = Collection<
   Record<string, unknown>,
   Context<any>,
   AnyFields,
-  ApiRouter<any> & CollectionDefaultAdminApiRouter<string, AnyContext, AnyFields>
+  ApiRouter<any>
 >
 export type AnyCollection = Collection<
   string,
@@ -571,6 +571,9 @@ export type ExtractAllCollectionEndpoints<TCollections extends Record<string, An
     }>
   >
 
+export type ConditionalAnyOutput<TFields extends Fields<any, any>, TOutput> =
+  IsEqual<TFields, AnyFields> extends true ? any : TOutput
+
 export type ConvertCollectionDefaultApiToApiRouteSchema<
   TSlug extends string,
   TMethod extends ApiDefaultMethod,
@@ -579,23 +582,23 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
   ? {
       path: `/api/${TSlug}/${TMethod}`
       method: 'POST'
-      body: ToZodObject<InferCreateFields<TFields>>
+      body: ConditionalAnyOutput<TFields, ToZodObject<InferCreateFields<TFields>>>
       responses: {
-        200: ToZodObject<ApiReturnType<TMethod, TFields>>
+        200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
       }
     }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? {
-        path: `/api/${TSlug}/${TMethod}/:id`
+        path: `/api/${TSlug}/:id`
         method: 'GET'
         pathParams: ToZodObject<{ id: string }>
         responses: {
-          200: ToZodObject<ApiReturnType<TMethod, TFields>>
+          200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
         }
       }
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
       ? {
-          path: `/api/${TSlug}/${TMethod}`
+          path: `/api/${TSlug}`
           method: 'GET'
           query: ToZodObject<{
             limit?: number
@@ -604,22 +607,22 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
             orderType?: 'asc' | 'desc'
           }>
           responses: {
-            200: ToZodObject<ApiReturnType<TMethod, TFields>>
+            200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
           }
         }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? {
-            path: `/api/${TSlug}/${TMethod}/:id`
+            path: `/api/${TSlug}/:id`
             method: 'PATCH'
             pathParams: ToZodObject<{ id: string }>
-            body: ToZodObject<InferUpdateFields<TFields>>
+            body: ConditionalAnyOutput<TFields, ToZodObject<InferUpdateFields<TFields>>>
             responses: {
               200: ToZodObject<ApiReturnType<TMethod, TFields>>
             }
           }
         : TMethod extends typeof ApiDefaultMethod.DELETE
           ? {
-              path: `/api/${TSlug}/${TMethod}`
+              path: `/api/${TSlug}`
               method: 'DELETE'
               body: ToZodObject<{ ids: string[] | number[] }>
               responses: {
@@ -656,8 +659,13 @@ export type CollectionDefaultAdminApiRouter<
   >
 }
 
-export type CollectionAdmin<TContext extends Context, TApiRouter extends ApiRouter<TContext>> = {
-  endpoints: TApiRouter
+export type CollectionAdmin<
+  TSlug extends string,
+  TContext extends Context,
+  TFields extends Fields<any, any>,
+  TApiRouter extends ApiRouter<TContext>,
+> = {
+  endpoints: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>
 }
 
 export function getDefaultCollectionAdminApiRouter<

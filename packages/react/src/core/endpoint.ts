@@ -1,4 +1,4 @@
-import type { ConditionalExcept, IsNever, Simplify, ValueOf } from 'type-fest'
+import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
 import { z, type ZodType } from 'zod/v4'
 
 import type { MaybePromise } from './collection'
@@ -41,15 +41,20 @@ type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
       ? InferPathParams<TApiRouteSchema['path']>
       : never
 
+type ConditionNeverKey<T extends Record<string, unknown>> = {
+  [K in keyof T]: IsNever<T[K]> extends true ? K : never
+}[keyof T]
+
+type ConditionalExceptNever<T extends Record<string, unknown>> = Except<T, ConditionNeverKey<T>>
+
 type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
   body: GetBody<TApiRouteSchema>
   query: GetQuery<TApiRouteSchema>
   pathParams: GetPathParams<TApiRouteSchema>
 } & GetHeadersObject<TApiRouteSchema>
 
-export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExcept<
-  ApiRouteHandlerBasePayload<TApiRouteSchema>,
-  never
+export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExceptNever<
+  ApiRouteHandlerBasePayload<TApiRouteSchema>
 >
 
 export type ApiRouteHandlerPayloadWithContext<

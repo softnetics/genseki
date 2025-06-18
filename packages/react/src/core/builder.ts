@@ -11,7 +11,6 @@ import { createDefaultApiHandlers } from './builder.handler'
 import {
   type Collection,
   type CollectionConfig,
-  type CollectionDefaultAdminApiRouter,
   type FindTableByTableTsName,
   type GetAllTableTsNames,
   getDefaultCollectionAdminApiRouter,
@@ -79,7 +78,7 @@ export class Builder<
     TFullSchema,
     TContext,
     FieldsWithFieldName<TFields>,
-    TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, FieldsWithFieldName<TFields>>
+    TApiRouter
   > {
     const table = this.config.schema[tableTsName]
     const tableRelationalConfig =
