@@ -1,5 +1,5 @@
 import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
-import type { ConditionalExcept, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
+import type { ConditionalExcept, IsEqual, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
 import z from 'zod/v4'
 
 import type { Context, RequestContext } from './context'
@@ -561,6 +561,9 @@ export type ExtractAllCollectionEndpoints<TCollections extends Record<string, An
 
 type SuccessResponse<TFunc extends (...args: any) => any> = ToZodObject<Awaited<ReturnType<TFunc>>>
 
+type ToAnyIfObjectHasField<T extends { [k: string]: unknown }> =
+  IsEqual<T, { [k: string]: unknown }> extends true ? T : any
+
 export type ConvertCollectionDefaultApiToApiRouteSchema<
   TSlug extends string,
   TFields extends Fields<any, any>,
@@ -570,7 +573,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
   ? {
       path: `/api/${TSlug}/${TMethod}`
       method: 'POST'
-      body: ToZodObject<InferCreateFields<TFields>>
+      body: ToZodObject<ToAnyIfObjectHasField<InferCreateFields<TFields>>>
       responses: {
         200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
       }
@@ -603,7 +606,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
             path: `/api/${TSlug}/${TMethod}/:id`
             method: 'PATCH'
             pathParams: ToZodObject<{ id: string }>
-            body: ToZodObject<InferUpdateFields<TFields>>
+            body: ToZodObject<ToAnyIfObjectHasField<InferUpdateFields<TFields>>>
             responses: {
               200: SuccessResponse<Exclude<TEndpoints[TMethod], undefined>>
             }

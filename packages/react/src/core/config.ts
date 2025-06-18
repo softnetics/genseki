@@ -4,6 +4,7 @@ import * as R from 'remeda'
 import {
   type AnyCollection,
   type ClientCollection,
+  type Collection,
   getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
@@ -86,7 +87,13 @@ export function defineBaseConfig<
 export function defineServerConfig<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   const TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  const TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
+  const TCollections extends Record<
+    string,
+    Collection<string, string, TFullSchema, TContext, Fields<TContext, TFullSchema>>
+  > = Record<
+    string,
+    Collection<string, string, TFullSchema, TContext, Fields<TContext, TFullSchema>>
+  >,
   const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
   const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 >(
