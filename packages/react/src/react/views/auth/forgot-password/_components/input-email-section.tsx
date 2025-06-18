@@ -3,7 +3,7 @@
 import { useForm } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import z from 'zod/v4'
+import { z } from 'zod/v4'
 
 import {
   Button,
@@ -13,16 +13,19 @@ import {
   FormItem,
   FormMessage,
   TextField,
-} from '../../../../../components'
+} from '@genseki/react'
 
 const schema = z.object({
-  email: z.email({ error: 'Invalid email address' }),
+  email: z.string().email({ message: 'Invalid email address' }),
 })
 
 export type OutputEmailForm = z.infer<typeof schema>
 
 interface InputEmailSectionProps {
-  onNext: (email: string) => void
+  onNext: (email: string) => Promise<{
+    status: number
+    errormessage?: string
+  }>
 }
 
 export function InputEmailSection({ onNext }: InputEmailSectionProps) {
@@ -35,8 +38,15 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
     <Form {...form}>
       <form
         onSubmit={form.handleSubmit(async (data) => {
-          onNext(data.email)
+          const response = await onNext(data.email)
           // await api.sendOtpToEmail(data.email)
+          if (response.status !== 200) {
+            form.setError('email', {
+              type: 'manual',
+              message: response.errormessage || 'Failed to send OTP',
+            })
+            return
+          }
         })}
         className="flex flex-col gap-4"
       >
@@ -46,14 +56,20 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField {...field} placeholder="อีเมล" />
+                <TextField {...field} placeholder="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <Button variant="primary" type="submit" className="w-full" size="sm">
-          ส่งรหัส OTP ไปยังอีเมล
+        <Button
+          variant="primary"
+          type="submit"
+          className="w-full"
+          size="sm"
+          onPress={() => form.clearErrors('email')}
+        >
+          Send OTP
         </Button>
       </form>
     </Form>
