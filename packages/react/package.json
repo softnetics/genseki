@@ -67,6 +67,7 @@
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.3",
     "remeda": "^2.21.2",
+    "sonner": "^2.0.3",
     "tailwind-merge": "^3.0.2",
     "tailwind-variants": "^1.0.0",
     "tailwindcss": "^4.1.7",

@@ -1,24 +1,52 @@
 'use client'
 
-import { Link, TextField } from '../../components'
-import { SubmitButton } from '../../components/compound/submit-button'
+import { useForm } from 'react-hook-form'
+
+import { zodResolver } from '@hookform/resolvers/zod'
+import { toast } from 'sonner'
+import { z } from 'zod'
+
+import {
+  Form,
+  FormControl,
+  FormField,
+  FormItem,
+  FormMessage,
+  Link,
+  SubmitButton,
+  TextField,
+} from '../../components'
 import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
+
+const schema = z.object({
+  email: z.string().email({ message: 'Invalid email address' }),
+  // TODO: custom password validation
+  password: z
+    .string()
+    .min(8, { message: 'Password must be at least 8 characters long' })
+    .regex(/[A-Za-z]/, { message: 'Must contain English letters (A-Z, a-z)' })
+    .regex(/[0-9]/, { message: 'Must contain numbers (0-9)' })
+    .trim(),
+})
 
 export function LoginClientForm() {
   const serverFunction = useServerFunction()
 
+  const form = useForm({
+    resolver: zodResolver(schema),
+    mode: 'onSubmit',
+  })
   const { navigate } = useNavigation()
 
-  async function login(formData: FormData) {
-    const email = formData.get('email') as string
-    const password = formData.get('password') as string
-
+  async function login(data: z.infer<typeof schema>) {
+    form.clearErrors('email')
+    form.clearErrors('password')
     const response = await serverFunction({
       method: 'auth.loginEmail',
       body: {
-        email,
-        password,
+        email: data.email,
+        password: data.password,
       },
       headers: {},
       query: {},
@@ -26,28 +54,74 @@ export function LoginClientForm() {
     })
 
     if (response.status !== 200) {
-      console.error('Login failed', response)
-      // TODO: add error handling
+      toast.error('Login failed', {
+        description: response.body.status || 'Failed to login',
+      })
+      form.setError('email', {
+        type: 'manual',
+        message: response.body.status || 'Failed to login',
+      })
+
       return
     }
+
+    toast.success('Login successful', {
+      description: 'You have successfully logged in.',
+    })
 
     navigate('../collections')
   }
 
   return (
-    <form className="flex flex-col space-y-8 flex-1" action={login}>
-      <TextField name="email" type="email" placeholder="email..." label="Email" />
-      <TextField
-        name="password"
-        type="password"
-        placeholder="password..."
-        label="Password"
-        isRevealable
-      />
-      <SubmitButton>Login</SubmitButton>
-      <Link href="./sign-up" intent="primary" className="text-sm">
+    <div className="flex flex-col space-y-8">
+      <Form {...form}>
+        <form className="flex flex-col space-y-8 flex-1" onSubmit={form.handleSubmit(login)}>
+          <FormField
+            control={form.control}
+            name="email"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <TextField
+                    {...field}
+                    name="email"
+                    type="email"
+                    placeholder="email..."
+                    label="Email"
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <FormField
+            control={form.control}
+            name="password"
+            render={({ field }) => (
+              <FormItem>
+                <FormControl>
+                  <TextField
+                    {...field}
+                    name="password"
+                    type="password"
+                    placeholder="password..."
+                    label="Password"
+                    isRevealable
+                  />
+                </FormControl>
+                <FormMessage />
+              </FormItem>
+            )}
+          />
+          <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
+            Forgot Password?
+          </Link>
+          <SubmitButton>Login</SubmitButton>
+        </form>
+      </Form>
+      <Link href="./sign-up" intent="primary" className="text-sm mx-auto">
         Create an account?
       </Link>
-    </form>
+    </div>
   )
 }

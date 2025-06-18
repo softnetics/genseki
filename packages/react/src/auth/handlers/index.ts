@@ -1,7 +1,8 @@
 import { forgotPasswordEmail } from './forgot-password'
 import { loginEmail } from './login-email'
 import { me } from './me'
-import { resetPasswordEmail } from './reset-password'
+import { resetPasswordEmail, validateResetToken } from './reset-password'
+import { sendEmailResetPassword } from './send-email-reset-password'
 import { signOut } from './sign-out'
 import { signUp } from './sign-up'
 
@@ -16,8 +17,10 @@ export function createAuthHandlers<TAuthContext extends AuthContext, TContext ex
     signUp: signUp<TAuthContext, TContext>(authContext),
     loginEmail: loginEmail<TAuthContext, TContext>(authContext),
     signOut: signOut<TAuthContext, TContext>(authContext),
-    resetPasswordEmail: resetPasswordEmail<TAuthContext, TContext>(authContext),
     forgotPasswordEmail: forgotPasswordEmail<TAuthContext, TContext>(authContext),
+    resetPasswordEmail: resetPasswordEmail<TAuthContext, TContext>(authContext),
+    validateResetToken: validateResetToken<TAuthContext, TContext>(authContext),
+    sendEmailResetPassword: sendEmailResetPassword<TAuthContext, TContext>(authContext),
     // Authentication required
     me: me<TAuthContext, TContext>(authContext),
   } as const
