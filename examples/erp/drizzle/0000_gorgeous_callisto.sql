@@ -38,7 +38,7 @@ CREATE TABLE "foods" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"name" varchar NOT NULL,
 	"is_cooked" boolean NOT NULL,
-	"description" text,
+	"description" json,
 	"cookingTypes" "types" DEFAULT 'other' NOT NULL,
 	"cookingDuration" numeric NOT NULL,
 	"cookingDate" date DEFAULT now() NOT NULL,
@@ -48,7 +48,7 @@ CREATE TABLE "foods" (
 CREATE TABLE "posts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar,
-	"content" text,
+	"content" json,
 	"authorId" uuid,
 	"categoryId" uuid,
 	"updatedAt" timestamp DEFAULT now(),

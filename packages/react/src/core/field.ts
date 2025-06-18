@@ -64,12 +64,15 @@ export type FieldBase = {
   description?: string
 }
 
-export interface FieldColumnStringCollectionOptions<TContext extends Context = Context> {
+export interface FieldColumnJsonCollectionOptions<TContext extends Context = Context> {
   richText: {
     type: 'richText'
     default?: string
     editorProviderProps: ServerConfigEditorProviderProps
   } & FieldBase
+}
+
+export interface FieldColumnStringCollectionOptions<TContext extends Context = Context> {
   text: {
     type: 'text'
     default?: string
@@ -167,7 +170,8 @@ export type FieldRelationCollectionOptions<
 }
 
 export type FieldColumnCollection<TContext extends Context = Context> =
-  FieldColumnStringCollectionOptions<TContext> &
+  FieldColumnJsonCollectionOptions<TContext> &
+    FieldColumnStringCollectionOptions<TContext> &
     FieldColumnStringArrayCollectionOptions<TContext> &
     FieldColumnNumberCollectionOptions<TContext> &
     FieldColumnNumberArrayCollectionOptions<TContext> &
@@ -245,15 +249,17 @@ export type FieldColumnOptionsFromTable<
       ? FieldColumnBooleanCollectionOptions[keyof FieldColumnBooleanCollectionOptions]
       : TColumn['_']['dataType'] extends 'date'
         ? FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
-        : TColumn['_']['dataType'] extends 'array'
-          ? TColumn['_']['data'] extends string[]
-            ? FieldColumnStringArrayCollectionOptions<TContext>[keyof FieldColumnStringArrayCollectionOptions<TContext>]
-            : TColumn['_']['data'] extends number[]
-              ? FieldColumnNumberArrayCollectionOptions<TContext>[keyof FieldColumnNumberArrayCollectionOptions<TContext>]
-              : TColumn['_']['data'] extends boolean[]
-                ? FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
-                : never
-          : never
+        : TColumn['_']['dataType'] extends 'json'
+          ? FieldColumnJsonCollectionOptions<TContext>[keyof FieldColumnJsonCollectionOptions<TContext>]
+          : TColumn['_']['dataType'] extends 'array'
+            ? TColumn['_']['data'] extends string[]
+              ? FieldColumnStringArrayCollectionOptions<TContext>[keyof FieldColumnStringArrayCollectionOptions<TContext>]
+              : TColumn['_']['data'] extends number[]
+                ? FieldColumnNumberArrayCollectionOptions<TContext>[keyof FieldColumnNumberArrayCollectionOptions<TContext>]
+                : TColumn['_']['data'] extends boolean[]
+                  ? FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
+                  : never
+            : never
 
 type RelationFieldOptionsFromTable<
   TRelationPrimaryColumn extends Column,

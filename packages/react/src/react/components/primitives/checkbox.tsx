@@ -113,6 +113,7 @@ const Checkbox = forwardRef(function Checkbox(
               {props.label ? (
                 <Label className={twMerge(props.description && 'text-sm/4 font-normal')}>
                   {props.label}
+                  {props.isRequired && <span className="ml-1 text-red-500">*</span>}
                 </Label>
               ) : (
                 (props.children as React.ReactNode)

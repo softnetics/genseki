@@ -2,6 +2,7 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import type { Fields } from '../../../core'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
@@ -13,11 +14,29 @@ interface CreateClientViewProps {
   optionsRecord: Record<string, any[]>
 }
 
+const getDefaultValue = (fields: Fields) => {
+  const mappedCheck = Object.values(fields).reduce((prev, current) => {
+    if (current.type === 'richText') {
+      return {
+        ...prev,
+        [current.fieldName]:
+          (current.editorProviderProps.content as string) ?? current.placeholder ?? '',
+      }
+    }
+
+    return prev
+  }, {})
+
+  return mappedCheck
+}
+
 export function CreateClientView(props: CreateClientViewProps) {
-  const form = useForm()
   const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
+  const form = useForm({
+    defaultValues: getDefaultValue(collection.fields),
+  })
 
   const w = form.watch()
 

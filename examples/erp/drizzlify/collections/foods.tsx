@@ -27,7 +27,7 @@ export const foodsCollection = builder.collection('foods', {
       isRequired: true,
       label: 'Food description',
       editorProviderProps: {
-        immediatelyRender: true,
+        immediatelyRender: false,
         shouldRerenderOnTransaction: true,
         content: '<h2>This came from foods field</h2>',
         slotBefore: <EditorSlotBefore />,
@@ -69,6 +69,7 @@ export const foodsCollection = builder.collection('foods', {
       type: 'checkbox',
       label: 'Food cooked',
       default: true,
+      isRequired: true,
       description: 'Is the food cooked?',
     }),
     cookingTypes: fb.columns('cookingTypes', {
