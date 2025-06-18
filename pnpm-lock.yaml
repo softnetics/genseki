@@ -35,6 +35,9 @@ importers:
       '@genseki/next':
         specifier: workspace:^
         version: link:../../packages/next
+      '@genseki/plugins':
+        specifier: workspace:^
+        version: link:../../packages/plugins
       '@genseki/react':
         specifier: workspace:^
         version: link:../../packages/react
