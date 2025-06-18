@@ -1,5 +1,3 @@
-import 'server-only'
-
 import {
   GetObjectCommand,
   PutObjectCommand,
@@ -8,16 +6,15 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
-import { StorageUploadAdapter, type UploadActionResponse } from '../generic-adapter'
+import type { StorageAdapter } from '../generic-adapter'
 
-export class StorageAdapterS3 extends StorageUploadAdapter {
+export class StorageAdapterS3 implements StorageAdapter {
   private static S3UploadAdapter: StorageAdapterS3
   private AWSClient: S3Client
   private bucket: string
+  public name = 'S3'
 
   private constructor(options: { bucket: string; clientConfig: S3ClientConfig }) {
-    super({ name: 'S3' })
-
     this.AWSClient = new S3Client(options.clientConfig)
     this.bucket = options.bucket
   }
@@ -34,9 +31,7 @@ export class StorageAdapterS3 extends StorageUploadAdapter {
   /**
    * @description Get the signed URL for reading the object from S3
    */
-  public async grabGetObjectSignedUrl(arg: {
-    key: string
-  }): Promise<UploadActionResponse<{ readObjectUrl: string }>> {
+  public async grabGetObjectSignedUrl(arg: { key: string }) {
     const getCommand = new GetObjectCommand({
       Bucket: this.bucket,
       Key: arg.key,
@@ -53,9 +48,7 @@ export class StorageAdapterS3 extends StorageUploadAdapter {
   /**
    * @description Get the signed URL for uploading the object to S3
    */
-  public async grabPutObjectSignedUrl(arg: {
-    key: string
-  }): Promise<UploadActionResponse<{ putObjectUrl: string }>> {
+  public async grabPutObjectSignedUrl(arg: { key: string }) {
     const putCommand = new PutObjectCommand({
       Bucket: this.bucket,
       Key: arg.key,
@@ -66,20 +59,6 @@ export class StorageAdapterS3 extends StorageUploadAdapter {
     return {
       message: 'File upload signed URL request success',
       data: { putObjectUrl: uploadSignedUrl },
-    }
-  }
-
-  async grabPermanentObjectUrl(arg: { key: string }): Promise<UploadActionResponse<any>> {
-    const getCommand = new GetObjectCommand({
-      Bucket: this.bucket,
-      Key: arg.key,
-    })
-
-    const response = await this.AWSClient.send(getCommand)
-
-    return {
-      message: 'Request object successfully',
-      data: { response },
     }
   }
 }

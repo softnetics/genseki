@@ -16,7 +16,7 @@ import {
   UploadImageButton,
 } from '@genseki/react'
 
-export const SlotBefore = () => {
+export const EditorSlotBefore = () => {
   return (
     <EditorBar>
       <EditorBarGroup>

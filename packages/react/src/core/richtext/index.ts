@@ -9,8 +9,8 @@ import * as R from 'remeda'
 
 import type { ClientEditorProviderProps, SanitizedExtension } from './types'
 
-import { BackColor, ImageUploadNodeExtension } from '../../react'
-import { Selection } from '../../react/components/compound/editor/extensions/selection-extension'
+import { BackColorExtension, ImageUploadNodeExtension } from '../../react'
+import { SelectionExtension } from '../../react/components/compound/editor/extensions/selection-extension'
 import type { StorageAdapterClient } from '../file-storage-adapters'
 
 /**
@@ -56,13 +56,13 @@ const constructSanitizedExtensions = (
       case 'underline':
         return Underline.configure(extension.options)
       case 'selection':
-        return Selection.configure(extension.options)
+        return SelectionExtension.configure(extension.options)
       case 'textAlign':
         return TextAlign.configure(extension.options)
       case 'textStyle':
         return TextStyle.configure(extension.options)
       case 'backColor':
-        return BackColor.configure(extension.options)
+        return BackColorExtension.configure(extension.options)
       case 'color':
         return Color.configure(extension.options)
       case 'image':

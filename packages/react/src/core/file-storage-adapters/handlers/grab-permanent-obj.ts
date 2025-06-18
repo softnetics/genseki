@@ -23,12 +23,10 @@ export function grabPermanentObject<const TContext extends Context>(
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     if (!uploadAdapter) throw new Error('Storage adpater is missing at server configuration')
 
-    const { message } = await uploadAdapter.grabPermanentObjectUrl({ key: args.query.key })
-
     return {
       status: 200,
       body: {
-        message: message,
+        message: 'This route is for future use',
       },
     }
   }

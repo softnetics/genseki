@@ -1,4 +1,3 @@
-import type { EditorProviderProps } from '@tiptap/react'
 import type { Column, Relation } from 'drizzle-orm'
 import {
   type FindTableByDBName,
@@ -13,6 +12,7 @@ import z from 'zod/v4'
 
 import { ApiDefaultMethod, type MaybePromise } from './collection'
 import type { Context, ContextToRequestContext } from './context'
+import type { ServerConfigEditorProviderProps } from './richtext/types'
 import {
   appendFieldNameToFields,
   type GetPrimaryColumn,
@@ -68,20 +68,7 @@ export interface FieldColumnStringCollectionOptions<TContext extends Context = C
   richText: {
     type: 'richText'
     default?: string
-    editorProviderProps: Omit<
-      EditorProviderProps,
-      | 'onBeforeCreate'
-      | 'onCreate'
-      | 'onContentError'
-      | 'onUpdate'
-      | 'onSelectionUpdate'
-      | 'onTransaction'
-      | 'onFocus'
-      | 'onBlur'
-      | 'onDestroy'
-      | 'onPaste'
-      | 'onDrop'
-    >
+    editorProviderProps: ServerConfigEditorProviderProps
   } & FieldBase
   text: {
     type: 'text'
@@ -509,7 +496,7 @@ export function fieldToZodScheama<TField extends Field<any>>(
   switch (field.type) {
     // Richtext JSON
     case 'richText':
-      return z.object({}) as unknown as FieldToZodScheama<TField>
+      return z.any() as unknown as FieldToZodScheama<TField>
     // string input
     case 'text':
     case 'selectText':

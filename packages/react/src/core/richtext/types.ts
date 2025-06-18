@@ -2,12 +2,21 @@ import type { HTMLAttributes, ReactNode } from 'react'
 
 import type { ParseOptions } from '@tiptap/pm/model'
 import type { EditorProps } from '@tiptap/pm/view'
-import type { Content, EnableRules, Extension, FocusPosition } from '@tiptap/react'
+import type {
+  Content,
+  EditorProviderProps,
+  EnableRules,
+  Extension,
+  FocusPosition,
+} from '@tiptap/react'
 
 import type { Field } from '..'
 
 export interface RichTextServerField extends Extract<Field, { type: 'richText' }> {}
 
+/**
+ * @description This is an editor config for client side usage, but hasn't composed in to EditorProviderProps as library need yet.
+ */
 export interface ClientEditorProviderProps {
   children?: ReactNode
   slotBefore?: ReactNode
@@ -55,4 +64,22 @@ export interface ClientEditorProviderProps {
 export type SanitizedExtension<TExtension extends Extension = Extension> = Omit<
   TExtension,
   'config' | 'configure' | 'extend'
+>
+
+/**
+ * @description This is an editor config for server side usage, the config need to strip into client editor config.
+ */
+export type ServerConfigEditorProviderProps = Omit<
+  EditorProviderProps,
+  | 'onBeforeCreate'
+  | 'onCreate'
+  | 'onContentError'
+  | 'onUpdate'
+  | 'onSelectionUpdate'
+  | 'onTransaction'
+  | 'onFocus'
+  | 'onBlur'
+  | 'onDestroy'
+  | 'onPaste'
+  | 'onDrop'
 >

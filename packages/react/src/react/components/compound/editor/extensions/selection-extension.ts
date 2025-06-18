@@ -2,7 +2,7 @@ import { Plugin, PluginKey } from '@tiptap/pm/state'
 import { Decoration, DecorationSet } from '@tiptap/pm/view'
 import { Extension, isNodeSelection } from '@tiptap/react'
 
-export const Selection = Extension.create({
+export const SelectionExtension = Extension.create({
   name: 'selection',
   addProseMirrorPlugins() {
     const { editor } = this

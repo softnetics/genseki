@@ -42,5 +42,6 @@ export type {
   InferApiRouteResponses,
 } from './endpoint'
 export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
+export * from './file-storage-adapters'
 export { createPlugin, type GensekiPlugin } from './plugins'
 export type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from './table'

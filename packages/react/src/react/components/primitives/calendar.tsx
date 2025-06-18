@@ -52,8 +52,7 @@ const Calendar = <T extends DateValue>({ errorMessage, className, ...props }: Ca
                   isSelected &&
                     'bg-primary pressed:bg-primary text-primary-fg hover:bg-primary/90 data-invalid:bg-danger data-invalid:text-danger-fg forced-colors:bg-[Highlight] forced-colors:text-[Highlight] forced-colors:data-invalid:bg-[Mark]',
                   isDisabled && 'text-muted-fg forced-colors:text-[GrayText]',
-                  // TODO: Fix this IMPOSSIBLE TYPE ERROR
-                  date.compare(now as any) === 0 &&
+                  date.compare(now) === 0 &&
                     'after:-translate-x-1/2 after:pointer-events-none after:absolute after:start-1/2 after:bottom-2 after:z-10 after:size-[3px] after:rounded-full after:bg-primary selected:after:bg-primary-fg focus-visible:after:bg-primary-fg',
                   className
                 )

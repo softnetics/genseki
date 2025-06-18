@@ -245,7 +245,6 @@ export function getClientConfig<
         storageAdapter: serverConfig.storageAdapter,
         grabPutObjectSignedUrlApiRoute: clientEndpoints['file.grabPutObjSignedUrl'],
         grabGetObjectSignedUrlApiRoute: clientEndpoints['file.grabGetObjSignedUrl'],
-        grabPermanentObjApiRoute: clientEndpoints['file.grabPermanentObj'],
       }),
     }),
   }

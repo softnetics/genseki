@@ -21,32 +21,30 @@ export type UploadFunction = (
   abortSignal: AbortSignal
 ) => Promise<string>
 
-export interface StorageAdapter<TGetPutUrl = any, TGetReadUrl = any, TGetPermanentObjectUrl = any> {
+export interface StorageAdapter {
   name: string
-  grabPutObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetPutUrl>>
-  grabGetObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetReadUrl>>
-  grabPermanentObjectUrl(arg: {
+  grabPutObjectSignedUrl(arg: {
     key: string
-  }): Promise<UploadActionResponse<TGetPermanentObjectUrl>>
+  }): Promise<UploadActionResponse<{ putObjectUrl: string }>>
+  grabGetObjectSignedUrl(arg: {
+    key: string
+  }): Promise<UploadActionResponse<{ readObjectUrl: string }>>
 }
 
 export interface StorageAdapterClient {
   name: string
   grabPutObjectSignedUrlApiRoute: ClientApiRouteSchema
   grabGetObjectSignedUrlApiRoute: ClientApiRouteSchema
-  grabPermanentObjApiRoute: ClientApiRouteSchema
 }
 
 export const getStorageAdapterClient = ({
   storageAdapter,
   grabPutObjectSignedUrlApiRoute,
   grabGetObjectSignedUrlApiRoute,
-  grabPermanentObjApiRoute,
 }: {
   storageAdapter?: StorageAdapter
   grabPutObjectSignedUrlApiRoute: ClientApiRouteSchema
   grabGetObjectSignedUrlApiRoute: ClientApiRouteSchema
-  grabPermanentObjApiRoute: ClientApiRouteSchema
 }): StorageAdapterClient => {
   if (!storageAdapter) throw new Error('Upload adapter is missing')
 
@@ -54,45 +52,18 @@ export const getStorageAdapterClient = ({
     name: storageAdapter.name,
     grabPutObjectSignedUrlApiRoute,
     grabGetObjectSignedUrlApiRoute,
-    grabPermanentObjApiRoute,
   }
 }
 
-// Use this abstract class to create a new `UploadAdapter`
-export abstract class StorageUploadAdapter<
-  TGetPutUrl = any,
-  TGetReadUrl = any,
-  TGetPermanentObjectUrl = any,
-> implements StorageAdapter<TGetPutUrl, TGetReadUrl, TGetPermanentObjectUrl>
-{
-  name: string
-  constructor(parameters: { name: string }) {
-    this.name = parameters.name
-  }
-
-  abstract grabPutObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetPutUrl>>
-
-  abstract grabGetObjectSignedUrl(arg: { key: string }): Promise<UploadActionResponse<TGetReadUrl>>
-
-  abstract grabPermanentObjectUrl(arg: {
-    key: string
-  }): Promise<UploadActionResponse<TGetPermanentObjectUrl>>
-}
-
-export const handleUploadAdapter = <TGetPutUrl, TGetReadUrl, TGetPermanentObjectUrl>(
-  adaptee: StorageUploadAdapter<TGetPutUrl, TGetReadUrl, TGetPermanentObjectUrl>
-): StorageAdapter<TGetPutUrl, TGetReadUrl, TGetPermanentObjectUrl> => {
+export const handleStorageAdapter = (adapter: StorageAdapter): StorageAdapter => {
   // Middle ware
   return {
-    name: adaptee.name,
+    name: adapter.name,
     grabPutObjectSignedUrl(...args) {
-      return adaptee.grabPutObjectSignedUrl(...args)
+      return adapter.grabPutObjectSignedUrl(...args)
     },
     grabGetObjectSignedUrl(...args) {
-      return adaptee.grabGetObjectSignedUrl(...args)
-    },
-    grabPermanentObjectUrl(...args) {
-      return adaptee.grabPermanentObjectUrl(...args)
+      return adapter.grabGetObjectSignedUrl(...args)
     },
   } satisfies StorageAdapter
 }

@@ -2,7 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 
 import { Builder, defineBaseConfig } from '@genseki/react'
-import { StorageAdapterS3 } from '@genseki/react/storage-upload-adapters'
+import { StorageAdapterS3 } from '@genseki/react'
 
 import * as schema from '~/db/schema'
 

@@ -5,9 +5,9 @@ import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 
-import { BackColor, ImageUploadNodeExtension, Selection } from '@genseki/react/richtext-plugins'
+import { BackColorExtension, ImageUploadNodeExtension, SelectionExtension } from '@genseki/react'
 
-import { SlotBefore } from '../editor/slot-before'
+import { EditorSlotBefore } from '../editor/slot-before'
 import { builder } from '../helper'
 
 export const foodsCollection = builder.collection('foods', {
@@ -30,12 +30,12 @@ export const foodsCollection = builder.collection('foods', {
         immediatelyRender: true,
         shouldRerenderOnTransaction: true,
         content: '<h2>This came from foods field</h2>',
-        slotBefore: <SlotBefore />,
+        slotBefore: <EditorSlotBefore />,
         extensions: [
           Color,
-          BackColor,
+          BackColorExtension,
           Underline.configure({ HTMLAttributes: { class: 'earth-underline' } }),
-          Selection,
+          SelectionExtension,
           TextStyle,
           TextAlign.configure({
             types: ['heading', 'paragraph'],
