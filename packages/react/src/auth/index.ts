@@ -110,7 +110,7 @@ type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> =
 }>
 
 export type Auth<
-  TContext extends Context = Context,
+  TContext extends AnyContext = AnyContext,
   TAuthConfig extends AuthConfig = AuthConfig,
 > = {
   config: TAuthConfig
@@ -142,7 +142,7 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<const TContext extends Context>(
+export function createAuth<const TContext extends AnyContext>(
   config: AuthConfig,
   context: TContext
 ): Auth<TContext> {

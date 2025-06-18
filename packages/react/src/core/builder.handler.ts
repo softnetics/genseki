@@ -14,8 +14,8 @@ import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
-import type { AnyContext, Context, RequestContext } from './context'
-import type { Field, Fields } from './field'
+import type { AnyContext, RequestContext } from './context'
+import type { AnyFields, Field, Fields } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,
@@ -26,8 +26,8 @@ import {
 } from './utils'
 
 export function createDefaultApiHandlers<
-  TContext extends Context,
-  TFields extends Fields<any, any>,
+  TContext extends AnyContext,
+  TFields extends AnyFields,
 >(args: {
   schema: Record<string, unknown>
   fields: TFields

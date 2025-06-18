@@ -19,7 +19,7 @@ import {
   getPrimaryColumnTsName,
 } from './utils'
 
-export type OptionCallback<TType extends string | number, in TContext extends Context<any>> = (
+export type OptionCallback<TType extends string | number, in TContext extends AnyContext> = (
   args: ContextToRequestContext<TContext>
 ) => MaybePromise<Array<{ label: string; value: TType }>>
 
@@ -63,9 +63,7 @@ export type FieldBase = {
   description?: string
 }
 
-export interface FieldColumnStringCollectionOptions<
-  in TContext extends Context<any, any> = Context<any, any>,
-> {
+export interface FieldColumnStringCollectionOptions<in TContext extends AnyContext = AnyContext> {
   text: {
     type: 'text'
     default?: string
@@ -92,7 +90,7 @@ export interface FieldColumnStringCollectionOptions<
   } & FieldBase
 }
 
-export interface FieldColumnStringArrayCollectionOptions<TContext extends Context = Context> {
+export interface FieldColumnStringArrayCollectionOptions<TContext extends AnyContext = AnyContext> {
   comboboxText: {
     type: 'comboboxText'
     options: OptionCallback<string, TContext>
@@ -100,7 +98,7 @@ export interface FieldColumnStringArrayCollectionOptions<TContext extends Contex
   } & FieldBase
 }
 
-export interface FieldColumnNumberCollectionOptions<TContext extends Context = Context> {
+export interface FieldColumnNumberCollectionOptions<TContext extends AnyContext = AnyContext> {
   number: {
     type: 'number'
     default?: number
@@ -112,7 +110,7 @@ export interface FieldColumnNumberCollectionOptions<TContext extends Context = C
   } & FieldBase
 }
 
-export interface FieldColumnNumberArrayCollectionOptions<TContext extends Context = Context> {
+export interface FieldColumnNumberArrayCollectionOptions<TContext extends AnyContext = AnyContext> {
   comboboxNumber: {
     type: 'comboboxNumber'
     options: OptionCallback<number, TContext>
@@ -146,7 +144,7 @@ export interface FieldColumnDateCollectionOptions {
 }
 
 export type FieldRelationCollectionOptions<
-  TContext extends Context<any> = Context<any>,
+  TContext extends AnyContext = AnyContext,
   TInputType extends string | number = string | number,
 > = {
   connect: {
@@ -165,7 +163,7 @@ export type FieldRelationCollectionOptions<
   } & FieldBase
 }
 
-export type FieldColumnCollection<TContext extends Context> =
+export type FieldColumnCollection<TContext extends AnyContext> =
   FieldColumnStringCollectionOptions<TContext> &
     FieldColumnStringArrayCollectionOptions<TContext> &
     FieldColumnNumberCollectionOptions<TContext> &
@@ -174,7 +172,7 @@ export type FieldColumnCollection<TContext extends Context> =
     FieldColumnBooleanArrayCollectionOptions &
     FieldColumnDateCollectionOptions
 
-export type FieldColumn<TContext extends Context> =
+export type FieldColumn<TContext extends AnyContext> =
   FieldColumnCollection<TContext>[keyof FieldColumnCollection<TContext>] & {
     _: FieldMetadataColumns
   }
@@ -204,10 +202,10 @@ export type FieldRelation<
   mode: 'one' | 'many'
 }
 
-export type FieldCollection<TContext extends Context<any>> = FieldColumnCollection<TContext> &
+export type FieldCollection<TContext extends AnyContext> = FieldColumnCollection<TContext> &
   FieldRelationCollection<any, TContext>
 
-export type FieldOptions<TContext extends Context<any>> =
+export type FieldOptions<TContext extends AnyContext> =
   FieldCollection<TContext>[keyof FieldCollection<TContext>]
 
 export type Field<
@@ -241,7 +239,7 @@ export type FieldsClient<TFields extends FieldsClientInitial = FieldsClientIniti
 
 export type FieldColumnOptionsFromTable<
   TColumn extends Column<any>,
-  TContext extends Context = Context,
+  TContext extends AnyContext = AnyContext,
 > = TColumn['_']['dataType'] extends 'string'
   ? FieldColumnStringCollectionOptions<TContext>[keyof FieldColumnStringCollectionOptions<TContext>]
   : TColumn['_']['dataType'] extends 'number'
@@ -262,7 +260,7 @@ export type FieldColumnOptionsFromTable<
 
 type RelationFieldOptionsFromTable<
   TRelationPrimaryColumn extends Column,
-  TContext extends Context = Context,
+  TContext extends AnyContext = AnyContext,
 > = TRelationPrimaryColumn['_']['data'] extends infer TType extends string | number
   ? FieldRelationCollectionOptions<TContext, TType>['connect' | 'create' | 'connectOrCreate']
   : TRelationPrimaryColumn

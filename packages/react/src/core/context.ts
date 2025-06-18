@@ -100,7 +100,7 @@ export class RequestContext<
   }
 }
 
-export type ContextToRequestContext<TContext extends Context> =
+export type ContextToRequestContext<TContext extends AnyContext> =
   TContext extends Context<infer TContextValue, infer TFullSchema, infer TUser>
     ? RequestContext<TContextValue, TFullSchema, TUser>
     : never

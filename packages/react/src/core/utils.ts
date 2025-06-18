@@ -1,9 +1,9 @@
 import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
 import { is, sql, Table } from 'drizzle-orm'
-import type { IsNever, Simplify, ValueOf } from 'type-fest'
+import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
 import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { Context, RequestContext } from './context'
+import type { AnyContext, RequestContext } from './context'
 import type {
   ApiHttpStatus,
   ApiRouteHandler,
@@ -21,6 +21,15 @@ import type {
 export function isRelationField(field: AnyField): field is FieldRelation {
   return field._.source === 'relation'
 }
+
+export type ConditionNeverKey<T extends Record<string, unknown>> = {
+  [K in keyof T]: IsNever<T[K]> extends true ? K : never
+}[keyof T]
+
+export type ConditionalExceptNever<T extends Record<string, unknown>> = Except<
+  T,
+  ConditionNeverKey<T>
+>
 
 export type GetPrimaryColumn<TTableRelationalConfig extends TableRelationalConfig> = ValueOf<{
   [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
@@ -219,7 +228,7 @@ export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = an
 
 export function withValidator<
   TApiRouteSchema extends ApiRouteSchema,
-  TContext extends Context = Context,
+  TContext extends AnyContext = AnyContext,
 >(
   schema: TApiRouteSchema,
   handler: ApiRouteHandler<TContext, TApiRouteSchema>
