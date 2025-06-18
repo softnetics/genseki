@@ -68,7 +68,7 @@ export const verification = pgTable('verification', {
 export const posts = pgTable('posts', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar(),
-  content: text(),
+  content: json(),
   authorId: uuid().references(() => user.id),
   categoryId: uuid().references(() => categories.id),
   ...timestamps,

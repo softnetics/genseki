@@ -48,7 +48,7 @@ CREATE TABLE "foods" (
 CREATE TABLE "posts" (
 	"id" uuid PRIMARY KEY DEFAULT gen_random_uuid() NOT NULL,
 	"title" varchar,
-	"content" text,
+	"content" json,
 	"authorId" uuid,
 	"categoryId" uuid,
 	"updatedAt" timestamp DEFAULT now(),
