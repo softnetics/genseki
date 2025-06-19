@@ -1,12 +1,13 @@
 import z from 'zod/v4'
 
-import type { ApiRouteHandler, ApiRouteSchema, Context } from '../../core'
+import type { ApiRouteHandler, ApiRouteSchema } from '../../core'
+import type { AnyContext } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import { type AuthContext } from '../context'
 
 export function sendEmailResetPassword<
   const TAuthContext extends AuthContext,
-  const TContext extends Context,
+  const TContext extends AnyContext,
 >(authContext: TAuthContext) {
   const { authConfig, internalHandlers } = authContext
 

@@ -55,6 +55,16 @@ export const authorCollection = builder.collection('authors', {
     email: fb.columns('email', {
       type: 'text',
     }),
+    example: fb.columns('bio', {
+      type: 'selectText',
+      options: async ({ db }) => {
+        const result = await db.query.authors.findMany()
+        return result.map((author) => ({
+          label: author.name,
+          value: author.id,
+        }))
+      },
+    }),
   })),
   identifierColumn: 'id',
 })

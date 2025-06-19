@@ -4,12 +4,21 @@ import { createContext, type ReactNode, useContext } from 'react'
 
 import { UiProviders } from './ui'
 
-import type { ClientConfig, DefaultCollection, ServerConfig } from '../../core'
+import type {
+  ClientApiRouter,
+  ClientCollection,
+  ClientConfig,
+  DefaultCollection,
+  ServerConfig,
+} from '../../core'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {
-  clientConfig: ClientConfig
+  clientConfig: ClientConfig<
+    Record<string, ClientCollection<any, any, any, any, any, any>>,
+    ClientApiRouter
+  >
   serverFunction: ServerFunction<TServerConfig>
 }
 
@@ -43,7 +52,10 @@ export const useServerFunction = <TServerConfig extends ServerConfig>() => {
 }
 
 export const RootProvider = (props: {
-  clientConfig: ClientConfig
+  clientConfig: ClientConfig<
+    Record<string, ClientCollection<any, any, any, any, any, any>>,
+    ClientApiRouter
+  >
   serverFunction: ServerFunction
   children: ReactNode
 }) => {

@@ -14,8 +14,8 @@ import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
-import type { Context, RequestContext } from './context'
-import type { Field, Fields } from './field'
+import type { AnyContext, RequestContext } from './context'
+import type { AnyFields, Field, Fields } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,
@@ -26,8 +26,8 @@ import {
 } from './utils'
 
 export function createDefaultApiHandlers<
-  TContext extends Context,
-  TFields extends Fields<any, any>,
+  TContext extends AnyContext,
+  TFields extends AnyFields,
 >(args: {
   schema: Record<string, unknown>
   fields: TFields
@@ -190,7 +190,7 @@ class ApiHandler {
 
   constructor(
     private readonly tableTsName: string,
-    private readonly fields: Fields<any>,
+    private readonly fields: Fields<any, AnyContext>,
     private readonly config: {
       schema: Record<string, unknown>
       context: RequestContext
@@ -259,10 +259,10 @@ class ApiHandler {
 
   private async resolveOneRelations(
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Fields<any>,
+    fields: Fields<any, AnyContext>,
     data: Record<string, any>
   ) {
-    const create = async (referencedTable: Table, fields: Fields<any>, value: any) => {
+    const create = async (referencedTable: Table, fields: Fields<any, AnyContext>, value: any) => {
       const id = await new ApiHandler(
         // TODO: i think this should not use public prefix to search the table
         this.config.tableTsNameByTableDbName[`public.${getTableName(referencedTable)}`],
@@ -273,7 +273,11 @@ class ApiHandler {
       return id
     }
 
-    const disconnect = async (referencedTable: Table, fields: Fields<any>, value: any) => {
+    const disconnect = async (
+      referencedTable: Table,
+      fields: Fields<any, AnyContext>,
+      value: any
+    ) => {
       const primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
       const primaryColumnTsName = getColumnTsName(
         getTableColumns(this.config.schema[this.tableTsName] as Table),
@@ -376,7 +380,7 @@ class ApiHandler {
   private async resolveManyRelations(
     id: string | number,
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Record<string, Field<any>>,
+    fields: Record<string, Field<any, AnyContext>>,
     data: Record<string, any>
   ) {
     // update the referenced table to have this id
@@ -392,7 +396,7 @@ class ApiHandler {
 
     const create = async (
       tableConfig: TableRelationalConfig,
-      fields: Fields<any>,
+      fields: Fields<any, AnyContext>,
       relation: Relation,
       value: any
     ) => {
@@ -531,7 +535,10 @@ class ApiHandler {
     return referenceFieldName
   }
 
-  private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
+  private getColumnValues(
+    fields: Fields<any, AnyContext>,
+    data: Record<string, any>
+  ): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
         if (field._.source === 'column' && data[field.fieldName]) {
@@ -544,7 +551,10 @@ class ApiHandler {
   }
 }
 
-function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Record<string, any> {
+function mapResultToFields(
+  fields: Fields<any, AnyContext>,
+  result: Record<string, any>
+): Record<string, any> {
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
       if (field._.source === 'column') {

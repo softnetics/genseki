@@ -1,13 +1,13 @@
 import z from 'zod/v4'
 
-import type { Context } from '../../core/context'
+import type { AnyContext } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
 import { type AuthContext } from '../context'
 import { hashPassword } from '../utils'
 
 export function resetPasswordEmail<
   const TAuthContext extends AuthContext,
-  const TContext extends Context,
+  const TContext extends AnyContext,
 >(authContext: TAuthContext) {
   const { authConfig, internalHandlers } = authContext
   const schema = {
@@ -88,7 +88,7 @@ export function resetPasswordEmail<
 
 export function validateResetToken<
   const TAuthContext extends AuthContext,
-  const TContext extends Context,
+  const TContext extends AnyContext,
 >(authContext: TAuthContext) {
   const { internalHandlers } = authContext
 

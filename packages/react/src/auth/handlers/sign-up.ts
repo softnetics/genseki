@@ -1,12 +1,12 @@
 import z from 'zod/v4'
 
-import type { Context } from '../../core/context'
+import type { AnyContext } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
 import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
 import { hashPassword, setSessionCookie } from '../utils'
 
-export function signUp<const TAuthContext extends AuthContext, const TContext extends Context>(
+export function signUp<const TAuthContext extends AuthContext, const TContext extends AnyContext>(
   authContext: TAuthContext
 ) {
   const {

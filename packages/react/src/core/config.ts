@@ -17,7 +17,7 @@ import {
   type ToClientApiRouteSchema,
   type ToRecordApiRouteSchema,
 } from './endpoint'
-import type { Field, FieldClient, Fields, FieldsClient } from './field'
+import type { AnyField, AnyFields, FieldClient, FieldsClient } from './field'
 import type { GensekiPlugin, MergePlugins } from './plugins'
 import { isRelationField } from './utils'
 
@@ -84,10 +84,10 @@ export function defineBaseConfig<
 }
 
 export function defineServerConfig<
-  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  const TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  const TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
-  const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
+  const TFullSchema extends Record<string, unknown>,
+  const TContext extends Context<TFullSchema>,
+  const TCollections extends Record<string, AnyCollection>,
+  const TEndpoints extends ApiRouter<TContext>,
   const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 >(
   baseConfig: BaseConfig<TFullSchema, TContext>,
@@ -119,18 +119,15 @@ export function defineServerConfig<
 }
 
 export interface ClientConfig<
-  TCollections extends Record<string, ClientCollection<any, any, any, any, any, any>> = Record<
-    string,
-    ClientCollection<any, any, any, any, any, any>
-  >,
-  TApiRouter extends ClientApiRouter = ClientApiRouter,
+  TCollections extends Record<string, ClientCollection<any, any, any, any, any, any>>,
+  TApiRouter extends ClientApiRouter,
 > {
   auth: AuthClient
   collections: TCollections
   endpoints: TApiRouter
 }
 
-export function getFieldClient(name: string, field: Field): FieldClient & { fieldName: string } {
+export function getFieldClient(name: string, field: AnyField): FieldClient & { fieldName: string } {
   if (isRelationField(field)) {
     if (field._.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
@@ -168,7 +165,7 @@ export function getFieldClient(name: string, field: Field): FieldClient & { fiel
   ) as FieldClient & { fieldName: string }
 }
 
-export function getFieldsClient(fields: Fields<any>): FieldsClient {
+export function getFieldsClient(fields: AnyFields): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 
