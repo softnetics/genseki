@@ -80,7 +80,7 @@ export const constructSanitizedExtensions = (
         return ImageUploadNodeExtension.configure({
           ...extension.options,
           async upload(file) {
-            const key = `${crypto.randomUUID()}/${file.name}`
+            const key = `${crypto.randomUUID()}-${file.name}`
 
             // Upload image
             const putObjSignedUrlApiRoute = storageAdapter.grabPutObjectSignedUrlApiRoute
