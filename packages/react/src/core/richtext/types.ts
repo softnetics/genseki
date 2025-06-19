@@ -63,7 +63,7 @@ export interface ClientEditorProviderProps {
 
 export type SanitizedExtension<TExtension extends Extension = Extension> = Omit<
   TExtension,
-  'config' | 'configure' | 'extend'
+  'config' | 'configure' | 'extend' | 'parent'
 >
 
 /**

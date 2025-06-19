@@ -1,11 +1,23 @@
-import Image from '@tiptap/extension-image'
+import Image, { type ImageOptions } from '@tiptap/extension-image'
 
-// Custom Image extension that supports data-key attribute
-export const CustomImageExtension = Image.extend({
+import type { StorageAdapterClient } from '../../../../../core/file-storage-adapters'
+import { CustomImageNodeWithRenderer } from '../nodes/custom-image-node'
+
+export interface CustomImageOptions extends ImageOptions {
+  storageAdapter: StorageAdapterClient
+}
+
+// Custom Image extension that only accepts data-key attribute
+export const CustomImageExtension = Image.extend<CustomImageOptions>({
   name: 'customImage',
   addAttributes() {
     return {
-      ...this.parent?.(),
+      alt: {
+        default: null,
+      },
+      title: {
+        default: null,
+      },
       'data-key': {
         default: null,
         parseHTML: (element) => element.getAttribute('data-key'),
@@ -13,12 +25,14 @@ export const CustomImageExtension = Image.extend({
           if (!attributes['data-key']) {
             return {}
           }
-
           return {
             'data-key': attributes['data-key'],
           }
         },
       },
     }
+  },
+  addNodeView() {
+    return CustomImageNodeWithRenderer
   },
 })

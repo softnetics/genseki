@@ -38,8 +38,6 @@ export function CreateClientView(props: CreateClientViewProps) {
     defaultValues: getDefaultValue(collection.fields),
   })
 
-  const w = form.watch()
-
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({
       method: `${props.slug}.create`,
@@ -79,7 +77,6 @@ export function CreateClientView(props: CreateClientViewProps) {
         ))}
         <SubmitButton>Create</SubmitButton>
       </form>
-      {JSON.stringify(w, null, 2)}
     </Form>
   )
 }

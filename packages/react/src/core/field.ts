@@ -219,8 +219,8 @@ export type FieldOptions<TContext extends AnyContext> =
   FieldCollection<TContext>[keyof FieldCollection<TContext>]
 
 export type Field<
-  TFullSchema extends Record<string, unknown>,
-  TContext extends Context<TFullSchema>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends Context<TFullSchema> = Context<TFullSchema>,
 > = FieldColumn<TContext> | FieldRelation<TFullSchema, TContext>
 
 export type AnyField = Field<any, AnyContext>

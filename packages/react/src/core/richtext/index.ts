@@ -22,13 +22,7 @@ const getSanitizedExtensions = (unSanitizedExtensions: Extensions): SanitizedExt
   const sanitizedExtensions = unSanitizedExtensions.map((extension) => {
     switch (extension.name) {
       case 'customImage':
-        return {
-          ...R.omit(extension, ['config']),
-          parent: {
-            ...R.omit(extension.parent!, ['config']),
-            child: R.omit(extension.parent!.child!, ['config']),
-          },
-        }
+        return R.omit(extension, ['config', 'parent'])
       case 'starterKit':
       case 'underline':
       case 'selection':
@@ -76,15 +70,18 @@ const constructSanitizedExtensions = (
       case 'image':
         return Image.configure(extension.options)
       case 'customImage':
-        return CustomImageExtension.configure(extension.options)
+        if (!storageAdapter) throw new Error("Storage adapter isn't defined at the server config")
+        return CustomImageExtension.configure({
+          ...extension.options,
+          storageAdapter,
+        })
       case 'imageUpload':
         if (!storageAdapter) throw new Error("Storage adapter isn't defined at the server config")
         return ImageUploadNodeExtension.configure({
           ...extension.options,
           async upload(file) {
-            // return { src: 'https://placehold.co/600x400', key: 'placeholder.png' }
+            const key = `${crypto.randomUUID()}/${file.name}`
 
-            const key = `${file.name}`
             // Upload image
             const putObjSignedUrlApiRoute = storageAdapter.grabPutObjectSignedUrlApiRoute
             const grabPutObjUrlEndpoint = new URL(
@@ -98,17 +95,8 @@ const constructSanitizedExtensions = (
               method: 'PUT',
               body: file,
             })
-            // Then get image src
-            const getObjSignedUrlApiRoute = storageAdapter.grabGetObjectSignedUrlApiRoute
-            const grabGetObjUrlEndpoint = new URL(
-              getObjSignedUrlApiRoute.path,
-              window.location.origin
-            )
-            grabGetObjUrlEndpoint.searchParams.append('key', key)
-            const getObjSignedUrl = await fetch(grabGetObjUrlEndpoint.toString())
-            const getObjSignedUrlData = await getObjSignedUrl.json()
 
-            return { src: getObjSignedUrlData.signedUrl, key }
+            return { key }
           },
         })
       default:
@@ -152,7 +140,7 @@ export const getClientEditorProviderProps = (
  * Constructs editor provider props by combining client props with storage adapter
  * @param clientEditorProviderProps - Client-side editor provider configuration
  * @param storageAdapter - Optional storage adapter for handling file uploads
- * @returns Combined editor provider props with constructed extensions
+ * @returns Combined editor provider props ready to be used in the client
  */
 export const constructEditorProviderProps = (
   clientEditorProviderProps: ClientEditorProviderProps,

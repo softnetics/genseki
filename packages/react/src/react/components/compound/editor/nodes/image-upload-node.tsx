@@ -16,14 +16,14 @@ export type FileItem =
       file: File
       progress: number
       status: 'uploading' | 'success' | 'error'
-      url?: string
+      key?: string
       abortController?: AbortController
     }
   | {
       id: string
       file: File
       status: 'uploading-no-progress'
-      url?: string
+      key?: string
       abortController?: AbortController
     }
 
@@ -32,7 +32,7 @@ interface UploadOptions {
   limit: number
   accept: string
   upload: UploadFunction
-  onSuccess?: (result: { src: string; key: string }) => void
+  onSuccess?: (result: { key: string }) => void
   onError?: (error: Error) => void
   showProgress?: boolean
 }
@@ -40,7 +40,7 @@ interface UploadOptions {
 function useFileUpload(options: UploadOptions) {
   const [fileItem, setFileItem] = React.useState<FileItem | null>(null)
 
-  const uploadFile = async (file: File): Promise<{ src: string; key: string } | null> => {
+  const uploadFile = async (file: File): Promise<{ key: string } | null> => {
     if (file.size > options.maxSize) {
       const error = new Error(
         `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
@@ -93,11 +93,11 @@ function useFileUpload(options: UploadOptions) {
           return {
             ...prev,
             status: 'success',
-            url: result.src,
+            key: result.key,
             progress: 100,
           }
         })
-        options.onSuccess?.({ src: result.src, key: result.key })
+        options.onSuccess?.({ key: result.key })
         return result
       }
 
@@ -118,7 +118,7 @@ function useFileUpload(options: UploadOptions) {
     }
   }
 
-  const uploadFiles = async (files: File[]): Promise<{ src: string; key: string } | null> => {
+  const uploadFiles = async (files: File[]): Promise<{ key: string } | null> => {
     if (!files || files.length === 0) {
       options.onError?.(new Error('No files to upload'))
       return null
@@ -146,9 +146,9 @@ function useFileUpload(options: UploadOptions) {
     if (fileItem.abortController) {
       fileItem.abortController.abort()
     }
-    if (fileItem.url) {
-      URL.revokeObjectURL(fileItem.url)
-    }
+    // if (fileItem.url) {
+    //   URL.revokeObjectURL(fileItem.url)
+    // }
     setFileItem(null)
   }
 
@@ -319,7 +319,7 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
         .insertContentAt(pos, [
           {
             type: 'customImage',
-            attrs: { src: result.src, alt: filename, title: filename, 'data-key': result.key },
+            attrs: { alt: filename, title: filename, 'data-key': result.key },
           },
         ])
         .run()
