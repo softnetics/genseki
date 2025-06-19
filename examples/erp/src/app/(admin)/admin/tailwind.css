@@ -1,3 +1,4 @@
 @import '@genseki/react/tailwind.css';
+@import './tiptap-style.css';
 
 @source "../../../../node_modules/@genseki/react";

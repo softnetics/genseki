@@ -1,5 +1,5 @@
 {
-  "id": "405ae38d-63a2-4a16-8ef6-f9b315d5d53c",
+  "id": "9f4bb366-40da-4bd3-a39d-aff61be678d3",
   "prevId": "00000000-0000-0000-0000-000000000000",
   "version": "7",
   "dialect": "postgresql",
@@ -273,6 +273,12 @@
           "primaryKey": false,
           "notNull": true
         },
+        "description": {
+          "name": "description",
+          "type": "json",
+          "primaryKey": false,
+          "notNull": false
+        },
         "cookingTypes": {
           "name": "cookingTypes",
           "type": "types",
@@ -329,7 +335,7 @@
         },
         "content": {
           "name": "content",
-          "type": "text",
+          "type": "json",
           "primaryKey": false,
           "notNull": false
         },

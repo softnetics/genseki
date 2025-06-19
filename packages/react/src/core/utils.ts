@@ -18,10 +18,30 @@ import type {
   FieldsWithFieldName,
 } from './field'
 
+export function tryParseJSONObject(jsonString: string): Record<string, unknown> | false {
+  try {
+    const o = JSON.parse(jsonString)
+
+    // Handle non-exception-throwing cases:
+    // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+    // but... JSON.parse(null) returns null, and typeof null === "object",
+    // so we must check for that, too. Thankfully, null is falsey, so this suffices:
+    if (o && typeof o === 'object') {
+      return o
+    }
+  } catch (error) {
+    return false
+  }
+  return false
+}
+
 export function isRelationField(field: AnyField): field is FieldRelation {
   return field._.source === 'relation'
 }
 
+export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
+  return field.type === 'richText'
+}
 export type ConditionNeverKey<T extends Record<string, unknown>> = {
   [K in keyof T]: IsNever<T[K]> extends true ? K : never
 }[keyof T]

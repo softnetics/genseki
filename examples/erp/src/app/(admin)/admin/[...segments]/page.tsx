@@ -16,8 +16,8 @@ export default async function AdminPage(props: AdminPageProps) {
     <RootPage
       serverConfig={serverConfig}
       serverFunction={serverFunction}
-      headersPromise={headers()}
       paramsPromise={props.params}
+      headersPromise={headers()}
       searchParamsPromise={props.searchParams}
     />
   )

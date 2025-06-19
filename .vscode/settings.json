@@ -44,7 +44,10 @@
   "typescript.tsdk": "node_modules/typescript/lib",
   "tailwindCSS.experimental.configFile": {
     "packages/react/src/react/styles/tailwind.css": "packages/react/**",
-    "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/src/app/(admin)/admin/**",
+    "examples/erp/src/app/(admin)/admin/tailwind.css": [
+      "examples/erp/src/app/(admin)/admin/**",
+      "examples/erp/drizzlify/**"
+    ],
     "examples/ui-playground/src/app/playground/tailwind.css": "examples/ui-playground/**"
   },
   "tailwindCSS.experimental.classRegex": [

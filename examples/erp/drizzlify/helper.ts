@@ -2,6 +2,7 @@ import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 
 import { Builder, defineBaseConfig } from '@genseki/react'
+import { StorageAdapterS3 } from '@genseki/react'
 
 import * as schema from '~/db/schema'
 
@@ -14,6 +15,15 @@ const db = drizzle({ client: pool, schema: schema, logger: true })
 export const baseConfig = defineBaseConfig({
   db: db,
   schema: schema,
+  storageAdapter: StorageAdapterS3.initailize({
+    bucket: process.env.AWS_BUCKET_NAME!,
+    clientConfig: {
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_KEY!,
+      },
+    },
+  }),
   auth: {
     resetPassword: {
       enabled: true,
@@ -36,10 +46,6 @@ export const baseConfig = defineBaseConfig({
     },
     emailAndPassword: {
       enabled: true,
-      // sendEmailVerfication(email) {
-      //   console.log('sendEmailVerfication', email)
-      // },
-      // skipEmailVerification: false,
     },
     secret: '',
   },

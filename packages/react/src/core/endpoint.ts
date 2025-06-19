@@ -115,7 +115,7 @@ export type ApiRoute<
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
-  handler: ApiRouteHandler<ContextToRequestContext<TContext>, TApiRouteSchema>
+  handler: ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
 export type AppendPrefixPathToApiRoute<
