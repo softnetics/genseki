@@ -9,7 +9,7 @@ import * as R from 'remeda'
 
 import type { ClientEditorProviderProps, SanitizedExtension } from './types'
 
-import { BackColorExtension, ImageUploadNodeExtension } from '../../react'
+import { BackColorExtension, CustomImageExtension, ImageUploadNodeExtension } from '../../react'
 import { SelectionExtension } from '../../react/components/compound/editor/extensions/selection-extension'
 import type { StorageAdapterClient } from '../file-storage-adapters'
 
@@ -21,6 +21,14 @@ import type { StorageAdapterClient } from '../file-storage-adapters'
 const getSanitizedExtensions = (unSanitizedExtensions: Extensions): SanitizedExtension[] => {
   const sanitizedExtensions = unSanitizedExtensions.map((extension) => {
     switch (extension.name) {
+      case 'customImage':
+        return {
+          ...R.omit(extension, ['config']),
+          parent: {
+            ...R.omit(extension.parent!, ['config']),
+            child: R.omit(extension.parent!.child!, ['config']),
+          },
+        }
       case 'starterKit':
       case 'underline':
       case 'selection':
@@ -67,44 +75,40 @@ const constructSanitizedExtensions = (
         return Color.configure(extension.options)
       case 'image':
         return Image.configure(extension.options)
+      case 'customImage':
+        return CustomImageExtension.configure(extension.options)
       case 'imageUpload':
         if (!storageAdapter) throw new Error("Storage adapter isn't defined at the server config")
         return ImageUploadNodeExtension.configure({
           ...extension.options,
           async upload(file) {
+            // return { src: 'https://placehold.co/600x400', key: 'placeholder.png' }
+
+            const key = `${file.name}`
             // Upload image
             const putObjSignedUrlApiRoute = storageAdapter.grabPutObjectSignedUrlApiRoute
-
             const grabPutObjUrlEndpoint = new URL(
               putObjSignedUrlApiRoute.path,
               window.location.origin
             )
-            grabPutObjUrlEndpoint.searchParams.append('key', file.name)
-
+            grabPutObjUrlEndpoint.searchParams.append('key', key)
             const putObjSignedUrl = await fetch(grabPutObjUrlEndpoint.toString())
-
             const putObjSignedUrlData = await putObjSignedUrl.json()
-
             await fetch(putObjSignedUrlData.signedUrl, {
               method: 'PUT',
               body: file,
             })
-
-            // Then et image src
+            // Then get image src
             const getObjSignedUrlApiRoute = storageAdapter.grabGetObjectSignedUrlApiRoute
-
             const grabGetObjUrlEndpoint = new URL(
               getObjSignedUrlApiRoute.path,
               window.location.origin
             )
-
-            grabGetObjUrlEndpoint.searchParams.append('key', file.name)
-
+            grabGetObjUrlEndpoint.searchParams.append('key', key)
             const getObjSignedUrl = await fetch(grabGetObjUrlEndpoint.toString())
-
             const getObjSignedUrlData = await getObjSignedUrl.json()
 
-            return getObjSignedUrlData.signedUrl
+            return { src: getObjSignedUrlData.signedUrl, key }
           },
         })
       default:

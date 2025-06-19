@@ -19,7 +19,7 @@ export type UploadFunction = (
   file: File,
   onProgress: (event: { progress: number }) => void,
   abortSignal: AbortSignal
-) => Promise<string>
+) => Promise<{ src: string; key: string }>
 
 export interface StorageAdapter {
   name: string

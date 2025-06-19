@@ -32,7 +32,7 @@ interface UploadOptions {
   limit: number
   accept: string
   upload: UploadFunction
-  onSuccess?: (url: string) => void
+  onSuccess?: (result: { src: string; key: string }) => void
   onError?: (error: Error) => void
   showProgress?: boolean
 }
@@ -40,7 +40,7 @@ interface UploadOptions {
 function useFileUpload(options: UploadOptions) {
   const [fileItem, setFileItem] = React.useState<FileItem | null>(null)
 
-  const uploadFile = async (file: File): Promise<string | null> => {
+  const uploadFile = async (file: File): Promise<{ src: string; key: string } | null> => {
     if (file.size > options.maxSize) {
       const error = new Error(
         `File size exceeds maximum allowed (${options.maxSize / 1024 / 1024}MB)`
@@ -71,7 +71,7 @@ function useFileUpload(options: UploadOptions) {
     try {
       if (!options.upload) throw new Error('Upload function is not defined')
 
-      const url = await options.upload(
+      const result = await options.upload(
         file,
         (event: { progress: number }) => {
           setFileItem((prev) => {
@@ -85,7 +85,7 @@ function useFileUpload(options: UploadOptions) {
         abortController.signal
       )
 
-      if (!url) throw new Error('Upload failed: No URL returned')
+      if (!result) throw new Error('Upload failed: No URL returned')
 
       if (!abortController.signal.aborted) {
         setFileItem((prev) => {
@@ -93,12 +93,12 @@ function useFileUpload(options: UploadOptions) {
           return {
             ...prev,
             status: 'success',
-            url,
+            url: result.src,
             progress: 100,
           }
         })
-        options.onSuccess?.(url)
-        return url
+        options.onSuccess?.({ src: result.src, key: result.key })
+        return result
       }
 
       return null
@@ -118,7 +118,7 @@ function useFileUpload(options: UploadOptions) {
     }
   }
 
-  const uploadFiles = async (files: File[]): Promise<string | null> => {
+  const uploadFiles = async (files: File[]): Promise<{ src: string; key: string } | null> => {
     if (!files || files.length === 0) {
       options.onError?.(new Error('No files to upload'))
       return null
@@ -279,6 +279,7 @@ const DropZoneContent: React.FC<{ maxSize: number }> = ({ maxSize }) => (
  * @description This custom node is not meant to be used directly, instead used by the image plugin.
  */
 export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
+  console.log('Image upload node props:', props)
   const { accept, limit, maxSize } = props.node.attrs
   const inputRef = React.useRef<HTMLInputElement>(null)
   const extension = props.extension
@@ -305,9 +306,9 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
   }
 
   const handleUpload = async (files: File[]) => {
-    const url = await uploadFiles(files)
+    const result = await uploadFiles(files)
 
-    if (url) {
+    if (result) {
       const pos = props.getPos()
       const filename = files[0]?.name.replace(/\.[^/.]+$/, '') || 'unknown'
 
@@ -317,8 +318,8 @@ export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
         .deleteRange({ from: pos, to: pos + 1 })
         .insertContentAt(pos, [
           {
-            type: 'image',
-            attrs: { src: url, alt: filename, title: filename },
+            type: 'customImage',
+            attrs: { src: result.src, alt: filename, title: filename, 'data-key': result.key },
           },
         ])
         .run()

@@ -30,7 +30,7 @@ export interface ImageUploadNodeOptions {
   /**
    * Callback for successful uploads.
    */
-  onSuccess?: (url: string) => void
+  onSuccess?: (result: { src: string; key: string }) => void
 
   /**
    * Whether to show the progress bar or not.

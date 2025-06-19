@@ -32,14 +32,14 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
-    <div className="mx-auto flex max-w-md w-full flex-col gap-y-4 mt-24">
+    <div className="mx-auto flex w-full flex-col px-8 lg:px-0 lg:max-w-[640px] gap-y-4 mt-24">
       <Typography type="h1" weight="semibold">
         Update {props.slug}
       </Typography>
       <UpdateClientView
         identifer={props.identifier}
         slug={props.slug}
-        defaultValues={result}
+        defaultValues={result.body}
         optionsRecord={optionsRecord}
       />
     </div>

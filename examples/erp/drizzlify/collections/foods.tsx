@@ -1,11 +1,15 @@
 import Color from '@tiptap/extension-color'
-import Image from '@tiptap/extension-image'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 
-import { BackColorExtension, ImageUploadNodeExtension, SelectionExtension } from '@genseki/react'
+import {
+  BackColorExtension,
+  CustomImageExtension,
+  ImageUploadNodeExtension,
+  SelectionExtension,
+} from '@genseki/react'
 
 import { EditorSlotBefore } from '../editor/slot-before'
 import { builder } from '../helper'
@@ -55,7 +59,7 @@ export const foodsCollection = builder.collection('foods', {
             strike: { HTMLAttributes: { class: 'strikethrough' } },
             blockquote: { HTMLAttributes: { class: 'blockquote-custom' } },
           }),
-          Image.configure({ HTMLAttributes: { className: 'image-displayer' } }),
+          CustomImageExtension.configure({ HTMLAttributes: { className: 'image-displayer' } }),
           ImageUploadNodeExtension.configure({
             showProgress: false,
             accept: 'image/*',
