@@ -31,10 +31,10 @@ export const foodsCollection = builder.collection('foods', {
       isRequired: true,
       label: 'Food description',
       editorProviderProps: {
-        immediatelyRender: false,
+        immediatelyRender: true,
         shouldRerenderOnTransaction: true,
-        content: '<h2>This came from foods field</h2>',
         slotBefore: <EditorSlotBefore />,
+        content: 'This is a field from foods collection',
         extensions: [
           Color,
           BackColorExtension,

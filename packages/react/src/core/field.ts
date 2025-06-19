@@ -1,3 +1,4 @@
+import { generateJSON } from '@tiptap/html'
 import type { Column, Relation } from 'drizzle-orm'
 import {
   type FindTableByDBName,
@@ -12,12 +13,15 @@ import z from 'zod/v4'
 
 import { ApiDefaultMethod, type MaybePromise } from './collection'
 import type { AnyContext, Context, ContextToRequestContext } from './context'
+import type { StorageAdapterClient } from './file-storage-adapters'
+import { constructSanitizedExtensions } from './richtext'
 import type { ServerConfigEditorProviderProps } from './richtext/types'
 import {
   appendFieldNameToFields,
   type GetPrimaryColumn,
   getPrimaryColumn,
   getPrimaryColumnTsName,
+  tryParseJSONObject,
 } from './utils'
 
 export type OptionCallback<TType extends string | number, in TContext extends AnyContext> = (
@@ -603,4 +607,34 @@ export function fieldsToZodObject<TFields extends AnyFields>(
   )
 
   return z.object(zodObject) as FieldsToZodObject<TFields>
+}
+
+export const getDefaultValueFromFields = (
+  fields: AnyFields,
+  storageAdapter?: StorageAdapterClient
+) => {
+  const mappedCheck = Object.values(fields).reduce((prev, current) => {
+    if (current.type === 'richText') {
+      const content = current.editorProviderProps.content ?? current.placeholder ?? ''
+
+      const json = tryParseJSONObject(content)
+
+      return {
+        ...prev,
+        [current.fieldName]:
+          json ||
+          generateJSON(
+            content,
+            constructSanitizedExtensions(
+              current.editorProviderProps.extensions || [],
+              storageAdapter
+            )
+          ),
+      }
+    }
+
+    return prev
+  }, {})
+
+  return mappedCheck
 }

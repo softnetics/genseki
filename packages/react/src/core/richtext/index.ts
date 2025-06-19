@@ -47,7 +47,7 @@ const getSanitizedExtensions = (unSanitizedExtensions: Extensions): SanitizedExt
  * Constructs sanitized extensions for editor initialization
  * @param sanitizedExtensions - Pre-sanitized extensions to process
  */
-const constructSanitizedExtensions = (
+export const constructSanitizedExtensions = (
   sanitizedExtensions: SanitizedExtension[],
   storageAdapter?: StorageAdapterClient
 ) => {
@@ -153,6 +153,6 @@ export const constructEditorProviderProps = (
 
   return {
     ...clientEditorProviderProps,
-    extensions: [...extensions],
+    extensions: extensions || [],
   } satisfies EditorProviderProps
 }
