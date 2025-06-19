@@ -6,10 +6,10 @@ import { sendEmailResetPassword } from './send-email-reset-password'
 import { signOut } from './sign-out'
 import { signUp } from './sign-up'
 
-import type { Context } from '../../core/context'
+import type { AnyContext } from '../../core/context'
 import { type AuthContext } from '../context'
 
-export function createAuthHandlers<TAuthContext extends AuthContext, TContext extends Context>(
+export function createAuthHandlers<TAuthContext extends AuthContext, TContext extends AnyContext>(
   authContext: TAuthContext
 ) {
   const handlers = {

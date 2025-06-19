@@ -6,7 +6,7 @@ import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from 
 import { AccountProvider } from './constant'
 import { getSessionCookie } from './utils'
 
-import type { Context } from '../core/context'
+import type { AnyContext, Context } from '../core/context'
 
 type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
   [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true
@@ -30,7 +30,7 @@ export type AuthContext<TConfig extends AuthConfig = AuthConfig> = {
   requiredAuthenticated: (headers?: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
 }
 
-export function createAuthContext<TAuthConfig extends AuthConfig, TContext extends Context>(
+export function createAuthContext<TAuthConfig extends AuthConfig, TContext extends AnyContext>(
   authConfig: TAuthConfig,
   context: TContext
 ): AuthContext<TAuthConfig> {

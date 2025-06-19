@@ -32,14 +32,14 @@ export async function ListView(props: ListViewProps) {
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.endpoints.findMany({
+  const result = await collection.admin.endpoints.findMany.handler({
     context,
-    slug: props.slug,
-    fields: collection.fields,
-    limit,
-    offset,
-    orderBy,
-    orderType,
+    query: {
+      limit,
+      offset,
+      orderBy,
+      orderType,
+    },
   })
 
   const clientCollection = getClientCollection(collection)
@@ -74,7 +74,7 @@ export async function ListView(props: ListViewProps) {
       </div>
       <div className="p-12">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-y-12">
-          <ListTable collection={clientCollection} data={result.data} />
+          <ListTable collection={clientCollection} data={result.body.data} />
         </div>
       </div>
     </div>

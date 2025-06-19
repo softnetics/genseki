@@ -1,24 +1,38 @@
 import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
 import { is, sql, Table } from 'drizzle-orm'
-import type { IsNever, Simplify, ValueOf } from 'type-fest'
+import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
 import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { Context, RequestContext } from './context'
+import type { AnyContext, RequestContext } from './context'
 import type {
   ApiHttpStatus,
   ApiRouteHandler,
   ApiRouteHandlerPayloadWithContext,
   ApiRouteSchema,
 } from './endpoint'
-import type { Field, FieldRelation, Fields, FieldsInitial, FieldsWithFieldName } from './field'
+import type {
+  AnyField,
+  AnyFields,
+  FieldRelation,
+  FieldsInitial,
+  FieldsWithFieldName,
+} from './field'
 
-export function isRelationField(field: Field): field is FieldRelation {
+export function isRelationField(field: AnyField): field is FieldRelation {
   return field._.source === 'relation'
 }
 
-export function isRichTextField(field: Field): field is Extract<Field, { type: 'richText' }> {
+export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
   return field.type === 'richText'
 }
+export type ConditionNeverKey<T extends Record<string, unknown>> = {
+  [K in keyof T]: IsNever<T[K]> extends true ? K : never
+}[keyof T]
+
+export type ConditionalExceptNever<T extends Record<string, unknown>> = Except<
+  T,
+  ConditionNeverKey<T>
+>
 
 export type GetPrimaryColumn<TTableRelationalConfig extends TableRelationalConfig> = ValueOf<{
   [K in keyof TTableRelationalConfig['columns']]: TTableRelationalConfig['columns'][K]['_']['isPrimaryKey'] extends true
@@ -95,7 +109,7 @@ const getExtraField = (tableRelational: TableRelationalConfig, identifierColumn?
 }
 
 export function createDrizzleQuery(
-  fields: Fields<any>,
+  fields: AnyFields,
   table: Record<string, TableRelationalConfig>,
   tableRelationalConfig: TableRelationalConfig,
   identifierColumn?: string
@@ -132,13 +146,13 @@ export function appendFieldNameToFields<TFields extends FieldsInitial<any, any>>
   return Object.fromEntries(
     Object.entries(fields).map(([key, field]) => {
       const fieldWithName = { ...field, fieldName: key }
-      return [key, fieldWithName as Field<any> & { fieldName: string }]
+      return [key, fieldWithName as AnyField & { fieldName: string }]
     })
   ) as FieldsWithFieldName<TFields>
 }
 
 export function mapValueToTsValue(
-  fields: Fields<any>,
+  fields: AnyFields,
   value: Record<string, any>
 ): Record<string, any> {
   const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
@@ -154,7 +168,7 @@ export async function validateRequestBody<
   TApiRouteSchema extends ApiRouteSchema = any,
   TContextValue extends Record<string, unknown> = Record<string, unknown>,
   TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
->(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>) {
+>(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>) {
   let zodErrors:
     | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', z.core.$ZodIssue[]>>
     | undefined
@@ -217,13 +231,13 @@ export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = an
 
 export function withValidator<
   TApiRouteSchema extends ApiRouteSchema,
-  TContext extends Context = Context,
+  TContext extends AnyContext = AnyContext,
 >(
   schema: TApiRouteSchema,
   handler: ApiRouteHandler<TContext, TApiRouteSchema>
 ): ApiRouteHandler<TContext, TApiRouteSchema> {
   const wrappedHandler = async (
-    payload: ApiRouteHandlerPayloadWithContext<TApiRouteSchema, TContext>
+    payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
   ) => {
     const zodErrors = await validateRequestBody(schema, payload)
     if (zodErrors) {
