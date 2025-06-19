@@ -1,5 +1,19 @@
 # @genseki/react
 
+## 0.1.0-alpha.3
+
+### Minor Changes
+
+- [#18](https://github.com/softnetics/genseki/pull/18) [`aeab5ea`](https://github.com/softnetics/genseki/commit/aeab5ea296865069c006e7c6aa5d8f75e70b0743) Thanks [@masternonnolnw](https://github.com/masternonnolnw)! - [[DRIZZ-35] - [Forget Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-35/)
+  [[DRIZZ-34] - [Reset Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-34/)
+  [[DRIZZ-33] - [Change Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-33/)
+
+### Patch Changes
+
+- [#50](https://github.com/softnetics/genseki/pull/50) [`136c1bc`](https://github.com/softnetics/genseki/commit/136c1bc5427853b7c063c96d51a3c1c6cd409303) Thanks [@miello](https://github.com/miello)! - [[DRIZZ-104] Fix simplify endpoint type problem about default api](https://app.plane.so/softnetics/browse/DRIZZ-104/)
+
+- [#32](https://github.com/softnetics/genseki/pull/32) [`3912698`](https://github.com/softnetics/genseki/commit/391269852c302a3c3ce273346786d751e4e7e4da) Thanks [@miello](https://github.com/miello)! - [[DRIZZ-98] Simplify endpoints logic in collection builder for type simplicity](https://app.plane.so/softnetics/browse/DRIZZ-98/)
+
 ## 0.1.0-alpha.2
 
 ### Patch Changes
