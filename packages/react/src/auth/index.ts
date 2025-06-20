@@ -10,6 +10,7 @@ import type { ApiRouteHandler } from '../core/endpoint'
 import type { Fields, FieldsClient } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
 
+export * from './constant'
 export * from './utils'
 
 export type AnyUserTable = WithAnyTable<

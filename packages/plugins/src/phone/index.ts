@@ -11,14 +11,13 @@ import type {
 } from '@genseki/react'
 import type { AnyUserTable as BaseAnyUserTable } from '@genseki/react'
 import {
+  AccountProvider,
   Builder,
   createPlugin,
   hashPassword,
   setSessionCookie,
   verifyPassword,
 } from '@genseki/react'
-
-import { AccountProvider } from '../../../react/src/auth/constant'
 
 export interface OtpRequestResponse {
   status: string
