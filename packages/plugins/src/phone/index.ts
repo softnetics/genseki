@@ -10,10 +10,15 @@ import type {
   WithAnyTable,
 } from '@genseki/react'
 import type { AnyUserTable as BaseAnyUserTable } from '@genseki/react'
-import { Builder, createPlugin } from '@genseki/react'
+import {
+  Builder,
+  createPlugin,
+  hashPassword,
+  setSessionCookie,
+  verifyPassword,
+} from '@genseki/react'
 
 import { AccountProvider } from '../../../react/src/auth/constant'
-import { hashPassword, setSessionCookie, verifyPassword } from '../../../react/src/auth/utils'
 
 export interface OtpRequestResponse {
   status: string
