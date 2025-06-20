@@ -210,15 +210,19 @@ export function phone<
     {
       method: 'POST',
       path: '/auth/phone/signup',
-      body: z.object(userModel).extend({
-        phone: z.string(),
-        name: z.string(),
-        email: z.string().email().nullable().optional(),
-        image: z.string().nullable().optional(),
-        token: z.string(),
-        pin: z.string(),
-        password: z.string(),
-      }),
+      body: z
+        .object
+        // add base user model properties
+        ()
+        .extend({
+          phone: z.string(),
+          name: z.string(),
+          email: z.string().email().nullable().optional(),
+          image: z.string().nullable().optional(),
+          token: z.string(),
+          pin: z.string(),
+          password: z.string(),
+        }),
       responses: {
         200: z.object({
           token: z.string().nullable(),
