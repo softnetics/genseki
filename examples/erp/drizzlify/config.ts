@@ -17,6 +17,11 @@ const baseServerConfig = defineServerConfig(baseConfig, {
       baseConfig: baseConfig!,
       sendOtp: async (phone) => {
         console.log(`Sending OTP to phone: ${phone}`)
+        return {
+          status: 'success',
+          token: '1234567890abcdef',
+          refno: 'ref123456',
+        }
       },
       verifyOtp: async (token, otp) => {
         console.log(`Verifying OTP: ${otp} for token: ${token}`)
