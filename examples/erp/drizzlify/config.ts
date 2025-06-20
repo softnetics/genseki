@@ -14,7 +14,7 @@ const baseServerConfig = defineServerConfig(baseConfig, {
   plugins: [
     phone({
       //  TODO: fix relation type
-      baseConfig: baseConfig!,
+      baseConfig: baseConfig! as any,
       sendOtp: async (phone) => {
         console.log(`Sending OTP to phone: ${phone}`)
         return {
@@ -87,6 +87,6 @@ const baseServerConfig = defineServerConfig(baseConfig, {
   },
 })
 
-const serverConfig = defineNextJsServerConfig(baseServerConfig)
+const serverConfig = defineNextJsServerConfig(baseServerConfig as any)
 
 export { serverConfig }
