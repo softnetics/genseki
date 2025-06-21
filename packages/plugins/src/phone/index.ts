@@ -35,20 +35,20 @@ type AnyUserTable = WithAnyTable<
 > &
   BaseAnyUserTable
 
-type BaseSchema = {
+type FullSchema = WithAnyRelations<{
   user: AnyUserTable
   account: AnyAccountTable
   session: AnySessionTable
-}
+}>
 
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function phone<TContext extends Context<WithAnyRelations<BaseSchema>>>({
+export function phone<TContext extends Context<FullSchema>>({
   baseConfig,
   sendOtp,
   verifyOtp,
   signUpOnVerification,
 }: {
-  baseConfig: BaseConfig<WithAnyRelations<BaseSchema>, TContext>
+  baseConfig: BaseConfig<FullSchema, TContext>
   sendOtp?: (phone: string) => Promise<OtpRequestResponse>
   verifyOtp?: (token: string, pin: string) => Promise<boolean>
 
