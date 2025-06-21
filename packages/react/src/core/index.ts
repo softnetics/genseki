@@ -1,4 +1,6 @@
 export { type AuthHandlers, createAuth } from '../auth'
+export { AccountProvider } from '../auth/constant'
+export { hashPassword, setSessionCookie, verifyPassword } from '../auth/utils'
 export { Builder } from './builder'
 export type {
   AnyCollection,
@@ -43,4 +45,11 @@ export type {
 } from './endpoint'
 export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
 export { createPlugin, type GensekiPlugin } from './plugins'
-export type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from './table'
+export type {
+  AnyTypedColumn,
+  WithAnyRelations,
+  WithAnyTable,
+  WithHasDefault,
+  WithNotNull,
+} from './table'
+export {} from './utils'

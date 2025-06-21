@@ -17,6 +17,7 @@ import {
   hashPassword,
   setSessionCookie,
   verifyPassword,
+  type WithAnyRelations,
 } from '@genseki/react'
 
 export interface OtpRequestResponse {
@@ -34,23 +35,20 @@ type AnyUserTable = WithAnyTable<
 > &
   BaseAnyUserTable
 
+type BaseSchema = {
+  user: AnyUserTable
+  account: AnyAccountTable
+  session: AnySessionTable
+}
+
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function phone<
-  TContext extends Context<{
-    user: AnyUserTable
-    account: AnyAccountTable
-    session: AnySessionTable
-  }>,
->({
+export function phone<TContext extends Context<WithAnyRelations<BaseSchema>>>({
   baseConfig,
   sendOtp,
   verifyOtp,
   signUpOnVerification,
 }: {
-  baseConfig: BaseConfig<
-    { user: AnyUserTable; account: AnyAccountTable; session: AnySessionTable },
-    TContext
-  >
+  baseConfig: BaseConfig<WithAnyRelations<BaseSchema>, TContext>
   sendOtp?: (phone: string) => Promise<OtpRequestResponse>
   verifyOtp?: (token: string, pin: string) => Promise<boolean>
 

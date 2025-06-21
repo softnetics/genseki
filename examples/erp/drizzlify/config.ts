@@ -14,7 +14,7 @@ const baseServerConfig = defineServerConfig(baseConfig, {
   plugins: [
     phone({
       //  TODO: fix relation type
-      baseConfig: baseConfig! as any,
+      baseConfig,
       sendOtp: async (phone) => {
         console.log(`Sending OTP to phone: ${phone}`)
         return {
