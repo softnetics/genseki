@@ -237,6 +237,7 @@ class ApiHandler {
     const fullInput = { ...input, ...oneInput }
     console.log('[create] fullInput', input)
     const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
+    console.log('[create] result', result)
     const id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
     return id

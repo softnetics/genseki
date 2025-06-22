@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { redirect } from 'next/navigation'
 import { createRouter } from 'radix3'
 
 import {
@@ -117,6 +118,17 @@ export function defineNextJsServerConfig<
         <CreateView {...args} {...args.params} />
       </CollectionAppLayout>
     ),
+  })
+  radixRouter.insert(`/collections/:slug/update`, {
+    requiredAuthentication: true,
+    view: (args: {
+      params: { slug: string }
+      headers: Headers
+      serverConfig: ServerConfig
+      searchParams: { [key: string]: string | string[] }
+    }) => {
+      redirect('.')
+    },
   })
   radixRouter.insert(`/collections/:slug/update/:identifier`, {
     requiredAuthentication: true,

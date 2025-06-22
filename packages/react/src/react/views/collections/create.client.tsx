@@ -2,7 +2,9 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
-import { getDefaultValueFromFields } from '../../../core/utils'
+import { toast } from 'sonner'
+
+import { getDefaultValueFromFields } from '../../../core/field'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
@@ -33,11 +35,14 @@ export function CreateClientView(props: CreateClientViewProps) {
     })
 
     if (result.status === 200) {
-      console.log('Creation successful:', result.body)
+      toast.success('Creation successfully')
       return navigate(`./`)
     } else {
-      // TODO: Handle error, e.g., show an error message
-      console.error('Creation failed:', result.body)
+      console.log(result.body)
+      const description = result.body?.message
+      toast.error('Failed to create', {
+        ...(description && { description }),
+      })
     }
   }
 
