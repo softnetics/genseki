@@ -18,6 +18,7 @@ import {
   TextUnderlineIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
+import { StarterKit } from '@tiptap/starter-kit'
 
 import {
   Link,
@@ -442,7 +443,7 @@ export default function UIPlayground() {
       </Wrapper>
       <Wrapper title="Rich text">
         <Suspense fallback={<div>Loading...</div>}>
-          <RichTextEditor editorProviderProps={{}} />
+          <RichTextEditor editorProviderProps={{ extensions: [StarterKit] }} />
         </Suspense>
       </Wrapper>
       <Wrapper title="Date picker">

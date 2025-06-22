@@ -21,7 +21,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
   const isInvalid = !!props.errorMessage
 
   return (
-    <div className="flex flex-col gap-y-1.5" data-invalid={true}>
+    <div className="flex flex-col gap-y-4" data-invalid={true}>
       {props.label && (
         <Label>
           {props.label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}

@@ -7,7 +7,7 @@ import {
   type ApiRouter,
   type AuthHandlers,
   AuthLayout,
-  CollectionLayout,
+  CollectionAppLayout,
   type Context,
   CreateView,
   ForgotPasswordView,
@@ -74,9 +74,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <HomeView serverConfig={args.serverConfig} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug`, {
@@ -87,9 +87,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <ListView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/:identifier`, {
@@ -100,9 +100,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <OneView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/create`, {
@@ -113,9 +113,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <CreateView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/update/:identifier`, {
@@ -126,9 +126,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <UpdateView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
 

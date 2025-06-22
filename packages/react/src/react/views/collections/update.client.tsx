@@ -48,7 +48,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="flex flex-col gap-y-4 mt-16"
+        className="flex flex-col gap-y-8 mt-16"
       >
         {Object.values(collection.fields).map((field) => (
           <AutoField

@@ -229,9 +229,13 @@ class ApiHandler {
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
     data: Record<string, any>
   ): Promise<string | number> {
+    console.log('[create] pre getColumnValues:', data)
     const input = this.getColumnValues(this.fields, data)
+    console.log('[create] input', input)
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
+    console.log('[create] oneInput', input)
     const fullInput = { ...input, ...oneInput }
+    console.log('[create] fullInput', input)
     const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
     const id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
@@ -541,12 +545,13 @@ class ApiHandler {
   ): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'column' && data[field.fieldName]) {
+        if (field._.source === 'column' && typeof data[field.fieldName] !== 'undefined') {
           return [[field._.columnTsName, data[field.fieldName]]]
         }
         return []
       })
     )
+
     return result
   }
 }
@@ -557,11 +562,15 @@ function mapResultToFields(
 ): Record<string, any> {
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
+      // End case
       if (field._.source === 'column') {
         const value = result[field._.columnTsName]
-        if (!value) return []
+
+        if (typeof value === 'undefined') return []
         return [[field.fieldName, value]]
       }
+
+      // Recursive case
       if (isRelationField(field)) {
         const value = result[field._.relationTsName]
         if (!value) return []

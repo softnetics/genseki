@@ -50,7 +50,7 @@ export function CreateClientView(props: CreateClientViewProps) {
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="flex flex-col gap-y-4 mt-16"
+        className="flex flex-col gap-y-8 mt-16 form"
       >
         {Object.values(collection.fields).map((field) => (
           <AutoField

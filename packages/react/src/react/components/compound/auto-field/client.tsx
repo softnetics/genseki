@@ -9,10 +9,8 @@ import {
   type CheckboxProps,
   DatePicker,
   type DatePickerProps,
-  FieldError,
   FormField,
   FormItemController,
-  Label,
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
@@ -59,6 +57,11 @@ export function AutoNumberField(props: NumberFieldProps) {
     <NumberField
       {...props}
       {...field}
+      onChange={(value) => {
+        const validValue = !isNaN(value) ? value : null
+        field.onChange(validValue)
+      }}
+      value={field.value}
       errorMessage={error?.message}
       className={cn('w-full', props.className)}
     />
@@ -66,15 +69,11 @@ export function AutoNumberField(props: NumberFieldProps) {
 }
 
 export function AutoSwitch(props: SwitchProps & { label?: string }) {
-  const { field, error, formItemId } = useFormItemController()
+  const { field, id } = useFormItemController()
 
   return (
-    <div className="flex items-center gap-x-4 bg-muted p-6 rounded-md">
-      <Label htmlFor={formItemId} className="select-none">
-        {props.label ?? field.name /* Switch label is requried anyway */}
-      </Label>
-      <Switch {...props} {...field} className={cn('', props.className)} />
-      {error && <FieldError>{error.message}</FieldError>}
+    <div className="pgap-y-4">
+      <Switch {...props} {...field} className={props.className} isSelected={field.value} id={id} />
     </div>
   )
 }
@@ -84,7 +83,7 @@ export function AutoCheckbox(props: CheckboxProps) {
 
   return (
     <div className="py-6">
-      <Checkbox {...props} {...field} className={cn('', props.className)} />
+      <Checkbox {...props} {...field} className={props.className} isSelected={field.value} />
     </div>
   )
 }
@@ -159,7 +158,7 @@ export function AutoSelectField(props: AutoSelectField) {
         }
       }}
     >
-      <SelectTrigger />
+      <SelectTrigger className="h-auto" />
       <SelectList items={props.items}>
         {(item) => (
           <SelectOption key={item.value} id={item.value} textValue={item.label}>
@@ -293,7 +292,7 @@ export function AutoField(props: AutoFieldProps) {
         <AutoFormField
           key={commonProps.name}
           name={commonProps.name}
-          component={<AutoNumberField {...commonProps} isDisabled={disabled} />}
+          component={<AutoTimeField {...commonProps} isDisabled={disabled} />}
         />
       )
 

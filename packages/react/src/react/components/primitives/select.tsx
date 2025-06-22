@@ -29,6 +29,7 @@ import { PopoverContent, type PopoverContentProps } from './popover'
 import { composeTailwindRenderProps, focusStyles } from './primitive'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
+import { cn } from '../../utils/cn'
 
 const selectTriggerStyles = tv({
   extend: focusStyles,
@@ -62,7 +63,7 @@ const Select = <T extends object>({
   return (
     <SelectPrimitive
       {...props}
-      className={composeTailwindRenderProps(className, 'group flex flex-col gap-y-1.5')}
+      className={composeTailwindRenderProps(className, 'group flex flex-col gap-y-4')}
     >
       {(values) => (
         <>
@@ -128,7 +129,7 @@ interface SelectTriggerProps extends React.ComponentProps<typeof Button> {
 const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
   return (
     <Button
-      className={composeRenderProps(className, (className, renderProps) =>
+      className={composeRenderProps(cn('h-auto', className), (className, renderProps) =>
         selectTriggerStyles({
           ...renderProps,
           className,
