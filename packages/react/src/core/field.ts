@@ -57,11 +57,11 @@ export type FieldMutateMode =
 
 export type FieldBase = {
   label?: string
+  description?: string
   placeholder?: string
   isRequired?: boolean
   update?: FieldMutateMode
   create?: FieldMutateMode
-  description?: string
 }
 
 export interface FieldColumnJsonCollectionOptions<in TContext extends AnyContext = AnyContext> {
@@ -76,7 +76,14 @@ export interface FieldColumnStringCollectionOptions<in TContext extends AnyConte
   text: {
     type: 'text'
     default?: string
-    label?: string
+  } & FieldBase
+  password: {
+    type: 'password'
+    default?: string
+  } & FieldBase
+  email: {
+    type: 'email'
+    default?: string
   } & FieldBase
   selectText: {
     type: 'selectText'
@@ -516,12 +523,19 @@ export function fieldToZodScheama<TField extends AnyField>(
     case 'text':
     case 'selectText':
     case 'time':
+    case 'password':
     case 'media':
       if (!field._.column.notNull) {
         return z.string().optional() as FieldToZodScheama<TField>
       }
 
       return z.string() as FieldToZodScheama<TField>
+    case 'email':
+      if (!field._.column.notNull) {
+        return z.string().email().optional() as FieldToZodScheama<TField>
+      }
+
+      return z.string().email() as FieldToZodScheama<TField>
     // string[] input
     case 'comboboxText':
       if (!field._.column.notNull) {

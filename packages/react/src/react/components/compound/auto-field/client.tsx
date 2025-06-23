@@ -3,7 +3,10 @@
 import { type ReactNode, startTransition, useMemo } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import { EnvelopeIcon } from '@phosphor-icons/react'
+
 import {
+  BaseIcon,
   Button,
   Checkbox,
   type CheckboxProps,
@@ -42,6 +45,36 @@ export function AutoTextField(props: TextFieldProps) {
   return (
     <TextField
       type="text"
+      {...props}
+      {...field}
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
+    />
+  )
+}
+
+export function AutoPasswordField(props: TextFieldProps) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <TextField
+      {...props}
+      {...field}
+      type="password"
+      isRevealable
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
+    />
+  )
+}
+
+export function AutoEmailField(props: TextFieldProps) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <TextField
+      type="email"
+      prefix={<BaseIcon icon={EnvelopeIcon} size="sm" />}
       {...props}
       {...field}
       errorMessage={error?.message}
@@ -240,9 +273,9 @@ export function AutoField(props: AutoFieldProps) {
   const { field, className } = props
 
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') {
-    return null
-  }
+
+  if (visibility === 'hidden') return null
+
   const disabled = visibility === 'disabled'
 
   const commonProps = {
@@ -277,7 +310,22 @@ export function AutoField(props: AutoFieldProps) {
           component={<AutoTextField {...commonProps} isDisabled={disabled} />}
         />
       )
-
+    case 'password':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoPasswordField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+    case 'email':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoEmailField {...commonProps} isDisabled={disabled} />}
+        />
+      )
     case 'number':
       return (
         <AutoFormField
