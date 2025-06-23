@@ -1,13 +1,11 @@
 import type { createFileUploadHandlers } from './handlers'
 
-import type { Context } from '../context'
+import type { AnyContext } from '../context'
 import type { ClientApiRouteSchema } from '../endpoint'
 
-export type FileUploadHandlers = ReturnType<
-  typeof createFileUploadHandlers<Context<any, any, any>>
->['handlers']
+export type FileUploadHandlers = ReturnType<typeof createFileUploadHandlers<AnyContext>>['handlers']
 
-export type UploadActionResponse<TData> = {
+export interface UploadActionResponse<TData> {
   message: string
   data: TData
 }
@@ -23,10 +21,10 @@ export type UploadFunction = (
 
 export interface StorageAdapter {
   name: string
-  grabPutObjectSignedUrl(arg: {
+  generatePutObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ putObjectUrl: string }>>
-  grabGetObjectSignedUrl(arg: {
+  generateGetObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ readObjectUrl: string }>>
 }
@@ -56,14 +54,14 @@ export const getStorageAdapterClient = ({
 }
 
 export const handleStorageAdapter = (adapter: StorageAdapter): StorageAdapter => {
-  // Middle ware
+  // Middleware
   return {
     name: adapter.name,
-    grabPutObjectSignedUrl(...args) {
-      return adapter.grabPutObjectSignedUrl(...args)
+    generatePutObjectSignedUrl(...args) {
+      return adapter.generatePutObjectSignedUrl(...args)
     },
-    grabGetObjectSignedUrl(...args) {
-      return adapter.grabGetObjectSignedUrl(...args)
+    generateGetObjectSignedUrl(...args) {
+      return adapter.generateGetObjectSignedUrl(...args)
     },
   } satisfies StorageAdapter
 }

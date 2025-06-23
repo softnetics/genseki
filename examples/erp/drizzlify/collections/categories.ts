@@ -23,7 +23,7 @@ export const categoriesCollection = builder.collection('categories', {
         }),
         content: fb.columns('content', {
           type: 'richText',
-          editorProviderProps: postEditorProviderProps,
+          editor: postEditorProviderProps,
         }),
       })),
       options: builder.options(async ({ db }) => {

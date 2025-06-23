@@ -91,12 +91,6 @@ export const postsCollection = builder.collection('posts', {
     },
   },
   fields: builder.fields('posts', (fb) => ({
-    id: fb.columns('id', {
-      label: 'ID',
-      type: 'text',
-      create: 'hidden',
-      update: 'hidden',
-    }),
     title: fb.columns('title', {
       type: 'text',
       label: 'Title',
@@ -106,7 +100,7 @@ export const postsCollection = builder.collection('posts', {
       type: 'richText',
       isRequired: true,
       label: 'Food description',
-      editorProviderProps: postEditorProviderProps,
+      editor: postEditorProviderProps,
     }),
     authorId: fb.relations('author', (fb) => ({
       type: 'connect',
@@ -136,7 +130,7 @@ export const postsCollection = builder.collection('posts', {
               type: 'richText',
               label: 'Content',
               description: 'The content of the post',
-              editorProviderProps: postEditorProviderProps,
+              editor: postEditorProviderProps,
             }),
           })),
         })),

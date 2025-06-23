@@ -28,7 +28,7 @@ export type FileItem =
     }
 
 interface UploadOptions {
-  maxSize: number
+  maxSize: number // Bytes
   limit: number
   accept: string
   upload: UploadFunction
@@ -214,10 +214,18 @@ type ImageUploadPreviewProps =
 const ImageUploadPreview: React.FC<ImageUploadPreviewProps> = (props) => {
   const formatFileSize = (bytes: number) => {
     if (bytes === 0) return '0 Bytes'
-    const k = 1024
-    const sizes = ['Bytes', 'KB', 'MB', 'GB']
-    const i = Math.floor(Math.log(bytes) / Math.log(k))
-    return `${parseFloat((bytes / Math.pow(k, i)).toFixed(2))} ${sizes[i]}`
+
+    const bytesPerUnit = 1024
+    const unitNames = ['Bytes', 'KB', 'MB', 'GB']
+
+    // Calculate which unit to use (0 = Bytes, 1 = KB, 2 = MB, 3 = GB)
+    const unitIndex = Math.floor(Math.log(bytes) / Math.log(bytesPerUnit))
+
+    // Convert bytes to the appropriate unit
+    const sizeInUnit = bytes / Math.pow(bytesPerUnit, unitIndex)
+    const formattedSize = parseFloat(sizeInUnit.toFixed(2))
+
+    return `${formattedSize} ${unitNames[unitIndex]}`
   }
 
   return (
@@ -279,7 +287,6 @@ const DropZoneContent: React.FC<{ maxSize: number }> = ({ maxSize }) => (
  * @description This custom node is not meant to be used directly, instead used by the image plugin.
  */
 export const ImageUploadNode: React.FC<NodeViewProps> = (props) => {
-  console.log('Image upload node props:', props)
   const { accept, limit, maxSize } = props.node.attrs
   const inputRef = React.useRef<HTMLInputElement>(null)
   const extension = props.extension

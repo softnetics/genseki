@@ -22,8 +22,9 @@ export function grabPutObjUrl<const TContext extends Context>(uploadAdapter?: St
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     if (!uploadAdapter) throw new Error('Storage adpater is missing at server configuration')
 
-    // TODO: Mkae this Type safe
-    const { message, data } = await uploadAdapter.grabPutObjectSignedUrl({ key: args.query.key })
+    const { message, data } = await uploadAdapter.generatePutObjectSignedUrl({
+      key: args.query.key,
+    })
 
     return {
       status: 200,

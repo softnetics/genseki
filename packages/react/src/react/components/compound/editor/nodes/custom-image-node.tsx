@@ -6,6 +6,7 @@ import { SpinnerIcon } from '@phosphor-icons/react'
 import type { Node } from '@tiptap/core'
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
+import { toast } from 'sonner'
 
 import type { StorageAdapterClient } from '../../../../../core'
 import { cn } from '../../../../utils/cn'
@@ -92,6 +93,10 @@ export const CustomImage: React.FC<CustomImageProps> = ({
 
     fetchSignedUrl()
   }, [dataKey])
+
+  useEffect(() => {
+    if (error) toast.error(error)
+  }, [error])
 
   if (loading) {
     return (

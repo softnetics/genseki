@@ -2,7 +2,7 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
-import { getDefaultValueFromFields } from '../../../core/field'
+import { getDefaultValueFromFields } from '../../../core/utils'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
@@ -22,8 +22,6 @@ export function CreateClientView(props: CreateClientViewProps) {
   const form = useForm({
     defaultValues: getDefaultValueFromFields(collection.fields, storageAdapter),
   })
-
-  // console.log('watch:', form.watch())
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({

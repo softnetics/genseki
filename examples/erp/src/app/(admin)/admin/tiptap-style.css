@@ -162,6 +162,7 @@
     padding: var(--outside-padding);
     border-radius: var(--outside-border-radius);
     cursor: pointer;
+    margin-bottom: 1rem;
 
     .ProseMirror-selectednode & {
       outline: 2px solid var(--color-primary);

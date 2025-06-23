@@ -38,8 +38,6 @@ const getSanitizedExtensions = (unSanitizedExtensions: Extensions): SanitizedExt
     }
   })
 
-  // console.log('Sanitized extensions ✨\n', unSanitizedExtensions, sanitizedExtensions)
-
   return sanitizedExtensions as SanitizedExtension[]
 }
 
@@ -79,6 +77,9 @@ export const constructSanitizedExtensions = (
         if (!storageAdapter) throw new Error("Storage adapter isn't defined at the server config")
         return ImageUploadNodeExtension.configure({
           ...extension.options,
+          onError(error) {
+            console.log('x', error)
+          },
           async upload(file) {
             const key = `${crypto.randomUUID()}-${file.name}`
 

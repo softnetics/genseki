@@ -8,8 +8,8 @@ export const createFileUploadHandlers = <TContext extends Context = Context>(
   uploadAdapter?: StorageAdapter
 ) => {
   const handlers = {
-    'file.grabPutObjSignedUrl': grabPutObjUrl<TContext>(uploadAdapter),
-    'file.grabGetObjSignedUrl': grabGetObjUrl<TContext>(uploadAdapter),
+    'file.generatePutObjSignedUrl': grabPutObjUrl<TContext>(uploadAdapter),
+    'file.generateGetObjSignedUrl': grabGetObjUrl<TContext>(uploadAdapter),
   }
 
   return {

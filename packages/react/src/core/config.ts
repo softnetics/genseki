@@ -181,8 +181,9 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
 
     const sanitizedRichTextField = {
       ...sanitizedBaseField,
-      editorProviderProps: getClientEditorProviderProps(field.editorProviderProps),
+      editor: getClientEditorProviderProps(field.editor),
     }
+
     return sanitizedRichTextField
   }
 
@@ -238,8 +239,8 @@ export function getClientConfig<
     ...(serverConfig.storageAdapter && {
       storageAdapter: getStorageAdapterClient({
         storageAdapter: serverConfig.storageAdapter,
-        grabPutObjectSignedUrlApiRoute: clientEndpoints['file.grabPutObjSignedUrl'],
-        grabGetObjectSignedUrlApiRoute: clientEndpoints['file.grabGetObjSignedUrl'],
+        grabPutObjectSignedUrlApiRoute: clientEndpoints['file.generatePutObjSignedUrl'],
+        grabGetObjectSignedUrlApiRoute: clientEndpoints['file.generateGetObjSignedUrl'],
       }),
     }),
   }

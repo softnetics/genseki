@@ -21,8 +21,6 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
-  // console.log('watch:', form.watch())
-
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({
       method: `${props.slug}.update`,

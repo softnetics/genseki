@@ -30,11 +30,11 @@ export const foodsCollection = builder.collection('foods', {
       type: 'richText',
       isRequired: true,
       label: 'Food description',
-      editorProviderProps: {
+      default: 'This is a example default rich text content',
+      editor: {
         immediatelyRender: true,
         shouldRerenderOnTransaction: true,
         slotBefore: <EditorSlotBefore />,
-        content: 'This is a field from foods collection',
         extensions: [
           Color,
           BackColorExtension,

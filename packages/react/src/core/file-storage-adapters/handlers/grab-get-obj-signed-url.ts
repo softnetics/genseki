@@ -23,7 +23,9 @@ export function grabGetObjUrl<const TContext extends Context>(uploadAdapter?: St
     if (!uploadAdapter) throw new Error('Storage adpater is missing at server configuration')
 
     // TODO: Mkae this Type safe
-    const { message, data } = await uploadAdapter.grabGetObjectSignedUrl({ key: args.query.key })
+    const { message, data } = await uploadAdapter.generateGetObjectSignedUrl({
+      key: args.query.key,
+    })
 
     return {
       status: 200,

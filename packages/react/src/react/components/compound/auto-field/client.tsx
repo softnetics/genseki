@@ -180,14 +180,14 @@ const AutoRichTextField = (props: {
   isDisabled?: boolean
   isPending?: boolean
   errorMessage?: string
-  editorProviderProps: ClientEditorProviderProps
+  editor: ClientEditorProviderProps
 }) => {
   const { field, error } = useFormItemController()
 
   const storageAdapter = useStorageAdapter()
 
   const editorProviderProps = useMemo(
-    () => constructEditorProviderProps(props.editorProviderProps, storageAdapter),
+    () => constructEditorProviderProps(props.editor, storageAdapter),
     []
   )
 
@@ -264,7 +264,7 @@ export function AutoField(props: AutoFieldProps) {
           component={
             <AutoRichTextField
               {...commonProps}
-              editorProviderProps={field.editorProviderProps as ClientEditorProviderProps}
+              editor={field.editor as ClientEditorProviderProps}
               isDisabled={disabled}
             />
           }
