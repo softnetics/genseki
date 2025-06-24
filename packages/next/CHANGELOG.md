@@ -1,5 +1,12 @@
 # @genseki/next
 
+## 0.1.0-alpha.4
+
+### Patch Changes
+
+- Updated dependencies [[`47b5852`](https://github.com/softnetics/genseki/commit/47b5852dc417682b1aee80cf5c8fbd7ff97484ad)]:
+  - @genseki/react@0.1.0-alpha.4
+
 ## 0.1.0-alpha.3
 
 ### Minor Changes
