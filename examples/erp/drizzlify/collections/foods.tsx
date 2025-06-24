@@ -28,7 +28,8 @@ export const foodsCollection = builder.collection('foods', {
     }),
     foodAvatar: fb.columns('foodAvatar', {
       type: 'media',
-      placeholder: 'Food avatar upload',
+      label: 'Pekora avatar upload',
+      placeholder: 'Pekora avatar upload',
       uploadOptions: {
         limit: 1,
         maxSize: 1024 * 1024 * 1,

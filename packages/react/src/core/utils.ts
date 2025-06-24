@@ -46,6 +46,11 @@ export function isRelationField(field: AnyField): field is FieldRelation {
 export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
   return field.type === 'richText'
 }
+
+export function isMediaField(field: AnyField): field is Extract<AnyField, { type: 'media' }> {
+  return field.type === 'media'
+}
+
 export type ConditionNeverKey<T extends Record<string, unknown>> = {
   [K in keyof T]: IsNever<T[K]> extends true ? K : never
 }[keyof T]
