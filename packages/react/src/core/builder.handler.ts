@@ -60,8 +60,6 @@ export function createDefaultApiHandlers<
       throw new Error('Record not found')
     }
 
-    console.log('[findOne] result', result)
-
     return {
       __pk: result.__pk,
       __id: result.__id,
@@ -229,15 +227,14 @@ class ApiHandler {
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
     data: Record<string, any>
   ): Promise<string | number> {
-    console.log('[create] pre getColumnValues:', data)
     const input = this.getColumnValues(this.fields, data)
-    console.log('[create] input', input)
+
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('[create] oneInput', input)
+
     const fullInput = { ...input, ...oneInput }
-    console.log('[create] fullInput', input)
+
     const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
-    console.log('[create] result', result)
+
     const id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
     return id
@@ -249,11 +246,11 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
-    console.log('[update] input', input)
+
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('[update] oneInput', oneInput)
+
     const fullInput = { ...input, ...oneInput }
-    console.log('[update] fullInput', fullInput)
+
     const result = (
       await tx.update(this.table).set(fullInput).where(eq(this.primaryColumn, id)).returning()
     )[0]

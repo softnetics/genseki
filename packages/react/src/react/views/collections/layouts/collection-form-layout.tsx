@@ -14,8 +14,8 @@ const layout = tv({
     },
     display: {
       flex: undefined,
-      'grid-2': '[&_form]:grid [&_form]:grid-cols-2 [&_form]:gap-4 [&_.submit-btn]:col-span-2',
-      'grid-3': '[&_form]:grid [&_form]:grid-cols-3 [&_form]:gap-4 [&_.submit-btn]:col-span-3',
+      'grid-2': '[&_form]:grid [&_form]:grid-cols-2 [&_form]:gap-4',
+      'grid-3': '[&_form]:grid [&_form]:grid-cols-3 [&_form]:gap-4',
     },
   },
   defaultVariants: {
