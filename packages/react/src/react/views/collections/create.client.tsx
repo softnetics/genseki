@@ -4,7 +4,7 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 
 import { toast } from 'sonner'
 
-import { getDefaultValueFromFields } from '../../../core/field'
+import { getDefaultValueFromFields } from '../../../core/utils'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
