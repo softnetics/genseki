@@ -384,6 +384,9 @@ importers:
       '@react-stately/color':
         specifier: ^3.8.6
         version: 3.8.6(react@19.1.0)
+      '@react-types/shared':
+        specifier: ^3.30.0
+        version: 3.30.0(react@19.1.0)
       '@tiptap/core':
         specifier: ^2.14.0
         version: 2.14.0(@tiptap/pm@2.14.0)
@@ -2207,11 +2210,6 @@ packages:
 
   '@react-types/select@3.9.13':
     resolution: {integrity: sha512-R7zwck353RV60gZimZ8pDKaj50aEtGzU8gk0jC3aBkfzSUKFJ6jq1DJdqyVQSwXdmPDd9iuketeIUIpEO2teoA==}
-    peerDependencies:
-      react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
-
-  '@react-types/shared@3.29.1':
-    resolution: {integrity: sha512-KtM+cDf2CXoUX439rfEhbnEdAgFZX20UP2A35ypNIawR7/PFFPjQDWyA2EnClCcW/dLWJDEPX2U8+EJff8xqmQ==}
     peerDependencies:
       react: ^16.8.0 || ^17.0.0-rc.1 || ^18.0.0 || ^19.0.0-rc.1
 
@@ -7025,7 +7023,7 @@ snapshots:
       '@react-aria/ssr': 3.9.8(react@19.1.0)
       '@react-aria/utils': 3.29.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@react-stately/flags': 3.1.1
-      '@react-types/shared': 3.29.1(react@19.1.0)
+      '@react-types/shared': 3.30.0(react@19.1.0)
       '@swc/helpers': 0.5.17
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
@@ -7424,7 +7422,7 @@ snapshots:
     dependencies:
       '@react-aria/interactions': 3.25.1(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
       '@react-aria/utils': 3.29.0(react-dom@19.1.0(react@19.1.0))(react@19.1.0)
-      '@react-types/shared': 3.29.1(react@19.1.0)
+      '@react-types/shared': 3.30.0(react@19.1.0)
       '@swc/helpers': 0.5.17
       react: 19.1.0
       react-dom: 19.1.0(react@19.1.0)
@@ -7814,10 +7812,6 @@ snapshots:
   '@react-types/select@3.9.13(react@19.1.0)':
     dependencies:
       '@react-types/shared': 3.30.0(react@19.1.0)
-      react: 19.1.0
-
-  '@react-types/shared@3.29.1(react@19.1.0)':
-    dependencies:
       react: 19.1.0
 
   '@react-types/shared@3.30.0(react@19.1.0)':

@@ -6,6 +6,7 @@ import Underline from '@tiptap/extension-underline'
 import type { EditorProviderProps, Extensions } from '@tiptap/react'
 import StarterKit from '@tiptap/starter-kit'
 import * as R from 'remeda'
+import { toast } from 'sonner'
 
 import type { ClientEditorProviderProps, SanitizedExtension } from './types'
 
@@ -78,19 +79,17 @@ export const constructSanitizedExtensions = (
         return ImageUploadNodeExtension.configure({
           ...extension.options,
           onError(error) {
-            console.log('x', error)
+            console.log(error)
+            toast.error(error.message)
           },
           async upload(file) {
             const key = `${crypto.randomUUID()}-${file.name}`
 
             // Upload image
             const putObjSignedUrlApiRoute = storageAdapter.grabPutObjectSignedUrlApiRoute
-            const grabPutObjUrlEndpoint = new URL(
-              putObjSignedUrlApiRoute.path,
-              window.location.origin
-            )
-            grabPutObjUrlEndpoint.searchParams.append('key', key)
-            const putObjSignedUrl = await fetch(grabPutObjUrlEndpoint.toString())
+            const putObjUrlEndpoint = new URL(putObjSignedUrlApiRoute.path, window.location.origin)
+            putObjUrlEndpoint.searchParams.append('key', key)
+            const putObjSignedUrl = await fetch(putObjUrlEndpoint.toString())
             const putObjSignedUrlData = await putObjSignedUrl.json()
             await fetch(putObjSignedUrlData.signedUrl, {
               method: 'PUT',

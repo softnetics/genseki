@@ -275,9 +275,6 @@
 
           .tiptap-image-upload-text {
             color: var(--color-text-nontrivial);
-            em {
-              text-decoration: underline dashed;
-            }
           }
 
           .tiptap-image-upload-subtext {

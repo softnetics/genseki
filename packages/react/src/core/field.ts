@@ -20,6 +20,8 @@ import {
   getPrimaryColumnTsName,
 } from './utils'
 
+import type { FileUploadOptionsProps } from '../react/components/compound/file-upload-field'
+
 export type OptionCallback<TType extends string | number, in TContext extends AnyContext> = (
   args: ContextToRequestContext<TContext>
 ) => MaybePromise<Array<{ label: string; value: TType }>>
@@ -100,7 +102,7 @@ export interface FieldColumnStringCollectionOptions<in TContext extends AnyConte
   } & FieldBase
   media: {
     type: 'media'
-    mimeTypes: string[]
+    uploadOptions?: FileUploadOptionsProps
   } & FieldBase
 }
 

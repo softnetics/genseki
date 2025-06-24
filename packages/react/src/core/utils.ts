@@ -349,7 +349,18 @@ export const getDefaultValueFromFields = (
     ).filter(([fieldName, defaultValue]) => typeof defaultValue !== 'undefined')
   )
 
-  console.log(mappedCheck)
-
   return mappedCheck
+}
+
+export const mimeTypeValidate = (allowedMimes: string[], checkingMime: string) => {
+  for (const allowedMime of allowedMimes) {
+    const [allowedMimeType, allowedMimeSubType] = allowedMime.split('/')
+    const [checkingMimeType, checkingMimeSubType] = checkingMime.split('/')
+
+    if (allowedMimeSubType === '*' && checkingMimeType === allowedMimeType) return true
+
+    if (checkingMime === allowedMime) return true
+  }
+
+  return false
 }
