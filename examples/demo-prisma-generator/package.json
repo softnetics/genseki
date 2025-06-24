@@ -1,0 +1,16 @@
+{
+  "name": "@example/demo-prisma-generator",
+  "version": "0.0.0",
+  "description": "",
+  "private": true,
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@genseki/prisma-generator": "workspace:^",
+    "prisma": "^6.10.1"
+  },
+  "dependencies": {
+    "@prisma/client": "^6.10.1"
+  }
+}

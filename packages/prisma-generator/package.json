@@ -1,0 +1,30 @@
+{
+  "name": "@genseki/prisma-generator",
+  "version": "0.0.0",
+  "description": "",
+  "main": "dist/index.js",
+  "bin": {
+    "@genseki/prisma-generator": "dist/index.js"
+  },
+  "scripts": {
+    "dev": "tsx ./scripts/dev.ts",
+    "build": "tsx ./scripts/build.ts",
+    "typecheck": "tsc",
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check ."
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "@internal/project-config": "workspace:^",
+    "@types/node": "^22",
+    "tsup": "^8.5.0",
+    "tsx": "^4.20.3",
+    "vitest": "^3.0.9"
+  },
+  "dependencies": {
+    "@prisma/generator-helper": "^6.10.1"
+  }
+}
