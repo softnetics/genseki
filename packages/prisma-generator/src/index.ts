@@ -8,7 +8,7 @@ import { defaultPath, generatorName } from './globals'
 
 import { version } from '../package.json'
 
-export const handler = generatorHandler({
+generatorHandler({
   onManifest: () => {
     return {
       version,
@@ -41,5 +41,3 @@ export const handler = generatorHandler({
     fs.writeFileSync(schemaFile, output)
   },
 })
-
-export default handler
