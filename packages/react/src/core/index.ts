@@ -20,6 +20,7 @@ export type {
   InferFullSchemaFromCollection,
   InferSlugFromCollection,
   InferTableNameFromCollection,
+  ToClientCollection,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export type { AnyServerConfig, BaseConfig, ClientConfig, ServerConfig } from './config'
