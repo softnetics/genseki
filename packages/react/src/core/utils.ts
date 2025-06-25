@@ -46,6 +46,11 @@ export function isRelationField(field: AnyField): field is FieldRelation {
 export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
   return field.type === 'richText'
 }
+
+export function isMediaField(field: AnyField): field is Extract<AnyField, { type: 'media' }> {
+  return field.type === 'media'
+}
+
 export type ConditionNeverKey<T extends Record<string, unknown>> = {
   [K in keyof T]: IsNever<T[K]> extends true ? K : never
 }[keyof T]
@@ -349,7 +354,18 @@ export const getDefaultValueFromFields = (
     ).filter(([fieldName, defaultValue]) => typeof defaultValue !== 'undefined')
   )
 
-  console.log(mappedCheck)
-
   return mappedCheck
+}
+
+export const mimeTypeValidate = (allowedMimes: string[], checkingMime: string) => {
+  for (const allowedMime of allowedMimes) {
+    const [allowedMimeType, allowedMimeSubType] = allowedMime.split('/')
+    const [checkingMimeType, checkingMimeSubType] = checkingMime.split('/')
+
+    if (allowedMimeSubType === '*' && checkingMimeType === allowedMimeType) return true
+
+    if (checkingMime === allowedMime) return true
+  }
+
+  return false
 }

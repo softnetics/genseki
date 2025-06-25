@@ -38,6 +38,25 @@ import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
 import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
+import { FileUploadField, type FileUploadFieldProps } from '../file-upload-field'
+
+export function AutoFileUploadField(props: FileUploadFieldProps) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <FileUploadField
+      {...props}
+      value={field.value}
+      onUploadSuccess={(fileKey) => {
+        field.onChange(fileKey)
+      }}
+      onRemoveSuccess={() => {
+        field.onChange(null)
+      }}
+      errorMessage={error?.message}
+    />
+  )
+}
 
 export function AutoTextField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
@@ -401,7 +420,19 @@ export function AutoField(props: AutoFieldProps) {
       return <p>COMBOBOX BOOLEAN</p>
     }
     case 'media': {
-      return <p>MEDIA</p>
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoFileUploadField
+              {...commonProps}
+              uploadOptions={field.uploadOptions}
+              isDisabled={disabled}
+            />
+          }
+        />
+      )
     }
 
     case 'create':

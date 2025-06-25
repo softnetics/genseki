@@ -115,6 +115,7 @@ export const foods = pgTable('foods', {
   description: json(),
   cookingTypes: typesEnum().notNull().default('other'),
   cookingDuration: decimal({ mode: 'number' }).notNull(),
+  foodAvatar: text(),
   // TODO: Make type infer for {mode:"string" | "date"}
   cookingDate: date().notNull().defaultNow(), // YYYY-MM-DD
   cookingTime: time().notNull().defaultNow(), // 00:00:00 - 24:00:00

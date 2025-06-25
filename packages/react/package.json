@@ -45,6 +45,7 @@
     "@react-aria/visually-hidden": "^3.8.23",
     "@react-stately/calendar": "^3.8.2",
     "@react-stately/color": "^3.8.6",
+    "@react-types/shared": "^3.30.0",
     "@tiptap/core": "^2.14.0",
     "@tiptap/extension-color": "^2.14.0",
     "@tiptap/extension-image": "^2.14.0",

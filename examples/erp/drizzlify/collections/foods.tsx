@@ -26,6 +26,16 @@ export const foodsCollection = builder.collection('foods', {
       description: 'A food name',
       update: 'disabled',
     }),
+    foodAvatar: fb.columns('foodAvatar', {
+      type: 'media',
+      label: 'Pekora avatar upload',
+      placeholder: 'Pekora avatar upload',
+      uploadOptions: {
+        limit: 1,
+        maxSize: 1024 * 1024 * 1,
+        mimeTypes: ['image/png', 'application/*'],
+      },
+    }),
     description: fb.columns('description', {
       type: 'richText',
       isRequired: true,

@@ -27,7 +27,7 @@ import {
 import { createFileUploadHandlers } from './file-storage-adapters/handlers'
 import type { GensekiPlugin, MergePlugins } from './plugins'
 import { getClientEditorProviderProps } from './richtext'
-import { isRelationField, isRichTextField } from './utils'
+import { isMediaField, isRelationField, isRichTextField } from './utils'
 
 import {
   type AuthClient,
@@ -185,6 +185,16 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
     }
 
     return sanitizedRichTextField
+  }
+
+  if (isMediaField(field)) {
+    return R.omit(
+      {
+        ...field,
+        label: field.label ?? name,
+      },
+      ['_', 'options' as any]
+    ) as FieldClient & { fieldName: string }
   }
 
   return R.omit(

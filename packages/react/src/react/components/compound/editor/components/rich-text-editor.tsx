@@ -1,11 +1,11 @@
 'use client'
-import { FieldErrorContext } from 'react-aria-components'
 
 import { EditorProvider, type EditorProviderProps } from '@tiptap/react'
 
 import { cn } from '../../../../utils/cn'
 import { focusStyles } from '../../../primitives'
-import { Description, FieldError, FieldGroup, Label } from '../../../primitives/field'
+import { CustomFieldError } from '../../../primitives/custom-field-error'
+import { Description, FieldGroup, Label } from '../../../primitives/field'
 
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
@@ -53,31 +53,5 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
       {props.description && <Description>{props.description}</Description>}
       <CustomFieldError errorMessage={props.errorMessage} />
     </div>
-  )
-}
-
-const CustomFieldError = (props: { errorMessage?: string }) => {
-  return (
-    <FieldErrorContext
-      value={{
-        isInvalid: !!props.errorMessage,
-        validationErrors: props.errorMessage ? [props.errorMessage] : [],
-        validationDetails: {
-          badInput: false,
-          customError: false,
-          patternMismatch: false,
-          rangeOverflow: false,
-          rangeUnderflow: false,
-          stepMismatch: false,
-          tooLong: false,
-          tooShort: false,
-          typeMismatch: false,
-          valid: true,
-          valueMissing: false,
-        },
-      }}
-    >
-      <FieldError>{props.errorMessage}</FieldError>
-    </FieldErrorContext>
   )
 }
