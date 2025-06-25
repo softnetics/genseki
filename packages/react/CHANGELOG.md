@@ -1,5 +1,19 @@
 # @genseki/react
 
+## 0.1.0-alpha.5
+
+### Minor Changes
+
+- [#37](https://github.com/softnetics/genseki/pull/37) [`7273ee1`](https://github.com/softnetics/genseki/commit/7273ee143ff173483cecf5fd35d6d81d619fdddd) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - [[DRIZZ-96] Richtext editor and storage plugin](https://app.plane.so/softnetics/browse/DRIZZ-96/)
+
+- [#55](https://github.com/softnetics/genseki/pull/55) [`8b4de17`](https://github.com/softnetics/genseki/commit/8b4de178c9fe3d96dc6aef40086e441395ee51b1) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - New media upload components with AutoField integrated, small minor modal UI improvement
+
+- [#52](https://github.com/softnetics/genseki/pull/52) [`9f29ffd`](https://github.com/softnetics/genseki/commit/9f29ffd462fd2b37085a51b2f18463ad65e7de05) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Create form and update form bugs fixed and multiple components visual improvement
+
+### Patch Changes
+
+- [#49](https://github.com/softnetics/genseki/pull/49) [`7cd8620`](https://github.com/softnetics/genseki/commit/7cd86208b821fcc0d36f46d50a4ea207215fb1f6) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Convert richtext field type to `json` from `string` and new S3 Storage adapter for object storing
+
 ## 0.1.0-alpha.4
 
 ### Minor Changes
