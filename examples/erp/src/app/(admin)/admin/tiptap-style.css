@@ -150,7 +150,7 @@
   /* Selecting an image */
   img.ProseMirror-selectednode,
   /* Selcting custom image */
-  .ProseMirror-selectednode:has(.custom-image-node) img {
+  .ProseMirror-selectednode img {
     outline: 4px solid var(--color-primary);
   }
 

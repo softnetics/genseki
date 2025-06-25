@@ -26,14 +26,14 @@ export const CustomImageNode: React.FC<CustomImageNodeProps> = (props) => {
 
   if (!dataKey) {
     return (
-      <NodeViewWrapper className="custom-image-node">
+      <NodeViewWrapper>
         <div className="custom-image-error">No data-key provided</div>
       </NodeViewWrapper>
     )
   }
 
   return (
-    <NodeViewWrapper className="custom-image-node">
+    <NodeViewWrapper>
       <CustomImage
         dataKey={dataKey}
         alt={props.node.attrs.alt}
