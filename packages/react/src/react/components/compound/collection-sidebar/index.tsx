@@ -15,6 +15,9 @@ import {
   Typography,
 } from '../../primitives'
 
+export * from './nav'
+export * from './sections'
+
 export async function AppSidebar({ collections }: { collections: Record<string, AnyCollection> }) {
   const collectionSlugs = Object.values(collections).map((collection) => collection.slug)
 

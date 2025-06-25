@@ -1,4 +1,4 @@
-import { generateJSON } from '@tiptap/core'
+import { generateJSON } from '@tiptap/html'
 import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
 import { is, sql, Table } from 'drizzle-orm'
 import * as R from 'remeda'
