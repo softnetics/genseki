@@ -12,6 +12,7 @@ import z from 'zod/v4'
 
 import { ApiDefaultMethod, type MaybePromise } from './collection'
 import type { AnyContext, Context, ContextToRequestContext } from './context'
+import type { ServerConfigEditorProviderProps } from './richtext/types'
 import {
   appendFieldNameToFields,
   type GetPrimaryColumn,
@@ -63,13 +64,19 @@ export type FieldBase = {
   description?: string
 }
 
+export interface FieldColumnJsonCollectionOptions<in TContext extends AnyContext = AnyContext> {
+  richText: {
+    type: 'richText'
+    default?: string
+    editor: ServerConfigEditorProviderProps
+  } & FieldBase
+}
+
 export interface FieldColumnStringCollectionOptions<in TContext extends AnyContext = AnyContext> {
   text: {
     type: 'text'
     default?: string
     label?: string
-    placeholder?: string
-    // editor?: Editor // TODO: Support rich text editor
   } & FieldBase
   selectText: {
     type: 'selectText'
@@ -90,7 +97,9 @@ export interface FieldColumnStringCollectionOptions<in TContext extends AnyConte
   } & FieldBase
 }
 
-export interface FieldColumnStringArrayCollectionOptions<TContext extends AnyContext = AnyContext> {
+export interface FieldColumnStringArrayCollectionOptions<
+  in TContext extends AnyContext = AnyContext,
+> {
   comboboxText: {
     type: 'comboboxText'
     options: OptionCallback<string, TContext>
@@ -163,8 +172,9 @@ export type FieldRelationCollectionOptions<
   } & FieldBase
 }
 
-export type FieldColumnCollection<TContext extends AnyContext> =
-  FieldColumnStringCollectionOptions<TContext> &
+export type FieldColumnCollection<TContext extends Context = Context> =
+  FieldColumnJsonCollectionOptions<TContext> &
+    FieldColumnStringCollectionOptions<TContext> &
     FieldColumnStringArrayCollectionOptions<TContext> &
     FieldColumnNumberCollectionOptions<TContext> &
     FieldColumnNumberArrayCollectionOptions<TContext> &
@@ -209,8 +219,8 @@ export type FieldOptions<TContext extends AnyContext> =
   FieldCollection<TContext>[keyof FieldCollection<TContext>]
 
 export type Field<
-  TFullSchema extends Record<string, unknown>,
-  TContext extends Context<TFullSchema>,
+  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends Context<TFullSchema> = Context<TFullSchema>,
 > = FieldColumn<TContext> | FieldRelation<TFullSchema, TContext>
 
 export type AnyField = Field<any, AnyContext>
@@ -248,15 +258,17 @@ export type FieldColumnOptionsFromTable<
       ? FieldColumnBooleanCollectionOptions[keyof FieldColumnBooleanCollectionOptions]
       : TColumn['_']['dataType'] extends 'date'
         ? FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
-        : TColumn['_']['dataType'] extends 'array'
-          ? TColumn['_']['data'] extends string[]
-            ? FieldColumnStringArrayCollectionOptions<TContext>[keyof FieldColumnStringArrayCollectionOptions<TContext>]
-            : TColumn['_']['data'] extends number[]
-              ? FieldColumnNumberArrayCollectionOptions<TContext>[keyof FieldColumnNumberArrayCollectionOptions<TContext>]
-              : TColumn['_']['data'] extends boolean[]
-                ? FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
-                : never
-          : never
+        : TColumn['_']['dataType'] extends 'json'
+          ? FieldColumnJsonCollectionOptions<TContext>[keyof FieldColumnJsonCollectionOptions<TContext>]
+          : TColumn['_']['dataType'] extends 'array'
+            ? TColumn['_']['data'] extends string[]
+              ? FieldColumnStringArrayCollectionOptions<TContext>[keyof FieldColumnStringArrayCollectionOptions<TContext>]
+              : TColumn['_']['data'] extends number[]
+                ? FieldColumnNumberArrayCollectionOptions<TContext>[keyof FieldColumnNumberArrayCollectionOptions<TContext>]
+                : TColumn['_']['data'] extends boolean[]
+                  ? FieldColumnBooleanArrayCollectionOptions[keyof FieldColumnBooleanArrayCollectionOptions]
+                  : never
+            : never
 
 type RelationFieldOptionsFromTable<
   TRelationPrimaryColumn extends Column,
@@ -497,6 +509,9 @@ export function fieldToZodScheama<TField extends AnyField>(
 ): FieldToZodScheama<TField> {
   // TODO: More options
   switch (field.type) {
+    // Richtext JSON
+    case 'richText':
+      return z.any() as unknown as FieldToZodScheama<TField>
     // string input
     case 'text':
     case 'selectText':
@@ -505,6 +520,7 @@ export function fieldToZodScheama<TField extends AnyField>(
       if (!field._.column.notNull) {
         return z.string().optional() as FieldToZodScheama<TField>
       }
+
       return z.string() as FieldToZodScheama<TField>
     // string[] input
     case 'comboboxText':

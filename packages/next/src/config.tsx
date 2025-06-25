@@ -88,7 +88,7 @@ export function defineNextJsServerConfig<
       searchParams: { [key: string]: string | string[] }
     }) => (
       <CollectionLayout serverConfig={args.serverConfig}>
-        <ListView {...args} {...args.params} />,
+        <ListView {...args} {...args.params} />
       </CollectionLayout>
     ),
   })

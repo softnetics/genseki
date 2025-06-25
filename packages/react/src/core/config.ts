@@ -4,6 +4,7 @@ import * as R from 'remeda'
 import {
   type AnyCollection,
   type ClientCollection,
+  type Collection,
   getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
@@ -18,8 +19,15 @@ import {
   type ToRecordApiRouteSchema,
 } from './endpoint'
 import type { AnyField, AnyFields, FieldClient, FieldsClient } from './field'
+import {
+  getStorageAdapterClient,
+  type StorageAdapter,
+  type StorageAdapterClient,
+} from './file-storage-adapters/generic-adapter'
+import { createFileUploadHandlers } from './file-storage-adapters/handlers'
 import type { GensekiPlugin, MergePlugins } from './plugins'
-import { isRelationField } from './utils'
+import { getClientEditorProviderProps } from './richtext'
+import { isRelationField, isRichTextField } from './utils'
 
 import {
   type AuthClient,
@@ -36,6 +44,7 @@ export interface BaseConfigOptions<
   db: NodePgDatabase<TFullSchema>
   schema: TFullSchema
   context?: TContextValue
+  storageAdapter?: StorageAdapter
   auth: AuthConfig
 }
 
@@ -93,22 +102,27 @@ export function defineServerConfig<
   baseConfig: BaseConfig<TFullSchema, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
-  const auth = createAuth(baseConfig.auth, baseConfig.context)
+  const auth = createAuth<TContext>(baseConfig.auth, baseConfig.context)
+  const fileUploadHandlers = createFileUploadHandlers<TContext>(baseConfig.storageAdapter)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
   let serverConfig: ServerConfig<
     TFullSchema,
     TContext,
     TCollections,
-    TEndpoints & AuthHandlers & typeof collectionEndpoints
+    TEndpoints & AuthHandlers & typeof collectionEndpoints & typeof fileUploadHandlers.handlers
   > = {
     ...baseConfig,
     collections: config.collections,
     endpoints: {
-      ...collectionEndpoints,
-      ...auth.handlers,
       ...config.endpoints,
-    } as TEndpoints & AuthHandlers & typeof collectionEndpoints,
+      ...auth.handlers,
+      ...collectionEndpoints,
+      ...fileUploadHandlers.handlers,
+    } as TEndpoints &
+      typeof auth.handlers &
+      typeof collectionEndpoints &
+      typeof fileUploadHandlers.handlers,
   }
 
   for (const { plugin } of config.plugins ?? []) {
@@ -125,6 +139,7 @@ export interface ClientConfig<
   auth: AuthClient
   collections: TCollections
   endpoints: TApiRouter
+  storageAdapter?: StorageAdapterClient
 }
 
 export function getFieldClient(name: string, field: AnyField): FieldClient & { fieldName: string } {
@@ -155,6 +170,23 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
     ) as FieldClient & { fieldName: string }
   }
 
+  if (isRichTextField(field)) {
+    const sanitizedBaseField = R.omit(
+      {
+        ...field,
+        label: field.label ?? name,
+      },
+      ['_', 'options' as any]
+    ) as FieldClient & { fieldName: string }
+
+    const sanitizedRichTextField = {
+      ...sanitizedBaseField,
+      editor: getClientEditorProviderProps(field.editor),
+    }
+
+    return sanitizedRichTextField
+  }
+
   return R.omit(
     {
       ...field,
@@ -169,13 +201,18 @@ export function getFieldsClient(fields: AnyFields): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 
-export function getClientCollection<const TCollection extends AnyCollection>(
-  collection: TCollection
-): ToClientCollection<TCollection> {
-  return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
-    ...collection,
-    fields: getFieldsClient(collection.fields),
-  })) as unknown as ToClientCollection<TCollection>
+export function getClientCollection<
+  const TCollection extends Collection<any, any, any, any, any, any>,
+>(collection: TCollection): ToClientCollection<TCollection> {
+  return R.pipe(
+    collection,
+    R.omit(['_', 'admin']),
+    (collection) =>
+      ({
+        ...collection,
+        fields: getFieldsClient(collection.fields),
+      }) as unknown as ToClientCollection<TCollection>
+  )
 }
 
 export function getClientConfig<
@@ -199,5 +236,12 @@ export function getClientConfig<
     ) as unknown as ToClientCollectionList<TCollections>,
     endpoints: clientEndpoints,
     $types: undefined as any,
+    ...(serverConfig.storageAdapter && {
+      storageAdapter: getStorageAdapterClient({
+        storageAdapter: serverConfig.storageAdapter,
+        grabPutObjectSignedUrlApiRoute: clientEndpoints['file.generatePutObjSignedUrl'],
+        grabGetObjectSignedUrlApiRoute: clientEndpoints['file.generateGetObjSignedUrl'],
+      }),
+    }),
   }
 }

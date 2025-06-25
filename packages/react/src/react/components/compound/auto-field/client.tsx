@@ -1,12 +1,8 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { type ReactNode, startTransition, useMemo } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import type { Field, FieldRelation } from '../../../../core'
-import type { AnyContext } from '../../../../core/context'
-import { cn } from '../../../utils/cn'
-import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 import {
   Button,
   Checkbox,
@@ -19,6 +15,7 @@ import {
   Label,
   NumberField,
   type NumberFieldProps,
+  RichTextEditor,
   Select,
   SelectList,
   SelectOption,
@@ -31,7 +28,15 @@ import {
   TimeField,
   type TimeFieldProps,
   useFormItemController,
-} from '../../primitives'
+} from '@genseki/react'
+
+import type { Field, FieldRelation } from '../../../../core'
+import type { AnyContext } from '../../../../core/context'
+import { constructEditorProviderProps } from '../../../../core/richtext'
+import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
+import { useStorageAdapter } from '../../../providers/root'
+import { cn } from '../../../utils/cn'
+import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
 
 export function AutoTextField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
@@ -166,6 +171,47 @@ export function AutoSelectField(props: AutoSelectField) {
   )
 }
 
+const AutoRichTextField = (props: {
+  name: string
+  label?: string
+  description?: string
+  isRequired?: boolean
+  placeholder?: string
+  isDisabled?: boolean
+  isPending?: boolean
+  errorMessage?: string
+  editor: ClientEditorProviderProps
+}) => {
+  const { field, error } = useFormItemController()
+
+  const storageAdapter = useStorageAdapter()
+
+  const editorProviderProps = useMemo(
+    () => constructEditorProviderProps(props.editor, storageAdapter),
+    []
+  )
+
+  return (
+    <RichTextEditor
+      label={props.label}
+      errorMessage={error?.message}
+      isRequired={props.isRequired}
+      isDisabled={props.isDisabled}
+      description={props.description}
+      editorProviderProps={{
+        ...editorProviderProps,
+        onUpdate(updateCb) {
+          startTransition(() => {
+            field.onChange(JSON.stringify(updateCb.editor.getJSON()))
+          })
+          editorProviderProps.onUpdate?.(updateCb)
+        },
+        content: field.value,
+      }}
+    />
+  )
+}
+
 export function AutoFormField(props: { name: string; component: ReactNode }) {
   const { control } = useFormContext()
   return (
@@ -206,9 +252,24 @@ export function AutoField(props: AutoFieldProps) {
     className: className,
     description: field.description,
     placeholder: field.placeholder,
+    isRequired: field.isRequired,
   }
 
   switch (field.type) {
+    case 'richText':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoRichTextField
+              {...commonProps}
+              editor={field.editor as ClientEditorProviderProps}
+              isDisabled={disabled}
+            />
+          }
+        />
+      )
     case 'text':
       return (
         <AutoFormField
@@ -498,7 +559,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 
   const createComponent = (name: string) => {
-    console.log('createComponent', name, props.field.fields)
     return Object.entries(props.field.fields).map(([key, childField]) => (
       <AutoFormField
         key={key}

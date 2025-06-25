@@ -39,6 +39,14 @@ export const useCollection = <TCollection extends DefaultCollection>(slug: strin
   return collection as TCollection
 }
 
+export const useStorageAdapter = () => {
+  const context = useContext(RootContext)
+  if (!context) throw new Error('useStorageAdapter must be used within a RootProvider')
+  const storageAdapter = context.clientConfig.storageAdapter
+
+  return storageAdapter
+}
+
 export const useClientConfig = () => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useClientConfig must be used within a RootProvider')

@@ -51,5 +51,6 @@ export type {
   Fields,
   FieldsClient,
 } from './field'
+export * from './file-storage-adapters'
 export { createPlugin, type GensekiPlugin } from './plugins'
 export type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from './table'

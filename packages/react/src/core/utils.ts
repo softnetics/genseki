@@ -1,5 +1,7 @@
+import { generateJSON } from '@tiptap/core'
 import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
 import { is, sql, Table } from 'drizzle-orm'
+import * as R from 'remeda'
 import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
 import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
@@ -17,11 +19,33 @@ import type {
   FieldsInitial,
   FieldsWithFieldName,
 } from './field'
+import type { StorageAdapterClient } from './file-storage-adapters'
+import { constructSanitizedExtensions } from './richtext'
+
+export function tryParseJSONObject(jsonString: string): Record<string, unknown> | false {
+  try {
+    const o = JSON.parse(jsonString)
+
+    // Handle non-exception-throwing cases:
+    // Neither JSON.parse(false) or JSON.parse(1234) throw errors, hence the type-checking,
+    // but... JSON.parse(null) returns null, and typeof null === "object",
+    // so we must check for that, too. Thankfully, null is falsey, so this suffices:
+    if (o && typeof o === 'object') {
+      return o
+    }
+  } catch (error) {
+    return false
+  }
+  return false
+}
 
 export function isRelationField(field: AnyField): field is FieldRelation {
   return field._.source === 'relation'
 }
 
+export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
+  return field.type === 'richText'
+}
 export type ConditionNeverKey<T extends Record<string, unknown>> = {
   [K in keyof T]: IsNever<T[K]> extends true ? K : never
 }[keyof T]
@@ -295,3 +319,35 @@ export type GetTableByTableTsName<
   TFullSchema extends Record<string, unknown>,
   TTableTsName extends keyof TFullSchema,
 > = TFullSchema[TTableTsName] extends Table<any> ? TFullSchema[TTableTsName] : never
+
+/**
+ * @description Return the default values for each provided fields, This should be used with `create` form
+ */
+export const getDefaultValueFromFields = (
+  fields: AnyFields,
+  storageAdapter?: StorageAdapterClient
+) => {
+  const mappedCheck = Object.fromEntries(
+    Object.entries(
+      R.mapValues(fields, (field) => {
+        if (field.type === 'richText') {
+          const content = field.editor.content ?? field.default ?? ''
+
+          const json = tryParseJSONObject(content)
+
+          return (
+            json ||
+            generateJSON(
+              content,
+              constructSanitizedExtensions(field.editor.extensions || [], storageAdapter)
+            )
+          )
+        }
+
+        return null
+      })
+    ).filter(([fieldName, defaultValue]) => !!defaultValue)
+  )
+
+  return mappedCheck
+}

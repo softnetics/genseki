@@ -3,6 +3,7 @@ import {
   boolean,
   date,
   decimal,
+  json,
   pgEnum,
   pgTable,
   text,
@@ -67,7 +68,7 @@ export const verification = pgTable('verification', {
 export const posts = pgTable('posts', {
   id: uuid('id').primaryKey().defaultRandom(),
   title: varchar(),
-  content: text(),
+  content: json(),
   authorId: uuid().references(() => user.id),
   categoryId: uuid().references(() => categories.id),
   ...timestamps,
@@ -111,6 +112,7 @@ export const foods = pgTable('foods', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar().notNull(),
   isCooked: boolean('is_cooked').notNull(),
+  description: json(),
   cookingTypes: typesEnum().notNull().default('other'),
   cookingDuration: decimal({ mode: 'number' }).notNull(),
   // TODO: Make type infer for {mode:"string" | "date"}

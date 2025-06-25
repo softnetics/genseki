@@ -21,8 +21,6 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
-  const w = form.watch()
-
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({
       method: `${props.slug}.update`,
@@ -62,7 +60,6 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         ))}
         <SubmitButton>Update</SubmitButton>
       </form>
-      {JSON.stringify(w, null, 2)}
     </Form>
   )
 }

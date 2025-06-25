@@ -442,7 +442,7 @@ export default function UIPlayground() {
       </Wrapper>
       <Wrapper title="Rich text">
         <Suspense fallback={<div>Loading...</div>}>
-          <RichTextEditor />
+          <RichTextEditor editorProviderProps={{}} />
         </Suspense>
       </Wrapper>
       <Wrapper title="Date picker">

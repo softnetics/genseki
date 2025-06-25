@@ -2,11 +2,12 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { getDefaultValueFromFields } from '../../../core/utils'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
-import { useCollection, useServerFunction } from '../../providers/root'
+import { useCollection, useServerFunction, useStorageAdapter } from '../../providers/root'
 
 interface CreateClientViewProps {
   slug: string
@@ -14,12 +15,13 @@ interface CreateClientViewProps {
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
-  const form = useForm()
   const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
-
-  const w = form.watch()
+  const storageAdapter = useStorageAdapter()
+  const form = useForm({
+    defaultValues: getDefaultValueFromFields(collection.fields, storageAdapter),
+  })
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({
@@ -60,7 +62,6 @@ export function CreateClientView(props: CreateClientViewProps) {
         ))}
         <SubmitButton>Create</SubmitButton>
       </form>
-      {JSON.stringify(w, null, 2)}
     </Form>
   )
 }
