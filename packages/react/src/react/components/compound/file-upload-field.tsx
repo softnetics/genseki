@@ -25,6 +25,55 @@ import {
 import { CustomFieldError } from '../primitives/custom-field-error'
 import { DropZone } from '../primitives/drop-zone'
 
+/**
+ * @description Generates a signed URL for uploading a file to object storage by making a request to the provided path with the file key
+ */
+const generatePutObjSignedUrlData = async (
+  path: string,
+  key: string
+): Promise<{ ok: true; data: any } | { ok: false; message: string }> => {
+  try {
+    const putObjUrlEndpoint = new URL(path, window.location.origin)
+
+    putObjUrlEndpoint.searchParams.append('key', key)
+
+    const putObjSignedUrl = await fetch(putObjUrlEndpoint.toString())
+
+    return {
+      ok: true,
+      data: await putObjSignedUrl.json(),
+    }
+  } catch (error) {
+    const message = (error as Error).message
+
+    return {
+      ok: false,
+      message: message,
+    }
+  }
+}
+
+/**
+ * @description
+ */
+const uploadObject = async (
+  signedUrl: string,
+  file: File
+): Promise<{ ok: true } | { ok: false; message: string }> => {
+  try {
+    await fetch(signedUrl, {
+      method: 'PUT',
+      body: file,
+    })
+
+    return { ok: true }
+  } catch (error) {
+    const message = (error as Error).message
+
+    return { ok: false, message }
+  }
+}
+
 export interface FileUploadOptionsProps {
   mimeTypes?: string[]
   maxSize?: number // Bytes (Default is 1024 * 1024 = 1 MB)
@@ -108,29 +157,38 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
       }
     }
 
-    try {
-      // TODO: Allow for multiples file, currently one at a time
-      const targetFile = files[0]
+    // TODO: Allow for multiples file, currently one at a time
+    const targetFile = files[0]
 
-      const key = `${crypto.randomUUID()}-${targetFile.name}`
+    const key = `${crypto.randomUUID()}-${targetFile.name}`
 
-      // Upload image
-      const putObjSignedUrlApiRoute = storageAdapter.grabPutObjectSignedUrlApiRoute
-      const putObjUrlEndpoint = new URL(putObjSignedUrlApiRoute.path, window.location.origin)
-      putObjUrlEndpoint.searchParams.append('key', key)
-      const putObjSignedUrl = await fetch(putObjUrlEndpoint.toString())
-      const putObjSignedUrlData = await putObjSignedUrl.json()
-      await fetch(putObjSignedUrlData.signedUrl, {
-        method: 'PUT',
-        body: targetFile,
+    // Get signed URL
+    const putObjSignedUrl = await generatePutObjSignedUrlData(
+      storageAdapter.grabPutObjectSignedUrlApiRoute.path,
+      key
+    )
+
+    if (!putObjSignedUrl.ok) {
+      props.onUploadFail?.(putObjSignedUrl.message || 'generating put object signed URL error')
+      toast.error('generating put object signed URL error', {
+        description: putObjSignedUrl.message,
       })
-
-      setFileKey(key)
-      props.onUploadSuccess?.(key)
-    } catch (error) {
-      console.log(error)
-      toast.error('File upload error')
+      return
     }
+
+    // Upload file using signed URL
+    const uploadResult = await uploadObject(putObjSignedUrl.data.signedUrl, targetFile)
+
+    if (!uploadResult.ok) {
+      props.onUploadFail?.(uploadResult.message || 'File upload error')
+      toast.error('File upload error', {
+        description: uploadResult.message,
+      })
+      return
+    }
+
+    setFileKey(key)
+    props.onUploadSuccess?.(key)
   }
 
   // For upload via clicking
@@ -168,6 +226,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
           fileKey={fileKey}
           onRemove={props.onRemove}
           onRemoveSuccess={props.onRemoveSuccess}
+          onRemoveFail={props.onRemoveFail}
           resetFileKey={() => setFileKey(undefined)}
         />
       ) : (
@@ -216,20 +275,28 @@ const FileDisplayer = (props: {
   resetFileKey: () => void
   onRemove?: (fileKey: string) => void
   onRemoveSuccess?: (fileKey: string) => void
+  onRemoveFail?: (reason: string) => void
 }) => {
-  const handleRemove = (e: React.MouseEvent) => {
+  const handleRemove = () => {
     // Custom handle on your own
     if (props.onRemove) {
       props.onRemove(props.fileKey)
       return
     }
 
-    // TODO: implement remove by signed-url method
-    // 1. Grab delete object signed url
-    // 2. Fetch the delete object signed url
-    // 3. Delete the object
-    props.resetFileKey()
-    props.onRemoveSuccess?.(props.fileKey)
+    try {
+      // TODO: implement remove by signed-url method
+      // 1. Grab delete object signed url
+      // 2. Fetch the delete object signed url
+      // 3. Delete the object
+      props.resetFileKey()
+      props.onRemoveSuccess?.(props.fileKey)
+    } catch (error) {
+      const message = (error as Error).message
+      props.onRemoveFail?.(message || 'Remove file fail')
+      toast.error('Remove file fail', { description: message })
+      return
+    }
   }
 
   return (
