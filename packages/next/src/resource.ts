@@ -97,7 +97,7 @@ export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any
       Object.entries(serverConfig.endpoints).flatMap(
         ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
           if (route.schema.method !== 'POST') return []
-
+          console.log('POST', route.schema.path)
           return [[route.schema.path, { route, methodName }]]
         }
       )

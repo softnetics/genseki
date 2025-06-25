@@ -1,8 +1,8 @@
 import Color from '@tiptap/extension-color'
-import TextAlign from '@tiptap/extension-text-align'
-import TextStyle from '@tiptap/extension-text-style'
-import Underline from '@tiptap/extension-underline'
-import StarterKit from '@tiptap/starter-kit'
+import { TextAlign } from '@tiptap/extension-text-align'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Underline } from '@tiptap/extension-underline'
+import { StarterKit } from '@tiptap/starter-kit'
 
 import {
   BackColorExtension,
@@ -73,12 +73,12 @@ export const foodsCollection = builder.collection('foods', {
       type: 'checkbox',
       label: 'Food cooked',
       default: true,
-      isRequired: true,
       description: 'Is the food cooked?',
     }),
     cookingTypes: fb.columns('cookingTypes', {
       type: 'selectText',
       label: 'Cooking types',
+      isRequired: true,
       options: (args) => {
         const res = args.db._.schema?.foods.columns.cookingTypes.enumValues || []
 
@@ -95,12 +95,12 @@ export const foodsCollection = builder.collection('foods', {
     cookingDate: fb.columns('cookingDate', {
       type: 'date',
       label: 'Cooking date',
-      default: new Date('2025-04-24'),
+      isRequired: true,
     }),
     cookingTime: fb.columns('cookingTime', {
       type: 'time',
       label: 'Cooking time',
-      default: new Date(),
+      isRequired: true,
     }),
   })),
 })

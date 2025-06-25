@@ -34,7 +34,7 @@ export const CollectionCard = ({
         <Typography type="h4" weight="semibold" className="text-text-nontrivial">
           {collectionName}
         </Typography>
-        <div className="flex items-center">
+        <div className="flex items-center gap-x-2">
           <BaseIcon icon={FolderIcon} size="sm" weight="duotone" />
           <Typography type="caption" weight="normal" className="text-nowrap">
             {amounts} items

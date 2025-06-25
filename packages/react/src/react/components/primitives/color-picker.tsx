@@ -50,7 +50,7 @@ const ColorPicker = ({
   ...props
 }: ColorPickerProps) => {
   return (
-    <div className={twMerge('flex flex-col items-start gap-y-1.5', className)}>
+    <div className={twMerge('flex flex-col items-start gap-y-4', className)}>
       <ColorPickerPrimitive {...props}>
         <Popover
           onOpenChange={(open) => {

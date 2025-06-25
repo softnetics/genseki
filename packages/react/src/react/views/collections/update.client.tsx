@@ -2,6 +2,8 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { toast } from 'sonner'
+
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
@@ -31,11 +33,14 @@ export function UpdateClientView(props: UpdateClientViewProps) {
     })
 
     if (result.status === 200) {
-      console.log('Update successful:', result.body)
-      return navigate(`../`) // Redirect to the list page
+      toast.success('Updation successfully')
+      return navigate(`../`)
     } else {
-      // TODO: Handle error, e.g., show an error message
-      console.error('Update failed:', result.body)
+      console.log(result.body)
+      const description = result.body?.message
+      toast.error('Failed to update', {
+        ...(description && { description }),
+      })
     }
   }
 
@@ -48,7 +53,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="flex flex-col gap-y-4 mt-16"
+        className="flex flex-col gap-y-8 mt-16"
       >
         {Object.values(collection.fields).map((field) => (
           <AutoField

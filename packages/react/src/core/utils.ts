@@ -344,10 +344,12 @@ export const getDefaultValueFromFields = (
           )
         }
 
-        return null
+        return field.default
       })
-    ).filter(([fieldName, defaultValue]) => !!defaultValue)
+    ).filter(([fieldName, defaultValue]) => typeof defaultValue !== 'undefined')
   )
+
+  console.log(mappedCheck)
 
   return mappedCheck
 }

@@ -111,7 +111,7 @@ export const typesEnum = pgEnum('types', ['fruit', 'vegetable', 'meat', 'dairy',
 export const foods = pgTable('foods', {
   id: uuid('id').primaryKey().defaultRandom(),
   name: varchar().notNull(),
-  isCooked: boolean('is_cooked').notNull(),
+  isCooked: boolean('is_cooked').default(true).notNull(),
   description: json(),
   cookingTypes: typesEnum().notNull().default('other'),
   cookingDuration: decimal({ mode: 'number' }).notNull(),

@@ -3,16 +3,17 @@
 import { type ReactNode, startTransition, useMemo } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
+import { EnvelopeIcon } from '@phosphor-icons/react'
+
 import {
+  BaseIcon,
   Button,
   Checkbox,
   type CheckboxProps,
   DatePicker,
   type DatePickerProps,
-  FieldError,
   FormField,
   FormItemController,
-  Label,
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
@@ -52,11 +53,28 @@ export function AutoTextField(props: TextFieldProps) {
   )
 }
 
-export function AutoNumberField(props: NumberFieldProps) {
+export function AutoPasswordField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
 
   return (
-    <NumberField
+    <TextField
+      {...props}
+      {...field}
+      type="password"
+      isRevealable
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
+    />
+  )
+}
+
+export function AutoEmailField(props: TextFieldProps) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <TextField
+      type="email"
+      prefix={<BaseIcon icon={EnvelopeIcon} size="sm" />}
       {...props}
       {...field}
       errorMessage={error?.message}
@@ -65,16 +83,30 @@ export function AutoNumberField(props: NumberFieldProps) {
   )
 }
 
-export function AutoSwitch(props: SwitchProps & { label?: string }) {
-  const { field, error, formItemId } = useFormItemController()
+export function AutoNumberField(props: NumberFieldProps) {
+  const { field, error } = useFormItemController()
 
   return (
-    <div className="flex items-center gap-x-4 bg-muted p-6 rounded-md">
-      <Label htmlFor={formItemId} className="select-none">
-        {props.label ?? field.name /* Switch label is requried anyway */}
-      </Label>
-      <Switch {...props} {...field} className={cn('', props.className)} />
-      {error && <FieldError>{error.message}</FieldError>}
+    <NumberField
+      {...props}
+      {...field}
+      onChange={(value) => {
+        const validValue = !isNaN(value) ? value : null
+        field.onChange(validValue)
+      }}
+      value={field.value}
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
+    />
+  )
+}
+
+export function AutoSwitch(props: SwitchProps & { label?: string }) {
+  const { field, id } = useFormItemController()
+
+  return (
+    <div className="pgap-y-4">
+      <Switch {...props} {...field} className={props.className} isSelected={field.value} id={id} />
     </div>
   )
 }
@@ -84,7 +116,7 @@ export function AutoCheckbox(props: CheckboxProps) {
 
   return (
     <div className="py-6">
-      <Checkbox {...props} {...field} className={cn('', props.className)} />
+      <Checkbox {...props} {...field} className={props.className} isSelected={field.value} />
     </div>
   )
 }
@@ -159,7 +191,7 @@ export function AutoSelectField(props: AutoSelectField) {
         }
       }}
     >
-      <SelectTrigger />
+      <SelectTrigger className="h-auto" />
       <SelectList items={props.items}>
         {(item) => (
           <SelectOption key={item.value} id={item.value} textValue={item.label}>
@@ -241,9 +273,9 @@ export function AutoField(props: AutoFieldProps) {
   const { field, className } = props
 
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') {
-    return null
-  }
+
+  if (visibility === 'hidden') return null
+
   const disabled = visibility === 'disabled'
 
   const commonProps = {
@@ -278,7 +310,22 @@ export function AutoField(props: AutoFieldProps) {
           component={<AutoTextField {...commonProps} isDisabled={disabled} />}
         />
       )
-
+    case 'password':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoPasswordField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+    case 'email':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoEmailField {...commonProps} isDisabled={disabled} />}
+        />
+      )
     case 'number':
       return (
         <AutoFormField
@@ -293,7 +340,7 @@ export function AutoField(props: AutoFieldProps) {
         <AutoFormField
           key={commonProps.name}
           name={commonProps.name}
-          component={<AutoNumberField {...commonProps} isDisabled={disabled} />}
+          component={<AutoTimeField {...commonProps} isDisabled={disabled} />}
         />
       )
 

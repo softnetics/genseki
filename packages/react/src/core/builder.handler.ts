@@ -60,8 +60,6 @@ export function createDefaultApiHandlers<
       throw new Error('Record not found')
     }
 
-    console.log('[findOne] result', result)
-
     return {
       __pk: result.__pk,
       __id: result.__id,
@@ -230,9 +228,13 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
+
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
+
     const fullInput = { ...input, ...oneInput }
+
     const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
+
     const id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
     return id
@@ -244,11 +246,11 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
-    console.log('[update] input', input)
+
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('[update] oneInput', oneInput)
+
     const fullInput = { ...input, ...oneInput }
-    console.log('[update] fullInput', fullInput)
+
     const result = (
       await tx.update(this.table).set(fullInput).where(eq(this.primaryColumn, id)).returning()
     )[0]
@@ -541,12 +543,13 @@ class ApiHandler {
   ): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'column' && data[field.fieldName]) {
+        if (field._.source === 'column' && typeof data[field.fieldName] !== 'undefined') {
           return [[field._.columnTsName, data[field.fieldName]]]
         }
         return []
       })
     )
+
     return result
   }
 }
@@ -557,11 +560,15 @@ function mapResultToFields(
 ): Record<string, any> {
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
+      // End case
       if (field._.source === 'column') {
         const value = result[field._.columnTsName]
-        if (!value) return []
+
+        if (typeof value === 'undefined') return []
         return [[field.fieldName, value]]
       }
+
+      // Recursive case
       if (isRelationField(field)) {
         const value = result[field._.relationTsName]
         if (!value) return []

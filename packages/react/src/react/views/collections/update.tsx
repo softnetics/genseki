@@ -1,3 +1,4 @@
+import { CollectionFormLayout } from './layouts/collection-form-layout'
 import { UpdateClientView } from './update.client'
 
 import { Context, createAuth, type ServerConfig } from '../../../core'
@@ -32,8 +33,8 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
-    <div className="mx-auto flex w-full flex-col px-8 lg:px-0 lg:max-w-[640px] gap-y-4 mt-24">
-      <Typography type="h1" weight="semibold">
+    <CollectionFormLayout>
+      <Typography type="h2" weight="semibold">
         Update {props.slug}
       </Typography>
       <UpdateClientView
@@ -42,6 +43,6 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
         defaultValues={result.body}
         optionsRecord={optionsRecord}
       />
-    </div>
+    </CollectionFormLayout>
   )
 }

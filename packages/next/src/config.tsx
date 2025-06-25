@@ -1,5 +1,6 @@
 import type { ReactNode } from 'react'
 
+import { redirect } from 'next/navigation'
 import { createRouter } from 'radix3'
 
 import {
@@ -7,7 +8,7 @@ import {
   type ApiRouter,
   type AuthHandlers,
   AuthLayout,
-  CollectionLayout,
+  CollectionAppLayout,
   type Context,
   CreateView,
   ForgotPasswordView,
@@ -74,9 +75,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <HomeView serverConfig={args.serverConfig} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug`, {
@@ -87,9 +88,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <ListView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/:identifier`, {
@@ -100,9 +101,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <OneView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
   radixRouter.insert(`/collections/:slug/create`, {
@@ -113,10 +114,21 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <CreateView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
+  })
+  radixRouter.insert(`/collections/:slug/update`, {
+    requiredAuthentication: true,
+    view: (args: {
+      params: { slug: string }
+      headers: Headers
+      serverConfig: ServerConfig
+      searchParams: { [key: string]: string | string[] }
+    }) => {
+      redirect('.')
+    },
   })
   radixRouter.insert(`/collections/:slug/update/:identifier`, {
     requiredAuthentication: true,
@@ -126,9 +138,9 @@ export function defineNextJsServerConfig<
       serverConfig: ServerConfig
       searchParams: { [key: string]: string | string[] }
     }) => (
-      <CollectionLayout serverConfig={args.serverConfig}>
+      <CollectionAppLayout serverConfig={args.serverConfig}>
         <UpdateView {...args} {...args.params} />
-      </CollectionLayout>
+      </CollectionAppLayout>
     ),
   })
 

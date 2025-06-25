@@ -19,6 +19,8 @@ import { tv } from 'tailwind-variants'
 import { Description, FieldError, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
+import { cn } from '../../utils/cn'
+
 interface CheckboxGroupProps extends CheckboxGroupPrimitiveProps {
   label?: string
   description?: string
@@ -76,6 +78,7 @@ const boxStyles = tv({
 
 interface CheckboxProps extends CheckboxPrimitiveProps {
   description?: string
+  errorMessage?: string
   label?: string
 }
 
@@ -83,6 +86,9 @@ const Checkbox = forwardRef(function Checkbox(
   { className, ...props }: CheckboxProps,
   ref: React.ForwardedRef<HTMLLabelElement>
 ) {
+  // If provide only 1 thing then center
+  const shouldCenter = [props.description, props.label].filter((item) => !!item).length == 1
+
   return (
     <CheckboxPrimitive
       ref={ref}
@@ -91,38 +97,43 @@ const Checkbox = forwardRef(function Checkbox(
         checkboxStyles({ ...renderProps, className })
       )}
     >
-      {({ isSelected, isIndeterminate, ...renderProps }) => (
-        <div
-          className={twMerge('flex gap-x-4', props.description ? 'items-start' : 'items-center')}
-        >
+      {({ isSelected, isIndeterminate, ...renderProps }) => {
+        return (
           <div
-            className={boxStyles({
-              ...renderProps,
-              isSelected: isSelected || isIndeterminate,
-            })}
+            className={twMerge(
+              'grid grid-cols-[40px_auto]',
+              shouldCenter ? 'items-center' : 'items-start'
+            )}
           >
-            {isIndeterminate ? (
-              <MinusIcon weight="bold" />
-            ) : isSelected ? (
-              <CheckIcon weight="bold" />
-            ) : null}
-          </div>
+            <div
+              className={boxStyles({
+                ...renderProps,
+                isSelected: isSelected || isIndeterminate,
+              })}
+            >
+              {isIndeterminate ? (
+                <MinusIcon weight="bold" />
+              ) : isSelected ? (
+                <CheckIcon weight="bold" />
+              ) : null}
+            </div>
 
-          <div className="flex flex-col gap-1">
-            <>
-              {props.label ? (
-                <Label className={twMerge(props.description && 'text-sm/4 font-normal')}>
-                  {props.label}
-                  {props.isRequired && <span className="ml-1 text-red-500">*</span>}
-                </Label>
-              ) : (
-                (props.children as React.ReactNode)
-              )}
-              {props.description && <Description>{props.description}</Description>}
-            </>
+            <div className="flex flex-col gap-1">
+              <>
+                {props.label ? (
+                  <Label className={cn(props.description && 'text-sm/4 font-normal')}>
+                    {props.label}
+                    {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+                  </Label>
+                ) : (
+                  (props.children as React.ReactNode)
+                )}
+                {props.description && <Description>{props.description}</Description>}
+              </>
+            </div>
           </div>
-        </div>
-      )}
+        )
+      }}
     </CheckboxPrimitive>
   )
 })

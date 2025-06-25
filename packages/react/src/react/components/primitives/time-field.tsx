@@ -34,7 +34,7 @@ const TimeField = <T extends TimeValue>({
       hourCycle={24}
       {...props}
       isInvalid={isInvalid}
-      className={composeTailwindRenderProps(className, 'group/time-field flex flex-col gap-y-1.5')}
+      className={composeTailwindRenderProps(className, 'group/time-field flex flex-col gap-y-4')}
     >
       {label && (
         <Label>
