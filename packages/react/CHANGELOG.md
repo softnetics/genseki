@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.6
+
+### Patch Changes
+
+- [#57](https://github.com/softnetics/genseki/pull/57) [`d0b6db4`](https://github.com/softnetics/genseki/commit/d0b6db459c0b0b2aa6b91fe1da32a8394c88c369) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Fix file upload handler implementation
+
+- [#60](https://github.com/softnetics/genseki/pull/60) [`a1d05fc`](https://github.com/softnetics/genseki/commit/a1d05fc4550b5a91d81710ed264e01bd29edbf8d) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - change `generateJSON` import path
+
+- [#59](https://github.com/softnetics/genseki/pull/59) [`bd3d4e6`](https://github.com/softnetics/genseki/commit/bd3d4e65b8c04368c8d8ec595217b8c5c6d25ce8) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Export more gensiki internal modules (most are UI components)
+
 ## 0.1.0-alpha.5
 
 ### Minor Changes
