@@ -1,3 +1,4 @@
+'use client'
 import { FieldErrorContext } from 'react-aria-components'
 
 import { FieldError } from './field'
