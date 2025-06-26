@@ -26,6 +26,7 @@ import {
   fieldsToZodObject,
   type FieldsWithFieldName,
 } from './field'
+import type { WhereExpression } from './filter'
 import { type GetTableByTableTsName, type ToZodObject } from './utils'
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
@@ -303,6 +304,17 @@ export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcep
   never
 > & { __pk: string | number; __id: string | number }
 
+type _InferFieldsColumnType<TColumn> = TColumn extends {
+  columnTsName: infer C extends string
+  column: { columnType: infer D }
+}
+  ? Record<C, D>
+  : _InferFieldsColumnType<Exclude<TColumn, TColumn>>
+
+export type InferColumnsType<TFields extends AnyFields> = _InferFieldsColumnType<
+  TFields[keyof TFields]['_']
+>
+
 export interface ServerApiHandlerArgs<
   TContext extends AnyContext = AnyContext,
   TFields extends Fields<any, TContext> = Fields<any, TContext>,
@@ -321,7 +333,7 @@ export type ApiArgs<
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? ServerApiHandlerArgs<TContext, TFields> & ApiFindOneArgs
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? ServerApiHandlerArgs<TContext, TFields> & ApiFindManyArgs
+      ? ServerApiHandlerArgs<TContext, TFields> & ApiFindManyArgs<TFields>
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? ServerApiHandlerArgs<TContext, TFields> & ApiUpdateArgs<TFields>
         : TMethod extends typeof ApiDefaultMethod.DELETE
@@ -348,11 +360,12 @@ export type ApiFindOneArgs = {
   id: string | number
 }
 
-export type ApiFindManyArgs = {
+export type ApiFindManyArgs<TFields extends AnyFields> = {
   limit?: number
   offset?: number
   orderBy?: string
   orderType?: 'asc' | 'desc'
+  where?: WhereExpression<TFields>
 }
 
 export type ApiCreateArgs<TFields extends AnyFields> = {
@@ -383,7 +396,7 @@ export type ClientApiArgs<
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? ApiFindOneArgs
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? ApiFindManyArgs
+      ? ApiFindManyArgs<TFields>
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? ApiUpdateArgs<TFields>
         : TMethod extends typeof ApiDefaultMethod.DELETE
@@ -752,6 +765,7 @@ export function getDefaultCollectionAdminApiRouter<
               offset: z.number().optional(),
               orderBy: z.string().optional(),
               orderType: z.enum(['asc', 'desc']).optional(),
+              where: z.object().optional(),
             }),
             responses: {
               200: response,
@@ -767,6 +781,7 @@ export function getDefaultCollectionAdminApiRouter<
               offset: args.query.offset,
               orderBy: args.query.orderBy,
               orderType: args.query.orderType,
+              where: args.query.where as any,
             })
             return { status: 200, body: response }
           }

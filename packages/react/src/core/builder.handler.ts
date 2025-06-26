@@ -16,6 +16,7 @@ import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
 import type { AnyContext, RequestContext } from './context'
 import type { AnyFields, Field, Fields } from './field'
+import { mapExpressionToSQL } from './filter'
 import {
   createDrizzleQuery,
   getColumnTsName,
@@ -44,6 +45,7 @@ export function createDefaultApiHandlers<
   const tableName = tableRelationalConfig.tsName
   const tableSchema = getTableFromSchema(schema, tableTsKey)
   const queryPayload = createDrizzleQuery(fields, tables, tableRelationalConfig, identifierColumn)
+  const whereBuilder = mapExpressionToSQL(tableRelationalConfig)
 
   const findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> = async (
     args
@@ -75,9 +77,11 @@ export function createDefaultApiHandlers<
 
     const orderType = args.orderType ?? 'asc'
     const orderBy = args.orderBy
+    const where = args.where ? whereBuilder(args.where) : undefined
 
     const result = await query.findMany({
       ...queryPayload,
+      where,
       limit: args.limit,
       offset: args.offset,
       orderBy: orderBy
