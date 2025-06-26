@@ -372,16 +372,16 @@ export function phone<TContext extends Context<FullSchema>>({
   )
 
   return createPlugin({
-    name: 'admin',
+    name: 'phone',
     plugin: (input) => {
       return {
         ...input,
         endpoints: {
           ...input.endpoints,
-          'auth.phone.login': loginByPhoneNumberEndpoint,
-          'auth.phone.signup': confirmOtpSignupByPhoneNumberEndpoint,
-          'phone.otp.send': sendOtpEndpoint,
-          'phone.otp.verify': otpVerifyEndpoint,
+          'auth.login-phone': loginByPhoneNumberEndpoint,
+          'auth.sign-up.phone': confirmOtpSignupByPhoneNumberEndpoint,
+          'auth.phone-otp-send': sendOtpEndpoint,
+          'auth.phone-otp-verify': otpVerifyEndpoint,
         },
       }
     },

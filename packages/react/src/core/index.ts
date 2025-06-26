@@ -52,4 +52,3 @@ export type {
   WithHasDefault,
   WithNotNull,
 } from './table'
-export {} from './utils'

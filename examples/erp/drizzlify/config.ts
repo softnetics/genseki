@@ -87,6 +87,6 @@ const baseServerConfig = defineServerConfig(baseConfig, {
   },
 })
 
-const serverConfig = defineNextJsServerConfig(baseServerConfig as any)
+const serverConfig = defineNextJsServerConfig(baseServerConfig)
 
 export { serverConfig }
