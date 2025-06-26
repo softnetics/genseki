@@ -40,3 +40,4 @@ yarn-error.log*
 
 .data
 packages/drizzlify-next/drizzilify.code-workspace
+.test-drive-data
