@@ -44,6 +44,9 @@ importers:
       '@genseki/rest':
         specifier: workspace:^
         version: link:../../packages/rest
+      '@hookform/resolvers':
+        specifier: ^5.0.1
+        version: 5.0.1(react-hook-form@7.56.3(react@19.1.0))
       '@tailwindcss/postcss':
         specifier: ^4.1.7
         version: 4.1.7
@@ -92,6 +95,9 @@ importers:
       react-dom:
         specifier: 19.1.0
         version: 19.1.0(react@19.1.0)
+      react-hook-form:
+        specifier: ^7.56.3
+        version: 7.56.3(react@19.1.0)
       tailwindcss:
         specifier: ^4.1.7
         version: 4.1.7
