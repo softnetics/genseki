@@ -612,6 +612,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
             offset?: number
             orderBy?: string
             orderType?: 'asc' | 'desc'
+            where?: WhereExpression<TFields>
           }>
           responses: {
             200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>

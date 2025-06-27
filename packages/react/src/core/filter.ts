@@ -24,9 +24,11 @@ import {
   type TableRelationalConfig,
 } from 'drizzle-orm'
 import { isObjectType } from 'remeda'
+import type { IfAny } from 'type-fest'
 
 import type { AnyFields } from '.'
 import type { InferColumnsType } from './collection'
+import type { FieldsWithFieldName } from './field'
 
 /* === Primitive Operators === */
 
@@ -248,19 +250,19 @@ type ColumnExpression<
     ? Record<TColumnName, OperationForType<TColumnType>>
     : never
 
-type AndExpression<TFields extends AnyFields> = {
+export type AndExpression<TFields extends AnyFields> = {
   $and: WhereExpression<TFields>[]
 }
 const isAndExpression = <TFields extends AnyFields>(op: unknown): op is AndExpression<TFields> =>
   typeof op === 'object' && !!op && '$and' in op
 
-type OrExpression<TFields extends AnyFields> = {
+export type OrExpression<TFields extends AnyFields> = {
   $or: WhereExpression<TFields>[]
 }
 const isOrExpression = <TFields extends AnyFields>(op: unknown): op is OrExpression<TFields> =>
   typeof op === 'object' && !!op && '$or' in op
 
-type NotExpression<TFields extends AnyFields> = {
+export type NotExpression<TFields extends AnyFields> = {
   $not: WhereExpression<TFields>
 }
 const isNotExpression = <TFields extends AnyFields>(op: unknown): op is NotExpression<TFields> =>
@@ -271,8 +273,9 @@ type BooleanExpressionOperations<TFields extends AnyFields> =
   | NotExpression<TFields>
 
 export type WhereExpression<TFields extends AnyFields> =
-  | BooleanExpressionOperations<TFields>
-  | ColumnExpression<TFields>
+  TFields extends FieldsWithFieldName<infer R>
+    ? IfAny<R, any, BooleanExpressionOperations<TFields> | ColumnExpression<TFields>>
+    : never
 
 const toSQL =
   (table: TableRelationalConfig) =>
