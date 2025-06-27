@@ -2,7 +2,8 @@
 import { useForm } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod/v4'
+// eslint-disable-next-line no-restricted-imports
+import { z } from 'zod'
 
 import {
   Form,
@@ -47,7 +48,7 @@ export const Display = ({ data, collection }: IDisplayProps) => {
 
   const filterForm = useForm({
     resolver: zodResolver(filterFormSchema),
-    mode: 'onChange',
+    mode: 'onSubmit',
   })
   async function search(data: z.infer<typeof filterFormSchema>) {
     const query = Object.entries(data)
