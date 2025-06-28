@@ -17,7 +17,7 @@ import {
 import { Builder } from '../builder'
 import { defineBaseConfig, defineServerConfig } from '../config'
 
-const schema = {
+export const schema = {
   ...baseSchema,
   vary: allFieldTypes,
 }
@@ -26,7 +26,7 @@ const db = drizzle({
   schema: schema,
 })
 
-export const postEditorProviderProps = {
+const postEditorProviderProps = {
   immediatelyRender: false,
   shouldRerenderOnTransaction: true,
   content: '<h2>This came from Post content field</h2>',
@@ -64,7 +64,7 @@ export const postEditorProviderProps = {
   ],
 }
 
-export const baseConfig = defineBaseConfig({
+const baseConfig = defineBaseConfig({
   db: db,
   schema: schema,
   context: { example: 'example' },
@@ -97,7 +97,7 @@ export const baseConfig = defineBaseConfig({
 const builder = new Builder({ schema }).$context<typeof baseConfig.context>()
 const vary = builder.collection('vary', {
   slug: 'allFields',
-  identifierColumn: 'bigserialBigInt',
+  identifierColumn: 'serial',
   fields: builder.fields('vary', (fb) => ({
     integer: fb.columns('integer', {
       type: 'number',
@@ -186,4 +186,3 @@ export const serverConfig = defineServerConfig(baseConfig, {
 })
 
 export type VaryCollectionFields = typeof serverConfig.collections.vary.fields
-export type ServerConfigContext = typeof serverConfig.context

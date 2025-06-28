@@ -277,7 +277,7 @@ export type WhereExpression<TFields extends AnyFields> =
     ? IfAny<R, any, BooleanExpressionOperations<TFields> | ColumnExpression<TFields>>
     : never
 
-const toSQL =
+const operatorToSQL =
   (table: TableRelationalConfig) =>
   (columnName: keyof typeof table.columns, verb: PrimitiveOperators): SQL => {
     const column = table.columns[columnName]
@@ -320,11 +320,13 @@ const toSQL =
         throw new Error(`Unknown verb: ${columnName}: ${JSON.stringify(verb)}`)
     }
   }
-export const mapExpressionToSQL = (table: TableRelationalConfig) => {
-  const map = toSQL(table)
-  const sqlize = <TFields extends AnyFields>(exp: WhereExpression<TFields>): SQL | undefined => {
+export const transformQueryObjectToSQL = <TFields extends AnyFields>(
+  table: TableRelationalConfig
+) => {
+  const toSQL = operatorToSQL(table)
+  const sqlize = (exp: WhereExpression<TFields>): SQL | undefined => {
     const sqls = Object.entries(exp).map(([columnOrOperator, operands]) => {
-      if (isOperators(operands)) return map(columnOrOperator, operands)
+      if (isOperators(operands)) return toSQL(columnOrOperator, operands)
       const expr = { [columnOrOperator]: operands }
       if (isAndExpression(expr)) return and(...expr['$and'].map(sqlize))
       if (isOrExpression(expr)) return or(...expr['$or'].map(sqlize))
@@ -337,7 +339,7 @@ export const mapExpressionToSQL = (table: TableRelationalConfig) => {
       throw new Error(`Unknown expr: ${expr}`)
     })
 
-    if (sqls.length > 0) return and(...sqls)
+    if (sqls.length > 1) return and(...sqls)
     return sqls[0]
   }
   return sqlize
