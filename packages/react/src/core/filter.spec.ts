@@ -199,7 +199,7 @@ describe('assertType: WhereExpression', () => {
 
 const tableRelationalConfig = extractTablesRelationalConfig(schema, createTableRelationsHelpers)
 
-describe('mapExpressionToSQL', () => {
+describe('transformQueryObjectToSQL', () => {
   const varyTable = tableRelationalConfig.tables['vary']
   const toSQL = transformQueryObjectToSQL<VaryCollectionFields>(varyTable)
 
@@ -346,22 +346,16 @@ describe('mapExpressionToSQL', () => {
     expect(
       toSQL({
         $or: [
-          {
-            $and: [
-              { text: { $like: '%A%' } },
-              { $or: [{ smallint: { $inArray: [4, 3, 2, 1] } }, { real: { $gte: 30 } }] },
-            ],
-          },
+          { text: { $like: '%A%' } },
+          { $or: [{ smallint: { $inArray: [4, 3, 2, 1] } }, { real: { $gte: 30 } }] },
         ],
         boolean: { $eq: true },
       })
     ).toStrictEqual(
       and(
         or(
-          and(
-            like(schema.vary.text, '%A%'),
-            or(inArray(schema.vary.smallint, [4, 3, 2, 1]), gte(schema.vary.real, 30))
-          )
+          like(schema.vary.text, '%A%'),
+          or(inArray(schema.vary.smallint, [4, 3, 2, 1]), gte(schema.vary.real, 30))
         ),
         eq(schema.vary.boolean, true)
       )
@@ -374,16 +368,14 @@ describe('mapExpressionToSQL', () => {
             text: { $like: '%A%' },
             $or: [{ smallint: { $inArray: [9, 8, 7, 6] } }, { real: { $gte: 30 } }],
           },
+          { boolean: { $eq: true } },
         ],
-        boolean: { $eq: true },
       })
     ).toStrictEqual(
-      and(
-        or(
-          and(
-            like(schema.vary.text, '%A%'),
-            or(inArray(schema.vary.smallint, [9, 8, 7, 6]), gte(schema.vary.real, 30))
-          )
+      or(
+        and(
+          like(schema.vary.text, '%A%'),
+          or(inArray(schema.vary.smallint, [9, 8, 7, 6]), gte(schema.vary.real, 30))
         ),
         eq(schema.vary.boolean, true)
       )
