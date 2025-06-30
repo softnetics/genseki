@@ -475,8 +475,8 @@ importers:
         specifier: ^1.3.4
         version: 1.3.4
       zod:
-        specifier: 3.25.53
-        version: 3.25.53
+        specifier: 3.25.67
+        version: 3.25.67
     devDependencies:
       '@types/json-schema':
         specifier: ^7.0.15
@@ -5465,6 +5465,9 @@ packages:
 
   zod@3.25.53:
     resolution: {integrity: sha512-BKOKoY3XcGUVkqaalCtFK15LhwR0G0i65AClFpWSXLN2gJNBGlTktukHgwexCTa/dAacPPp9ReryXPWyeZF4LQ==}
+
+  zod@3.25.67:
+    resolution: {integrity: sha512-idA2YXwpCdqUSKRCACDE6ItZD9TZzy3OZMtpfLoh6oPR47lipysRrJfjzMqFxQ3uJuUPyUeWe1r9vLH33xO/Qw==}
 
 snapshots:
 
@@ -11566,3 +11569,5 @@ snapshots:
       zod: 3.25.53
 
   zod@3.25.53: {}
+
+  zod@3.25.67: {}
