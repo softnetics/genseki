@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -19,7 +19,7 @@ import {
 import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
 
-const schema = z.object({
+const FormSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
   // TODO: custom password validation
   password: z
@@ -30,16 +30,18 @@ const schema = z.object({
     .trim(),
 })
 
+type FormSchema = z.infer<typeof FormSchema>
+
 export function LoginClientForm() {
   const serverFunction = useServerFunction()
 
-  const form = useForm({
-    resolver: zodResolver(schema),
+  const form = useForm<FormSchema>({
+    resolver: standardSchemaResolver(FormSchema),
     mode: 'onSubmit',
   })
   const { navigate } = useNavigation()
 
-  async function login(data: z.infer<typeof schema>) {
+  async function login(data: z.infer<typeof FormSchema>) {
     form.clearErrors('email')
     form.clearErrors('password')
     const response = await serverFunction({

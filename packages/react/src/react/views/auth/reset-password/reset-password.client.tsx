@@ -2,9 +2,9 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
-import { z } from 'zod'
+import { z } from 'zod/v4'
 
 import {
   Form,
@@ -19,7 +19,7 @@ import {
   useServerFunction,
 } from '@genseki/react'
 
-const formSchema = z
+const FormSchema = z
   .object({
     // TODO: custom password validation
     password: z
@@ -35,6 +35,8 @@ const formSchema = z
     path: ['confirmPassword'],
   })
 
+type FormSchema = z.infer<typeof FormSchema>
+
 interface ResetPasswordClientFormProps {
   token?: string
 }
@@ -44,14 +46,14 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
 
   const serverFunction = useServerFunction()
 
-  const form = useForm({
-    resolver: zodResolver(formSchema),
+  const form = useForm<FormSchema>({
+    resolver: standardSchemaResolver(FormSchema),
     mode: 'all',
   })
 
   const { handleSubmit, control } = form
 
-  const handleResetPassword = async (data: z.infer<typeof formSchema>) => {
+  const handleResetPassword = async (data: z.infer<typeof FormSchema>) => {
     const response = await serverFunction({
       method: 'auth.resetPasswordEmail',
       body: {
