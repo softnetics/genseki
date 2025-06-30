@@ -1,5 +1,17 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.6
+
+### Patch Changes
+
+- [#62](https://github.com/softnetics/genseki/pull/62) [`cef24e5`](https://github.com/softnetics/genseki/commit/cef24e50e0678b35af8d8a38ded86c49f0777e2f) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Upgrade Zod version to 3.25.67
+
+- Updated dependencies [[`cef24e5`](https://github.com/softnetics/genseki/commit/cef24e50e0678b35af8d8a38ded86c49f0777e2f)]:
+  - @genseki/react@0.1.0-alpha.7
+  - @genseki/next@0.1.0-alpha.7
+  - @genseki/react-query@0.1.0-alpha.7
+  - @genseki/rest@0.1.0-alpha.7
+
 ## 0.1.0-alpha.5
 
 ### Patch Changes
