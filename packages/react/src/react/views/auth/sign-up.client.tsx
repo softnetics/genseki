@@ -2,7 +2,7 @@
 
 import { useForm } from 'react-hook-form'
 
-import { zodResolver } from '@hookform/resolvers/zod'
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
@@ -18,7 +18,7 @@ import {
 import { useNavigation } from '../../providers'
 import { useClientConfig, useServerFunction } from '../../providers/root'
 
-const schema = z
+const FormSchema = z
   .object({
     name: z.string().min(1, { message: 'Full name is required' }).trim(),
     email: z.string().email({ message: 'Invalid email address' }),
@@ -35,18 +35,18 @@ const schema = z
     message: 'Passwords do not match',
   })
 
-type SignUpFormData = z.infer<typeof schema>
+type FormSchema = z.infer<typeof FormSchema>
 
 export function SignUpClientForm() {
   const clientConfig = useClientConfig()
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
-  const form = useForm<SignUpFormData>({
-    resolver: zodResolver(schema),
+  const form = useForm<FormSchema>({
+    resolver: standardSchemaResolver(FormSchema),
   })
 
-  const onValid = async (data: SignUpFormData) => {
+  const onValid = async (data: FormSchema) => {
     const response = await serverFunction({
       method: 'auth.signUp',
       body: data,
