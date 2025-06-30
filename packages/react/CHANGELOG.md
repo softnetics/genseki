@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.7
+
+### Patch Changes
+
+- [#62](https://github.com/softnetics/genseki/pull/62) [`cef24e5`](https://github.com/softnetics/genseki/commit/cef24e50e0678b35af8d8a38ded86c49f0777e2f) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Upgrade Zod version to 3.25.67
+
 ## 0.1.0-alpha.6
 
 ### Patch Changes
