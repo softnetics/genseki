@@ -77,6 +77,9 @@
   --color-ocean-800: #112a7c;
   --color-ocean-900: #08153d;
 
+  --color-darkred-50: #DC2626;
+  --color-darkred-100: #B91C1C;
+
   --color-black-normal: #000000;
   --color-black-vanish: rgba(0, 0, 0, 0);
 
@@ -175,7 +178,8 @@
 }
 
 @layer base {
-  .dark {
+  /* Do we have a dark mode? */
+  /* .dark {
     --color-text-correct: var(--color-palm-600);
     --color-text-incorrect: var(--color-valencia-600);
     --color-text-accent: var(--color-pumpkin-500);
@@ -184,7 +188,7 @@
     --color-text-body: var(--color-bluegray-200);
     --color-text-trivial: var(--color-bluegray-400);
     --color-text-white: var(--color-bluegray-600);
-  }
+  } */
 
   /* IntentUI | Theme for used by @theme */
   /**
