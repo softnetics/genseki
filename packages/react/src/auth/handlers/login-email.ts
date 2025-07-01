@@ -13,7 +13,7 @@ export function loginEmail<const TAuthContext extends AuthContext, const TContex
 
   const schema = {
     method: 'POST',
-    path: '/api/auth/login-email',
+    path: '/api/auth/login/email',
     body: z.object({
       email: z.string(),
       password: z.string(),
