@@ -6,17 +6,16 @@ import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
 import { hashPassword, setSessionCookie } from '../utils'
 
-export function signUpEmail<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContext,
->(authContext: TAuthContext) {
+export function signUp<const TAuthContext extends AuthContext, const TContext extends AnyContext>(
+  authContext: TAuthContext
+) {
   const {
     authConfig: { emailAndPassword },
     internalHandlers,
   } = authContext
   const schema = {
     method: 'POST',
-    path: '/api/auth/sign-up/email',
+    path: '/api/auth/sign-up',
     body: z
       .object({
         name: z.string(),
@@ -59,31 +58,22 @@ export function signUpEmail<
     // NOTE: Callback URL is used for email verification
 
     // Check if auto login is enabled
+    const session = await internalHandlers.session.create({
+      userId: user.id,
+      // TODO: Customize expiresAt
+      expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
+    })
 
     const responseHeaders = {}
     if (emailAndPassword?.signUp?.autoLogin !== false) {
-      const session = await internalHandlers.session.create({
-        userId: user.id,
-        // TODO: Customize expiresAt
-        expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
-      })
       // Set session cookie if auto login is enabled
       setSessionCookie(responseHeaders, session.token)
-
-      return {
-        status: 200,
-        body: {
-          token: session.token,
-          user: user,
-        },
-        headers: responseHeaders,
-      }
     }
 
     return {
       status: 200,
       body: {
-        token: null,
+        token: session.token,
         user: user,
       },
       headers: responseHeaders,

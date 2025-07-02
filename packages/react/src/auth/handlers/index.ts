@@ -4,7 +4,7 @@ import { me } from './me'
 import { resetPasswordEmail, validateResetToken } from './reset-password'
 import { sendEmailResetPassword } from './send-email-reset-password'
 import { signOut } from './sign-out'
-import { signUpEmail } from './sign-up-email'
+import { signUp } from './sign-up'
 
 import type { AnyContext } from '../../core/context'
 import { type AuthContext } from '../context'
@@ -14,7 +14,7 @@ export function createAuthHandlers<TAuthContext extends AuthContext, TContext ex
 ) {
   const handlers = {
     //  No authentication required
-    signUpEmail: signUpEmail<TAuthContext, TContext>(authContext),
+    signUp: signUp<TAuthContext, TContext>(authContext),
     loginEmail: loginEmail<TAuthContext, TContext>(authContext),
     signOut: signOut<TAuthContext, TContext>(authContext),
     forgotPasswordEmail: forgotPasswordEmail<TAuthContext, TContext>(authContext),

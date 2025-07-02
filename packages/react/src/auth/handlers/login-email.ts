@@ -14,7 +14,7 @@ export function loginEmail<
 
   const schema = {
     method: 'POST',
-    path: '/api/auth/login/email',
+    path: '/api/auth/login-email',
     body: z.object({
       email: z.string(),
       password: z.string(),

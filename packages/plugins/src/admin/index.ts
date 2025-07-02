@@ -3,14 +3,7 @@ import { eq } from 'drizzle-orm'
 import type { SimplifyDeep, ValueOf } from 'type-fest'
 import { z } from 'zod/v4'
 
-import type {
-  AnyTypedColumn,
-  BaseConfig,
-  Context,
-  WithAnyRelations,
-  WithAnyTable,
-  WithNotNull,
-} from '@genseki/react'
+import type { AnyTypedColumn, BaseConfig, Context, WithAnyTable, WithNotNull } from '@genseki/react'
 import type { AnyUserTable as BaseAnyUserTable } from '@genseki/react'
 import { Builder, createPlugin } from '@genseki/react'
 
@@ -99,13 +92,9 @@ export function mergeAccessControl<
   )
 }
 
-type FullSchema = WithAnyRelations<{
-  user: AnyUserTable
-}>
-
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function admin<TContext extends Context<FullSchema>>(
-  baseConfig: BaseConfig<FullSchema, TContext>,
+export function admin<TContext extends Context<{ user: AnyUserTable }>>(
+  baseConfig: BaseConfig<{ user: AnyUserTable }, TContext>,
   options: AdminPluginOptions
 ) {
   const schema = baseConfig.schema
