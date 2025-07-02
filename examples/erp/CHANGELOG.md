@@ -1,5 +1,18 @@
 # @example/erp
 
+## 0.1.0-alpha.6
+
+### Patch Changes
+
+- [#67](https://github.com/softnetics/genseki/pull/67) [`49927f2`](https://github.com/softnetics/genseki/commit/49927f2f7593ad4c43895789948291b02e52f2bb) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Add Phone plugins
+
+- Updated dependencies [[`49927f2`](https://github.com/softnetics/genseki/commit/49927f2f7593ad4c43895789948291b02e52f2bb), [`39f4197`](https://github.com/softnetics/genseki/commit/39f41976fac7c62ea30456ed4a6ef411925fb7de)]:
+  - @genseki/plugins@0.1.0-alpha.8
+  - @genseki/react@0.1.0-alpha.8
+  - @genseki/rest@0.1.0-alpha.8
+  - @genseki/next@0.1.0-alpha.8
+  - @genseki/react-query@0.1.0-alpha.8
+
 ## 0.1.0-alpha.5
 
 ### Patch Changes
