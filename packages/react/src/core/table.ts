@@ -1,4 +1,5 @@
-import type { AnyColumn, AnyTable } from 'drizzle-orm'
+import type { AnyColumn, AnyTable, Relations } from 'drizzle-orm'
+import type { Merge, UnionToIntersection } from 'type-fest'
 
 export type AnyTypedColumn<T> = AnyColumn & {
   _: {
@@ -26,3 +27,22 @@ export type WithAnyTable<
   columns: TColumns
 }> &
   TColumns
+
+type AnyRelationsFromTableKey<T extends string | number | symbol> = T extends string
+  ? {
+      [key: string]: Relations<T>
+    }
+  : never
+
+type AnyRelations<T extends Record<string, unknown>> = UnionToIntersection<
+  AnyRelationsFromTableKey<keyof T>
+>
+
+type WithAnyTableSchema<T extends Record<string, unknown>> = T & {
+  [key: string]: WithAnyTable<any, string>
+}
+
+export type WithAnyRelations<
+  T extends Record<string, unknown>,
+  U extends WithAnyTableSchema<T> = WithAnyTableSchema<T>,
+> = Merge<AnyRelations<U>, U>
