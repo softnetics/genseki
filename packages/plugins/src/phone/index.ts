@@ -313,7 +313,7 @@ export function phone<TContext extends Context<FullSchema>>({
       method: 'POST',
       path: '/auth/verification/verify/phone',
       body: z.object({
-        pin: z.string().min(1, 'Ref Code is required'),
+        pin: z.string().min(1, 'Pin is required'),
         token: z.string().min(1, 'Token is required'),
       }),
       responses: {
@@ -350,7 +350,7 @@ export function phone<TContext extends Context<FullSchema>>({
           status: 400 as const,
           body: {
             success: false,
-            error: 'Invalid ref code or token',
+            error: 'Invalid token',
           },
         }
       }
@@ -362,16 +362,6 @@ export function phone<TContext extends Context<FullSchema>>({
           body: {
             success: false,
             error: 'Verification does not match the authenticated user',
-          },
-        }
-      }
-
-      if (user.id) {
-        return {
-          status: 400 as const,
-          body: {
-            success: false,
-            error: 'User not found for the provided token',
           },
         }
       }
