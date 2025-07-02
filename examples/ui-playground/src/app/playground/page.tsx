@@ -27,6 +27,8 @@ import {
   ButtonGroupItem,
   Link,
   Pagination,
+  Radio,
+  RadioGroup,
   Switch,
   Tag,
   TagGroup,
@@ -1386,6 +1388,17 @@ export default function UIPlayground() {
       <Wrapper title="Pagination">
         <PlaygroundCard title="Default" categoryTitle="Pagination">
           <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Radio group">
+        <PlaygroundCard title="Default" categoryTitle="Radio group">
+          <RadioGroup aria-label="Radio">
+            <Radio value="x">X</Radio>
+            <Radio value="y">Y</Radio>
+            <Radio value="z" isDisabled>
+              Z
+            </Radio>
+          </RadioGroup>
         </PlaygroundCard>
       </Wrapper>
     </div>
