@@ -14,7 +14,7 @@ type Before = (request: Request) => void
 
 export interface CreateRestClientConfig {
   baseUrl: string
-  before: Before[]
+  before?: Before[]
 }
 
 interface AnyPayload {
@@ -39,7 +39,7 @@ async function makeFetch(
     body: payload.body ? JSON.stringify(payload.body) : null,
   })
 
-  for (const before of config.before) {
+  for (const before of config.before ?? []) {
     before(request)
   }
 
