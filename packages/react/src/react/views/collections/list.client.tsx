@@ -44,6 +44,7 @@ const tableDataExtract = <
 
   headers.sort((a, b) => (b.label === collection.identifierColumn ? 1 : -1))
 
+  // `isCooked` header is not sent
   const rows = data.map((record) => ({
     key: record.__id,
     rows: headers.map(
@@ -61,7 +62,7 @@ const Toolbar = (props: {
   selection: string[]
   setSelection: (args: string[]) => void
 }) => {
-  const { refresh } = useNavigation()
+  const navigation = useNavigation()
   const serverFunction = useServerFunction()
 
   return (
@@ -89,7 +90,7 @@ const Toolbar = (props: {
                 query: {},
               })
               props.setSelection([])
-              refresh()
+              navigation.refresh()
             }}
           >
             Delete
@@ -115,6 +116,7 @@ export function ListTable<
   TCollection extends ClientCollection<string, any, any, any, FieldsClient, any>,
 >(props: { collection: TCollection; data: InferFieldsFromCollection<TCollection>[] }) {
   const serverFunction = useServerFunction()
+  const navigation = useNavigation()
 
   const [selection, setSelection] = useState<string[]>([])
 
@@ -169,6 +171,7 @@ export function ListTable<
                             pathParams: {},
                             query: {},
                           })
+                          navigation.refresh()
                         }}
                       >
                         Delete

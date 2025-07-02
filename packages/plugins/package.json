@@ -1,6 +1,6 @@
 {
   "name": "@genseki/plugins",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.7",
   "sideEffects": false,
   "type": "module",
   "files": [
@@ -30,12 +30,14 @@
     "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
   },
   "dependencies": {
+    "@tiptap/react": "^2.12.0",
+    "@tiptap/starter-kit": "^2.12.0",
     "cookie-es": "^2.0.0",
     "deepmerge-ts": "^7.1.5",
     "drizzle-orm": "^0.41.0",
     "remeda": "^2.21.2",
     "valibot": "^1.0.0",
-    "zod": "3.25.53"
+    "zod": "3.25.67"
   },
   "devDependencies": {
     "@genseki/react": "workspace:^",

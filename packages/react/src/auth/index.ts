@@ -5,7 +5,7 @@ import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
 import { getFieldsClient } from '../core/config'
-import { Context, type ContextToRequestContext } from '../core/context'
+import { type AnyContext, Context, type ContextToRequestContext } from '../core/context'
 import type { ApiRouteHandler } from '../core/endpoint'
 import type { Fields, FieldsClient } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
@@ -83,7 +83,7 @@ export interface AuthConfig {
     passwordHasher?: (password: string) => Promise<string> // default: scrypt
     signUp?: {
       autoLogin?: boolean // default: true
-      additionalFields?: Fields<any>
+      additionalFields?: Fields<Record<string, unknown>, AnyContext>
     }
   }
   oauth2?: {
@@ -113,13 +113,18 @@ type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> =
 }>
 
 export type Auth<
-  TContext extends Context = Context,
+  TContext extends AnyContext = AnyContext,
   TAuthConfig extends AuthConfig = AuthConfig,
 > = {
   config: TAuthConfig
   context: ContextToRequestContext<TContext>
   authContext: AuthContext
-  handlers: Simplify<AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>>
+  handlers: Simplify<
+    AddObjectKeyPrefix<
+      ReturnType<typeof createAuthHandlers<any, Context<any, any, any>>>['handlers'],
+      'auth'
+    >
+  >
 }
 
 export type AuthHandlers = Auth<any, any>['handlers']
@@ -145,7 +150,7 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<const TContext extends Context>(
+export function createAuth<const TContext extends AnyContext>(
   config: AuthConfig,
   context: TContext
 ): Auth<TContext> {
@@ -157,8 +162,9 @@ export function createAuth<const TContext extends Context>(
     const handler: ApiRouteHandler<TContext, any> = (args) => {
       return h.handler({ ...args, context: wrappedContext } as any) as any
     }
-    return { schema: h.schema, handler }
-  }) as ReturnType<typeof createAuthHandlers>['handlers']
+    h.handler
+    return { schema: h.schema, handler } as any
+  }) as ReturnType<typeof createAuthHandlers<typeof authContext, TContext>>['handlers']
 
   const prefixedHandlers = Object.fromEntries(
     Object.entries(handlers).map(([key, value]) => {

@@ -1,3 +1,4 @@
+import { CollectionFormLayout } from './layouts/collection-form-layout'
 import { UpdateClientView } from './update.client'
 
 import { Context, createAuth, type ServerConfig } from '../../../core'
@@ -22,26 +23,26 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
   const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
   const context = Context.toRequestContext(authContext, headersValue)
 
-  const result = await collection.admin.endpoints.findOne({
-    context: context,
-    slug: props.slug,
-    fields: collection.fields,
-    id: props.identifier,
+  const result = await collection.admin.endpoints.findOne.handler({
+    context,
+    pathParams: {
+      id: props.identifier,
+    },
   })
 
   const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
-    <div className="mx-auto flex max-w-md w-full flex-col gap-y-4 mt-24">
-      <Typography type="h1" weight="semibold">
+    <CollectionFormLayout>
+      <Typography type="h2" weight="semibold">
         Update {props.slug}
       </Typography>
       <UpdateClientView
         identifer={props.identifier}
         slug={props.slug}
-        defaultValues={result}
+        defaultValues={result.body}
         optionsRecord={optionsRecord}
       />
-    </div>
+    </CollectionFormLayout>
   )
 }

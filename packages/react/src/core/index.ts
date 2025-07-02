@@ -22,6 +22,7 @@ export type {
   InferFullSchemaFromCollection,
   InferSlugFromCollection,
   InferTableNameFromCollection,
+  ToClientCollection,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export type { AnyServerConfig, BaseConfig, ClientConfig, ServerConfig } from './config'
@@ -32,7 +33,7 @@ export {
   getClientConfig,
   getFieldsClient,
 } from './config'
-export { Context, RequestContext } from './context'
+export { type AnyContext, Context, RequestContext } from './context'
 export type {
   ApiRoute,
   ApiRouteHandler,
@@ -43,7 +44,16 @@ export type {
   ClientApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
+export type {
+  AnyFields,
+  Field,
+  FieldBase,
+  FieldClient,
+  FieldRelation,
+  Fields,
+  FieldsClient,
+} from './field'
+export * from './file-storage-adapters'
 export { createPlugin, type GensekiPlugin } from './plugins'
 export type {
   AnyTypedColumn,

@@ -69,7 +69,7 @@ const Header = ({ className, ...props }: DialogHeaderProps) => {
       data-slot="dialog-header"
       ref={headerRef}
       className={twMerge(
-        'relative flex flex-col gap-0.5 p-4 sm:gap-1 sm:p-6 sm:pb-10 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0',
+        'relative flex flex-col gap-0.5 sm:gap-1 p-6 pt-8 sm:p-10 sm:pt-10 [&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-0',
         className
       )}
     >
@@ -174,7 +174,7 @@ const Footer = ({ className, ...props }: DialogFooterProps) => {
       ref={footerRef}
       data-slot="dialog-footer"
       className={twMerge(
-        'isolate mt-auto flex flex-col-reverse justify-between gap-3 p-4 pt-3 sm:flex-row sm:p-6 sm:pt-6',
+        'isolate mt-auto flex flex-col-reverse justify-between gap-3 sm:flex-row p-6 sm:p-10',
         className
       )}
       {...props}

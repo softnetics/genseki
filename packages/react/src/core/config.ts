@@ -4,6 +4,7 @@ import * as R from 'remeda'
 import {
   type AnyCollection,
   type ClientCollection,
+  type Collection,
   getAllCollectionEndpoints,
   type ToClientCollection,
   type ToClientCollectionList,
@@ -17,9 +18,16 @@ import {
   type ToClientApiRouteSchema,
   type ToRecordApiRouteSchema,
 } from './endpoint'
-import type { Field, FieldClient, Fields, FieldsClient } from './field'
+import type { AnyField, AnyFields, FieldClient, FieldsClient } from './field'
+import {
+  getStorageAdapterClient,
+  type StorageAdapter,
+  type StorageAdapterClient,
+} from './file-storage-adapters/generic-adapter'
+import { createFileUploadHandlers } from './file-storage-adapters/handlers'
 import type { GensekiPlugin, MergePlugins } from './plugins'
-import { isRelationField } from './utils'
+import { getClientEditorProviderProps } from './richtext'
+import { isMediaField, isRelationField, isRichTextField } from './utils'
 
 import {
   type AuthClient,
@@ -36,6 +44,7 @@ export interface BaseConfigOptions<
   db: NodePgDatabase<TFullSchema>
   schema: TFullSchema
   context?: TContextValue
+  storageAdapter?: StorageAdapter
   auth: AuthConfig
 }
 
@@ -84,31 +93,36 @@ export function defineBaseConfig<
 }
 
 export function defineServerConfig<
-  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  const TContext extends Context<TFullSchema> = Context<TFullSchema>,
-  const TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
-  const TEndpoints extends ApiRouter<TContext> = ApiRouter<TContext>,
+  const TFullSchema extends Record<string, unknown>,
+  const TContext extends Context<TFullSchema>,
+  const TCollections extends Record<string, AnyCollection>,
+  const TEndpoints extends ApiRouter<TContext>,
   const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 >(
   baseConfig: BaseConfig<TFullSchema, TContext>,
   config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
 ) {
-  const auth = createAuth(baseConfig.auth, baseConfig.context)
+  const auth = createAuth<TContext>(baseConfig.auth, baseConfig.context)
+  const fileUploadHandlers = createFileUploadHandlers<TContext>(baseConfig.storageAdapter)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
   let serverConfig: ServerConfig<
     TFullSchema,
     TContext,
     TCollections,
-    TEndpoints & AuthHandlers & typeof collectionEndpoints
+    TEndpoints & AuthHandlers & typeof collectionEndpoints & typeof fileUploadHandlers.handlers
   > = {
     ...baseConfig,
     collections: config.collections,
     endpoints: {
-      ...collectionEndpoints,
-      ...auth.handlers,
       ...config.endpoints,
-    } as TEndpoints & AuthHandlers & typeof collectionEndpoints,
+      ...auth.handlers,
+      ...collectionEndpoints,
+      ...fileUploadHandlers.handlers,
+    } as TEndpoints &
+      typeof auth.handlers &
+      typeof collectionEndpoints &
+      typeof fileUploadHandlers.handlers,
   }
 
   for (const { plugin } of config.plugins ?? []) {
@@ -119,18 +133,16 @@ export function defineServerConfig<
 }
 
 export interface ClientConfig<
-  TCollections extends Record<string, ClientCollection<any, any, any, any, any, any>> = Record<
-    string,
-    ClientCollection<any, any, any, any, any, any>
-  >,
-  TApiRouter extends ClientApiRouter = ClientApiRouter,
+  TCollections extends Record<string, ClientCollection<any, any, any, any, any, any>>,
+  TApiRouter extends ClientApiRouter,
 > {
   auth: AuthClient
   collections: TCollections
   endpoints: TApiRouter
+  storageAdapter?: StorageAdapterClient
 }
 
-export function getFieldClient(name: string, field: Field): FieldClient & { fieldName: string } {
+export function getFieldClient(name: string, field: AnyField): FieldClient & { fieldName: string } {
   if (isRelationField(field)) {
     if (field._.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
@@ -158,6 +170,33 @@ export function getFieldClient(name: string, field: Field): FieldClient & { fiel
     ) as FieldClient & { fieldName: string }
   }
 
+  if (isRichTextField(field)) {
+    const sanitizedBaseField = R.omit(
+      {
+        ...field,
+        label: field.label ?? name,
+      },
+      ['_', 'options' as any]
+    ) as FieldClient & { fieldName: string }
+
+    const sanitizedRichTextField = {
+      ...sanitizedBaseField,
+      editor: getClientEditorProviderProps(field.editor),
+    }
+
+    return sanitizedRichTextField
+  }
+
+  if (isMediaField(field)) {
+    return R.omit(
+      {
+        ...field,
+        label: field.label ?? name,
+      },
+      ['_', 'options' as any]
+    ) as FieldClient & { fieldName: string }
+  }
+
   return R.omit(
     {
       ...field,
@@ -168,17 +207,22 @@ export function getFieldClient(name: string, field: Field): FieldClient & { fiel
   ) as FieldClient & { fieldName: string }
 }
 
-export function getFieldsClient(fields: Fields<any>): FieldsClient {
+export function getFieldsClient(fields: AnyFields): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 
-export function getClientCollection<const TCollection extends AnyCollection>(
-  collection: TCollection
-): ToClientCollection<TCollection> {
-  return R.pipe(collection, R.omit(['_', 'admin']), (collection) => ({
-    ...collection,
-    fields: getFieldsClient(collection.fields),
-  })) as unknown as ToClientCollection<TCollection>
+export function getClientCollection<
+  const TCollection extends Collection<any, any, any, any, any, any>,
+>(collection: TCollection): ToClientCollection<TCollection> {
+  return R.pipe(
+    collection,
+    R.omit(['_', 'admin']),
+    (collection) =>
+      ({
+        ...collection,
+        fields: getFieldsClient(collection.fields),
+      }) as unknown as ToClientCollection<TCollection>
+  )
 }
 
 export function getClientConfig<
@@ -202,5 +246,12 @@ export function getClientConfig<
     ) as unknown as ToClientCollectionList<TCollections>,
     endpoints: clientEndpoints,
     $types: undefined as any,
+    ...(serverConfig.storageAdapter && {
+      storageAdapter: getStorageAdapterClient({
+        storageAdapter: serverConfig.storageAdapter,
+        grabPutObjectSignedUrlApiRoute: clientEndpoints['file.generatePutObjSignedUrl'],
+        grabGetObjectSignedUrlApiRoute: clientEndpoints['file.generateGetObjSignedUrl'],
+      }),
+    }),
   }
 }

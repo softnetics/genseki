@@ -1,6 +1,6 @@
 {
   "name": "@example/ui-playground",
-  "version": "0.1.0-alpha.1",
+  "version": "0.1.0-alpha.6",
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev --port 3003 --turbopack",
@@ -20,13 +20,14 @@
     "@phosphor-icons/react": "^2.1.8",
     "@tailwindcss/postcss": "^4.1.7",
     "@tanstack/react-query": "^5.71.5",
+    "@tiptap/starter-kit": "^2.14",
     "next": "15.2.2",
     "next-themes": "^0.4.6",
     "postcss": "^8.5.3",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwindcss": "^4.1.7",
-    "zod": "3.25.53"
+    "zod": "3.25.67"
   },
   "devDependencies": {
     "@internal/project-config": "workspace:^",

@@ -14,8 +14,8 @@ import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
-import type { Context, RequestContext } from './context'
-import type { Field, Fields } from './field'
+import type { AnyContext, RequestContext } from './context'
+import type { AnyFields, Field, Fields } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,
@@ -26,8 +26,8 @@ import {
 } from './utils'
 
 export function createDefaultApiHandlers<
-  TContext extends Context,
-  TFields extends Fields<any, any>,
+  TContext extends AnyContext,
+  TFields extends AnyFields,
 >(args: {
   schema: Record<string, unknown>
   fields: TFields
@@ -59,8 +59,6 @@ export function createDefaultApiHandlers<
       // TODO: Custom error
       throw new Error('Record not found')
     }
-
-    console.log('[findOne] result', result)
 
     return {
       __pk: result.__pk,
@@ -190,7 +188,7 @@ class ApiHandler {
 
   constructor(
     private readonly tableTsName: string,
-    private readonly fields: Fields<any>,
+    private readonly fields: Fields<any, AnyContext>,
     private readonly config: {
       schema: Record<string, unknown>
       context: RequestContext
@@ -230,9 +228,13 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
+
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
+
     const fullInput = { ...input, ...oneInput }
+
     const result = (await tx.insert(this.table).values([fullInput]).returning())[0]
+
     const id = result[this.primaryColumnTsName]
     await this.resolveManyRelations(id, tx, this.fields, data)
     return id
@@ -244,11 +246,11 @@ class ApiHandler {
     data: Record<string, any>
   ): Promise<string | number> {
     const input = this.getColumnValues(this.fields, data)
-    console.log('[update] input', input)
+
     const oneInput = await this.resolveOneRelations(tx, this.fields, data)
-    console.log('[update] oneInput', oneInput)
+
     const fullInput = { ...input, ...oneInput }
-    console.log('[update] fullInput', fullInput)
+
     const result = (
       await tx.update(this.table).set(fullInput).where(eq(this.primaryColumn, id)).returning()
     )[0]
@@ -259,10 +261,10 @@ class ApiHandler {
 
   private async resolveOneRelations(
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Fields<any>,
+    fields: Fields<any, AnyContext>,
     data: Record<string, any>
   ) {
-    const create = async (referencedTable: Table, fields: Fields<any>, value: any) => {
+    const create = async (referencedTable: Table, fields: Fields<any, AnyContext>, value: any) => {
       const id = await new ApiHandler(
         // TODO: i think this should not use public prefix to search the table
         this.config.tableTsNameByTableDbName[`public.${getTableName(referencedTable)}`],
@@ -273,7 +275,11 @@ class ApiHandler {
       return id
     }
 
-    const disconnect = async (referencedTable: Table, fields: Fields<any>, value: any) => {
+    const disconnect = async (
+      referencedTable: Table,
+      fields: Fields<any, AnyContext>,
+      value: any
+    ) => {
       const primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
       const primaryColumnTsName = getColumnTsName(
         getTableColumns(this.config.schema[this.tableTsName] as Table),
@@ -376,7 +382,7 @@ class ApiHandler {
   private async resolveManyRelations(
     id: string | number,
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Record<string, Field<any>>,
+    fields: Record<string, Field<any, AnyContext>>,
     data: Record<string, any>
   ) {
     // update the referenced table to have this id
@@ -392,7 +398,7 @@ class ApiHandler {
 
     const create = async (
       tableConfig: TableRelationalConfig,
-      fields: Fields<any>,
+      fields: Fields<any, AnyContext>,
       relation: Relation,
       value: any
     ) => {
@@ -531,27 +537,38 @@ class ApiHandler {
     return referenceFieldName
   }
 
-  private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
+  private getColumnValues(
+    fields: Fields<any, AnyContext>,
+    data: Record<string, any>
+  ): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'column' && data[field.fieldName]) {
+        if (field._.source === 'column' && typeof data[field.fieldName] !== 'undefined') {
           return [[field._.columnTsName, data[field.fieldName]]]
         }
         return []
       })
     )
+
     return result
   }
 }
 
-function mapResultToFields(fields: Fields<any>, result: Record<string, any>): Record<string, any> {
+function mapResultToFields(
+  fields: Fields<any, AnyContext>,
+  result: Record<string, any>
+): Record<string, any> {
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
+      // End case
       if (field._.source === 'column') {
         const value = result[field._.columnTsName]
-        if (!value) return []
+
+        if (typeof value === 'undefined') return []
         return [[field.fieldName, value]]
       }
+
+      // Recursive case
       if (isRelationField(field)) {
         const value = result[field._.relationTsName]
         if (!value) return []

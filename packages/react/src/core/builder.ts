@@ -35,7 +35,7 @@ import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
-  TContext extends Context = Context,
+  TContext extends Context<TFullSchema> = Context<TFullSchema>,
 > {
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
@@ -51,14 +51,17 @@ export class Builder<
     this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
   }
 
-  $context<TContext extends Context = Context>(): Builder<TFullSchema, TContext> {
+  $context<TContext extends Context<TFullSchema> = Context<TFullSchema>>(): Builder<
+    TFullSchema,
+    TContext
+  > {
     return new Builder<TFullSchema, TContext>({ schema: this.config.schema })
   }
 
   collection<
     const TSlug extends string = string,
     const TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    const TFields extends Fields<TContext, TFullSchema> = Fields<TContext, TFullSchema>,
+    const TFields extends Fields<TFullSchema, TContext> = Fields<TFullSchema, TContext>,
     const TApiRouter extends ApiRouter<TContext> = {},
   >(
     tableTsName: TTableTsName,
@@ -165,7 +168,7 @@ export class Builder<
 
   fields<
     TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TContext>,
+    TFields extends FieldsInitial<TFullSchema, TContext>,
   >(
     tableTsName: TTableTsName,
     optionsFn: (

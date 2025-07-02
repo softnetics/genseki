@@ -50,7 +50,7 @@ const ColorPicker = ({
   ...props
 }: ColorPickerProps) => {
   return (
-    <div className={twMerge('flex flex-col items-start gap-y-1.5', className)}>
+    <div className={twMerge('flex flex-col items-start gap-y-4', className)}>
       <ColorPickerPrimitive {...props}>
         <Popover
           onOpenChange={(open) => {
@@ -61,7 +61,10 @@ const ColorPicker = ({
             isDisabled={isDisabled}
             size="md"
             variant="ghost"
-            className={cn('*:data-[slot=color-swatch]:mx-0 w-auto gap-x-4', buttonClassName)}
+            className={cn(
+              '*:data-[slot=color-swatch]:mx-0 w-auto gap-x-4 duration-150 ease-out transition-all',
+              buttonClassName
+            )}
           >
             <ColorSwatch className="size-14" />
             {label && label}

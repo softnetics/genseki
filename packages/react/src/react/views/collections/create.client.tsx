@@ -2,11 +2,14 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { toast } from 'sonner'
+
+import { getDefaultValueFromFields } from '../../../core/utils'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
-import { useCollection, useServerFunction } from '../../providers/root'
+import { useCollection, useServerFunction, useStorageAdapter } from '../../providers/root'
 
 interface CreateClientViewProps {
   slug: string
@@ -14,12 +17,13 @@ interface CreateClientViewProps {
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
-  const form = useForm()
   const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
-
-  const w = form.watch()
+  const storageAdapter = useStorageAdapter()
+  const form = useForm({
+    defaultValues: getDefaultValueFromFields(collection.fields, storageAdapter),
+  })
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
     const result = await serverFunction({
@@ -31,11 +35,14 @@ export function CreateClientView(props: CreateClientViewProps) {
     })
 
     if (result.status === 200) {
-      console.log('Creation successful:', result.body)
+      toast.success('Creation successfully')
       return navigate(`./`)
     } else {
-      // TODO: Handle error, e.g., show an error message
-      console.error('Creation failed:', result.body)
+      console.log(result.body)
+      const description = result.body?.message
+      toast.error('Failed to create', {
+        ...(description && { description }),
+      })
     }
   }
 
@@ -48,7 +55,7 @@ export function CreateClientView(props: CreateClientViewProps) {
       <form
         noValidate
         onSubmit={form.handleSubmit(onSubmit, onError)}
-        className="flex flex-col gap-y-4 mt-16"
+        className="flex flex-col gap-y-8 mt-16"
       >
         {Object.values(collection.fields).map((field) => (
           <AutoField
@@ -60,7 +67,6 @@ export function CreateClientView(props: CreateClientViewProps) {
         ))}
         <SubmitButton>Create</SubmitButton>
       </form>
-      {JSON.stringify(w, null, 2)}
     </Form>
   )
 }

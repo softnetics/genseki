@@ -52,7 +52,7 @@ const DateField = <T extends DateValue>({
   return (
     <DateFieldPrimitive
       isInvalid={isInvalid}
-      className={composeTailwindRenderProps(props.className, 'group flex flex-col gap-y-1.5')}
+      className={composeTailwindRenderProps(props.className, 'group flex flex-col gap-y-4')}
       {...props}
     >
       {label && (

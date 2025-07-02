@@ -1,3 +1,5 @@
+import { postEditorProviderProps } from './posts'
+
 import { builder } from '../helper'
 
 export const categoriesCollection = builder.collection('categories', {
@@ -20,7 +22,8 @@ export const categoriesCollection = builder.collection('categories', {
           type: 'text',
         }),
         content: fb.columns('content', {
-          type: 'text',
+          type: 'richText',
+          editor: postEditorProviderProps,
         }),
       })),
       options: builder.options(async ({ db }) => {

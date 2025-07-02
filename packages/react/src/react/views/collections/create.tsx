@@ -1,4 +1,5 @@
 import { CreateClientView } from './create.client'
+import { CollectionFormLayout } from './layouts/collection-form-layout'
 
 import { Context, createAuth, type ServerConfig } from '../../../core'
 import { createOptionsRecord } from '../../components/compound/auto-field'
@@ -25,11 +26,11 @@ export async function CreateView<TServerConfig extends ServerConfig>(
   const optionsRecord = await createOptionsRecord(context, collection.fields)
 
   return (
-    <div className="mx-auto flex max-w-md w-full flex-col gap-y-4 mt-24">
-      <Typography type="h1" weight="semibold">
+    <CollectionFormLayout size="md">
+      <Typography type="h2" weight="semibold">
         Create new {props.slug}
       </Typography>
       <CreateClientView slug={props.slug} optionsRecord={optionsRecord} />
-    </div>
+    </CollectionFormLayout>
   )
 }

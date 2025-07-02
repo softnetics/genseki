@@ -4,12 +4,21 @@ import { createContext, type ReactNode, useContext } from 'react'
 
 import { UiProviders } from './ui'
 
-import type { ClientConfig, DefaultCollection, ServerConfig } from '../../core'
+import type {
+  ClientApiRouter,
+  ClientCollection,
+  ClientConfig,
+  DefaultCollection,
+  ServerConfig,
+} from '../../core'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TServerConfig extends ServerConfig = ServerConfig> = {
-  clientConfig: ClientConfig
+  clientConfig: ClientConfig<
+    Record<string, ClientCollection<any, any, any, any, any, any>>,
+    ClientApiRouter
+  >
   serverFunction: ServerFunction<TServerConfig>
 }
 
@@ -30,6 +39,14 @@ export const useCollection = <TCollection extends DefaultCollection>(slug: strin
   return collection as TCollection
 }
 
+export const useStorageAdapter = () => {
+  const context = useContext(RootContext)
+  if (!context) throw new Error('useStorageAdapter must be used within a RootProvider')
+  const storageAdapter = context.clientConfig.storageAdapter
+
+  return storageAdapter
+}
+
 export const useClientConfig = () => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useClientConfig must be used within a RootProvider')
@@ -43,7 +60,10 @@ export const useServerFunction = <TServerConfig extends ServerConfig>() => {
 }
 
 export const RootProvider = (props: {
-  clientConfig: ClientConfig
+  clientConfig: ClientConfig<
+    Record<string, ClientCollection<any, any, any, any, any, any>>,
+    ClientApiRouter
+  >
   serverFunction: ServerFunction
   children: ReactNode
 }) => {

@@ -41,6 +41,8 @@ export class Context<
   }
 }
 
+export type AnyContext = Context<any, any, any>
+
 export class RequestContext<
   const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
   const TContextValue extends Record<string, unknown> = Record<string, unknown>,
@@ -98,7 +100,7 @@ export class RequestContext<
   }
 }
 
-export type ContextToRequestContext<TContext extends Context = Context> =
+export type ContextToRequestContext<TContext extends AnyContext> =
   TContext extends Context<infer TContextValue, infer TFullSchema, infer TUser>
     ? RequestContext<TContextValue, TFullSchema, TUser>
     : never

@@ -1,23 +1,22 @@
 'use client'
 
-import type { ReactNode } from 'react'
+import { type ReactNode, startTransition, useMemo } from 'react'
 import { useFieldArray, useFormContext } from 'react-hook-form'
 
-import type { Field, FieldRelation } from '../../../../core'
-import { cn } from '../../../utils/cn'
-import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
+import { EnvelopeIcon } from '@phosphor-icons/react'
+
 import {
+  BaseIcon,
   Button,
   Checkbox,
   type CheckboxProps,
   DatePicker,
   type DatePickerProps,
-  FieldError,
   FormField,
   FormItemController,
-  Label,
   NumberField,
   type NumberFieldProps,
+  RichTextEditor,
   Select,
   SelectList,
   SelectOption,
@@ -30,7 +29,34 @@ import {
   TimeField,
   type TimeFieldProps,
   useFormItemController,
-} from '../../primitives'
+} from '@genseki/react'
+
+import type { Field, FieldRelation } from '../../../../core'
+import type { AnyContext } from '../../../../core/context'
+import { constructEditorProviderProps } from '../../../../core/richtext'
+import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
+import { useStorageAdapter } from '../../../providers/root'
+import { cn } from '../../../utils/cn'
+import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
+import { FileUploadField, type FileUploadFieldProps } from '../file-upload-field'
+
+export function AutoFileUploadField(props: FileUploadFieldProps) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <FileUploadField
+      {...props}
+      value={field.value}
+      onUploadSuccess={(fileKey) => {
+        field.onChange(fileKey)
+      }}
+      onRemoveSuccess={() => {
+        field.onChange(null)
+      }}
+      errorMessage={error?.message}
+    />
+  )
+}
 
 export function AutoTextField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
@@ -46,11 +72,28 @@ export function AutoTextField(props: TextFieldProps) {
   )
 }
 
-export function AutoNumberField(props: NumberFieldProps) {
+export function AutoPasswordField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
 
   return (
-    <NumberField
+    <TextField
+      {...props}
+      {...field}
+      type="password"
+      isRevealable
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
+    />
+  )
+}
+
+export function AutoEmailField(props: TextFieldProps) {
+  const { field, error } = useFormItemController()
+
+  return (
+    <TextField
+      type="email"
+      prefix={<BaseIcon icon={EnvelopeIcon} size="sm" />}
       {...props}
       {...field}
       errorMessage={error?.message}
@@ -59,16 +102,30 @@ export function AutoNumberField(props: NumberFieldProps) {
   )
 }
 
-export function AutoSwitch(props: SwitchProps & { label?: string }) {
-  const { field, error, formItemId } = useFormItemController()
+export function AutoNumberField(props: NumberFieldProps) {
+  const { field, error } = useFormItemController()
 
   return (
-    <div className="flex items-center gap-x-4 bg-muted p-6 rounded-md">
-      <Label htmlFor={formItemId} className="select-none">
-        {props.label ?? field.name /* Switch label is requried anyway */}
-      </Label>
-      <Switch {...props} {...field} className={cn('', props.className)} />
-      {error && <FieldError>{error.message}</FieldError>}
+    <NumberField
+      {...props}
+      {...field}
+      onChange={(value) => {
+        const validValue = !isNaN(value) ? value : null
+        field.onChange(validValue)
+      }}
+      value={field.value}
+      errorMessage={error?.message}
+      className={cn('w-full', props.className)}
+    />
+  )
+}
+
+export function AutoSwitch(props: SwitchProps & { label?: string }) {
+  const { field, id } = useFormItemController()
+
+  return (
+    <div className="pgap-y-4">
+      <Switch {...props} {...field} className={props.className} isSelected={field.value} id={id} />
     </div>
   )
 }
@@ -78,7 +135,7 @@ export function AutoCheckbox(props: CheckboxProps) {
 
   return (
     <div className="py-6">
-      <Checkbox {...props} {...field} className={cn('', props.className)} />
+      <Checkbox {...props} {...field} className={props.className} isSelected={field.value} />
     </div>
   )
 }
@@ -153,7 +210,7 @@ export function AutoSelectField(props: AutoSelectField) {
         }
       }}
     >
-      <SelectTrigger />
+      <SelectTrigger className="h-auto" />
       <SelectList items={props.items}>
         {(item) => (
           <SelectOption key={item.value} id={item.value} textValue={item.label}>
@@ -162,6 +219,47 @@ export function AutoSelectField(props: AutoSelectField) {
         )}
       </SelectList>
     </Select>
+  )
+}
+
+const AutoRichTextField = (props: {
+  name: string
+  label?: string
+  description?: string
+  isRequired?: boolean
+  placeholder?: string
+  isDisabled?: boolean
+  isPending?: boolean
+  errorMessage?: string
+  editor: ClientEditorProviderProps
+}) => {
+  const { field, error } = useFormItemController()
+
+  const storageAdapter = useStorageAdapter()
+
+  const editorProviderProps = useMemo(
+    () => constructEditorProviderProps(props.editor, storageAdapter),
+    []
+  )
+
+  return (
+    <RichTextEditor
+      label={props.label}
+      errorMessage={error?.message}
+      isRequired={props.isRequired}
+      isDisabled={props.isDisabled}
+      description={props.description}
+      editorProviderProps={{
+        ...editorProviderProps,
+        onUpdate(updateCb) {
+          startTransition(() => {
+            field.onChange(JSON.stringify(updateCb.editor.getJSON()))
+          })
+          editorProviderProps.onUpdate?.(updateCb)
+        },
+        content: field.value,
+      }}
+    />
   )
 }
 
@@ -183,7 +281,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 
 interface AutoFieldProps {
   // NOTE: This should be FieldClient but the type is not correct
-  field: Field & { fieldName: string }
+  field: Field<any, AnyContext> & { fieldName: string }
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'
@@ -194,9 +292,9 @@ export function AutoField(props: AutoFieldProps) {
   const { field, className } = props
 
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') {
-    return null
-  }
+
+  if (visibility === 'hidden') return null
+
   const disabled = visibility === 'disabled'
 
   const commonProps = {
@@ -205,9 +303,24 @@ export function AutoField(props: AutoFieldProps) {
     className: className,
     description: field.description,
     placeholder: field.placeholder,
+    isRequired: field.isRequired,
   }
 
   switch (field.type) {
+    case 'richText':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoRichTextField
+              {...commonProps}
+              editor={field.editor as ClientEditorProviderProps}
+              isDisabled={disabled}
+            />
+          }
+        />
+      )
     case 'text':
       return (
         <AutoFormField
@@ -216,7 +329,22 @@ export function AutoField(props: AutoFieldProps) {
           component={<AutoTextField {...commonProps} isDisabled={disabled} />}
         />
       )
-
+    case 'password':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoPasswordField {...commonProps} isDisabled={disabled} />}
+        />
+      )
+    case 'email':
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={<AutoEmailField {...commonProps} isDisabled={disabled} />}
+        />
+      )
     case 'number':
       return (
         <AutoFormField
@@ -231,7 +359,7 @@ export function AutoField(props: AutoFieldProps) {
         <AutoFormField
           key={commonProps.name}
           name={commonProps.name}
-          component={<AutoNumberField {...commonProps} isDisabled={disabled} />}
+          component={<AutoTimeField {...commonProps} isDisabled={disabled} />}
         />
       )
 
@@ -292,7 +420,19 @@ export function AutoField(props: AutoFieldProps) {
       return <p>COMBOBOX BOOLEAN</p>
     }
     case 'media': {
-      return <p>MEDIA</p>
+      return (
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoFileUploadField
+              {...commonProps}
+              uploadOptions={field.uploadOptions}
+              isDisabled={disabled}
+            />
+          }
+        />
+      )
     }
 
     case 'create':
@@ -497,7 +637,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 
   const createComponent = (name: string) => {
-    console.log('createComponent', name, props.field.fields)
     return Object.entries(props.field.fields).map(([key, childField]) => (
       <AutoFormField
         key={key}

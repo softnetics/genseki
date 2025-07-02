@@ -137,7 +137,7 @@ const SidebarProvider = ({
           '[--sidebar-accent:color-mix(in_oklab,var(--color-sidebar)_95%,black_5%)]',
           'dark:[--sidebar-accent:color-mix(in_oklab,var(--color-sidebar)_90%,white_10%)]',
           'text-sidebar-fg flex min-h-svh w-full',
-          'group/sidebar-root has-data-[sidebar-intent=inset]:bg-sidebar dark:has-data-[sidebar-intent=inset]:bg-bg',
+          'group/sidebar-root has-data-[sidebar-intent=inset]:bg-sidebar dark:has-data-[sidebar-intent=inset]:bg-sidebar',
           className
         )}
         ref={ref}
@@ -183,7 +183,7 @@ const sidebar = tv({
       float:
         'bg-bg p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(--spacing(4)+2px)]',
       inset: [
-        'bg-sidebar p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+--spacing(2)+2px)] dark:bg-bg',
+        'p-2 group-data-[sidebar-collapsible=dock]/sidebar-container:w-[calc(var(--sidebar-width-dock)+--spacing(2)+2px)]',
       ],
       fleet: [
         'group-data-[sidebar-collapsible=dock]/sidebar-container:w-(--sidebar-width-dock)',
@@ -270,7 +270,7 @@ const Sidebar = ({
           data-sidebar="default"
           className={twJoin(
             'text-sidebar-fg flex h-full w-full flex-col',
-            'group-data-[sidebar-intent=inset]/sidebar-container:bg-sidebar dark:group-data-[sidebar-intent=inset]/sidebar-container:bg-bg',
+            'group-data-[sidebar-intent=inset]/sidebar-container:bg-sidebar dark:group-data-[sidebar-intent=inset]/sidebar-container:bg-sidebar',
             'group-data-[sidebar-intent=float]/sidebar-container:border-(--sidebar-border) group-data-[sidebar-intent=float]/sidebar-container:bg-sidebar group-data-[sidebar-intent=float]/sidebar-container:shadow-xs group-data-[sidebar-intent=float]/sidebar-container:rounded-lg group-data-[sidebar-intent=float]/sidebar-container:border'
           )}
         >
@@ -562,7 +562,7 @@ const SidebarInset = ({ className, ref, ...props }: React.ComponentProps<'main'>
       ref={ref}
       className={twMerge(
         'peer-data-[sidebar-intent=inset]:border-(--sidebar-border) relative flex min-h-svh w-full flex-1 flex-col peer-data-[sidebar-intent=inset]:border',
-        'bg-bg dark:peer-data-[sidebar-intent=inset]:bg-sidebar peer-data-[sidebar-intent=inset]:overflow-hidden',
+        'bg-bg dark:peer-data-[sidebar-intent=inset]:bg-bg peer-data-[sidebar-intent=inset]:overflow-hidden',
         'md:peer-data-[sidebar-intent=inset]:shadow-xs peer-data-[sidebar-intent=inset]:min-h-[calc(100svh-theme(spacing.4))] md:peer-data-[sidebar-intent=inset]:m-2 md:peer-data-[sidebar-intent=inset]:ml-0 md:peer-data-[sidebar-state=collapsed]:peer-data-[sidebar-intent=inset]:ml-2 md:peer-data-[sidebar-intent=inset]:rounded-xl',
         className
       )}
