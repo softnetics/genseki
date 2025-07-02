@@ -4,7 +4,7 @@ import { me } from './me'
 import { resetPasswordEmail, validateResetToken } from './reset-password'
 import { sendEmailResetPassword } from './send-email-reset-password'
 import { signOut } from './sign-out'
-import { signUpEmail } from './sign-up'
+import { signUpEmail } from './sign-up-email'
 
 import type { Context } from '../../core/context'
 import { type AuthContext } from '../context'

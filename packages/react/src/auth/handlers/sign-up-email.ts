@@ -6,7 +6,7 @@ import { AccountProvider } from '../constant'
 import { type AuthContext } from '../context'
 import { hashPassword, setSessionCookie } from '../utils'
 
-export function signUp<const TAuthContext extends AuthContext, const TContext extends Context>(
+export function signUpEmail<const TAuthContext extends AuthContext, const TContext extends Context>(
   authContext: TAuthContext
 ) {
   const {
