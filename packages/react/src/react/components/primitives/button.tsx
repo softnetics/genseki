@@ -32,7 +32,7 @@ const buttonVariants = tv({
         'bg-none [&>*]:text-text-body text-text-body hover:bg-bluegray-50 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
       vanish:
         '[&>*]:text-secondary-fg text-secondary-fg focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
-      destruction: `[&>*]:text-white text-white bg-darkred-50 hover:bg-darkred-100
+      destruction: `[&>*]:text-white text-white bg-red-600 hover:bg-red-700
         focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
     },
     size: {

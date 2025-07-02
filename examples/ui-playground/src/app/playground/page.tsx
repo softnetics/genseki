@@ -21,6 +21,10 @@ import {
 import { StarterKit } from '@tiptap/starter-kit'
 
 import {
+  Breadcrumbs,
+  BreadcrumbsItem,
+  ButtonGroup,
+  ButtonGroupItem,
   Link,
   Switch,
   Tag,
@@ -264,7 +268,7 @@ const countries = [
 
 export default function UIPlayground() {
   return (
-    <div className="bg-bg pb-24">
+    <div className="bg-black pb-24">
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" categoryTitle="Theme playground">
           <div className="bg-bg border-border rounded-sm border px-8 py-4">
@@ -1354,6 +1358,28 @@ export default function UIPlayground() {
               </Typography>
             </div>
           </div>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Button group">
+        <PlaygroundCard title="Medium size (md)" categoryTitle="Button group">
+          <div className="flex items-center gap-x-4">
+            <ButtonGroup>
+              <ButtonGroupItem id="1d">1d</ButtonGroupItem>
+              <ButtonGroupItem id="1w">1w</ButtonGroupItem>
+              <ButtonGroupItem id="1m">1m</ButtonGroupItem>
+              <ButtonGroupItem id="1y">1y</ButtonGroupItem>
+            </ButtonGroup>
+          </div>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Breadcrumbs">
+        <PlaygroundCard title="4 items" categoryTitle="Breadcrumbs">
+          <Breadcrumbs>
+            <BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page1</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page2</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page3</BreadcrumbsItem>
+          </Breadcrumbs>
         </PlaygroundCard>
       </Wrapper>
     </div>

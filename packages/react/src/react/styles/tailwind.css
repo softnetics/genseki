@@ -77,8 +77,16 @@
   --color-ocean-800: #112a7c;
   --color-ocean-900: #08153d;
 
-  --color-darkred-50: #DC2626;
-  --color-darkred-100: #B91C1C;
+  --color-red-50: #FEF2F2;
+  --color-red-100: #FEE2E2;
+  --color-red-200: #FECACA;
+  --color-red-300: #FCA5A5;
+  --color-red-400: #F87171;
+  --color-red-500: #EF4444;
+  --color-red-600: #DC2626;
+  --color-red-700: #B91C1C;
+  --color-red-800: #991B1B;
+  --color-red-900: #450A0A;
 
   --color-black-normal: #000000;
   --color-black-vanish: rgba(0, 0, 0, 0);
