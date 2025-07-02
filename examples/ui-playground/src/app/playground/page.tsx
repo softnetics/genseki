@@ -26,6 +26,7 @@ import {
   ButtonGroup,
   ButtonGroupItem,
   Link,
+  Pagination,
   Switch,
   Tag,
   TagGroup,
@@ -1380,6 +1381,11 @@ export default function UIPlayground() {
             <BreadcrumbsItem href="/">Page2</BreadcrumbsItem>
             <BreadcrumbsItem href="/">Page3</BreadcrumbsItem>
           </Breadcrumbs>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Pagination">
+        <PlaygroundCard title="Default" categoryTitle="Pagination">
+          <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
         </PlaygroundCard>
       </Wrapper>
     </div>
