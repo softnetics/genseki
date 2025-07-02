@@ -255,9 +255,7 @@ export function phone<TContext extends Context<FullSchema>>({
     {
       method: 'POST',
       path: '/auth/verification/otp/phone',
-      body: z.object({
-        phone: z.string().min(1, 'Phone number is required'),
-      }),
+      body: z.any(),
       responses: {
         200: z.object({
           success: z.boolean(),
@@ -271,9 +269,17 @@ export function phone<TContext extends Context<FullSchema>>({
       },
     },
     async ({ context, body }) => {
-      const { phone } = body
       // TODO: Fix type
-      const user = (await context.requiredAuthenticated()) as { id: string }
+      const user = (await context.requiredAuthenticated()) as { id: string; phone?: string }
+
+      if (!user.phone) {
+        return {
+          status: 400 as const,
+          body: { success: false, error: 'Phone number is required in user profile' },
+        }
+      }
+
+      const phone = user.phone
 
       if (!sendOtp) {
         return {
