@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 
 import { IconGallery, IconGrid4, IconLink, IconRedo, IconUndo } from '@intentui/icons'
 import {
@@ -30,6 +30,7 @@ import {
   Pagination,
   Radio,
   RadioGroup,
+  ReorderGroup,
   Switch,
   Tag,
   TagGroup,
@@ -270,7 +271,30 @@ const countries = [
   },
 ]
 
+interface ReorderMockData {
+  id: string
+  text: string
+}
+
+const mockDataReorder: ReorderMockData[] = [
+  { id: 'id1', text: 'Button 1' },
+  { id: 'id2', text: 'Button 2' },
+  { id: 'id3', text: 'Button 3' },
+  { id: 'id4', text: 'Button 4' },
+  { id: 'id5', text: 'Button 5' },
+]
+
 export default function UIPlayground() {
+  const [btnData, setBtnData] = useState<ReorderMockData[]>(mockDataReorder)
+
+  // Map new order
+  const handleReorder = (newOrder: string[]) => {
+    setBtnData((prev) => {
+      const map = new Map(prev.map((item) => [item.id, item]))
+      return newOrder.map((id) => map.get(id)).filter((b): b is ReorderMockData => Boolean(b))
+    })
+  }
+
   return (
     <div className="bg-black pb-24">
       <Wrapper title="Theme playground">
@@ -1424,6 +1448,17 @@ export default function UIPlayground() {
             maxSize: 1024 * 1024 * 2,
           }}
         />
+      </Wrapper>
+
+      <Wrapper title="Reorder group">
+        <ReorderGroup title="Reorder Item" onReorder={handleReorder}>
+          {btnData.map((b) => (
+            // key use for reorder group
+            <div key={b.id} className="p-4 bg-bluegray-600 text-bluegray-50">
+              {b.text}
+            </div>
+          ))}
+        </ReorderGroup>
       </Wrapper>
     </div>
   )
