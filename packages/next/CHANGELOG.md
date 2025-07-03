@@ -1,5 +1,14 @@
 # @genseki/next
 
+## 0.1.0-alpha.10
+
+### Patch Changes
+
+- [#70](https://github.com/softnetics/genseki/pull/70) [`ba3ea68`](https://github.com/softnetics/genseki/commit/ba3ea6839f707612ee71a5123c0eca99376ac905) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix catching error in nextjs resource route
+
+- Updated dependencies []:
+  - @genseki/react@0.1.0-alpha.10
+
 ## 0.1.0-alpha.9
 
 ### Patch Changes
