@@ -1,5 +1,16 @@
 # @example/erp
 
+## 0.1.0-alpha.8
+
+### Patch Changes
+
+- Updated dependencies [[`ba3ea68`](https://github.com/softnetics/genseki/commit/ba3ea6839f707612ee71a5123c0eca99376ac905)]:
+  - @genseki/next@0.1.0-alpha.10
+  - @genseki/react@0.1.0-alpha.10
+  - @genseki/rest@0.1.0-alpha.10
+  - @genseki/react-query@0.1.0-alpha.10
+  - @genseki/plugins@0.1.0-alpha.10
+
 ## 0.1.0-alpha.7
 
 ### Patch Changes
