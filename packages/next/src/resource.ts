@@ -50,21 +50,31 @@ async function makeApiRoute(
   const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
   const context = Context.toRequestContext(authContext, reqHeaders)
 
-  const rawResponse = await route.handler({
-    context,
-    headers: reqHeaders,
-    pathParams: pathParams,
-    query: reqSearchParams,
-    body,
-  })
+  try {
+    const rawResponse = await route.handler({
+      context,
+      headers: reqHeaders,
+      pathParams: pathParams,
+      query: reqSearchParams,
+      body,
+    })
 
-  return new Response(JSON.stringify(rawResponse.body) as any, {
-    status: rawResponse.status,
-    headers: {
-      'Content-Type': 'application/json',
-      ...rawResponse.headers,
-    },
-  })
+    return new Response(JSON.stringify(rawResponse.body) as any, {
+      status: rawResponse.status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...rawResponse.headers,
+      },
+    })
+  } catch (error: any) {
+    console.error('Error in API route:', error)
+    return Response.json(
+      {
+        message: error.message || 'Internal Server Error',
+      },
+      { status: error.status || 500 }
+    )
+  }
 }
 
 async function lookupRoute(
