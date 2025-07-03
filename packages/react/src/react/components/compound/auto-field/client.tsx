@@ -663,7 +663,9 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               <div>
                 {props.field.label} #{index + 1}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`)}
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                connectComponent(`${props.name}.${field.fieldName}.${index}.connect`)
+              )}
             </div>
           ))}
           <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
@@ -679,7 +681,9 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               <div>
                 {props.field.label} #{index + 1}
               </div>
-              {createComponent(`${props.name}.${index}.create`)}
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                createComponent(`${props.name}.${field.fieldName}.${index}.create`)
+              )}
             </div>
           ))}
           <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
@@ -696,8 +700,12 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               <div>
                 {props.field.label} #{index + 1}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`)}
-              {createComponent(`${props.name}.${index}.create`)}
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                connectComponent(`${props.name}.${field.fieldName}.${index}.connect`)
+              )}
+              {Object.entries(props.field.fields).map(([key, field]) =>
+                createComponent(`${props.name}.${field.fieldName}.${index}.create`)
+              )}
             </div>
           ))}
           <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
