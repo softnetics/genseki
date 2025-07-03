@@ -1,5 +1,14 @@
 # @genseki/next
 
+## 0.1.0-alpha.11
+
+### Patch Changes
+
+- [#72](https://github.com/softnetics/genseki/pull/72) [`51dd567`](https://github.com/softnetics/genseki/commit/51dd567d24373d87a233b8993dad1fdb85c61b1b) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix nextjs resource route response
+
+- Updated dependencies []:
+  - @genseki/react@0.1.0-alpha.11
+
 ## 0.1.0-alpha.10
 
 ### Patch Changes
