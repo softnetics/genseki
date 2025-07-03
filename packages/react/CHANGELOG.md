@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.12
+
+### Patch Changes
+
+- [#76](https://github.com/softnetics/genseki/pull/76) [`4322698`](https://github.com/softnetics/genseki/commit/4322698c86e3677d031f158e0102ddd020321700) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix request context misconfigure
+
 ## 0.1.0-alpha.11
 
 ## 0.1.0-alpha.10
