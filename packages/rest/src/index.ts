@@ -10,8 +10,11 @@ import type {
 
 import { withPathParams, withQueryParams } from './utils'
 
+type Before = (request: Request) => void
+
 export interface CreateRestClientConfig {
   baseUrl: string
+  before?: Before[]
 }
 
 interface AnyPayload {
@@ -28,12 +31,20 @@ async function makeFetch(
   config: CreateRestClientConfig
 ) {
   const fullPath = withQueryParams(withPathParams(path, payload?.pathParams), payload?.query)
-  const response = await fetch(`${config.baseUrl}${fullPath}`, {
+
+  const request = new Request(`${config.baseUrl}${fullPath}`, {
     method: method,
     // TODO: Support uploading file and plain text
     headers: { 'Content-Type': 'application/json', ...payload?.headers },
     body: payload.body ? JSON.stringify(payload.body) : null,
   })
+
+  for (const before of config.before ?? []) {
+    before(request)
+  }
+
+  const response = await fetch(request)
+
   return response.json() as any
 }
 

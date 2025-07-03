@@ -8,6 +8,13 @@
       "when": 1750223054875,
       "tag": "0000_gorgeous_callisto",
       "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1751345264268,
+      "tag": "0001_tricky_strong_guy",
+      "breakpoints": true
     }
   ]
 }

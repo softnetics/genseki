@@ -22,8 +22,11 @@ export async function handleServerFunction<
     if (!apiRoute) {
       throw new Error(`No API route found for method: ${args.method as string}`)
     }
-    const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
-    const context = Context.toRequestContext(authContext, args.headers)
+    const { authContext } = createAuth(serverConfig.auth, serverConfig.context)
+    const context = Context.toRequestContext(serverConfig.context, {
+      authContext,
+      headers: args.headers,
+    })
 
     const response = await apiRoute.handler({
       ...args,

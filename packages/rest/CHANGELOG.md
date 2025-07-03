@@ -1,5 +1,17 @@
 # @genseki/rest
 
+## 0.1.0-alpha.11
+
+## 0.1.0-alpha.10
+
+## 0.1.0-alpha.9
+
+## 0.1.0-alpha.8
+
+### Minor Changes
+
+- [#65](https://github.com/softnetics/genseki/pull/65) [`39f4197`](https://github.com/softnetics/genseki/commit/39f41976fac7c62ea30456ed4a6ef411925fb7de) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Add "before" middleware to alter Request object
+
 ## 0.1.0-alpha.7
 
 ## 0.1.0-alpha.6

@@ -39,7 +39,6 @@ export interface QueryClient<TApiRouter extends ApiRouter> {
   >(
     method: TMethod,
     path: TPath,
-    payload: TPayload,
     options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
   ) => UseMutationResult<TResponse, TError, TPayload, TContext>
   queryOptions: <
@@ -64,7 +63,6 @@ export interface QueryClient<TApiRouter extends ApiRouter> {
   >(
     method: TMethod,
     path: TPath,
-    payload: TPayload,
     options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
   ) => UseMutationOptions<TResponse, TError, TPayload, TContext>
 }

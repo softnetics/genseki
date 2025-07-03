@@ -47,24 +47,40 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
-  const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
-  const context = Context.toRequestContext(authContext, reqHeaders)
-
-  const rawResponse = await route.handler({
-    context,
+  const { authContext } = createAuth(serverConfig.auth, serverConfig.context)
+  const context = Context.toRequestContext(serverConfig.context, {
+    authContext,
     headers: reqHeaders,
-    pathParams: pathParams,
-    query: reqSearchParams,
-    body,
   })
 
-  return new Response(JSON.stringify(rawResponse.body) as any, {
-    status: rawResponse.status,
-    headers: {
-      'Content-Type': 'application/json',
-      ...rawResponse.headers,
-    },
-  })
+  try {
+    const rawResponse = await route.handler({
+      context,
+      headers: reqHeaders,
+      pathParams: pathParams,
+      query: reqSearchParams,
+      body,
+    })
+
+    return new Response(JSON.stringify(rawResponse) as any, {
+      status: rawResponse.status,
+      headers: {
+        'Content-Type': 'application/json',
+        ...rawResponse.headers,
+      },
+    })
+  } catch (error: any) {
+    console.error('Error in API route:', error)
+    return Response.json(
+      {
+        status: error.status || 500,
+        body: {
+          message: error.message || 'Internal Server Error',
+        },
+      },
+      { status: error.status || 500 }
+    )
+  }
 }
 
 async function lookupRoute(

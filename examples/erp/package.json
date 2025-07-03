@@ -1,6 +1,6 @@
 {
   "name": "@example/erp",
-  "version": "0.1.0-alpha.5",
+  "version": "0.1.0-alpha.9",
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev --turbopack",
@@ -16,6 +16,7 @@
   "dependencies": {
     "@genseki/next": "workspace:^",
     "@genseki/react": "workspace:^",
+    "@genseki/plugins": "workspace:^",
     "@genseki/react-query": "workspace:^",
     "@genseki/rest": "workspace:^",
     "@tailwindcss/postcss": "^4.1.7",

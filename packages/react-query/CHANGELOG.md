@@ -1,5 +1,17 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.11
+
+## 0.1.0-alpha.10
+
+## 0.1.0-alpha.9
+
+### Patch Changes
+
+- [#68](https://github.com/softnetics/genseki/pull/68) [`6fc1d78`](https://github.com/softnetics/genseki/commit/6fc1d787522c0df9d17125f70fb2338f4033d002) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix remove payload from useMutation
+
+## 0.1.0-alpha.8
+
 ## 0.1.0-alpha.7
 
 ## 0.1.0-alpha.6

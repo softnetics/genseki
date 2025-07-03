@@ -1,5 +1,51 @@
 # @example/erp
 
+## 0.1.0-alpha.9
+
+### Patch Changes
+
+- Updated dependencies [[`51dd567`](https://github.com/softnetics/genseki/commit/51dd567d24373d87a233b8993dad1fdb85c61b1b)]:
+  - @genseki/next@0.1.0-alpha.11
+  - @genseki/react@0.1.0-alpha.11
+  - @genseki/rest@0.1.0-alpha.11
+  - @genseki/react-query@0.1.0-alpha.11
+  - @genseki/plugins@0.1.0-alpha.11
+
+## 0.1.0-alpha.8
+
+### Patch Changes
+
+- Updated dependencies [[`ba3ea68`](https://github.com/softnetics/genseki/commit/ba3ea6839f707612ee71a5123c0eca99376ac905)]:
+  - @genseki/next@0.1.0-alpha.10
+  - @genseki/react@0.1.0-alpha.10
+  - @genseki/rest@0.1.0-alpha.10
+  - @genseki/react-query@0.1.0-alpha.10
+  - @genseki/plugins@0.1.0-alpha.10
+
+## 0.1.0-alpha.7
+
+### Patch Changes
+
+- Updated dependencies [[`6fc1d78`](https://github.com/softnetics/genseki/commit/6fc1d787522c0df9d17125f70fb2338f4033d002)]:
+  - @genseki/react-query@0.1.0-alpha.9
+  - @genseki/react@0.1.0-alpha.9
+  - @genseki/next@0.1.0-alpha.9
+  - @genseki/rest@0.1.0-alpha.9
+  - @genseki/plugins@0.1.0-alpha.9
+
+## 0.1.0-alpha.6
+
+### Patch Changes
+
+- [#67](https://github.com/softnetics/genseki/pull/67) [`49927f2`](https://github.com/softnetics/genseki/commit/49927f2f7593ad4c43895789948291b02e52f2bb) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Add Phone plugins
+
+- Updated dependencies [[`49927f2`](https://github.com/softnetics/genseki/commit/49927f2f7593ad4c43895789948291b02e52f2bb), [`39f4197`](https://github.com/softnetics/genseki/commit/39f41976fac7c62ea30456ed4a6ef411925fb7de)]:
+  - @genseki/plugins@0.1.0-alpha.8
+  - @genseki/react@0.1.0-alpha.8
+  - @genseki/rest@0.1.0-alpha.8
+  - @genseki/next@0.1.0-alpha.8
+  - @genseki/react-query@0.1.0-alpha.8
+
 ## 0.1.0-alpha.5
 
 ### Patch Changes
