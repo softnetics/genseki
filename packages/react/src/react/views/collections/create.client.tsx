@@ -67,6 +67,7 @@ export function CreateClientView(props: CreateClientViewProps) {
         ))}
         <SubmitButton>Create</SubmitButton>
       </form>
+      {JSON.stringify(form.getValues(), null, 2)}
     </Form>
   )
 }

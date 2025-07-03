@@ -25,8 +25,6 @@ export const user = pgTable('user', {
   email: text('email').notNull().unique(),
   emailVerified: boolean('email_verified').notNull().default(false),
   image: text('image'),
-  phone: text('phone'),
-  phoneVerified: boolean('phone_verified').default(false),
   ...timestamps,
 })
 
@@ -117,8 +115,24 @@ export const foods = pgTable('foods', {
   description: json(),
   cookingTypes: typesEnum().notNull().default('other'),
   cookingDuration: decimal({ mode: 'number' }).notNull(),
-  foodAvatar: text(),
   // TODO: Make type infer for {mode:"string" | "date"}
   cookingDate: date().notNull().defaultNow(), // YYYY-MM-DD
   cookingTime: time().notNull().defaultNow(), // 00:00:00 - 24:00:00
 })
+
+export const foodsRelations = relations(foods, ({ many }) => ({
+  foodImages: many(foodImages),
+}))
+
+export const foodImages = pgTable('foodImages', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  url: text('url').notNull(),
+  foodId: uuid('foodId').references(() => foods.id),
+})
+
+export const foodImagesRelations = relations(foodImages, ({ one }) => ({
+  food: one(foods, {
+    fields: [foodImages.foodId],
+    references: [foods.id],
+  }),
+}))
