@@ -48,7 +48,7 @@ export function SignUpClientForm() {
 
   const onValid = async (data: FormSchema) => {
     const response = await serverFunction({
-      method: 'auth.signUpEmail',
+      method: 'auth.signUp',
       body: data,
       headers: {},
       query: {},
