@@ -20,8 +20,11 @@ export async function CreateView<TServerConfig extends ServerConfig>(
   if (!collection) throw new Error(`Collection ${props.slug} not found`)
 
   const headersValue = getHeadersObject(props.headers)
-  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
-  const context = Context.toRequestContext(authContext, headersValue)
+  const { authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(props.serverConfig.context, {
+    authContext,
+    headers: headersValue,
+  })
 
   const optionsRecord = await createOptionsRecord(context, collection.fields)
 

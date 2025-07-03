@@ -47,8 +47,11 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
-  const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
-  const context = Context.toRequestContext(authContext, reqHeaders)
+  const { authContext } = createAuth(serverConfig.auth, serverConfig.context)
+  const context = Context.toRequestContext(serverConfig.context, {
+    authContext,
+    headers: reqHeaders,
+  })
 
   try {
     const rawResponse = await route.handler({

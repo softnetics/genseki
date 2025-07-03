@@ -29,8 +29,11 @@ export async function ListView(props: ListViewProps) {
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
-  const { context: authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
-  const context = Context.toRequestContext(authContext, headersValue)
+  const { authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
+  const context = Context.toRequestContext(props.serverConfig.context, {
+    authContext,
+    headers: headersValue,
+  })
 
   const result = await collection.admin.endpoints.findMany.handler({
     context,
