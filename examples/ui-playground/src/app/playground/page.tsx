@@ -25,6 +25,7 @@ import {
   BreadcrumbsItem,
   ButtonGroup,
   ButtonGroupItem,
+  FileUploadField,
   Link,
   Pagination,
   Radio,
@@ -1391,15 +1392,38 @@ export default function UIPlayground() {
         </PlaygroundCard>
       </Wrapper>
       <Wrapper title="Radio group">
-        <PlaygroundCard title="Default" categoryTitle="Radio group">
-          <RadioGroup aria-label="Radio">
-            <Radio value="x">X</Radio>
-            <Radio value="y">Y</Radio>
-            <Radio value="z" isDisabled>
-              Z
-            </Radio>
-          </RadioGroup>
-        </PlaygroundCard>
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Radio group">
+            <RadioGroup aria-label="Radio">
+              <Radio value="x">X</Radio>
+              <Radio value="y">Y</Radio>
+              <Radio value="z" isDisabled>
+                Z
+              </Radio>
+            </RadioGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Small size (sm)" categoryTitle="Radio group">
+            <RadioGroup aria-label="Radio">
+              <Radio value="x" size="sm">
+                X
+              </Radio>
+              <Radio value="y" size="sm">
+                Y
+              </Radio>
+              <Radio value="z" isDisabled size="sm">
+                Z
+              </Radio>
+            </RadioGroup>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+      <Wrapper title="File upload field">
+        <FileUploadField
+          uploadOptions={{
+            mimeTypes: ['image/png', 'image/jpeg', 'image/gif'],
+            maxSize: 1024 * 1024 * 2,
+          }}
+        />
       </Wrapper>
     </div>
   )
