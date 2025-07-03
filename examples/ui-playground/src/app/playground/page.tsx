@@ -25,7 +25,6 @@ import {
   BreadcrumbsItem,
   ButtonGroup,
   ButtonGroupItem,
-  FileUploadField,
   Link,
   Pagination,
   Radio,
@@ -1440,14 +1439,6 @@ export default function UIPlayground() {
             </RadioGroup>
           </PlaygroundCard>
         </div>
-      </Wrapper>
-      <Wrapper title="File upload field">
-        <FileUploadField
-          uploadOptions={{
-            mimeTypes: ['image/png', 'image/jpeg', 'image/gif'],
-            maxSize: 1024 * 1024 * 2,
-          }}
-        />
       </Wrapper>
 
       <Wrapper title="Reorder group">

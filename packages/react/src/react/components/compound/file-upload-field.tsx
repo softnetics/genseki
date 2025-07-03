@@ -13,6 +13,7 @@ import type { DropEvent, FileDropItem } from '@react-types/shared'
 import { toast } from 'sonner'
 
 import { mimeTypeValidate } from '../../../core/utils'
+import { useStorageAdapter } from '../../providers/root'
 import {
   BaseIcon,
   Button,
@@ -111,7 +112,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   const [uploadStatus, setUploadStatus] = useState<'pending' | 'success' | 'failed' | undefined>(
     undefined
   )
-  // const storageAdapter = useStorageAdapter()
+  const storageAdapter = useStorageAdapter()
   const inputRef = useRef<HTMLInputElement>(null)
   const maxSize = props.uploadOptions?.maxSize || 1024 * 1024 * 1
   const readableMaxSize = `${maxSize / 1024 / 1024}MB`
@@ -129,13 +130,13 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     }
 
     // Check for storage adapter availability
-    // if (!storageAdapter) {
-    //   toast.error('Storage adater is missing', {
-    //     description: 'Check the config file if you have provided the adapter',
-    //   })
-    //   props.onUploadFail?.('Storage adater is missing')
-    //   return
-    // }
+    if (!storageAdapter) {
+      toast.error('Storage adater is missing', {
+        description: 'Check the config file if you have provided the adapter',
+      })
+      props.onUploadFail?.('Storage adater is missing')
+      return
+    }
 
     // Show toast if file amount is exceed
     if (files.length > limit) {
@@ -174,18 +175,10 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     const key = `${crypto.randomUUID()}-${targetFile.name}`
 
     // Get signed URL
-    // const putObjSignedUrl = await generatePutObjSignedUrlData(
-    //   storageAdapter.grabPutObjectSignedUrlApiRoute.path,
-    //   key
-    // )
-
-    const putObjSignedUrl = {
-      ok: true,
-      data: {
-        signedUrl: 'https://picsum.photos/200',
-      },
-      message: 'success',
-    }
+    const putObjSignedUrl = await generatePutObjSignedUrlData(
+      storageAdapter.grabPutObjectSignedUrlApiRoute.path,
+      key
+    )
 
     if (!putObjSignedUrl.ok) {
       props.onUploadFail?.(putObjSignedUrl.message || 'generating put object signed URL error')
@@ -197,12 +190,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     }
 
     // Upload file using signed URL
-    // const uploadResult = await uploadObject(putObjSignedUrl.data.signedUrl, targetFile)
-
-    const uploadResult = {
-      ok: true,
-      message: 'success',
-    }
+    const uploadResult = await uploadObject(putObjSignedUrl.data.signedUrl, targetFile)
 
     if (!uploadResult.ok) {
       props.onUploadFail?.(uploadResult.message || 'File upload error')
