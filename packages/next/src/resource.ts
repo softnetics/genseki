@@ -59,7 +59,7 @@ async function makeApiRoute(
       body,
     })
 
-    return new Response(JSON.stringify(rawResponse.body) as any, {
+    return new Response(JSON.stringify(rawResponse) as any, {
       status: rawResponse.status,
       headers: {
         'Content-Type': 'application/json',
@@ -70,7 +70,10 @@ async function makeApiRoute(
     console.error('Error in API route:', error)
     return Response.json(
       {
-        message: error.message || 'Internal Server Error',
+        status: error.status || 500,
+        body: {
+          message: error.message || 'Internal Server Error',
+        },
       },
       { status: error.status || 500 }
     )
