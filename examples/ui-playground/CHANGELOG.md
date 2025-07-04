@@ -1,5 +1,25 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.12
+
+### Patch Changes
+
+- Updated dependencies [[`a9fc278`](https://github.com/softnetics/genseki/commit/a9fc2786cf838a12b3b701d0cdb008ce24da2878)]:
+  - @genseki/react@0.1.0-alpha.13
+  - @genseki/next@0.1.0-alpha.13
+  - @genseki/react-query@0.1.0-alpha.13
+  - @genseki/rest@0.1.0-alpha.13
+
+## 0.1.0-alpha.11
+
+### Patch Changes
+
+- Updated dependencies [[`4322698`](https://github.com/softnetics/genseki/commit/4322698c86e3677d031f158e0102ddd020321700)]:
+  - @genseki/react@0.1.0-alpha.12
+  - @genseki/next@0.1.0-alpha.12
+  - @genseki/react-query@0.1.0-alpha.12
+  - @genseki/rest@0.1.0-alpha.12
+
 ## 0.1.0-alpha.10
 
 ### Patch Changes
