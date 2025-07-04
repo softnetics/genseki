@@ -19,6 +19,7 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { StarterKit } from '@tiptap/starter-kit'
+import { useTheme } from 'next-themes'
 
 import {
   Breadcrumbs,
@@ -284,6 +285,7 @@ const mockDataReorder: ReorderMockData[] = [
 ]
 
 export default function UIPlayground() {
+  const { setTheme, theme } = useTheme()
   const [btnData, setBtnData] = useState<ReorderMockData[]>(mockDataReorder)
 
   // Map new order
@@ -295,7 +297,16 @@ export default function UIPlayground() {
   }
 
   return (
-    <div className="bg-black pb-24">
+    <div className="bg-white pb-24 relative dark:bg-black">
+      <div className="fixed top-6 right-6 z-50">
+        <Button
+          variant={theme === 'dark' ? 'secondary' : 'primary'}
+          size="md"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          {theme === 'dark' ? 'Light' : 'Dark'}
+        </Button>
+      </div>
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" categoryTitle="Theme playground">
           <div className="bg-bg border-border rounded-sm border px-8 py-4">
