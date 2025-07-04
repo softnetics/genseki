@@ -62,3 +62,4 @@ export type {
   WithHasDefault,
   WithNotNull,
 } from './table'
+export { getDefaultValueFromFields } from './utils'
