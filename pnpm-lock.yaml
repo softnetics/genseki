@@ -30,6 +30,22 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
+<<<<<<< Updated upstream
+=======
+  examples/demo-prisma-generator:
+    dependencies:
+      '@prisma/client':
+        specifier: ^6.10.1
+        version: 6.10.1(prisma@6.10.1(typescript@5.8.2))(typescript@5.8.2)
+    devDependencies:
+      '@genseki/prisma-generator':
+        specifier: workspace:^
+        version: link:../../packages/prisma-generator
+      prisma:
+        specifier: ^6.10.1
+        version: 6.10.1(typescript@5.8.2)
+
+>>>>>>> Stashed changes
   examples/erp:
     dependencies:
       '@genseki/next':
