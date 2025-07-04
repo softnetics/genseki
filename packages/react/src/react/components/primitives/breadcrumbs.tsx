@@ -14,7 +14,7 @@ interface BreadcrumbsContextProps {
 }
 
 const BreadcrumbsProvider = createContext<BreadcrumbsContextProps>({
-  separator: 'chevron',
+  separator: 'slash',
 })
 
 const Breadcrumbs = <T extends object>({
@@ -42,12 +42,15 @@ const BreadcrumbsItem = ({
 }: BreadcrumbsItemProps & Partial<Omit<LinkProps, 'className'>>) => {
   const { separator: contextSeparator } = use(BreadcrumbsProvider)
   separator = contextSeparator ?? separator
-  const separatorValue = separator === true ? 'chevron' : separator
+  const separatorValue = separator === true ? 'slash' : separator
 
   return (
     <Breadcrumb
       {...props}
-      className={composeTailwindRenderProps(className, 'flex items-center gap-2 text-sm')}
+      className={composeTailwindRenderProps(
+        className,
+        'flex items-center gap-2 text-base font-medium'
+      )}
     >
       {({ isCurrent }) => (
         <>
@@ -60,15 +63,11 @@ const BreadcrumbsItem = ({
   )
 }
 
-const Separator = ({
-  separator = 'chevron',
-}: {
-  separator?: BreadcrumbsItemProps['separator']
-}) => {
+const Separator = ({ separator = 'slash' }: { separator?: BreadcrumbsItemProps['separator'] }) => {
   return (
-    <span className="*:text-muted-fg *:shrink-0 *:data-[slot=icon]:size-3.5">
+    <span className="*:text-text-muted-fg *:shrink-0 *:data-[slot=icon]:size-3.5">
       {separator === 'chevron' && <IconChevronLgRight />}
-      {separator === 'slash' && <span className="text-muted-fg">/</span>}
+      {separator === 'slash' && <span className="text-bluegray-400">/</span>}
     </span>
   )
 }
