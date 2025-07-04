@@ -30,14 +30,16 @@ export function signOut<const TAuthContext extends AuthContext, const TContext e
       throw new Error('No session cookie found')
     }
 
+    const responseHeaders = {}
     await internalHandlers.session.deleteById(cookie)
-    deleteSessionCookie(args.headers)
+    deleteSessionCookie(responseHeaders)
 
     return {
       status: 200,
       body: {
         status: 'ok',
       },
+      headers: responseHeaders,
     }
   }
 
