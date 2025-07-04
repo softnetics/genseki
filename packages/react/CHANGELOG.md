@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.14
+
+### Patch Changes
+
+- [#86](https://github.com/softnetics/genseki/pull/86) [`17efb99`](https://github.com/softnetics/genseki/commit/17efb99fb6f2621cf7d808e12e38ddfc52031240) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix logout which was not setting the empty session cookie in the response headers
+
 ## 0.1.0-alpha.13
 
 ### Patch Changes
