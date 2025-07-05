@@ -19,7 +19,7 @@ async function _getUser(serverFunction: ServerFunction, headers: Headers): Promi
     body: {},
     pathParams: {},
     query: {},
-  })
+  } as unknown as never)
 
   if (response.status !== 200) {
     return null

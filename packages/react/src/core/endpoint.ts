@@ -2,7 +2,7 @@ import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import { z, type ZodType } from 'zod/v4'
 
 import type { MaybePromise } from './collection'
-import type { AnyContext, ContextToRequestContext } from './context'
+import type { AnyContextable, ContextToRequestContext } from './context'
 import type { ConditionalExceptNever } from './utils'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
@@ -53,7 +53,7 @@ export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = Con
 >
 
 export type ApiRouteHandlerPayloadWithContext<
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TApiRouteSchema extends ApiRouteSchema,
 > = ApiRouteHandlerPayload<TApiRouteSchema> & {
   context: ContextToRequestContext<TContext>
@@ -71,7 +71,7 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
   payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
@@ -111,7 +111,7 @@ export interface ApiRouteMutationSchema extends ApiRouteCommonSchema {
 export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
 
 export type ApiRoute<
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
@@ -132,7 +132,7 @@ export type AppendPrefixPathToApiRoute<
       : never
     : never
 
-export interface ApiRouter<in TContext extends AnyContext = AnyContext> {
+export interface ApiRouter<in TContext extends AnyContextable = AnyContextable> {
   [key: string]: ApiRoute<TContext, any>
 }
 
@@ -151,19 +151,19 @@ export interface ClientApiRouter {
   [key: string]: ClientApiRouteSchema
 }
 
-export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<AnyContext>> = {
+export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<AnyContextable>> = {
   [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, any>
     ? TApiRouter[TKey]['schema']
     : never
 }
 
-export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<AnyContext>> = {
+export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<AnyContextable>> = {
   [TKey in keyof TApiRouter]: ClientApiRouteSchema
 }
 
 export function createEndpoint<
   const TApiEndpointSchema extends ApiRouteSchema,
-  const TContext extends AnyContext = AnyContext,
+  const TContext extends AnyContextable = AnyContextable,
 >(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
   return {
     schema,

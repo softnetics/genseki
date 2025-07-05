@@ -12,7 +12,7 @@ import {
 } from '@genseki/react'
 
 import { EditorSlotBefore } from '../editor/slot-before'
-import { builder } from '../helper'
+import { builder, db } from '../helper'
 
 export const foodsCollection = builder.collection('foods', {
   slug: 'foods',
@@ -94,8 +94,8 @@ export const foodsCollection = builder.collection('foods', {
       type: 'selectText',
       label: 'Cooking types',
       isRequired: true,
-      options: (args) => {
-        const res = args.db._.schema?.foods.columns.cookingTypes.enumValues || []
+      options: () => {
+        const res = db._.schema?.foods.columns.cookingTypes.enumValues || []
 
         return res.map((v) => ({ label: v, value: v }))
       },

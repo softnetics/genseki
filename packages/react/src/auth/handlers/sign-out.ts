@@ -1,13 +1,14 @@
 import z from 'zod/v4'
 
-import type { AnyContext } from '../../core/context'
+import type { AnyContextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
 import { type AuthContext } from '../context'
 import { deleteSessionCookie, getSessionCookie } from '../utils'
 
-export function signOut<const TAuthContext extends AuthContext, const TContext extends AnyContext>(
-  authContext: TAuthContext
-) {
+export function signOut<
+  const TAuthContext extends AuthContext,
+  const TContext extends AnyContextable,
+>(authContext: TAuthContext) {
   const { internalHandlers } = authContext
 
   const schema = {

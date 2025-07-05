@@ -3,7 +3,7 @@ import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 import { ListTable } from './list.client'
 
 import type { ServerConfig } from '../../../core'
-import { Context, createAuth, getClientCollection } from '../../../core'
+import { getClientCollection } from '../../../core'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
@@ -29,9 +29,7 @@ export async function ListView(props: ListViewProps) {
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
-  const { authContext } = createAuth(props.serverConfig.auth, props.serverConfig.context)
-  const context = Context.toRequestContext(props.serverConfig.context, {
-    authContext,
+  const context = props.serverConfig.context.toRequestContext({
     headers: headersValue,
   })
 

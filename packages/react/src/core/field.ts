@@ -11,7 +11,7 @@ import type { ZodObject, ZodOptional } from 'zod/v4'
 import z from 'zod/v4'
 
 import { ApiDefaultMethod, type MaybePromise } from './collection'
-import type { AnyContext, Context, ContextToRequestContext } from './context'
+import type { AnyContextable, ContextToRequestContext } from './context'
 import type { ServerConfigEditorProviderProps } from './richtext/types'
 import {
   appendFieldNameToFields,
@@ -22,7 +22,7 @@ import {
 
 import type { FileUploadOptionsProps } from '../react/components/compound/file-upload-field'
 
-export type OptionCallback<TType extends string | number, in TContext extends AnyContext> = (
+export type OptionCallback<TType extends string | number, in TContext extends AnyContextable> = (
   args: ContextToRequestContext<TContext>
 ) => MaybePromise<Array<{ label: string; value: TType }>>
 
@@ -66,7 +66,7 @@ export type FieldBase = {
   create?: FieldMutateMode
 }
 
-export interface FieldColumnJsonCollectionOptions<in TContext extends AnyContext = AnyContext> {
+export interface FieldColumnJsonCollectionOptions {
   richText: {
     type: 'richText'
     default?: string
@@ -74,7 +74,9 @@ export interface FieldColumnJsonCollectionOptions<in TContext extends AnyContext
   } & FieldBase
 }
 
-export interface FieldColumnStringCollectionOptions<in TContext extends AnyContext = AnyContext> {
+export interface FieldColumnStringCollectionOptions<
+  in TContext extends AnyContextable = AnyContextable,
+> {
   text: {
     type: 'text'
     default?: string
@@ -107,7 +109,7 @@ export interface FieldColumnStringCollectionOptions<in TContext extends AnyConte
 }
 
 export interface FieldColumnStringArrayCollectionOptions<
-  in TContext extends AnyContext = AnyContext,
+  in TContext extends AnyContextable = AnyContextable,
 > {
   comboboxText: {
     type: 'comboboxText'
@@ -116,7 +118,9 @@ export interface FieldColumnStringArrayCollectionOptions<
   } & FieldBase
 }
 
-export interface FieldColumnNumberCollectionOptions<TContext extends AnyContext = AnyContext> {
+export interface FieldColumnNumberCollectionOptions<
+  TContext extends AnyContextable = AnyContextable,
+> {
   number: {
     type: 'number'
     default?: number
@@ -128,7 +132,9 @@ export interface FieldColumnNumberCollectionOptions<TContext extends AnyContext 
   } & FieldBase
 }
 
-export interface FieldColumnNumberArrayCollectionOptions<TContext extends AnyContext = AnyContext> {
+export interface FieldColumnNumberArrayCollectionOptions<
+  TContext extends AnyContextable = AnyContextable,
+> {
   comboboxNumber: {
     type: 'comboboxNumber'
     options: OptionCallback<number, TContext>
@@ -162,7 +168,7 @@ export interface FieldColumnDateCollectionOptions {
 }
 
 export type FieldRelationCollectionOptions<
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
   TInputType extends string | number = string | number,
 > = {
   connect: {
@@ -181,8 +187,8 @@ export type FieldRelationCollectionOptions<
   } & FieldBase
 }
 
-export type FieldColumnCollection<TContext extends Context = Context> =
-  FieldColumnJsonCollectionOptions<TContext> &
+export type FieldColumnCollection<TContext extends AnyContextable = AnyContextable> =
+  FieldColumnJsonCollectionOptions &
     FieldColumnStringCollectionOptions<TContext> &
     FieldColumnStringArrayCollectionOptions<TContext> &
     FieldColumnNumberCollectionOptions<TContext> &
@@ -191,14 +197,14 @@ export type FieldColumnCollection<TContext extends Context = Context> =
     FieldColumnBooleanArrayCollectionOptions &
     FieldColumnDateCollectionOptions
 
-export type FieldColumn<TContext extends AnyContext> =
+export type FieldColumn<TContext extends AnyContextable> =
   FieldColumnCollection<TContext>[keyof FieldColumnCollection<TContext>] & {
     _: FieldMetadataColumns
   }
 
 export type FieldRelationCollection<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
 > = Simplify<
   FieldRelationCollectionOptions<TContext> & {
     connect: {
@@ -215,39 +221,39 @@ export type FieldRelationCollection<
 
 export type FieldRelation<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
 > = FieldRelationCollection<TFullSchema, TContext>[keyof FieldRelationCollection<any, TContext>] & {
   _: FieldMetadataRelations
   mode: 'one' | 'many'
 }
 
-export type FieldCollection<TContext extends AnyContext> = FieldColumnCollection<TContext> &
+export type FieldCollection<TContext extends AnyContextable> = FieldColumnCollection<TContext> &
   FieldRelationCollection<any, TContext>
 
-export type FieldOptions<TContext extends AnyContext> =
+export type FieldOptions<TContext extends AnyContextable> =
   FieldCollection<TContext>[keyof FieldCollection<TContext>]
 
 export type Field<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
 > = FieldColumn<TContext> | FieldRelation<TFullSchema, TContext>
 
-export type AnyField = Field<any, AnyContext>
+export type AnyField = Field<any, AnyContextable>
 
 export type FieldsInitial<
   TFullSchema extends Record<string, unknown>,
-  TContext extends Context<TFullSchema>,
+  TContext extends AnyContextable,
 > = Record<string, Field<TFullSchema, TContext>>
 
-export type AnyFieldsInitial = FieldsInitial<any, AnyContext>
+export type AnyFieldsInitial = FieldsInitial<any, AnyContextable>
 
 export type Fields<
   TFullSchema extends Record<string, unknown>,
-  TContext extends Context<TFullSchema>,
+  TContext extends AnyContextable,
   TFields extends FieldsInitial<TFullSchema, TContext> = FieldsInitial<TFullSchema, TContext>,
 > = FieldsWithFieldName<TFields>
 
-export type AnyFields = Fields<any, AnyContext, any>
+export type AnyFields = Fields<any, AnyContextable, any>
 
 export type FieldClient = Omit<AnyField, 'options'>
 
@@ -258,7 +264,7 @@ export type FieldsClient<TFields extends FieldsClientInitial = FieldsClientIniti
 
 export type FieldColumnOptionsFromTable<
   TColumn extends Column<any>,
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
 > = TColumn['_']['dataType'] extends 'string'
   ? FieldColumnStringCollectionOptions<TContext>[keyof FieldColumnStringCollectionOptions<TContext>]
   : TColumn['_']['dataType'] extends 'number'
@@ -268,7 +274,7 @@ export type FieldColumnOptionsFromTable<
       : TColumn['_']['dataType'] extends 'date'
         ? FieldColumnDateCollectionOptions[keyof FieldColumnDateCollectionOptions]
         : TColumn['_']['dataType'] extends 'json'
-          ? FieldColumnJsonCollectionOptions<TContext>[keyof FieldColumnJsonCollectionOptions<TContext>]
+          ? FieldColumnJsonCollectionOptions[keyof FieldColumnJsonCollectionOptions]
           : TColumn['_']['dataType'] extends 'array'
             ? TColumn['_']['data'] extends string[]
               ? FieldColumnStringArrayCollectionOptions<TContext>[keyof FieldColumnStringArrayCollectionOptions<TContext>]
@@ -281,7 +287,7 @@ export type FieldColumnOptionsFromTable<
 
 type RelationFieldOptionsFromTable<
   TRelationPrimaryColumn extends Column,
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
 > = TRelationPrimaryColumn['_']['data'] extends infer TType extends string | number
   ? FieldRelationCollectionOptions<TContext, TType>['connect' | 'create' | 'connectOrCreate']
   : TRelationPrimaryColumn
@@ -314,7 +320,7 @@ export class FieldBuilder<
   TFullSchema extends Record<string, unknown>,
   TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
   TTableTsName extends string,
-  TContext extends Context<TFullSchema>,
+  TContext extends AnyContextable,
 > {
   private readonly tableRelationalConfig: TTableRelationConfigByTableTsName[TTableTsName]
 
