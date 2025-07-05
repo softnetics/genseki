@@ -1,3 +1,5 @@
+import type { PropsWithChildren, ReactNode } from 'react'
+
 import {
   createTableRelationsHelpers,
   extractTablesRelationalConfig,
@@ -10,9 +12,7 @@ import type { Simplify } from 'type-fest'
 
 import { createDefaultApiHandlers } from './builder.handler'
 import {
-  type Collection,
   type CollectionConfig,
-  type FindTableByTableTsName,
   type GetAllTableTsNames,
   getDefaultCollectionAdminApiRouter,
 } from './collection'
@@ -33,6 +33,57 @@ import {
   type OptionCallback,
 } from './field'
 import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
+
+import { CreateView } from '../react/views/collections/create'
+import { OneView } from '../react/views/collections/one'
+import { UpdateView } from '../react/views/collections/update'
+
+interface RenderArgs {
+  params: Record<string, string>
+  headers: Headers
+  searchParams: { [key: string]: string | string[] }
+}
+
+// TODO: Fix this type
+interface AuthenticatedRenderArgs extends RenderArgs {}
+
+// TODO: Revise this one
+export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<string, unknown>> =
+  | {
+      requiredAuthenticated: true
+      id?: string
+      path: string
+      render: (args: AuthenticatedRenderArgs & TProps) => ReactNode
+      props?: TProps
+    }
+  | {
+      requiredAuthenticated: false
+      id?: string
+      path: string
+      render: (args: RenderArgs & TProps) => ReactNode
+      props?: TProps
+    }
+
+export interface Genseki<
+  TName extends string,
+  TContext extends AnyContext,
+  TEndpoints extends ApiRouter<TContext> = {},
+> {
+  name: TName
+  endpoints: TEndpoints
+  uis: GensekiUiRouter[]
+}
+
+// TODO: Authentication context
+export interface GensekiBuilderArgs {
+  layout: (props: PropsWithChildren) => ReactNode
+}
+
+export type GensekiBuilder<
+  TName extends string,
+  TContext extends AnyContext,
+  TEndpoints extends ApiRouter<TContext> = {},
+> = (config: GensekiBuilderArgs) => Genseki<TName, TContext, TEndpoints>
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
@@ -70,19 +121,8 @@ export class Builder<
       TFields,
       TApiRouter
     >
-  ): Collection<
-    TSlug,
-    FindTableByTableTsName<TFullSchema, TTableTsName>['_']['name'],
-    TFullSchema,
-    TContext,
-    FieldsWithFieldName<TFields>,
-    TApiRouter
-  > {
+  ): GensekiBuilder<TSlug, TContext, TApiRouter> {
     const table = this.config.schema[tableTsName]
-    const tableRelationalConfig =
-      this.tableRelationalConfigByTableTsName[
-        tableTsName as unknown as keyof typeof this.tableRelationalConfigByTableTsName
-      ]
 
     if (!is(table, Table)) {
       throw new Error(`Table ${tableTsName as string} not found`)
@@ -105,7 +145,9 @@ export class Builder<
       findOne: config.admin?.api?.findOne ?? defaultHandlers.findOne,
       findMany: config.admin?.api?.findMany ?? defaultHandlers.findMany,
     }
+
     const endpoints: TApiRouter = config.admin?.endpoints ?? ({} as TApiRouter)
+
     const defaultEndpoints = getDefaultCollectionAdminApiRouter<
       TSlug,
       TContext,
@@ -114,10 +156,7 @@ export class Builder<
       create: async (args) => {
         // TODO: Access control
         const defaultApi = config.admin?.api?.create ? defaultHandlers.create : (undefined as any)
-        const result = await api.create({
-          ...args,
-          defaultApi,
-        })
+        const result = await api.create({ ...args, defaultApi })
         return result
       },
       update: async (args) => {
@@ -148,20 +187,62 @@ export class Builder<
       },
     })
 
-    return {
-      _: {
-        table: table as GetTableByTableTsName<TFullSchema, TTableTsName>,
-        tableConfig: tableRelationalConfig,
-      },
-      slug: config.slug,
-      fields: config.fields,
-      identifierColumn: config.identifierColumn as string,
-      admin: {
-        endpoints: {
-          ...endpoints,
-          ...defaultEndpoints,
+    return (setting) => {
+      const Layout = setting.layout
+
+      const uiRouters: GensekiUiRouter[] = [
+        {
+          path: `/collections/${config.slug}`,
+          requiredAuthenticated: true,
+          render: (args) => (
+            <Layout>
+              <ListView {...args} {...args.params} />
+            </Layout>
+          ),
         },
-      },
+        {
+          path: `/collections/${config.slug}/:identifier`,
+          requiredAuthenticated: true,
+          render: (args) => (
+            <Layout>
+              <OneView {...args} {...args.params} />
+            </Layout>
+          ),
+        },
+        {
+          path: `/collections/${config.slug}`,
+          requiredAuthenticated: true,
+          render: (args) => (
+            <Layout>
+              <CreateView {...args} {...args.params} />
+            </Layout>
+          ),
+        },
+        {
+          path: `/collections/${config.slug}/create`,
+          requiredAuthenticated: true,
+          render: (args) => (
+            <Layout>
+              <CreateView {...args} {...args.params} />
+            </Layout>
+          ),
+        },
+        {
+          path: `/collections/${config.slug}/update/:identifier`,
+          requiredAuthenticated: true,
+          render: (args) => (
+            <Layout>
+              <UpdateView {...args} {...args.params} />
+            </Layout>
+          ),
+        },
+      ]
+
+      return {
+        name: config.slug,
+        endpoints: endpoints,
+        uis: uiRouters,
+      }
     }
   }
 

@@ -25,7 +25,7 @@ import {
   type StorageAdapterClient,
 } from './file-storage-adapters/generic-adapter'
 import { createFileUploadHandlers } from './file-storage-adapters/handlers'
-import type { GensekiPlugin, MergePlugins } from './plugins'
+import type { GensekiPlugin } from './plugins'
 import { getClientEditorProviderProps } from './richtext'
 import { isMediaField, isRelationField, isRichTextField } from './utils'
 
@@ -78,6 +78,7 @@ export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<an
     : never
 
 export function defineServerConfig<
+  const TName extends string,
   const TFullSchema extends Record<string, unknown>,
   const TContext extends AnyContextable,
   const TCollections extends Record<string, AnyCollection>,
@@ -88,7 +89,7 @@ export function defineServerConfig<
   const fileUploadHandlers = createFileUploadHandlers<TContext>(config.storageAdapter)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
-  let serverConfig: ServerConfig<
+  const serverConfig: ServerConfig<
     any,
     TContext,
     TCollections,
@@ -109,12 +110,6 @@ export function defineServerConfig<
       typeof collectionEndpoints &
       typeof fileUploadHandlers.handlers,
   }
-
-  for (const { plugin } of config.plugins ?? []) {
-    serverConfig = plugin(serverConfig) as any
-  }
-
-  return serverConfig as MergePlugins<typeof serverConfig, TPlugins>
 }
 
 export interface ClientConfig<
