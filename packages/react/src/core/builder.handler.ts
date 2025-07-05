@@ -9,12 +9,12 @@ import {
   or,
   type TableRelationalConfig,
 } from 'drizzle-orm'
-import type { NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
+import type { NodePgDatabase, NodePgQueryResultHKT } from 'drizzle-orm/node-postgres'
 import type { PgTransaction } from 'drizzle-orm/pg-core'
 import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/query'
 
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
-import type { AnyContext, RequestContext } from './context'
+import type { AnyContextable, AnyRequestContextable } from './context'
 import type { AnyFields, Field, Fields } from './field'
 import {
   createDrizzleQuery,
@@ -26,9 +26,10 @@ import {
 } from './utils'
 
 export function createDefaultApiHandlers<
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
 >(args: {
+  db: NodePgDatabase<any>
   schema: Record<string, unknown>
   fields: TFields
   tableTsKey: string
@@ -36,7 +37,7 @@ export function createDefaultApiHandlers<
   tableNamesMap: Record<string, string>
   tables: Record<string, TableRelationalConfig>
 }): CollectionAdminApi<TContext, TFields> {
-  const { fields, tableTsKey, tableNamesMap, tables, schema, identifierColumn } = args
+  const { db, fields, tableTsKey, tableNamesMap, tables, schema, identifierColumn } = args
 
   const tableRelationalConfig = tables[tableTsKey]
   const primaryKeyColumn = getPrimaryColumn(tableRelationalConfig)
@@ -48,7 +49,6 @@ export function createDefaultApiHandlers<
   const findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> = async (
     args
   ) => {
-    const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const result = await query.findFirst({
@@ -70,7 +70,6 @@ export function createDefaultApiHandlers<
   const findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> = async (
     args
   ) => {
-    const db = args.context.db
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
     const orderType = args.orderType ?? 'asc'
@@ -101,7 +100,6 @@ export function createDefaultApiHandlers<
   }
 
   const create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> = async (args) => {
-    const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -132,7 +130,6 @@ export function createDefaultApiHandlers<
   }
 
   const update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> = async (args) => {
-    const db = args.context.db
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -163,8 +160,6 @@ export function createDefaultApiHandlers<
 
   // why not just delete? why _delete?
   const _delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE> = async (args) => {
-    const db = args.context.db
-
     await db
       .delete(tableSchema)
       .where(or(...args.ids.map((id) => eq(identifierKeyColumn, id))))
@@ -188,10 +183,10 @@ class ApiHandler {
 
   constructor(
     private readonly tableTsName: string,
-    private readonly fields: Fields<any, AnyContext>,
+    private readonly fields: Fields<any, AnyContextable>,
     private readonly config: {
       schema: Record<string, unknown>
-      context: RequestContext
+      context: AnyRequestContextable
       tableTsNameByTableDbName: Record<string, string>
       tableRelationalConfigByTableTsName: Record<string, TableRelationalConfig>
     }
@@ -261,10 +256,14 @@ class ApiHandler {
 
   private async resolveOneRelations(
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Fields<any, AnyContext>,
+    fields: Fields<any, AnyContextable>,
     data: Record<string, any>
   ) {
-    const create = async (referencedTable: Table, fields: Fields<any, AnyContext>, value: any) => {
+    const create = async (
+      referencedTable: Table,
+      fields: Fields<any, AnyContextable>,
+      value: any
+    ) => {
       const id = await new ApiHandler(
         // TODO: i think this should not use public prefix to search the table
         this.config.tableTsNameByTableDbName[`public.${getTableName(referencedTable)}`],
@@ -277,7 +276,7 @@ class ApiHandler {
 
     const disconnect = async (
       referencedTable: Table,
-      fields: Fields<any, AnyContext>,
+      fields: Fields<any, AnyContextable>,
       value: any
     ) => {
       const primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
@@ -382,7 +381,7 @@ class ApiHandler {
   private async resolveManyRelations(
     id: string | number,
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Record<string, Field<any, AnyContext>>,
+    fields: Record<string, Field<any, AnyContextable>>,
     data: Record<string, any>
   ) {
     // update the referenced table to have this id
@@ -398,7 +397,7 @@ class ApiHandler {
 
     const create = async (
       tableConfig: TableRelationalConfig,
-      fields: Fields<any, AnyContext>,
+      fields: Fields<any, AnyContextable>,
       relation: Relation,
       value: any
     ) => {
@@ -538,7 +537,7 @@ class ApiHandler {
   }
 
   private getColumnValues(
-    fields: Fields<any, AnyContext>,
+    fields: Fields<any, AnyContextable>,
     data: Record<string, any>
   ): Record<string, any> {
     const result = Object.fromEntries(
@@ -555,7 +554,7 @@ class ApiHandler {
 }
 
 function mapResultToFields(
-  fields: Fields<any, AnyContext>,
+  fields: Fields<any, AnyContextable>,
   result: Record<string, any>
 ): Record<string, any> {
   const mappedResult = Object.fromEntries(

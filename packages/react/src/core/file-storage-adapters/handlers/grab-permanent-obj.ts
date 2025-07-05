@@ -1,10 +1,10 @@
 import z from 'zod/v4'
 
-import type { Context } from '../../context'
+import type { AnyContextable } from '../../context'
 import { type ApiRouteHandler, type ApiRouteQuerySchema, createEndpoint } from '../../endpoint'
 import type { StorageAdapter } from '../generic-adapter'
 
-export function grabPermanentObject<const TContext extends Context>(
+export function grabPermanentObject<const TContext extends AnyContextable>(
   uploadAdapter?: StorageAdapter
 ) {
   const schema = {

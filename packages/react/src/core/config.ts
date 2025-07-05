@@ -9,7 +9,7 @@ import {
   type ToClientCollection,
   type ToClientCollectionList,
 } from './collection'
-import { Context } from './context'
+import type { AnyContextable } from './context'
 import {
   type ApiRoute,
   type ApiRouter,
@@ -37,82 +37,67 @@ import {
   getAuthClient,
 } from '../auth'
 
-export interface BaseConfigOptions<
+export interface ServerConfigOptions<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContextValue extends Record<string, unknown> = Record<string, unknown>,
+  TContext extends AnyContextable = AnyContextable,
+  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
+  TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
+  TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
 > {
   db: NodePgDatabase<TFullSchema>
   schema: TFullSchema
-  context?: TContextValue
-  storageAdapter?: StorageAdapter
-  auth: AuthConfig
-}
-
-export interface BaseConfig<
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
-> extends Omit<BaseConfigOptions<TFullSchema>, 'context'> {
   context: TContext
+  auth: AuthConfig
+  collections: TCollections
+  endpoints: TApiRouter
+  plugins?: TPlugins
+  storageAdapter?: StorageAdapter
 }
 
 export interface ServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
   TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
-> extends BaseConfig<TFullSchema> {
+> {
+  db: NodePgDatabase<TFullSchema>
+  auth: AuthConfig
   context: TContext
-  collections: TCollections
   endpoints: TApiRouter
+  collections: TCollections
+  storageAdapter?: StorageAdapter
 }
 
-export interface AnyServerConfig extends ServerConfig<Record<string, unknown>, Context, {}, {}> {}
+export interface AnyServerConfig extends ServerConfig<any, AnyContextable, {}, {}> {}
 
-export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any, any>> =
-  TServerConfig extends ServerConfig<any, any, any, infer TApiRouter>
+export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any>> =
+  TServerConfig extends ServerConfig<any, any, infer TApiRouter>
     ? TApiRouter extends ApiRouter<any>
       ? TApiRouter
       : never
     : never
 
-export function defineBaseConfig<
-  const TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  const TContextValue extends Record<string, unknown> = Record<string, unknown>,
->(
-  config: BaseConfigOptions<TFullSchema, TContextValue>
-): BaseConfig<TFullSchema, Context<TFullSchema, TContextValue>> {
-  const context = new Context(config.db, { ...config.context }) as Context<
-    TFullSchema,
-    TContextValue
-  >
-
-  return {
-    ...config,
-    context,
-  }
-}
-
 export function defineServerConfig<
   const TFullSchema extends Record<string, unknown>,
-  const TContext extends Context<TFullSchema>,
+  const TContext extends AnyContextable,
   const TCollections extends Record<string, AnyCollection>,
   const TEndpoints extends ApiRouter<TContext>,
   const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
->(
-  baseConfig: BaseConfig<TFullSchema, TContext>,
-  config: { collections: TCollections; endpoints?: TEndpoints; plugins?: TPlugins }
-) {
-  const auth = createAuth<TContext>(baseConfig.auth, baseConfig.context)
-  const fileUploadHandlers = createFileUploadHandlers<TContext>(baseConfig.storageAdapter)
+>(config: ServerConfigOptions<TFullSchema, TContext, TCollections, TEndpoints, TPlugins>) {
+  const auth = createAuth<TFullSchema, TContext>(config)
+  const fileUploadHandlers = createFileUploadHandlers<TContext>(config.storageAdapter)
   const collectionEndpoints = getAllCollectionEndpoints(config.collections)
 
   let serverConfig: ServerConfig<
-    TFullSchema,
+    any,
     TContext,
     TCollections,
     TEndpoints & AuthHandlers & typeof collectionEndpoints & typeof fileUploadHandlers.handlers
   > = {
-    ...baseConfig,
+    db: config.db,
+    auth: config.auth,
+    context: config.context,
+    storageAdapter: config.storageAdapter,
     collections: config.collections,
     endpoints: {
       ...config.endpoints,

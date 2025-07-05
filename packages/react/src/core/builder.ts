@@ -5,6 +5,7 @@ import {
   is,
   Table,
 } from 'drizzle-orm'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Simplify } from 'type-fest'
 
 import { createDefaultApiHandlers } from './builder.handler'
@@ -15,7 +16,7 @@ import {
   type GetAllTableTsNames,
   getDefaultCollectionAdminApiRouter,
 } from './collection'
-import type { Context } from './context'
+import type { AnyContextable } from './context'
 import {
   type ApiRoute,
   type ApiRouteHandler,
@@ -35,12 +36,12 @@ import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
 > {
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
 
-  constructor(private readonly config: { schema: TFullSchema }) {
+  constructor(private readonly config: { db: NodePgDatabase<TFullSchema>; schema: TFullSchema }) {
     const tablesConfig = extractTablesRelationalConfig(
       this.config.schema,
       createTableRelationsHelpers
@@ -51,11 +52,8 @@ export class Builder<
     this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
   }
 
-  $context<TContext extends Context<TFullSchema> = Context<TFullSchema>>(): Builder<
-    TFullSchema,
-    TContext
-  > {
-    return new Builder<TFullSchema, TContext>({ schema: this.config.schema })
+  $context<TContext extends AnyContextable>(): Builder<TFullSchema, TContext> {
+    return new Builder<TFullSchema, TContext>({ db: this.config.db, schema: this.config.schema })
   }
 
   collection<
@@ -91,6 +89,7 @@ export class Builder<
     }
 
     const defaultHandlers = createDefaultApiHandlers({
+      db: this.config.db,
       schema: this.config.schema,
       fields: config.fields,
       identifierColumn: config.identifierColumn as string,

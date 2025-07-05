@@ -5,11 +5,11 @@ import { createRouter } from 'radix3'
 
 import {
   type AnyCollection,
+  type AnyContextable,
   type ApiRouter,
   type AuthHandlers,
   AuthLayout,
   CollectionAppLayout,
-  type Context,
   CreateView,
   ForgotPasswordView,
   HomeView,
@@ -49,7 +49,7 @@ export type RouterData =
 
 export interface NextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
   TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<any>,
 > extends ServerConfig<TFullSchema, TContext, TCollections, TApiRouter> {
@@ -59,7 +59,7 @@ export interface NextJsServerConfig<
 
 export function defineNextJsServerConfig<
   TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends Context<TFullSchema> = Context<TFullSchema>,
+  TContext extends AnyContextable = AnyContextable,
   TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
   TApiRouter extends ApiRouter<TContext> = ApiRouter<any>,
 >(

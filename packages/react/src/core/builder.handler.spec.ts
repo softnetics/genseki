@@ -3,7 +3,7 @@ import { beforeEach, describe, expect, it, vi } from 'vitest'
 
 import * as schema from './__mocks__/test-schema'
 import { Builder } from './builder'
-import { RequestContext } from './context'
+import type { Contextable, RequestContextable, RequestContextArgs } from './context'
 
 // TODO: Refactor this to use a more generic mock database setup, maybe create(tx, query)
 const prepareMockDb = () => {
@@ -97,7 +97,37 @@ const mockAuthorData = Array.from({ length: 10 }, (_, i) => ({
   name: `Author ${i + 1}`,
 }))
 
-const builder = new Builder({ schema }).$context<RequestContext<any, typeof schema>>()
+interface User {
+  id: string
+  name: string
+  email: string
+}
+
+class MyRequestContext implements RequestContextable<User> {
+  constructor() {}
+
+  requiredAuthenticated() {
+    // Simulate an authenticated user
+    return {
+      id: '123',
+      name: 'John Doe',
+      email: 'example@example.com',
+    }
+  }
+}
+
+class MyContext implements Contextable<User> {
+  constructor() {}
+
+  toRequestContext(args: RequestContextArgs) {
+    return new MyRequestContext()
+  }
+}
+
+const myContext = new MyContext()
+const requestContext = myContext.toRequestContext({ headers: {} })
+
+const builder = new Builder({ db: mockDb as any, schema }).$context<MyContext>()
 
 describe('ApiHandler', () => {
   describe('with initial and utils', () => {
@@ -157,10 +187,8 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.create.handler({
-        context,
+        context: requestContext,
         body: {
           nameField: postData.name,
         },
@@ -201,10 +229,8 @@ describe('ApiHandler', () => {
         nameTs: postData.name,
       })
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.findOne.handler({
-        context,
+        context: requestContext,
         pathParams: {
           id: postData.id,
         },
@@ -248,10 +274,8 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.update.handler({
-        context,
+        context: requestContext,
         pathParams: {
           id: postData.id,
         },
@@ -287,10 +311,8 @@ describe('ApiHandler', () => {
       tx.delete = deleteMock
       mockDb.delete = deleteMock
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.delete.handler({
-        context,
+        context: requestContext,
         body: {
           ids: [mockPostData[0].name, mockPostData[1].name, mockPostData[2].name],
         },
@@ -340,10 +362,8 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.create.handler({
-        context,
+        context: requestContext,
         body: {
           nameField: postData.name,
         },
@@ -371,10 +391,8 @@ describe('ApiHandler', () => {
         nameTs: postData.name,
       })
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.findOne.handler({
-        context,
+        context: requestContext,
         pathParams: {
           id: postData.id,
         },
@@ -414,10 +432,8 @@ describe('ApiHandler', () => {
         vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
       )
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.update.handler({
-        context,
+        context: requestContext,
         pathParams: {
           id: postData.id,
         },
@@ -440,10 +456,8 @@ describe('ApiHandler', () => {
       tx.delete = deleteMock
       mockDb.delete = deleteMock
 
-      const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
       const result = await postCollection.admin.endpoints.delete.handler({
-        context,
+        context: requestContext,
         body: {
           ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
         },
@@ -518,10 +532,9 @@ describe('ApiHandler', () => {
               nameTs: authorData.name,
             },
           })
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           const result = await postWithAuthorCreateCollection.admin.endpoints.create.handler({
-            context,
+            context: requestContext,
             body: {
               nameField: postData.name,
               authorField: {
@@ -557,10 +570,8 @@ describe('ApiHandler', () => {
             },
           })
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await postWithAuthorCreateCollection.admin.endpoints.findOne.handler({
-            context,
+            context: requestContext,
             headers: {},
             pathParams: {
               id: postData.id,
@@ -633,10 +644,9 @@ describe('ApiHandler', () => {
               nameTs: updatedAuthorData.name,
             },
           })
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           const result = await postWithAuthorCreateCollection.admin.endpoints.update.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: postData.id,
             },
@@ -667,10 +677,8 @@ describe('ApiHandler', () => {
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await postWithAuthorCreateCollection.admin.endpoints.delete.handler({
-            context,
+            context: requestContext,
             body: {
               ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
             },
@@ -749,10 +757,9 @@ describe('ApiHandler', () => {
               { idTs: mockPostData[4].id, nameTs: mockPostData[4].name },
             ],
           })
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           const result = await authorWithPostsCreateCollection.admin.endpoints.create.handler({
-            context,
+            context: requestContext,
             body: {
               nameField: authorData.name,
               postsField: [
@@ -797,10 +804,8 @@ describe('ApiHandler', () => {
             ],
           })
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await authorWithPostsCreateCollection.admin.endpoints.findOne.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: authorData.id,
             },
@@ -882,12 +887,10 @@ describe('ApiHandler', () => {
             ],
           })
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           // // ====== end service part (TS) ======
           // // ===== start user part (field) =====
           const result = await authorWithPostsCreateCollection.admin.endpoints.update.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: updatedAuthorData.id,
             },
@@ -948,10 +951,8 @@ describe('ApiHandler', () => {
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await authorWithPostsCreateCollection.admin.endpoints.delete.handler({
-            context,
+            context: requestContext,
             body: {
               ids: [mockAuthorData[0].id, mockAuthorData[1].id, mockAuthorData[2].id],
             },
@@ -1026,9 +1027,8 @@ describe('ApiHandler', () => {
             vi.fn().mockResolvedValueOnce([{ idTs: postData.id, nameTs: postData.name }])
           )
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
           const result = await postWithAuthorConnectCollection.admin.endpoints.create.handler({
-            context,
+            context: requestContext,
             body: {
               nameField: postData.name,
               authorField: {
@@ -1062,10 +1062,8 @@ describe('ApiHandler', () => {
             },
           })
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await postWithAuthorConnectCollection.admin.endpoints.findOne.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: postData.id,
             },
@@ -1142,10 +1140,9 @@ describe('ApiHandler', () => {
               nameTs: 'Author 2',
             },
           })
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           const result = await postWithAuthorConnectCollection.admin.endpoints.update.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: postData.id,
             },
@@ -1175,10 +1172,8 @@ describe('ApiHandler', () => {
             vi.fn().mockResolvedValueOnce([])
           )
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await postWithAuthorConnectCollection.admin.endpoints.delete.handler({
-            context,
+            context: requestContext,
             body: {
               ids: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id],
             },
@@ -1251,10 +1246,9 @@ describe('ApiHandler', () => {
               { idTs: mockPostData[2].id, nameTs: mockPostData[2].name },
             ],
           })
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           const result = await authorWithPostConnectCollection.admin.endpoints.create.handler({
-            context,
+            context: requestContext,
             body: {
               nameField: authorData.name,
               postsField: [mockPostData[0].id, mockPostData[1].id, mockPostData[2].id].map(
@@ -1310,10 +1304,8 @@ describe('ApiHandler', () => {
             ],
           })
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await authorWithPostConnectCollection.admin.endpoints.findOne.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: authorData.id,
             },
@@ -1396,10 +1388,9 @@ describe('ApiHandler', () => {
               { idTs: 'post-3', nameTs: 'Post 3' },
             ],
           })
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
           const result = await authorWithPostConnectCollection.admin.endpoints.update.handler({
-            context,
+            context: requestContext,
             pathParams: {
               id: updatedAuthorData.id,
             },
@@ -1432,10 +1423,8 @@ describe('ApiHandler', () => {
         it('should (D) delete successfully', async () => {
           const { deleteMock, whereMock } = prepareDeleteMock(vi.fn().mockResolvedValueOnce([]))
 
-          const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
           const result = await authorWithPostConnectCollection.admin.endpoints.delete.handler({
-            context,
+            context: requestContext,
             body: {
               ids: [mockAuthorData[0].id, mockAuthorData[1].id, mockAuthorData[2].id],
             },
@@ -1515,11 +1504,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.create.handler({
-                context,
+                context: requestContext,
                 body: {
                   nameField: postData.name,
                   authorField: {
@@ -1559,11 +1547,9 @@ describe('ApiHandler', () => {
               },
             })
 
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.findOne.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: postData.id,
                 },
@@ -1640,11 +1626,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.update.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: updatedPostData.id,
                 },
@@ -1682,11 +1667,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.delete.handler({
-                context,
+                context: requestContext,
                 body: {
                   ids: postIdsToDelete,
                 },
@@ -1748,11 +1732,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.create.handler({
-                context,
+                context: requestContext,
                 body: {
                   nameField: postWithAuthorDataField.nameField,
                   authorField: {
@@ -1801,11 +1784,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.findOne.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: postData.id,
                 },
@@ -1885,11 +1867,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.update.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: updatedPostData.id,
                 },
@@ -1927,11 +1908,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await postWithAuthorConnectOrCreateCollection.admin.endpoints.delete.handler({
-                context,
+                context: requestContext,
                 body: {
                   ids: postIdsToDelete,
                 },
@@ -2052,12 +2032,10 @@ describe('ApiHandler', () => {
 
             // ===== start user part (field) =====
             // change to create Author and make it auto connect to post
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.create.handler({
-                // TODO: fix create data shouldn't have primary key
-                context,
+                context: requestContext,
                 body: {
                   nameField: authorWithPostDataField.nameField,
                   postsField: [
@@ -2134,11 +2112,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.findOne.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: authorData.id,
                 },
@@ -2232,11 +2209,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.update.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: updatedAuthorData.id,
                 },
@@ -2307,11 +2283,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.delete.handler({
-                context,
+                context: requestContext,
                 body: {
                   ids: authorIdsToDelete,
                 },
@@ -2374,11 +2349,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.create.handler({
-                context,
+                context: requestContext,
                 body: {
                   nameField: authorWithPostDataField.nameField,
                   postsField: [
@@ -2442,11 +2416,9 @@ describe('ApiHandler', () => {
 
             mockDb.query.authorTs.findFirst = vi.fn().mockResolvedValueOnce(authorWithPostDataTs)
 
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.findOne.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: authorData.id,
                 },
@@ -2537,11 +2509,10 @@ describe('ApiHandler', () => {
             // ====== end service part (TS) ======
 
             // ===== start user part (field) =====
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
 
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.update.handler({
-                context,
+                context: requestContext,
                 pathParams: {
                   id: updatedAuthorData.id,
                 },
@@ -2603,11 +2574,9 @@ describe('ApiHandler', () => {
             tx.delete = deleteMock
             mockDb.delete = deleteMock
 
-            const context: any = new RequestContext(mockDb as any, undefined, {} as any)
-
             const result =
               await authorWithPostsConnectOrCreateCollection.admin.endpoints.delete.handler({
-                context,
+                context: requestContext,
                 body: {
                   ids: authorIdsToDelete,
                 },

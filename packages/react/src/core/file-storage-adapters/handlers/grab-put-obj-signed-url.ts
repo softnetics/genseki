@@ -1,10 +1,12 @@
 import z from 'zod/v4'
 
-import type { Context } from '../../context'
+import type { AnyContextable } from '../../context'
 import { type ApiRouteHandler, type ApiRouteQuerySchema, createEndpoint } from '../../endpoint'
 import type { StorageAdapter } from '../generic-adapter'
 
-export function grabPutObjUrl<const TContext extends Context>(uploadAdapter?: StorageAdapter) {
+export function grabPutObjUrl<const TContext extends AnyContextable>(
+  uploadAdapter?: StorageAdapter
+) {
   const schema = {
     method: 'GET',
     path: '/api/storage/put-obj-signed-url',

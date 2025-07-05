@@ -1,12 +1,11 @@
-import type { RequestContext } from '../../../../core'
 import { type Fields } from '../../../../core'
-import type { AnyContext } from '../../../../core/context'
+import type { AnyContextable, AnyRequestContextable } from '../../../../core/context'
 
 export * from './client'
 
 export async function createOptionsRecord(
-  context: RequestContext,
-  fields: Fields<any, AnyContext>,
+  context: AnyRequestContextable,
+  fields: Fields<any, AnyContextable>,
   prefix: string = ''
 ): Promise<Record<string, any[]>> {
   const promises = Object.values(fields).flatMap(async (field) => {

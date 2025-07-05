@@ -6,12 +6,13 @@ import { sendEmailResetPassword } from './send-email-reset-password'
 import { signOut } from './sign-out'
 import { signUpEmail } from './sign-up-email'
 
-import type { AnyContext } from '../../core/context'
+import type { AnyContextable } from '../../core/context'
 import { type AuthContext } from '../context'
 
-export function createAuthHandlers<TAuthContext extends AuthContext, TContext extends AnyContext>(
-  authContext: TAuthContext
-) {
+export function createAuthHandlers<
+  TAuthContext extends AuthContext,
+  TContext extends AnyContextable,
+>(authContext: TAuthContext) {
   const handlers = {
     //  No authentication required
     signUpEmail: signUpEmail<TAuthContext, TContext>(authContext),

@@ -1,22 +1,22 @@
 import type { ValueOf } from 'type-fest'
 
 import {
+  type AnyServerConfig,
   type ApiRoute,
   type ApiRouteHandlerPayload,
   type ApiRouter,
   type ApiRouteResponse,
   type ApiRouteSchema,
-  type ServerConfig,
 } from '../core'
 
-export type ServerFunction<
-  TServerConfig extends ServerConfig<any, any, any, any> = ServerConfig<any, any, any, any>,
-> = <TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>>(
+export type ServerFunction<TServerConfig extends AnyServerConfig = AnyServerConfig> = <
+  TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
+>(
   args: TApiArgs
 ) => Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>>
 
 export type GetServerFunctionResponse<
-  TServerConfig extends ServerConfig<any, any, any, ApiRouter>,
+  TServerConfig extends AnyServerConfig,
   TMethod extends keyof TServerConfig['endpoints'],
 > = TServerConfig['endpoints'][TMethod] extends infer TApiRoute extends ApiRoute<any, any>
   ? ApiRouteResponse<TApiRoute['schema']['responses']>

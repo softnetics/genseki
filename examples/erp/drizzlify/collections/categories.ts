@@ -1,6 +1,6 @@
 import { postEditorProviderProps } from './posts'
 
-import { builder } from '../helper'
+import { builder, db } from '../helper'
 
 export const categoriesCollection = builder.collection('categories', {
   slug: 'categories',
@@ -26,7 +26,7 @@ export const categoriesCollection = builder.collection('categories', {
           editor: postEditorProviderProps,
         }),
       })),
-      options: builder.options(async ({ db }) => {
+      options: builder.options(async () => {
         const result = await db.query.user.findMany({ columns: { id: true, name: true } })
         return result.map((user) => ({ label: user.name ?? user.id, value: user.id }))
       }),

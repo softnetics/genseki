@@ -1,12 +1,11 @@
 import type { AnyTable, Column } from 'drizzle-orm'
 import { and, asc, desc, eq, like } from 'drizzle-orm'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 
 import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
 import { AccountProvider } from './constant'
 import { getSessionCookie } from './utils'
-
-import type { AnyContext, Context } from '../core/context'
 
 type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
   [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true
@@ -30,11 +29,11 @@ export type AuthContext<TConfig extends AuthConfig = AuthConfig> = {
   requiredAuthenticated: (headers?: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
 }
 
-export function createAuthContext<TAuthConfig extends AuthConfig, TContext extends AnyContext>(
+export function createAuthContext<TAuthConfig extends AuthConfig>(
   authConfig: TAuthConfig,
-  context: TContext
+  db: NodePgDatabase<any>
 ): AuthContext<TAuthConfig> {
-  const internalHandlers = createInternalHandlers(authConfig, context)
+  const internalHandlers = createInternalHandlers(authConfig, db)
 
   return {
     authConfig: authConfig,
@@ -62,12 +61,12 @@ export function createAuthContext<TAuthConfig extends AuthConfig, TContext exten
 
 function createInternalHandlers<TAuthConfig extends AuthConfig>(
   config: TAuthConfig,
-  context: Context
+  db: NodePgDatabase
 ) {
   const user = {
     findById: async (id: string) => {
       const table = config.user.model
-      const users = await context.db.select().from(table).where(eq(table.id, id))
+      const users = await db.select().from(table).where(eq(table.id, id))
       if (users.length === 0) throw new Error('User not found')
       if (users.length > 1) throw new Error('Multiple users found')
       const user = users[0]
@@ -76,7 +75,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     findByEmail: async (email: string) => {
       const table = config.user.model
 
-      const users = await context.db.select().from(table).where(eq(table.email, email))
+      const users = await db.select().from(table).where(eq(table.email, email))
       if (users.length === 0) throw new Error('User not found')
       if (users.length > 1) throw new Error('Multiple users found')
       const user = users[0]
@@ -85,7 +84,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     list: async (pagination: Pagination<keyof AnyUserTable['_']['columns']>) => {
       const { page = 1, pageSize = 10, sort } = pagination
       const table = config.user.model
-      const users = await context.db
+      const users = await db
         .select()
         .from(table)
         .limit(pageSize)
@@ -100,19 +99,19 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     },
     create: async (data: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>) => {
       const table = config.user.model
-      const user = await context.db.insert(table).values(data).returning()
+      const user = await db.insert(table).values(data).returning()
       return user[0]
     },
   }
   const account = {
     link: async (data: Omit<InferTableType<AnyAccountTable>, 'id' | 'emailVerified'>) => {
       const table = config.account.model
-      const user = await context.db.insert(table).values(data).returning()
+      const user = await db.insert(table).values(data).returning()
       return user[0]
     },
     updatePassword: async (userId: string, password: string) => {
       const table = config.account.model
-      const account = await context.db
+      const account = await db
         .update(table)
         .set({ password })
         .where(and(eq(table.userId, userId), eq(table.providerId, AccountProvider.CREDENTIAL)))
@@ -122,7 +121,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       return account[0]
     },
     findByUserEmailAndProvider: async (email: string, providerId: AccountProvider) => {
-      const accounts = await context.db
+      const accounts = await db
         .select({
           user: config.user.model,
           password: config.account.model.password,
@@ -144,7 +143,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     create: async (data: { userId: string; expiresAt: Date }) => {
       const table = config.session.model
       const token = crypto.randomUUID()
-      const session = await context.db
+      const session = await db
         .insert(table)
         .values({ ...data, token })
         .returning()
@@ -152,11 +151,11 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     },
     update: async (id: string, data: any) => {
       const table = config.session.model
-      const session = await context.db.update(table).set(data).where(eq(table.id, id)).returning()
+      const session = await db.update(table).set(data).where(eq(table.id, id)).returning()
       return session[0]
     },
     findUserBySessionToken: async (token: string) => {
-      const sessions = await context.db
+      const sessions = await db
         .select({
           id: config.session.model.id,
           user: config.user.model,
@@ -176,17 +175,17 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     },
     deleteById: async (id: string) => {
       const table = config.session.model
-      const session = await context.db.delete(table).where(eq(table.id, id)).returning()
+      const session = await db.delete(table).where(eq(table.id, id)).returning()
       return session[0]
     },
     deleteByToken: async (token: string) => {
       const table = config.session.model
-      const session = await context.db.delete(table).where(eq(table.token, token)).returning()
+      const session = await db.delete(table).where(eq(table.token, token)).returning()
       return session[0]
     },
     deleteByUserId: async (userId: string) => {
       const table = config.session.model
-      const session = await context.db.delete(table).where(eq(table.userId, userId)).returning()
+      const session = await db.delete(table).where(eq(table.userId, userId)).returning()
       return session[0]
     },
   }
@@ -194,28 +193,25 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
   const verification = {
     create: async (data: { identifier: string; value: string; expiresAt: Date }) => {
       const table = config.verification.model
-      const verification = await context.db.insert(table).values(data).returning()
+      const verification = await db.insert(table).values(data).returning()
       return verification[0]
     },
     findByIdentifier: async (identifier: string) => {
       const table = config.verification.model
-      const verifications = await context.db
-        .select()
-        .from(table)
-        .where(eq(table.identifier, identifier))
+      const verifications = await db.select().from(table).where(eq(table.identifier, identifier))
       if (verifications.length === 0) throw new Error('Verification not found')
       if (verifications.length > 1) throw new Error('Multiple verifications found')
       return verifications[0]
     },
     delete: async (id: string) => {
       const table = config.verification.model
-      const verification = await context.db.delete(table).where(eq(table.id, id)).returning()
+      const verification = await db.delete(table).where(eq(table.id, id)).returning()
       if (verification.length === 0) throw new Error('Verification not found')
       return verification[0]
     },
     deleteByUserIdAndIdentifierPrefix: async (userId: string, identifierPrefix: string) => {
       const table = config.verification.model
-      return await context.db
+      return await db
         .delete(table)
         .where(and(eq(table.value, userId), like(table.identifier, `${identifierPrefix}%`)))
         .returning()

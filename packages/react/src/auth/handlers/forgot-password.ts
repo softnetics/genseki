@@ -1,12 +1,12 @@
 import z from 'zod/v4'
 
-import type { AnyContext } from '../../core/context'
+import type { AnyContextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
 import type { AuthContext } from '../context'
 
 export function forgotPasswordEmail<
   const TAuthContext extends AuthContext,
-  const TContext extends AnyContext,
+  const TContext extends AnyContextable,
 >(authContext: TAuthContext) {
   const { authConfig, internalHandlers } = authContext
 
