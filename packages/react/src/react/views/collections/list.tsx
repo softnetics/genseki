@@ -42,6 +42,7 @@ export async function ListView(props: ListViewProps) {
       offset,
       orderBy,
       orderType,
+      where: undefined, // TODO: filter at front-end side
     },
   })
 
