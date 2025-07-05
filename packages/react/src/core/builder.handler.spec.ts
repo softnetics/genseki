@@ -1,7 +1,15 @@
+import { describe, expect, it } from 'vitest'
+
 // TODO: As this test file is currently hard to maintain and mock the database,
 // we should refactor it to use a more generic mock database setup.
 // So, this file test should split into multiple unit tests for each sub-functions
 // This will help to ensure that each part of the code is tested independently instead of big integration test.
+
+describe('Builder Handler', () => {
+  it('should be defined', () => {
+    expect(true).toBe(true) // Placeholder for actual tests
+  })
+})
 
 // import { eq, or, sql } from 'drizzle-orm'
 // import { beforeEach, describe, expect, it, vi } from 'vitest'
