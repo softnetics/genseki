@@ -583,11 +583,33 @@ export default function UIPlayground() {
         </div>
       </Wrapper>
       <Wrapper title="Badge">
-        <PlaygroundCard title="Single badge" categoryTitle="Badge">
+        <PlaygroundCard title="Small size (sm)" categoryTitle="Badge">
           <div className="flex flex-wrap gap-2">
-            {['primary', 'secondary', 'success', 'info', 'warning', 'danger'].map(
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+              (intent, index) => (
+                <Badge key={index} intent={intent as any} shape="circle" size="sm">
+                  {intent}
+                </Badge>
+              )
+            )}
+          </div>
+        </PlaygroundCard>
+        <PlaygroundCard title="Medium size (md)" categoryTitle="Badge">
+          <div className="flex flex-wrap gap-2">
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
               (intent, index) => (
                 <Badge key={index} intent={intent as any} shape="circle">
+                  {intent}
+                </Badge>
+              )
+            )}
+          </div>
+        </PlaygroundCard>
+        <PlaygroundCard title="Large size (lg)" categoryTitle="Badge">
+          <div className="flex flex-wrap gap-2">
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+              (intent, index) => (
+                <Badge key={index} intent={intent as any} shape="circle" size="lg">
                   {intent}
                 </Badge>
               )
