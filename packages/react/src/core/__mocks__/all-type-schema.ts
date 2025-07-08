@@ -29,7 +29,7 @@ export const allFieldTypes = pgTable('table', {
   integer: integer(),
   smallint: smallint(),
   bigint: bigint({ mode: 'bigint' }),
-  serial: serial(),
+  serial: serial().primaryKey(),
   smallserial: smallserial(),
   bigserialNumber: bigserial({ mode: 'number' }),
   bigserialBigInt: bigserial({ mode: 'bigint' }),
