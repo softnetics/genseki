@@ -111,31 +111,6 @@ export function admin<TContext extends Context<FullSchema>>(
   const schema = baseConfig.schema
   const builder = new Builder({ schema: baseConfig.schema }).$context<typeof baseConfig.context>()
 
-  const userCollection = builder.collection('user', {
-    slug: 'user',
-    identifierColumn: 'id',
-    fields: builder.fields('user', (fb) => ({
-      name: fb.columns('name', {
-        type: 'text',
-      }),
-      email: fb.columns('email', {
-        type: 'text',
-      }),
-      role: fb.columns('role', {
-        type: 'text',
-      }),
-      banned: fb.columns('banned', {
-        type: 'checkbox',
-      }),
-      bannedReason: fb.columns('bannedReason', {
-        type: 'text',
-      }),
-      bannedExpiresAt: fb.columns('bannedExpiresAt', {
-        type: 'date',
-      }),
-    })),
-  })
-
   const hasPermissionEndpoint = builder.endpoint(
     {
       method: 'POST',
@@ -223,10 +198,6 @@ export function admin<TContext extends Context<FullSchema>>(
     plugin: (input) => {
       return {
         ...input,
-        collections: {
-          ...input.collections,
-          user: userCollection,
-        },
         endpoints: {
           ...input.endpoints,
           'auth.hasPermission': hasPermissionEndpoint,
