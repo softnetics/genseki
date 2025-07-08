@@ -13,7 +13,7 @@ import {
 } from '@genseki/react'
 
 import { EditorSlotBefore } from '../editor/slot-before'
-import { builder } from '../helper'
+import { builder, db } from '../helper'
 
 export const postEditorProviderProps = {
   immediatelyRender: false,
@@ -135,7 +135,7 @@ export const postsCollection = builder.collection('posts', {
           })),
         })),
       })),
-      options: builder.options(async ({ db }) => {
+      options: builder.options(async () => {
         const result = await db.query.user.findMany({ columns: { id: true, name: true } })
         return result.map((user) => ({ label: user.name, value: user.id }))
       }),

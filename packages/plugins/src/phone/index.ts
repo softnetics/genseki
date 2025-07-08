@@ -1,13 +1,13 @@
 import { and, eq } from 'drizzle-orm'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { z } from 'zod/v4'
 
 import type {
   AnyAccountTable,
+  AnyContextable,
   AnySessionTable,
   AnyTypedColumn,
   AnyVerificationTable,
-  BaseConfig,
-  Context,
   WithAnyTable,
 } from '@genseki/react'
 import type { AnyUserTable as BaseAnyUserTable } from '@genseki/react'
@@ -44,27 +44,34 @@ type FullSchema = WithAnyRelations<{
 }>
 
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function phone<TContext extends Context<FullSchema>>({
-  baseConfig,
+export function phone<TContext extends AnyContextable>({
+  db,
+  schema,
   sendOtp,
   verifyOtp,
   signUpOnVerification,
+  options,
 }: {
-  baseConfig: BaseConfig<FullSchema, TContext>
+  db: NodePgDatabase<FullSchema>
+  schema: FullSchema
+  context: TContext
   sendOtp?: (phone: string) => Promise<OtpRequestResponse>
   verifyOtp?: (args: { token: string; pin: string }) => Promise<boolean>
   signUpOnVerification?: {
     getTempEmail?: (phoneNumber: string) => string
     getTempName?: (phoneNumber: string) => string
   }
+  options?: {
+    autoLogin?: boolean
+    passwordHasher?: (passowrd: string) => Promise<string> | string
+  }
 }) {
-  const schema = baseConfig.schema
-  const builder = new Builder({ schema: baseConfig.schema }).$context<typeof baseConfig.context>()
+  const builder = new Builder({ db: db, schema: schema }).$context<TContext>()
 
   const internalHandlers = {
     account: {
       findByUserPhoneAndProvider: async (email: string, providerId: string) => {
-        const accounts = await baseConfig.db
+        const accounts = await db
           .select({
             user: schema.user,
             password: schema.account.password,
@@ -77,7 +84,7 @@ export function phone<TContext extends Context<FullSchema>>({
         return accounts[0]
       },
       link: async (data: any) => {
-        const user = await baseConfig.db.insert(schema.account).values(data).returning()
+        const user = await db.insert(schema.account).values(data).returning()
         return user[0]
       },
     },
@@ -85,7 +92,7 @@ export function phone<TContext extends Context<FullSchema>>({
       create: async (data: { userId: string; expiresAt: Date }) => {
         const table = schema.session
         const token = crypto.randomUUID()
-        const session = await baseConfig.db
+        const session = await db
           .insert(table)
           .values({ ...data, token })
           .returning()
@@ -94,7 +101,7 @@ export function phone<TContext extends Context<FullSchema>>({
     },
     user: {
       create: async (data: any) => {
-        const user = await baseConfig.db.insert(schema.user).values(data).returning()
+        const user = await db.insert(schema.user).values(data).returning()
         return user[0]
       },
     },
@@ -192,8 +199,7 @@ export function phone<TContext extends Context<FullSchema>>({
     },
     async ({ body }) => {
       const hashedPassword =
-        (await baseConfig.auth.emailAndPassword?.passwordHasher?.(body.password)) ??
-        (await hashPassword(body.password))
+        (await options?.passwordHasher?.(body.password)) ?? (await hashPassword(body.password))
 
       const name = body.name ?? signUpOnVerification?.getTempName?.(body.phone) ?? body.phone
       const email =
@@ -220,7 +226,7 @@ export function phone<TContext extends Context<FullSchema>>({
       // Check if auto login is enabled
 
       const responseHeaders = {}
-      if (baseConfig.auth.emailAndPassword?.signUp?.autoLogin !== false) {
+      if (options?.autoLogin !== false) {
         const session = await internalHandlers.session.create({
           userId: user.id,
           // TODO: Customize expiresAt
@@ -296,7 +302,7 @@ export function phone<TContext extends Context<FullSchema>>({
       const refCode = otpRequestResponse.refno
       const token = otpRequestResponse.token
 
-      await baseConfig.db.insert(schema.verification).values({
+      await db.insert(schema.verification).values({
         identifier: `verify-phone:${refCode}:${token}`,
         value: user.id,
         // TODO: Customize expiresAt
@@ -346,7 +352,7 @@ export function phone<TContext extends Context<FullSchema>>({
       // Check if the user is authenticated
       const user = (await context.requiredAuthenticated()) as { id: string }
 
-      const verification = await context.db
+      const verification = await db
         .select()
         .from(schema.verification)
         .where(and(eq(schema.verification.identifier, `verify-phone:${body.token}`)))
@@ -383,10 +389,7 @@ export function phone<TContext extends Context<FullSchema>>({
         }
       }
 
-      await baseConfig.db
-        .update(schema.user)
-        .set({ phoneVerified: true })
-        .where(eq(schema.user.id, user.id))
+      await db.update(schema.user).set({ phoneVerified: true }).where(eq(schema.user.id, user.id))
 
       return {
         status: 200 as const,

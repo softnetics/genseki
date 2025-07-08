@@ -2,17 +2,59 @@ import z from 'zod/v4'
 
 import { defineNextJsServerConfig } from '@genseki/next'
 import { phone } from '@genseki/plugins'
-import { defineServerConfig } from '@genseki/react'
+import { defineServerConfig, StorageAdapterS3 } from '@genseki/react'
+
+import * as schema from '~/db/schema'
 
 import { foodsCollection } from './collections/foods'
 import { usersCollection } from './collections/users'
-import { baseConfig, builder } from './helper'
+import { builder, db, MyContext } from './helper'
 
-const baseServerConfig = defineServerConfig(baseConfig, {
+const context = new MyContext()
+
+const baseServerConfig = defineServerConfig({
+  db: db,
+  schema: schema,
+  context: context,
+  storageAdapter: StorageAdapterS3.initailize({
+    bucket: process.env.AWS_BUCKET_NAME!,
+    clientConfig: {
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_KEY!,
+      },
+    },
+  }),
+  auth: {
+    resetPassword: {
+      enabled: true,
+      async sendEmailResetPassword(email, token) {
+        console.log('sendEmailResetPassword config', email, token)
+        return
+      },
+    },
+    user: {
+      model: schema.user,
+    },
+    session: {
+      model: schema.session,
+    },
+    account: {
+      model: schema.account,
+    },
+    verification: {
+      model: schema.verification,
+    },
+    emailAndPassword: {
+      enabled: true,
+    },
+    secret: '',
+  },
   plugins: [
     phone({
-      //  TODO: fix relation type
-      baseConfig,
+      db: db,
+      schema: schema,
+      context: context,
       sendOtp: async (phone) => {
         console.log(`Sending OTP to phone: ${phone}`)
         return {

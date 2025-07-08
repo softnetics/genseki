@@ -2,7 +2,7 @@ import type { Many, Table, TableRelationalConfig } from 'drizzle-orm'
 import type { ConditionalExcept, IsEqual, Simplify, UnionToIntersection, ValueOf } from 'type-fest'
 import z from 'zod/v4'
 
-import type { AnyContext, Context, RequestContext } from './context'
+import type { AnyContextable, AnyRequestContextable } from './context'
 import {
   type ApiRoute,
   type ApiRouteHandler,
@@ -304,17 +304,17 @@ export type InferFields<TFields extends FieldsClient> = SimplifyConditionalExcep
 > & { __pk: string | number; __id: string | number }
 
 export interface ServerApiHandlerArgs<
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
   TFields extends Fields<any, TContext> = Fields<any, TContext>,
 > {
   slug: string
   fields: TFields
-  context: RequestContext
+  context: AnyRequestContextable
 }
 
 export type ApiArgs<
   TMethod extends ApiDefaultMethod,
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? ServerApiHandlerArgs<TContext, TFields> & ApiCreateArgs<TFields>
@@ -360,7 +360,7 @@ export type ApiCreateArgs<TFields extends AnyFields> = {
 }
 
 export type ApiHandlerFn<
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
   TMethod extends ApiDefaultMethod,
 > = (args: ApiArgs<TMethod, TContext, TFields>) => MaybePromise<ApiReturnType<TMethod, TFields>>
@@ -391,7 +391,7 @@ export type ClientApiArgs<
           : never
 
 export type ApiConfigHandlerFn<
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
   TMethod extends ApiDefaultMethod,
 > = (
@@ -400,7 +400,7 @@ export type ApiConfigHandlerFn<
   }
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
-export type CollectionAdminApiConfig<TContext extends AnyContext, TFields extends AnyFields> = {
+export type CollectionAdminApiConfig<TContext extends AnyContextable, TFields extends AnyFields> = {
   create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
   findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
   findMany?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
@@ -408,7 +408,7 @@ export type CollectionAdminApiConfig<TContext extends AnyContext, TFields extend
   delete?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
 }
 
-export type CollectionAdminApi<TContext extends AnyContext, TFields extends AnyFields> = {
+export type CollectionAdminApi<TContext extends AnyContextable, TFields extends AnyFields> = {
   create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
   findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
   findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
@@ -417,7 +417,7 @@ export type CollectionAdminApi<TContext extends AnyContext, TFields extends AnyF
 }
 
 export type CollectionAdminConfig<
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
   TApiRouter extends ApiRouter<TContext>,
 > = {
@@ -436,7 +436,7 @@ export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
 export interface CollectionConfig<
   TSlug extends string,
   TTable extends Table,
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends FieldsInitial<any, TContext>,
   TAppRouter extends ApiRouter<TContext>,
 > {
@@ -450,7 +450,7 @@ export interface Collection<
   TSlug extends string,
   TTableName extends string,
   TFullSchema extends Record<string, unknown>,
-  in TContext extends Context<TFullSchema>,
+  in TContext extends AnyContextable,
   TFields extends Fields<TFullSchema, TContext>,
   TApiRouter extends ApiRouter<TContext> = {},
 > {
@@ -468,7 +468,7 @@ export type DefaultCollection = Collection<
   string,
   string,
   Record<string, unknown>,
-  AnyContext,
+  AnyContextable,
   AnyFields,
   ApiRouter<any>
 >
@@ -476,9 +476,9 @@ export type AnyCollection = Collection<
   string,
   string,
   any,
-  AnyContext,
+  AnyContextable,
   AnyFields,
-  ApiRouter<AnyContext>
+  ApiRouter<AnyContextable>
 >
 
 export type ToClientCollection<TCollection extends AnyCollection> = ClientCollection<
@@ -501,7 +501,7 @@ export type ClientCollection<
   TSlug extends string,
   TTableName extends string,
   TFullSchema extends Record<string, unknown>,
-  TContext extends Context<TFullSchema>,
+  TContext extends AnyContextable,
   TFields extends Record<string, FieldClient>,
   TApiRouter extends ClientApiRouter = {},
 > = Simplify<
@@ -628,7 +628,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
 
 export type CollectionDefaultAdminApiRouter<
   TSlug extends string,
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
 > = {
   create: ApiRoute<
@@ -655,7 +655,7 @@ export type CollectionDefaultAdminApiRouter<
 
 export type CollectionAdmin<
   TSlug extends string,
-  TContext extends AnyContext,
+  TContext extends AnyContextable,
   TFields extends AnyFields,
   TApiRouter extends ApiRouter<TContext>,
 > = {
@@ -664,7 +664,7 @@ export type CollectionAdmin<
 
 export function getDefaultCollectionAdminApiRouter<
   TSlug extends string = string,
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
   TFields extends AnyFields = AnyFields,
 >(
   slug: TSlug,
@@ -692,7 +692,7 @@ export function getDefaultCollectionAdminApiRouter<
             },
           } satisfies ApiRouteSchema
 
-          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+          const handler: ApiRouteHandler<AnyContextable, typeof schema> = async (args) => {
             const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
               slug: slug,
               fields: fields,
@@ -721,7 +721,7 @@ export function getDefaultCollectionAdminApiRouter<
             },
           } satisfies ApiRouteSchema
 
-          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+          const handler: ApiRouteHandler<AnyContextable, typeof schema> = async (args) => {
             const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
               slug: slug,
               fields: fields,
@@ -758,7 +758,7 @@ export function getDefaultCollectionAdminApiRouter<
             },
           } satisfies ApiRouteSchema
 
-          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+          const handler: ApiRouteHandler<AnyContextable, typeof schema> = async (args) => {
             const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
               slug: slug,
               fields: fields,
@@ -795,7 +795,7 @@ export function getDefaultCollectionAdminApiRouter<
             },
           } satisfies ApiRouteSchema
 
-          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+          const handler: ApiRouteHandler<AnyContextable, typeof schema> = async (args) => {
             const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
               slug: slug,
               fields: fields,
@@ -823,7 +823,7 @@ export function getDefaultCollectionAdminApiRouter<
             },
           } satisfies ApiRouteSchema
 
-          const handler: ApiRouteHandler<RequestContext, typeof schema> = async (args) => {
+          const handler: ApiRouteHandler<AnyContextable, typeof schema> = async (args) => {
             await (fn as ApiHandlerFn<any, any, typeof method>)({
               slug,
               fields,

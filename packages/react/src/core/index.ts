@@ -1,6 +1,14 @@
 export { type AuthHandlers, createAuth } from '../auth'
 export { AccountProvider } from '../auth/constant'
 export { hashPassword, setSessionCookie, verifyPassword } from '../auth/utils'
+export type {
+  AnyContextable,
+  AnyRequestContextable,
+  Contextable,
+  ContextToRequestContext,
+  RequestContextable,
+  RequestContextArgs,
+} from '../core/context'
 export { Builder } from './builder'
 export type {
   AnyCollection,
@@ -25,15 +33,8 @@ export type {
   ToClientCollection,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
-export type { AnyServerConfig, BaseConfig, ClientConfig, ServerConfig } from './config'
-export {
-  defineBaseConfig,
-  defineServerConfig,
-  getClientCollection,
-  getClientConfig,
-  getFieldsClient,
-} from './config'
-export { type AnyContext, Context, RequestContext } from './context'
+export type { AnyServerConfig, ClientConfig, ServerConfig } from './config'
+export { defineServerConfig, getClientCollection, getClientConfig, getFieldsClient } from './config'
 export type {
   ApiRoute,
   ApiRouteHandler,

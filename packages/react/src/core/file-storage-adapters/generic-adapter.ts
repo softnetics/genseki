@@ -1,9 +1,11 @@
 import type { createFileUploadHandlers } from './handlers'
 
-import type { AnyContext } from '../context'
+import type { AnyContextable } from '../context'
 import type { ClientApiRouteSchema } from '../endpoint'
 
-export type FileUploadHandlers = ReturnType<typeof createFileUploadHandlers<AnyContext>>['handlers']
+export type FileUploadHandlers = ReturnType<
+  typeof createFileUploadHandlers<AnyContextable>
+>['handlers']
 
 export interface UploadActionResponse<TData> {
   message: string

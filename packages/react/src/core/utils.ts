@@ -5,7 +5,7 @@ import * as R from 'remeda'
 import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
 import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { AnyContext, RequestContext } from './context'
+import type { AnyContextable } from './context'
 import type {
   ApiHttpStatus,
   ApiRouteHandler,
@@ -192,8 +192,7 @@ export function mapValueToTsValue(
 
 export async function validateRequestBody<
   TApiRouteSchema extends ApiRouteSchema = any,
-  TContextValue extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends RequestContext<TContextValue> = RequestContext<TContextValue>,
+  TContext extends AnyContextable = AnyContextable,
 >(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>) {
   let zodErrors:
     | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', z.core.$ZodIssue[]>>
@@ -257,7 +256,7 @@ export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = an
 
 export function withValidator<
   TApiRouteSchema extends ApiRouteSchema,
-  TContext extends AnyContext = AnyContext,
+  TContext extends AnyContextable = AnyContextable,
 >(
   schema: TApiRouteSchema,
   handler: ApiRouteHandler<TContext, TApiRouteSchema>

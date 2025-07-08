@@ -3,45 +3,42 @@ import z from 'zod/v4'
 
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
-import { defineBaseConfig, defineServerConfig, getClientConfig } from './config'
+import { defineServerConfig, getClientConfig } from './config'
+import { type Contextable, type RequestContextable, type RequestContextArgs } from './context'
 
 const db = drizzle({
   connection: '',
   schema: schema,
 })
 
-const baseConfig = defineBaseConfig({
-  db: db,
-  schema: schema,
-  context: { example: 'example' },
-  auth: {
-    user: {
-      model: schema.user,
-    },
-    session: {
-      model: schema.session,
-    },
-    account: {
-      model: schema.account,
-    },
-    verification: {
-      model: schema.verification,
-    },
-    emailAndPassword: {
-      enabled: true,
-    },
-    oauth2: {
-      google: {
-        enabled: true,
-        clientId: '',
-        clientSecret: '',
-      },
-    },
-    secret: '',
-  },
-})
+interface User {
+  id: string
+  name: string
+  email: string
+}
 
-const builder = new Builder({ schema }).$context<typeof baseConfig.context>()
+class MyRequestContext implements RequestContextable<User> {
+  constructor() {}
+
+  requiredAuthenticated() {
+    // Simulate an authenticated user
+    return {
+      id: '123',
+      name: 'John Doe',
+      email: 'example@example.com',
+    }
+  }
+}
+
+class MyContext implements Contextable<User> {
+  constructor(public readonly sentence: string) {}
+
+  toRequestContext(args: RequestContextArgs) {
+    return new MyRequestContext()
+  }
+}
+
+const builder = new Builder({ db, schema }).$context<MyContext>()
 
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
@@ -57,7 +54,7 @@ export const authorCollection = builder.collection('authors', {
     }),
     example: fb.columns('bio', {
       type: 'selectText',
-      options: async ({ db }) => {
+      options: async (context) => {
         const result = await db.query.authors.findMany()
         return result.map((author) => ({
           label: author.name,
@@ -94,7 +91,7 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async ({ db }) => {
+      options: async () => {
         const result = await db.query.authors.findMany()
         return result.map((author) => ({
           label: author.name,
@@ -112,7 +109,7 @@ export const postCollection = builder.collection('posts', {
           type: 'text',
         }),
       })),
-      options: async ({ db }) => {
+      options: async () => {
         const result = await db.query.categories.findMany()
         return result.map((category) => ({
           label: category.name,
@@ -128,7 +125,7 @@ export const postCollection = builder.collection('posts', {
         }),
         tagId: fb.columns('tagId', {
           type: 'selectNumber',
-          options: async ({ db }) => {
+          options: async () => {
             const result = await db.query.tags.findMany()
             return result.map((tag) => ({
               label: tag.name,
@@ -198,7 +195,35 @@ export const postCollection = builder.collection('posts', {
   },
 })
 
-export const serverConfig = defineServerConfig(baseConfig, {
+export const serverConfig = defineServerConfig({
+  db: db,
+  schema: schema,
+  context: new MyContext('Hello World'),
+  auth: {
+    user: {
+      model: schema.user,
+    },
+    session: {
+      model: schema.session,
+    },
+    account: {
+      model: schema.account,
+    },
+    verification: {
+      model: schema.verification,
+    },
+    emailAndPassword: {
+      enabled: true,
+    },
+    oauth2: {
+      google: {
+        enabled: true,
+        clientId: '',
+        clientSecret: '',
+      },
+    },
+    secret: '',
+  },
   collections: {
     authors: authorCollection,
     posts: postCollection,
