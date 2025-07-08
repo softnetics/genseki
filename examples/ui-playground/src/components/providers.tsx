@@ -4,6 +4,8 @@ import type { PropsWithChildren } from 'react'
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 
+import { Toast } from '@genseki/react'
+
 export function Providers(props: PropsWithChildren) {
   return (
     <NextThemesProvider
@@ -14,6 +16,7 @@ export function Providers(props: PropsWithChildren) {
       enableColorScheme
     >
       {props.children}
+      <Toast />
     </NextThemesProvider>
   )
 }

@@ -1,6 +1,6 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 
 import { IconGallery, IconGrid4, IconLink, IconRedo, IconUndo } from '@intentui/icons'
 import {
@@ -19,9 +19,18 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { StarterKit } from '@tiptap/starter-kit'
+import { useTheme } from 'next-themes'
 
 import {
+  Breadcrumbs,
+  BreadcrumbsItem,
+  ButtonGroup,
+  ButtonGroupItem,
   Link,
+  Pagination,
+  Radio,
+  RadioGroup,
+  ReorderGroup,
   Switch,
   Tag,
   TagGroup,
@@ -262,9 +271,42 @@ const countries = [
   },
 ]
 
+interface ReorderMockData {
+  id: string
+  text: string
+}
+
+const mockDataReorder: ReorderMockData[] = [
+  { id: 'id1', text: 'Button 1' },
+  { id: 'id2', text: 'Button 2' },
+  { id: 'id3', text: 'Button 3' },
+  { id: 'id4', text: 'Button 4' },
+  { id: 'id5', text: 'Button 5' },
+]
+
 export default function UIPlayground() {
+  const { setTheme, theme } = useTheme()
+  const [btnData, setBtnData] = useState<ReorderMockData[]>(mockDataReorder)
+
+  // Map new order
+  const handleReorder = (newOrder: string[]) => {
+    setBtnData((prev) => {
+      const map = new Map(prev.map((item) => [item.id, item]))
+      return newOrder.map((id) => map.get(id)).filter((b): b is ReorderMockData => Boolean(b))
+    })
+  }
+
   return (
-    <div className="bg-bg pb-24">
+    <div className="bg-white pb-24 relative dark:bg-black">
+      <div className="fixed top-6 right-6 z-50">
+        <Button
+          variant={theme === 'dark' ? 'secondary' : 'primary'}
+          size="md"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          {theme === 'dark' ? 'Light' : 'Dark'}
+        </Button>
+      </div>
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" categoryTitle="Theme playground">
           <div className="bg-bg border-border rounded-sm border px-8 py-4">
@@ -1355,6 +1397,70 @@ export default function UIPlayground() {
             </div>
           </div>
         </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Button group">
+        <PlaygroundCard title="Medium size (md)" categoryTitle="Button group">
+          <div className="flex items-center gap-x-4">
+            <ButtonGroup>
+              <ButtonGroupItem id="1d">1d</ButtonGroupItem>
+              <ButtonGroupItem id="1w">1w</ButtonGroupItem>
+              <ButtonGroupItem id="1m">1m</ButtonGroupItem>
+              <ButtonGroupItem id="1y">1y</ButtonGroupItem>
+            </ButtonGroup>
+          </div>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Breadcrumbs">
+        <PlaygroundCard title="4 items" categoryTitle="Breadcrumbs">
+          <Breadcrumbs>
+            <BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page1</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page2</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page3</BreadcrumbsItem>
+          </Breadcrumbs>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Pagination">
+        <PlaygroundCard title="Default" categoryTitle="Pagination">
+          <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Radio group">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Radio group">
+            <RadioGroup aria-label="Radio">
+              <Radio value="x">X</Radio>
+              <Radio value="y">Y</Radio>
+              <Radio value="z" isDisabled>
+                Z
+              </Radio>
+            </RadioGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Small size (sm)" categoryTitle="Radio group">
+            <RadioGroup aria-label="Radio">
+              <Radio value="x" size="sm">
+                X
+              </Radio>
+              <Radio value="y" size="sm">
+                Y
+              </Radio>
+              <Radio value="z" isDisabled size="sm">
+                Z
+              </Radio>
+            </RadioGroup>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Reorder group">
+        <ReorderGroup title="Reorder Item" onReorder={handleReorder}>
+          {btnData.map((b) => (
+            // key use for reorder group
+            <div key={b.id} className="p-4 bg-bluegray-600 text-bluegray-50">
+              {b.text}
+            </div>
+          ))}
+        </ReorderGroup>
       </Wrapper>
     </div>
   )
