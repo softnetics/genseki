@@ -28,6 +28,7 @@ import {
   ButtonGroupItem,
   Link,
   Pagination,
+  ProgressBar,
   Radio,
   RadioGroup,
   ReorderGroup,
@@ -587,7 +588,7 @@ export default function UIPlayground() {
       <Wrapper title="Badge">
         <PlaygroundCard title="Small size (sm)" categoryTitle="Badge">
           <div className="flex flex-wrap gap-2">
-            {['gray', 'primary', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
               (intent, index) => (
                 <Badge key={index} intent={intent as any} shape="circle" size="sm">
                   {intent}
@@ -598,7 +599,7 @@ export default function UIPlayground() {
         </PlaygroundCard>
         <PlaygroundCard title="Medium size (md)" categoryTitle="Badge">
           <div className="flex flex-wrap gap-2">
-            {['gray', 'primary', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
               (intent, index) => (
                 <Badge key={index} intent={intent as any} shape="circle">
                   {intent}
@@ -1485,6 +1486,33 @@ export default function UIPlayground() {
             </div>
           ))}
         </ReorderGroup>
+      </Wrapper>
+
+      <Wrapper title="Progress bar">
+        <div className="grid grid-cols-3 gap-4">
+          <PlaygroundCard title="Default" categoryTitle="Progress bar">
+            <ProgressBar value={0} className="w-full" />
+            <ProgressBar value={25} className="w-full" />
+            <ProgressBar value={50} className="w-full" />
+            <ProgressBar value={75} className="w-full" />
+            <ProgressBar value={100} className="w-full" />
+          </PlaygroundCard>
+
+          <PlaygroundCard title="isShowPercent" categoryTitle="Progress bar">
+            <ProgressBar value={0} className="w-full" />
+            <ProgressBar value={25} className="w-full" isShowPercent />
+            <ProgressBar value={50} className="w-full" isShowPercent />
+            <ProgressBar value={75} className="w-full" isShowPercent />
+            <ProgressBar value={100} className="w-full" isShowPercent />
+          </PlaygroundCard>
+          <PlaygroundCard title="isShowPercentPopup" categoryTitle="Progress bar">
+            <ProgressBar value={0} className="w-full" />
+            <ProgressBar value={25} className="w-full" isShowPercentPopup />
+            <ProgressBar value={50} className="w-full" isShowPercentPopup />
+            <ProgressBar value={75} className="w-full" isShowPercentPopup />
+            <ProgressBar value={100} className="w-full" isShowPercentPopup />
+          </PlaygroundCard>
+        </div>
       </Wrapper>
     </div>
   )
