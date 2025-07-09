@@ -18,7 +18,7 @@ import { XIcon } from '@phosphor-icons/react'
 import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
-import { badgeIntents, badgeShapes, badgeStyles } from './badge'
+import { badgeShapes, badgeStyles } from './badge'
 import { Description, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
@@ -27,59 +27,64 @@ import { BaseIcon } from '../../components/primitives/base-icon'
 const intents = {
   primary: {
     base: [
-      badgeIntents.primary,
-      '**:[[slot=remove]]:hover:bg-primary **:[[slot=remove]]:hover:text-primary-fg',
+      'bg-pumpkin-100 text-pumpkin-600 **:[[slot=remove]]:hover:bg-primary **:[[slot=remove]]:hover:text-primary-fg',
     ],
     selected: [
       'bg-primary dark:hover:bg-primary dark:bg-primary hover:bg-primary text-primary-fg dark:text-primary-fg hover:text-primary-fg',
       '**:[[slot=remove]]:hover:bg-primary-fg/50 **:[[slot=remove]]:hover:text-primary',
     ],
   },
-  secondary: {
+  gray: {
     base: [
-      badgeIntents.secondary,
-      '**:[[slot=remove]]:hover:bg-fg **:[[slot=remove]]:hover:text-bg',
+      'bg-bluegray-100 text-text-body **:[[slot=remove]]:hover:bg-fg **:[[slot=remove]]:hover:text-bg',
     ],
     selected: [
-      'bg-fg text-bg dark:bg-fg/90 dark:text-secondary',
+      'bg-stroke-body text-white',
       '**:[[slot=remove]]:hover:bg-secondary/30 **:[[slot=remove]]:hover:text-secondary',
     ],
   },
-  success: {
+  correct: {
     base: [
-      badgeIntents.success,
-      '**:[[slot=remove]]:hover:bg-success **:[[slot=remove]]:hover:text-success-fg',
+      'bg-surface-correct text-text-correct **:[[slot=remove]]:hover:bg-success **:[[slot=remove]]:hover:text-success-fg',
     ],
     selected: [
-      'bg-success dark:bg-success dark:text-success-fg dark:hover:bg-success hover:bg-success text-success-fg hover:text-success-fg',
+      'bg-palm-500 text-white',
       '**:[[slot=remove]]:hover:bg-success-fg/30 **:[[slot=remove]]:hover:text-success-fg',
     ],
   },
-  warning: {
+  incorrect: {
     base: [
-      badgeIntents.warning,
-      '**:[[slot=remove]]:hover:bg-warning **:[[slot=remove]]:hover:text-warning-fg',
+      'bg-red-50 text-red-700 **:[[slot=remove]]:hover:bg-danger **:[[slot=remove]]:hover:text-danger-fg',
     ],
     selected: [
-      'bg-warning dark:hover:bg-warning dark:bg-warning dark:text-bg hover:bg-warning text-warning-fg hover:text-warning-fg',
+      'bg-red-500 text-white',
+      '**:[[slot=remove]]:hover:bg-danger-fg/30 **:[[slot=remove]]:hover:text-danger-fg',
+    ],
+  },
+  accent: {
+    base: [
+      'bg-yellow-50 text-yellow-600 **:[[slot=remove]]:hover:bg-warning **:[[slot=remove]]:hover:text-warning-fg',
+    ],
+    selected: [
+      'bg-yellow-500 text-white',
       '**:[[slot=remove]]:hover:bg-warning-fg/30 **:[[slot=remove]]:hover:text-warning-fg',
     ],
   },
-  danger: {
+  info: {
     base: [
-      badgeIntents.danger,
+      'bg-ocean-50 text-ocean-600',
       '**:[[slot=remove]]:hover:bg-danger **:[[slot=remove]]:hover:text-danger-fg',
     ],
     selected: [
-      'bg-danger dark:bg-danger dark:hover:bg-danger/90 hover:bg-danger text-danger-fg hover:text-danger-fg',
+      'bg-ocean-500 text-white',
       '**:[[slot=remove]]:hover:bg-danger-fg/30 **:[[slot=remove]]:hover:text-danger-fg',
     ],
   },
 }
 
-type RestrictedIntent = 'primary' | 'secondary'
+type RestrictedIntent = 'primary' | 'gray' | 'correct' | 'incorrect' | 'accent' | 'info'
 
-type Intent = 'primary' | 'secondary' | 'warning' | 'danger' | 'success'
+type Intent = 'primary' | 'gray' | 'correct' | 'incorrect' | 'accent' | 'info'
 
 type Shape = keyof typeof badgeShapes
 
@@ -145,9 +150,10 @@ const tagStyles = tv({
 interface TagProps extends TagPrimitiveProps {
   intent?: Intent
   shape?: Shape
+  size?: 'sm' | 'md'
 }
 
-const Tag = ({ className, intent, shape, ...props }: TagProps) => {
+const Tag = ({ className, intent, shape, size = 'md', ...props }: TagProps) => {
   const textValue = typeof props.children === 'string' ? props.children : undefined
   const groupContext = use(TagGroupContext)
 
@@ -163,8 +169,10 @@ const Tag = ({ className, intent, shape, ...props }: TagProps) => {
           ...renderProps,
           isLink: 'href' in props,
           className: twJoin([
+            'border-none transition-colors duration-100',
             intents[finalIntent]?.base,
             badgeShapes[finalShape],
+            size === 'sm' ? 'text-sm px-4 py-2' : 'text-base px-4 py-3',
             renderProps.isSelected ? intents[finalIntent].selected : undefined,
           ]),
         })
@@ -177,9 +185,9 @@ const Tag = ({ className, intent, shape, ...props }: TagProps) => {
             {allowsRemoving && (
               <Button
                 slot="remove"
-                className="-mr-0.5 ml-0.5 grid size-6 place-content-center rounded-sm hover:[&>[data-slot=icon]]:text-primary-fg outline-hidden [&>[data-slot=icon]]:size-5 [&>[data-slot=icon]]:shrink-0"
+                className="-mr-0.5 ml-4 grid size-6 place-content-center rounded-sm hover:[&>[data-slot=icon]]:text-primary-fg outline-hidden [&>[data-slot=icon]]:size-6 [&>[data-slot=icon]]:shrink-0"
               >
-                <BaseIcon icon={XIcon} size="sm" className="text-inherit" />
+                <BaseIcon icon={XIcon} className="text-inherit" />
               </Button>
             )}
           </>

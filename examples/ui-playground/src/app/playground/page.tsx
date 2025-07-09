@@ -553,21 +553,23 @@ export default function UIPlayground() {
       <Wrapper title="Tag group">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Tag group" categoryTitle="Tag group">
-            <TagGroup label="Android Brands" selectionMode="multiple">
+            <TagGroup label="Colors" selectionMode="multiple">
               <TagList
                 items={[
-                  { id: '1', name: 'Samsung', available: false },
-                  { id: '2', name: 'OnePlus', available: true },
-                  { id: '3', name: 'Google', available: true },
-                  { id: '4', name: 'Xiaomi', available: false },
+                  { id: '1', name: 'Brand', available: false, intent: 'primary' },
+                  { id: '2', name: 'Gray', available: true, intent: 'gray' },
+                  { id: '3', name: 'Correct', available: true, intent: 'correct' },
+                  { id: '4', name: 'Incorrect', available: false, intent: 'incorrect' },
+                  { id: '5', name: 'Accent', available: false, intent: 'accent' },
+                  { id: '6', name: 'Info', available: false, intent: 'info' },
                 ]}
               >
-                {(item) => <Tag>{item.name}</Tag>}
+                {(item) => <Tag intent={item.intent as any}>{item.name}</Tag>}
               </TagList>
             </TagGroup>
           </PlaygroundCard>
           <PlaygroundCard title="Tag group with remove" categoryTitle="Tag group">
-            <TagGroup label="Android Brands" selectionMode="multiple" onRemove={() => {}}>
+            <TagGroup label="Android Brands (sm)" selectionMode="multiple" onRemove={() => {}}>
               <TagList
                 items={[
                   { id: '1', name: 'Samsung', available: false },
@@ -576,7 +578,7 @@ export default function UIPlayground() {
                   { id: '4', name: 'Xiaomi', available: false },
                 ]}
               >
-                {(item) => <Tag>{item.name}</Tag>}
+                {(item) => <Tag size="sm">{item.name}</Tag>}
               </TagList>
             </TagGroup>
           </PlaygroundCard>
@@ -585,7 +587,7 @@ export default function UIPlayground() {
       <Wrapper title="Badge">
         <PlaygroundCard title="Small size (sm)" categoryTitle="Badge">
           <div className="flex flex-wrap gap-2">
-            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+            {['gray', 'primary', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
               (intent, index) => (
                 <Badge key={index} intent={intent as any} shape="circle" size="sm">
                   {intent}
@@ -596,7 +598,7 @@ export default function UIPlayground() {
         </PlaygroundCard>
         <PlaygroundCard title="Medium size (md)" categoryTitle="Badge">
           <div className="flex flex-wrap gap-2">
-            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+            {['gray', 'primary', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
               (intent, index) => (
                 <Badge key={index} intent={intent as any} shape="circle">
                   {intent}

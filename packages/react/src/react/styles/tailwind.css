@@ -88,6 +88,17 @@
   --color-red-800: #991B1B;
   --color-red-900: #450A0A;
 
+  --color-yellow-50: #FEFCE8;
+  --color-yellow-100: #FEF9C3;
+  --color-yellow-200: #FEF08A;
+  --color-yellow-300: #FDE047;
+  --color-yellow-400: #FACC15;
+  --color-yellow-500: #EAB308;
+  --color-yellow-600: #CA8A04;
+  --color-yellow-700: #A16207;
+  --color-yellow-800: #854D0E;
+  --color-yellow-900: #422006;
+
   --color-black-normal: #000000;
   --color-black-vanish: rgba(0, 0, 0, 0);
 
@@ -166,6 +177,9 @@
   --color-warning: var(--warning);
   --color-warning-fg: var(--warning-fg);
 
+  --color-yellow: var(--yellow);
+  --color-yellow-fg: var(--yellow-fg);
+
   --color-muted: var(--muted);
   --color-muted-fg: var(--muted-fg);
 
@@ -230,6 +244,9 @@
 
     --danger: var(--color-valencia-600);
     --danger-fg: var(--color-valencia-50);
+
+    --accent: var(--color-yellow-500);
+    --accent-fg: var(--color-yellow-900);
 
     --border: var(--color-bluegray-300);
     --input: var(--color-bluegray-300);
