@@ -1,38 +1,42 @@
 import { CollectionFormLayout } from './layouts/collection-form-layout'
+import type { BaseViewProps } from './types'
 import { UpdateClientView } from './update.client'
 
-import { type ServerConfig } from '../../../core'
+import { getFieldsClient } from '../../../core'
+import type {
+  ApiDefaultMethod,
+  ConvertCollectionDefaultApiToApiRouteSchema,
+} from '../../../core/collection'
+import type { ApiRoute } from '../../../core/endpoint'
 import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
 
-interface UpdateViewProps<TServerConfig extends ServerConfig> {
+interface UpdateViewProps extends BaseViewProps {
   slug: string
   headers: Headers
   identifier: string
-  serverConfig: TServerConfig
+  findOne: ApiRoute<
+    ConvertCollectionDefaultApiToApiRouteSchema<string, (typeof ApiDefaultMethod)['FIND_ONE'], any>
+  >
 }
 
-export async function UpdateView<TServerConfig extends ServerConfig>(
-  props: UpdateViewProps<TServerConfig>
-) {
-  const collection = props.serverConfig.collections[props.slug]
-  if (!collection) throw new Error(`Collection ${props.slug} not found`)
-
+export async function UpdateView(props: UpdateViewProps) {
   const headersValue = getHeadersObject(props.headers)
 
-  const context = props.serverConfig.context.toRequestContext({
+  const context = props.context.toRequestContext({
     headers: headersValue,
   })
 
-  const result = await collection.admin.endpoints.findOne.handler({
+  const result = await props.findOne.handler({
     context,
     pathParams: {
       id: props.identifier,
     },
   })
 
-  const optionsRecord = await createOptionsRecord(context, collection.fields)
+  const optionsRecord = await createOptionsRecord(context, props.collectionOptions.fields)
+  const fieldsClient = getFieldsClient(props.collectionOptions.fields)
 
   return (
     <CollectionFormLayout>
@@ -40,6 +44,7 @@ export async function UpdateView<TServerConfig extends ServerConfig>(
         Update {props.slug}
       </Typography>
       <UpdateClientView
+        fields={fieldsClient}
         identifer={props.identifier}
         slug={props.slug}
         defaultValues={result.body}

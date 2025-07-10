@@ -31,10 +31,9 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
-import type { Field, FieldRelation } from '../../../../core'
-import type { AnyContextable } from '../../../../core/context'
+import type { FieldClient, FieldRelation } from '../../../../core'
 import { constructEditorProviderProps } from '../../../../core/richtext'
-import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
+import type { EditorProviderClientProps } from '../../../../core/richtext/types'
 import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
@@ -231,7 +230,7 @@ const AutoRichTextField = (props: {
   isDisabled?: boolean
   isPending?: boolean
   errorMessage?: string
-  editor: ClientEditorProviderProps
+  editor: EditorProviderClientProps
 }) => {
   const { field, error } = useFormItemController()
 
@@ -281,7 +280,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 
 interface AutoFieldProps {
   // NOTE: This should be FieldClient but the type is not correct
-  field: Field<any, AnyContextable> & { fieldName: string }
+  field: FieldClient & { fieldName: string }
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'
@@ -315,7 +314,8 @@ export function AutoField(props: AutoFieldProps) {
           component={
             <AutoRichTextField
               {...commonProps}
-              editor={field.editor as ClientEditorProviderProps}
+              // TODO: Fix this
+              editor={field.editor as EditorProviderClientProps}
               isDisabled={disabled}
             />
           }

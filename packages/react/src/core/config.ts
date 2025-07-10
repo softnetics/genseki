@@ -1,125 +1,89 @@
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
+import type { PropsWithChildren, ReactNode } from 'react'
+
 import * as R from 'remeda'
 
-import {
-  type AnyCollection,
-  type ClientCollection,
-  type Collection,
-  getAllCollectionEndpoints,
-  type ToClientCollection,
-  type ToClientCollectionList,
-} from './collection'
-import type { AnyContextable } from './context'
-import {
-  type ApiRoute,
-  type ApiRouter,
-  type ClientApiRouter,
-  getClientEndpoint,
-  type ToClientApiRouteSchema,
-  type ToRecordApiRouteSchema,
-} from './endpoint'
+import { type ApiRouter } from './endpoint'
 import type { AnyField, AnyFields, FieldClient, FieldsClient } from './field'
-import {
-  getStorageAdapterClient,
-  type StorageAdapter,
-  type StorageAdapterClient,
-} from './file-storage-adapters/generic-adapter'
-import { createFileUploadHandlers } from './file-storage-adapters/handlers'
-import type { GensekiPlugin } from './plugins'
-import { getClientEditorProviderProps } from './richtext'
+import { type StorageAdapter } from './file-storage-adapters/generic-adapter'
+import { getEditorProviderClientProps } from './richtext'
 import { isMediaField, isRelationField, isRichTextField } from './utils'
 
-import {
-  type AuthClient,
-  type AuthConfig,
-  type AuthHandlers,
-  createAuth,
-  getAuthClient,
-} from '../auth'
-
-export interface ServerConfigOptions<
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends AnyContextable = AnyContextable,
-  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
-  TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
-  TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
-> {
-  db: NodePgDatabase<TFullSchema>
-  schema: TFullSchema
-  context: TContext
-  auth: AuthConfig
-  collections: TCollections
-  endpoints: TApiRouter
-  plugins?: TPlugins
-  storageAdapter?: StorageAdapter
+interface RenderArgs {
+  params: Record<string, string>
+  headers: Headers
+  searchParams: { [key: string]: string | string[] }
 }
 
-export interface ServerConfig<
-  TFullSchema extends Record<string, unknown> = Record<string, unknown>,
-  TContext extends AnyContextable = AnyContextable,
-  TCollections extends Record<string, AnyCollection> = Record<string, AnyCollection>,
-  TApiRouter extends ApiRouter<TContext> = AuthHandlers & ApiRouter<TContext>,
-> {
-  db: NodePgDatabase<TFullSchema>
-  auth: AuthConfig
-  context: TContext
-  endpoints: TApiRouter
-  collections: TCollections
-  storageAdapter?: StorageAdapter
-}
+// TODO: Fix this type
+interface AuthenticatedRenderArgs extends RenderArgs {}
 
-export interface AnyServerConfig extends ServerConfig<any, AnyContextable, {}, {}> {}
+// TODO: Revise this one
+export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<string, unknown>> =
+  | {
+      requiredAuthenticated: true
+      id?: string
+      path: string
+      render: (args: AuthenticatedRenderArgs & TProps) => ReactNode
+      props?: TProps
+    }
+  | {
+      requiredAuthenticated: false
+      id?: string
+      path: string
+      render: (args: RenderArgs & TProps) => ReactNode
+      props?: TProps
+    }
 
-export type InferApiRouterFromServerConfig<TServerConfig extends ServerConfig<any, any, any>> =
-  TServerConfig extends ServerConfig<any, any, infer TApiRouter>
-    ? TApiRouter extends ApiRouter<any>
-      ? TApiRouter
-      : never
-    : never
-
-export function defineServerConfig<
-  const TName extends string,
-  const TFullSchema extends Record<string, unknown>,
-  const TContext extends AnyContextable,
-  const TCollections extends Record<string, AnyCollection>,
-  const TEndpoints extends ApiRouter<TContext>,
-  const TPlugins extends GensekiPlugin<any>[] = [...GensekiPlugin<any>[]],
->(config: ServerConfigOptions<TFullSchema, TContext, TCollections, TEndpoints, TPlugins>) {
-  const auth = createAuth<TFullSchema, TContext>(config)
-  const fileUploadHandlers = createFileUploadHandlers<TContext>(config.storageAdapter)
-  const collectionEndpoints = getAllCollectionEndpoints(config.collections)
-
-  const serverConfig: ServerConfig<
-    any,
-    TContext,
-    TCollections,
-    TEndpoints & AuthHandlers & typeof collectionEndpoints & typeof fileUploadHandlers.handlers
-  > = {
-    db: config.db,
-    auth: config.auth,
-    context: config.context,
-    storageAdapter: config.storageAdapter,
-    collections: config.collections,
-    endpoints: {
-      ...config.endpoints,
-      ...auth.handlers,
-      ...collectionEndpoints,
-      ...fileUploadHandlers.handlers,
-    } as TEndpoints &
-      typeof auth.handlers &
-      typeof collectionEndpoints &
-      typeof fileUploadHandlers.handlers,
+export interface GensekiAppOptions {
+  title: string
+  components: {
+    Layout: (props: PropsWithChildren) => ReactNode
+    NotFound: () => ReactNode
+    CollectionLayout: (props: PropsWithChildren) => ReactNode
   }
+  storageAdapter?: StorageAdapter
 }
 
-export interface ClientConfig<
-  TCollections extends Record<string, ClientCollection<any, any, any, any, any, any>>,
-  TApiRouter extends ClientApiRouter,
-> {
-  auth: AuthClient
-  collections: TCollections
-  endpoints: TApiRouter
-  storageAdapter?: StorageAdapterClient
+export interface GensekiCore<TApiRouter extends ApiRouter> {
+  api: TApiRouter
+  uis: GensekiUiRouter[]
+}
+
+export interface GensekiPlugin<TName extends string, TApiRouter extends ApiRouter> {
+  name: TName
+  plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
+}
+
+type AnyGensekiPlugin = GensekiPlugin<string, any>
+type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
+  TPlugin['plugin']
+>['api']
+
+export class GensekiApp<TMainApiRouter extends ApiRouter = {}> {
+  private readonly plugins: GensekiPlugin<string, ApiRouter>[] = []
+
+  constructor(private readonly options: GensekiAppOptions) {}
+
+  apply<const TPlugin extends AnyGensekiPlugin>(
+    plugin: TPlugin
+  ): GensekiApp<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
+    this.plugins.push(plugin)
+    // TODO: I don't know why this is needed, need to investigate
+    return this as unknown as GensekiApp<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
+  }
+
+  build(): GensekiCore<TMainApiRouter> {
+    const uis = this.plugins.flatMap((plugin) => plugin.plugin(this.options).uis)
+    const api = this.plugins.reduce(
+      (acc, plugin) => ({
+        ...acc,
+        ...plugin.plugin(this.options).api,
+      }),
+      {}
+    ) as TMainApiRouter
+
+    return { api: api, uis: uis }
+  }
 }
 
 export function getFieldClient(name: string, field: AnyField): FieldClient & { fieldName: string } {
@@ -161,7 +125,7 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
 
     const sanitizedRichTextField = {
       ...sanitizedBaseField,
-      editor: getClientEditorProviderProps(field.editor),
+      editor: getEditorProviderClientProps(field.editor),
     }
 
     return sanitizedRichTextField
@@ -191,47 +155,29 @@ export function getFieldsClient(fields: AnyFields): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 
-export function getClientCollection<
-  const TCollection extends Collection<any, any, any, any, any, any>,
->(collection: TCollection): ToClientCollection<TCollection> {
-  return R.pipe(
-    collection,
-    R.omit(['_', 'admin']),
-    (collection) =>
-      ({
-        ...collection,
-        fields: getFieldsClient(collection.fields),
-      }) as unknown as ToClientCollection<TCollection>
-  )
-}
+// export function getClientConfig<
+//   TCollections extends Record<string, AnyCollection>,
+//   TApiRouter extends ApiRouter<any>,
+// >(
+//   serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
+// ): ClientConfig<ToClientCollectionList<TCollections>, ToClientApiRouteSchema<TApiRouter>> & {
+//   $types: ToRecordApiRouteSchema<TApiRouter>
+// } {
+//   const clientEndpoints = R.mapValues(serverConfig.endpoints, (value) =>
+//     getClientEndpoint(value as ApiRoute<any, any>)
+//   ) as ToClientApiRouteSchema<TApiRouter>
 
-export function getClientConfig<
-  TCollections extends Record<string, AnyCollection>,
-  TApiRouter extends ApiRouter<any>,
->(
-  serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
-): ClientConfig<ToClientCollectionList<TCollections>, ToClientApiRouteSchema<TApiRouter>> & {
-  $types: ToRecordApiRouteSchema<TApiRouter>
-} {
-  const collections = serverConfig.collections
-
-  const clientEndpoints = R.mapValues(serverConfig.endpoints, (value) =>
-    getClientEndpoint(value as ApiRoute<any, any>)
-  ) as ToClientApiRouteSchema<TApiRouter>
-
-  return {
-    auth: getAuthClient(serverConfig.auth),
-    collections: R.mapValues(collections, (s) =>
-      getClientCollection(s as AnyCollection)
-    ) as unknown as ToClientCollectionList<TCollections>,
-    endpoints: clientEndpoints,
-    $types: undefined as any,
-    ...(serverConfig.storageAdapter && {
-      storageAdapter: getStorageAdapterClient({
-        storageAdapter: serverConfig.storageAdapter,
-        grabPutObjectSignedUrlApiRoute: clientEndpoints['file.generatePutObjSignedUrl'],
-        grabGetObjectSignedUrlApiRoute: clientEndpoints['file.generateGetObjSignedUrl'],
-      }),
-    }),
-  }
-}
+//   return {
+//     auth: getAuthClient(serverConfig.auth),
+//     collections: serverConfig.collections,
+//     endpoints: clientEndpoints,
+//     $types: undefined as any,
+//     ...(serverConfig.storageAdapter && {
+//       storageAdapter: getStorageAdapterClient({
+//         storageAdapter: serverConfig.storageAdapter,
+//         grabPutObjectSignedUrlApiRoute: clientEndpoints['file.generatePutObjSignedUrl'],
+//         grabGetObjectSignedUrlApiRoute: clientEndpoints['file.generateGetObjSignedUrl'],
+//       }),
+//     }),
+//   }
+// }

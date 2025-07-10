@@ -1,28 +1,26 @@
-import type { PropsWithChildren, ReactNode } from 'react'
-
 import {
   createTableRelationsHelpers,
   extractTablesRelationalConfig,
   type ExtractTablesWithRelations,
-  is,
-  Table,
 } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { Simplify } from 'type-fest'
 
 import { createDefaultApiHandlers } from './builder.handler'
 import {
-  type CollectionConfig,
+  type CollectionDefaultAdminApiRouter,
+  type CollectionOptions,
   type GetAllTableTsNames,
   getDefaultCollectionAdminApiRouter,
 } from './collection'
+import type { GensekiPlugin, GensekiUiRouter } from './config'
 import type { AnyContextable } from './context'
 import {
-  type ApiRoute,
+  type AnyApiRouter,
   type ApiRouteHandler,
   type ApiRouter,
   type ApiRouteSchema,
-  type AppendPrefixPathToApiRoute,
+  type ApiRouteWithContext,
   createEndpoint,
 } from './endpoint'
 import {
@@ -32,58 +30,12 @@ import {
   type FieldsWithFieldName,
   type OptionCallback,
 } from './field'
-import { appendFieldNameToFields, type GetTableByTableTsName } from './utils'
+import { appendFieldNameToFields } from './utils'
 
 import { CreateView } from '../react/views/collections/create'
+import { ListView } from '../react/views/collections/list'
 import { OneView } from '../react/views/collections/one'
 import { UpdateView } from '../react/views/collections/update'
-
-interface RenderArgs {
-  params: Record<string, string>
-  headers: Headers
-  searchParams: { [key: string]: string | string[] }
-}
-
-// TODO: Fix this type
-interface AuthenticatedRenderArgs extends RenderArgs {}
-
-// TODO: Revise this one
-export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<string, unknown>> =
-  | {
-      requiredAuthenticated: true
-      id?: string
-      path: string
-      render: (args: AuthenticatedRenderArgs & TProps) => ReactNode
-      props?: TProps
-    }
-  | {
-      requiredAuthenticated: false
-      id?: string
-      path: string
-      render: (args: RenderArgs & TProps) => ReactNode
-      props?: TProps
-    }
-
-export interface Genseki<
-  TName extends string,
-  TContext extends AnyContext,
-  TEndpoints extends ApiRouter<TContext> = {},
-> {
-  name: TName
-  endpoints: TEndpoints
-  uis: GensekiUiRouter[]
-}
-
-// TODO: Authentication context
-export interface GensekiBuilderArgs {
-  layout: (props: PropsWithChildren) => ReactNode
-}
-
-export type GensekiBuilder<
-  TName extends string,
-  TContext extends AnyContext,
-  TEndpoints extends ApiRouter<TContext> = {},
-> = (config: GensekiBuilderArgs) => Genseki<TName, TContext, TEndpoints>
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
@@ -92,7 +44,13 @@ export class Builder<
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>
 
-  constructor(private readonly config: { db: NodePgDatabase<TFullSchema>; schema: TFullSchema }) {
+  constructor(
+    private readonly config: {
+      db: NodePgDatabase<TFullSchema>
+      schema: TFullSchema
+      context: TContext
+    }
+  ) {
     const tablesConfig = extractTablesRelationalConfig(
       this.config.schema,
       createTableRelationsHelpers
@@ -103,147 +61,159 @@ export class Builder<
     this.tableTsNameByTableDbName = tablesConfig.tableNamesMap
   }
 
-  $context<TContext extends AnyContextable>(): Builder<TFullSchema, TContext> {
-    return new Builder<TFullSchema, TContext>({ db: this.config.db, schema: this.config.schema })
-  }
-
   collection<
-    const TSlug extends string = string,
-    const TTableTsName extends GetAllTableTsNames<TFullSchema> = GetAllTableTsNames<TFullSchema>,
-    const TFields extends Fields<TFullSchema, TContext> = Fields<TFullSchema, TContext>,
-    const TApiRouter extends ApiRouter<TContext> = {},
+    const TTableTsName extends GetAllTableTsNames<TFullSchema>,
+    const TSlug extends string,
+    const TFields extends Fields<TFullSchema, AnyContextable> = {},
+    const TApiRouter extends AnyApiRouter = {},
   >(
     tableTsName: TTableTsName,
-    config: CollectionConfig<
-      TSlug,
-      GetTableByTableTsName<TFullSchema, TTableTsName>,
-      TContext,
-      TFields,
-      TApiRouter
-    >
-  ): GensekiBuilder<TSlug, TContext, TApiRouter> {
-    const table = this.config.schema[tableTsName]
-
-    if (!is(table, Table)) {
-      throw new Error(`Table ${tableTsName as string} not found`)
-    }
-
+    options: CollectionOptions<TSlug, TContext, TFields, TApiRouter>
+  ): GensekiPlugin<
+    TSlug,
+    Simplify<TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>>
+  > {
     const defaultHandlers = createDefaultApiHandlers({
       db: this.config.db,
       schema: this.config.schema,
-      fields: config.fields,
-      identifierColumn: config.identifierColumn as string,
+      fields: options.fields,
       tableTsKey: tableTsName,
+      identifierColumn: options.identifierColumn as string,
       tables: this.tableRelationalConfigByTableTsName,
       tableNamesMap: this.tableTsNameByTableDbName,
     })
 
     const api = {
-      create: config.admin?.api?.create ?? defaultHandlers.create,
-      update: config.admin?.api?.update ?? defaultHandlers.update,
-      delete: config.admin?.api?.delete ?? defaultHandlers.delete,
-      findOne: config.admin?.api?.findOne ?? defaultHandlers.findOne,
-      findMany: config.admin?.api?.findMany ?? defaultHandlers.findMany,
+      create: options.admin?.api?.create ?? defaultHandlers.create,
+      update: options.admin?.api?.update ?? defaultHandlers.update,
+      delete: options.admin?.api?.delete ?? defaultHandlers.delete,
+      findOne: options.admin?.api?.findOne ?? defaultHandlers.findOne,
+      findMany: options.admin?.api?.findMany ?? defaultHandlers.findMany,
     }
 
-    const endpoints: TApiRouter = config.admin?.endpoints ?? ({} as TApiRouter)
+    const endpoints: TApiRouter = options.admin?.endpoints ?? ({} as TApiRouter)
 
-    const defaultEndpoints = getDefaultCollectionAdminApiRouter<
-      TSlug,
-      TContext,
-      FieldsWithFieldName<TFields>
-    >(config.slug, config.fields, {
+    const defaultEndpoints = getDefaultCollectionAdminApiRouter(options.slug, options.fields, {
       create: async (args) => {
         // TODO: Access control
-        const defaultApi = config.admin?.api?.create ? defaultHandlers.create : (undefined as any)
-        const result = await api.create({ ...args, defaultApi })
+        const defaultApi = options.admin?.api?.create ? defaultHandlers.create : (undefined as any)
+        const result = await api.create({ ...args, defaultApi } as any)
         return result
       },
       update: async (args) => {
         // TODO: Access control
-        const defaultApi = config.admin?.api?.update ? defaultHandlers.update : (undefined as any)
-        const result = await api.update({ ...args, defaultApi })
+        const defaultApi = options.admin?.api?.update ? defaultHandlers.update : (undefined as any)
+        const result = await api.update({ ...args, defaultApi } as any)
         return result
       },
       delete: async (args) => {
         // TODO: Access control
-        const defaultApi = config.admin?.api?.delete ? defaultHandlers.delete : (undefined as any)
-        const result = await api.delete({ ...args, defaultApi })
+        const defaultApi = options.admin?.api?.delete ? defaultHandlers.delete : (undefined as any)
+        const result = await api.delete({ ...args, defaultApi } as any)
         return result
       },
       findOne: async (args) => {
         // TODO: Access control
-        const defaultApi = config.admin?.api?.findOne ? defaultHandlers.findOne : (undefined as any)
-        const result = await api.findOne({ ...args, defaultApi })
+        const defaultApi = options.admin?.api?.findOne
+          ? defaultHandlers.findOne
+          : (undefined as any)
+        const result = await api.findOne({ ...args, defaultApi } as any)
         return result
       },
       findMany: async (args) => {
         // TODO: Access control
-        const defaultApi = config.admin?.api?.findMany
+        const defaultApi = options.admin?.api?.findMany
           ? defaultHandlers.findMany
           : (undefined as any)
-        const result = await api.findMany({ ...args, defaultApi })
+        const result = await api.findMany({ ...args, defaultApi } as any)
         return result
       },
     })
 
-    return (setting) => {
-      const Layout = setting.layout
-
-      const uiRouters: GensekiUiRouter[] = [
-        {
-          path: `/collections/${config.slug}`,
-          requiredAuthenticated: true,
-          render: (args) => (
-            <Layout>
-              <ListView {...args} {...args.params} />
-            </Layout>
-          ),
-        },
-        {
-          path: `/collections/${config.slug}/:identifier`,
-          requiredAuthenticated: true,
-          render: (args) => (
-            <Layout>
-              <OneView {...args} {...args.params} />
-            </Layout>
-          ),
-        },
-        {
-          path: `/collections/${config.slug}`,
-          requiredAuthenticated: true,
-          render: (args) => (
-            <Layout>
-              <CreateView {...args} {...args.params} />
-            </Layout>
-          ),
-        },
-        {
-          path: `/collections/${config.slug}/create`,
-          requiredAuthenticated: true,
-          render: (args) => (
-            <Layout>
-              <CreateView {...args} {...args.params} />
-            </Layout>
-          ),
-        },
-        {
-          path: `/collections/${config.slug}/update/:identifier`,
-          requiredAuthenticated: true,
-          render: (args) => (
-            <Layout>
-              <UpdateView {...args} {...args.params} />
-            </Layout>
-          ),
-        },
-      ]
-
-      return {
-        name: config.slug,
-        endpoints: endpoints,
-        uis: uiRouters,
-      }
+    const allEndpoints = {
+      ...defaultEndpoints,
+      ...endpoints,
     }
+
+    // TODO: Add defaultApiType to GensekiPlugin
+    const plugin: GensekiPlugin<
+      TSlug,
+      TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>
+    > = {
+      name: options.slug,
+      plugin: (gensekiOptions) => {
+        const CollectionLayout = gensekiOptions.components.CollectionLayout
+
+        const defaultArgs = {
+          slug: options.slug,
+          context: this.config.context,
+          collectionOptions: options,
+        }
+
+        const uis: GensekiUiRouter[] = [
+          {
+            path: `/collections/${options.slug}`,
+            requiredAuthenticated: true,
+            render: (args) => (
+              <CollectionLayout>
+                <ListView
+                  {...args}
+                  {...args.params}
+                  {...defaultArgs}
+                  findMany={allEndpoints.findMany}
+                />
+              </CollectionLayout>
+            ),
+          },
+          {
+            path: `/collections/${options.slug}/:identifier`,
+            requiredAuthenticated: true,
+            render: (args) => (
+              <CollectionLayout>
+                <OneView
+                  {...args}
+                  {...args.params}
+                  {...defaultArgs}
+                  identifier={args.params.identifier}
+                  findOne={allEndpoints.findOne}
+                />
+              </CollectionLayout>
+            ),
+          },
+          {
+            path: `/collections/${options.slug}/create`,
+            requiredAuthenticated: true,
+            render: (args) => (
+              <CollectionLayout>
+                <CreateView {...args} {...args.params} {...defaultArgs} />
+              </CollectionLayout>
+            ),
+          },
+          {
+            path: `/collections/${options.slug}/update/:identifier`,
+            requiredAuthenticated: true,
+            render: (args) => (
+              <CollectionLayout>
+                <UpdateView
+                  {...args}
+                  {...args.params}
+                  {...defaultArgs}
+                  identifier={args.params.identifer}
+                  findOne={allEndpoints.findOne}
+                />
+              </CollectionLayout>
+            ),
+          },
+        ]
+
+        return {
+          api: allEndpoints as TApiRouter &
+            CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>,
+          uis: uis,
+        }
+      },
+    }
+    return plugin
   }
 
   fields<
@@ -269,12 +239,11 @@ export class Builder<
   endpoint<const TApiEndpointSchema extends ApiRouteSchema>(
     args: TApiEndpointSchema,
     handler: ApiRouteHandler<TContext, TApiEndpointSchema>
-  ): AppendPrefixPathToApiRoute<ApiRoute<TContext, TApiEndpointSchema>, '/api'> {
-    const prefixPath = '/api'
-    args.path = `${prefixPath}${args.path}`
-    return createEndpoint(args, handler) as AppendPrefixPathToApiRoute<
-      ApiRoute<TContext, TApiEndpointSchema>,
-      '/api'
-    >
+  ): ApiRouteWithContext<TContext, TApiEndpointSchema> {
+    return createEndpoint(args, handler)
+  }
+
+  endpoints<const TApiRouter extends ApiRouter>(endpoints: TApiRouter): Simplify<TApiRouter> {
+    return endpoints
   }
 }

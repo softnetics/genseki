@@ -1,5 +1,6 @@
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
-import { z, type ZodType } from 'zod/v4'
+import type { z } from 'zod/v4'
+import { type ZodType } from 'zod/v4'
 
 import type { MaybePromise } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
@@ -21,11 +22,7 @@ export type InferPathParams<TPath extends string> = Simplify<
 
 // TODO: With IsNever, the performance is not good. Need to fix it.
 type GetBody<TApiRouteSchema extends ApiRouteSchema> =
-  TApiRouteSchema extends ApiRouteMutationSchema
-    ? IsNever<TApiRouteSchema['body']> extends false
-      ? Output<TApiRouteSchema['body']>
-      : never
-    : never
+  IsNever<TApiRouteSchema['body']> extends false ? Output<TApiRouteSchema['body']> : never
 
 type GetHeadersObject<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['headers']>> extends false
@@ -71,15 +68,13 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContext extends AnyContextable = AnyContextable,
+  TContext extends AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
   payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
-export type GetApiRouteSchemaFromApiRouteHandler<
-  TApiRouteHandler extends ApiRouteHandler<any, any>,
-> =
+export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
   TApiRouteHandler extends ApiRouteHandler<any, infer TApiRouteSchema extends ApiRouteSchema>
     ? TApiRouteSchema
     : never
@@ -90,27 +85,34 @@ export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = Val
     : never
 }>
 
-export interface ApiRouteCommonSchema {
+export interface ApiRouteSchema {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
-  pathParams?: InputSchema
+  body?: InputSchema
   query?: InputSchema
   headers?: InputSchema
+  pathParams?: InputSchema
   description?: string
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
 }
 
-export interface ApiRouteQuerySchema extends ApiRouteCommonSchema {
-  method: 'GET'
+export interface AnyApiRouteSchema {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
+  body?: any
+  pathParams?: any
+  query?: any
+  headers?: any
+  description?: string
+  responses: Partial<Record<ApiHttpStatus, any>>
 }
 
-export interface ApiRouteMutationSchema extends ApiRouteCommonSchema {
-  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-  body: InputSchema
+export type ApiRoute<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = {
+  schema: TApiRouteSchema
+  handler: ApiRouteHandler<AnyContextable, TApiRouteSchema>
 }
 
-export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
-
-export type ApiRoute<
+export type ApiRouteWithContext<
   TContext extends AnyContextable = AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
@@ -118,85 +120,21 @@ export type ApiRoute<
   handler: ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
-export type AppendPrefixPathToApiRoute<
-  TApiRoute extends ApiRoute<any, any>,
-  TPrefixPath extends string,
-> =
-  TApiRoute extends ApiRoute<infer TContext, any>
-    ? TApiRoute extends { schema: { path: infer TPath extends string } }
-      ? Simplify<
-          { path: `${TPrefixPath}${TPath}` } & Omit<TApiRoute['schema'], 'path'>
-        > extends infer TNewApiRouteSchema extends ApiRouteSchema
-        ? ApiRoute<TContext, TNewApiRouteSchema>
-        : never
-      : never
-    : never
-
-export interface ApiRouter<in TContext extends AnyContextable = AnyContextable> {
-  [key: string]: ApiRoute<TContext, any>
+export interface ApiRouter {
+  [key: string]: ApiRouter | ApiRoute
 }
 
-export interface ClientApiRouteSchema {
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-  path: string
-  pathParams?: z.core.JSONSchema.BaseSchema
-  query?: z.core.JSONSchema.BaseSchema
-  headers?: z.core.JSONSchema.BaseSchema
-  description?: string
-  body?: z.core.JSONSchema.BaseSchema
-  responses: Partial<Record<ApiHttpStatus, z.core.JSONSchema.BaseSchema>>
+export interface AnyApiRouter {
+  [key: string]: ApiRouter | ApiRoute<AnyApiRouteSchema>
 }
 
-export interface ClientApiRouter {
-  [key: string]: ClientApiRouteSchema
-}
-
-export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<AnyContextable>> = {
-  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, any>
-    ? TApiRouter[TKey]['schema']
-    : never
-}
-
-export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<AnyContextable>> = {
-  [TKey in keyof TApiRouter]: ClientApiRouteSchema
-}
-
-export function createEndpoint<
-  const TApiEndpointSchema extends ApiRouteSchema,
-  const TContext extends AnyContextable = AnyContextable,
->(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
+export function createEndpoint<const TApiEndpointSchema extends ApiRouteSchema>(
+  schema: TApiEndpointSchema,
+  handler: ApiRouteHandler<AnyContextable, TApiEndpointSchema>
+) {
   return {
     schema,
     handler: handler,
     // handler: withValidator(schema, handler),
   }
-}
-
-export function getClientEndpoint(endpoint: ApiRoute<any>): ClientApiRouteSchema {
-  const schema = endpoint.schema
-  const template = {
-    path: schema.path,
-    method: schema.method,
-    ...(schema.headers ? { headers: z.toJSONSchema(schema.headers) } : {}),
-    ...(schema.pathParams
-      ? {
-          pathParams: z.toJSONSchema(schema.pathParams),
-        }
-      : {}),
-    ...(schema.query ? { query: z.toJSONSchema(schema.query) } : {}),
-    responses: Object.fromEntries(
-      Object.entries(schema.responses).map(([key, value]) => {
-        return [key, value ? z.toJSONSchema(value) : undefined]
-      })
-    ) as Partial<Record<ApiHttpStatus, z.core.JSONSchema.BaseSchema>>,
-  }
-
-  if (schema.method === 'GET') {
-    return template as ClientApiRouteSchema
-  }
-
-  return {
-    ...template,
-    body: schema.body ? z.toJSONSchema(schema.body) : undefined,
-  } as ClientApiRouteSchema
 }

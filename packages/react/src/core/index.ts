@@ -11,30 +11,17 @@ export type {
 } from '../core/context'
 export { Builder } from './builder'
 export type {
-  AnyCollection,
   ApiReturnType,
   ClientApiArgs,
-  ClientCollection,
-  Collection,
-  CollectionAdmin,
   CollectionAdminApi,
-  CollectionAdminApiConfig,
-  CollectionAdminConfig,
-  CollectionConfig,
-  DefaultCollection,
-  InferApiRouterFromCollection,
-  InferContextFromCollection,
+  CollectionAdminApiOptions,
+  CollectionAdminOptions,
+  CollectionOptions,
   InferField,
   InferFields,
-  InferFieldsFromCollection,
-  InferFullSchemaFromCollection,
-  InferSlugFromCollection,
-  InferTableNameFromCollection,
-  ToClientCollection,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
-export type { AnyServerConfig, ClientConfig, ServerConfig } from './config'
-export { defineServerConfig, getClientCollection, getClientConfig, getFieldsClient } from './config'
+export { GensekiApp, getFieldsClient } from './config'
 export type {
   ApiRoute,
   ApiRouteHandler,
@@ -42,20 +29,18 @@ export type {
   ApiRouter,
   ApiRouteResponse,
   ApiRouteSchema,
-  ClientApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
 export type {
   AnyFields,
   Field,
-  FieldBase,
+  FieldOptionsBase as FieldBase,
   FieldClient,
   FieldRelation,
   Fields,
   FieldsClient,
 } from './field'
 export * from './file-storage-adapters'
-export { createPlugin, type GensekiPlugin } from './plugins'
 export type {
   AnyTypedColumn,
   WithAnyRelations,

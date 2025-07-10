@@ -8,7 +8,7 @@ import StarterKit from '@tiptap/starter-kit'
 import * as R from 'remeda'
 import { toast } from 'sonner'
 
-import type { ClientEditorProviderProps, SanitizedExtension } from './types'
+import type { EditorProviderClientProps, SanitizedExtension } from './types'
 
 import { BackColorExtension, CustomImageExtension, ImageUploadNodeExtension } from '../../react'
 import { SelectionExtension } from '../../react/components/compound/editor/extensions/selection-extension'
@@ -112,9 +112,9 @@ export const constructSanitizedExtensions = (
  * @param serverEditorProviderProps - Raw editor provider configuration
  * @returns Sanitized editor provider props safe for client-side use
  */
-export const getClientEditorProviderProps = (
+export const getEditorProviderClientProps = (
   serverEditorProviderProps: EditorProviderProps
-): ClientEditorProviderProps => {
+): EditorProviderClientProps => {
   const sanitizedExtensions = getSanitizedExtensions(serverEditorProviderProps.extensions ?? [])
 
   const clientEditorProviderProps = R.pipe(
@@ -131,7 +131,7 @@ export const getClientEditorProviderProps = (
       'onDestroy',
     ]),
     R.merge({ extensions: sanitizedExtensions })
-  ) satisfies ClientEditorProviderProps
+  ) satisfies EditorProviderClientProps
 
   return clientEditorProviderProps
 }
@@ -143,7 +143,7 @@ export const getClientEditorProviderProps = (
  * @returns Combined editor provider props ready to be used in the client
  */
 export const constructEditorProviderProps = (
-  clientEditorProviderProps: ClientEditorProviderProps,
+  clientEditorProviderProps: EditorProviderClientProps,
   storageAdapter?: StorageAdapterClient
 ): EditorProviderProps => {
   const extensions = constructSanitizedExtensions(

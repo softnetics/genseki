@@ -4,22 +4,23 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 
 import { toast } from 'sonner'
 
+import type { FieldsClient } from '../../../core'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
-import { useCollection, useServerFunction } from '../../providers/root'
+import { useServerFunction } from '../../providers/root'
 
 interface UpdateClientViewProps {
   slug: string
   identifer: string
+  fields: FieldsClient
   optionsRecord: Record<string, any[]>
   defaultValues?: Record<string, any>
 }
 
 export function UpdateClientView(props: UpdateClientViewProps) {
   const form = useForm({ defaultValues: props.defaultValues })
-  const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
@@ -55,7 +56,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(collection.fields).map((field) => (
+        {Object.values(props.fields).map((field) => (
           <AutoField
             key={field.fieldName}
             field={field}

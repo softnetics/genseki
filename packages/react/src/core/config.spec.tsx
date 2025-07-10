@@ -3,7 +3,7 @@ import z from 'zod/v4'
 
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
-import { defineServerConfig, getClientConfig } from './config'
+import { GensekiApp } from './config'
 import { type Contextable, type RequestContextable, type RequestContextArgs } from './context'
 
 const db = drizzle({
@@ -31,14 +31,14 @@ class MyRequestContext implements RequestContextable<User> {
 }
 
 class MyContext implements Contextable<User> {
-  constructor(public readonly sentence: string) {}
+  constructor() {}
 
   toRequestContext(args: RequestContextArgs) {
     return new MyRequestContext()
   }
 }
 
-const builder = new Builder({ db, schema }).$context<MyContext>()
+const builder = new Builder({ db, schema, context: new MyContext() })
 
 export const authorCollection = builder.collection('authors', {
   slug: 'authors',
@@ -65,6 +65,30 @@ export const authorCollection = builder.collection('authors', {
   })),
   identifierColumn: 'id',
 })
+
+const x = builder.fields('authors', (fb) => ({
+  id: fb.columns('id', {
+    type: 'text',
+  }),
+  name: fb.columns('name', {
+    type: 'text',
+  }),
+  email: fb.columns('email', {
+    type: 'text',
+  }),
+  example: fb.columns('bio', {
+    type: 'selectText',
+    options: async (context) => {
+      const result = await db.query.authors.findMany()
+      return result.map((author) => ({
+        label: author.name,
+        value: author.id,
+      }))
+    },
+  }),
+}))
+
+type X = (typeof x)['id']
 
 export const postCollection = builder.collection('posts', {
   slug: 'posts',
@@ -195,93 +219,13 @@ export const postCollection = builder.collection('posts', {
   },
 })
 
-export const serverConfig = defineServerConfig({
-  db: db,
-  schema: schema,
-  context: new MyContext('Hello World'),
-  auth: {
-    user: {
-      model: schema.user,
-    },
-    session: {
-      model: schema.session,
-    },
-    account: {
-      model: schema.account,
-    },
-    verification: {
-      model: schema.verification,
-    },
-    emailAndPassword: {
-      enabled: true,
-    },
-    oauth2: {
-      google: {
-        enabled: true,
-        clientId: '',
-        clientSecret: '',
-      },
-    },
-    secret: '',
+export const app = new GensekiApp({
+  title: 'Genseki App',
+  components: {
+    Layout: ({ children }) => <div>{children}</div>,
+    NotFound: () => <div>Not Found</div>,
+    CollectionLayout: ({ children }) => <div>{children}</div>,
   },
-  collections: {
-    authors: authorCollection,
-    posts: postCollection,
-  },
-  endpoints: {
-    createWithPosts: builder.endpoint(
-      {
-        path: '/hello/:id',
-        method: 'POST',
-        body: z.object({
-          name: z.string(),
-        }),
-        responses: {
-          200: z.object({
-            hello: z.string(),
-          }),
-        },
-      },
-      ({ context, body }) => {
-        const name = body.name
-        return {
-          status: 200 as const,
-          body: {
-            hello: name,
-          },
-        }
-      }
-    ),
-    getPosts: builder.endpoint(
-      {
-        path: '/test',
-        method: 'GET',
-        query: z.object({
-          authorId: z.string().optional(),
-        }),
-        responses: {
-          200: z.object({
-            posts: z.array(
-              z.object({
-                id: z.string(),
-                title: z.string(),
-                content: z.string(),
-              })
-            ),
-          }),
-        },
-      },
-      async ({ context, query }) => {
-        return {
-          status: 200 as const,
-          body: {
-            posts: [],
-          },
-        }
-      }
-    ),
-  },
-  plugins: [],
 })
-
-export const clientConfig = getClientConfig(serverConfig)
+  .apply(authorCollection)
+  .apply(postCollection)
