@@ -14,14 +14,13 @@ import {
   getDefaultCollectionAdminApiRouter,
 } from './collection'
 import type { GensekiPlugin, GensekiUiRouter } from './config'
-import type { AnyContextable } from './context'
+import type { AnyContextable, ContextToRequestContext } from './context'
 import {
   type AnyApiRouter,
-  type ApiRouteHandler,
+  type ApiRoute,
+  type ApiRouteHandlerInitial,
   type ApiRouter,
   type ApiRouteSchema,
-  type ApiRouteWithContext,
-  createEndpoint,
 } from './endpoint'
 import { FieldBuilder, type Fields, type OptionCallback } from './field'
 import { appendFieldNameToFields } from './utils'
@@ -64,10 +63,7 @@ export class Builder<
   >(
     tableTsName: TTableTsName,
     options: CollectionOptions<TSlug, TContext, TFields, TApiRouter>
-  ): GensekiPlugin<
-    TSlug,
-    Simplify<TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>>
-  > {
+  ): GensekiPlugin<TSlug, Simplify<TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>>> {
     const defaultHandlers = createDefaultApiHandlers({
       db: this.config.db,
       schema: this.config.schema,
@@ -88,52 +84,62 @@ export class Builder<
 
     const endpoints: TApiRouter = options.admin?.endpoints ?? ({} as TApiRouter)
 
-    const defaultEndpoints = getDefaultCollectionAdminApiRouter(options.slug, options.fields, {
-      create: async (args) => {
-        // TODO: Access control
-        const defaultApi = options.admin?.api?.create ? defaultHandlers.create : (undefined as any)
-        const result = await api.create({ ...args, defaultApi } as any)
-        return result
-      },
-      update: async (args) => {
-        // TODO: Access control
-        const defaultApi = options.admin?.api?.update ? defaultHandlers.update : (undefined as any)
-        const result = await api.update({ ...args, defaultApi } as any)
-        return result
-      },
-      delete: async (args) => {
-        // TODO: Access control
-        const defaultApi = options.admin?.api?.delete ? defaultHandlers.delete : (undefined as any)
-        const result = await api.delete({ ...args, defaultApi } as any)
-        return result
-      },
-      findOne: async (args) => {
-        // TODO: Access control
-        const defaultApi = options.admin?.api?.findOne
-          ? defaultHandlers.findOne
-          : (undefined as any)
-        const result = await api.findOne({ ...args, defaultApi } as any)
-        return result
-      },
-      findMany: async (args) => {
-        // TODO: Access control
-        const defaultApi = options.admin?.api?.findMany
-          ? defaultHandlers.findMany
-          : (undefined as any)
-        const result = await api.findMany({ ...args, defaultApi } as any)
-        return result
-      },
-    })
+    const defaultEndpoints = getDefaultCollectionAdminApiRouter(
+      this.config.context,
+      options.slug,
+      options.fields,
+      {
+        create: async (args) => {
+          // TODO: Access control
+          const defaultApi = options.admin?.api?.create
+            ? defaultHandlers.create
+            : (undefined as any)
+          const result = await api.create({ ...args, defaultApi } as any)
+          return result
+        },
+        update: async (args) => {
+          // TODO: Access control
+          const defaultApi = options.admin?.api?.update
+            ? defaultHandlers.update
+            : (undefined as any)
+          const result = await api.update({ ...args, defaultApi } as any)
+          return result
+        },
+        delete: async (args) => {
+          // TODO: Access control
+          const defaultApi = options.admin?.api?.delete
+            ? defaultHandlers.delete
+            : (undefined as any)
+          const result = await api.delete({ ...args, defaultApi } as any)
+          return result
+        },
+        findOne: async (args) => {
+          // TODO: Access control
+          const defaultApi = options.admin?.api?.findOne
+            ? defaultHandlers.findOne
+            : (undefined as any)
+          const result = await api.findOne({ ...args, defaultApi } as any)
+          return result
+        },
+        findMany: async (args) => {
+          // TODO: Access control
+          const defaultApi = options.admin?.api?.findMany
+            ? defaultHandlers.findMany
+            : (undefined as any)
+          const result = await api.findMany({ ...args, defaultApi } as any)
+          return result
+        },
+      }
+    )
 
     const allEndpoints = {
       ...defaultEndpoints,
       ...endpoints,
     }
 
-    // TODO: Add defaultApiType to GensekiPlugin
     const plugin: GensekiPlugin<
       TSlug,
-      TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>
+      TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>
     > = {
       name: options.slug,
       plugin: (gensekiOptions) => {
@@ -206,8 +212,7 @@ export class Builder<
         ]
 
         return {
-          api: allEndpoints as TApiRouter &
-            CollectionDefaultAdminApiRouter<TSlug, TContext, TFields>,
+          api: allEndpoints as TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>,
           uis: uis,
         }
       },
@@ -234,10 +239,18 @@ export class Builder<
   }
 
   endpoint<const TApiEndpointSchema extends ApiRouteSchema>(
-    args: TApiEndpointSchema,
-    handler: ApiRouteHandler<TContext, TApiEndpointSchema>
-  ): ApiRouteWithContext<TContext, TApiEndpointSchema> {
-    return createEndpoint(args, handler)
+    schema: TApiEndpointSchema,
+    handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
+  ): ApiRoute<TApiEndpointSchema> {
+    return {
+      schema: schema,
+      handler: (payload, request) => {
+        const context = this.config.context.toRequestContext(
+          request
+        ) as ContextToRequestContext<TContext>
+        return handler({ ...payload, context: context })
+      },
+    }
   }
 
   endpoints<const TApiRouter extends ApiRouter>(endpoints: TApiRouter): Simplify<TApiRouter> {

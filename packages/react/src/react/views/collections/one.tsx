@@ -24,14 +24,13 @@ export async function OneView(props: OneViewProps) {
     method: 'GET',
     headers: headersValue,
   })
-  const context = props.context.toRequestContext(request)
 
-  const result = await props.findOne.handler({
-    context,
-    pathParams: {
-      id: props.identifier,
+  const result = await props.findOne.handler(
+    {
+      pathParams: { id: props.identifier },
     },
-  })
+    request
+  )
 
   return <div>{JSON.stringify(result)}</div>
 }

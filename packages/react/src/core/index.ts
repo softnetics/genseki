@@ -33,14 +33,15 @@ export type {
   AnyApiRouteSchema,
   ApiRoute,
   ApiRouteHandler,
+  ApiRouteHandlerBasePayload,
   ApiRouteHandlerPayload,
   ApiRouter,
   ApiRouteResponse,
   ApiRouteSchema,
   ApiRouteSchemaClient,
-  ApiRouteWithContext,
   InferApiRouteResponses,
 } from './endpoint'
+export { isApiRoute } from './endpoint'
 export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
 export * from './file-storage-adapters'
 export type {

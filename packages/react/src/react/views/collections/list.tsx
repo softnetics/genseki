@@ -40,18 +40,14 @@ export async function ListView(props: ListViewProps) {
     headers: headersValue,
   })
 
-  const context = props.context.toRequestContext(request)
-
   // TODO: Consider moving to client component
-  const result = await props.findMany.handler({
-    context,
-    query: {
-      limit,
-      offset,
-      orderBy,
-      orderType,
+  const result = await props.findMany.handler(
+    {
+      query: { limit, offset, orderBy, orderType },
+      headers: headersValue,
     },
-  })
+    request
+  )
 
   const collectionOptionsClient = getCollectionOptionsClient(props.collectionOptions)
 

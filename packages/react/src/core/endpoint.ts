@@ -4,8 +4,9 @@ import { type ZodType } from 'zod/v4'
 import type { JSONSchema } from 'zod/v4/core'
 
 import type { MaybePromise } from './collection'
-import type { AnyContextable, ContextToRequestContext } from './context'
-import { type ConditionalExceptNever, withValidator } from './utils'
+import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'
+import { withValidator } from './endpoint.utils'
+import { type ConditionalExceptNever } from './utils'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 
@@ -40,7 +41,7 @@ type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
       ? InferPathParams<TApiRouteSchema['path']>
       : never
 
-type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
+export type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
   body: GetBody<TApiRouteSchema>
   query: GetQuery<TApiRouteSchema>
   pathParams: GetPathParams<TApiRouteSchema>
@@ -49,13 +50,6 @@ type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
 export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExceptNever<
   ApiRouteHandlerBasePayload<TApiRouteSchema>
 >
-
-export type ApiRouteHandlerPayloadWithContext<
-  TContext extends AnyContextable,
-  TApiRouteSchema extends ApiRouteSchema,
-> = ApiRouteHandlerPayload<TApiRouteSchema> & {
-  context: ContextToRequestContext<TContext>
-}
 
 export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, InputSchema>>> =
   ValueOf<{
@@ -68,15 +62,20 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
       : never
   }>
 
-export type ApiRouteHandler<
-  in TContext extends AnyContextable,
-  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
+export type ApiRouteHandler<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = (
+  payload: ApiRouteHandlerPayload<TApiRouteSchema>,
+  request: Request
+) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
+
+export type ApiRouteHandlerInitial<
+  TContext extends AnyRequestContextable,
+  TApiRouteSchema extends ApiRouteSchema,
 > = (
-  payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
+  payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext }
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
-  TApiRouteHandler extends ApiRouteHandler<any, infer TApiRouteSchema extends ApiRouteSchema>
+  TApiRouteHandler extends ApiRouteHandler<infer TApiRouteSchema extends ApiRouteSchema>
     ? TApiRouteSchema
     : never
 
@@ -120,15 +119,7 @@ export interface AnyApiRouteSchema {
 
 export type ApiRoute<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = {
   schema: TApiRouteSchema
-  handler: ApiRouteHandler<AnyContextable, TApiRouteSchema>
-}
-
-export type ApiRouteWithContext<
-  in TContext extends AnyContextable = AnyContextable,
-  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
-> = {
-  schema: TApiRouteSchema
-  handler: ApiRouteHandler<TContext, TApiRouteSchema>
+  handler: ApiRouteHandler<TApiRouteSchema>
 }
 
 export interface ApiRouter {
@@ -139,12 +130,25 @@ export interface AnyApiRouter {
   [key: string]: AnyApiRouter | ApiRoute<AnyApiRouteSchema>
 }
 
+export function isApiRoute<TApiRoute extends ApiRoute>(
+  apiRoute: TApiRoute | ApiRouter
+): apiRoute is TApiRoute {
+  return 'schema' in apiRoute && 'handler' in apiRoute
+}
+
 export function createEndpoint<
-  const TApiEndpointSchema extends ApiRouteSchema,
   const TContext extends AnyContextable,
->(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
+  const TApiEndpointSchema extends ApiRouteSchema,
+>(
+  context: TContext,
+  schema: TApiEndpointSchema,
+  handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
+): ApiRoute<TApiEndpointSchema> {
   return {
-    schema,
-    handler: withValidator(schema, handler),
+    schema: schema,
+    handler: withValidator(schema, (payload, request) => {
+      const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
+      return handler({ ...payload, context: requestContext })
+    }),
   }
 }

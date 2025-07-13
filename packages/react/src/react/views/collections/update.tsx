@@ -31,12 +31,12 @@ export async function UpdateView(props: UpdateViewProps) {
 
   const context = props.context.toRequestContext(request)
 
-  const result = await props.findOne.handler({
-    context,
-    pathParams: {
-      id: props.identifier,
+  const result = await props.findOne.handler(
+    {
+      pathParams: { id: props.identifier },
     },
-  })
+    request
+  )
 
   const optionsRecord = await createOptionsRecord(context, props.collectionOptions.fields)
   const fieldsClient = getFieldsClient(props.collectionOptions.fields)
