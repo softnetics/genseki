@@ -4,7 +4,6 @@ import { CollectionSection } from './sections/collection-section'
 import { NavigationSection } from './sections/navigations-section'
 import { PluginSection } from './sections/plugin-section'
 
-import type { AnyCollection } from '../../../../core/collection'
 import {
   BaseIcon,
   Sidebar,
@@ -18,8 +17,9 @@ import {
 export * from './nav'
 export * from './sections'
 
-export async function AppSidebar({ collections }: { collections: Record<string, AnyCollection> }) {
-  const collectionSlugs = Object.values(collections).map((collection) => collection.slug)
+// TODO: Revise this component
+export async function AppSidebar() {
+  const collectionSlugs = ['mockA', 'mockB']
 
   return (
     <Sidebar

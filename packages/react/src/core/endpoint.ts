@@ -1,6 +1,7 @@
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
 import type { z } from 'zod/v4'
 import { type ZodType } from 'zod/v4'
+import type { JSONSchema } from 'zod/v4/core'
 
 import type { MaybePromise } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
@@ -94,6 +95,16 @@ export interface ApiRouteSchema {
   pathParams?: InputSchema
   description?: string
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
+}
+export interface ApiRouteSchemaClient {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
+  body?: JSONSchema.JSONSchema
+  query?: JSONSchema.JSONSchema
+  headers?: JSONSchema.JSONSchema
+  pathParams?: JSONSchema.JSONSchema
+  description?: string
+  responses: Partial<Record<ApiHttpStatus, JSONSchema.JSONSchema>>
 }
 
 export interface AnyApiRouteSchema {

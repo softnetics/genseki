@@ -31,15 +31,7 @@ export type {
   ApiRouteSchema,
   InferApiRouteResponses,
 } from './endpoint'
-export type {
-  AnyFields,
-  Field,
-  FieldOptionsBase as FieldBase,
-  FieldClient,
-  FieldRelation,
-  Fields,
-  FieldsClient,
-} from './field'
+export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
 export * from './file-storage-adapters'
 export type {
   AnyTypedColumn,

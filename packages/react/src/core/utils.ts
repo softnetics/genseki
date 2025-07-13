@@ -5,6 +5,7 @@ import * as R from 'remeda'
 import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
 import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
+import type { FieldBase } from '.'
 import type { AnyContextable } from './context'
 import type {
   ApiHttpStatus,
@@ -13,11 +14,12 @@ import type {
   ApiRouteSchema,
 } from './endpoint'
 import type {
-  AnyField,
-  AnyFields,
+  FieldClientBase,
+  FieldColumnJsonRichText,
+  FieldColumnStringMedia,
   FieldRelation,
-  FieldsInitial,
-  FieldsWithFieldName,
+  Fields,
+  FieldsClient,
 } from './field'
 import type { StorageAdapterClient } from './file-storage-adapters'
 import { constructSanitizedExtensions } from './richtext'
@@ -39,15 +41,26 @@ export function tryParseJSONObject(jsonString: string): Record<string, unknown> 
   return false
 }
 
-export function isRelationField(field: AnyField): field is FieldRelation {
-  return field._.source === 'relation'
+export function isRelationField(field: FieldBase): field is FieldRelation {
+  return field.$client.source === 'relation'
 }
 
-export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
+export function isRichTextField(field: FieldClientBase): field is FieldColumnJsonRichText {
   return field.type === 'richText'
 }
 
-export function isMediaField(field: AnyField): field is Extract<AnyField, { type: 'media' }> {
+export function isFieldsWithFieldName(fields: Fields): fields is Fields {
+  return Object.values(fields).every((field) => {
+    return (
+      'fieldName' in fields.$client &&
+      (field.$client as any).fieldName !== undefined &&
+      'fieldName' in fields.$server &&
+      (field.$server as any).fieldName !== undefined
+    )
+  })
+}
+
+export function isMediaField(field: FieldBase): field is FieldColumnStringMedia {
   return field.type === 'media'
 }
 
@@ -135,23 +148,23 @@ const getExtraField = (tableRelational: TableRelationalConfig, identifierColumn?
 }
 
 export function createDrizzleQuery(
-  fields: AnyFields,
+  fields: Fields,
   table: Record<string, TableRelationalConfig>,
   tableRelationalConfig: TableRelationalConfig,
   identifierColumn?: string
 ): Record<string, any> {
   const queryColumns = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
-      if (field._.source !== 'column') return []
-      return [[field._.columnTsName, true as const]]
+      if (field.$client.source !== 'column') return []
+      return [[field.$client.columnTsName, true as const]]
     })
   )
 
   const queryWith = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
-      const relationName = field._.relation.fieldName
-      const referencedTableName = field._.referencedTableTsName
+      const relationName = field.$server.relation.fieldName
+      const referencedTableName = field.$client.referencedTableTsName
 
       return [
         [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
@@ -166,25 +179,23 @@ export function createDrizzleQuery(
   }
 }
 
-export function appendFieldNameToFields<TFields extends FieldsInitial<any, any>>(
+export function appendFieldNameToFields<TFields extends Fields>(
   fields: TFields
-): Simplify<FieldsWithFieldName<TFields>> {
+): Simplify<TFields> {
   return Object.fromEntries(
     Object.entries(fields).map(([key, field]) => {
-      const fieldWithName = { ...field, fieldName: key }
-      return [key, fieldWithName as AnyField & { fieldName: string }]
+      field.$client.fieldName = key
+      field.$server.fieldName = key
+      return [key, field]
     })
-  ) as FieldsWithFieldName<TFields>
+  ) as TFields
 }
 
-export function mapValueToTsValue(
-  fields: AnyFields,
-  value: Record<string, any>
-): Record<string, any> {
+export function mapValueToTsValue(fields: Fields, value: Record<string, any>): Record<string, any> {
   const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
     if (value[fieldName] === undefined) return []
-    if (field._.source !== 'column') return []
-    return [[field._.columnTsName, value[fieldName]]]
+    if (field.$client.source !== 'column') return []
+    return [[field.$client.columnTsName, value[fieldName]]]
   })
 
   return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
@@ -328,14 +339,17 @@ export type GetTableByTableTsName<
  * @description Return the default values for each provided fields, This should be used with `create` form
  */
 export const getDefaultValueFromFields = (
-  fields: AnyFields,
+  fields: FieldsClient,
   storageAdapter?: StorageAdapterClient
 ) => {
   const mappedCheck = Object.fromEntries(
     Object.entries(
       R.mapValues(fields, (field) => {
-        if (field.type === 'richText') {
+        if (isRichTextField(field)) {
           const content = field.editor.content ?? field.default ?? ''
+
+          // TODO: Support JSONContent and JSONContent[]
+          if (typeof content !== 'string') return undefined
 
           const json = tryParseJSONObject(content)
 
@@ -343,12 +357,12 @@ export const getDefaultValueFromFields = (
             json ||
             generateJSON(
               content,
-              constructSanitizedExtensions(field.editor.extensions || [], storageAdapter)
+              // TODO: Recheck this type
+              constructSanitizedExtensions((field.editor.extensions as any[]) || [], storageAdapter)
             )
           )
         }
-
-        return field.default
+        return 'default' in field ? field.default : undefined
       })
     ).filter(([fieldName, defaultValue]) => typeof defaultValue !== 'undefined')
   )

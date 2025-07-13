@@ -15,19 +15,20 @@ import type { RelationalQueryBuilder } from 'drizzle-orm/pg-core/query-builders/
 
 import type { ApiDefaultMethod, ApiHandlerFn, CollectionAdminApi, InferFields } from './collection'
 import type { AnyContextable, AnyRequestContextable } from './context'
-import type { AnyFields, Field, Fields } from './field'
+import type { Fields } from './field'
 import {
   createDrizzleQuery,
   getColumnTsName,
   getPrimaryColumn,
   getTableFromSchema,
+  isFieldsWithFieldName,
   isRelationField,
   mapValueToTsValue as mapFieldValueToTsValue,
 } from './utils'
 
 export function createDefaultApiHandlers<
   TContext extends AnyContextable,
-  TFields extends AnyFields,
+  TFields extends Fields,
 >(args: {
   db: NodePgDatabase<any>
   schema: Record<string, unknown>
@@ -100,6 +101,10 @@ export function createDefaultApiHandlers<
   }
 
   const create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> = async (args) => {
+    if (!isFieldsWithFieldName(fields)) {
+      throw new Error('Fields must be FieldsWithFieldName')
+    }
+
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -130,6 +135,10 @@ export function createDefaultApiHandlers<
   }
 
   const update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> = async (args) => {
+    if (!isFieldsWithFieldName(fields)) {
+      throw new Error('Fields must be FieldsWithFieldName')
+    }
+
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -183,7 +192,7 @@ class ApiHandler {
 
   constructor(
     private readonly tableTsName: string,
-    private readonly fields: Fields<any, AnyContextable>,
+    private readonly fields: Fields,
     private readonly config: {
       schema: Record<string, unknown>
       context: AnyRequestContextable
@@ -256,14 +265,10 @@ class ApiHandler {
 
   private async resolveOneRelations(
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Fields<any, AnyContextable>,
+    fields: Fields,
     data: Record<string, any>
   ) {
-    const create = async (
-      referencedTable: Table,
-      fields: Fields<any, AnyContextable>,
-      value: any
-    ) => {
+    const create = async (referencedTable: Table, fields: Fields, value: any) => {
       const id = await new ApiHandler(
         // TODO: i think this should not use public prefix to search the table
         this.config.tableTsNameByTableDbName[`public.${getTableName(referencedTable)}`],
@@ -274,11 +279,7 @@ class ApiHandler {
       return id
     }
 
-    const disconnect = async (
-      referencedTable: Table,
-      fields: Fields<any, AnyContextable>,
-      value: any
-    ) => {
+    const disconnect = async (referencedTable: Table, fields: Fields, value: any) => {
       const primaryColumn = getPrimaryColumn(this.tableRelationalConfig)
       const primaryColumnTsName = getColumnTsName(
         getTableColumns(this.config.schema[this.tableTsName] as Table),
@@ -293,9 +294,9 @@ class ApiHandler {
 
     const result = await Promise.all(
       Object.entries(fields).flatMap(async ([fieldName, field]) => {
-        if (!isRelationField(field) || !is(field._.relation, One)) return []
+        if (!isRelationField(field) || !is(field.$server.relation, One)) return []
 
-        const relationFields = field._.relation.config?.fields ?? []
+        const relationFields = field.$server.relation.config?.fields ?? []
 
         if (relationFields.length !== 1) {
           throw new Error('Relation fields must be 1. Multiple relations not supported')
@@ -312,7 +313,15 @@ class ApiHandler {
         if (value['disconnect']) {
           // If the value has disconnect, we need to set the relation field to null
           // and return the relation field name and null value
-          await disconnect(field._.relation.referencedTable, field.fields, value['disconnect'])
+          if (!isFieldsWithFieldName(field.fields)) {
+            throw new Error('Fields must be FieldsWithFieldName')
+          }
+
+          await disconnect(
+            field.$server.relation.referencedTable,
+            field.fields,
+            value['disconnect']
+          )
           return [[relationFieldTsName, null]]
         }
 
@@ -342,7 +351,11 @@ class ApiHandler {
 
             return [
               relationFieldTsName,
-              await create(field._.relation.referencedTable, field.fields, createValue),
+              await create(
+                field.$server.relation.referencedTable,
+                field.fields as Fields,
+                createValue
+              ),
             ]
           }
           case 'connect': {
@@ -367,7 +380,7 @@ class ApiHandler {
 
             return [
               relationFieldTsName,
-              await create(field._.relation.referencedTable, field.fields, createValue),
+              await create(field.$server.relation.referencedTable, field.fields, createValue),
             ]
           }
         }
@@ -381,9 +394,13 @@ class ApiHandler {
   private async resolveManyRelations(
     id: string | number,
     tx: PgTransaction<NodePgQueryResultHKT, any, any>,
-    fields: Record<string, Field<any, AnyContextable>>,
+    fields: Fields,
     data: Record<string, any>
   ) {
+    if (!isFieldsWithFieldName(fields)) {
+      throw new Error('Fields must be FieldsWithFieldName')
+    }
+
     // update the referenced table to have this id
     const connect = async (tableConfig: TableRelationalConfig, relation: Relation, value: any) => {
       const referencedFieldName = this.findReferencedColumnFromManyRelation(relation)
@@ -397,10 +414,13 @@ class ApiHandler {
 
     const create = async (
       tableConfig: TableRelationalConfig,
-      fields: Fields<any, AnyContextable>,
+      fields: Fields,
       relation: Relation,
       value: any
     ) => {
+      if (!isFieldsWithFieldName(fields)) {
+        throw new Error('Fields must be FieldsBase')
+      }
       const referenceFieldName = this.findReferencedColumnFromManyRelation(relation)
       const payload = {
         ...mapFieldValueToTsValue(fields, value),
@@ -430,20 +450,20 @@ class ApiHandler {
     const resultPromises = Object.entries(fields).flatMap(async ([fieldName, field]) => {
       // Filter out non-relation fields
       if (!isRelationField(field)) return []
-      if (!is(field._.relation, Many)) return []
+      if (!is(field.$server.relation, Many)) return []
       const values = data[fieldName] as any[]
       if (!values || values.length === 0) return []
 
       const promises = values.map(async (value) => {
         const sourceTableRelationalConfig =
-          this.config.tableRelationalConfigByTableTsName[field._.referencedTableTsName]
+          this.config.tableRelationalConfigByTableTsName[field.$client.referencedTableTsName]
 
         const _disconnectFn = () =>
-          disconnect(sourceTableRelationalConfig, field._.relation, value['disconnect'])
+          disconnect(sourceTableRelationalConfig, field.$server.relation, value['disconnect'])
         const _connectFn = () =>
-          connect(sourceTableRelationalConfig, field._.relation, value['connect'])
+          connect(sourceTableRelationalConfig, field.$server.relation, value['connect'])
         const _createFn = () =>
-          create(sourceTableRelationalConfig, field.fields, field._.relation, value['create'])
+          create(sourceTableRelationalConfig, field.fields, field.$server.relation, value['create'])
 
         if (value['disconnect']) {
           return [[fieldName, await _disconnectFn()]] as const
@@ -536,14 +556,14 @@ class ApiHandler {
     return referenceFieldName
   }
 
-  private getColumnValues(
-    fields: Fields<any, AnyContextable>,
-    data: Record<string, any>
-  ): Record<string, any> {
+  private getColumnValues(fields: Fields, data: Record<string, any>): Record<string, any> {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
-        if (field._.source === 'column' && typeof data[field.fieldName] !== 'undefined') {
-          return [[field._.columnTsName, data[field.fieldName]]]
+        if (
+          field.$client.source === 'column' &&
+          typeof data[field.$client.fieldName] !== 'undefined'
+        ) {
+          return [[field.$client.columnTsName, data[field.$client.fieldName]]]
         }
         return []
       })
@@ -553,38 +573,43 @@ class ApiHandler {
   }
 }
 
-function mapResultToFields(
-  fields: Fields<any, AnyContextable>,
-  result: Record<string, any>
-): Record<string, any> {
+function mapResultToFields(fields: Fields, result: Record<string, any>): Record<string, any> {
+  if (!isFieldsWithFieldName(fields)) {
+    throw new Error('Fields must be FieldsWithFieldName')
+  }
+
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
       // End case
-      if (field._.source === 'column') {
-        const value = result[field._.columnTsName]
+      if (field.$client.source === 'column') {
+        const value = result[field.$client.columnTsName]
 
         if (typeof value === 'undefined') return []
-        return [[field.fieldName, value]]
+        return [[field.$client.fieldName, value]]
       }
 
       // Recursive case
       if (isRelationField(field)) {
-        const value = result[field._.relationTsName]
+        const value = result[field.$client.relationTsName]
         if (!value) return []
 
         if (Array.isArray(value)) {
           const values = value.map((v) => ({
-            ...mapResultToFields(field.fields, v),
+            ...mapResultToFields(field.fields as Fields, v),
             __pk: v['__pk'],
             __id: v['__id'],
           }))
-          return [[field.fieldName, values]]
+          return [[field.$client.fieldName, values]]
         }
 
         return [
           [
-            field.fieldName,
-            { ...mapResultToFields(field.fields, value), __pk: value['__pk'], __id: value['__id'] },
+            field.$client.fieldName,
+            {
+              ...mapResultToFields(field.fields as Fields, value),
+              __pk: value['__pk'],
+              __id: value['__id'],
+            },
           ],
         ]
       }

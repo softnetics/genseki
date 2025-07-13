@@ -38,7 +38,7 @@ const tableDataExtract = (
   options: { clientFields: FieldsClient; identifierColumn: string }
 ) => {
   const headers = Object.values(options.clientFields).map((column) => {
-    return { ...column, label: column.fieldName /* Fallback to key if no label */ }
+    return { ...column, label: column.$client.fieldName /* Fallback to key if no label */ }
   })
 
   headers.sort((a, b) => (b.label === options.identifierColumn ? 1 : -1))
@@ -48,7 +48,7 @@ const tableDataExtract = (
     key: record.__id,
     rows: headers.map(
       (header) =>
-        record[header.fieldName] ??
+        record[header.$client.fieldName] ??
         'Unknown' /* Unknown meant that it's missing a correct heading label */
     ),
   }))
@@ -81,8 +81,7 @@ const Toolbar = (props: {
             size="md"
             leadingIcon={<BaseIcon icon={TrashIcon} size="md" />}
             onClick={async () => {
-              await serverFunction({
-                method: `${props.slug}.delete`,
+              await serverFunction(`${props.slug}.delete`, {
                 body: { ids: props.selection },
                 headers: {},
                 pathParams: {},
@@ -170,8 +169,7 @@ export function ListTable(props: ListTableProps) {
                       <MenuItem
                         isDanger
                         onAction={async () => {
-                          await serverFunction({
-                            method: `${props.slug}.delete`,
+                          await serverFunction(`${props.slug}.delete`, {
                             body: { ids: [key] },
                             headers: {},
                             pathParams: {},

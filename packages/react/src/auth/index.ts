@@ -84,7 +84,7 @@ export interface AuthConfig {
     passwordHasher?: (password: string) => Promise<string> // default: scrypt
     signUp?: {
       autoLogin?: boolean // default: true
-      additionalFields?: Fields<Record<string, unknown>, AnyContextable>
+      additionalFields?: Fields
     }
   }
   oauth2?: {

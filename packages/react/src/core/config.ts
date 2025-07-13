@@ -2,9 +2,13 @@ import type { PropsWithChildren, ReactNode } from 'react'
 
 import * as R from 'remeda'
 
-import { type ApiRouter } from './endpoint'
-import type { AnyField, AnyFields, FieldClient, FieldsClient } from './field'
-import { type StorageAdapter } from './file-storage-adapters/generic-adapter'
+import { type AnyApiRouter, type ApiRouter } from './endpoint'
+import type { FieldBase, FieldClient, Fields, FieldsClient } from './field'
+import {
+  getStorageAdapterClient,
+  type StorageAdapter,
+  type StorageAdapterClient,
+} from './file-storage-adapters/generic-adapter'
 import { getEditorProviderClientProps } from './richtext'
 import { isMediaField, isRelationField, isRichTextField } from './utils'
 
@@ -44,9 +48,10 @@ export interface GensekiAppOptions {
   storageAdapter?: StorageAdapter
 }
 
-export interface GensekiCore<TApiRouter extends ApiRouter> {
+export interface GensekiCore<TApiRouter extends ApiRouter = ApiRouter> {
   api: TApiRouter
   uis: GensekiUiRouter[]
+  storageAdapter?: StorageAdapterClient
 }
 
 export interface GensekiPlugin<TName extends string, TApiRouter extends ApiRouter> {
@@ -54,13 +59,13 @@ export interface GensekiPlugin<TName extends string, TApiRouter extends ApiRoute
   plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
 }
 
-type AnyGensekiPlugin = GensekiPlugin<string, any>
+type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
 type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
   TPlugin['plugin']
 >['api']
 
 export class GensekiApp<TMainApiRouter extends ApiRouter = {}> {
-  private readonly plugins: GensekiPlugin<string, ApiRouter>[] = []
+  private readonly plugins: GensekiPlugin<string, AnyApiRouter>[] = []
 
   constructor(private readonly options: GensekiAppOptions) {}
 
@@ -82,13 +87,24 @@ export class GensekiApp<TMainApiRouter extends ApiRouter = {}> {
       {}
     ) as TMainApiRouter
 
-    return { api: api, uis: uis }
+    return {
+      storageAdapter: getStorageAdapterClient({
+        storageAdapter: this.options.storageAdapter,
+        grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
+        grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
+      }),
+      api: api,
+      uis: uis,
+    }
   }
 }
 
-export function getFieldClient(name: string, field: AnyField): FieldClient & { fieldName: string } {
+export function getFieldClient(
+  name: string,
+  field: FieldBase
+): FieldClient & { $client: { fieldName: string } } {
   if (isRelationField(field)) {
-    if (field._.source === 'relation') {
+    if (field.$client.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
         Object.entries(field.fields).map(([key, value]) => {
           return [key, getFieldClient(key, value)]
@@ -100,8 +116,8 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
           ...field,
           fields: sanitizedFields,
         },
-        ['_', 'options' as any]
-      ) as FieldClient & { fieldName: string }
+        ['$server', 'options' as any]
+      ) as FieldClient & { $client: { fieldName: string } }
     }
 
     return R.omit(
@@ -110,8 +126,8 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
         label: field.label ?? name,
         placeholder: field.placeholder ?? name,
       },
-      ['_', 'options' as any]
-    ) as FieldClient & { fieldName: string }
+      ['$server', 'options' as any]
+    ) as FieldClient & { $client: { fieldName: string } }
   }
 
   if (isRichTextField(field)) {
@@ -120,8 +136,8 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
         ...field,
         label: field.label ?? name,
       },
-      ['_', 'options' as any]
-    ) as FieldClient & { fieldName: string }
+      ['$server', 'options' as any]
+    ) as FieldClient & { $client: { fieldName: string } }
 
     const sanitizedRichTextField = {
       ...sanitizedBaseField,
@@ -137,8 +153,8 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
         ...field,
         label: field.label ?? name,
       },
-      ['_', 'options' as any]
-    ) as FieldClient & { fieldName: string }
+      ['$server', 'options' as any]
+    ) as FieldClient & { $client: { fieldName: string } }
   }
 
   return R.omit(
@@ -147,11 +163,11 @@ export function getFieldClient(name: string, field: AnyField): FieldClient & { f
       label: field.label ?? name,
       placeholder: field.placeholder ?? name,
     },
-    ['_', 'options' as any]
-  ) as FieldClient & { fieldName: string }
+    ['$server', 'options' as any]
+  ) as FieldClient & { $client: { fieldName: string } }
 }
 
-export function getFieldsClient(fields: AnyFields): FieldsClient {
+export function getFieldsClient(fields: Fields): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
 

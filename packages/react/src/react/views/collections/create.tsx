@@ -2,6 +2,7 @@ import { CreateClientView } from './create.client'
 import { CollectionFormLayout } from './layouts/collection-form-layout'
 import type { BaseViewProps } from './types'
 
+import { getFieldsClient } from '../../../core'
 import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
@@ -17,6 +18,7 @@ export async function CreateView(props: CreateViewProps) {
     headers: headersValue,
   })
 
+  const fieldsClient = getFieldsClient(props.collectionOptions.fields)
   const optionsRecord = await createOptionsRecord(context, props.collectionOptions.fields)
 
   return (
@@ -24,7 +26,7 @@ export async function CreateView(props: CreateViewProps) {
       <Typography type="h2" weight="semibold">
         Create new {props.slug}
       </Typography>
-      <CreateClientView slug={props.slug} optionsRecord={optionsRecord} />
+      <CreateClientView slug={props.slug} fields={fieldsClient} optionsRecord={optionsRecord} />
     </CollectionFormLayout>
   )
 }

@@ -3,7 +3,7 @@ import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 import { ListTable } from './list.client'
 import type { BaseViewProps } from './types'
 
-import type { ApiDefaultMethod, ApiRoute } from '../../../core'
+import type { ApiDefaultMethod, ApiRoute, Fields } from '../../../core'
 import {
   type ConvertCollectionDefaultApiToApiRouteSchema,
   getCollectionOptionsClient,
@@ -18,7 +18,11 @@ interface ListViewProps extends BaseViewProps {
   headers: Headers
   searchParams: Record<string, string | string[]>
   findMany: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<string, (typeof ApiDefaultMethod)['FIND_MANY'], any>
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      string,
+      (typeof ApiDefaultMethod)['FIND_MANY'],
+      Fields
+    >
   >
 }
 
@@ -43,7 +47,7 @@ export async function ListView(props: ListViewProps) {
       orderBy,
       orderType,
     },
-  } as any)
+  })
 
   const collectionOptionsClient = getCollectionOptionsClient(props.collectionOptions)
 

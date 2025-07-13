@@ -88,8 +88,6 @@ const x = builder.fields('authors', (fb) => ({
   }),
 }))
 
-type X = (typeof x)['id']
-
 export const postCollection = builder.collection('posts', {
   slug: 'posts',
   fields: builder.fields('posts', (fb) => ({
@@ -102,27 +100,6 @@ export const postCollection = builder.collection('posts', {
     content: fb.columns('content', {
       type: 'text',
     }),
-    author: fb.relations('author', (fb) => ({
-      type: 'connectOrCreate',
-      fields: fb.fields('authors', (fb) => ({
-        id: fb.columns('id', {
-          type: 'text',
-        }),
-        name: fb.columns('name', {
-          type: 'text',
-        }),
-        email: fb.columns('email', {
-          type: 'text',
-        }),
-      })),
-      options: async () => {
-        const result = await db.query.authors.findMany()
-        return result.map((author) => ({
-          label: author.name,
-          value: author.id,
-        }))
-      },
-    })),
     categories: fb.relations('category', (fb) => ({
       type: 'connectOrCreate',
       fields: fb.fields('categories', (fb) => ({

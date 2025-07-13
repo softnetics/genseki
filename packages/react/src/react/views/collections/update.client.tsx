@@ -25,8 +25,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   const { navigate } = useNavigation()
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
-    const result = await serverFunction({
-      method: `${props.slug}.update`,
+    const result = await serverFunction(`${props.slug}.update`, {
       body: data,
       headers: {},
       pathParams: { id: props.identifer },
@@ -38,7 +37,13 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       return navigate(`../`)
     } else {
       console.log(result.body)
-      const description = result.body?.message
+      const description =
+        typeof result.body === 'object' &&
+        !!result.body &&
+        'message' in result.body &&
+        typeof result.body.message === 'string'
+          ? result.body.message
+          : 'Failed to update'
       toast.error('Failed to update', {
         ...(description && { description }),
       })
@@ -58,7 +63,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       >
         {Object.values(props.fields).map((field) => (
           <AutoField
-            key={field.fieldName}
+            key={field.$client.fieldName}
             field={field}
             visibilityField="update"
             optionsRecord={props.optionsRecord}

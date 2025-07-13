@@ -1,9 +1,6 @@
-import type { ServerConfig } from '../../../../core'
 import { AppSidebarNav, SidebarInset, SidebarProvider } from '../../../components'
-import { AppSidebar } from '../../../components/compound/collection-sidebar'
 
 interface RootLayoutProps {
-  serverConfig: ServerConfig
   children: React.ReactNode
 }
 
@@ -13,7 +10,8 @@ interface RootLayoutProps {
 export function CollectionAppLayout(props: RootLayoutProps) {
   return (
     <SidebarProvider>
-      <AppSidebar collections={props.serverConfig.collections} />
+      {/* TODO: Fix sidebar */}
+      {/* <AppSidebar collections={props.serverConfig.collections} /> */}
       <SidebarInset>
         <AppSidebarNav />
         {props.children}

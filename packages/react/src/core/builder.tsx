@@ -23,18 +23,13 @@ import {
   type ApiRouteWithContext,
   createEndpoint,
 } from './endpoint'
-import {
-  FieldBuilder,
-  type Fields,
-  type FieldsInitial,
-  type FieldsWithFieldName,
-  type OptionCallback,
-} from './field'
+import { FieldBuilder, type Fields, type OptionCallback } from './field'
 import { appendFieldNameToFields } from './utils'
 
 import { CreateView } from '../react/views/collections/create'
 import { ListView } from '../react/views/collections/list'
 import { OneView } from '../react/views/collections/one'
+import type { BaseViewProps } from '../react/views/collections/types'
 import { UpdateView } from '../react/views/collections/update'
 
 export class Builder<
@@ -64,7 +59,7 @@ export class Builder<
   collection<
     const TTableTsName extends GetAllTableTsNames<TFullSchema>,
     const TSlug extends string,
-    const TFields extends Fields<TFullSchema, AnyContextable> = {},
+    const TFields extends Fields,
     const TApiRouter extends AnyApiRouter = {},
   >(
     tableTsName: TTableTsName,
@@ -147,7 +142,11 @@ export class Builder<
         const defaultArgs = {
           slug: options.slug,
           context: this.config.context,
-          collectionOptions: options,
+          collectionOptions: {
+            slug: options.slug,
+            identifierColumn: options.identifierColumn,
+            fields: options.fields,
+          } satisfies BaseViewProps['collectionOptions'],
         }
 
         const uis: GensekiUiRouter[] = [
@@ -216,19 +215,17 @@ export class Builder<
     return plugin
   }
 
-  fields<
-    TTableTsName extends GetAllTableTsNames<TFullSchema>,
-    TFields extends FieldsInitial<TFullSchema, TContext>,
-  >(
+  fields<TTableTsName extends GetAllTableTsNames<TFullSchema>, TFields extends Fields>(
     tableTsName: TTableTsName,
     optionsFn: (
       fb: FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
     ) => TFields
-  ): Simplify<FieldsWithFieldName<TFields>> {
+  ): Simplify<TFields> {
     const fb = new FieldBuilder(
       tableTsName,
       this.tableRelationalConfigByTableTsName
     ) as FieldBuilder<TFullSchema, ExtractTablesWithRelations<TFullSchema>, TTableTsName, TContext>
+
     return appendFieldNameToFields(optionsFn(fb))
   }
 

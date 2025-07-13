@@ -4,41 +4,48 @@ import { createContext, type ReactNode, useContext } from 'react'
 
 import { UiProviders } from './ui'
 
-import type { StorageAdapterClient } from '../../core'
+import type { GensekiCore } from '../../core/config'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
-type RootContextValue = {
-  storageAdapter: StorageAdapterClient
-  serverFunction: ServerFunction<TServerConfig>
+type RootContextValue<TGensekiCore extends GensekiCore = GensekiCore> = {
+  core: TGensekiCore
+  serverFunction: ServerFunction<TGensekiCore>
 }
 
 const RootContext = createContext<RootContextValue>(null!)
 
-export const useRootContext = <TServerConfig extends ServerConfig>() => {
+export const useRootContext = <TGensekiCore extends GensekiCore>() => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useRootContext must be used within a RootProvider')
-  return context as unknown as RootContextValue<TServerConfig>
+  return context as unknown as RootContextValue<TGensekiCore>
 }
 
 export const useStorageAdapter = () => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useStorageAdapter must be used within a RootProvider')
-  const storageAdapter = context.storageAdapter
-
+  const storageAdapter = context.core.storageAdapter
+  if (!storageAdapter) {
+    throw new Error('Storage adapter is not configured in the GensekiCore')
+  }
   return storageAdapter
 }
 
-export const useServerFunction = <TServerConfig extends ServerConfig>() => {
+export const useServerFunction = <TGensekiCore extends GensekiCore>() => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useCollectionServerFunctions must be used within a RootProvider')
-  return context.serverFunction as unknown as ServerFunction<TServerConfig>
+  return context.serverFunction as unknown as ServerFunction<TGensekiCore>
 }
 
-export const RootProvider = (props: { serverFunction: ServerFunction; children: ReactNode }) => {
+export const RootProvider = (props: {
+  core: GensekiCore
+  serverFunction: ServerFunction
+  children: ReactNode
+}) => {
   return (
     <RootContext.Provider
       value={{
+        core: props.core,
         serverFunction: props.serverFunction,
       }}
     >

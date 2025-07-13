@@ -1,9 +1,8 @@
-import type { AnyFields } from '../../../core'
-import type { CollectionOptions } from '../../../core/collection'
+import type { CollectionOptions, Fields } from '../../../core'
 import type { AnyContextable } from '../../../core/context'
 
 export interface BaseViewProps {
   slug: string
   context: AnyContextable
-  collectionOptions: CollectionOptions<string, AnyContextable, AnyFields, {}>
+  collectionOptions: Omit<CollectionOptions<string, AnyContextable, Fields, any>, 'admin'>
 }
