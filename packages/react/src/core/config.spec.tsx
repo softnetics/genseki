@@ -4,7 +4,7 @@ import z from 'zod/v4'
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
 import { GensekiApp } from './config'
-import { type Contextable, type RequestContextable, type RequestContextArgs } from './context'
+import { type Contextable, type RequestContextable } from './context'
 
 const db = drizzle({
   connection: '',
@@ -33,7 +33,7 @@ class MyRequestContext implements RequestContextable<User> {
 class MyContext implements Contextable<User> {
   constructor() {}
 
-  toRequestContext(args: RequestContextArgs) {
+  toRequestContext(request: Request) {
     return new MyRequestContext()
   }
 }

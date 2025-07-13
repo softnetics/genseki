@@ -1,17 +1,15 @@
 import z from 'zod/v4'
 
-import type { AnyContextable } from '../../core/context'
+import type { Contextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
-import { type AuthContext } from '../context'
+import type { AuthApiBuilderArgs, AuthOptions } from '..'
 
-export function me<const TAuthContext extends AuthContext, const TContext extends AnyContextable>(
-  authContext: TAuthContext
+export function me<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
 ) {
-  const { requiredAuthenticated } = authContext
-
   const schema = {
     method: 'GET',
-    path: '/api/auth/me',
+    path: '/auth/me',
     responses: {
       200: z.object({
         id: z.string(),
@@ -26,7 +24,8 @@ export function me<const TAuthContext extends AuthContext, const TContext extend
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
-    const user = await requiredAuthenticated(args.headers)
+    const { id } = await args.context.requiredAuthenticated()
+    const user = await builderArgs.handler.user.findById(id)
 
     return {
       status: 200,

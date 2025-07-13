@@ -1,22 +1,17 @@
 import z from 'zod/v4'
 
-import type { AnyContextable } from '../../core/context'
+import type { Contextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
+import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { AccountProvider } from '../constant'
-import { type AuthContext } from '../context'
 import { hashPassword, setSessionCookie } from '../utils'
 
-export function signUpEmail<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContextable,
->(authContext: TAuthContext) {
-  const {
-    authConfig: { emailAndPassword },
-    internalHandlers,
-  } = authContext
+export function signUpEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
+) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/sign-up/email',
+    path: '/auth/sign-up/email',
     body: z
       .object({
         name: z.string(),
@@ -37,18 +32,18 @@ export function signUpEmail<
     },
   } as const satisfies ApiRouteSchema
 
-  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
-    const hashedPassword =
-      (await emailAndPassword?.passwordHasher?.(args.body.password)) ??
-      (await hashPassword(args.body.password))
+  const passwordHasher = builderArgs.options.method.emailAndPassword?.passwordHasher ?? hashPassword
 
-    const user = await internalHandlers.user.create({
+  const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
+    const hashedPassword = await passwordHasher(args.body.password)
+
+    const user = await builderArgs.handler.user.create({
       name: args.body.name,
       email: args.body.email,
       image: null,
     })
 
-    await internalHandlers.account.link({
+    await builderArgs.handler.account.link({
       userId: user.id,
       providerId: AccountProvider.CREDENTIAL,
       accountId: user.id,
@@ -61,8 +56,8 @@ export function signUpEmail<
     // Check if auto login is enabled
 
     const responseHeaders = {}
-    if (emailAndPassword?.signUp?.autoLogin !== false) {
-      const session = await internalHandlers.session.create({
+    if (builderArgs.options.method.emailAndPassword?.signUp?.autoLogin !== false) {
+      const session = await builderArgs.handler.session.create({
         userId: user.id,
         // TODO: Customize expiresAt
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),

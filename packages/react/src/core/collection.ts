@@ -2,7 +2,7 @@ import type { Many, Table } from 'drizzle-orm'
 import type { ConditionalExcept, IsEqual, Simplify, ValueOf } from 'type-fest'
 import z from 'zod/v4'
 
-import type { FieldBase, FieldsBase } from '.'
+import type { FieldBase } from '.'
 import { getFieldsClient } from './config'
 import type { AnyContextable, AnyRequestContextable } from './context'
 import {
@@ -170,7 +170,7 @@ export type InferUpdateField<TField extends FieldBase> = TField extends FieldRel
     ? ActivateFieldMutateMode<TField['$server']['column']['_']['data'], TField, 'update'>
     : never
 
-export type InferUpdateFields<TFields extends FieldsBase> = SimplifyConditionalExcept<
+export type InferUpdateFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
     [TKey in keyof TFields]: TFields[TKey] extends FieldBase
       ? Simplify<InferUpdateField<TFields[TKey]>>

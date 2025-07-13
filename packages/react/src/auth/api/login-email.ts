@@ -1,20 +1,17 @@
 import z from 'zod/v4'
 
-import type { AnyContextable } from '../../core/context'
+import type { Contextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
+import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { AccountProvider } from '../constant'
-import { type AuthContext } from '../context'
 import { setSessionCookie, verifyPassword } from '../utils'
 
-export function loginEmail<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContextable,
->(authContext: TAuthContext) {
-  const { internalHandlers } = authContext
-
+export function loginEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
+) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/login/email',
+    path: '/auth/login/email',
     body: z.object({
       email: z.string(),
       password: z.string(),
@@ -33,7 +30,7 @@ export function loginEmail<
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
-    const account = await internalHandlers.account.findByUserEmailAndProvider(
+    const account = await builderArgs.handler.account.findByUserEmailAndProvider(
       args.body.email,
       AccountProvider.CREDENTIAL
     )
@@ -43,7 +40,7 @@ export function loginEmail<
       throw new Error('Invalid password')
     }
 
-    const session = await internalHandlers.session.create({
+    const session = await builderArgs.handler.session.create({
       userId: account.user.id,
       // TODO: Customize expiresAt
       expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),

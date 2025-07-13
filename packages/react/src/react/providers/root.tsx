@@ -9,7 +9,7 @@ import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
 type RootContextValue<TGensekiCore extends GensekiCore = GensekiCore> = {
-  core: TGensekiCore
+  app: GensekiCore['app']
   serverFunction: ServerFunction<TGensekiCore>
 }
 
@@ -24,7 +24,7 @@ export const useRootContext = <TGensekiCore extends GensekiCore>() => {
 export const useStorageAdapter = () => {
   const context = useContext(RootContext)
   if (!context) throw new Error('useStorageAdapter must be used within a RootProvider')
-  const storageAdapter = context.core.storageAdapter
+  const storageAdapter = context.app?.storageAdapter
   if (!storageAdapter) {
     throw new Error('Storage adapter is not configured in the GensekiCore')
   }
@@ -38,17 +38,12 @@ export const useServerFunction = <TGensekiCore extends GensekiCore>() => {
 }
 
 export const RootProvider = (props: {
-  core: GensekiCore
+  app: GensekiCore['app']
   serverFunction: ServerFunction
   children: ReactNode
 }) => {
   return (
-    <RootContext.Provider
-      value={{
-        core: props.core,
-        serverFunction: props.serverFunction,
-      }}
-    >
+    <RootContext.Provider value={{ app: props.app, serverFunction: props.serverFunction }}>
       <Toast />
       <UiProviders>{props.children}</UiProviders>
     </RootContext.Provider>

@@ -1,18 +1,15 @@
 import z from 'zod/v4'
 
-import type { AnyContextable } from '../../core/context'
+import type { Contextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
-import type { AuthContext } from '../context'
+import type { AuthApiBuilderArgs, AuthOptions } from '..'
 
-export function forgotPasswordEmail<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContextable,
->(authContext: TAuthContext) {
-  const { authConfig, internalHandlers } = authContext
-
+export function forgotPasswordEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
+) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/forgot-password',
+    path: '/auth/forgot-password',
     body: z.object({
       email: z.string(),
     }),
@@ -27,7 +24,7 @@ export function forgotPasswordEmail<
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
-    if (!authConfig.resetPassword?.enabled) {
+    if (!builderArgs.options.method.emailAndPassword?.resetPassword?.enabled) {
       // TODO: Log not enabled
       return {
         status: 400,
@@ -35,19 +32,21 @@ export function forgotPasswordEmail<
       }
     }
 
-    const user = await internalHandlers.user.findByEmail(args.body.email)
+    const user = await builderArgs.handler.user.findByEmail(args.body.email)
 
     const token = ''
     const identifier = `reset-password:${token}`
-    await internalHandlers.verification.create({
+    await builderArgs.handler.verification.create({
       identifier,
       value: user.id,
       expiresAt: new Date(
-        Date.now() + (authConfig.resetPassword?.expiresInMs ?? 1000 * 60 * 60 * 24)
+        Date.now() +
+          (builderArgs.options.method.emailAndPassword?.resetPassword?.expiresInMs ??
+            1000 * 60 * 60 * 24)
       ),
     })
 
-    const resetPasswordLink = `${authConfig.resetPassword?.resetPasswordUrl ?? '/auth/reset-password'}?token=${token}`
+    const resetPasswordLink = `${builderArgs.options.method.emailAndPassword?.resetPassword?.resetPasswordUrl ?? '/auth/reset-password'}?token=${token}`
     // Send email
 
     return {

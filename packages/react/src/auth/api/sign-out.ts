@@ -1,19 +1,16 @@
 import z from 'zod/v4'
 
-import type { AnyContextable } from '../../core/context'
+import type { Contextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
-import { type AuthContext } from '../context'
+import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { deleteSessionCookie, getSessionCookie } from '../utils'
 
-export function signOut<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContextable,
->(authContext: TAuthContext) {
-  const { internalHandlers } = authContext
-
+export function signOut<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
+) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/sign-out',
+    path: '/auth/sign-out',
     body: undefined,
     responses: {
       200: z.object({
@@ -32,7 +29,7 @@ export function signOut<
     }
 
     const responseHeaders = {}
-    await internalHandlers.session.deleteById(cookie)
+    await builderArgs.handler.session.deleteById(cookie)
     deleteSessionCookie(responseHeaders)
 
     return {

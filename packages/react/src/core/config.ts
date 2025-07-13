@@ -38,8 +38,9 @@ export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<stri
       props?: TProps
     }
 
-export interface GensekiAppOptions {
+export interface GensekiAppOptions<TApiPrefix extends string = '/api'> {
   title: string
+  apiPrefix?: TApiPrefix
   components: {
     Layout: (props: PropsWithChildren) => ReactNode
     NotFound: () => ReactNode
@@ -48,51 +49,62 @@ export interface GensekiAppOptions {
   storageAdapter?: StorageAdapter
 }
 
-export interface GensekiCore<TApiRouter extends ApiRouter = ApiRouter> {
+export interface GensekiCore<TApiRouter extends ApiRouter = AnyApiRouter> {
   api: TApiRouter
   uis: GensekiUiRouter[]
-  storageAdapter?: StorageAdapterClient
+  app?: {
+    storageAdapter?: StorageAdapterClient
+  }
 }
 
-export interface GensekiPlugin<TName extends string, TApiRouter extends ApiRouter> {
+export interface GensekiPlugin<
+  TName extends string,
+  TApiPrefix extends string,
+  TApiRouter extends ApiRouter,
+> {
   name: TName
-  plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
+  plugin: (options: GensekiAppOptions<TApiPrefix>) => GensekiCore<TApiRouter>
 }
 
-type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
+type AnyGensekiPlugin = GensekiPlugin<string, string, AnyApiRouter>
 type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
   TPlugin['plugin']
 >['api']
 
-export class GensekiApp<TMainApiRouter extends ApiRouter = {}> {
-  private readonly plugins: GensekiPlugin<string, AnyApiRouter>[] = []
+export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends ApiRouter = {}> {
+  private readonly apiPathPrefix: string
+  private readonly plugins: AnyGensekiPlugin[] = []
 
-  constructor(private readonly options: GensekiAppOptions) {}
+  constructor(private readonly options: GensekiAppOptions<TApiPrefix>) {
+    this.apiPathPrefix = options.apiPrefix ?? '/api'
+  }
 
   apply<const TPlugin extends AnyGensekiPlugin>(
     plugin: TPlugin
-  ): GensekiApp<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
+  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
     this.plugins.push(plugin)
     // TODO: I don't know why this is needed, need to investigate
-    return this as unknown as GensekiApp<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
+    return this as unknown as GensekiApp<
+      TApiPrefix,
+      TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>
+    >
   }
 
   build(): GensekiCore<TMainApiRouter> {
     const uis = this.plugins.flatMap((plugin) => plugin.plugin(this.options).uis)
     const api = this.plugins.reduce(
-      (acc, plugin) => ({
-        ...acc,
-        ...plugin.plugin(this.options).api,
-      }),
+      (acc, plugin) => ({ ...acc, ...plugin.plugin(this.options).api }),
       {}
     ) as TMainApiRouter
 
     return {
-      storageAdapter: getStorageAdapterClient({
-        storageAdapter: this.options.storageAdapter,
-        grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
-        grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
-      }),
+      app: {
+        storageAdapter: getStorageAdapterClient({
+          storageAdapter: this.options.storageAdapter,
+          grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
+          grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
+        }),
+      },
       api: api,
       uis: uis,
     }

@@ -1,18 +1,16 @@
 import z from 'zod/v4'
 
-import type { AnyContextable } from '../../core/context'
+import type { Contextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
-import { type AuthContext } from '../context'
+import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { hashPassword } from '../utils'
 
-export function resetPasswordEmail<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContextable,
->(authContext: TAuthContext) {
-  const { authConfig, internalHandlers } = authContext
+export function resetPasswordEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
+) {
   const schema = {
     method: 'POST',
-    path: '/api/auth/reset-password',
+    path: '/auth/reset-password',
     query: z.object({
       token: z.string(),
     }),
@@ -30,7 +28,7 @@ export function resetPasswordEmail<
   } as const satisfies ApiRouteSchema
 
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
-    if (!authConfig.resetPassword?.enabled) {
+    if (!builderArgs.options.method.emailAndPassword?.resetPassword?.enabled) {
       // TODO: Log not enabled
       return {
         status: 400,
@@ -39,7 +37,7 @@ export function resetPasswordEmail<
     }
 
     const identifier = `reset-password:${args.query.token}`
-    const verification = await internalHandlers.verification.findByIdentifier(identifier)
+    const verification = await builderArgs.handler.verification.findByIdentifier(identifier)
 
     if (!verification || !verification.value) {
       return {
@@ -48,7 +46,7 @@ export function resetPasswordEmail<
       }
     }
 
-    const user = await internalHandlers.user.findById(verification.value)
+    const user = await builderArgs.handler.user.findById(verification.value)
 
     if (!user) {
       return {
@@ -65,12 +63,12 @@ export function resetPasswordEmail<
     }
 
     // delete the verification token
-    await internalHandlers.verification.delete(verification.id)
+    await builderArgs.handler.verification.delete(verification.id)
 
     const hashedPassword = await hashPassword(args.body.password)
-    await internalHandlers.account.updatePassword(user.id, hashedPassword)
+    await builderArgs.handler.account.updatePassword(user.id, hashedPassword)
 
-    const redirectTo = `${authConfig.resetPassword?.redirectTo ?? '/auth/login'}`
+    const redirectTo = `${builderArgs.options.method.emailAndPassword?.resetPassword?.redirectTo ?? '/auth/login'}`
 
     const responseHeaders = {
       Location: redirectTo,
@@ -86,12 +84,9 @@ export function resetPasswordEmail<
   return createEndpoint(schema, handler)
 }
 
-export function validateResetToken<
-  const TAuthContext extends AuthContext,
-  const TContext extends AnyContextable,
->(authContext: TAuthContext) {
-  const { internalHandlers } = authContext
-
+export function validateResetToken<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+  builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
+) {
   const schema = {
     method: 'POST',
     path: '/api/auth/validate-reset-password-token',
@@ -114,7 +109,7 @@ export function validateResetToken<
 
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     try {
-      const verification = await internalHandlers.verification.findByIdentifier(
+      const verification = await builderArgs.handler.verification.findByIdentifier(
         `reset-password:${args.body.token}`
       )
 
