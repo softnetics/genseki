@@ -34,7 +34,7 @@ import { UpdateView } from '../react/views/collections/update'
 
 export class Builder<
   TFullSchema extends Record<string, unknown>,
-  TContext extends AnyContextable = AnyContextable,
+  in out TContext extends AnyContextable = AnyContextable,
 > {
   private readonly tableRelationalConfigByTableTsName: ExtractTablesWithRelations<TFullSchema>
   private readonly tableTsNameByTableDbName: Record<string, string>

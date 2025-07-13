@@ -5,7 +5,7 @@ import type { JSONSchema } from 'zod/v4/core'
 
 import type { MaybePromise } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
-import type { ConditionalExceptNever } from './utils'
+import { type ConditionalExceptNever, withValidator } from './utils'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
 
@@ -69,7 +69,7 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
   }>
 
 export type ApiRouteHandler<
-  TContext extends AnyContextable,
+  in TContext extends AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
   payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
@@ -124,7 +124,7 @@ export type ApiRoute<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = 
 }
 
 export type ApiRouteWithContext<
-  TContext extends AnyContextable = AnyContextable,
+  in TContext extends AnyContextable = AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = {
   schema: TApiRouteSchema
@@ -136,16 +136,15 @@ export interface ApiRouter {
 }
 
 export interface AnyApiRouter {
-  [key: string]: ApiRouter | ApiRoute<AnyApiRouteSchema>
+  [key: string]: AnyApiRouter | ApiRoute<AnyApiRouteSchema>
 }
 
-export function createEndpoint<const TApiEndpointSchema extends ApiRouteSchema>(
-  schema: TApiEndpointSchema,
-  handler: ApiRouteHandler<AnyContextable, TApiEndpointSchema>
-) {
+export function createEndpoint<
+  const TApiEndpointSchema extends ApiRouteSchema,
+  const TContext extends AnyContextable,
+>(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
   return {
     schema,
-    handler: handler,
-    // handler: withValidator(schema, handler),
+    handler: withValidator(schema, handler),
   }
 }

@@ -1,4 +1,4 @@
-import { and, eq } from 'drizzle-orm'
+import { and, eq, type InferSelectModel } from 'drizzle-orm'
 import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { z } from 'zod/v4'
 
@@ -27,13 +27,10 @@ export interface OtpRequestResponse {
   refno: string
 }
 
-type AnyUserTable = WithAnyTable<
-  {
-    phone: AnyTypedColumn<string>
-    phoneVerified: AnyTypedColumn<boolean>
-  },
-  'user'
-> &
+type AnyUserTable = WithAnyTable<{
+  phone: AnyTypedColumn<string>
+  phoneVerified: AnyTypedColumn<boolean>
+}> &
   BaseAnyUserTable
 
 type FullSchema = WithAnyRelations<{
@@ -44,29 +41,26 @@ type FullSchema = WithAnyRelations<{
 }>
 
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function phone<TContext extends AnyContextable>({
-  db,
-  schema,
-  sendOtp,
-  verifyOtp,
-  signUpOnVerification,
-  options,
-}: {
-  db: NodePgDatabase<FullSchema>
-  schema: FullSchema
-  context: TContext
-  sendOtp?: (phone: string) => Promise<OtpRequestResponse>
-  verifyOtp?: (args: { token: string; pin: string }) => Promise<boolean>
-  signUpOnVerification?: {
-    getTempEmail?: (phoneNumber: string) => string
-    getTempName?: (phoneNumber: string) => string
+export function phone<TContext extends AnyContextable>(
+  context: TContext,
+  args: {
+    db: NodePgDatabase<FullSchema>
+    schema: FullSchema
+    sendOtp?: (phone: string) => Promise<OtpRequestResponse>
+    verifyOtp?: (args: { token: string; pin: string }) => Promise<boolean>
+    signUpOnVerification?: {
+      getTempEmail?: (phoneNumber: string) => string
+      getTempName?: (phoneNumber: string) => string
+    }
+    options?: {
+      autoLogin?: boolean
+      passwordHasher?: (passowrd: string) => Promise<string> | string
+    }
   }
-  options?: {
-    autoLogin?: boolean
-    passwordHasher?: (passowrd: string) => Promise<string> | string
-  }
-}) {
-  const builder = new Builder({ db: db, schema: schema }).$context<TContext>()
+) {
+  const { db, schema, sendOtp, verifyOtp, signUpOnVerification, options } = args
+
+  const builder = new Builder({ db: db, schema: schema, context })
 
   const internalHandlers = {
     account: {
@@ -81,7 +75,10 @@ export function phone<TContext extends AnyContextable>({
           .where(and(eq(schema.user.email, email), eq(schema.account.providerId, providerId)))
         if (accounts.length === 0) throw new Error('Account not found')
         if (accounts.length > 1) throw new Error('Multiple accounts found')
-        return accounts[0]
+        return accounts[0] as {
+          user: InferSelectModel<typeof schema.user>
+          password: string | null
+        }
       },
       link: async (data: any) => {
         const user = await db.insert(schema.account).values(data).returning()
@@ -400,18 +397,21 @@ export function phone<TContext extends AnyContextable>({
     }
   )
 
+  const api = {
+    'login-phone': loginByPhoneNumberEndpoint,
+    'sign-up-phone': signUpPhoneEndpoint,
+    'verification-otp-phone': sendPhoneVerificationOtpEndpoint,
+    'verification-otp-verify-phone': verifyPhoneVerificationEndpoint,
+  } as const
+
   return createPlugin({
     name: 'phone',
     plugin: (input) => {
       return {
-        ...input,
-        endpoints: {
-          ...input.endpoints,
-          'auth.login-phone': loginByPhoneNumberEndpoint,
-          'auth.sign-up-phone': signUpPhoneEndpoint,
-          'auth.verification-otp-phone': sendPhoneVerificationOtpEndpoint,
-          'auth.verification-otp-verify-phone': verifyPhoneVerificationEndpoint,
+        api: {
+          phone: api,
         },
+        uis: [],
       }
     },
   })

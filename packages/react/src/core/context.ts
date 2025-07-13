@@ -1,3 +1,5 @@
+import type { IsAny } from 'type-fest'
+
 import type { MaybePromise } from './collection'
 
 interface BaseUser {
@@ -21,6 +23,10 @@ export interface Contextable<TUser extends BaseUser = BaseUser> {
 
 export type AnyContextable = Contextable<any>
 
-export type ContextToRequestContext<TContext extends AnyContextable> = ReturnType<
-  TContext['toRequestContext']
->
+export type ContextToRequestContext<TContext extends AnyContextable> =
+  ReturnType<TContext['toRequestContext']> extends RequestContextable<infer TUser>
+    ? IsAny<TUser> extends true
+      ? // TODO: Recheck why AnyRequestContextable is not working here
+        any
+      : RequestContextable<TUser>
+    : never

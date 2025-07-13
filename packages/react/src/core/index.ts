@@ -19,14 +19,26 @@ export type {
   InferFields,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
-export { GensekiApp, getFieldsClient } from './config'
+export {
+  createPlugin,
+  type GensekiApp,
+  type GensekiAppOptions,
+  type GensekiCore,
+  type GensekiPlugin,
+  type GensekiUiRouter,
+  getFieldsClient,
+} from './config'
 export type {
+  AnyApiRouter,
+  AnyApiRouteSchema,
   ApiRoute,
   ApiRouteHandler,
   ApiRouteHandlerPayload,
   ApiRouter,
   ApiRouteResponse,
   ApiRouteSchema,
+  ApiRouteSchemaClient,
+  ApiRouteWithContext,
   InferApiRouteResponses,
 } from './endpoint'
 export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'

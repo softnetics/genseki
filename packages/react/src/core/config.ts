@@ -2,7 +2,7 @@ import type { PropsWithChildren, ReactNode } from 'react'
 
 import * as R from 'remeda'
 
-import { type AnyApiRouter, type ApiRouter } from './endpoint'
+import { type AnyApiRouter } from './endpoint'
 import type { FieldBase, FieldClient, Fields, FieldsClient } from './field'
 import {
   getStorageAdapterClient,
@@ -48,7 +48,7 @@ export interface GensekiAppOptions {
   storageAdapter?: StorageAdapter
 }
 
-export interface GensekiCore<TApiRouter extends ApiRouter = AnyApiRouter> {
+export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
   api: TApiRouter
   uis: GensekiUiRouter[]
   app?: {
@@ -56,9 +56,16 @@ export interface GensekiCore<TApiRouter extends ApiRouter = AnyApiRouter> {
   }
 }
 
-export interface GensekiPlugin<TName extends string, TApiRouter extends ApiRouter> {
+export interface GensekiPlugin<TName extends string, TApiRouter extends AnyApiRouter> {
   name: TName
   plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
+}
+
+export function createPlugin<TName extends string, TApiRouter extends AnyApiRouter>(args: {
+  name: TName
+  plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
+}): GensekiPlugin<TName, TApiRouter> {
+  return args
 }
 
 type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
@@ -66,7 +73,7 @@ type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnT
   TPlugin['plugin']
 >['api']
 
-export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends ApiRouter = {}> {
+export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
   // private readonly apiPathPrefix: string
   private readonly plugins: AnyGensekiPlugin[] = []
 
