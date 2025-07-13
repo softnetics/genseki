@@ -21,7 +21,9 @@ export type {
 export { ApiDefaultMethod } from './collection'
 export {
   createPlugin,
-  type GensekiApp,
+  GensekiApp,
+  type GensekiAppCompiled,
+  type GensekiAppCompiledClient,
   type GensekiAppOptions,
   type GensekiCore,
   type GensekiPlugin,

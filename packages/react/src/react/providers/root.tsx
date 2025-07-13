@@ -4,13 +4,13 @@ import { createContext, type ReactNode, useContext } from 'react'
 
 import { UiProviders } from './ui'
 
-import type { GensekiCore } from '../../core/config'
+import type { GensekiAppCompiled, GensekiAppCompiledClient, GensekiCore } from '../../core/config'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
-type RootContextValue<TGensekiCore extends GensekiCore = GensekiCore> = {
-  app: GensekiCore['app']
-  serverFunction: ServerFunction<TGensekiCore>
+type RootContextValue<TGensekiApp extends GensekiAppCompiled = GensekiAppCompiled> = {
+  app: GensekiAppCompiledClient
+  serverFunction: ServerFunction<TGensekiApp>
 }
 
 const RootContext = createContext<RootContextValue>(null!)
@@ -38,7 +38,7 @@ export const useServerFunction = <TGensekiCore extends GensekiCore>() => {
 }
 
 export const RootProvider = (props: {
-  app: GensekiCore['app']
+  app: GensekiAppCompiledClient
   serverFunction: ServerFunction
   children: ReactNode
 }) => {

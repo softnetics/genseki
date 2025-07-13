@@ -1,10 +1,10 @@
 import { NotAuthorizedPage, NotfoundPage, type ServerFunction } from '@genseki/react'
 
-import type { NextJsServerConfig } from '../config'
 import { getUser } from '../utils/get-user'
+import type { NextJsGensekiApp } from '../with'
 
 interface RootProps {
-  serverConfig: NextJsServerConfig<any, any, any, any>
+  app: NextJsGensekiApp
   serverFunction: ServerFunction
   headersPromise: Promise<Headers>
   paramsPromise: Promise<{ segments: string[] }>
@@ -18,27 +18,25 @@ export async function RootPage(props: RootProps) {
     props.headersPromise,
   ])
   const path = `/${params.segments.join('/')}`
-  const result = props.serverConfig.radixRouter.lookup(path)
+  const result = props.app.radixRouter.lookup(path)
 
   if (!result) {
     return <NotfoundPage redirectURL="/admin/collections" />
   }
 
   let user: any = {}
-  if (result.requiredAuthentication) {
+  if (result.requiredAuthenticated) {
     user = await getUser(props.serverFunction, headers)
     if (!user) {
       return <NotAuthorizedPage redirectURL="/admin/auth/login" />
     }
   }
 
-  const page = result.view({
-    user: user,
+  const page = result.render({
     headers: headers,
     params: result.params ?? {},
-    serverConfig: props.serverConfig,
     searchParams: searchParams,
-    serverFunction: props.serverFunction,
+    props: result.props ?? {},
   })
 
   return page

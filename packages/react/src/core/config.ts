@@ -27,14 +27,14 @@ export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<stri
       requiredAuthenticated: true
       id?: string
       path: string
-      render: (args: AuthenticatedRenderArgs & TProps) => ReactNode
+      render: (args: AuthenticatedRenderArgs & { props: TProps }) => ReactNode
       props?: TProps
     }
   | {
       requiredAuthenticated: false
       id?: string
       path: string
-      render: (args: RenderArgs & TProps) => ReactNode
+      render: (args: RenderArgs & { props: TProps }) => ReactNode
       props?: TProps
     }
 
@@ -51,9 +51,15 @@ export interface GensekiAppOptions {
 export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
   api: TApiRouter
   uis: GensekiUiRouter[]
-  app?: {
-    storageAdapter?: StorageAdapterClient
-  }
+}
+
+export interface GensekiAppCompiled<TApiRouter extends AnyApiRouter = AnyApiRouter>
+  extends GensekiCore<TApiRouter> {
+  storageAdapter?: StorageAdapterClient
+}
+
+export interface GensekiAppCompiledClient {
+  storageAdapter?: StorageAdapterClient
 }
 
 export interface GensekiPlugin<TName extends string, TApiRouter extends AnyApiRouter> {
@@ -92,7 +98,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     >
   }
 
-  build(): GensekiCore<TMainApiRouter> {
+  build(): GensekiAppCompiled<TMainApiRouter> {
     const uis = this.plugins.flatMap((plugin) => plugin.plugin(this.options).uis)
     const api = this.plugins.reduce(
       (acc, plugin) => ({ ...acc, ...plugin.plugin(this.options).api }),
@@ -100,13 +106,11 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     ) as TMainApiRouter
 
     return {
-      app: {
-        storageAdapter: getStorageAdapterClient({
-          storageAdapter: this.options.storageAdapter,
-          grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
-          grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
-        }),
-      },
+      storageAdapter: getStorageAdapterClient({
+        storageAdapter: this.options.storageAdapter,
+        grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
+        grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
+      }),
       api: api,
       uis: uis,
     }

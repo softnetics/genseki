@@ -1,22 +1,23 @@
 import { type ReactNode } from 'react'
 
-import { getClientConfig, RootProvider, type ServerFunction } from '@genseki/react'
+import { RootProvider, type ServerFunction } from '@genseki/react'
 
 import { NextNavigationProvider } from './navigation'
 
-import type { NextJsServerConfig } from '../config'
+import type { NextJsGensekiApp } from '../with'
 
 interface RootLayoutProps {
-  serverConfig: NextJsServerConfig<any, any, any, any>
-  serverFunction: ServerFunction<NextJsServerConfig<any, any, any, any>>
+  app: NextJsGensekiApp
+  serverFunction: ServerFunction
   children: ReactNode
 }
 
 export function RootLayout(props: RootLayoutProps) {
-  const clientConfig = getClientConfig(props.serverConfig)
+  const clientApp = props.app.toClient()
+
   return (
     <NextNavigationProvider>
-      <RootProvider clientConfig={clientConfig} serverFunction={props.serverFunction}>
+      <RootProvider app={clientApp} serverFunction={props.serverFunction}>
         {props.children}
       </RootProvider>
     </NextNavigationProvider>

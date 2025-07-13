@@ -13,7 +13,7 @@ const getHeadersObject = (headers: Headers): Record<string, string> => {
 // TODO: Add type for user
 async function _getUser(serverFunction: ServerFunction, headers: Headers): Promise<any | null> {
   const reqHeaders = getHeadersObject(headers)
-  const response = await serverFunction({
+  const response = await serverFunction('auth.me', {
     method: 'auth.me',
     headers: reqHeaders,
     body: {},

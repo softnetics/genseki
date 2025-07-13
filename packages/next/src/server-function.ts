@@ -2,35 +2,76 @@ import { parseSetCookie } from 'cookie-es'
 import { cookies } from 'next/headers'
 
 import {
-  type AnyServerConfig,
+  type AnyApiRouteSchema,
   type ApiRoute,
+  type ApiRouteHandlerBasePayload,
+  type ApiRouter,
+  type ApiRouteSchema,
+  type GensekiCore,
+  type GetApiRouterFromGensekiCore,
+  type GetGensekiApiRouterMethod,
   type GetServerFunctionApiArgs,
   type GetServerFunctionResponse,
+  isApiRoute,
 } from '@genseki/react'
 
+function findApiRoute<TApiRouter extends ApiRouter, TMethod extends string>(
+  apiRouter: TApiRouter,
+  methodName: TMethod
+): ApiRoute | undefined {
+  const [head, ...tails] = methodName.split('.')
+  const router = apiRouter[head]
+  if (!router) return undefined
+  if (isApiRoute(router) && tails.length === 0) {
+    return router as ApiRoute
+  }
+
+  if (!isApiRoute(router)) {
+    findApiRoute(router, tails.join('.'))
+  }
+
+  return undefined
+}
+
+function createUrl(schema: ApiRouteSchema, data: ApiRouteHandlerBasePayload<AnyApiRouteSchema>) {
+  const url = new URL(schema.path, 'http://localhost')
+
+  for (const [key, value] of Object.entries(data.pathParams || {})) {
+    url.pathname = url.pathname.replace(`:${key}`, String(value))
+  }
+
+  for (const [key, value] of Object.entries(data.query || {})) {
+    url.searchParams.append(key, String(value))
+  }
+
+  const request = new Request(url, {
+    method: schema.method,
+    body: 'body' in data ? JSON.stringify(data.body) : undefined,
+    headers: 'headers' in data ? data.headers : {},
+  })
+
+  return request
+}
+
 export async function handleServerFunction<
-  TServerConfig extends AnyServerConfig,
-  TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
+  TCore extends GensekiCore,
+  TMethod extends GetGensekiApiRouterMethod<TCore['api']>,
+  TApiArgs extends GetServerFunctionApiArgs<GetApiRouterFromGensekiCore<TCore>, TMethod>,
 >(
-  serverConfig: TServerConfig,
+  core: TCore,
+  methodName: TMethod,
   args: TApiArgs
-): Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>> {
+): Promise<GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>> {
   try {
-    const apiRoute = serverConfig.endpoints?.[
-      args.method as keyof typeof serverConfig.endpoints
-    ] as ApiRoute
+    // TODO: Recusively find the method in the core.api object
+    const apiRoute = findApiRoute(core.api, methodName)
     if (!apiRoute) {
-      throw new Error(`No API route found for method: ${args.method as string}`)
+      throw new Error(`No API route found for method: ${methodName as string}`)
     }
 
-    const context = serverConfig.context.toRequestContext({
-      headers: args.headers,
-    })
+    // TODO: Recheck if the dummy request is correct
 
-    const response = await apiRoute.handler({
-      ...args,
-      context,
-    })
+    const response = await apiRoute.handler(args as any, createUrl(apiRoute.schema, args as any))
 
     if (response.headers?.['Set-Cookie']) {
       const setCookieData = parseSetCookie(response.headers['Set-Cookie'])
@@ -38,7 +79,7 @@ export async function handleServerFunction<
       c.set(setCookieData.name, setCookieData.value, setCookieData)
     }
 
-    return response as GetServerFunctionResponse<TServerConfig, TApiArgs['method']>
+    return response as GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>
   } catch (error) {
     console.error('Error handling server function:', error)
     return {
