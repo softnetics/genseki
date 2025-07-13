@@ -6,6 +6,7 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { SubmitButton } from '../../react/components/compound/submit-button'
 import {
   Form,
   FormControl,
@@ -13,11 +14,10 @@ import {
   FormItem,
   FormMessage,
   Link,
-  SubmitButton,
   TextField,
-} from '../../components'
-import { useNavigation } from '../../providers'
-import { useServerFunction } from '../../providers/root'
+} from '../../react/components/primitives'
+import { useNavigation } from '../../react/providers/navigation'
+import { useServerFunction } from '../../react/providers/root'
 
 const FormSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),
@@ -44,8 +44,7 @@ export function LoginClientForm() {
   async function login(data: z.infer<typeof FormSchema>) {
     form.clearErrors('email')
     form.clearErrors('password')
-    const response = await serverFunction({
-      method: 'auth.loginEmail',
+    const response = await serverFunction('auth.loginEmail', {
       body: {
         email: data.email,
         password: data.password,
@@ -57,11 +56,13 @@ export function LoginClientForm() {
 
     if (response.status !== 200) {
       toast.error('Login failed', {
-        description: response.body.status || 'Failed to login',
+        // description: response.body.status || 'Failed to login',
+        description: 'Failed to login',
       })
       form.setError('email', {
         type: 'manual',
-        message: response.body.status || 'Failed to login',
+        // message: response.body.status || 'Failed to login',
+        message: 'Failed to login',
       })
 
       return

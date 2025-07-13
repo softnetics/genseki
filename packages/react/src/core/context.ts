@@ -4,8 +4,13 @@ interface BaseUser {
   id: string
 }
 
-export interface RequestContextable<TUser extends BaseUser = BaseUser> {
-  requiredAuthenticated(): MaybePromise<TUser>
+export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
+  constructor(private readonly request: Request) {}
+  getRequest() {
+    return this.request
+  }
+
+  abstract requiredAuthenticated(): MaybePromise<TUser>
 }
 
 export type AnyRequestContextable = RequestContextable<any>

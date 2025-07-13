@@ -179,6 +179,25 @@ export function createAuthInternalHandler(options: AuthOptions) {
         .where(and(eq(table.value, userId), like(table.identifier, `${identifierPrefix}%`)))
         .returning()
     },
+    findByResetPasswordToken: async (token: string) => {
+      const identifier = `reset-password:${token}`
+      const table = options.schema.verification
+      const verifications = await db.select().from(table).where(eq(table.identifier, identifier))
+      if (verifications.length === 0) throw new Error('Verification not found')
+      if (verifications.length > 1) throw new Error('Multiple verifications found')
+      return verifications[0]
+    },
+    createWithResetPasswordToken: async (userId: string, expiresInMs?: number) => {
+      const table = options.schema.verification
+      const token = crypto.randomUUID()
+      const identifier = `reset-password:${token}`
+      const expiresAt = new Date(Date.now() + (expiresInMs ?? 1000 * 60 * 15)) // default 15 mins
+      const verification = await db
+        .insert(table)
+        .values({ identifier, value: userId, expiresAt })
+        .returning()
+      return verification[0]
+    },
   }
 
   return {

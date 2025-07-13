@@ -24,9 +24,12 @@ interface UpdateViewProps extends BaseViewProps {
 export async function UpdateView(props: UpdateViewProps) {
   const headersValue = getHeadersObject(props.headers)
 
-  const context = props.context.toRequestContext({
+  const request = new Request('', {
+    method: 'GET',
     headers: headersValue,
   })
+
+  const context = props.context.toRequestContext(request)
 
   const result = await props.findOne.handler({
     context,

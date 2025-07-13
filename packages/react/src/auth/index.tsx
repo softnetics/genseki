@@ -3,13 +3,22 @@ import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import { forgotPasswordEmail } from './api/forgot-password'
 import { loginEmail } from './api/login-email'
 import { me } from './api/me'
-import { resetPasswordEmail, validateResetToken } from './api/reset-password-email'
+import {
+  resetPasswordEmail,
+  validateResetToken,
+  validateVerification,
+} from './api/reset-password-email'
 import { sendResetPasswordEmail } from './api/send-email-reset-password'
 import { signOut } from './api/sign-out'
 import { signUpEmail } from './api/sign-up-email'
 import { type AuthInternalHandler, createAuthInternalHandler } from './context'
+import { ForgotPasswordView } from './views/forgot-password/forgot-password'
+import { AuthLayout } from './views/layout'
+import { LoginView } from './views/login'
+import { ResetPasswordView } from './views/reset-password/reset-password'
+import { SignUpView } from './views/sign-up'
 
-import { type GensekiCore } from '../core/config'
+import { type GensekiCore, type GensekiUiRouter } from '../core/config'
 import { type Contextable } from '../core/context'
 import type { Fields } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
@@ -128,8 +137,58 @@ export function auth<TContext extends Contextable, TAuthOptions extends AuthOpti
     me: me(apiOptions),
   } as const
 
+  const uis: GensekiUiRouter[] = [
+    {
+      id: 'login',
+      path: '/auth/login',
+      requiredAuthenticated: false,
+      render: (args) => (
+        <AuthLayout>
+          <LoginView {...args} {...args.params} />
+        </AuthLayout>
+      ),
+    },
+    {
+      id: 'sign-up',
+      path: '/auth/sign-up',
+      requiredAuthenticated: false,
+      render: (args) => (
+        <AuthLayout>
+          <SignUpView {...args} {...args.params} />
+        </AuthLayout>
+      ),
+    },
+    {
+      id: 'forgot-password',
+      path: '/auth/forgot-password',
+      requiredAuthenticated: false,
+      render: (args) => (
+        <AuthLayout>
+          <ForgotPasswordView {...args} {...args.params} />
+        </AuthLayout>
+      ),
+    },
+    {
+      id: 'reset-password',
+      path: '/auth/reset-password',
+      requiredAuthenticated: false,
+      render: (args) => (
+        <AuthLayout>
+          <ResetPasswordView
+            {...args}
+            validateToken={async (token) => {
+              const verification = await authHandler.verification.findByResetPasswordToken(token)
+              const validation = await validateVerification(verification)
+              return !!validation
+            }}
+          />
+        </AuthLayout>
+      ),
+    },
+  ]
+
   return {
     api: api,
-    uis: [],
+    uis: uis,
   } satisfies GensekiCore
 }

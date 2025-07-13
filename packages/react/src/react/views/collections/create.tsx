@@ -14,10 +14,12 @@ interface CreateViewProps extends BaseViewProps {
 
 export async function CreateView(props: CreateViewProps) {
   const headersValue = getHeadersObject(props.headers)
-  const context = props.context.toRequestContext({
+  // TODO: Fix this dummy request
+  const request = new Request('', {
+    method: 'GET',
     headers: headersValue,
   })
-
+  const context = props.context.toRequestContext(request)
   const fieldsClient = getFieldsClient(props.collectionOptions.fields)
   const optionsRecord = await createOptionsRecord(context, props.collectionOptions.fields)
 

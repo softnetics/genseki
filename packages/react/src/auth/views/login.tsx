@@ -1,12 +1,8 @@
 import { LoginClientForm } from './login.client'
 
-import type { ServerConfig } from '../../../core'
-import { ButtonLink } from '../../components'
-import { Typography } from '../../components/primitives/typography'
+import { ButtonLink, Typography } from '../../react/components/primitives'
 
-interface SignInViewProps {
-  serverConfig: ServerConfig
-}
+interface SignInViewProps {}
 
 export function LoginView(props: SignInViewProps) {
   return (

@@ -34,9 +34,13 @@ export async function ListView(props: ListViewProps) {
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
-  const context = props.context.toRequestContext({
+  // TODO: Fix this dummy request
+  const request = new Request('', {
+    method: 'GET',
     headers: headersValue,
   })
+
+  const context = props.context.toRequestContext(request)
 
   // TODO: Consider moving to client component
   const result = await props.findMany.handler({

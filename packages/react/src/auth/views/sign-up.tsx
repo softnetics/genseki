@@ -1,11 +1,8 @@
 import { SignUpClientForm } from './sign-up.client'
 
-import type { ServerConfig } from '../../../core'
-import { Typography } from '../../components/primitives/typography'
+import { Typography } from '../../react/components/primitives'
 
-interface SignInViewProps {
-  serverConfig: ServerConfig
-}
+interface SignInViewProps {}
 
 export function SignUpView(props: SignInViewProps) {
   return (

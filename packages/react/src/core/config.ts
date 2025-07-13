@@ -38,9 +38,8 @@ export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<stri
       props?: TProps
     }
 
-export interface GensekiAppOptions<TApiPrefix extends string = '/api'> {
+export interface GensekiAppOptions {
   title: string
-  apiPrefix?: TApiPrefix
   components: {
     Layout: (props: PropsWithChildren) => ReactNode
     NotFound: () => ReactNode
@@ -57,26 +56,22 @@ export interface GensekiCore<TApiRouter extends ApiRouter = AnyApiRouter> {
   }
 }
 
-export interface GensekiPlugin<
-  TName extends string,
-  TApiPrefix extends string,
-  TApiRouter extends ApiRouter,
-> {
+export interface GensekiPlugin<TName extends string, TApiRouter extends ApiRouter> {
   name: TName
-  plugin: (options: GensekiAppOptions<TApiPrefix>) => GensekiCore<TApiRouter>
+  plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
 }
 
-type AnyGensekiPlugin = GensekiPlugin<string, string, AnyApiRouter>
+type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
 type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
   TPlugin['plugin']
 >['api']
 
 export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends ApiRouter = {}> {
-  private readonly apiPathPrefix: string
+  // private readonly apiPathPrefix: string
   private readonly plugins: AnyGensekiPlugin[] = []
 
-  constructor(private readonly options: GensekiAppOptions<TApiPrefix>) {
-    this.apiPathPrefix = options.apiPrefix ?? '/api'
+  constructor(private readonly options: GensekiAppOptions) {
+    // this.apiPathPrefix = options.apiPrefix ?? '/api'
   }
 
   apply<const TPlugin extends AnyGensekiPlugin>(

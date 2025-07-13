@@ -36,8 +36,9 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
       }
     }
 
-    const identifier = `reset-password:${args.query.token}`
-    const verification = await builderArgs.handler.verification.findByIdentifier(identifier)
+    const verification = await builderArgs.handler.verification.findByResetPasswordToken(
+      args.query.token
+    )
 
     if (!verification || !verification.value) {
       return {
@@ -84,6 +85,26 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
   return createEndpoint(schema, handler)
 }
 
+export function validateVerification(verification?: {
+  id: string
+  identifier: string
+  value: string | null
+  expiresAt: Date
+}) {
+  if (!verification) {
+    return null
+  }
+  if (verification.expiresAt < new Date()) {
+    return null
+  }
+  return {
+    id: verification.id,
+    identifier: verification.identifier,
+    value: verification.value,
+    expiresAt: verification.expiresAt.toISOString(),
+  }
+}
+
 export function validateResetToken<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
 ) {
@@ -109,11 +130,13 @@ export function validateResetToken<TContext extends Contextable, TAuthOptions ex
 
   const handler: ApiRouteHandler<TContext, typeof schema> = async (args) => {
     try {
-      const verification = await builderArgs.handler.verification.findByIdentifier(
-        `reset-password:${args.body.token}`
+      const verification = await builderArgs.handler.verification.findByResetPasswordToken(
+        args.body.token
       )
 
-      if (!verification || verification.expiresAt < new Date()) {
+      const validatedVerification = validateVerification(verification)
+
+      if (!validatedVerification) {
         return {
           status: 200,
           body: { verification: null },
@@ -123,9 +146,7 @@ export function validateResetToken<TContext extends Contextable, TAuthOptions ex
       return {
         status: 200,
         body: {
-          verification: verification
-            ? { ...verification, expiresAt: verification.expiresAt.toISOString() }
-            : null,
+          verification: validatedVerification,
         },
       }
     } catch {

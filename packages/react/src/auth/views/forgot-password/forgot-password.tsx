@@ -1,10 +1,8 @@
-import { type ServerConfig, Typography } from '@genseki/react'
+import { Typography } from '@genseki/react'
 
 import { ForgotPasswordClientForm } from './forgot-password.client'
 
-interface ForgotPasswordViewProps {
-  serverConfig: ServerConfig
-}
+interface ForgotPasswordViewProps {}
 
 export function ForgotPasswordView(props: ForgotPasswordViewProps) {
   return (

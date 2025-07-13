@@ -38,7 +38,7 @@ const FormSchema = z
 type FormSchema = z.infer<typeof FormSchema>
 
 interface ResetPasswordClientFormProps {
-  token?: string
+  token: string
 }
 
 export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps) {
@@ -54,8 +54,7 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
   const { handleSubmit, control } = form
 
   const handleResetPassword = async (data: z.infer<typeof FormSchema>) => {
-    const response = await serverFunction({
-      method: 'auth.resetPasswordEmail',
+    const response = await serverFunction('auth.resetPasswordEmail', {
       body: {
         password: data.password,
       },
@@ -65,11 +64,13 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
     })
     if (response.status !== 200) {
       toast.error('Failed to reset password', {
-        description: response.body.status || 'Failed to reset password',
+        // description: response.body.status || 'Failed to reset password',
+        description: 'Failed to reset password',
       })
       form.setError('password', {
         type: 'manual',
-        message: response.body.status || 'Failed to reset password',
+        // message: response.body.status || 'Failed to reset password',
+        message: 'Failed to reset password',
       })
       return
     }

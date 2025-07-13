@@ -6,17 +6,17 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
+import { SubmitButton } from '../../react/components/compound/submit-button'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-  SubmitButton,
   TextField,
-} from '../../components'
-import { useNavigation } from '../../providers'
-import { useClientConfig, useServerFunction } from '../../providers/root'
+} from '../../react/components/primitives'
+import { useNavigation } from '../../react/providers/navigation'
+import { useServerFunction } from '../../react/providers/root'
 
 const FormSchema = z
   .object({
@@ -37,8 +37,11 @@ const FormSchema = z
 
 type FormSchema = z.infer<typeof FormSchema>
 
-export function SignUpClientForm() {
-  const clientConfig = useClientConfig()
+interface SignUpClientFormProps {
+  autoLogin?: boolean
+}
+
+export function SignUpClientForm(props: SignUpClientFormProps) {
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
@@ -47,8 +50,7 @@ export function SignUpClientForm() {
   })
 
   const onValid = async (data: FormSchema) => {
-    const response = await serverFunction({
-      method: 'auth.signUpEmail',
+    const response = await serverFunction('auth.signUpEmail', {
       body: data,
       headers: {},
       query: {},
@@ -57,33 +59,14 @@ export function SignUpClientForm() {
 
     if (response.status !== 200) {
       toast.error('Failed to sign up', {
-        description: response.body.status || 'Failed to sign up',
+        // description: response.body.status || 'Failed to sign up',
+        description: 'Failed to sign up',
       })
       return
     }
 
-    if (clientConfig.auth.ui.signUp.autoLogin) {
-      const loginResponse = await serverFunction({
-        method: 'auth.loginEmail',
-        body: { email: data.email, password: data.password },
-        headers: {},
-        query: {},
-        pathParams: {},
-      })
-
-      if (loginResponse.status !== 200) {
-        toast.error('Failed to log in after sign up', {
-          description: loginResponse.body.status || 'Failed to log in',
-        })
-        return
-      }
-
-      toast.success('Successfully signed up and logged in', {
-        description: 'You are now logged in.',
-      })
-
-      return navigate('../collections')
-    }
+    // TODO: Move redirect logic to server function
+    if (props.autoLogin) return navigate('../collections')
 
     toast.success('Successfully signed up', {
       description: 'You can now log in with your credentials.',

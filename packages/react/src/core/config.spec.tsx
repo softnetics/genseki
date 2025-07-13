@@ -4,7 +4,7 @@ import z from 'zod/v4'
 import * as schema from './__mocks__/complex-schema'
 import { Builder } from './builder'
 import { GensekiApp } from './config'
-import { type Contextable, type RequestContextable } from './context'
+import { type Contextable, RequestContextable } from './context'
 
 const db = drizzle({
   connection: '',
@@ -17,8 +17,10 @@ interface User {
   email: string
 }
 
-class MyRequestContext implements RequestContextable<User> {
-  constructor() {}
+class MyRequestContext extends RequestContextable<User> {
+  constructor(request: Request) {
+    super(request)
+  }
 
   requiredAuthenticated() {
     // Simulate an authenticated user
@@ -34,7 +36,7 @@ class MyContext implements Contextable<User> {
   constructor() {}
 
   toRequestContext(request: Request) {
-    return new MyRequestContext()
+    return new MyRequestContext(request)
   }
 }
 

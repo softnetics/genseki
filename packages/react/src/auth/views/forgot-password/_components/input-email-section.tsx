@@ -24,7 +24,7 @@ export type OutputEmailForm = z.infer<typeof schema>
 interface InputEmailSectionProps {
   onNext: (email: string) => Promise<{
     status: number
-    errormessage?: string
+    errorMessage?: string
   }>
 }
 
@@ -43,7 +43,7 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
           if (response.status !== 200) {
             form.setError('email', {
               type: 'manual',
-              message: response.errormessage || 'Failed to send OTP',
+              message: response.errorMessage || 'Failed to send OTP',
             })
             return
           }

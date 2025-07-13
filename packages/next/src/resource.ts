@@ -1,12 +1,7 @@
 import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
-import {
-  type AnyServerConfig,
-  type ApiRoute,
-  type ApiRouter,
-  type ServerConfig,
-} from '@genseki/react'
+import { type ApiRoute, type ApiRouter } from '@genseki/react'
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}

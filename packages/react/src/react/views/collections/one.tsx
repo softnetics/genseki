@@ -18,9 +18,13 @@ interface OneViewProps extends BaseViewProps {
 
 export async function OneView(props: OneViewProps) {
   const headersValue = getHeadersObject(props.headers)
-  const context = props.context.toRequestContext({
+
+  // TODO: Fix this dummy request
+  const request = new Request('', {
+    method: 'GET',
     headers: headersValue,
   })
+  const context = props.context.toRequestContext(request)
 
   const result = await props.findOne.handler({
     context,

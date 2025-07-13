@@ -1,7 +1,4 @@
-import type { ServerConfig } from '../../../core'
-
 interface AuthLayoutProps {
-  serverConfig: ServerConfig
   children: React.ReactNode
 }
 

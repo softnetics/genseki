@@ -21,8 +21,7 @@ export function ForgotPasswordClientForm() {
       return (
         <InputEmailSection
           onNext={async (email) => {
-            const response = await serverFunction({
-              method: 'auth.sendEmailResetPassword',
+            const response = await serverFunction('auth.sendEmailResetPassword', {
               body: {
                 email,
               },
@@ -33,11 +32,14 @@ export function ForgotPasswordClientForm() {
 
             if (response.status !== 200) {
               toast.error('Failed to send OTP', {
-                description: response.body.status || 'Failed to send OTP',
+                // TODO: use response.body.status when available
+                // description: response.body.status || 'Failed to send OTP',
+                description: 'Failed to send OTP',
               })
               return {
                 status: response.status,
-                errormessage: response.body.status || 'Failed to send OTP',
+                // errormessage: response.body.status || 'Failed to send OTP',
+                errorMessage: 'Failed to send OTP',
               }
             }
 

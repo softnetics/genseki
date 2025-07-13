@@ -72,8 +72,7 @@ export type ApiRouteHandler<
   TContext extends AnyContextable,
   TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
 > = (
-  payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>,
-  request: Request
+  payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
