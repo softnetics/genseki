@@ -1,5 +1,5 @@
 import { getClientConfig } from '@genseki/react'
 
-import { serverConfig } from '~/drizzlify/config'
+import { serverConfig } from '~/genseki/config'
 
 export const clientConfig = getClientConfig(serverConfig)

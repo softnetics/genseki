@@ -5,8 +5,8 @@ export type {
   AnyRequestContextable,
   Contextable,
   ContextToRequestContext,
-  RequestContextable,
 } from '../core/context'
+export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
 export type {
   ApiReturnType,
@@ -41,6 +41,8 @@ export type {
   ApiRouteResponse,
   ApiRouteSchema,
   ApiRouteSchemaClient,
+  FilterByMethod,
+  FlattenApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
 export { isApiRoute } from './endpoint'

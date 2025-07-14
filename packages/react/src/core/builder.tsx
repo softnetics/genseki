@@ -25,6 +25,7 @@ import {
 import { FieldBuilder, type Fields, type OptionCallback } from './field'
 import { appendFieldNameToFields } from './utils'
 
+import { CollectionAppLayout } from '../react'
 import { CreateView } from '../react/views/collections/create'
 import { ListView } from '../react/views/collections/list'
 import { OneView } from '../react/views/collections/one'
@@ -63,7 +64,10 @@ export class Builder<
   >(
     tableTsName: TTableTsName,
     options: CollectionOptions<TSlug, TContext, TFields, TApiRouter>
-  ): GensekiPlugin<TSlug, Simplify<TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>>> {
+  ): GensekiPlugin<
+    TSlug,
+    { [K in TSlug]: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields> }
+  > {
     const defaultHandlers = createDefaultApiHandlers({
       db: this.config.db,
       schema: this.config.schema,
@@ -139,11 +143,11 @@ export class Builder<
 
     const plugin: GensekiPlugin<
       TSlug,
-      TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>
+      { [K in TSlug]: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields> }
     > = {
       name: options.slug,
       plugin: (gensekiOptions) => {
-        const CollectionLayout = gensekiOptions.components.CollectionLayout
+        const CollectionLayout = gensekiOptions.components?.CollectionLayout ?? CollectionAppLayout
 
         const defaultArgs = {
           slug: options.slug,
@@ -212,7 +216,9 @@ export class Builder<
         ]
 
         return {
-          api: allEndpoints as TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>,
+          api: { [options.slug]: allEndpoints } as {
+            [K in TSlug]: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>
+          },
           uis: uis,
         }
       },

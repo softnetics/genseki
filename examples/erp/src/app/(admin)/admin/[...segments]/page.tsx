@@ -2,7 +2,7 @@ import { headers } from 'next/headers'
 
 import { RootPage } from '@genseki/next'
 
-import { serverConfig } from '~/drizzlify/config'
+import { serverConfig } from '~/genseki/config'
 
 import { serverFunction } from '../../_helper/server'
 

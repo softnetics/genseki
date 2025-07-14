@@ -40,10 +40,10 @@ export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<stri
 
 export interface GensekiAppOptions {
   title: string
-  components: {
-    Layout: (props: PropsWithChildren) => ReactNode
-    NotFound: () => ReactNode
-    CollectionLayout: (props: PropsWithChildren) => ReactNode
+  components?: {
+    Layout?: (props: PropsWithChildren) => ReactNode
+    NotFound?: () => ReactNode
+    CollectionLayout?: (props: PropsWithChildren) => ReactNode
   }
   storageAdapter?: StorageAdapter
 }

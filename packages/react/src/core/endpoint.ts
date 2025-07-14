@@ -22,6 +22,19 @@ export type InferPathParams<TPath extends string> = Simplify<
     : never
 >
 
+export type FlattenApiRouter<TApiRouter extends AnyApiRouter> = ValueOf<{
+  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends infer TApiRoute extends ApiRoute
+    ? Simplify<TApiRoute>
+    : TApiRouter[TKey] extends infer TApiRouter extends AnyApiRouter
+      ? Simplify<FlattenApiRouter<TApiRouter>>
+      : never
+}>
+
+export type FilterByMethod<TApiRoute extends ApiRoute, TMethod extends string> = Extract<
+  TApiRoute,
+  { schema: { method: TMethod } }
+>
+
 // TODO: With IsNever, the performance is not good. Need to fix it.
 type GetBody<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<TApiRouteSchema['body']> extends false ? Output<TApiRouteSchema['body']> : never
@@ -117,7 +130,7 @@ export interface AnyApiRouteSchema {
   responses: Partial<Record<ApiHttpStatus, any>>
 }
 
-export type ApiRoute<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = {
+export type ApiRoute<TApiRouteSchema extends AnyApiRouteSchema = AnyApiRouteSchema> = {
   schema: TApiRouteSchema
   handler: ApiRouteHandler<TApiRouteSchema>
 }

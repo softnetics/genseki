@@ -1,12 +1,7 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
 import { Pool } from 'pg'
 
-import {
-  Builder,
-  type Contextable,
-  type RequestContextable,
-  type RequestContextArgs,
-} from '@genseki/react'
+import { Builder, type Contextable, RequestContextable } from '@genseki/react'
 
 import * as schema from '~/db/schema'
 
@@ -22,8 +17,10 @@ interface User {
   email: string
 }
 
-class MyRequestContext implements RequestContextable<User> {
-  constructor() {}
+class MyRequestContext extends RequestContextable<User> {
+  constructor(request: Request) {
+    super(request)
+  }
 
   requiredAuthenticated() {
     // Simulate an authenticated user
@@ -38,9 +35,9 @@ class MyRequestContext implements RequestContextable<User> {
 export class MyContext implements Contextable<User> {
   constructor() {}
 
-  toRequestContext(args: RequestContextArgs) {
-    return new MyRequestContext()
+  toRequestContext(request: Request) {
+    return new MyRequestContext(request)
   }
 }
 
-export const builder = new Builder({ db, schema }).$context<MyContext>()
+export const builder = new Builder({ db, schema, context: new MyContext() })

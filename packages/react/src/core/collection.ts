@@ -454,7 +454,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
   TFields extends Fields,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
   ? {
-      path: `/api/${TSlug}/${TMethod}`
+      path: `/${TSlug}`
       method: 'POST'
       body: ConditionalAnyOutput<TFields, ToZodObject<InferCreateFields<TFields>>>
       responses: {
@@ -463,7 +463,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
     }
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? {
-        path: `/api/${TSlug}/:id`
+        path: `/${TSlug}/:id`
         method: 'GET'
         pathParams: ToZodObject<{ id: string }>
         responses: {
@@ -472,7 +472,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
       }
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
       ? {
-          path: `/api/${TSlug}`
+          path: `/${TSlug}`
           method: 'GET'
           query: ToZodObject<{
             limit?: number
@@ -486,7 +486,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
         }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? {
-            path: `/api/${TSlug}/:id`
+            path: `/${TSlug}/:id`
             method: 'PATCH'
             pathParams: ToZodObject<{ id: string }>
             body: ConditionalAnyOutput<TFields, ToZodObject<InferUpdateFields<TFields>>>
@@ -496,7 +496,7 @@ export type ConvertCollectionDefaultApiToApiRouteSchema<
           }
         : TMethod extends typeof ApiDefaultMethod.DELETE
           ? {
-              path: `/api/${TSlug}`
+              path: `/${TSlug}`
               method: 'DELETE'
               body: ToZodObject<{ ids: string[] | number[] }>
               responses: {
@@ -541,7 +541,7 @@ export function getDefaultCollectionAdminApiRouter(
           const endpoint = createEndpoint(
             context,
             {
-              path: `/api/${slug}/${method}`,
+              path: `/${slug}`,
               method: 'POST',
               // TODO: fieldToZodObject but create fields
               body: body,
@@ -571,7 +571,7 @@ export function getDefaultCollectionAdminApiRouter(
           const endpoint = createEndpoint(
             context,
             {
-              path: `/api/${slug}/${method}/:id`,
+              path: `/${slug}/:id`,
               method: 'GET',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),
@@ -604,7 +604,7 @@ export function getDefaultCollectionAdminApiRouter(
           const endpoint = createEndpoint(
             context,
             {
-              path: `/api/${slug}/${method}`,
+              path: `/${slug}`,
               method: 'GET',
               query: z.object({
                 limit: z.number().optional(),
@@ -638,7 +638,7 @@ export function getDefaultCollectionAdminApiRouter(
           const endpoint = createEndpoint(
             context,
             {
-              path: `/api/${slug}/${method}/:id`,
+              path: `/${slug}/:id`,
               method: 'PATCH',
               pathParams: z.object({
                 id: z.union([z.string(), z.number()]),
@@ -670,7 +670,7 @@ export function getDefaultCollectionAdminApiRouter(
           const endpoint = createEndpoint(
             context,
             {
-              path: `/api/${slug}/${method}`,
+              path: `/${slug}`,
               method: 'DELETE',
               body: z.object({
                 ids: z.union([z.string().array(), z.number().array()]),
