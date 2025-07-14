@@ -42,17 +42,6 @@ export function isRichTextField(field: FieldClientBase): field is FieldColumnJso
   return field.type === 'richText'
 }
 
-export function isFieldsWithFieldName(fields: Fields): fields is Fields {
-  return Object.values(fields).every((field) => {
-    return (
-      'fieldName' in fields.$client &&
-      (field.$client as any).fieldName !== undefined &&
-      'fieldName' in fields.$server &&
-      (field.$server as any).fieldName !== undefined
-    )
-  })
-}
-
 export function isMediaField(field: FieldBase): field is FieldColumnStringMedia {
   return field.type === 'media'
 }

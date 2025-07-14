@@ -13,7 +13,7 @@ import {
   type GetAllTableTsNames,
   getDefaultCollectionAdminApiRouter,
 } from './collection'
-import type { GensekiPlugin, GensekiUiRouter } from './config'
+import { createGensekiUiRoute, type GensekiPlugin, type GensekiUiRouter } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
   type AnyApiRouter,
@@ -25,6 +25,7 @@ import {
   appendApiPathPrefix,
 } from './endpoint'
 import { FieldBuilder, type Fields, type OptionCallback } from './field'
+import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
 import { appendFieldNameToFields } from './utils'
 
 import { CollectionAppLayout, HomeView } from '../react'
@@ -152,8 +153,6 @@ export class Builder<
     > = {
       name: options.slug,
       plugin: (gensekiOptions) => {
-        const CollectionLayout = gensekiOptions.components?.CollectionLayout ?? CollectionAppLayout
-
         const defaultArgs = {
           slug: options.slug,
           context: this.config.context,
@@ -164,35 +163,55 @@ export class Builder<
           } satisfies BaseViewProps['collectionOptions'],
         }
 
-        const uis: GensekiUiRouter[] = [
-          {
-            path: `/collections`,
-            requiredAuthenticated: true,
-            render: (args) => (
-              <CollectionLayout>
-                <HomeView />
-              </CollectionLayout>
-            ),
-          },
-          {
+        const _collectionHomeRoute = gensekiOptions.uis.find(
+          (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
+        ) as GensekiUiRouter<GensekiUiCommonProps['COLLECTION_HOME']> | undefined
+
+        const collectionHomeRoute = _collectionHomeRoute
+          ? {
+              ..._collectionHomeRoute,
+              props: {
+                cards: [
+                  ...(_collectionHomeRoute.props?.cards ?? []),
+                  { name: options.slug, path: `/admin/collections/${options.slug}` },
+                ],
+              },
+            }
+          : createGensekiUiRoute({
+              id: GensekiUiCommonId.COLLECTION_HOME,
+              path: `/collections`,
+              requiredAuthenticated: true,
+              render: (args) => (
+                <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <HomeView {...args.props} />
+                </CollectionAppLayout>
+              ),
+              props: {
+                cards: [{ name: options.slug, path: `/admin/collections/${options.slug}` }],
+              } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTION_HOME],
+            })
+
+        const uis = [
+          collectionHomeRoute,
+          createGensekiUiRoute({
             path: `/collections/${options.slug}`,
             requiredAuthenticated: true,
             render: (args) => (
-              <CollectionLayout>
+              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <ListView
                   {...args}
                   {...args.params}
                   {...defaultArgs}
                   findMany={defaultEndpoints.findMany}
                 />
-              </CollectionLayout>
+              </CollectionAppLayout>
             ),
-          },
-          {
+          }),
+          createGensekiUiRoute({
             path: `/collections/${options.slug}/:identifier`,
             requiredAuthenticated: true,
             render: (args) => (
-              <CollectionLayout>
+              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <OneView
                   {...args}
                   {...args.params}
@@ -200,23 +219,23 @@ export class Builder<
                   identifier={args.params.identifier}
                   findOne={defaultEndpoints.findOne}
                 />
-              </CollectionLayout>
+              </CollectionAppLayout>
             ),
-          },
-          {
+          }),
+          createGensekiUiRoute({
             path: `/collections/${options.slug}/create`,
             requiredAuthenticated: true,
             render: (args) => (
-              <CollectionLayout>
+              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <CreateView {...args} {...args.params} {...defaultArgs} />
-              </CollectionLayout>
+              </CollectionAppLayout>
             ),
-          },
-          {
+          }),
+          createGensekiUiRoute({
             path: `/collections/${options.slug}/update/:identifier`,
             requiredAuthenticated: true,
             render: (args) => (
-              <CollectionLayout>
+              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <UpdateView
                   {...args}
                   {...args.params}
@@ -224,9 +243,9 @@ export class Builder<
                   identifier={args.params.identifer}
                   findOne={defaultEndpoints.findOne}
                 />
-              </CollectionLayout>
+              </CollectionAppLayout>
             ),
-          },
+          }),
         ]
 
         return {

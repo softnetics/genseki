@@ -22,6 +22,7 @@ import { createPlugin, type GensekiUiRouter } from '../core/config'
 import { type Contextable } from '../core/context'
 import type { Fields } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
+import { GensekiUiCommonId } from '../core/ui'
 
 export * from './constant'
 export * from './utils'
@@ -139,7 +140,7 @@ export function auth<TContext extends Contextable, TAuthOptions extends AuthOpti
 
   const uis: GensekiUiRouter[] = [
     {
-      id: 'login',
+      id: GensekiUiCommonId.AUTH_LOGIN,
       path: '/auth/login',
       requiredAuthenticated: false,
       render: (args) => (
@@ -149,7 +150,7 @@ export function auth<TContext extends Contextable, TAuthOptions extends AuthOpti
       ),
     },
     {
-      id: 'sign-up',
+      id: GensekiUiCommonId.AUTH_SIGNUP,
       path: '/auth/sign-up',
       requiredAuthenticated: false,
       render: (args) => (
@@ -159,7 +160,7 @@ export function auth<TContext extends Contextable, TAuthOptions extends AuthOpti
       ),
     },
     {
-      id: 'forgot-password',
+      id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
       path: '/auth/forgot-password',
       requiredAuthenticated: false,
       render: (args) => (
@@ -169,7 +170,7 @@ export function auth<TContext extends Contextable, TAuthOptions extends AuthOpti
       ),
     },
     {
-      id: 'reset-password',
+      id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
       path: '/auth/reset-password',
       requiredAuthenticated: false,
       render: (args) => (

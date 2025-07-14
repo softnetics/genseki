@@ -35,7 +35,7 @@ export async function ListView(props: ListViewProps) {
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
   // TODO: Fix this dummy request
-  const request = new Request('', {
+  const request = new Request('http://localhost', {
     method: 'GET',
     headers: headersValue,
   })
@@ -48,6 +48,12 @@ export async function ListView(props: ListViewProps) {
     },
     request
   )
+
+  if (result.status !== 200) {
+    throw new Error(
+      `Failed to fetch data: ${result.status} ${JSON.stringify(result.body, null, 2)}`
+    )
+  }
 
   const collectionOptionsClient = getCollectionOptionsClient(props.collectionOptions)
 

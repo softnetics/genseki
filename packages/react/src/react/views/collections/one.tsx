@@ -20,7 +20,7 @@ export async function OneView(props: OneViewProps) {
   const headersValue = getHeadersObject(props.headers)
 
   // TODO: Fix this dummy request
-  const request = new Request('', {
+  const request = new Request('http://localhost', {
     method: 'GET',
     headers: headersValue,
   })

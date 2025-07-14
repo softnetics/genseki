@@ -21,7 +21,6 @@ import {
   getColumnTsName,
   getPrimaryColumn,
   getTableFromSchema,
-  isFieldsWithFieldName,
   isRelationField,
   mapValueToTsValue as mapFieldValueToTsValue,
 } from './utils'
@@ -101,10 +100,6 @@ export function createDefaultApiHandlers<
   }
 
   const create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> = async (args) => {
-    if (!isFieldsWithFieldName(fields)) {
-      throw new Error('Fields must be FieldsWithFieldName')
-    }
-
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -135,10 +130,6 @@ export function createDefaultApiHandlers<
   }
 
   const update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> = async (args) => {
-    if (!isFieldsWithFieldName(fields)) {
-      throw new Error('Fields must be FieldsWithFieldName')
-    }
-
     // TODO: Please reuse findOne instead of duplicate logic
     const query = db.query[tableName as keyof typeof db.query] as RelationalQueryBuilder<any, any>
 
@@ -313,9 +304,6 @@ class ApiHandler {
         if (value['disconnect']) {
           // If the value has disconnect, we need to set the relation field to null
           // and return the relation field name and null value
-          if (!isFieldsWithFieldName(field.fields)) {
-            throw new Error('Fields must be FieldsWithFieldName')
-          }
 
           await disconnect(
             field.$server.relation.referencedTable,
@@ -397,10 +385,6 @@ class ApiHandler {
     fields: Fields,
     data: Record<string, any>
   ) {
-    if (!isFieldsWithFieldName(fields)) {
-      throw new Error('Fields must be FieldsWithFieldName')
-    }
-
     // update the referenced table to have this id
     const connect = async (tableConfig: TableRelationalConfig, relation: Relation, value: any) => {
       const referencedFieldName = this.findReferencedColumnFromManyRelation(relation)
@@ -418,9 +402,6 @@ class ApiHandler {
       relation: Relation,
       value: any
     ) => {
-      if (!isFieldsWithFieldName(fields)) {
-        throw new Error('Fields must be FieldsBase')
-      }
       const referenceFieldName = this.findReferencedColumnFromManyRelation(relation)
       const payload = {
         ...mapFieldValueToTsValue(fields, value),
@@ -574,10 +555,6 @@ class ApiHandler {
 }
 
 function mapResultToFields(fields: Fields, result: Record<string, any>): Record<string, any> {
-  if (!isFieldsWithFieldName(fields)) {
-    throw new Error('Fields must be FieldsWithFieldName')
-  }
-
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
       // End case

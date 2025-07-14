@@ -15,7 +15,7 @@ interface CreateViewProps extends BaseViewProps {
 export async function CreateView(props: CreateViewProps) {
   const headersValue = getHeadersObject(props.headers)
   // TODO: Fix this dummy request
-  const request = new Request('', {
+  const request = new Request('http://localhost', {
     method: 'GET',
     headers: headersValue,
   })

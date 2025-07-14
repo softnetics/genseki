@@ -1,4 +1,4 @@
-import type { PropsWithChildren, ReactNode } from 'react'
+import { type ReactNode } from 'react'
 
 import * as R from 'remeda'
 
@@ -12,7 +12,10 @@ import {
 import { getEditorProviderClientProps } from './richtext'
 import { isMediaField, isRelationField, isRichTextField } from './utils'
 
+import type { AppSideBarBuilderProps } from '../react'
+
 interface RenderArgs {
+  pathname: string
   params: Record<string, string>
   headers: Headers
   searchParams: { [key: string]: string | string[] }
@@ -22,7 +25,7 @@ interface RenderArgs {
 interface AuthenticatedRenderArgs extends RenderArgs {}
 
 // TODO: Revise this one
-export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<string, unknown>> =
+export type GensekiUiRouter<TProps = any> =
   | {
       requiredAuthenticated: true
       id?: string
@@ -38,15 +41,23 @@ export type GensekiUiRouter<TProps extends Record<string, unknown> = Record<stri
       props?: TProps
     }
 
+export function createGensekiUiRoute<TProps extends Record<string, unknown>>(
+  args: GensekiUiRouter<TProps>
+): GensekiUiRouter<TProps> {
+  return args
+}
+
 export interface GensekiAppOptions {
   title: string
+  version: string
   components?: {
-    Layout?: (props: PropsWithChildren) => ReactNode
     NotFound?: () => ReactNode
-    CollectionLayout?: (props: PropsWithChildren) => ReactNode
   }
+  sidebar?: AppSideBarBuilderProps
   storageAdapter?: StorageAdapter
 }
+
+export interface GensekiPluginOptions extends GensekiAppOptions, GensekiCore<AnyApiRouter> {}
 
 export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
   api: TApiRouter
@@ -64,12 +75,12 @@ export interface GensekiAppCompiledClient {
 
 export interface GensekiPlugin<TName extends string, TApiRouter extends AnyApiRouter> {
   name: TName
-  plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
+  plugin: (options: GensekiPluginOptions) => GensekiCore<TApiRouter>
 }
 
 export function createPlugin<TName extends string, TApiRouter extends AnyApiRouter>(args: {
   name: TName
-  plugin: (options: GensekiAppOptions) => GensekiCore<TApiRouter>
+  plugin: (options: GensekiPluginOptions) => GensekiCore<TApiRouter>
 }): GensekiPlugin<TName, TApiRouter> {
   return args
 }
@@ -99,11 +110,19 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 
   build(): GensekiAppCompiled<TMainApiRouter> {
-    const uis = this.plugins.flatMap((plugin) => plugin.plugin(this.options).uis)
-    const api = this.plugins.reduce(
-      (acc, plugin) => ({ ...acc, ...plugin.plugin(this.options).api }),
-      {}
-    ) as TMainApiRouter
+    const core = this.plugins.reduce(
+      (acc, plugin) => {
+        const pluginCore = plugin.plugin({
+          ...this.options,
+          ...acc,
+        })
+        return {
+          api: { ...acc.api, ...pluginCore.api },
+          uis: [...acc.uis, ...(pluginCore.uis ?? [])],
+        }
+      },
+      { uis: [], api: {} } as unknown as GensekiCore<TMainApiRouter>
+    )
 
     return {
       storageAdapter: getStorageAdapterClient({
@@ -111,8 +130,8 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
         grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
         grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
       }),
-      api: api,
-      uis: uis,
+      api: core.api,
+      uis: core.uis,
     }
   }
 }

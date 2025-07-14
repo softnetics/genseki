@@ -1,17 +1,31 @@
-import { AppSidebarNav, SidebarInset, SidebarProvider } from '../../../components'
+import {
+  AppSidebar,
+  type AppSideBarBuilderProps,
+  AppSidebarNav,
+  SidebarInset,
+  SidebarProvider,
+} from '../../../components'
 
-interface RootLayoutProps {
+export interface CollectionAppLayoutProps {
+  title: string
+  version: string
   children: React.ReactNode
+  pathname: string
+  sidebar?: AppSideBarBuilderProps
 }
 
 /**
  * @description RootCollection Layout is included with `sidebar`
  */
-export function CollectionAppLayout(props: RootLayoutProps) {
+export function CollectionAppLayout(props: CollectionAppLayoutProps) {
   return (
     <SidebarProvider>
-      {/* TODO: Fix sidebar */}
-      {/* <AppSidebar collections={props.serverConfig.collections} /> */}
+      <AppSidebar
+        title={props.title}
+        version={props.version}
+        sidebar={props.sidebar}
+        pathname={props.pathname}
+      />
       <SidebarInset>
         <AppSidebarNav />
         {props.children}

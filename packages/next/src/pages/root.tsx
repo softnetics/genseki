@@ -17,8 +17,9 @@ export async function RootPage(props: RootProps) {
     props.searchParamsPromise,
     props.headersPromise,
   ])
-  const path = `/${params.segments.join('/')}`
-  const result = props.app.radixRouter.lookup(path)
+
+  const pathname = `/${params.segments.join('/')}`
+  const result = props.app.radixRouter.lookup(pathname)
 
   if (!result) {
     return <NotfoundPage redirectURL="/admin/collections" />
@@ -34,6 +35,7 @@ export async function RootPage(props: RootProps) {
 
   const page = result.render({
     headers: headers,
+    pathname: pathname,
     params: result.params ?? {},
     searchParams: searchParams,
     props: result.props ?? {},
