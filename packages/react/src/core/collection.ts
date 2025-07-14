@@ -2,9 +2,9 @@ import type { Many, Table } from 'drizzle-orm'
 import type { ConditionalExcept, IsEqual, Simplify, ValueOf } from 'type-fest'
 import z from 'zod/v4'
 
-import type { FieldBase } from '.'
+import type { ContextToRequestContext, FieldBase } from '.'
 import { getFieldsClient } from './config'
-import type { AnyContextable, AnyRequestContextable } from './context'
+import type { AnyContextable } from './context'
 import { type AnyApiRouter, type ApiRoute, createEndpoint } from './endpoint'
 import {
   type FieldClient,
@@ -293,25 +293,26 @@ export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   never
 > & { __pk: string | number; __id: string | number }
 
-export interface ServerApiHandlerArgs<TFields extends Fields> {
+export interface ServerApiHandlerArgs<TContext extends AnyContextable, TFields extends Fields> {
   slug: string
   fields: TFields
-  context: AnyRequestContextable
+  context: ContextToRequestContext<TContext>
 }
 
 export type ApiArgs<
+  TContext extends AnyContextable,
   TMethod extends ApiDefaultMethod,
   TFields extends Fields,
 > = TMethod extends typeof ApiDefaultMethod.CREATE
-  ? ServerApiHandlerArgs<TFields> & ApiCreateArgs<TFields>
+  ? ServerApiHandlerArgs<TContext, TFields> & ApiCreateArgs<TFields>
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
-    ? ServerApiHandlerArgs<TFields> & ApiFindOneArgs
+    ? ServerApiHandlerArgs<TContext, TFields> & ApiFindOneArgs
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? ServerApiHandlerArgs<TFields> & ApiFindManyArgs
+      ? ServerApiHandlerArgs<TContext, TFields> & ApiFindManyArgs
       : TMethod extends typeof ApiDefaultMethod.UPDATE
-        ? ServerApiHandlerArgs<TFields> & ApiUpdateArgs<TFields>
+        ? ServerApiHandlerArgs<TContext, TFields> & ApiUpdateArgs<TFields>
         : TMethod extends typeof ApiDefaultMethod.DELETE
-          ? ServerApiHandlerArgs<TFields> & ApiDeleteArgs
+          ? ServerApiHandlerArgs<TContext, TFields> & ApiDeleteArgs
           : never
 
 export type ApiReturnType<
@@ -349,7 +350,7 @@ export type ApiHandlerFn<
   TContext extends AnyContextable,
   TFields extends Fields,
   TMethod extends ApiDefaultMethod,
-> = (args: ApiArgs<TMethod, TFields>) => MaybePromise<ApiReturnType<TMethod, TFields>>
+> = (args: ApiArgs<TContext, TMethod, TFields>) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
 export type ApiUpdateArgs<TFields extends Fields> = {
   // This should be the primary field of the collection e.g. __pk or username
@@ -361,27 +362,12 @@ export type ApiDeleteArgs = {
   ids: string[] | number[]
 }
 
-export type ClientApiArgs<
-  TMethod extends ApiDefaultMethod,
-  TFields extends Fields,
-> = TMethod extends typeof ApiDefaultMethod.CREATE
-  ? ApiCreateArgs<TFields>
-  : TMethod extends typeof ApiDefaultMethod.FIND_ONE
-    ? ApiFindOneArgs
-    : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? ApiFindManyArgs
-      : TMethod extends typeof ApiDefaultMethod.UPDATE
-        ? ApiUpdateArgs<TFields>
-        : TMethod extends typeof ApiDefaultMethod.DELETE
-          ? ApiDeleteArgs
-          : never
-
 export type ApiConfigHandlerFn<
   TContext extends AnyContextable,
   TFields extends Fields,
   TMethod extends ApiDefaultMethod,
 > = (
-  args: ApiArgs<TMethod, TFields> & {
+  args: ApiArgs<TContext, TMethod, TFields> & {
     defaultApi: ApiHandlerFn<TContext, TFields, TMethod>
   }
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
@@ -553,7 +539,7 @@ export function getDefaultCollectionAdminApiRouter(
               },
             },
             async (args) => {
-              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
                 slug: slug,
                 fields: fields,
                 context: args.context,
@@ -581,7 +567,7 @@ export function getDefaultCollectionAdminApiRouter(
               },
             },
             async (args) => {
-              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
                 slug: slug,
                 fields: fields,
                 context: args.context,
@@ -617,7 +603,7 @@ export function getDefaultCollectionAdminApiRouter(
               },
             },
             async (args) => {
-              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
                 slug: slug,
                 fields: fields,
                 context: args.context,
@@ -653,7 +639,7 @@ export function getDefaultCollectionAdminApiRouter(
               },
             },
             async (args) => {
-              const response = await (fn as ApiHandlerFn<any, any, typeof method>)({
+              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
                 slug: slug,
                 fields: fields,
                 context: args.context,
@@ -680,7 +666,7 @@ export function getDefaultCollectionAdminApiRouter(
               },
             },
             async (args) => {
-              await (fn as ApiHandlerFn<any, any, typeof method>)({
+              await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
                 slug,
                 fields,
                 context: args.context,

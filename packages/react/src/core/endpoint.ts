@@ -165,3 +165,37 @@ export function createEndpoint<
     }),
   }
 }
+
+export type AppendApiPathPrefix<TPathPrefix extends string, TApiRouter extends ApiRouter> = {
+  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute
+    ? {
+        schema: Omit<TApiRouter[TKey]['schema'], 'path'> & {
+          path: `${TPathPrefix}${TApiRouter[TKey]['schema']['path']}`
+        }
+        handler: TApiRouter[TKey]['handler']
+      }
+    : TApiRouter[TKey] extends ApiRouter
+      ? AppendApiPathPrefix<TPathPrefix, TApiRouter[TKey]>
+      : never
+}
+
+export function appendApiPathPrefix<TPathPrefix extends string, TApiRouter extends ApiRouter>(
+  prefix: TPathPrefix,
+  apiRouter: TApiRouter
+): AppendApiPathPrefix<TPathPrefix, TApiRouter> {
+  const transformedApiRouter: AppendApiPathPrefix<TPathPrefix, TApiRouter> = {} as any
+  for (const key in apiRouter) {
+    const route = apiRouter[key]
+    if (isApiRoute(route)) {
+      Object.assign(transformedApiRouter, {
+        [key]: {
+          schema: { ...route.schema, path: `${prefix}${route.schema.path}` },
+          handler: route.handler,
+        },
+      })
+      continue
+    }
+    Object.assign(transformedApiRouter, { [key]: appendApiPathPrefix(prefix, route) })
+  }
+  return transformedApiRouter
+}

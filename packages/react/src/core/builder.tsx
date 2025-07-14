@@ -21,6 +21,8 @@ import {
   type ApiRouteHandlerInitial,
   type ApiRouter,
   type ApiRouteSchema,
+  type AppendApiPathPrefix,
+  appendApiPathPrefix,
 } from './endpoint'
 import { FieldBuilder, type Fields, type OptionCallback } from './field'
 import { appendFieldNameToFields } from './utils'
@@ -66,7 +68,10 @@ export class Builder<
     options: CollectionOptions<TSlug, TContext, TFields, TApiRouter>
   ): GensekiPlugin<
     TSlug,
-    { [K in TSlug]: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields> }
+    {
+      [K in TSlug]: AppendApiPathPrefix<`/${TSlug}`, TApiRouter> &
+        CollectionDefaultAdminApiRouter<TSlug, TFields>
+    }
   > {
     const defaultHandlers = createDefaultApiHandlers({
       db: this.config.db,
@@ -136,14 +141,14 @@ export class Builder<
       }
     )
 
-    const allEndpoints = {
-      ...defaultEndpoints,
-      ...endpoints,
-    }
+    const transformApis = appendApiPathPrefix(`/${options.slug}`, endpoints)
 
     const plugin: GensekiPlugin<
       TSlug,
-      { [K in TSlug]: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields> }
+      {
+        [K in TSlug]: AppendApiPathPrefix<`/${TSlug}`, TApiRouter> &
+          CollectionDefaultAdminApiRouter<TSlug, TFields>
+      }
     > = {
       name: options.slug,
       plugin: (gensekiOptions) => {
@@ -169,7 +174,7 @@ export class Builder<
                   {...args}
                   {...args.params}
                   {...defaultArgs}
-                  findMany={allEndpoints.findMany}
+                  findMany={defaultEndpoints.findMany}
                 />
               </CollectionLayout>
             ),
@@ -184,7 +189,7 @@ export class Builder<
                   {...args.params}
                   {...defaultArgs}
                   identifier={args.params.identifier}
-                  findOne={allEndpoints.findOne}
+                  findOne={defaultEndpoints.findOne}
                 />
               </CollectionLayout>
             ),
@@ -208,7 +213,7 @@ export class Builder<
                   {...args.params}
                   {...defaultArgs}
                   identifier={args.params.identifer}
-                  findOne={allEndpoints.findOne}
+                  findOne={defaultEndpoints.findOne}
                 />
               </CollectionLayout>
             ),
@@ -216,8 +221,14 @@ export class Builder<
         ]
 
         return {
-          api: { [options.slug]: allEndpoints } as {
-            [K in TSlug]: TApiRouter & CollectionDefaultAdminApiRouter<TSlug, TFields>
+          api: {
+            [options.slug]: {
+              ...defaultEndpoints,
+              ...transformApis,
+            },
+          } as {
+            [K in TSlug]: AppendApiPathPrefix<`/${TSlug}`, TApiRouter> &
+              CollectionDefaultAdminApiRouter<TSlug, TFields>
           },
           uis: uis,
         }

@@ -10,7 +10,6 @@ export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
 export type {
   ApiReturnType,
-  ClientApiArgs,
   CollectionAdminApi,
   CollectionAdminApiOptions,
   CollectionAdminOptions,
