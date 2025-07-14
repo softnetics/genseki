@@ -18,7 +18,7 @@ import { LoginView } from './views/login'
 import { ResetPasswordView } from './views/reset-password/reset-password'
 import { SignUpView } from './views/sign-up'
 
-import { type GensekiCore, type GensekiUiRouter } from '../core/config'
+import { createPlugin, type GensekiUiRouter } from '../core/config'
 import { type Contextable } from '../core/context'
 import type { Fields } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
@@ -65,7 +65,7 @@ export type AnyVerificationTable = WithAnyTable<{
 }>
 
 export interface AuthOptions {
-  db: NodePgDatabase
+  db: NodePgDatabase<Record<string, unknown>>
   schema: {
     user: AnyUserTable
     session: AnySessionTable
@@ -187,8 +187,13 @@ export function auth<TContext extends Contextable, TAuthOptions extends AuthOpti
     },
   ]
 
-  return {
-    api: api,
-    uis: uis,
-  } satisfies GensekiCore
+  return createPlugin({
+    name: 'auth',
+    plugin: () => ({
+      api: {
+        auth: api,
+      },
+      uis: uis,
+    }),
+  })
 }

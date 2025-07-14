@@ -14,12 +14,11 @@ const getHeadersObject = (headers: Headers): Record<string, string> => {
 async function _getUser(serverFunction: ServerFunction, headers: Headers): Promise<any | null> {
   const reqHeaders = getHeadersObject(headers)
   const response = await serverFunction('auth.me', {
-    method: 'auth.me',
     headers: reqHeaders,
-    body: {},
+    body: undefined,
     pathParams: {},
     query: {},
-  } as unknown as never)
+  })
 
   if (response.status !== 200) {
     return null

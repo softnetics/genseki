@@ -27,7 +27,7 @@ import {
 import { FieldBuilder, type Fields, type OptionCallback } from './field'
 import { appendFieldNameToFields } from './utils'
 
-import { CollectionAppLayout } from '../react'
+import { CollectionAppLayout, HomeView } from '../react'
 import { CreateView } from '../react/views/collections/create'
 import { ListView } from '../react/views/collections/list'
 import { OneView } from '../react/views/collections/one'
@@ -165,6 +165,15 @@ export class Builder<
         }
 
         const uis: GensekiUiRouter[] = [
+          {
+            path: `/collections`,
+            requiredAuthenticated: true,
+            render: (args) => (
+              <CollectionLayout>
+                <HomeView />
+              </CollectionLayout>
+            ),
+          },
           {
             path: `/collections/${options.slug}`,
             requiredAuthenticated: true,

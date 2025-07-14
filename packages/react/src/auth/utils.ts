@@ -20,7 +20,7 @@ function deleteCookie(headers: Record<string, string> | undefined, name: string)
   headers['Set-Cookie'] = `${name}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`
 }
 
-const SESSION_COOKIE_NAME = 'SESSION_ID'
+const SESSION_COOKIE_NAME = 'GENSEKI_SESSION'
 
 export function getSessionCookie(headers: Record<string, string> | undefined): string | undefined {
   const cookies = parseCookies(headers?.['cookie'] || '')

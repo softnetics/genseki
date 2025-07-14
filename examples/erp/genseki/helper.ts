@@ -22,13 +22,31 @@ class MyRequestContext extends RequestContextable<User> {
     super(request)
   }
 
-  requiredAuthenticated() {
-    // Simulate an authenticated user
-    return {
-      id: '123',
-      name: 'John Doe',
-      email: 'example@example.com',
+  async requiredAuthenticated() {
+    const sessionValue = this.getSessionCookie()
+    if (!sessionValue) {
+      throw new Error('Authentication required')
     }
+
+    const session = await db.query.session.findFirst({
+      columns: {},
+      with: {
+        user: {
+          columns: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      where: (session, { eq }) => eq(session.token, sessionValue),
+    })
+
+    if (!session) {
+      throw new Error('Session not found')
+    }
+
+    return session.user
   }
 }
 
@@ -40,4 +58,6 @@ export class MyContext implements Contextable<User> {
   }
 }
 
-export const builder = new Builder({ db, schema, context: new MyContext() })
+export const context = new MyContext()
+
+export const builder = new Builder({ db, schema, context: context })

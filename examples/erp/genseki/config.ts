@@ -1,14 +1,49 @@
 import { withNextJs } from '@genseki/next'
-import { GensekiApp } from '@genseki/react'
+import { auth, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
 import { categoriesCollection } from './collections/categories'
 import { foodsCollection } from './collections/foods'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
+import { context, db } from './helper'
+
+import * as schema from '../db/schema'
 
 const app = new GensekiApp({
   title: 'Genseki ERP Example',
+  storageAdapter: StorageAdapterS3.initailize({
+    bucket: process.env.AWS_BUCKET_NAME!,
+    clientConfig: {
+      credentials: {
+        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+        secretAccessKey: process.env.AWS_SECRET_KEY!,
+      },
+    },
+  }),
 })
+  .apply(
+    auth(context, {
+      db: db,
+      schema: {
+        user: schema.user,
+        session: schema.session,
+        account: schema.account,
+        verification: schema.verification,
+      },
+      method: {
+        emailAndPassword: {
+          enabled: true,
+          resetPassword: {
+            enabled: true,
+            sendEmailResetPassword: async (email, token) => {
+              console.log('sendEmailResetPassword config', email, token)
+              return
+            },
+          },
+        },
+      },
+    })
+  )
   .apply(usersCollection)
   .apply(foodsCollection)
   .apply(categoriesCollection)

@@ -2,8 +2,7 @@ import { headers } from 'next/headers'
 
 import { RootPage } from '@genseki/next'
 
-import { serverConfig } from '~/genseki/config'
-
+import { nextjsApp } from '../../../../../genseki/config'
 import { serverFunction } from '../../_helper/server'
 
 interface AdminPageProps {
@@ -14,7 +13,7 @@ interface AdminPageProps {
 export default async function AdminPage(props: AdminPageProps) {
   return (
     <RootPage
-      serverConfig={serverConfig}
+      app={nextjsApp}
       serverFunction={serverFunction}
       paramsPromise={props.params}
       headersPromise={headers()}

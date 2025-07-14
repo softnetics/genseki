@@ -23,17 +23,20 @@ function findApiRoute<TApiRouter extends ApiRouter, TMethod extends string>(
   const router = apiRouter[head]
   if (!router) return undefined
   if (isApiRoute(router) && tails.length === 0) {
-    return router as ApiRoute
+    return router
   }
 
   if (!isApiRoute(router)) {
-    findApiRoute(router, tails.join('.'))
+    return findApiRoute(router, tails.join('.'))
   }
 
   return undefined
 }
 
-function createUrl(schema: ApiRouteSchema, data: ApiRouteHandlerBasePayload<AnyApiRouteSchema>) {
+function createRequest(
+  schema: ApiRouteSchema,
+  data: ApiRouteHandlerBasePayload<AnyApiRouteSchema>
+) {
   const url = new URL(schema.path, 'http://localhost')
 
   for (const [key, value] of Object.entries(data.pathParams || {})) {
@@ -71,7 +74,10 @@ export async function handleServerFunction<
 
     // TODO: Recheck if the dummy request is correct
 
-    const response = await apiRoute.handler(args as any, createUrl(apiRoute.schema, args as any))
+    const response = await apiRoute.handler(
+      args as any,
+      createRequest(apiRoute.schema, args as any)
+    )
 
     if (response.headers?.['Set-Cookie']) {
       const setCookieData = parseSetCookie(response.headers['Set-Cookie'])

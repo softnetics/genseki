@@ -1,5 +1,6 @@
 export { RootLayout } from './layouts/root'
 export { RootPage } from './pages/root'
+export { createApiResourceRouter } from './resource'
 export { handleServerFunction } from './server-function'
 export { withNextJs } from './with'
 export type { ServerFunction } from '@genseki/react'

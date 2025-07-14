@@ -72,7 +72,7 @@ export function SignUpClientForm(props: SignUpClientFormProps) {
       description: 'You can now log in with your credentials.',
     })
 
-    return navigate('../auth/sign-in')
+    return navigate('../auth/login')
   }
 
   return (
