@@ -518,6 +518,16 @@ export default function UIPlayground() {
           <Calendar aria-label="Event date" />
         </div>
       </Wrapper>
+      <Wrapper title="Switch">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size" categoryTitle="Switch">
+            <Switch size="md" />
+          </PlaygroundCard>
+          <PlaygroundCard title="Large size" categoryTitle="Switch">
+            <Switch size="lg" />
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
       <Wrapper title="Multi select">
         <PlaygroundCard title="Multi select" categoryTitle="Multi select">
           <Select label="Design software" placeholder="Select a software">
