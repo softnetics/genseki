@@ -207,30 +207,3 @@ export function getFieldClient(
 export function getFieldsClient(fields: Fields): FieldsClient {
   return R.mapValues(fields, (value, key) => getFieldClient(key, value))
 }
-
-// export function getClientConfig<
-//   TCollections extends Record<string, AnyCollection>,
-//   TApiRouter extends ApiRouter<any>,
-// >(
-//   serverConfig: ServerConfig<any, any, TCollections, TApiRouter>
-// ): ClientConfig<ToClientCollectionList<TCollections>, ToClientApiRouteSchema<TApiRouter>> & {
-//   $types: ToRecordApiRouteSchema<TApiRouter>
-// } {
-//   const clientEndpoints = R.mapValues(serverConfig.endpoints, (value) =>
-//     getClientEndpoint(value as ApiRoute<any, any>)
-//   ) as ToClientApiRouteSchema<TApiRouter>
-
-//   return {
-//     auth: getAuthClient(serverConfig.auth),
-//     collections: serverConfig.collections,
-//     endpoints: clientEndpoints,
-//     $types: undefined as any,
-//     ...(serverConfig.storageAdapter && {
-//       storageAdapter: getStorageAdapterClient({
-//         storageAdapter: serverConfig.storageAdapter,
-//         grabPutObjectSignedUrlApiRoute: clientEndpoints['file.generatePutObjSignedUrl'],
-//         grabGetObjectSignedUrlApiRoute: clientEndpoints['file.generateGetObjSignedUrl'],
-//       }),
-//     }),
-//   }
-// }
