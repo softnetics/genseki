@@ -22,6 +22,7 @@ import { StarterKit } from '@tiptap/starter-kit'
 import { useTheme } from 'next-themes'
 
 import {
+  Avatar,
   Breadcrumbs,
   BreadcrumbsItem,
   ButtonGroup,
@@ -1511,6 +1512,24 @@ export default function UIPlayground() {
             <ProgressBar value={50} className="w-full" isShowPercentPopup />
             <ProgressBar value={75} className="w-full" isShowPercentPopup />
             <ProgressBar value={100} className="w-full" isShowPercentPopup />
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Avatar">
+        <div className="grid grid-cols-3 gap-4">
+          <PlaygroundCard title="Normal" categoryTitle="Avatar">
+            <Avatar src="https://github.com/shadcn.png" size="xl" isShowIndicator />
+            <Avatar src="https://github.com/shadcn.png" size="lg" isShowIndicator />
+            <Avatar size="md" isShowIndicator />
+            <Avatar src="https://github.com/shadcn.png" size="sm" isShowIndicator label="test" />
+            <Avatar
+              src="https://github.com/shadcn.png"
+              size="xs"
+              isShowIndicator
+              label="test"
+              subLabel="test"
+            />
           </PlaygroundCard>
         </div>
       </Wrapper>
