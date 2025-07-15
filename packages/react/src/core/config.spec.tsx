@@ -200,10 +200,9 @@ export const postCollection = builder.collection('posts', {
 
 export const app = new GensekiApp({
   title: 'Genseki App',
+  version: '1.0.0',
   components: {
-    Layout: ({ children }) => <div>{children}</div>,
     NotFound: () => <div>Not Found</div>,
-    CollectionLayout: ({ children }) => <div>{children}</div>,
   },
 })
   .apply(authorCollection)
