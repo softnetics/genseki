@@ -34,6 +34,9 @@ import {
   RadioGroup,
   ReorderGroup,
   Switch,
+  Tab,
+  TabList,
+  Tabs,
   Tag,
   TagGroup,
   TagList,
@@ -1517,19 +1520,40 @@ export default function UIPlayground() {
       </Wrapper>
 
       <Wrapper title="Avatar">
+        <PlaygroundCard title="Normal" categoryTitle="Avatar">
+          <Avatar src="https://github.com/shadcn.png" size="xl" isShowIndicator />
+          <Avatar src="https://github.com/shadcn.png" size="lg" isShowIndicator />
+          <Avatar size="md" isShowIndicator />
+          <Avatar src="https://github.com/shadcn.png" size="sm" isShowIndicator label="test" />
+          <Avatar
+            src="https://github.com/shadcn.png"
+            size="xs"
+            isShowIndicator
+            label="test"
+            subLabel="test"
+          />
+        </PlaygroundCard>
+      </Wrapper>
+
+      <Wrapper title="Tabs">
         <div className="grid grid-cols-3 gap-4">
-          <PlaygroundCard title="Normal" categoryTitle="Avatar">
-            <Avatar src="https://github.com/shadcn.png" size="xl" isShowIndicator />
-            <Avatar src="https://github.com/shadcn.png" size="lg" isShowIndicator />
-            <Avatar size="md" isShowIndicator />
-            <Avatar src="https://github.com/shadcn.png" size="sm" isShowIndicator label="test" />
-            <Avatar
-              src="https://github.com/shadcn.png"
-              size="xs"
-              isShowIndicator
-              label="test"
-              subLabel="test"
-            />
+          <PlaygroundCard title="Default" categoryTitle="Tabs">
+            <Tabs size="lg">
+              <TabList>
+                <Tab>Label 1</Tab>
+                <Tab>Label 2</Tab>
+                <Tab>Label 3</Tab>
+              </TabList>
+            </Tabs>
+          </PlaygroundCard>
+          <PlaygroundCard title="With badgeNumber" categoryTitle="Tabs">
+            <Tabs size="md">
+              <TabList>
+                <Tab badgeNumber={1}>Label 1</Tab>
+                <Tab badgeNumber={2}>Label 2</Tab>
+                <Tab badgeNumber={3}>Label 3</Tab>
+              </TabList>
+            </Tabs>
           </PlaygroundCard>
         </div>
       </Wrapper>

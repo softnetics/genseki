@@ -19,6 +19,7 @@ import { LayoutGroup, motion } from 'motion/react'
 import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
+import { Badge } from './badge'
 import { composeTailwindRenderProps } from './primitive'
 
 const tabsStyles = tv({
@@ -28,19 +29,25 @@ const tabsStyles = tv({
       horizontal: 'flex-col',
       vertical: 'w-[800px] flex-row',
     },
+    size: {
+      md: 'text-base',
+      lg: 'text-lg',
+    },
   },
 })
 
 interface TabsProps extends TabsPrimitiveProps {
+  size?: 'md' | 'lg'
   ref?: React.RefObject<HTMLDivElement>
 }
-const Tabs = ({ className, ref, ...props }: TabsProps) => {
+const Tabs = ({ className, ref, size, ...props }: TabsProps) => {
   return (
     <TabsPrimitive
       className={composeRenderProps(className, (className, renderProps) =>
         tabsStyles({
           ...renderProps,
           className,
+          size,
         })
       )}
       ref={ref}
@@ -53,8 +60,8 @@ const tabListStyles = tv({
   base: 'flex forced-color-adjust-none',
   variants: {
     orientation: {
-      horizontal: 'flex-row gap-x-5 border-border border-b',
-      vertical: 'flex-col items-start gap-y-4 border-l',
+      horizontal: 'flex-row gap-x-5 border-border border-b-2',
+      vertical: 'flex-col items-start gap-y-4 border-l-2',
     },
   },
 })
@@ -79,26 +86,31 @@ const TabList = <T extends object>({ className, ref, ...props }: TabListProps<T>
 
 const tabStyles = tv({
   base: [
-    'relative flex cursor-default items-center whitespace-nowrap rounded-full font-medium text-sm outline-hidden transition hover:text-fg *:data-[slot=icon]:mr-2 *:data-[slot=icon]:size-4',
+    'relative flex cursor-pointer items-center whitespace-nowrap rounded-full font-semibold outline-hidden transition *:data-[slot=icon]:mr-2 *:data-[slot=icon]:size-4 focus-visible:text-text-accent',
     'group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:py-0 group-data-[orientation=vertical]/tabs:pr-2 group-data-[orientation=vertical]/tabs:pl-4',
-    'group-data-[orientation=horizontal]/tabs:pb-3',
+    'group-data-[orientation=horizontal]/tabs:pb-6',
   ],
   variants: {
     isSelected: {
-      false: 'text-muted-fg',
-      true: 'text-fg',
+      false: 'text-text-body',
+      true: 'text-text-accent',
     },
-    isFocused: { false: 'ring-0', true: 'text-fg' },
+    isFocused: { false: 'ring-0', true: 'text-text-accent' },
     isDisabled: {
       true: 'text-muted-fg/50',
+    },
+    size: {
+      md: 'text-base',
+      lg: 'text-lg',
     },
   },
 })
 
 interface TabProps extends TabPrimitiveProps {
+  badgeNumber?: number
   ref?: React.RefObject<HTMLButtonElement>
 }
-const Tab = ({ children, ref, ...props }: TabProps) => {
+const Tab = ({ children, badgeNumber, ref, ...props }: TabProps) => {
   return (
     <TabPrimitive
       ref={ref}
@@ -112,14 +124,21 @@ const Tab = ({ children, ref, ...props }: TabProps) => {
     >
       {({ isSelected }) => (
         <>
-          {children as React.ReactNode}
+          <div className="flex items-center gap-4">
+            {children as React.ReactNode}
+            {badgeNumber && (
+              <Badge intent={isSelected ? 'brand' : 'gray'} size="sm">
+                {badgeNumber}
+              </Badge>
+            )}
+          </div>
           {isSelected && (
             <motion.span
               data-slot="selected-indicator"
               className={twMerge(
-                'bg-fg absolute rounded',
+                'bg-pumpkin-500 absolute rounded',
                 // horizontal
-                'group-data-[orientation=horizontal]/tabs:inset-x-0 group-data-[orientation=horizontal]/tabs:-bottom-px group-data-[orientation=horizontal]/tabs:h-0.5 group-data-[orientation=horizontal]/tabs:w-full',
+                'group-data-[orientation=horizontal]/tabs:inset-x-0 group-data-[orientation=horizontal]/tabs:-bottom-px group-data-[orientation=horizontal]/tabs:h-1 group-data-[orientation=horizontal]/tabs:w-full',
                 // vertical
                 'group-data-[orientation=vertical]/tabs:left-0 group-data-[orientation=vertical]/tabs:h-[calc(100%-10%)] group-data-[orientation=vertical]/tabs:w-0.5 group-data-[orientation=vertical]/tabs:transform'
               )}
@@ -143,7 +162,7 @@ const TabPanel = ({ className, ref, ...props }: TabPanelProps) => {
       ref={ref}
       className={composeTailwindRenderProps(
         className,
-        'text-fg focus-visible:outline-hidden flex-1 text-lg text-sm'
+        'text-fg focus-visible:outline-hidden flex-1 text-lg'
       )}
     />
   )
