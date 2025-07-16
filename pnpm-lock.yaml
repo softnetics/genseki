@@ -42,9 +42,6 @@ importers:
       prisma:
         specifier: ^6.10.1
         version: 6.10.1(typescript@5.8.2)
-      project-config:workspce:*:
-        specifier: link:@internal/project-config:workspce:*
-        version: link:@internal/project-config:workspce:*
 
   examples/erp:
     dependencies:
@@ -373,6 +370,9 @@ importers:
       '@prisma/generator-helper':
         specifier: ^6.10.1
         version: 6.10.1
+      typescript:
+        specifier: 5.8.2
+        version: 5.8.2
     devDependencies:
       '@internal/project-config':
         specifier: workspace:^

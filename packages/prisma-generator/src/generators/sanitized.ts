@@ -1,0 +1,243 @@
+import type { DMMF } from '@prisma/generator-helper'
+import ts, { factory } from 'typescript'
+
+import pkg from '../../package.json'
+
+function generateModelShapeBaseProperties(field: DMMF.Field) {
+  function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
+    return fieldKeys.map((key) => {
+      return factory.createPropertyAssignment(
+        key,
+        field[key] ? factory.createTrue() : factory.createFalse()
+      )
+    })
+  }
+
+  const isRelation = !!field.relationName
+
+  return [
+    factory.createPropertyAssignment(
+      'schema',
+      factory.createPropertyAccessExpression(
+        factory.createIdentifier('SchemaType'),
+        factory.createIdentifier(isRelation ? 'RELATION' : 'COLUMN')
+      )
+    ),
+    factory.createPropertyAssignment('name', factory.createStringLiteral(field.name)),
+    ...createBooleanProperties([
+      'isId',
+      'isList',
+      'isUnique',
+      'isReadOnly',
+      'isRequired',
+      'hasDefaultValue',
+    ]),
+  ]
+}
+
+function generateModelShapeColumnDefinition(
+  field: DMMF.Field,
+  enums: readonly DMMF.DatamodelEnum[]
+) {
+  let properties: ts.PropertyAssignment[]
+  if (field.kind !== 'enum') {
+    properties = [
+      factory.createPropertyAssignment(
+        'dataType',
+        factory.createPropertyAccessExpression(
+          factory.createIdentifier('DataType'),
+          factory.createIdentifier(field.type.toUpperCase())
+        )
+      ),
+    ]
+  } else {
+    const enumValues =
+      enums
+        .find((e) => e.name === field.type)
+        ?.values.map((v) => factory.createStringLiteral(v.name)) ?? []
+    properties = [
+      factory.createPropertyAssignment(
+        'dataType',
+        factory.createPropertyAccessExpression(
+          factory.createIdentifier('DataType'),
+          factory.createIdentifier('STRING')
+        )
+      ),
+      factory.createPropertyAssignment(
+        'enumValues',
+        factory.createArrayLiteralExpression(enumValues, true)
+      ),
+    ]
+  }
+
+  return factory.createPropertyAssignment(
+    field.name,
+    factory.createObjectLiteralExpression(
+      [...generateModelShapeBaseProperties(field), ...properties],
+      true
+    )
+  )
+}
+
+function generateModelRelationShapeDefinition(field: DMMF.Field) {
+  return factory.createPropertyAssignment(
+    field.name,
+    factory.createObjectLiteralExpression(
+      [
+        ...generateModelShapeBaseProperties(field),
+        ...(field.relationName
+          ? [
+              factory.createPropertyAssignment(
+                'relationName',
+                factory.createStringLiteral(field.relationName)
+              ),
+            ]
+          : []),
+        factory.createPropertyAssignment(
+          'referencedModel',
+          factory.createStringLiteral(field.type)
+        ),
+        factory.createPropertyAssignment(
+          'relationToFields',
+          factory.createArrayLiteralExpression(
+            field.relationToFields?.map((f) => factory.createStringLiteral(f)) ?? []
+          )
+        ),
+        factory.createPropertyAssignment(
+          'relationFromFields',
+          factory.createArrayLiteralExpression(
+            field.relationFromFields?.map((f) => factory.createStringLiteral(f)) ?? []
+          )
+        ),
+      ],
+      true
+    )
+  )
+}
+
+function generateModelShapeDefinition(
+  fields: readonly DMMF.Field[],
+  enums: readonly DMMF.DatamodelEnum[]
+) {
+  const props = fields.map((field) => {
+    if (field.relationName) return generateModelRelationShapeDefinition(field)
+    return generateModelShapeColumnDefinition(field, enums)
+  })
+
+  return factory.createObjectLiteralExpression(props, true)
+}
+
+function generateModelDefinition(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
+  const shapeArgs = generateModelShapeDefinition(model.fields, enums)
+
+  const primaryFieldNames = model.fields.filter((field) => field.isId).map((field) => field.name)
+  const allPriamryFieldNames = [
+    ...primaryFieldNames,
+    ...(model.primaryKey?.fields.map((f) => f) ?? []),
+  ]
+
+  const singleUniqueFieldNames = model.fields
+    .filter((field) => field.isUnique)
+    .map((field) => [field.name])
+  const allUniqueFields = [allPriamryFieldNames, ...singleUniqueFieldNames, ...model.uniqueFields]
+
+  const configArgs = factory.createObjectLiteralExpression(
+    [
+      factory.createPropertyAssignment('name', factory.createStringLiteral(`${model.name}Model`)),
+      factory.createPropertyAssignment(
+        'dbModelName',
+        factory.createStringLiteral(model.dbName ?? model.name)
+      ),
+      factory.createPropertyAssignment('prismaModelName', factory.createStringLiteral(model.name)),
+      factory.createPropertyAssignment(
+        'primaryFields',
+        factory.createArrayLiteralExpression(
+          allPriamryFieldNames.map((field) => factory.createStringLiteral(field))
+        )
+      ),
+      factory.createPropertyAssignment(
+        'uniqueFields',
+        factory.createArrayLiteralExpression(
+          allUniqueFields.map((field) =>
+            factory.createArrayLiteralExpression(field.map((f) => factory.createStringLiteral(f)))
+          )
+        )
+      ),
+    ],
+    true
+  )
+
+  const modelSchema = factory.createVariableStatement(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    factory.createVariableDeclarationList(
+      [
+        factory.createVariableDeclaration(
+          `${model.name}Model`,
+          undefined,
+          undefined,
+          factory.createCallExpression(factory.createIdentifier('model'), undefined, [
+            shapeArgs,
+            configArgs,
+          ])
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  )
+
+  const modelType = factory.createTypeAliasDeclaration(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    `${model.name}Model`,
+    undefined,
+    factory.createTypeReferenceNode('Simplify', [
+      factory.createTypeQueryNode(factory.createIdentifier(`${model.name}Model`)),
+    ])
+  )
+
+  return [modelSchema, modelType] as const
+}
+
+export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
+  // Import statements
+  const imports = [
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        false,
+        undefined,
+        factory.createNamedImports([
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('type Simplify')
+          ),
+          factory.createImportSpecifier(false, undefined, factory.createIdentifier('model')),
+          factory.createImportSpecifier(false, undefined, factory.createIdentifier('DataType')),
+          factory.createImportSpecifier(false, undefined, factory.createIdentifier('SchemaType')),
+        ])
+      ),
+      factory.createStringLiteral(pkg.name)
+    ),
+  ]
+
+  // Import the shared enums
+
+  const sanitizedModels = datamodel.models.flatMap((model) => {
+    return generateModelDefinition(model, datamodel.enums)
+  })
+
+  const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
+  const sourceFile = ts.createSourceFile(
+    'dummy.ts',
+    '',
+    ts.ScriptTarget.Latest,
+    false,
+    ts.ScriptKind.TS
+  )
+
+  const declarartions = [...imports, ...sanitizedModels]
+
+  return declarartions
+    .map((node) => printer.printNode(ts.EmitHint.Unspecified, node, sourceFile))
+    .join('\n\n')
+}

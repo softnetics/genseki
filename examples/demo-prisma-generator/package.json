@@ -6,6 +6,9 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "scripts": {
+    "codegen": "prisma generate"
+  },
   "devDependencies": {
     "@genseki/prisma-generator": "workspace:^",
     "prisma": "^6.10.1"

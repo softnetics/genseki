@@ -25,6 +25,7 @@
     "vitest": "^3.0.9"
   },
   "dependencies": {
-    "@prisma/generator-helper": "^6.10.1"
+    "@prisma/generator-helper": "^6.10.1",
+    "typescript": "5.8.2"
   }
 }

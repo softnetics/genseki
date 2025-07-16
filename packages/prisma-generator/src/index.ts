@@ -4,9 +4,18 @@ import fs from 'node:fs'
 import { generatorHandler } from '@prisma/generator-helper'
 import path from 'path'
 
+import { generateSanitizedCode } from './generators/sanitized'
+import { generateEnums } from './generators/shared'
+import { generateUnsanitizedCode } from './generators/unsanitized'
 import { defaultPath, generatorName } from './globals'
 
 import { version } from '../package.json'
+
+function writeFile(folderOutput: string, fileName: string, content: string) {
+  const schemaFile = path.join(folderOutput, fileName)
+  fs.mkdirSync(path.dirname(schemaFile), { recursive: true })
+  fs.writeFileSync(schemaFile, content)
+}
 
 export const handler = generatorHandler({
   onManifest: () => {
@@ -18,9 +27,6 @@ export const handler = generatorHandler({
   },
   onGenerate: async (options) => {
     const { dmmf, generator } = options
-    const output = `const test = ${JSON.stringify(dmmf.datamodel.models, null, 2)}`
-
-    // Import the main generator function
 
     // Call the generate function with the necessary parameters
     const folderOutput = path.resolve(
@@ -30,16 +36,17 @@ export const handler = generatorHandler({
           : defaultPath)
     )
 
-    const schemaFile = folderOutput.endsWith('.ts')
-      ? folderOutput
-      : path.join(folderOutput, 'genseki.ts')
+    const sharedCode = generateEnums(dmmf.datamodel)
+    writeFile(folderOutput, 'shared.ts', sharedCode)
 
-    fs.mkdirSync(path.dirname(schemaFile), {
-      recursive: true,
-    })
+    const sanitizedCode = generateSanitizedCode(dmmf.datamodel)
+    writeFile(folderOutput, 'sanitized.ts', sanitizedCode)
 
-    fs.writeFileSync(schemaFile, output)
+    const unsanitizedCode = generateUnsanitizedCode(dmmf.datamodel)
+    writeFile(folderOutput, 'unsanitized.ts', unsanitizedCode)
   },
 })
 
 export default handler
+
+export * from './types'
