@@ -654,10 +654,10 @@ export default function UIPlayground() {
                 </ModalDescription>
               </ModalHeader>
               <ModalFooter className="flex justify-between">
-                <ModalClose variant="outline" size="sm">
+                <ModalClose variant="outline" size="sm" className="w-1/2">
                   Cancel
                 </ModalClose>
-                <ModalClose variant="destruction" size="sm">
+                <ModalClose variant="destruction" size="sm" className="w-1/2">
                   Delete
                   <BaseIcon icon={TrashIcon} size="sm" />
                 </ModalClose>
