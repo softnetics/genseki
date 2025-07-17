@@ -2,7 +2,6 @@ import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
 import pkg from '../../package.json'
-import { DataType } from '../types'
 
 function generateModelShapeBaseProperties(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
@@ -231,25 +230,7 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
   return [modelConfigInterface, modelShapeInterface, modelSchema] as const
 }
 
-function uniqueBy<T>(array: T[], key: (item: T) => string): T[] {
-  const seen = new Set<string>()
-  return array.filter((item) => {
-    const identifier = key(item)
-    if (seen.has(identifier)) {
-      return false
-    }
-    seen.add(identifier)
-    return true
-  })
-}
-
 export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
-  const fields = datamodel.models.flatMap((model) => model.fields)
-  const enumFields = uniqueBy(
-    fields.filter((field) => !(field.type.toUpperCase() in DataType)),
-    (field) => field.type
-  ).filter((field) => field.kind === 'enum')
-
   // Import statements
   const imports = [
     factory.createImportDeclaration(
@@ -258,24 +239,19 @@ export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
         false,
         undefined,
         factory.createNamedImports([
-          factory.createImportSpecifier(false, undefined, factory.createIdentifier('DataType')),
-          factory.createImportSpecifier(false, undefined, factory.createIdentifier('SchemaType')),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('type DataType')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('type SchemaType')
+          ),
         ])
       ),
       factory.createStringLiteral(pkg.name)
-    ),
-    factory.createImportDeclaration(
-      undefined,
-      factory.createImportClause(
-        false,
-        undefined,
-        factory.createNamedImports(
-          enumFields.map((e) =>
-            factory.createImportSpecifier(false, undefined, factory.createIdentifier(e.type))
-          )
-        )
-      ),
-      factory.createStringLiteral('./shared')
     ),
   ]
 

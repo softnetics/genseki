@@ -220,8 +220,6 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
     ),
   ]
 
-  // Import the shared enums
-
   const sanitizedModels = datamodel.models.flatMap((model) => {
     return generateModelDefinition(model, datamodel.enums)
   })

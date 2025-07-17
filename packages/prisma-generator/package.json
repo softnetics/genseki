@@ -6,6 +6,9 @@
   "bin": {
     "@genseki/prisma-generator": "dist/index.js"
   },
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "dev": "tsx ./scripts/dev.ts",
     "build": "tsx ./scripts/build.ts",

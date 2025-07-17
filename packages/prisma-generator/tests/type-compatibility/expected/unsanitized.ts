@@ -1,4 +1,4 @@
-import type { DataType, SchemaType } from '@genseki/prisma-generator'
+import { type DataType, type SchemaType } from '@genseki/prisma-generator'
 
 export interface DataModelConfig {
   name: 'DataModel'

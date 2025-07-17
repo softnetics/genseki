@@ -5,7 +5,6 @@ import { generatorHandler } from '@prisma/generator-helper'
 import path from 'path'
 
 import { generateSanitizedCode } from './generators/sanitized'
-import { generateEnums } from './generators/shared'
 import { generateUnsanitizedCode } from './generators/unsanitized'
 import { defaultPath, generatorName } from './globals'
 
@@ -36,8 +35,8 @@ export const handler = generatorHandler({
           : defaultPath)
     )
 
-    const sharedCode = generateEnums(dmmf.datamodel)
-    writeFile(folderOutput, 'shared.ts', sharedCode)
+    // const sharedCode = generateEnums(dmmf.datamodel)
+    // writeFile(folderOutput, 'shared.ts', sharedCode)
 
     const sanitizedCode = generateSanitizedCode(dmmf.datamodel)
     writeFile(folderOutput, 'sanitized.ts', sanitizedCode)
