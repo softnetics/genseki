@@ -43,6 +43,7 @@ import {
   Tag,
   TagGroup,
   TagList,
+  Textarea,
   TextField,
   TimeField,
   ToggleGroup,
@@ -1083,7 +1084,14 @@ export default function UIPlayground() {
                 isDisabled
                 placeholder="Data"
               />
-
+              <TextField
+                isRequired
+                type="password"
+                label="Package name"
+                isPending
+                description="This is a helper text"
+                size="md"
+              />
               <TextField
                 isRequired
                 type="password"
@@ -1135,6 +1143,20 @@ export default function UIPlayground() {
                 suffix={'Right?'}
               />
             </div>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+      <Wrapper title="Textarea">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Textarea">
+            <Textarea
+              label="Package name"
+              // description="This is a helper text"
+              errorMessage="This is an error message"
+              placeholder="Data"
+              className="w-[320px]"
+              isRequired
+            />
           </PlaygroundCard>
         </div>
       </Wrapper>

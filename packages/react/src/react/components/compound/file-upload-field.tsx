@@ -234,7 +234,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     <div className="group flex flex-col gap-y-4">
       {props.label && (
         <Label htmlFor={props.name}>
-          {props.label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
         </Label>
       )}
       {fileKey ? (

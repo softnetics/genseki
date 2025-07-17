@@ -87,7 +87,7 @@ const TextField = ({
         <>
           {label && (
             <Label>
-              {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+              {label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
             </Label>
           )}
           <FieldGroup
@@ -124,7 +124,7 @@ const TextField = ({
                 )}
               </Button>
             ) : isPending ? (
-              <Loader variant="spin" />
+              <Loader variant="spin" className="size-10" />
             ) : suffix ? (
               typeof suffix === 'string' ? (
                 <Typography
