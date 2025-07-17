@@ -1,0 +1,10 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator gesenki {
+  // NOTE: This should be "@genseki/prisma-generator" but we use a local path for testing
+  provider = "tsx ./src/index.ts"
+  output   = "./expected"
+}

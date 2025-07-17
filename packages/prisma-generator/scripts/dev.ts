@@ -10,9 +10,10 @@ const dev = async () => {
     sourcemap: true,
     clean: true,
     onSuccess: async () => {
-      execSync('cd ../../examples/demo-prisma-generator && npx prisma generate dev', {
-        stdio: 'inherit',
-      })
+      execSync('npx prisma generate --schema=./tests/type-compatibility', { stdio: 'inherit' })
+      execSync('npx prisma generate --schema=./tests/complex-relationship', { stdio: 'inherit' })
+      execSync('pnpm lint:fix')
+      execSync('pnpm format')
     },
     dts: true,
     format: ['cjs'],

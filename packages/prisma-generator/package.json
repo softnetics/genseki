@@ -9,8 +9,9 @@
   "scripts": {
     "dev": "tsx ./scripts/dev.ts",
     "build": "tsx ./scripts/build.ts",
-    "typecheck": "tsc",
+    "typecheck": "tsc --noEmit",
     "lint": "eslint .",
+    "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check ."
   },
@@ -26,6 +27,7 @@
   },
   "dependencies": {
     "@prisma/generator-helper": "^6.10.1",
+    "prisma": "^6.10.1",
     "typescript": "5.8.2"
   }
 }
