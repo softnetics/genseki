@@ -1556,6 +1556,35 @@ export default function UIPlayground() {
         </div>
       </Wrapper>
 
+      <Wrapper title="Checkbox">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <CheckboxGroup>
+            <Checkbox value="x">X</Checkbox>
+            <Checkbox
+              value="y"
+              label="Remember me"
+              description="Save my login details for next time"
+            ></Checkbox>
+            <Checkbox isDisabled value="z">
+              Z
+            </Checkbox>
+          </CheckboxGroup>
+          <CheckboxGroup>
+            <Checkbox value="x" size="lg">
+              X
+            </Checkbox>
+            <Checkbox
+              value="y"
+              label="Remember me"
+              description="Save my login details for next time"
+            ></Checkbox>
+            <Checkbox isDisabled value="z">
+              Z
+            </Checkbox>
+          </CheckboxGroup>
+        </div>
+      </Wrapper>
+
       <Wrapper title="Reorder group">
         <ReorderGroup title="Reorder Item" onReorder={handleReorder}>
           {btnData.map((b) => (
