@@ -36,7 +36,6 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       toast.success('Updation successfully')
       return navigate(`../`)
     } else {
-      console.log(result.body)
       const description =
         typeof result.body === 'object' &&
         !!result.body &&

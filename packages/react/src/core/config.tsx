@@ -102,11 +102,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     plugin: TPlugin
   ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
     this.plugins.push(plugin)
-    // TODO: I don't know why this is needed, need to investigate
-    return this as unknown as GensekiApp<
-      TApiPrefix,
-      TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>
-    >
+    return this as any
   }
 
   build(): GensekiAppCompiled<TMainApiRouter> {

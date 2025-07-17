@@ -3,7 +3,7 @@ import z from 'zod/v4'
 import type { Contextable } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import type { AuthApiBuilderArgs, AuthOptions } from '..'
-import { hashPassword } from '../utils'
+import { defaultHashPassword } from '../utils'
 
 export function resetPasswordEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
@@ -20,7 +20,7 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
         password: z.string(),
       }),
       responses: {
-        200: z.object({
+        303: z.object({
           status: z.string(),
         }),
         400: z.object({
@@ -67,7 +67,7 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
       // delete the verification token
       await builderArgs.handler.verification.delete(verification.id)
 
-      const hashedPassword = await hashPassword(args.body.password)
+      const hashedPassword = await defaultHashPassword(args.body.password)
       await builderArgs.handler.account.updatePassword(user.id, hashedPassword)
 
       const redirectTo = `${builderArgs.options.method.emailAndPassword?.resetPassword?.redirectTo ?? '/auth/login'}`
@@ -77,7 +77,7 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
       }
 
       return {
-        status: 200,
+        status: 303,
         headers: responseHeaders,
         body: { status: 'ok' },
       }
@@ -151,6 +151,7 @@ export function validateResetToken<TContext extends Contextable, TAuthOptions ex
           },
         }
       } catch {
+        // TODO: Log error
         return {
           status: 200,
           body: { verification: null },

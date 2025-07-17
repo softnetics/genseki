@@ -4,12 +4,13 @@ import type { Contextable } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { AccountProvider } from '../constant'
-import { hashPassword, setSessionCookie } from '../utils'
+import { defaultHashPassword, setSessionCookie } from '../utils'
 
 export function signUpEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
 ) {
-  const passwordHasher = builderArgs.options.method.emailAndPassword?.passwordHasher ?? hashPassword
+  const passwordHasher =
+    builderArgs.options.method.emailAndPassword?.passwordHasher ?? defaultHashPassword
 
   return createEndpoint(
     builderArgs.context,

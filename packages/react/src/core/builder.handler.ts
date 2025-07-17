@@ -437,7 +437,7 @@ class ApiHandler {
 
       const promises = values.map(async (value) => {
         const sourceTableRelationalConfig =
-          this.config.tableRelationalConfigByTableTsName[field.$client.referencedTableTsName]
+          this.config.tableRelationalConfigByTableTsName[field.$server.referencedTableTsName]
 
         const _disconnectFn = () =>
           disconnect(sourceTableRelationalConfig, field.$server.relation, value['disconnect'])
@@ -541,10 +541,10 @@ class ApiHandler {
     const result = Object.fromEntries(
       Object.entries(fields).flatMap(([_, field]) => {
         if (
-          field.$client.source === 'column' &&
-          typeof data[field.$client.fieldName] !== 'undefined'
+          field.$server.source === 'column' &&
+          typeof data[field.$server.fieldName] !== 'undefined'
         ) {
-          return [[field.$client.columnTsName, data[field.$client.fieldName]]]
+          return [[field.$server.columnTsName, data[field.$server.fieldName]]]
         }
         return []
       })

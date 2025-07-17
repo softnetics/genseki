@@ -38,7 +38,6 @@ export function CreateClientView(props: CreateClientViewProps) {
       toast.success('Creation successfully')
       return navigate(`./`)
     } else {
-      console.log(result.body)
       const description =
         typeof result.body === 'object' &&
         !!result.body &&

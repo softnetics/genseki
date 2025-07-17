@@ -15,10 +15,7 @@ import {
   isApiRoute,
 } from '@genseki/react'
 
-function findApiRoute<TApiRouter extends ApiRouter, TMethod extends string>(
-  apiRouter: TApiRouter,
-  methodName: TMethod
-): ApiRoute | undefined {
+function findApiRoute(apiRouter: ApiRouter, methodName: string): ApiRoute | undefined {
   const [head, ...tails] = methodName.split('.')
   const router = apiRouter[head]
   if (!router) return undefined
@@ -26,6 +23,7 @@ function findApiRoute<TApiRouter extends ApiRouter, TMethod extends string>(
     return router
   }
 
+  // TODO: Improve split and join logic performance
   if (!isApiRoute(router)) {
     return findApiRoute(router, tails.join('.'))
   }

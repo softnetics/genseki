@@ -1,5 +1,9 @@
 export { AccountProvider } from '../auth/constant'
-export { hashPassword, setSessionCookie, verifyPassword } from '../auth/utils'
+export {
+  defaultHashPassword as hashPassword,
+  setSessionCookie,
+  verifyPassword,
+} from '../auth/utils'
 export type {
   AnyContextable,
   AnyRequestContextable,

@@ -35,7 +35,7 @@ export function deleteSessionCookie(headers?: Record<string, string>) {
   deleteCookie(headers, SESSION_COOKIE_NAME)
 }
 
-export async function hashPassword(password: string): Promise<string> {
+export async function defaultHashPassword(password: string): Promise<string> {
   const salt = randomBytes(8).toString('hex')
   const derivedKey = await scrypt(password, salt, 64)
   return salt + ':' + (derivedKey as Buffer).toString('hex')

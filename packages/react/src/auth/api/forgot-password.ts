@@ -40,8 +40,8 @@ export function forgotPasswordEmail<TContext extends Contextable, TAuthOptions e
         builderArgs.options.method.emailAndPassword?.resetPassword?.expiresInMs
       )
 
+      // TODO: Send forgot password link to email or SMS
       const resetPasswordLink = `${builderArgs.options.method.emailAndPassword?.resetPassword?.resetPasswordUrl ?? '/auth/reset-password'}?token=${verification.value}`
-      // Send email
 
       return {
         status: 200,

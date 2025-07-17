@@ -35,7 +35,7 @@ export function tryParseJSONObject(jsonString: string): Record<string, unknown> 
 }
 
 export function isRelationField(field: FieldBase): field is FieldRelation {
-  return field.$client.source === 'relation'
+  return field.$server.source === 'relation'
 }
 
 export function isRichTextField(field: FieldClientBase): field is FieldColumnJsonRichText {
@@ -137,8 +137,8 @@ export function createDrizzleQuery(
 ): Record<string, any> {
   const queryColumns = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
-      if (field.$client.source !== 'column') return []
-      return [[field.$client.columnTsName, true as const]]
+      if (field.$server.source !== 'column') return []
+      return [[field.$server.columnTsName, true as const]]
     })
   )
 
@@ -146,7 +146,7 @@ export function createDrizzleQuery(
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
       const relationName = field.$server.relation.fieldName
-      const referencedTableName = field.$client.referencedTableTsName
+      const referencedTableName = field.$server.referencedTableTsName
 
       return [
         [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
@@ -176,8 +176,8 @@ export function appendFieldNameToFields<TFields extends Fields>(
 export function mapValueToTsValue(fields: Fields, value: Record<string, any>): Record<string, any> {
   const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
     if (value[fieldName] === undefined) return []
-    if (field.$client.source !== 'column') return []
-    return [[field.$client.columnTsName, value[fieldName]]]
+    if (field.$server.source !== 'column') return []
+    return [[field.$server.columnTsName, value[fieldName]]]
   })
 
   return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
