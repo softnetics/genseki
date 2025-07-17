@@ -22,6 +22,7 @@ import { StarterKit } from '@tiptap/starter-kit'
 import { useTheme } from 'next-themes'
 
 import {
+  Annotation,
   Avatar,
   Breadcrumbs,
   BreadcrumbsItem,
@@ -1578,6 +1579,11 @@ export default function UIPlayground() {
             buttonTitle="Card Action"
           />
         </PlaygroundCard>
+      </Wrapper>
+
+      <Wrapper title="Annotation">
+        <Annotation>Annotation</Annotation>
+        <Annotation className="bg-red-50 text-red-700">Annotation</Annotation>
       </Wrapper>
     </div>
   )
