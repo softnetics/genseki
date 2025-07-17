@@ -62,7 +62,7 @@ const Radio = ({ className, children, description, label, size = 'md', ...props 
   return (
     <RadioPrimitive
       {...props}
-      className={composeTailwindRenderProps(className, 'group block disabled:opacity-50')}
+      className={composeTailwindRenderProps(className, 'group block disabled:opacity-50 ')}
     >
       {composeRenderProps(
         children,
@@ -96,8 +96,8 @@ const Radio = ({ className, children, description, label, size = 'md', ...props 
               <button
                 data-slot="indicator"
                 className={twMerge([
-                  `relative inset-ring inset-bluegray-300 isolate flex ${sizeClasses[size].indicator} shrink-0 items-center justify-center rounded-full bg-secondary text-bg transition before:absolute before:inset-auto before:shrink-0 before:rounded-full before:content-['']`,
-                  `focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+                  `relative inset-bluegray-300 isolate flex ${sizeClasses[size].indicator} shrink-0 items-center justify-center rounded-full bg-secondary text-bg transition before:absolute before:inset-auto before:shrink-0 before:rounded-full before:content-['']`,
+                  `focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none border border-bluegray-400`,
                   isSelected && [
                     'bg-primary text-primary-fg before:bg-white',
                     'group-invalid:inset-ring-danger/70 group-invalid:bg-danger group-invalid:text-danger-fg',
@@ -107,7 +107,7 @@ const Radio = ({ className, children, description, label, size = 'md', ...props 
                     'group-invalid:inset-ring-danger/70 group-invalid:text-danger-fg group-invalid:ring-danger/20',
                   ],
                   isInvalid && 'inset-ring-danger/70 bg-danger/20 text-danger-fg ring-danger/20',
-                  isDisabled && 'bg-accent-fg cursor-not-allowed',
+                  isDisabled && 'bg-bluegray-50 cursor-not-allowed',
                   isSelected && isDisabled && 'before:bg-bluegray-300',
                 ])}
               />

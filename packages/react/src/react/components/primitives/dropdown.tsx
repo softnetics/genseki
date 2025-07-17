@@ -32,6 +32,7 @@ const dropdownItemStyles = tv({
     'data-[slot=menu-radio]:*:data-[slot=icon]:size-8 *:data-[slot=icon]:mr-3',
     'forced-colors:**:data-[slot=icon]:text-[CanvasText] forced-colors:group-focus:**:data-[slot=icon]:text-[Canvas] ',
     '[&>[slot=label]+[data-slot=icon]]:absolute [&>[slot=label]+[data-slot=icon]]:right-0',
+    'flex items-center justify-between gap-2 w-full',
   ],
   variants: {
     isDisabled: {
@@ -96,8 +97,8 @@ const DropdownItem = forwardRef(function DropdownItem(
     >
       {composeRenderProps(props.children, (children, { isSelected }) => (
         <>
-          {isSelected && <CheckIcon className="-mx-0.5 mr-2" data-slot="checked-icon" />}
           {typeof children === 'string' ? <DropdownLabel>{children}</DropdownLabel> : children}
+          {isSelected && <CheckIcon className="-mx-0.5 mr-2" data-slot="checked-icon" />}
         </>
       ))}
     </ListBoxItemPrimitive>

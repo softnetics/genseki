@@ -7,6 +7,7 @@ import {
   CaretDownIcon,
   DiscordLogoIcon,
   GithubLogoIcon,
+  MagnifyingGlassIcon,
   PlusCircleIcon,
   TextAlignCenterIcon,
   TextAlignJustifyIcon,
@@ -532,7 +533,37 @@ export default function UIPlayground() {
       </Wrapper>
       <Wrapper title="Multi select">
         <PlaygroundCard title="Multi select" categoryTitle="Multi select">
-          <Select label="Design software" placeholder="Select a software">
+          <Select
+            label="Design software"
+            placeholder="Select a software"
+            className="w-[320px]"
+            isRequired
+          >
+            <SelectTrigger
+              prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" weight="regular" />}
+            />
+            <SelectList
+              items={[
+                { id: 0, name: 'A' },
+                { id: 1, name: 'B' },
+                { id: 2, name: 'C' },
+                { id: 3, name: 'D' },
+              ]}
+            >
+              {(item) => (
+                <SelectOption id={item.id} textValue={item.name}>
+                  {item.name}
+                </SelectOption>
+              )}
+            </SelectList>
+          </Select>
+          <Select
+            label="Design software"
+            placeholder="Select a software"
+            className="w-[320px]"
+            isRequired
+            isDisabled
+          >
             <SelectTrigger />
             <SelectList
               items={[

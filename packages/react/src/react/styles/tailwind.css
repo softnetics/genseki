@@ -222,7 +222,7 @@
 
     --primary: var(--color-pumpkin-500);
     --primary-fg: var(--color-pumpkin-50);
-    --primary-emphasis: var(--color-pumpkin-600);
+    --primary-emphasis: var(--color-pumpkin-400);
 
     --secondary: var(--color-bluegray-200);
     --secondary-fg: var(--color-bluegray-600);
@@ -244,9 +244,6 @@
 
     --danger: var(--color-valencia-600);
     --danger-fg: var(--color-valencia-50);
-
-    --accent: var(--color-yellow-500);
-    --accent-fg: var(--color-yellow-900);
 
     --border: var(--color-bluegray-300);
     --input: var(--color-bluegray-300);

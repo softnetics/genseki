@@ -34,7 +34,7 @@ import { cn } from '../../utils/cn'
 const selectTriggerStyles = tv({
   extend: focusStyles,
   base: [
-    'btr flex w-full cursor-default items-center gap-12 gap-x-2 rounded-md border border-input px-6 py-6 text-start shadow-sm transition group-disabled:opacity-50 **:data-[slot=icon]:size-8 h-20 dark:shadow-none',
+    'btr flex w-full cursor-default items-center gap-12 gap-x-2 rounded-md border border-input px-6 py-5 text-start shadow-sm transition group-disabled:opacity-50 **:data-[slot=icon]:size-8 h-20 dark:shadow-none',
     'group-data-open:border-ring/70 group-data-open:ring-4 group-data-open:ring-ring/20',
     'text-fg group-invalid:border-danger group-invalid:ring-danger/20 forced-colors:group-invalid:border-[Mark]',
   ],
@@ -136,7 +136,7 @@ const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
         })
       )}
     >
-      {props.prefix && <span className="-mr-1">{props.prefix}</span>}
+      {props.prefix && <span className="mr-2">{props.prefix}</span>}
       <SelectValue
         data-slot="select-value"
         className="data-placeholder:text-muted-fg grid flex-1 grid-cols-[auto_1fr] items-center text-base *:data-[slot=avatar]:*:-mx-0.5 *:data-[slot=avatar]:-mx-0.5 *:data-[slot=icon]:-mx-0.5 *:data-[slot=avatar]:*:mr-2 *:data-[slot=avatar]:mr-2 *:data-[slot=icon]:mr-2 [&_[slot=description]]:hidden"
