@@ -1,4 +1,5 @@
 import { drizzle } from 'drizzle-orm/node-postgres'
+import { describe, expect, it } from 'vitest'
 import z from 'zod/v4'
 
 import * as schema from './__mocks__/complex-schema'
@@ -207,3 +208,9 @@ export const app = new GensekiApp({
 })
   .apply(authorCollection)
   .apply(postCollection)
+
+describe('GensekiApp', () => {
+  it('should have the correct title and version', () => {
+    expect(app).toBeTruthy()
+  })
+})
