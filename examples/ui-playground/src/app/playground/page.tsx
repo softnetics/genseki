@@ -27,6 +27,7 @@ import {
   BreadcrumbsItem,
   ButtonGroup,
   ButtonGroupItem,
+  Card,
   Link,
   Pagination,
   ProgressBar,
@@ -1520,7 +1521,7 @@ export default function UIPlayground() {
             <ProgressBar value={100} className="w-full" isShowPercent />
           </PlaygroundCard>
           <PlaygroundCard title="isShowPercentPopup" categoryTitle="Progress bar">
-            <ProgressBar value={0} className="w-full" />
+            <ProgressBar value={0} className="w-full" isShowPercentPopup />
             <ProgressBar value={25} className="w-full" isShowPercentPopup />
             <ProgressBar value={50} className="w-full" isShowPercentPopup />
             <ProgressBar value={75} className="w-full" isShowPercentPopup />
@@ -1566,6 +1567,17 @@ export default function UIPlayground() {
             </Tabs>
           </PlaygroundCard>
         </div>
+      </Wrapper>
+
+      <Wrapper title="Card">
+        <PlaygroundCard title="Default" categoryTitle="Card">
+          <Card
+            title="Card Title"
+            itemNumber={10}
+            description="Manage your product catalog including inventory, pricing, and categories."
+            buttonTitle="Card Action"
+          />
+        </PlaygroundCard>
       </Wrapper>
     </div>
   )

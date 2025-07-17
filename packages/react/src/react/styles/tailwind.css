@@ -252,6 +252,8 @@
     --input: var(--color-bluegray-300);
     --ring: var(--color-pumpkin-500);
 
+    --icon-tertiary: var(--color-bluegray-400);
+
     --navbar: var(--color-bluegray-100);
     --navbar-fg: var(--color-bluegray-500);
 
