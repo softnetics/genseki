@@ -23,6 +23,9 @@ export function sendResetPasswordEmail<
         400: z.object({
           status: z.string(),
         }),
+        500: z.object({
+          status: z.string(),
+        }),
       },
     },
     async (args) => {
@@ -42,6 +45,13 @@ export function sendResetPasswordEmail<
         return {
           status: 400,
           body: { status: 'user not found' },
+        }
+      }
+
+      if (!user.email) {
+        return {
+          status: 500,
+          body: { status: 'user email not found' },
         }
       }
 
@@ -65,6 +75,7 @@ export function sendResetPasswordEmail<
 
       // TODO: change this to domain config websiteURL
       const resetPasswordLink = `${builderArgs.options.method.emailAndPassword?.resetPassword?.resetPasswordUrl ?? 'http://localhost:3000/admin/auth/reset-password'}?token=${token}`
+
       // Send email
       if (builderArgs.options.method.emailAndPassword?.resetPassword?.sendEmailResetPassword) {
         await builderArgs.options.method.emailAndPassword?.resetPassword.sendEmailResetPassword(

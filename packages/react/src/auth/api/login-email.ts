@@ -23,8 +23,8 @@ export function loginEmail<TContext extends Contextable, TAuthOptions extends Au
           token: z.string().nullable(),
           user: z.object({
             id: z.string(),
-            name: z.string(),
-            email: z.string(),
+            name: z.string().nullable().optional(),
+            email: z.string().nullable().optional(),
             image: z.string().nullable().optional(),
           }),
         }),
