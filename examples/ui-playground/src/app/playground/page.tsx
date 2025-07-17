@@ -51,6 +51,8 @@ import {
   ToolbarGroup,
   ToolbarItem,
   ToolbarSeparator,
+  Tooltip,
+  TooltipContent,
 } from '@genseki/react'
 import { RichTextEditor } from '@genseki/react'
 import { BaseIcon } from '@genseki/react'
@@ -1141,6 +1143,7 @@ export default function UIPlayground() {
                 size="xs"
                 prefix={'MR.'}
                 suffix={'Right?'}
+                isDisabled
               />
             </div>
           </PlaygroundCard>
@@ -1151,11 +1154,18 @@ export default function UIPlayground() {
           <PlaygroundCard title="Medium size (md)" categoryTitle="Textarea">
             <Textarea
               label="Package name"
-              // description="This is a helper text"
-              errorMessage="This is an error message"
+              description="This is a helper text"
               placeholder="Data"
               className="w-[320px]"
               isRequired
+            />
+            <Textarea
+              label="Package name"
+              description="This is a helper text"
+              placeholder="Data"
+              className="w-[320px]"
+              isRequired
+              isDisabled
             />
           </PlaygroundCard>
         </div>
@@ -1637,6 +1647,43 @@ export default function UIPlayground() {
       <Wrapper title="Annotation">
         <Annotation>Annotation</Annotation>
         <Annotation className="bg-red-50 text-red-700">Annotation</Annotation>
+      </Wrapper>
+
+      <Wrapper title="Tools Tip group">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 **:[button]:w-full">
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Bottom
+            </Button>
+            <TooltipContent placement="bottom">
+              Tooltip shown at <strong>bottom</strong>.
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Top
+            </Button>
+            <TooltipContent placement="top">
+              Tooltip shown at <strong>top</strong>.
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Left
+            </Button>
+            <TooltipContent placement="left">
+              Tooltip shown at <strong>left</strong>.
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Right
+            </Button>
+            <TooltipContent placement="right">
+              Tooltip shown at <strong>right</strong>.
+            </TooltipContent>
+          </Tooltip>
+        </div>
       </Wrapper>
     </div>
   )
