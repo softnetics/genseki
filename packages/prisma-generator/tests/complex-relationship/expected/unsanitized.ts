@@ -9,90 +9,94 @@ export interface TableAModelConfig {
 }
 
 export interface TableAModelShape {
-  id: {
-    schema: typeof SchemaType.COLUMN
-    name: 'id'
-    isId: true
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
+  columns: {
+    id: {
+      schema: typeof SchemaType.COLUMN
+      name: 'id'
+      isId: true
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    name: {
+      schema: typeof SchemaType.COLUMN
+      name: 'name'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    description: {
+      schema: typeof SchemaType.COLUMN
+      name: 'description'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    createdAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'createdAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: true
+      dataType: typeof DataType.DATETIME
+    }
+    updatedAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'updatedAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.DATETIME
+    }
   }
-  name: {
-    schema: typeof SchemaType.COLUMN
-    name: 'name'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  description: {
-    schema: typeof SchemaType.COLUMN
-    name: 'description'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: false
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  createdAt: {
-    schema: typeof SchemaType.COLUMN
-    name: 'createdAt'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: true
-    dataType: typeof DataType.DATETIME
-  }
-  updatedAt: {
-    schema: typeof SchemaType.COLUMN
-    name: 'updatedAt'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.DATETIME
-  }
-  tableB: {
-    schema: typeof SchemaType.RELATION
-    name: 'tableB'
-    isId: false
-    isList: true
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    relationName: 'TableAToTableB'
-    referencedModel: TableBModel
-    relationToFields: []
-    relationFromFields: []
-    relationDataTypes: []
-  }
-  tableC: {
-    schema: typeof SchemaType.RELATION
-    name: 'tableC'
-    isId: false
-    isList: true
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    relationName: 'TableAToTableC'
-    referencedModel: TableCModel
-    relationToFields: []
-    relationFromFields: []
-    relationDataTypes: []
+  relations: {
+    tableB: {
+      schema: typeof SchemaType.RELATION
+      name: 'tableB'
+      isId: false
+      isList: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'TableAToTableB'
+      referencedModel: TableBModel
+      relationToFields: []
+      relationFromFields: []
+      relationDataTypes: []
+    }
+    tableC: {
+      schema: typeof SchemaType.RELATION
+      name: 'tableC'
+      isId: false
+      isList: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'TableAToTableC'
+      referencedModel: TableCModel
+      relationToFields: []
+      relationFromFields: []
+      relationDataTypes: []
+    }
   }
 }
 
@@ -110,101 +114,105 @@ export interface TableBModelConfig {
 }
 
 export interface TableBModelShape {
-  id: {
-    schema: typeof SchemaType.COLUMN
-    name: 'id'
-    isId: true
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
+  columns: {
+    id: {
+      schema: typeof SchemaType.COLUMN
+      name: 'id'
+      isId: true
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    name: {
+      schema: typeof SchemaType.COLUMN
+      name: 'name'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    description: {
+      schema: typeof SchemaType.COLUMN
+      name: 'description'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    createdAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'createdAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: true
+      dataType: typeof DataType.DATETIME
+    }
+    updatedAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'updatedAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.DATETIME
+    }
+    tableCId: {
+      schema: typeof SchemaType.COLUMN
+      name: 'tableCId'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: true
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
   }
-  name: {
-    schema: typeof SchemaType.COLUMN
-    name: 'name'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  description: {
-    schema: typeof SchemaType.COLUMN
-    name: 'description'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: false
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  createdAt: {
-    schema: typeof SchemaType.COLUMN
-    name: 'createdAt'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: true
-    dataType: typeof DataType.DATETIME
-  }
-  updatedAt: {
-    schema: typeof SchemaType.COLUMN
-    name: 'updatedAt'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.DATETIME
-  }
-  tableA: {
-    schema: typeof SchemaType.RELATION
-    name: 'tableA'
-    isId: false
-    isList: true
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    relationName: 'TableAToTableB'
-    referencedModel: TableAModel
-    relationToFields: []
-    relationFromFields: []
-    relationDataTypes: []
-  }
-  tableCId: {
-    schema: typeof SchemaType.COLUMN
-    name: 'tableCId'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: true
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  tableC: {
-    schema: typeof SchemaType.RELATION
-    name: 'tableC'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    relationName: 'TableBToTableC'
-    referencedModel: TableCModel
-    relationToFields: ['id']
-    relationFromFields: ['id']
-    relationDataTypes: [typeof DataType.STRING]
+  relations: {
+    tableA: {
+      schema: typeof SchemaType.RELATION
+      name: 'tableA'
+      isId: false
+      isList: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'TableAToTableB'
+      referencedModel: TableAModel
+      relationToFields: []
+      relationFromFields: []
+      relationDataTypes: []
+    }
+    tableC: {
+      schema: typeof SchemaType.RELATION
+      name: 'tableC'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'TableBToTableC'
+      referencedModel: TableCModel
+      relationToFields: ['id']
+      relationFromFields: ['id']
+      relationDataTypes: [typeof DataType.STRING]
+    }
   }
 }
 
@@ -222,90 +230,94 @@ export interface TableCModelConfig {
 }
 
 export interface TableCModelShape {
-  id: {
-    schema: typeof SchemaType.COLUMN
-    name: 'id'
-    isId: true
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
+  columns: {
+    id: {
+      schema: typeof SchemaType.COLUMN
+      name: 'id'
+      isId: true
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    name: {
+      schema: typeof SchemaType.COLUMN
+      name: 'name'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    description: {
+      schema: typeof SchemaType.COLUMN
+      name: 'description'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    createdAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'createdAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: true
+      dataType: typeof DataType.DATETIME
+    }
+    updatedAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'updatedAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.DATETIME
+    }
   }
-  name: {
-    schema: typeof SchemaType.COLUMN
-    name: 'name'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  description: {
-    schema: typeof SchemaType.COLUMN
-    name: 'description'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: false
-    hasDefaultValue: false
-    dataType: typeof DataType.STRING
-  }
-  createdAt: {
-    schema: typeof SchemaType.COLUMN
-    name: 'createdAt'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: true
-    dataType: typeof DataType.DATETIME
-  }
-  updatedAt: {
-    schema: typeof SchemaType.COLUMN
-    name: 'updatedAt'
-    isId: false
-    isList: false
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    dataType: typeof DataType.DATETIME
-  }
-  tableA: {
-    schema: typeof SchemaType.RELATION
-    name: 'tableA'
-    isId: false
-    isList: true
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    relationName: 'TableAToTableC'
-    referencedModel: TableAModel
-    relationToFields: []
-    relationFromFields: []
-    relationDataTypes: []
-  }
-  tableB: {
-    schema: typeof SchemaType.RELATION
-    name: 'tableB'
-    isId: false
-    isList: true
-    isUnique: false
-    isReadOnly: false
-    isRequired: true
-    hasDefaultValue: false
-    relationName: 'TableBToTableC'
-    referencedModel: TableBModel
-    relationToFields: []
-    relationFromFields: []
-    relationDataTypes: []
+  relations: {
+    tableA: {
+      schema: typeof SchemaType.RELATION
+      name: 'tableA'
+      isId: false
+      isList: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'TableAToTableC'
+      referencedModel: TableAModel
+      relationToFields: []
+      relationFromFields: []
+      relationDataTypes: []
+    }
+    tableB: {
+      schema: typeof SchemaType.RELATION
+      name: 'tableB'
+      isId: false
+      isList: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'TableBToTableC'
+      referencedModel: TableBModel
+      relationToFields: []
+      relationFromFields: []
+      relationDataTypes: []
+    }
   }
 }
 

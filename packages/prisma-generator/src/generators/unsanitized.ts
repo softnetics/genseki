@@ -153,10 +153,28 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
     `${baseName}Shape`,
     undefined,
     undefined,
-    model.fields.map((field) => {
-      if (field.relationName) return generateFieldRelationSchemaInterface(field, model.fields)
-      return generateFieldColumnSchemaInterface(field, enums)
-    })
+    [
+      factory.createPropertySignature(
+        undefined,
+        'columns',
+        undefined,
+        factory.createTypeLiteralNode(
+          model.fields
+            .filter((f) => !f.relationName)
+            .map((field) => generateFieldColumnSchemaInterface(field, enums))
+        )
+      ),
+      factory.createPropertySignature(
+        undefined,
+        'relations',
+        undefined,
+        factory.createTypeLiteralNode(
+          model.fields
+            .filter((f) => f.relationName)
+            .map((field) => generateFieldRelationSchemaInterface(field, model.fields))
+        )
+      ),
+    ]
   )
 
   const primaryFieldNames = model.fields.filter((field) => field.isId).map((field) => [field.name])
