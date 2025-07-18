@@ -15,6 +15,9 @@
       "dependsOn": ["^bundle"],
       "outputs": ["dist"]
     },
+    "codegen": {
+      "dependsOn": ["^codegen"]
+    },
     "lint": {
       "dependsOn": ["^lint"]
     },
