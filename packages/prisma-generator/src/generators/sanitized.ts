@@ -220,6 +220,108 @@ function generateModelSchemaDefinition(model: DMMF.Model, enums: readonly DMMF.D
   return [modelSchema, modelType] as const
 }
 
+function generateModelFunction() {
+  const factory = ts.factory
+
+  const jsDoc = factory.createJSDocComment(
+    'Creates a sanitized model with the given shape and config.',
+    [
+      factory.createJSDocParameterTag(
+        undefined,
+        factory.createIdentifier('shape'),
+        false,
+        factory.createJSDocTypeExpression(factory.createTypeReferenceNode('TShape')),
+        undefined,
+        'The shape of the model'
+      ),
+      factory.createJSDocParameterTag(
+        undefined,
+        factory.createIdentifier('config'),
+        false,
+        factory.createJSDocTypeExpression(factory.createTypeReferenceNode('TConfig')),
+        undefined,
+        'The configuration of the model'
+      ),
+      factory.createJSDocReturnTag(
+        undefined,
+        factory.createJSDocTypeExpression(
+          factory.createTypeReferenceNode('SanitizedModel', [
+            factory.createTypeReferenceNode('TShape'),
+          ])
+        ),
+        'A sanitized model containing the shape and config'
+      ),
+    ]
+  )
+
+  const func = factory.createFunctionDeclaration(
+    undefined,
+    undefined,
+    'model',
+    [
+      factory.createTypeParameterDeclaration(
+        [factory.createModifier(ts.SyntaxKind.ConstKeyword)],
+        'TShape',
+        factory.createTypeReferenceNode('SanitizedModelShape')
+      ),
+      factory.createTypeParameterDeclaration(
+        [factory.createModifier(ts.SyntaxKind.ConstKeyword)],
+        'TConfig',
+        factory.createTypeReferenceNode('ModelConfig')
+      ),
+    ],
+    [
+      factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        'shape',
+        undefined,
+        factory.createTypeReferenceNode('TShape')
+      ),
+      factory.createParameterDeclaration(
+        undefined,
+        undefined,
+        'config',
+        undefined,
+        factory.createTypeReferenceNode('TConfig')
+      ),
+    ],
+    factory.createTypeReferenceNode('SanitizedModelSchema', [
+      factory.createTypeReferenceNode('TShape'),
+      factory.createTypeReferenceNode('TConfig'),
+    ]),
+    factory.createBlock(
+      [
+        factory.createReturnStatement(
+          factory.createObjectLiteralExpression([
+            factory.createShorthandPropertyAssignment('config'),
+            factory.createShorthandPropertyAssignment('shape'),
+          ])
+        ),
+      ],
+      true
+    )
+  )
+
+  // Attach the JSDoc
+  ts.addSyntheticLeadingComment(
+    func,
+    ts.SyntaxKind.MultiLineCommentTrivia,
+    ts
+      .createPrinter()
+      .printNode(
+        ts.EmitHint.Unspecified,
+        jsDoc,
+        ts.createSourceFile('', '', ts.ScriptTarget.Latest)
+      )
+      .replace(/\/\*/g, '')
+      .replace(/\*\//g, ''),
+    true
+  )
+
+  return func
+}
+
 export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
   // Import statements
   const imports = [
@@ -234,7 +336,21 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
             undefined,
             factory.createIdentifier('type Simplify')
           ),
-          factory.createImportSpecifier(false, undefined, factory.createIdentifier('model')),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('type SanitizedModelShape')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('type ModelConfig')
+          ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('type SanitizedModelSchema')
+          ),
           factory.createImportSpecifier(false, undefined, factory.createIdentifier('DataType')),
           factory.createImportSpecifier(false, undefined, factory.createIdentifier('SchemaType')),
         ])
@@ -243,6 +359,7 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
     ),
   ]
 
+  const modelFunction = generateModelFunction()
   const sanitizedModels = datamodel.models.flatMap((model) => {
     return generateModelSchemaDefinition(model, datamodel.enums)
   })
@@ -256,7 +373,7 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
     ts.ScriptKind.TS
   )
 
-  const declarartions = [...imports, ...sanitizedModels]
+  const declarartions = [...imports, modelFunction, ...sanitizedModels]
 
   return declarartions
     .map((node) => printer.printNode(ts.EmitHint.Unspecified, node, sourceFile))

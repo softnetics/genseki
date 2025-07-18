@@ -1,4 +1,24 @@
-import { DataType, model, SchemaType, type Simplify } from '@genseki/react'
+import {
+  DataType,
+  type ModelConfig,
+  type SanitizedModelSchema,
+  type SanitizedModelShape,
+  SchemaType,
+  type Simplify,
+} from '@genseki/react'
+
+/**
+ * Creates a sanitized model with the given shape and config.
+ * @param {TShape} shape The shape of the model
+ * @param {TConfig} config The configuration of the model
+ * @returns {SanitizedModel<TShape>} A sanitized model containing the shape and config
+ */
+function model<const TShape extends SanitizedModelShape, const TConfig extends ModelConfig>(
+  shape: TShape,
+  config: TConfig
+): SanitizedModelSchema<TShape, TConfig> {
+  return { config, shape }
+}
 
 export const TableAModel = model(
   {
