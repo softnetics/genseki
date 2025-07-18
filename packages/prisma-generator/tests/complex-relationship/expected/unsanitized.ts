@@ -1,4 +1,4 @@
-import { type DataType, type SchemaType } from '@genseki/prisma-generator'
+import { type DataType, type SchemaType } from '@genseki/react'
 
 export interface TableAModelConfig {
   name: 'TableAModel'
@@ -77,6 +77,7 @@ export interface TableAModelShape {
     referencedModel: TableBModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
   tableC: {
     schema: typeof SchemaType.RELATION
@@ -91,6 +92,7 @@ export interface TableAModelShape {
     referencedModel: TableCModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
 }
 
@@ -176,6 +178,7 @@ export interface TableBModelShape {
     referencedModel: TableAModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
   tableCId: {
     schema: typeof SchemaType.COLUMN
@@ -201,6 +204,7 @@ export interface TableBModelShape {
     referencedModel: TableCModel
     relationToFields: ['id']
     relationFromFields: ['id']
+    relationDataTypes: [typeof DataType.STRING]
   }
 }
 
@@ -286,6 +290,7 @@ export interface TableCModelShape {
     referencedModel: TableAModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
   tableB: {
     schema: typeof SchemaType.RELATION
@@ -300,6 +305,7 @@ export interface TableCModelShape {
     referencedModel: TableBModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
 }
 

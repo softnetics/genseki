@@ -1,9 +1,7 @@
 import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
-import pkg from '../../package.json'
-
-function generateModelShapeBaseProperties(field: DMMF.Field) {
+function generateFieldBaseSchemaDefinition(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
     return fieldKeys.map((key) => {
       return factory.createPropertyAssignment(
@@ -35,7 +33,7 @@ function generateModelShapeBaseProperties(field: DMMF.Field) {
   ]
 }
 
-function generateModelShapeColumnDefinition(
+function generateFieldColumnSchemaDefinition(
   field: DMMF.Field,
   enums: readonly DMMF.DatamodelEnum[]
 ) {
@@ -73,18 +71,18 @@ function generateModelShapeColumnDefinition(
   return factory.createPropertyAssignment(
     field.name,
     factory.createObjectLiteralExpression(
-      [...generateModelShapeBaseProperties(field), ...properties],
+      [...generateFieldBaseSchemaDefinition(field), ...properties],
       true
     )
   )
 }
 
-function generateModelRelationShapeDefinition(field: DMMF.Field) {
+function generateFieldRelationSchemaDefinition(field: DMMF.Field, fields: readonly DMMF.Field[]) {
   return factory.createPropertyAssignment(
     field.name,
     factory.createObjectLiteralExpression(
       [
-        ...generateModelShapeBaseProperties(field),
+        ...generateFieldBaseSchemaDefinition(field),
         ...(field.relationName
           ? [
               factory.createPropertyAssignment(
@@ -109,27 +107,26 @@ function generateModelRelationShapeDefinition(field: DMMF.Field) {
             field.relationFromFields?.map((f) => factory.createStringLiteral(f)) ?? []
           )
         ),
+        factory.createPropertyAssignment(
+          'relationDataTypes',
+          factory.createArrayLiteralExpression(
+            field.relationFromFields?.flatMap((f) => {
+              const found = fields.find((field) => field.name === f)
+              if (!found) return []
+              return factory.createPropertyAccessExpression(
+                factory.createIdentifier('DataType'),
+                factory.createIdentifier(found.type.toUpperCase())
+              )
+            }) ?? []
+          )
+        ),
       ],
       true
     )
   )
 }
 
-function generateModelShapeDefinition(
-  fields: readonly DMMF.Field[],
-  enums: readonly DMMF.DatamodelEnum[]
-) {
-  const props = fields.map((field) => {
-    if (field.relationName) return generateModelRelationShapeDefinition(field)
-    return generateModelShapeColumnDefinition(field, enums)
-  })
-
-  return factory.createObjectLiteralExpression(props, true)
-}
-
-function generateModelDefinition(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
-  const shapeArgs = generateModelShapeDefinition(model.fields, enums)
-
+function generateModelShapeDefinition(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
   const primaryFieldNames = model.fields.filter((field) => field.isId).map((field) => field.name)
   const allPriamryFieldNames = [
     ...primaryFieldNames,
@@ -141,14 +138,24 @@ function generateModelDefinition(model: DMMF.Model, enums: readonly DMMF.Datamod
     .map((field) => [field.name])
   const allUniqueFields = [allPriamryFieldNames, ...singleUniqueFieldNames, ...model.uniqueFields]
 
-  const configArgs = factory.createObjectLiteralExpression(
+  const columns = model.fields
+    .filter((field) => !field.relationName)
+    .map((field) => generateFieldColumnSchemaDefinition(field, enums))
+
+  const relations = model.fields
+    .filter((field) => field.relationName)
+    .map((field) => generateFieldRelationSchemaDefinition(field, model.fields))
+
+  return factory.createObjectLiteralExpression(
     [
-      factory.createPropertyAssignment('name', factory.createStringLiteral(`${model.name}Model`)),
       factory.createPropertyAssignment(
-        'dbModelName',
-        factory.createStringLiteral(model.dbName ?? model.name)
+        'columns',
+        factory.createObjectLiteralExpression(columns, true)
       ),
-      factory.createPropertyAssignment('prismaModelName', factory.createStringLiteral(model.name)),
+      factory.createPropertyAssignment(
+        'relations',
+        factory.createObjectLiteralExpression(relations, true)
+      ),
       factory.createPropertyAssignment(
         'primaryFields',
         factory.createArrayLiteralExpression(
@@ -163,6 +170,22 @@ function generateModelDefinition(model: DMMF.Model, enums: readonly DMMF.Datamod
           )
         )
       ),
+    ],
+    true
+  )
+}
+
+function generateModelSchemaDefinition(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
+  const shapeArgs = generateModelShapeDefinition(model, enums)
+
+  const configArgs = factory.createObjectLiteralExpression(
+    [
+      factory.createPropertyAssignment('name', factory.createStringLiteral(`${model.name}Model`)),
+      factory.createPropertyAssignment(
+        'dbModelName',
+        factory.createStringLiteral(model.dbName ?? model.name)
+      ),
+      factory.createPropertyAssignment('prismaModelName', factory.createStringLiteral(model.name)),
     ],
     true
   )
@@ -216,12 +239,12 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
           factory.createImportSpecifier(false, undefined, factory.createIdentifier('SchemaType')),
         ])
       ),
-      factory.createStringLiteral(pkg.name)
+      factory.createStringLiteral('@genseki/react')
     ),
   ]
 
   const sanitizedModels = datamodel.models.flatMap((model) => {
-    return generateModelDefinition(model, datamodel.enums)
+    return generateModelSchemaDefinition(model, datamodel.enums)
   })
 
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })

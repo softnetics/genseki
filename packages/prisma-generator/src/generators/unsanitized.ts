@@ -1,9 +1,7 @@
 import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
-import pkg from '../../package.json'
-
-function generateModelShapeBaseProperties(field: DMMF.Field) {
+function generateFieldBaseSchemaProperties(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
     return fieldKeys.flatMap((key) => {
       const value = field[key]
@@ -46,7 +44,7 @@ function generateModelShapeBaseProperties(field: DMMF.Field) {
   ]
 }
 
-function generateModelShapeColumnInterface(
+function generateFieldColumnSchemaInterface(
   field: DMMF.Field,
   enums: readonly DMMF.DatamodelEnum[]
 ) {
@@ -77,9 +75,7 @@ function generateModelShapeColumnInterface(
         undefined,
         'enumValues',
         undefined,
-        factory.createTupleTypeNode(
-          enumValues.map((value) => ts.factory.createLiteralTypeNode(value))
-        )
+        factory.createTupleTypeNode(enumValues.map((value) => factory.createLiteralTypeNode(value)))
       ),
     ]
   }
@@ -88,17 +84,17 @@ function generateModelShapeColumnInterface(
     undefined,
     field.name,
     undefined,
-    factory.createTypeLiteralNode([...generateModelShapeBaseProperties(field), ...properties])
+    factory.createTypeLiteralNode([...generateFieldBaseSchemaProperties(field), ...properties])
   )
 }
 
-function generateModelRelationShapeInterface(field: DMMF.Field) {
+function generateFieldRelationSchemaInterface(field: DMMF.Field, fields: readonly DMMF.Field[]) {
   return factory.createPropertySignature(
     undefined,
     field.name,
     undefined,
     factory.createTypeLiteralNode([
-      ...generateModelShapeBaseProperties(field),
+      ...generateFieldBaseSchemaProperties(field),
       factory.createPropertySignature(
         undefined,
         'relationName',
@@ -117,7 +113,7 @@ function generateModelRelationShapeInterface(field: DMMF.Field) {
         undefined,
         factory.createTupleTypeNode(
           field.relationToFields?.map((f) =>
-            ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(f))
+            factory.createLiteralTypeNode(factory.createStringLiteral(f))
           ) ?? []
         )
       ),
@@ -127,8 +123,20 @@ function generateModelRelationShapeInterface(field: DMMF.Field) {
         undefined,
         factory.createTupleTypeNode(
           field.relationToFields?.map((f) =>
-            ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(f))
+            factory.createLiteralTypeNode(factory.createStringLiteral(f))
           ) ?? []
+        )
+      ),
+      factory.createPropertySignature(
+        undefined,
+        'relationDataTypes',
+        undefined,
+        factory.createTupleTypeNode(
+          field.relationFromFields?.flatMap((f) => {
+            const found = fields.find((field) => field.name === f)
+            if (!found) return []
+            return factory.createTypeReferenceNode(`typeof DataType.STRING`)
+          }) ?? []
         )
       ),
     ])
@@ -144,8 +152,8 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
     undefined,
     undefined,
     model.fields.map((field) => {
-      if (field.relationName) return generateModelRelationShapeInterface(field)
-      return generateModelShapeColumnInterface(field, enums)
+      if (field.relationName) return generateFieldRelationSchemaInterface(field, model.fields)
+      return generateFieldColumnSchemaInterface(field, enums)
     })
   )
 
@@ -187,7 +195,7 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
         undefined,
         factory.createTupleTypeNode(
           allPriamryFieldNames.map((field) =>
-            factory.createLiteralTypeNode(ts.factory.createStringLiteral(field))
+            factory.createLiteralTypeNode(factory.createStringLiteral(field))
           )
         )
       ),
@@ -197,8 +205,8 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
         undefined,
         factory.createTupleTypeNode(
           allUniqueFields.map((field) =>
-            ts.factory.createTupleTypeNode(
-              field.map((f) => ts.factory.createLiteralTypeNode(ts.factory.createStringLiteral(f)))
+            factory.createTupleTypeNode(
+              field.map((f) => factory.createLiteralTypeNode(factory.createStringLiteral(f)))
             )
           )
         )
@@ -251,7 +259,7 @@ export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
           ),
         ])
       ),
-      factory.createStringLiteral(pkg.name)
+      factory.createStringLiteral('@genseki/react')
     ),
   ]
 

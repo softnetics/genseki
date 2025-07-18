@@ -22,6 +22,7 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "@genseki/react": "workspace:^",
     "@internal/project-config": "workspace:^",
     "@types/node": "^22",
     "tsup": "^8.5.0",

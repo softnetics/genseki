@@ -1,4 +1,4 @@
-import { type DataType, type SchemaType } from '@genseki/prisma-generator'
+import { type DataType, type SchemaType } from '@genseki/react'
 
 export interface DataModelConfig {
   name: 'DataModel'
@@ -155,6 +155,7 @@ export interface DataModelShape {
     referencedModel: RelationAModel
     relationToFields: ['id']
     relationFromFields: ['id']
+    relationDataTypes: [typeof DataType.STRING]
   }
   optionalStringField: {
     schema: typeof SchemaType.COLUMN
@@ -280,6 +281,7 @@ export interface DataModelShape {
     referencedModel: RelationBModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
   stringArrayField: {
     schema: typeof SchemaType.COLUMN
@@ -405,6 +407,7 @@ export interface DataModelShape {
     referencedModel: RelationCModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
 }
 
@@ -457,6 +460,7 @@ export interface RelationAModelShape {
     referencedModel: DataModel
     relationToFields: []
     relationFromFields: []
+    relationDataTypes: []
   }
 }
 
@@ -520,6 +524,7 @@ export interface RelationBModelShape {
     referencedModel: DataModel
     relationToFields: ['id']
     relationFromFields: ['id']
+    relationDataTypes: [typeof DataType.STRING]
   }
 }
 
@@ -583,6 +588,7 @@ export interface RelationCModelShape {
     referencedModel: DataModel
     relationToFields: ['id']
     relationFromFields: ['id']
+    relationDataTypes: [typeof DataType.STRING]
   }
 }
 
