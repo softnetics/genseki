@@ -1,6 +1,6 @@
 'use client'
 
-import { useCallback, useEffect, useRef, useState } from 'react'
+import { forwardRef, useCallback, useEffect, useRef, useState } from 'react'
 import type { DialogProps, DialogTriggerProps, ModalOverlayProps } from 'react-aria-components'
 import {
   composeRenderProps,
@@ -17,9 +17,11 @@ import {
   DialogClose,
   DialogCloseIcon,
   DialogDescription,
+  type DialogDescriptionProps,
   DialogFooter,
   DialogHeader,
   DialogTitle,
+  type DialogTitleProps,
   DialogTrigger,
 } from './dialog'
 
@@ -47,7 +49,7 @@ const modalOverlayStyles = tv({
 })
 const modalContentStyles = tv({
   base: [
-    'max-h-full w-full rounded-t-2xl bg-overlay text-left align-middle text-overlay-fg shadow-lg ring-1 ring-fg/5',
+    'max-h-full w-full rounded-t-2xl bg-white text-left align-middle text-overlay-fg shadow-lg ring-1 ring-fg/5 border border-bluegray-300',
     'overflow-hidden sm:rounded-2xl dark:ring-border',
     'sm:-translate-x-1/2 sm:-translate-y-1/2 sm:fixed sm:top-1/2 sm:left-[50vw]',
   ],
@@ -174,14 +176,26 @@ const ModalContent = ({
   )
 }
 
+const ModalTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
+  function ModalTitle(props, ref) {
+    return <DialogTitle ref={ref} className="text-bluegray-800" {...props} />
+  }
+)
+
+const ModalDescription = forwardRef<HTMLDivElement, DialogDescriptionProps>(
+  function ModalDescription(props, ref) {
+    return <DialogDescription ref={ref} className="text-bluegray-600" {...props} />
+  }
+)
+
 export {
   Modal,
   DialogBody as ModalBody,
   DialogClose as ModalClose,
   ModalContent,
-  DialogDescription as ModalDescription,
+  ModalDescription,
   DialogFooter as ModalFooter,
   DialogHeader as ModalHeader,
-  DialogTitle as ModalTitle,
+  ModalTitle,
   DialogTrigger as ModalTrigger,
 }

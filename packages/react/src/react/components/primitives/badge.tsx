@@ -1,36 +1,35 @@
 import { tv, type VariantProps } from 'tailwind-variants'
 
 const badgeIntents = {
-  primary: [
-    '[--badge-primary:color-mix(in_oklab,var(--color-primary)_10%,white_90%)] [--badge-primary-fg:color-mix(in_oklab,var(--color-primary)_60%,white_40%)] bg-(--badge-primary)',
-    'dark:bg-primary/15 text-primary dark:text-(--badge-primary-fg) dark:group-hover:bg-primary/25',
-    'group-hover:bg-[color-mix(in_oklab,var(--color-primary)_15%,white_85%)] dark:group-hover:bg-primary/20',
-  ],
-  secondary: [
-    'bg-secondary group-hover:bg-muted dark:bg-secondary dark:group-hover:bg-muted text-secondary-fg',
-  ],
-  success: [
-    'bg-emerald-500/15 text-emerald-700 group-hover:bg-emerald-500/25 dark:bg-emerald-500/10 dark:text-emerald-400 dark:group-hover:bg-emerald-500/20',
-  ],
-  info: 'bg-sky-500/15 text-sky-700 group-hover:bg-sky-500/25 dark:bg-sky-500/10 dark:text-sky-300 dark:group-hover:bg-sky-500/20',
-  warning:
-    'bg-amber-400/20 text-amber-700 group-hover:bg-amber-400/30 dark:bg-amber-400/10 dark:text-amber-400 dark:group-hover:bg-amber-400/15',
-  danger:
-    'bg-red-500/15 text-red-700 group-hover:bg-red-500/25 dark:bg-red-500/10 dark:text-red-400 dark:group-hover:bg-red-500/20',
+  gray: 'bg-white border-gray-300 text-text-body',
+  brand: 'bg-pumpkin-50 text-text-accent border-pumpkin-300',
+  blue: 'bg-ocean-50 text-ocean-500 border-ocean-300',
+  red: 'bg-red-50 text-red-500 border-red-300',
+  yellow: 'bg-yellow-50 text-yellow-500 border-yellow-300',
+  green: 'bg-palm-50 text-palm-500 border-palm-300',
+  purple: 'bg-purple-50 text-purple-500 border-purple-300',
+  cyan: 'bg-cyan-50 text-cyan-500 border-cyan-300',
 }
 const badgeShapes = {
-  square: 'px-3 py-2 rounded-md ',
-  circle: 'px-3 py-2 rounded-full',
+  square: 'px-2 py-2 rounded-md',
+  circle: 'px-2 py-2 rounded-full',
+}
+const sizeStyles = {
+  sm: 'text-xs px-4',
+  md: 'text-sm px-5 py-1',
+  lg: 'text-sm px-6 py-2',
 }
 const badgeStyles = tv({
-  base: 'inline-flex items-center gap-x-1.5 py-0.5 font-medium text-sm/6 **:data-[slot=icon]:size-3 forced-colors:outline',
+  base: 'inline-flex items-center font-medium border **:data-[slot=icon]:size-3 forced-colors:outline',
   variants: {
     intent: { ...badgeIntents },
     shape: { ...badgeShapes },
+    size: { ...sizeStyles },
   },
   defaultVariants: {
-    intent: 'primary',
+    intent: 'gray',
     shape: 'circle',
+    size: 'md',
   },
 })
 
@@ -41,9 +40,9 @@ interface BadgeProps
   children: React.ReactNode
 }
 
-const Badge = ({ children, intent, shape, className, ...props }: BadgeProps) => {
+const Badge = ({ children, intent, shape, size, className, ...props }: BadgeProps) => {
   return (
-    <span {...props} className={badgeStyles({ intent, shape, className })}>
+    <span {...props} className={badgeStyles({ intent, shape, size, className })}>
       {children}
     </span>
   )

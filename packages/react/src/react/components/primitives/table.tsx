@@ -58,7 +58,7 @@ const Root = forwardRef<HTMLTableElement, TableProps>((props, ref) => {
 const Table = ({ allowResize, className, bleed, ref, ...props }: TableProps) => {
   return (
     <TableContext.Provider value={{ allowResize, bleed }}>
-      <div className="flow-root">
+      <div className="flow-root rounded-sm overflow-hidden border border-border shadow-xs">
         <div
           className={twMerge(
             '-mx-(--gutter) has-data-[slot=table-resizable-container]:overflow-auto relative overflow-x-auto whitespace-nowrap',
@@ -114,12 +114,12 @@ const TableColumn = ({ isResizable = false, className, ...props }: TableColumnPr
       className={composeTailwindRenderProps(
         className,
         twJoin(
-          'text-text-nontrivial text-left font-medium',
+          'text-bluegray-400 text-left font-semibold text-sm',
           'allows-sorting:cursor-default outline-hidden data-dragging:cursor-grabbing relative',
-          'px-(--gutter) py-(--gutter-y)',
-          !bleed
-            ? 'sm:first:pl-1 sm:last:pr-1'
-            : 'first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
+          'px-6 py-7',
+          // !bleed
+          //   ? 'sm:first:pl-1 sm:last:pr-1'
+          //   : 'first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
           isResizable && 'overflow-hidden truncate'
         )
       )}
@@ -221,17 +221,7 @@ const TableRow = <T extends object>({
       {...props}
       className={composeRenderProps(
         className,
-        (
-          className,
-          {
-            isSelected,
-            isFocusVisible,
-            selectionMode,
-            isFocusVisibleWithin,
-            isDragging,
-            isDisabled,
-          }
-        ) =>
+        (className, { isSelected, selectionMode, isFocusVisibleWithin, isDragging, isDisabled }) =>
           twMerge(
             'text-muted-fg ring-primary border-muted group relative cursor-default border-b outline-transparent last:border-b-0',
             isDragging && 'outline outline-blue-500',
@@ -275,10 +265,10 @@ const TableCell = ({ className, ...props }: CellProps) => {
       className={composeTailwindRenderProps(
         className,
         twJoin(
-          'px-(--gutter) py-(--gutter-y) outline-hidden group-has-data-focus-visible-within:text-fg group align-middle',
-          !bleed
-            ? 'sm:first:pl-1 sm:last:pr-1'
-            : 'first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
+          'px-6 py-10 outline-hidden group-has-data-focus-visible-within:text-fg group align-middle text-base text-fg bg-white dark:bg-transparent',
+          // !bleed
+          //   ? 'sm:first:pl-1 sm:last:pr-1'
+          //   : 'first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
           allowResize && 'overflow-hidden truncate'
         )
       )}

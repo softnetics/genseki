@@ -57,7 +57,7 @@ const DateField = <T extends DateValue>({
     >
       {label && (
         <Label>
-          {label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+          {label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
         </Label>
       )}
       <FieldGroup>
