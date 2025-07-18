@@ -403,7 +403,7 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'comboboxNumber':
     case 'comboboxText': {
-      const options = props.optionsRecord[field.$client.source] ?? []
+      const options = props.optionsRecord[field.$client.fieldName] ?? []
       return (
         <select name={field.$client.fieldName}>
           {options.map((option) => (
@@ -532,7 +532,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
   const connectComponent = (
     <FormField
-      name={props.name}
+      name={`${props.name}.connect`}
       control={control}
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>

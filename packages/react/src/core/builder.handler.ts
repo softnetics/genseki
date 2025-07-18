@@ -558,16 +558,16 @@ function mapResultToFields(fields: Fields, result: Record<string, any>): Record<
   const mappedResult = Object.fromEntries(
     Object.entries(fields).flatMap(([_, field]) => {
       // End case
-      if (field.$client.source === 'column') {
-        const value = result[field.$client.columnTsName]
+      if (field.$server.source === 'column') {
+        const value = result[field.$server.columnTsName]
 
         if (typeof value === 'undefined') return []
-        return [[field.$client.fieldName, value]]
+        return [[field.$server.fieldName, value]]
       }
 
       // Recursive case
       if (isRelationField(field)) {
-        const value = result[field.$client.relationTsName]
+        const value = result[field.$server.relationTsName]
         if (!value) return []
 
         if (Array.isArray(value)) {
@@ -576,12 +576,12 @@ function mapResultToFields(fields: Fields, result: Record<string, any>): Record<
             __pk: v['__pk'],
             __id: v['__id'],
           }))
-          return [[field.$client.fieldName, values]]
+          return [[field.$server.fieldName, values]]
         }
 
         return [
           [
-            field.$client.fieldName,
+            field.$server.fieldName,
             {
               ...mapResultToFields(field.fields as Fields, value),
               __pk: value['__pk'],

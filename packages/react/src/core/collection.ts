@@ -411,7 +411,7 @@ export interface CollectionOptions<
   TFields extends Fields,
   TAppRouter extends AnyApiRouter,
 > {
-  // TODO: This should not exists, "fields" should know about this informaation. Need to refactor
+  // TODO: This should not exists, "fields" should know about this information. Need to refactor
   slug: TSlug
   identifierColumn: string
   fields: TFields
