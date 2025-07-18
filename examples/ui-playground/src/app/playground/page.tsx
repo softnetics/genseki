@@ -1152,6 +1152,7 @@ export default function UIPlayground() {
                 suffix={'Right?'}
                 isDisabled
               />
+              <TextField type="text" description="copy" size="md" isShowCopyButton isShowHttp />
             </div>
           </PlaygroundCard>
         </div>
@@ -1784,6 +1785,20 @@ export default function UIPlayground() {
             </TableBody>
           </Table>
         </div>
+      </Wrapper>
+
+      <Wrapper title="Form">
+        <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+          <TextField label="Name" placeholder="Enter your name" isRequired />
+          <Textarea
+            label="Description"
+            placeholder="Enter your description"
+            errorMessage="Description is required"
+          />
+          <Button type="submit" variant="primary" size="sm">
+            Submit
+          </Button>
+        </form>
       </Wrapper>
     </div>
   )

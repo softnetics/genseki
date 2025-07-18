@@ -41,7 +41,6 @@ const Textarea = ({
             'focus:border-ring/70 focus:ring-3 focus:ring-ring/20',
             'focus:invalid:border-danger/70 focus:invalid:ring-3 focus:invalid:ring-danger/20',
             'invalid:border-red-500',
-            !!errorMessage && 'border-red-500',
             'disabled:bg-muted disabled:forced-colors:border-[GrayText] disabled:cursor-not-allowed',
             'hover:border-current/20 invalid:hover:border-danger/70',
           ])

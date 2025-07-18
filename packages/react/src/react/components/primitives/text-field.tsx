@@ -5,7 +5,7 @@ import type { InputProps, TextFieldProps as TextFieldPrimitiveProps } from 'reac
 import { TextField as TextFieldPrimitive } from 'react-aria-components'
 import { useFormStatus } from 'react-dom'
 
-import { EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
+import { CopyIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 import { Button } from './button'
@@ -24,6 +24,8 @@ interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
   suffix?: React.ReactNode
   isPending?: boolean
   className?: string
+  isShowHttp?: boolean
+  isShowCopyButton?: boolean
 }
 
 interface RevealableTextFieldProps extends BaseTextFieldProps {
@@ -96,6 +98,13 @@ const TextField = ({
             data-loading={isPending ? 'true' : undefined}
             className={cn(fieldgroupVariants({ size: props.size, className }))}
           >
+            {props.isShowHttp && (
+              <div className="border-r border-border mr-1 flex items-center p-6">
+                <Typography type="caption" weight="medium" className="text-bluegray-400">
+                  http://
+                </Typography>
+              </div>
+            )}
             {prefix && typeof prefix === 'string' ? (
               <Typography
                 data-slot="prefix"
@@ -139,6 +148,22 @@ const TextField = ({
                 <div data-slot="suffix">{suffix}</div>
               )
             ) : null}
+            {props.isShowCopyButton && (
+              <div className="border-l border-border ml-1 flex items-center gap-2">
+                <Button
+                  variant="vanish"
+                  size="md"
+                  type="button"
+                  onPress={() => {
+                    navigator.clipboard.writeText(props.value ?? '')
+                  }}
+                  className="flex items-center gap-2"
+                >
+                  <BaseIcon icon={CopyIcon} size="md" weight="regular" />
+                  Copy
+                </Button>
+              </div>
+            )}
           </FieldGroup>
           {description && <Description>{description}</Description>}
           <FieldError>{errorMessage}</FieldError>
