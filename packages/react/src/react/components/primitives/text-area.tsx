@@ -37,7 +37,7 @@ const Textarea = ({
         className={composeTailwindRenderProps(
           className,
           twJoin([
-            'field-sizing-content max-h-96 min-h-64 w-full min-w-0 rounded-lg border border-input py-6 px-7 text-base placeholder-muted-fg shadow-xs outline-hidden transition duration-200',
+            'field-sizing-content max-h-96 min-h-64 w-full min-w-0 rounded-lg border border-input py-6 px-7 text-base placeholder-muted-fg shadow-xs outline-hidden transition duration-200 text-fg',
             'focus:border-ring/70 focus:ring-3 focus:ring-ring/20',
             'focus:invalid:border-danger/70 focus:invalid:ring-3 focus:invalid:ring-danger/20',
             'invalid:border-red-500',

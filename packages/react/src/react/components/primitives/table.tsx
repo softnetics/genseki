@@ -265,7 +265,7 @@ const TableCell = ({ className, ...props }: CellProps) => {
       className={composeTailwindRenderProps(
         className,
         twJoin(
-          'px-6 py-10 outline-hidden group-has-data-focus-visible-within:text-fg group align-middle text-base text-bluegray-800 bg-white dark:bg-transparent',
+          'px-6 py-10 outline-hidden group-has-data-focus-visible-within:text-fg group align-middle text-base text-fg bg-white dark:bg-transparent',
           // !bleed
           //   ? 'sm:first:pl-1 sm:last:pr-1'
           //   : 'first:pl-(--gutter,--spacing(2)) last:pr-(--gutter,--spacing(2))',
