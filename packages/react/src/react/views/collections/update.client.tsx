@@ -13,7 +13,7 @@ import { useServerFunction } from '../../providers/root'
 
 interface UpdateClientViewProps {
   slug: string
-  identifer: string
+  identifier: string
   fields: FieldsClient
   optionsRecord: Record<string, any[]>
   defaultValues?: Record<string, any>
@@ -28,7 +28,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
     const result = await serverFunction(`${props.slug}.update`, {
       body: data,
       headers: {},
-      pathParams: { id: props.identifer },
+      pathParams: { id: props.identifier },
       query: {},
     })
 

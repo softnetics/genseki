@@ -238,9 +238,8 @@ export class Builder<
               <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <UpdateView
                   {...args}
-                  {...args.params}
                   {...defaultArgs}
-                  identifier={args.params.identifer}
+                  identifier={args.params.identifier}
                   findOne={defaultEndpoints.findOne}
                 />
               </CollectionAppLayout>

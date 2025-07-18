@@ -49,7 +49,7 @@ export async function UpdateView(props: UpdateViewProps) {
       </Typography>
       <UpdateClientView
         fields={fieldsClient}
-        identifer={props.identifier}
+        identifier={props.identifier}
         slug={props.slug}
         defaultValues={result.body}
         optionsRecord={optionsRecord}
