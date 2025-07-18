@@ -4,30 +4,30 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 
 import { toast } from 'sonner'
 
+import type { FieldsClient } from '../../../core/field'
 import { getDefaultValueFromFields } from '../../../core/utils'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
-import { useCollection, useServerFunction, useStorageAdapter } from '../../providers/root'
+import { useServerFunction, useStorageAdapter } from '../../providers/root'
 
 interface CreateClientViewProps {
   slug: string
+  fields: FieldsClient
   optionsRecord: Record<string, any[]>
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
-  const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
   const storageAdapter = useStorageAdapter()
   const form = useForm({
-    defaultValues: getDefaultValueFromFields(collection.fields, storageAdapter),
+    defaultValues: getDefaultValueFromFields(props.fields, storageAdapter),
   })
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
-    const result = await serverFunction({
-      method: `${props.slug}.create`,
+    const result = await serverFunction(`${props.slug}.create`, {
       body: data,
       headers: {},
       pathParams: {},
@@ -38,8 +38,13 @@ export function CreateClientView(props: CreateClientViewProps) {
       toast.success('Creation successfully')
       return navigate(`./`)
     } else {
-      console.log(result.body)
-      const description = result.body?.message
+      const description =
+        typeof result.body === 'object' &&
+        !!result.body &&
+        'message' in result.body &&
+        typeof result.body.message === 'string'
+          ? result.body.message
+          : 'Failed to create'
       toast.error('Failed to create', {
         ...(description && { description }),
       })
@@ -57,9 +62,9 @@ export function CreateClientView(props: CreateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(collection.fields).map((field) => (
+        {Object.values(props.fields).map((field) => (
           <AutoField
-            key={field.fieldName}
+            key={field.$client.fieldName}
             field={field}
             visibilityField="create"
             optionsRecord={props.optionsRecord}

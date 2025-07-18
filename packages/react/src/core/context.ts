@@ -1,25 +1,40 @@
+import type { IsAny } from 'type-fest'
+
 import type { MaybePromise } from './collection'
+
+import { getSessionCookie } from '../auth/utils'
+import { getHeadersObject } from '../react/utils/headers'
 
 interface BaseUser {
   id: string
 }
 
-export interface RequestContextArgs {
-  headers?: Record<string, string>
-}
+export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
+  constructor(private readonly request: Request) {}
 
-export interface RequestContextable<TUser extends BaseUser = BaseUser> {
-  requiredAuthenticated(): MaybePromise<TUser>
+  getRequest() {
+    return this.request
+  }
+
+  getSessionCookie() {
+    return getSessionCookie(getHeadersObject(this.request.headers))
+  }
+
+  abstract requiredAuthenticated(): MaybePromise<TUser>
 }
 
 export type AnyRequestContextable = RequestContextable<any>
 
 export interface Contextable<TUser extends BaseUser = BaseUser> {
-  toRequestContext(args: RequestContextArgs): RequestContextable<TUser>
+  toRequestContext(request: Request): RequestContextable<TUser>
 }
 
 export type AnyContextable = Contextable<any>
 
-export type ContextToRequestContext<TContext extends AnyContextable> = ReturnType<
-  TContext['toRequestContext']
->
+export type ContextToRequestContext<TContext extends AnyContextable> =
+  ReturnType<TContext['toRequestContext']> extends RequestContextable<infer TUser>
+    ? IsAny<TUser> extends true
+      ? // TODO: Recheck why AnyRequestContextable is not working here
+        any
+      : RequestContextable<TUser>
+    : never

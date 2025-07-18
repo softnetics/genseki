@@ -3,21 +3,16 @@ import type { Column, SQL, TableRelationalConfig } from 'drizzle-orm'
 import { is, sql, Table } from 'drizzle-orm'
 import * as R from 'remeda'
 import type { Except, IsNever, Simplify, ValueOf } from 'type-fest'
-import type { z, ZodObject, ZodOptional, ZodType } from 'zod/v4'
+import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { AnyContextable } from './context'
+import type { FieldBase } from '.'
 import type {
-  ApiHttpStatus,
-  ApiRouteHandler,
-  ApiRouteHandlerPayloadWithContext,
-  ApiRouteSchema,
-} from './endpoint'
-import type {
-  AnyField,
-  AnyFields,
+  FieldClientBase,
+  FieldColumnJsonRichText,
+  FieldColumnStringMedia,
   FieldRelation,
-  FieldsInitial,
-  FieldsWithFieldName,
+  Fields,
+  FieldsClient,
 } from './field'
 import type { StorageAdapterClient } from './file-storage-adapters'
 import { constructSanitizedExtensions } from './richtext'
@@ -39,15 +34,15 @@ export function tryParseJSONObject(jsonString: string): Record<string, unknown> 
   return false
 }
 
-export function isRelationField(field: AnyField): field is FieldRelation {
-  return field._.source === 'relation'
+export function isRelationField(field: FieldBase): field is FieldRelation {
+  return field.$server.source === 'relation'
 }
 
-export function isRichTextField(field: AnyField): field is Extract<AnyField, { type: 'richText' }> {
+export function isRichTextField(field: FieldClientBase): field is FieldColumnJsonRichText {
   return field.type === 'richText'
 }
 
-export function isMediaField(field: AnyField): field is Extract<AnyField, { type: 'media' }> {
+export function isMediaField(field: FieldBase): field is FieldColumnStringMedia {
   return field.type === 'media'
 }
 
@@ -135,23 +130,23 @@ const getExtraField = (tableRelational: TableRelationalConfig, identifierColumn?
 }
 
 export function createDrizzleQuery(
-  fields: AnyFields,
+  fields: Fields,
   table: Record<string, TableRelationalConfig>,
   tableRelationalConfig: TableRelationalConfig,
   identifierColumn?: string
 ): Record<string, any> {
   const queryColumns = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
-      if (field._.source !== 'column') return []
-      return [[field._.columnTsName, true as const]]
+      if (field.$server.source !== 'column') return []
+      return [[field.$server.columnTsName, true as const]]
     })
   )
 
   const queryWith = Object.fromEntries(
     Object.values(fields).flatMap((field) => {
       if (!isRelationField(field)) return []
-      const relationName = field._.relation.fieldName
-      const referencedTableName = field._.referencedTableTsName
+      const relationName = field.$server.relation.fieldName
+      const referencedTableName = field.$server.referencedTableTsName
 
       return [
         [relationName, createDrizzleQuery(field.fields, table, table[referencedTableName]) as any],
@@ -166,137 +161,26 @@ export function createDrizzleQuery(
   }
 }
 
-export function appendFieldNameToFields<TFields extends FieldsInitial<any, any>>(
+export function appendFieldNameToFields<TFields extends Fields>(
   fields: TFields
-): Simplify<FieldsWithFieldName<TFields>> {
+): Simplify<TFields> {
   return Object.fromEntries(
     Object.entries(fields).map(([key, field]) => {
-      const fieldWithName = { ...field, fieldName: key }
-      return [key, fieldWithName as AnyField & { fieldName: string }]
+      field.$client.fieldName = key
+      field.$server.fieldName = key
+      return [key, field]
     })
-  ) as FieldsWithFieldName<TFields>
+  ) as TFields
 }
 
-export function mapValueToTsValue(
-  fields: AnyFields,
-  value: Record<string, any>
-): Record<string, any> {
+export function mapValueToTsValue(fields: Fields, value: Record<string, any>): Record<string, any> {
   const mappedEntries = Object.entries(fields).flatMap(([fieldName, field]) => {
     if (value[fieldName] === undefined) return []
-    if (field._.source !== 'column') return []
-    return [[field._.columnTsName, value[fieldName]]]
+    if (field.$server.source !== 'column') return []
+    return [[field.$server.columnTsName, value[fieldName]]]
   })
 
   return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
-}
-
-export async function validateRequestBody<
-  TApiRouteSchema extends ApiRouteSchema = any,
-  TContext extends AnyContextable = AnyContextable,
->(schema: TApiRouteSchema, payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>) {
-  let zodErrors:
-    | Partial<Record<'query' | 'pathParams' | 'headers' | 'body', z.core.$ZodIssue[]>>
-    | undefined
-
-  if (schema.query) {
-    const err = await schema.query.safeParseAsync((payload as any).query)
-    if (!err.success) {
-      zodErrors = {
-        ...zodErrors,
-        query: err.error.issues,
-      }
-    }
-  }
-
-  if (schema.pathParams) {
-    const err = await schema.pathParams.safeParseAsync((payload as any).pathParams)
-    if (!err.success) {
-      zodErrors = {
-        ...zodErrors,
-        pathParams: err.error.issues,
-      }
-    }
-  }
-
-  if (schema.headers) {
-    const err = await schema.headers.safeParseAsync((payload as any).headers)
-    if (!err.success) {
-      zodErrors = {
-        ...zodErrors,
-        headers: err.error.issues,
-      }
-    }
-  }
-
-  if (schema.method !== 'GET' && schema.body) {
-    const err = await schema.body.safeParseAsync((payload as any).body)
-    if (!err.success) {
-      zodErrors = {
-        ...zodErrors,
-        body: err.error.issues,
-      }
-    }
-  }
-
-  return zodErrors
-}
-
-export function validateResponseBody<TApiRouteSchema extends ApiRouteSchema = any>(
-  schema: TApiRouteSchema,
-  statusCode: ApiHttpStatus,
-  response: any
-) {
-  if (!schema.responses[statusCode]) {
-    throw new Error(`No response schema defined for status code ${statusCode}`)
-  }
-
-  const result = schema.responses[statusCode].safeParse(response)
-  return result.error
-}
-
-export function withValidator<
-  TApiRouteSchema extends ApiRouteSchema,
-  TContext extends AnyContextable = AnyContextable,
->(
-  schema: TApiRouteSchema,
-  handler: ApiRouteHandler<TContext, TApiRouteSchema>
-): ApiRouteHandler<TContext, TApiRouteSchema> {
-  const wrappedHandler = async (
-    payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
-  ) => {
-    const zodErrors = await validateRequestBody(schema, payload)
-    if (zodErrors) {
-      return {
-        status: 400,
-        body: {
-          error: 'Validation failed',
-          details: zodErrors,
-        },
-      }
-    }
-
-    const response = await handler(payload)
-
-    const validationError = validateResponseBody(
-      schema,
-      response.status as ApiHttpStatus,
-      response.body
-    )
-
-    if (validationError) {
-      return {
-        status: 500,
-        body: {
-          error: 'Response validation failed',
-          details: validationError.issues,
-        },
-      }
-    }
-
-    return response
-  }
-
-  return wrappedHandler as ApiRouteHandler<TContext, TApiRouteSchema>
 }
 
 export type JoinArrays<T extends any[]> = Simplify<
@@ -328,14 +212,17 @@ export type GetTableByTableTsName<
  * @description Return the default values for each provided fields, This should be used with `create` form
  */
 export const getDefaultValueFromFields = (
-  fields: AnyFields,
+  fields: FieldsClient,
   storageAdapter?: StorageAdapterClient
 ) => {
   const mappedCheck = Object.fromEntries(
     Object.entries(
       R.mapValues(fields, (field) => {
-        if (field.type === 'richText') {
+        if (isRichTextField(field)) {
           const content = field.editor.content ?? field.default ?? ''
+
+          // TODO: Support JSONContent and JSONContent[]
+          if (typeof content !== 'string') return undefined
 
           const json = tryParseJSONObject(content)
 
@@ -343,12 +230,12 @@ export const getDefaultValueFromFields = (
             json ||
             generateJSON(
               content,
-              constructSanitizedExtensions(field.editor.extensions || [], storageAdapter)
+              // TODO: Recheck this type
+              constructSanitizedExtensions((field.editor.extensions as any[]) || [], storageAdapter)
             )
           )
         }
-
-        return field.default
+        return 'default' in field ? field.default : undefined
       })
     ).filter(([fieldName, defaultValue]) => typeof defaultValue !== 'undefined')
   )

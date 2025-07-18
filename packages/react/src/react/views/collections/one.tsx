@@ -1,29 +1,36 @@
-import { type ServerConfig } from '../../../core'
+import type { BaseViewProps } from './types'
+
+import type {
+  ApiDefaultMethod,
+  ConvertCollectionDefaultApiToApiRouteSchema,
+} from '../../../core/collection'
+import type { ApiRoute } from '../../../core/endpoint'
 import { getHeadersObject } from '../../utils/headers'
 
-interface OneViewProps<TServerConfig extends ServerConfig> {
+interface OneViewProps extends BaseViewProps {
   slug: string
   headers: Headers
   identifier: string
-  serverConfig: TServerConfig
+  findOne: ApiRoute<
+    ConvertCollectionDefaultApiToApiRouteSchema<string, (typeof ApiDefaultMethod)['FIND_ONE'], any>
+  >
 }
 
-export async function OneView<TServerConfig extends ServerConfig>(
-  props: OneViewProps<TServerConfig>
-) {
-  const collection = props.serverConfig.collections[props.slug]
-  if (!collection) throw new Error(`Collection ${props.slug} not found`)
+export async function OneView(props: OneViewProps) {
   const headersValue = getHeadersObject(props.headers)
-  const context = props.serverConfig.context.toRequestContext({
+
+  // TODO: Fix this dummy request
+  const request = new Request('http://localhost', {
+    method: 'GET',
     headers: headersValue,
   })
 
-  const result = await collection.admin.endpoints.findOne.handler({
-    context,
-    pathParams: {
-      id: props.identifier,
+  const result = await props.findOne.handler(
+    {
+      pathParams: { id: props.identifier },
     },
-  })
+    request
+  )
 
   return <div>{JSON.stringify(result)}</div>
 }

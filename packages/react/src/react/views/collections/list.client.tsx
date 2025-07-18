@@ -10,7 +10,8 @@ import {
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
 
-import type { ClientCollection, FieldsClient, InferFieldsFromCollection } from '../../../core'
+import type { FieldsClient } from '../../../core'
+import type { CollectionOptionsClient } from '../../../core/collection'
 import {
   Button,
   ButtonLink,
@@ -32,24 +33,22 @@ import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
 
 // Maybe tanstack-hooks-form is more reasonable for this, but the clock is ticking fr fr nocap
-const tableDataExtract = <
-  TCollection extends ClientCollection<any, any, any, any, FieldsClient, any>,
->(
-  collection: TCollection,
-  data: InferFieldsFromCollection<TCollection>[]
+const tableDataExtract = (
+  data: any[],
+  options: { clientFields: FieldsClient; identifierColumn: string }
 ) => {
-  const headers = Object.values(collection.fields).map((column) => {
-    return { ...column, label: column.fieldName /* Fallback to key if no label */ }
+  const headers = Object.values(options.clientFields).map((column) => {
+    return { ...column, label: column.$client.fieldName /* Fallback to key if no label */ }
   })
 
-  headers.sort((a, b) => (b.label === collection.identifierColumn ? 1 : -1))
+  headers.sort((a, b) => (b.label === options.identifierColumn ? 1 : -1))
 
   // `isCooked` header is not sent
   const rows = data.map((record) => ({
     key: record.__id,
     rows: headers.map(
       (header) =>
-        record[header.fieldName] ??
+        record[header.$client.fieldName] ??
         'Unknown' /* Unknown meant that it's missing a correct heading label */
     ),
   }))
@@ -82,8 +81,7 @@ const Toolbar = (props: {
             size="md"
             leadingIcon={<BaseIcon icon={TrashIcon} size="md" />}
             onClick={async () => {
-              await serverFunction({
-                method: `${props.slug}.delete`,
+              await serverFunction(`${props.slug}.delete`, {
                 body: { ids: props.selection },
                 headers: {},
                 pathParams: {},
@@ -112,19 +110,26 @@ const Toolbar = (props: {
   )
 }
 
-export function ListTable<
-  TCollection extends ClientCollection<string, any, any, any, FieldsClient, any>,
->(props: { collection: TCollection; data: InferFieldsFromCollection<TCollection>[] }) {
+interface ListTableProps {
+  slug: string
+  collectionOptions: CollectionOptionsClient
+  data: any[]
+}
+
+export function ListTable(props: ListTableProps) {
   const serverFunction = useServerFunction()
   const navigation = useNavigation()
 
   const [selection, setSelection] = useState<string[]>([])
 
-  const { headers, rows } = tableDataExtract(props.collection, props.data)
+  const { headers, rows } = tableDataExtract(props.data, {
+    clientFields: props.collectionOptions.fields,
+    identifierColumn: props.collectionOptions.identifierColumn,
+  })
 
   return (
     <>
-      <Toolbar slug={props.collection.slug} selection={selection} setSelection={setSelection} />
+      <Toolbar slug={props.slug} selection={selection} setSelection={setSelection} />
       <Table
         bleed
         aria-label="Items"
@@ -146,7 +151,7 @@ export function ListTable<
         </TableHeader>
         <TableBody items={rows}>
           {({ key, rows }) => (
-            <TableRow href={`./${props.collection.slug}/update/${key}`} id={key}>
+            <TableRow href={`./${props.slug}/update/${key}`} id={key}>
               {rows.map((cell) => (
                 // TODO: Make this right
                 <TableCell key={JSON.stringify(cell)}>{JSON.stringify(cell, null)}</TableCell>
@@ -164,8 +169,7 @@ export function ListTable<
                       <MenuItem
                         isDanger
                         onAction={async () => {
-                          await serverFunction({
-                            method: `${props.collection.slug}.delete`,
+                          await serverFunction(`${props.slug}.delete`, {
                             body: { ids: [key] },
                             headers: {},
                             pathParams: {},

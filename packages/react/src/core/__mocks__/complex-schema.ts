@@ -111,6 +111,7 @@ export const tags = pgTable('tags', {
 
 // Posts to Tags junction table (many-to-many)
 export const postsToTags = pgTable('posts_to_tags', {
+  id: serial('id').primaryKey(),
   postId: integer('post_id')
     .references(() => posts.id)
     .notNull(),
