@@ -432,7 +432,7 @@ export const DataModel = model(
   {
     name: 'DataModel',
     dbModelName: 'Data',
-    prismaModelName: 'Data',
+    prismaModelName: 'data',
   }
 )
 
@@ -487,7 +487,7 @@ export const RelationAModel = model(
   {
     name: 'RelationAModel',
     dbModelName: 'RelationA',
-    prismaModelName: 'RelationA',
+    prismaModelName: 'relationA',
   }
 )
 
@@ -553,7 +553,7 @@ export const RelationBModel = model(
   {
     name: 'RelationBModel',
     dbModelName: 'RelationB',
-    prismaModelName: 'RelationB',
+    prismaModelName: 'relationB',
   }
 )
 
@@ -619,8 +619,17 @@ export const RelationCModel = model(
   {
     name: 'RelationCModel',
     dbModelName: 'RelationC',
-    prismaModelName: 'RelationC',
+    prismaModelName: 'relationC',
   }
 )
 
 export type RelationCModel = Simplify<typeof RelationCModel>
+
+export const SanitizedFullModelSchemas = {
+  data: DataModel,
+  relationA: RelationAModel,
+  relationB: RelationBModel,
+  relationC: RelationCModel,
+}
+
+export type SanitizedFullModelSchemas = Simplify<typeof SanitizedFullModelSchemas>

@@ -3,7 +3,7 @@ import { type DataType, type SchemaType } from '@genseki/react'
 export interface TableAModelConfig {
   name: 'TableAModel'
   dbModelName: 'TableA'
-  prismaModelName: 'TableA'
+  prismaModelName: 'tableA'
   primaryFields: ['id']
   uniqueFields: [['id']]
 }
@@ -104,7 +104,7 @@ export interface TableAModel {
 export interface TableBModelConfig {
   name: 'TableBModel'
   dbModelName: 'TableB'
-  prismaModelName: 'TableB'
+  prismaModelName: 'tableB'
   primaryFields: ['id']
   uniqueFields: [['id']]
 }
@@ -216,7 +216,7 @@ export interface TableBModel {
 export interface TableCModelConfig {
   name: 'TableCModel'
   dbModelName: 'TableC'
-  prismaModelName: 'TableC'
+  prismaModelName: 'tableC'
   primaryFields: ['id']
   uniqueFields: [['id']]
 }
@@ -312,4 +312,10 @@ export interface TableCModelShape {
 export interface TableCModel {
   shape: TableCModelShape
   config: TableCModelConfig
+}
+
+export interface FullModelSchemas {
+  tableA: TableAModel
+  tableB: TableBModel
+  tableC: TableCModel
 }

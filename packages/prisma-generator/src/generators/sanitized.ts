@@ -1,6 +1,8 @@
 import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
+import { toCamelCase } from './utils'
+
 function generateFieldBaseSchemaDefinition(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
     return fieldKeys.map((key) => {
@@ -185,7 +187,10 @@ function generateModelSchemaDefinition(model: DMMF.Model, enums: readonly DMMF.D
         'dbModelName',
         factory.createStringLiteral(model.dbName ?? model.name)
       ),
-      factory.createPropertyAssignment('prismaModelName', factory.createStringLiteral(model.name)),
+      factory.createPropertyAssignment(
+        'prismaModelName',
+        factory.createStringLiteral(toCamelCase(model.name))
+      ),
     ],
     true
   )
@@ -364,6 +369,38 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
     return generateModelSchemaDefinition(model, datamodel.enums)
   })
 
+  const modelSchemasVariable = factory.createVariableStatement(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    factory.createVariableDeclarationList(
+      [
+        factory.createVariableDeclaration(
+          `SanitizedFullModelSchemas`,
+          undefined,
+          undefined,
+          factory.createObjectLiteralExpression(
+            datamodel.models.map((model) =>
+              factory.createPropertyAssignment(
+                factory.createStringLiteral(`${toCamelCase(model.name)}`),
+                factory.createIdentifier(`${model.name}Model`)
+              )
+            ),
+            true
+          )
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
+  )
+
+  const modelSchemasType = factory.createTypeAliasDeclaration(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    `SanitizedFullModelSchemas`,
+    undefined,
+    factory.createTypeReferenceNode('Simplify', [
+      factory.createTypeQueryNode(factory.createIdentifier(`SanitizedFullModelSchemas`)),
+    ])
+  )
+
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
   const sourceFile = ts.createSourceFile(
     'dummy.ts',
@@ -373,7 +410,13 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
     ts.ScriptKind.TS
   )
 
-  const declarartions = [...imports, modelFunction, ...sanitizedModels]
+  const declarartions = [
+    ...imports,
+    modelFunction,
+    ...sanitizedModels,
+    modelSchemasVariable,
+    modelSchemasType,
+  ]
 
   return declarartions
     .map((node) => printer.printNode(ts.EmitHint.Unspecified, node, sourceFile))

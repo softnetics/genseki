@@ -1,6 +1,8 @@
 import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
+import { toCamelCase } from './utils'
+
 function generateFieldBaseSchemaProperties(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
     return fieldKeys.flatMap((key) => {
@@ -187,7 +189,7 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
         undefined,
         'prismaModelName',
         undefined,
-        factory.createTypeReferenceNode(`"${model.name}"`)
+        factory.createTypeReferenceNode(`"${toCamelCase(model.name)}"`)
       ),
       factory.createPropertySignature(
         undefined,
@@ -267,6 +269,21 @@ export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
     return generateModelInterface(model, datamodel.enums)
   })
 
+  const modelSchemas = factory.createInterfaceDeclaration(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    `FullModelSchemas`,
+    undefined,
+    undefined,
+    datamodel.models.map((model) => {
+      return factory.createPropertySignature(
+        undefined,
+        toCamelCase(model.name),
+        undefined,
+        factory.createTypeReferenceNode(`${model.name}Model`)
+      )
+    })
+  )
+
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
   const sourceFile = ts.createSourceFile(
     'dummy.ts',
@@ -276,7 +293,7 @@ export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
     ts.ScriptKind.TS
   )
 
-  const declarartions = [...imports, ...modelInterfaces]
+  const declarartions = [...imports, ...modelInterfaces, modelSchemas]
 
   return declarartions
     .map((node) => printer.printNode(ts.EmitHint.Unspecified, node, sourceFile))

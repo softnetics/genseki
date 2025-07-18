@@ -117,7 +117,7 @@ export const TableAModel = model(
   {
     name: 'TableAModel',
     dbModelName: 'TableA',
-    prismaModelName: 'TableA',
+    prismaModelName: 'tableA',
   }
 )
 
@@ -231,7 +231,7 @@ export const TableBModel = model(
   {
     name: 'TableBModel',
     dbModelName: 'TableB',
-    prismaModelName: 'TableB',
+    prismaModelName: 'tableB',
   }
 )
 
@@ -334,8 +334,16 @@ export const TableCModel = model(
   {
     name: 'TableCModel',
     dbModelName: 'TableC',
-    prismaModelName: 'TableC',
+    prismaModelName: 'tableC',
   }
 )
 
 export type TableCModel = Simplify<typeof TableCModel>
+
+export const SanitizedFullModelSchemas = {
+  tableA: TableAModel,
+  tableB: TableBModel,
+  tableC: TableCModel,
+}
+
+export type SanitizedFullModelSchemas = Simplify<typeof SanitizedFullModelSchemas>
