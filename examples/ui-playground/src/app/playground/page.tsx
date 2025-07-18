@@ -32,12 +32,19 @@ import {
   Card,
   Link,
   Pagination,
+  PaginationWithDropdown,
   ProgressBar,
   Radio,
   RadioGroup,
   ReorderGroup,
   Switch,
   Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
   TabList,
   Tabs,
   Tag,
@@ -1528,6 +1535,14 @@ export default function UIPlayground() {
         <PlaygroundCard title="Default" categoryTitle="Pagination">
           <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
         </PlaygroundCard>
+        <PlaygroundCard title="With dropdown" categoryTitle="Pagination">
+          <PaginationWithDropdown
+            currentPage={1}
+            totalPages={10}
+            defaultPageSize={10}
+            onPageChange={() => {}}
+          />
+        </PlaygroundCard>
       </Wrapper>
       <Wrapper title="Radio group">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
@@ -1558,30 +1573,34 @@ export default function UIPlayground() {
 
       <Wrapper title="Checkbox">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
-          <CheckboxGroup>
-            <Checkbox value="x">X</Checkbox>
-            <Checkbox
-              value="y"
-              label="Remember me"
-              description="Save my login details for next time"
-            ></Checkbox>
-            <Checkbox isDisabled value="z">
-              Z
-            </Checkbox>
-          </CheckboxGroup>
-          <CheckboxGroup>
-            <Checkbox value="x" size="lg">
-              X
-            </Checkbox>
-            <Checkbox
-              value="y"
-              label="Remember me"
-              description="Save my login details for next time"
-            ></Checkbox>
-            <Checkbox isDisabled value="z">
-              Z
-            </Checkbox>
-          </CheckboxGroup>
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Checkbox">
+            <CheckboxGroup>
+              <Checkbox value="x">X</Checkbox>
+              <Checkbox
+                value="y"
+                label="Remember me"
+                description="Save my login details for next time"
+              ></Checkbox>
+              <Checkbox isDisabled value="z">
+                Z
+              </Checkbox>
+            </CheckboxGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Large size (lg)" categoryTitle="Checkbox">
+            <CheckboxGroup>
+              <Checkbox value="x" size="lg">
+                X
+              </Checkbox>
+              <Checkbox
+                value="y"
+                label="Remember me"
+                description="Save my login details for next time"
+              ></Checkbox>
+              <Checkbox isDisabled value="z">
+                Z
+              </Checkbox>
+            </CheckboxGroup>
+          </PlaygroundCard>
         </div>
       </Wrapper>
 
@@ -1712,6 +1731,58 @@ export default function UIPlayground() {
               Tooltip shown at <strong>right</strong>.
             </TooltipContent>
           </Tooltip>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Table">
+        <div className="flex flex-col gap-4">
+          <Table aria-label="Bands">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn isRowHeader>Name</TableColumn>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>1</TableCell>
+                <TableCell>Nirvana</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2</TableCell>
+                <TableCell>The Beatles</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+
+          <Table aria-label="Bands">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn isRowHeader>Name</TableColumn>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>1</TableCell>
+                <TableCell>Nirvana</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2</TableCell>
+                <TableCell>The Beatles</TableCell>
+              </TableRow>
+              {/* Pagination */}
+              <TableRow>
+                <TableCell colSpan={2}>
+                  <div className="flex justify-between items-center w-full">
+                    <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
+                    <PaginationWithDropdown
+                      currentPage={1}
+                      totalPages={10}
+                      defaultPageSize={10}
+                      onPageChange={() => {}}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
         </div>
       </Wrapper>
     </div>

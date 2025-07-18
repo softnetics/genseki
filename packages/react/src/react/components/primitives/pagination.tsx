@@ -3,12 +3,21 @@
 import { IconArrowLeft, IconArrowRight } from '@intentui/icons'
 import clsx from 'clsx'
 
+import { Select, SelectList, SelectOption, SelectTrigger } from '../..'
+
 interface PaginationProps {
   variant?: 'default' | 'compact'
   currentPage: number
   totalPages: number
   onPageChange: (page: number) => void
   maxVisiblePages?: number
+}
+
+interface PaginationWithDropdownProps {
+  currentPage: number
+  totalPages: number
+  defaultPageSize?: number
+  onPageChange: (page: number) => void
 }
 
 const Pagination = (props: PaginationProps) => {
@@ -30,7 +39,7 @@ const Pagination = (props: PaginationProps) => {
       {/* Previous Button */}
       <button
         className={clsx(
-          'flex gap-2.5 size-20 bg-accent-fg transition-colors text-lg shrink-0 items-center justify-center',
+          'flex gap-2.5 size-20 transition-colors text-lg shrink-0 items-center justify-center bg-white',
           currentPage === 1
             ? 'cursor-not-allowed text-bluegray-300'
             : 'cursor-pointer text-text-body '
@@ -49,7 +58,7 @@ const Pagination = (props: PaginationProps) => {
             return (
               <div
                 key={`elipse-${page}-${idx}`}
-                className={`size-20 shrink-0 flex items-center justify-center bg-accent-fg text-text-body transition-colors cursor-pointer text-lg border-l border-bluegray-300`}
+                className={`size-20 shrink-0 flex items-center justify-center text-text-body transition-colors cursor-pointer text-lg border-l border-bluegray-300 bg-white`}
               >
                 <span className="text-lg">...</span>
               </div>
@@ -60,7 +69,7 @@ const Pagination = (props: PaginationProps) => {
               key={`page-${page}-${idx}`}
               className={clsx(
                 'flex size-20 shrink-0 items-center justify-center bg-accent-fg text-text-body transition-colors cursor-pointer text-lg',
-                page === currentPage ? 'bg-bluegray-50' : '',
+                page === currentPage ? 'bg-bluegray-50' : 'bg-white',
                 variant === 'compact' ? 'border-l border-bluegray-300' : 'rounded-lg',
                 page === totalPages && variant === 'compact' && 'border-r border-bluegray-300'
               )}
@@ -75,7 +84,7 @@ const Pagination = (props: PaginationProps) => {
       {/* Next Button */}
       <button
         className={clsx(
-          'flex gap-2.5 size-20 bg-accent-fg transition-colors cursor-pointer text-lg shrink-0 items-center justify-center',
+          'flex gap-2.5 size-20 transition-colors cursor-pointer text-lg shrink-0 items-center justify-center bg-white',
           currentPage === totalPages
             ? 'cursor-not-allowed text-bluegray-300'
             : 'cursor-pointer text-text-body'
@@ -86,6 +95,45 @@ const Pagination = (props: PaginationProps) => {
         <p className="hidden tablet:block font-bold text-sm">ถัดไป</p>
         <IconArrowRight className="size-10" />
       </button>
+    </div>
+  )
+}
+
+const PaginationWithDropdown = (props: PaginationWithDropdownProps) => {
+  const { currentPage, totalPages, defaultPageSize = 10, onPageChange } = props
+
+  const pageSizeOptions = [
+    { id: 10, title: '10' },
+    { id: 25, title: '25' },
+    { id: 50, title: '50' },
+    { id: 100, title: '100' },
+  ]
+
+  return (
+    <div className="flex items-center gap-6">
+      <div className="flex items-center gap-2 text-bluegray-400">
+        <p>Page</p>
+        <p className="font-semibold text-bluegray-800 dark:text-bluegray-200">{currentPage}</p>
+        <p>of</p>
+        <p className="font-semibold text-bluegray-800 dark:text-bluegray-200">{totalPages}</p>
+      </div>
+
+      {/* Select Page Size */}
+      <Select
+        defaultSelectedKey={defaultPageSize}
+        placeholder="Select a page size"
+        className="w-72"
+        onSelectionChange={(e) => onPageChange(Number(e))}
+      >
+        <SelectTrigger />
+        <SelectList>
+          {pageSizeOptions.map((option) => (
+            <SelectOption key={option.id} id={option.id} textValue={option.title}>
+              Per Page : {option.title}
+            </SelectOption>
+          ))}
+        </SelectList>
+      </Select>
     </div>
   )
 }
@@ -138,5 +186,5 @@ function generatePages(current: number, total: number, maxVisible: number) {
   return pages
 }
 
-export type { PaginationProps }
-export { Pagination }
+export type { PaginationProps, PaginationWithDropdownProps }
+export { Pagination, PaginationWithDropdown }
