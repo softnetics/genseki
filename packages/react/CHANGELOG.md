@@ -1,5 +1,13 @@
 # @genseki/react
 
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- [#93](https://github.com/softnetics/genseki/pull/93) [`b56cc5e`](https://github.com/softnetics/genseki/commit/b56cc5e2135a7e15cccb0595fc266d329e027a87) Thanks [@t0ngk](https://github.com/t0ngk)! - feat: can disable in autofield
+
+- [#90](https://github.com/softnetics/genseki/pull/90) [`63c94ed`](https://github.com/softnetics/genseki/commit/63c94ed9ff12730d2fa6121f6d3215ec906aff23) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Change context model to user-defined context
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes
