@@ -1,5 +1,11 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- [#92](https://github.com/softnetics/genseki/pull/92) [`5b9967f`](https://github.com/softnetics/genseki/commit/5b9967f2882419867d860045e977bd3834f7bd17) Thanks [@intaniger](https://github.com/intaniger)! - fix: :coffin: remove user collection from plugin
+
 ## 0.1.0-alpha.14
 
 ## 0.1.0-alpha.13

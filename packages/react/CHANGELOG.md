@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- [#88](https://github.com/softnetics/genseki/pull/88) [`9ad485e`](https://github.com/softnetics/genseki/commit/9ad485eedfd3e890d8f58158b7c7b25b27cdbe87) Thanks [@t0ngk](https://github.com/t0ngk)! - export getDefaultValueFromFields for custom page
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes
