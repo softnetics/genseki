@@ -4,31 +4,31 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 
 import { toast } from 'sonner'
 
+import type { FieldsClient } from '../../../core'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
-import { useCollection, useServerFunction } from '../../providers/root'
+import { useServerFunction } from '../../providers/root'
 
 interface UpdateClientViewProps {
   slug: string
-  identifer: string
+  identifier: string
+  fields: FieldsClient
   optionsRecord: Record<string, any[]>
   defaultValues?: Record<string, any>
 }
 
 export function UpdateClientView(props: UpdateClientViewProps) {
   const form = useForm({ defaultValues: props.defaultValues })
-  const collection = useCollection(props.slug)
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
-    const result = await serverFunction({
-      method: `${props.slug}.update`,
+    const result = await serverFunction(`${props.slug}.update`, {
       body: data,
       headers: {},
-      pathParams: { id: props.identifer },
+      pathParams: { id: props.identifier },
       query: {},
     })
 
@@ -36,8 +36,13 @@ export function UpdateClientView(props: UpdateClientViewProps) {
       toast.success('Updation successfully')
       return navigate(`../`)
     } else {
-      console.log(result.body)
-      const description = result.body?.message
+      const description =
+        typeof result.body === 'object' &&
+        !!result.body &&
+        'message' in result.body &&
+        typeof result.body.message === 'string'
+          ? result.body.message
+          : 'Failed to update'
       toast.error('Failed to update', {
         ...(description && { description }),
       })
@@ -55,9 +60,9 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(collection.fields).map((field) => (
+        {Object.values(props.fields).map((field) => (
           <AutoField
-            key={field.fieldName}
+            key={field.$client.fieldName}
             field={field}
             visibilityField="update"
             optionsRecord={props.optionsRecord}

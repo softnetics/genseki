@@ -1,11 +1,9 @@
 import type { AnyTable, Column } from 'drizzle-orm'
 import { and, asc, desc, eq, like } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 
-import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthConfig } from '.'
+import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthOptions } from '.'
 import { AccountProvider } from './constant'
-import { getSessionCookie } from './utils'
 
 type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
   [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true
@@ -22,50 +20,12 @@ type Pagination<TField extends string = string> = {
   }[]
 }
 
-export type AuthContext<TConfig extends AuthConfig = AuthConfig> = {
-  authConfig: TConfig
-  internalHandlers: InternalHandlers
+export function createAuthInternalHandler(options: AuthOptions) {
+  const db = options.db
 
-  requiredAuthenticated: (headers?: Record<string, string>) => Promise<InferTableType<AnyUserTable>>
-}
-
-export function createAuthContext<TAuthConfig extends AuthConfig>(
-  authConfig: TAuthConfig,
-  db: NodePgDatabase<any>
-): AuthContext<TAuthConfig> {
-  const internalHandlers = createInternalHandlers(authConfig, db)
-
-  return {
-    authConfig: authConfig,
-    internalHandlers: internalHandlers,
-
-    requiredAuthenticated: async (headers?: Record<string, string>) => {
-      const sessionToken = getSessionCookie(headers)
-      if (!sessionToken) throw new Error('Unauthorized')
-      const session = await internalHandlers.session.findUserBySessionToken(sessionToken)
-      if (!session) throw new Error('Unauthorized')
-      if (session.expiresAt < new Date()) {
-        await internalHandlers.session.deleteById(session.id)
-        throw new Error('Session expired')
-      }
-      return {
-        id: session.user.id,
-        name: session.user.name,
-        email: session.user.email,
-        image: session.user.image,
-        emailVerified: session.user.emailVerified,
-      }
-    },
-  }
-}
-
-function createInternalHandlers<TAuthConfig extends AuthConfig>(
-  config: TAuthConfig,
-  db: NodePgDatabase
-) {
   const user = {
     findById: async (id: string) => {
-      const table = config.user.model
+      const table = options.schema.user
       const users = await db.select().from(table).where(eq(table.id, id))
       if (users.length === 0) throw new Error('User not found')
       if (users.length > 1) throw new Error('Multiple users found')
@@ -73,7 +33,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       return user
     },
     findByEmail: async (email: string) => {
-      const table = config.user.model
+      const table = options.schema.user
 
       const users = await db.select().from(table).where(eq(table.email, email))
       if (users.length === 0) throw new Error('User not found')
@@ -83,7 +43,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     },
     list: async (pagination: Pagination<keyof AnyUserTable['_']['columns']>) => {
       const { page = 1, pageSize = 10, sort } = pagination
-      const table = config.user.model
+      const table = options.schema.user
       const users = await db
         .select()
         .from(table)
@@ -98,19 +58,19 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       return users
     },
     create: async (data: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>) => {
-      const table = config.user.model
+      const table = options.schema.user
       const user = await db.insert(table).values(data).returning()
       return user[0]
     },
   }
   const account = {
     link: async (data: Omit<InferTableType<AnyAccountTable>, 'id' | 'emailVerified'>) => {
-      const table = config.account.model
+      const table = options.schema.account
       const user = await db.insert(table).values(data).returning()
       return user[0]
     },
     updatePassword: async (userId: string, password: string) => {
-      const table = config.account.model
+      const table = options.schema.account
       const account = await db
         .update(table)
         .set({ password })
@@ -123,13 +83,16 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
     findByUserEmailAndProvider: async (email: string, providerId: AccountProvider) => {
       const accounts = await db
         .select({
-          user: config.user.model,
-          password: config.account.model.password,
+          user: options.schema.user,
+          password: options.schema.account.password,
         })
-        .from(config.account.model)
-        .leftJoin(config.user.model, eq(config.account.model.userId, config.user.model.id))
+        .from(options.schema.account)
+        .leftJoin(options.schema.user, eq(options.schema.account.userId, options.schema.user.id))
         .where(
-          and(eq(config.user.model.email, email), eq(config.account.model.providerId, providerId))
+          and(
+            eq(options.schema.user.email, email),
+            eq(options.schema.account.providerId, providerId)
+          )
         )
       if (accounts.length === 0) throw new Error('Account not found')
       if (accounts.length > 1) throw new Error('Multiple accounts found')
@@ -141,7 +104,7 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
   }
   const session = {
     create: async (data: { userId: string; expiresAt: Date }) => {
-      const table = config.session.model
+      const table = options.schema.session
       const token = crypto.randomUUID()
       const session = await db
         .insert(table)
@@ -150,20 +113,20 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       return session[0]
     },
     update: async (id: string, data: any) => {
-      const table = config.session.model
+      const table = options.schema.session
       const session = await db.update(table).set(data).where(eq(table.id, id)).returning()
       return session[0]
     },
     findUserBySessionToken: async (token: string) => {
       const sessions = await db
         .select({
-          id: config.session.model.id,
-          user: config.user.model,
-          expiresAt: config.session.model.expiresAt,
+          id: options.schema.session.id,
+          user: options.schema.user,
+          expiresAt: options.schema.session.expiresAt,
         })
-        .from(config.session.model)
-        .leftJoin(config.user.model, eq(config.session.model.userId, config.user.model.id))
-        .where(eq(config.session.model.token, token))
+        .from(options.schema.session)
+        .leftJoin(options.schema.user, eq(options.schema.session.userId, options.schema.user.id))
+        .where(eq(options.schema.session.token, token))
       if (sessions.length === 0) throw new Error('Session not found')
       if (sessions.length > 1) throw new Error('Multiple sessions found')
       const session = sessions[0]
@@ -174,17 +137,17 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
       }
     },
     deleteById: async (id: string) => {
-      const table = config.session.model
+      const table = options.schema.session
       const session = await db.delete(table).where(eq(table.id, id)).returning()
       return session[0]
     },
     deleteByToken: async (token: string) => {
-      const table = config.session.model
+      const table = options.schema.session
       const session = await db.delete(table).where(eq(table.token, token)).returning()
       return session[0]
     },
     deleteByUserId: async (userId: string) => {
-      const table = config.session.model
+      const table = options.schema.session
       const session = await db.delete(table).where(eq(table.userId, userId)).returning()
       return session[0]
     },
@@ -192,29 +155,48 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
 
   const verification = {
     create: async (data: { identifier: string; value: string; expiresAt: Date }) => {
-      const table = config.verification.model
+      const table = options.schema.verification
       const verification = await db.insert(table).values(data).returning()
       return verification[0]
     },
     findByIdentifier: async (identifier: string) => {
-      const table = config.verification.model
+      const table = options.schema.verification
       const verifications = await db.select().from(table).where(eq(table.identifier, identifier))
       if (verifications.length === 0) throw new Error('Verification not found')
       if (verifications.length > 1) throw new Error('Multiple verifications found')
       return verifications[0]
     },
     delete: async (id: string) => {
-      const table = config.verification.model
+      const table = options.schema.verification
       const verification = await db.delete(table).where(eq(table.id, id)).returning()
       if (verification.length === 0) throw new Error('Verification not found')
       return verification[0]
     },
     deleteByUserIdAndIdentifierPrefix: async (userId: string, identifierPrefix: string) => {
-      const table = config.verification.model
+      const table = options.schema.verification
       return await db
         .delete(table)
         .where(and(eq(table.value, userId), like(table.identifier, `${identifierPrefix}%`)))
         .returning()
+    },
+    findByResetPasswordToken: async (token: string) => {
+      const identifier = `reset-password:${token}`
+      const table = options.schema.verification
+      const verifications = await db.select().from(table).where(eq(table.identifier, identifier))
+      if (verifications.length === 0) throw new Error('Verification not found')
+      if (verifications.length > 1) throw new Error('Multiple verifications found')
+      return verifications[0]
+    },
+    createWithResetPasswordToken: async (userId: string, expiresInMs?: number) => {
+      const table = options.schema.verification
+      const token = crypto.randomUUID()
+      const identifier = `reset-password:${token}`
+      const expiresAt = new Date(Date.now() + (expiresInMs ?? 1000 * 60 * 15)) // default 15 mins
+      const verification = await db
+        .insert(table)
+        .values({ identifier, value: userId, expiresAt })
+        .returning()
+      return verification[0]
     },
   }
 
@@ -226,4 +208,4 @@ function createInternalHandlers<TAuthConfig extends AuthConfig>(
   }
 }
 
-type InternalHandlers = ReturnType<typeof createInternalHandlers>
+export type AuthInternalHandler = ReturnType<typeof createAuthInternalHandler>

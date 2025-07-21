@@ -1,11 +1,11 @@
-import type { ValueOf } from 'type-fest'
-
 import type {
+  ApiRoute,
   ApiRouteHandlerPayload,
   ApiRouter,
   ApiRouteResponse,
-  ApiRouteSchema,
-  ServerConfig,
+  FilterByMethod,
+  FlattenApiRouter,
+  GensekiCore,
 } from '@genseki/react'
 
 import { withPathParams, withQueryParams } from './utils'
@@ -48,9 +48,9 @@ async function makeFetch(
   return response.json() as any
 }
 
-export function createRestClient<TServerConfig extends ServerConfig<any, any, any, any>>(
+export function createRestClient<TCore extends GensekiCore>(
   config: CreateRestClientConfig
-): RestClient<TServerConfig['endpoints']> {
+): RestClient<TCore['api']> {
   return {
     GET: async (path: string, payload: AnyPayload) => {
       return makeFetch('GET', path, payload, config)
@@ -67,50 +67,33 @@ export function createRestClient<TServerConfig extends ServerConfig<any, any, an
     PATCH: async (path: string, payload: AnyPayload) => {
       return makeFetch('PATCH', path, payload, config)
     },
-  }
+  } as RestClient<TCore['api']>
 }
 
-export type ExtractClientApiRouterPath<TApiRouter extends ApiRouter<any>> = ValueOf<{
-  [TKey in keyof TApiRouter]: TApiRouter[TKey]['schema'] extends {
-    path: infer TPath extends string
-  }
-    ? TPath
-    : never
-}>
+export type ExtractApiRouterPath<TApiRoute extends ApiRoute> = TApiRoute['schema']['path']
 
-export type RestResponse<TApiRouter extends ApiRouter<any>, TPath extends string> = ValueOf<{
-  [TKey in keyof TApiRouter]: TApiRouter[TKey]['schema'] extends { path: TPath }
-    ? TApiRouter[TKey]['schema'] extends infer TApiRouteSchema extends ApiRouteSchema
-      ? ApiRouteResponse<TApiRouteSchema['responses']>
-      : never
-    : never
-}>
+export type RestResponse<TApiRoute extends ApiRoute, TPath extends string> = ApiRouteResponse<
+  Extract<TApiRoute, { schema: { path: TPath } }>['schema']['responses']
+>
 
-export type RestPayload<TApiRouter extends ApiRouter<any>, TPath extends string> = ValueOf<{
-  [TKey in keyof TApiRouter]: TApiRouter[TKey]['schema'] extends { path: TPath }
-    ? TApiRouter[TKey]['schema'] extends infer TApiRouteSchema extends ApiRouteSchema
-      ? ApiRouteHandlerPayload<TApiRouteSchema>
-      : never
-    : never
-}>
+export type RestPayload<TApiRoute extends ApiRoute, TPath extends string> = ApiRouteHandlerPayload<
+  Extract<TApiRoute, { schema: { path: TPath } }>['schema']
+>
 
-export type RestMethod<TApiRouter extends ApiRouter<any>> = <
-  TPath extends ExtractClientApiRouterPath<TApiRouter>,
+export type RestMethod<TApiRoute extends ApiRoute> = <
+  TPath extends ExtractApiRouterPath<TApiRoute>,
 >(
   path: TPath,
-  payload: RestPayload<TApiRouter, TPath>
-) => Promise<RestResponse<TApiRouter, TPath>>
+  payload: RestPayload<TApiRoute, TPath>
+) => Promise<RestResponse<TApiRoute, TPath>>
 
-export type FilterByMethod<TApiRouter extends ApiRouter<any>, TMethod extends string> = {
-  [TKey in keyof TApiRouter as TApiRouter[TKey]['schema'] extends { method: TMethod }
-    ? TKey
-    : never]: TApiRouter[TKey]
-}
-
-export interface RestClient<TApiRouter extends ApiRouter<any>> {
-  GET: RestMethod<FilterByMethod<TApiRouter, 'GET'>>
-  POST: RestMethod<FilterByMethod<TApiRouter, 'POST'>>
-  PUT: RestMethod<FilterByMethod<TApiRouter, 'PUT'>>
-  DELETE: RestMethod<FilterByMethod<TApiRouter, 'DELETE'>>
-  PATCH: RestMethod<FilterByMethod<TApiRouter, 'PATCH'>>
-}
+export type RestClient<TApiRouter extends ApiRouter> =
+  FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
+    ? {
+        GET: RestMethod<FilterByMethod<TApiRoute, 'GET'>>
+        POST: RestMethod<FilterByMethod<TApiRoute, 'POST'>>
+        PUT: RestMethod<FilterByMethod<TApiRoute, 'PUT'>>
+        DELETE: RestMethod<FilterByMethod<TApiRoute, 'DELETE'>>
+        PATCH: RestMethod<FilterByMethod<TApiRoute, 'PATCH'>>
+      }
+    : never

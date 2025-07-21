@@ -2,10 +2,11 @@ import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
 import {
-  type AnyServerConfig,
   type ApiRoute,
   type ApiRouter,
-  type ServerConfig,
+  type ApiRouteSchema,
+  type GensekiCore,
+  isApiRoute,
 } from '@genseki/react'
 
 function extractHeaders(headers: Headers) {
@@ -26,7 +27,6 @@ function extractSearchParams(searchParams: URLSearchParams) {
 
 async function makeApiRoute(
   req: NextRequest,
-  serverConfig: AnyServerConfig,
   route: ApiRoute,
   pathParams: Record<string, string> | undefined
 ) {
@@ -46,18 +46,16 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
-  const context = serverConfig.context.toRequestContext({
-    headers: reqHeaders,
-  })
-
   try {
-    const rawResponse = await route.handler({
-      context,
-      headers: reqHeaders,
-      pathParams: pathParams,
-      query: reqSearchParams,
-      body,
-    })
+    const rawResponse = await route.handler(
+      {
+        headers: reqHeaders,
+        pathParams: pathParams,
+        query: reqSearchParams,
+        body,
+      },
+      req
+    )
 
     return new Response(JSON.stringify(rawResponse) as any, {
       status: rawResponse.status,
@@ -80,94 +78,72 @@ async function makeApiRoute(
   }
 }
 
-async function lookupRoute(
-  radixRouter: ReturnType<typeof createRouter>,
-  req: NextRequest,
-  serverConfig: ServerConfig<any, any, any, ApiRouter<any>>
-) {
+async function lookupRoute(radixRouter: ReturnType<typeof createRouter>, req: NextRequest) {
   const match = radixRouter.lookup(req.nextUrl.pathname)
   if (!match) return Response.json({ message: 'Not Found' }, { status: 404 })
   const pathParams = match.params
   const route = match.route as ApiRoute<any>
-  return makeApiRoute(req, serverConfig, route, pathParams)
+  return makeApiRoute(req, route, pathParams)
 }
 
-export function createApiResourceRouter(serverConfig: ServerConfig<any, any, any, ApiRouter<any>>) {
+export function createApiResourceRouter(core: GensekiCore) {
+  const apiRouter = core.api
+
   const radixGetRouter = createRouter({
-    routes: Object.fromEntries(
-      Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
-          if (route.schema.method !== 'GET') return []
-          console.log('GET', route.schema.path)
-          return [[route.schema.path, { route, methodName }]]
-        }
-      )
-    ),
+    routes: createRadixRoutesFromApiRouter(apiRouter, 'GET'),
   })
-
   const radixPostRouter = createRouter({
-    routes: Object.fromEntries(
-      Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
-          if (route.schema.method !== 'POST') return []
-          console.log('POST', route.schema.path)
-          return [[route.schema.path, { route, methodName }]]
-        }
-      )
-    ),
+    routes: createRadixRoutesFromApiRouter(apiRouter, 'POST'),
   })
-
   const radixPutRouter = createRouter({
-    routes: Object.fromEntries(
-      Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
-          if (route.schema.method !== 'PUT') return []
-          console.log('PUT', route.schema.path)
-          return [[route.schema.path, { route, methodName }]]
-        }
-      )
-    ),
+    routes: createRadixRoutesFromApiRouter(apiRouter, 'PUT'),
   })
-
   const radixPatchRouter = createRouter({
-    routes: Object.fromEntries(
-      Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
-          if (route.schema.method !== 'PATCH') return []
-          console.log('PATCH', route.schema.path)
-          return [[route.schema.path, { route, methodName }]]
-        }
-      )
-    ),
+    routes: createRadixRoutesFromApiRouter(apiRouter, 'PATCH'),
   })
-
   const radixDeleteRouter = createRouter({
-    routes: Object.fromEntries(
-      Object.entries(serverConfig.endpoints).flatMap(
-        ([methodName, route]: [string, ApiRoute<typeof serverConfig.context>]) => {
-          if (route.schema.method !== 'DELETE') return []
-          console.log('DELETE', route.schema.path)
-          return [[route.schema.path, { route, methodName }]]
-        }
-      )
-    ),
+    routes: createRadixRoutesFromApiRouter(apiRouter, 'DELETE'),
   })
 
   return {
     GET: async (req: NextRequest) => {
-      return lookupRoute(radixGetRouter, req, serverConfig)
+      return lookupRoute(radixGetRouter, req)
     },
     POST: async (req: NextRequest) => {
-      return lookupRoute(radixPostRouter, req, serverConfig)
+      return lookupRoute(radixPostRouter, req)
     },
     PUT: async (req: NextRequest) => {
-      return lookupRoute(radixPutRouter, req, serverConfig)
+      return lookupRoute(radixPutRouter, req)
     },
     DELETE: async (req: NextRequest) => {
-      return lookupRoute(radixDeleteRouter, req, serverConfig)
+      return lookupRoute(radixDeleteRouter, req)
     },
     PATCH: async (req: NextRequest) => {
-      return lookupRoute(radixPatchRouter, req, serverConfig)
+      return lookupRoute(radixPatchRouter, req)
     },
   }
+}
+
+function createRadixRoutesFromApiRouter(
+  apiRoutes: ApiRouter,
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+): Record<string, { route: ApiRouteSchema; methodName: string }> {
+  const filteredRoutes = Object.entries(apiRoutes).filter(([, router]) => {
+    if (isApiRoute(router)) {
+      return router.schema.method === method
+    }
+  })
+
+  const routes = filteredRoutes.flatMap(([methodName, router]) => {
+    if (isApiRoute(router)) {
+      return [[router.schema.path, { route: router.schema, methodName }]] as const
+    }
+    const nestedRoutes = Object.entries(createRadixRoutesFromApiRouter(router, method)).map(
+      ([path, route]) =>
+        [path, { route: route.route, methodName: `${methodName}.${route.methodName}` }] as const
+    )
+    return nestedRoutes
+  })
+
+  return Object.fromEntries(routes)
 }

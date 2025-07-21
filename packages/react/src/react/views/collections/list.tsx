@@ -1,27 +1,32 @@
 import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { ListTable } from './list.client'
+import type { BaseViewProps } from './types'
 
-import type { ServerConfig } from '../../../core'
-import { getClientCollection } from '../../../core'
+import type { ApiDefaultMethod, ApiRoute, Fields } from '../../../core'
+import {
+  type ConvertCollectionDefaultApiToApiRouteSchema,
+  getCollectionOptionsClient,
+} from '../../../core/collection'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
 import { formatSlug } from '../../utils/format-slug'
 import { getHeadersObject } from '../../utils/headers'
 
-interface ListViewProps {
-  slug: string
+interface ListViewProps extends BaseViewProps {
   headers: Headers
-  serverConfig: ServerConfig
   searchParams: Record<string, string | string[]>
+  findMany: ApiRoute<
+    ConvertCollectionDefaultApiToApiRouteSchema<
+      string,
+      (typeof ApiDefaultMethod)['FIND_MANY'],
+      Fields
+    >
+  >
 }
 
 export async function ListView(props: ListViewProps) {
-  const collection = props.serverConfig.collections[props.slug]
-
-  if (!collection) throw new Error(`Collection ${props.slug} not found`)
-
   const headersValue = getHeadersObject(props.headers)
 
   const limit = parseInt((props.searchParams['limit'] as string) ?? '10')
@@ -29,21 +34,28 @@ export async function ListView(props: ListViewProps) {
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
-  const context = props.serverConfig.context.toRequestContext({
+  // TODO: Fix this dummy request
+  const request = new Request('http://localhost', {
+    method: 'GET',
     headers: headersValue,
   })
 
-  const result = await collection.admin.endpoints.findMany.handler({
-    context,
-    query: {
-      limit,
-      offset,
-      orderBy,
-      orderType,
+  // TODO: Consider moving to client component
+  const result = await props.findMany.handler(
+    {
+      query: { limit, offset, orderBy, orderType },
+      headers: headersValue,
     },
-  })
+    request
+  )
 
-  const clientCollection = getClientCollection(collection)
+  if (result.status !== 200) {
+    throw new Error(
+      `Failed to fetch data: ${result.status} ${JSON.stringify(result.body, null, 2)}`
+    )
+  }
+
+  const collectionOptionsClient = getCollectionOptionsClient(props.collectionOptions)
 
   return (
     <div>
@@ -65,7 +77,7 @@ export async function ListView(props: ListViewProps) {
           </div>
           <div className="flex flex-col">
             <Typography type="h2" weight="bold" className="text-text-nontrivial">
-              {formatSlug(collection.slug)}
+              {formatSlug(props.slug)}
             </Typography>
             <Typography type="h4" weight="normal" className="text-text-body">
               A collection
@@ -75,7 +87,11 @@ export async function ListView(props: ListViewProps) {
       </div>
       <div className="p-12">
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-y-12">
-          <ListTable collection={clientCollection} data={result.body.data} />
+          <ListTable
+            slug={props.slug}
+            collectionOptions={collectionOptionsClient}
+            data={result.body.data}
+          />
         </div>
       </div>
     </div>

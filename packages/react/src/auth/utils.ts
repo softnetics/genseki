@@ -20,7 +20,7 @@ function deleteCookie(headers: Record<string, string> | undefined, name: string)
   headers['Set-Cookie'] = `${name}=; Path=/; HttpOnly; SameSite=Strict; Max-Age=0`
 }
 
-const SESSION_COOKIE_NAME = 'SESSION_ID'
+const SESSION_COOKIE_NAME = 'GENSEKI_SESSION'
 
 export function getSessionCookie(headers: Record<string, string> | undefined): string | undefined {
   const cookies = parseCookies(headers?.['cookie'] || '')
@@ -35,7 +35,7 @@ export function deleteSessionCookie(headers?: Record<string, string>) {
   deleteCookie(headers, SESSION_COOKIE_NAME)
 }
 
-export async function hashPassword(password: string): Promise<string> {
+export async function defaultHashPassword(password: string): Promise<string> {
   const salt = randomBytes(8).toString('hex')
   const derivedKey = await scrypt(password, salt, 64)
   return salt + ':' + (derivedKey as Buffer).toString('hex')
