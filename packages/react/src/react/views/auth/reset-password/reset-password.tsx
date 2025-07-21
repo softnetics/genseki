@@ -1,4 +1,4 @@
-import { createAuth, type ServerConfig, Typography } from '@genseki/react'
+import { type ServerConfig, Typography } from '@genseki/react'
 
 import { ResetPasswordClientForm } from './reset-password.client'
 
@@ -10,14 +10,12 @@ interface ResetPasswordViewProps {
 export async function ResetPasswordView({ searchParams, serverConfig }: ResetPasswordViewProps) {
   const token = searchParams['token'] as string | undefined
 
-  const { context: authContext } = createAuth(serverConfig.auth, serverConfig.context)
-
   const validateToken = await serverConfig.endpoints['auth.validateResetToken'].handler({
     body: {
       token: token || '',
     },
     headers: {},
-    context: authContext,
+    context: serverConfig.context,
   })
 
   if (!token || !validateToken?.body?.verification) {

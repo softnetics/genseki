@@ -1,12 +1,12 @@
 import { deepmerge } from 'deepmerge-ts'
 import { eq } from 'drizzle-orm'
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { SimplifyDeep, ValueOf } from 'type-fest'
 import { z } from 'zod/v4'
 
 import type {
+  AnyContextable,
   AnyTypedColumn,
-  BaseConfig,
-  Context,
   WithAnyRelations,
   WithAnyTable,
   WithNotNull,
@@ -104,12 +104,15 @@ type FullSchema = WithAnyRelations<{
 }>
 
 // TODO: TFullSchema should be Generic but it is not working with the current setup
-export function admin<TContext extends Context<FullSchema>>(
-  baseConfig: BaseConfig<FullSchema, TContext>,
+export function admin<TContext extends AnyContextable>(args: {
+  db: NodePgDatabase<FullSchema>
+  schema: FullSchema
+  context: TContext
   options: AdminPluginOptions
-) {
-  const schema = baseConfig.schema
-  const builder = new Builder({ schema: baseConfig.schema }).$context<typeof baseConfig.context>()
+}) {
+  const { db, schema, options } = args
+
+  const builder = new Builder({ db: db, schema: schema }).$context<TContext>()
 
   const hasPermissionEndpoint = builder.endpoint(
     {
@@ -177,7 +180,7 @@ export function admin<TContext extends Context<FullSchema>>(
     async ({ context, body }) => {
       const { userId } = body
 
-      await context.db
+      await db
         .update(schema.user)
         .set({
           banned: true,

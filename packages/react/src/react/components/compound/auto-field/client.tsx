@@ -32,7 +32,7 @@ import {
 } from '@genseki/react'
 
 import type { Field, FieldRelation } from '../../../../core'
-import type { AnyContext } from '../../../../core/context'
+import type { AnyContextable } from '../../../../core/context'
 import { constructEditorProviderProps } from '../../../../core/richtext'
 import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
 import { useStorageAdapter } from '../../../providers/root'
@@ -281,7 +281,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 
 interface AutoFieldProps {
   // NOTE: This should be FieldClient but the type is not correct
-  field: Field<any, AnyContext> & { fieldName: string }
+  field: Field<any, AnyContextable> & { fieldName: string }
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'

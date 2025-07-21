@@ -2,29 +2,28 @@ import { parseSetCookie } from 'cookie-es'
 import { cookies } from 'next/headers'
 
 import {
-  type ApiRouter,
-  Context,
-  createAuth,
+  type AnyServerConfig,
+  type ApiRoute,
   type GetServerFunctionApiArgs,
   type GetServerFunctionResponse,
-  type ServerConfig,
 } from '@genseki/react'
 
 export async function handleServerFunction<
-  TServerConfig extends ServerConfig<any, any, any, ApiRouter<any>>,
+  TServerConfig extends AnyServerConfig,
   TApiArgs extends GetServerFunctionApiArgs<TServerConfig['endpoints']>,
 >(
   serverConfig: TServerConfig,
   args: TApiArgs
 ): Promise<GetServerFunctionResponse<TServerConfig, TApiArgs['method']>> {
   try {
-    const apiRoute = serverConfig.endpoints?.[args.method as keyof typeof serverConfig.endpoints]
+    const apiRoute = serverConfig.endpoints?.[
+      args.method as keyof typeof serverConfig.endpoints
+    ] as ApiRoute
     if (!apiRoute) {
       throw new Error(`No API route found for method: ${args.method as string}`)
     }
-    const { authContext } = createAuth(serverConfig.auth, serverConfig.context)
-    const context = Context.toRequestContext(serverConfig.context, {
-      authContext,
+
+    const context = serverConfig.context.toRequestContext({
       headers: args.headers,
     })
 

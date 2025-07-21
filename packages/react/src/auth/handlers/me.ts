@@ -1,10 +1,10 @@
 import z from 'zod/v4'
 
-import type { AnyContext } from '../../core/context'
+import type { AnyContextable } from '../../core/context'
 import { type ApiRouteHandler, type ApiRouteSchema, createEndpoint } from '../../core/endpoint'
 import { type AuthContext } from '../context'
 
-export function me<const TAuthContext extends AuthContext, const TContext extends AnyContext>(
+export function me<const TAuthContext extends AuthContext, const TContext extends AnyContextable>(
   authContext: TAuthContext
 ) {
   const { requiredAuthenticated } = authContext

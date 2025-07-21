@@ -1,3 +1,4 @@
+import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import * as R from 'remeda'
 import type { Simplify } from 'type-fest'
 
@@ -5,7 +6,7 @@ import { type AuthContext, createAuthContext } from './context'
 import { createAuthHandlers } from './handlers'
 
 import { getFieldsClient } from '../core/config'
-import { type AnyContext, Context, type ContextToRequestContext } from '../core/context'
+import { type AnyContextable } from '../core/context'
 import type { ApiRouteHandler } from '../core/endpoint'
 import type { Fields, FieldsClient } from '../core/field'
 import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
@@ -83,7 +84,7 @@ export interface AuthConfig {
     passwordHasher?: (password: string) => Promise<string> // default: scrypt
     signUp?: {
       autoLogin?: boolean // default: true
-      additionalFields?: Fields<Record<string, unknown>, AnyContext>
+      additionalFields?: Fields<Record<string, unknown>, AnyContextable>
     }
   }
   oauth2?: {
@@ -112,22 +113,14 @@ type AddObjectKeyPrefix<T extends Record<string, any>, TPrefix extends string> =
   [K in keyof T as K extends string ? `${TPrefix}.${K}` : never]: T[K]
 }>
 
-export type Auth<
-  TContext extends AnyContext = AnyContext,
-  TAuthConfig extends AuthConfig = AuthConfig,
-> = {
-  config: TAuthConfig
-  context: ContextToRequestContext<TContext>
+export type Auth<TContext extends AnyContextable = AnyContextable> = {
   authContext: AuthContext
   handlers: Simplify<
-    AddObjectKeyPrefix<
-      ReturnType<typeof createAuthHandlers<any, Context<any, any, any>>>['handlers'],
-      'auth'
-    >
+    AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers<any, TContext>>['handlers'], 'auth'>
   >
 }
 
-export type AuthHandlers = Auth<any, any>['handlers']
+export type AuthHandlers = Auth<any>['handlers']
 
 export type AuthClient = {
   login: {
@@ -150,17 +143,23 @@ export type AuthClient = {
   }
 }
 
-export function createAuth<const TContext extends AnyContext>(
-  config: AuthConfig,
+export function createAuth<
+  TFullSchema extends Record<string, unknown>,
+  TContext extends AnyContextable,
+>(config: {
+  db: NodePgDatabase<TFullSchema>
+  auth: AuthConfig
   context: TContext
-): Auth<TContext> {
-  const authContext = createAuthContext(config, context)
+}): Auth<TContext> {
+  const authContext = createAuthContext(config.auth, config.db)
   const { handlers: originalHandlers } = createAuthHandlers(authContext)
-  const wrappedContext = Context.toRequestContext(context, { authContext })
 
   const handlers = R.mapValues(originalHandlers, (h) => {
     const handler: ApiRouteHandler<TContext, any> = (args) => {
-      return h.handler({ ...args, context: wrappedContext } as any) as any
+      const context = config.context.toRequestContext({
+        headers: args.headers,
+      })
+      return h.handler({ ...args, context: context } as any) as any
     }
     h.handler
     return { schema: h.schema, handler } as any
@@ -173,8 +172,6 @@ export function createAuth<const TContext extends AnyContext>(
   ) as unknown as AddObjectKeyPrefix<ReturnType<typeof createAuthHandlers>['handlers'], 'auth'>
 
   return {
-    config,
-    context: wrappedContext as ContextToRequestContext<TContext>,
     authContext,
     handlers: prefixedHandlers,
   }

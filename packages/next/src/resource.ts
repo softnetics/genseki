@@ -2,10 +2,9 @@ import { type NextRequest } from 'next/server'
 import { createRouter } from 'radix3'
 
 import {
+  type AnyServerConfig,
   type ApiRoute,
   type ApiRouter,
-  Context,
-  createAuth,
   type ServerConfig,
 } from '@genseki/react'
 
@@ -27,7 +26,7 @@ function extractSearchParams(searchParams: URLSearchParams) {
 
 async function makeApiRoute(
   req: NextRequest,
-  serverConfig: ServerConfig<any, any, any, ApiRouter<any>>,
+  serverConfig: AnyServerConfig,
   route: ApiRoute,
   pathParams: Record<string, string> | undefined
 ) {
@@ -47,9 +46,7 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
-  const { authContext } = createAuth(serverConfig.auth, serverConfig.context)
-  const context = Context.toRequestContext(serverConfig.context, {
-    authContext,
+  const context = serverConfig.context.toRequestContext({
     headers: reqHeaders,
   })
 
