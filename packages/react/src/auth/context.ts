@@ -1,202 +1,217 @@
-import type { AnyTable, Column } from 'drizzle-orm'
-import { and, asc, desc, eq, like } from 'drizzle-orm'
-import type { UndefinedToOptional } from 'type-fest/source/internal'
-
-import type { AnyAccountTable, AnySessionTable, AnyUserTable, AuthOptions } from '.'
+import type { AnyAccountTable, AnyUserTable, AuthOptions } from '.'
 import { AccountProvider } from './constant'
 
-type InferTableType<T extends AnyTable<{}>> = UndefinedToOptional<{
-  [K in keyof T['_']['columns']]: T['_']['columns'][K]['_']['notNull'] extends true
-    ? T['_']['columns'][K]['_']['data']
-    : T['_']['columns'][K]['_']['data'] | null | undefined
-}>
+import type { AnyContextable } from '../core'
+import type { InferTableType } from '../core/table'
 
-type Pagination<TField extends string = string> = {
-  page?: number // default 1
-  pageSize?: number // default 10
-  sort?: {
-    field: TField
-    order: 'asc' | 'desc'
-  }[]
-}
-
-export function createAuthInternalHandler(options: AuthOptions) {
-  const db = options.db
+export function createAuthInternalHandler(context: AnyContextable, options: AuthOptions) {
+  const prisma = context.getPrismaClient()
 
   const user = {
-    findById: async (id: string) => {
-      const table = options.schema.user
-      const users = await db.select().from(table).where(eq(table.id, id))
-      if (users.length === 0) throw new Error('User not found')
-      if (users.length > 1) throw new Error('Multiple users found')
-      const user = users[0]
-      return user
+    async findById(id: string) {
+      const modelName = options.schema.user.config.prismaModelName
+      const pkField = options.schema.user.shape.primaryFields[0]
+      const user = await prisma[modelName].findUnique({
+        where: { [pkField]: id },
+      })
+      if (!user) throw new Error('User not found')
+      return user as InferTableType<AuthOptions['schema']['user']>
     },
-    findByEmail: async (email: string) => {
-      const table = options.schema.user
 
-      const users = await db.select().from(table).where(eq(table.email, email))
-      if (users.length === 0) throw new Error('User not found')
-      if (users.length > 1) throw new Error('Multiple users found')
-      const user = users[0]
-      return user
+    async findByEmail(email: string) {
+      const modelName = options.schema.user.config.prismaModelName
+      const emailField = options.schema.user.shape.columns.email.name
+      const user = await prisma[modelName].findFirst({
+        where: { [emailField]: email },
+      })
+      if (!user) throw new Error('User not found')
+      return user as InferTableType<AuthOptions['schema']['user']>
     },
-    list: async (pagination: Pagination<keyof AnyUserTable['_']['columns']>) => {
-      const { page = 1, pageSize = 10, sort } = pagination
-      const table = options.schema.user
-      const users = await db
-        .select()
-        .from(table)
-        .limit(pageSize)
-        .offset((page - 1) * pageSize)
-        .orderBy(
-          ...(sort?.map((s) => {
-            const column = table[s.field as keyof typeof table] as Column
-            return s.order === 'asc' ? asc(column) : desc(column)
-          }) ?? [])
-        )
-      return users
-    },
-    create: async (data: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>) => {
-      const table = options.schema.user
-      const user = await db.insert(table).values(data).returning()
-      return user[0]
+
+    async create(data: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>) {
+      const modelName = options.schema.user.config.prismaModelName
+
+      const user = await prisma[modelName].create({
+        data: {
+          ...data,
+          emailVerified: null, // Set to null by default
+        },
+      })
+
+      return user as InferTableType<AuthOptions['schema']['user']>
     },
   }
+
   const account = {
-    link: async (data: Omit<InferTableType<AnyAccountTable>, 'id' | 'emailVerified'>) => {
-      const table = options.schema.account
-      const user = await db.insert(table).values(data).returning()
-      return user[0]
+    async link(data: Omit<InferTableType<AnyAccountTable>, 'id' | 'emailVerified'>) {
+      const modelName = options.schema.account.config.prismaModelName
+      const accountIdField = options.schema.account.shape.columns.userId.name
+      const accountIdValue = data[accountIdField as unknown as keyof typeof data]
+
+      const account = await prisma[modelName].upsert({
+        where: { [accountIdField]: accountIdValue },
+        create: data,
+        update: data,
+      })
+
+      return account as InferTableType<AuthOptions['schema']['account']>
     },
-    updatePassword: async (userId: string, password: string) => {
-      const table = options.schema.account
-      const account = await db
-        .update(table)
-        .set({ password })
-        .where(and(eq(table.userId, userId), eq(table.providerId, AccountProvider.CREDENTIAL)))
-        .returning()
+
+    async updatePassword(userId: string, password: string) {
+      const modelName = options.schema.account.config.prismaModelName
+      const userIdField = options.schema.account.shape.columns.userId.name
+      const providerField = options.schema.account.shape.columns.provider.name
+      const passwordField = options.schema.account.shape.columns.password.name
+
+      const account = await prisma[modelName].update({
+        where: {
+          [userIdField]: userId,
+          [providerField]: AccountProvider.CREDENTIAL,
+        },
+        data: { [passwordField]: password },
+      })
+
       if (account.length === 0) throw new Error('Account not found')
       if (account.length > 1) throw new Error('Multiple accounts found')
       return account[0]
     },
-    findByUserEmailAndProvider: async (email: string, providerId: AccountProvider) => {
-      const accounts = await db
-        .select({
-          user: options.schema.user,
-          password: options.schema.account.password,
-        })
-        .from(options.schema.account)
-        .leftJoin(options.schema.user, eq(options.schema.account.userId, options.schema.user.id))
-        .where(
-          and(
-            eq(options.schema.user.email, email),
-            eq(options.schema.account.providerId, providerId)
-          )
-        )
-      if (accounts.length === 0) throw new Error('Account not found')
-      if (accounts.length > 1) throw new Error('Multiple accounts found')
-      return accounts[0] as unknown as {
-        password: InferTableType<AnyAccountTable>['password']
-        user: InferTableType<AnyUserTable>
+
+    async findByUserEmailAndProvider(email: string, providerId: AccountProvider) {
+      const emailField = options.schema.user.shape.columns.email.name
+
+      const user = (await prisma[options.schema.user.config.prismaModelName].findUnique({
+        where: { [emailField]: email },
+      })) as InferTableType<AuthOptions['schema']['user']>
+
+      const userIdField = options.schema.account.shape.columns.userId.name
+      const providerField = options.schema.account.shape.columns.provider.name
+
+      const account = (await prisma[options.schema.account.config.prismaModelName].findFirst({
+        where: {
+          [userIdField]: user.id,
+          [providerField]: providerId,
+        },
+      })) as InferTableType<AuthOptions['schema']['account']>
+      return {
+        user: user,
+        account: account,
       }
     },
   }
   const session = {
-    create: async (data: { userId: string; expiresAt: Date }) => {
-      const table = options.schema.session
+    async create(data: { userId: string; expiresAt: Date }) {
+      const modelName = options.schema.session.config.prismaModelName
+
       const token = crypto.randomUUID()
-      const session = await db
-        .insert(table)
-        .values({ ...data, token })
-        .returning()
-      return session[0]
+
+      const userIdField = options.schema.session.shape.columns.userId.name
+      const tokenField = options.schema.session.shape.columns.token.name
+      const expiredAtField = options.schema.session.shape.columns.expiredAt.name
+
+      const session = await prisma[modelName].create({
+        data: {
+          [userIdField]: data.userId,
+          [tokenField]: token,
+          [expiredAtField]: data.expiresAt,
+        },
+      })
+
+      return session as InferTableType<AuthOptions['schema']['session']>
     },
-    update: async (id: string, data: any) => {
-      const table = options.schema.session
-      const session = await db.update(table).set(data).where(eq(table.id, id)).returning()
-      return session[0]
+
+    async findUserBySessionToken(token: string) {
+      const sessionModelName = options.schema.session.config.prismaModelName
+
+      const userIdField = options.schema.session.shape.columns.userId.name
+      const tokenField = options.schema.session.shape.columns.token.name
+
+      const session = (await prisma[sessionModelName].findFirst({
+        where: { [tokenField]: token },
+        select: { [userIdField]: true },
+      })) as InferTableType<AuthOptions['schema']['session']>
+
+      if (!session) throw new Error('Session not found')
+
+      const userModelName = options.schema.user.config.prismaModelName
+      const pkField = options.schema.user.shape.primaryFields[0]
+
+      const userIdValue = session[userIdField as unknown as keyof typeof session]
+      const user = (await prisma[userModelName].findUnique({
+        where: { [pkField]: userIdValue },
+      })) as InferTableType<AuthOptions['schema']['user']>
+
+      if (!user) throw new Error('User not found')
+
+      return user
     },
-    findUserBySessionToken: async (token: string) => {
-      const sessions = await db
-        .select({
-          id: options.schema.session.id,
-          user: options.schema.user,
-          expiresAt: options.schema.session.expiresAt,
-        })
-        .from(options.schema.session)
-        .leftJoin(options.schema.user, eq(options.schema.session.userId, options.schema.user.id))
-        .where(eq(options.schema.session.token, token))
-      if (sessions.length === 0) throw new Error('Session not found')
-      if (sessions.length > 1) throw new Error('Multiple sessions found')
-      const session = sessions[0]
-      return session as unknown as {
-        id: InferTableType<AnySessionTable>['id']
-        user: InferTableType<AnyUserTable>
-        expiresAt: InferTableType<AnySessionTable>['expiresAt']
-      }
+
+    async deleteByToken(token: string) {
+      const modelName = options.schema.session.config.prismaModelName
+      const tokenField = options.schema.session.shape.columns.token.name
+      await prisma[modelName].delete({ where: { [tokenField]: token } })
     },
-    deleteById: async (id: string) => {
-      const table = options.schema.session
-      const session = await db.delete(table).where(eq(table.id, id)).returning()
-      return session[0]
-    },
-    deleteByToken: async (token: string) => {
-      const table = options.schema.session
-      const session = await db.delete(table).where(eq(table.token, token)).returning()
-      return session[0]
-    },
-    deleteByUserId: async (userId: string) => {
-      const table = options.schema.session
-      const session = await db.delete(table).where(eq(table.userId, userId)).returning()
-      return session[0]
+
+    async deleteByUserId(userId: string) {
+      const modelName = options.schema.session.config.prismaModelName
+      const userIdField = options.schema.session.shape.columns.userId.name
+      await prisma[modelName].delete({ where: { [userIdField]: userId } })
     },
   }
 
   const verification = {
-    create: async (data: { identifier: string; value: string; expiresAt: Date }) => {
-      const table = options.schema.verification
-      const verification = await db.insert(table).values(data).returning()
-      return verification[0]
+    async create(data: { identifier: string; value: string; expiredAt: Date }) {
+      const modelName = options.schema.verification.config.prismaModelName
+      const identifierField = options.schema.verification.shape.columns.identifier.name
+      const valueField = options.schema.verification.shape.columns.value.name
+      const expiredAtField = options.schema.verification.shape.columns.expiredAt.name
+
+      const verification = await prisma[modelName].create({
+        data: {
+          [identifierField]: data.identifier,
+          [valueField]: data.value,
+          [expiredAtField]: data.expiredAt,
+        },
+      })
+
+      return verification
     },
+
     findByIdentifier: async (identifier: string) => {
-      const table = options.schema.verification
-      const verifications = await db.select().from(table).where(eq(table.identifier, identifier))
-      if (verifications.length === 0) throw new Error('Verification not found')
-      if (verifications.length > 1) throw new Error('Multiple verifications found')
-      return verifications[0]
+      const modelName = options.schema.verification.config.prismaModelName
+      const identifierField = options.schema.verification.shape.columns.identifier.name
+      const createdAtField = options.schema.verification.shape.columns.createdAt.name
+      const verification = await prisma[modelName].findFirst({
+        where: { [identifierField]: identifier },
+        orderBy: { [createdAtField]: 'desc' },
+      })
+      if (!verification) throw new Error('Verification not found')
+      return verification
     },
-    delete: async (id: string) => {
-      const table = options.schema.verification
-      const verification = await db.delete(table).where(eq(table.id, id)).returning()
-      if (verification.length === 0) throw new Error('Verification not found')
-      return verification[0]
+
+    async deleteByIdentifier(identifier: string) {
+      const modelName = options.schema.verification.config.prismaModelName
+      const identifierField = options.schema.verification.shape.columns.identifier.name
+      const verification = await prisma[modelName].delete({
+        where: { [identifierField]: identifier },
+      })
+      if (!verification) throw new Error('Verification not found')
+      return verification
     },
-    deleteByUserIdAndIdentifierPrefix: async (userId: string, identifierPrefix: string) => {
-      const table = options.schema.verification
-      return await db
-        .delete(table)
-        .where(and(eq(table.value, userId), like(table.identifier, `${identifierPrefix}%`)))
-        .returning()
-    },
-    findByResetPasswordToken: async (token: string) => {
-      const identifier = `reset-password:${token}`
-      const table = options.schema.verification
-      const verifications = await db.select().from(table).where(eq(table.identifier, identifier))
-      if (verifications.length === 0) throw new Error('Verification not found')
-      if (verifications.length > 1) throw new Error('Multiple verifications found')
-      return verifications[0]
-    },
-    createWithResetPasswordToken: async (userId: string, expiresInMs?: number) => {
-      const table = options.schema.verification
-      const token = crypto.randomUUID()
-      const identifier = `reset-password:${token}`
-      const expiresAt = new Date(Date.now() + (expiresInMs ?? 1000 * 60 * 15)) // default 15 mins
-      const verification = await db
-        .insert(table)
-        .values({ identifier, value: userId, expiresAt })
-        .returning()
-      return verification[0]
+
+    async deleteByUserIdAndIdentifierPrefix(userId: string, identifierPrefix: string) {
+      const modelName = options.schema.verification.config.prismaModelName
+      const userIdField = options.schema.verification.shape.columns.value.name
+      const identifierField = options.schema.verification.shape.columns.identifier.name
+      const verification = await prisma[modelName].deleteMany({
+        where: {
+          [userIdField]: userId,
+          [identifierField]: {
+            startsWith: identifierPrefix,
+          },
+        },
+      })
+      if (verification.count === 0) throw new Error('Verification not found')
+      return verification
     },
   }
 
@@ -205,6 +220,18 @@ export function createAuthInternalHandler(options: AuthOptions) {
     account,
     session,
     verification,
+
+    identifier: {
+      resetPassword: (token: string) => `reset-password:${token}`,
+      emailVerification: (token: string) => `email-verification:${token}`,
+      emailChange: (token: string) => `email-change:${token}`,
+    },
+
+    identityPrefix: {
+      resetPassword: 'reset-password:',
+      emailVerification: 'email-verification:',
+      emailChange: 'email-change:',
+    },
   }
 }
 

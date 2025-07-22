@@ -1,27 +1,22 @@
-import type { Column, Relation } from 'drizzle-orm'
-import {
-  type FindTableByDBName,
-  getTableName,
-  is,
-  One,
-  type TableRelationalConfig,
-} from 'drizzle-orm'
 import type { Simplify } from 'type-fest'
-import type { ZodObject, ZodOptional } from 'zod/v4'
 import z from 'zod/v4'
 
 import { ApiDefaultMethod, type MaybePromise } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
+import {
+  type DataType,
+  type FieldColumnSchema,
+  type FieldRelationSchema,
+  type ModelSchemas,
+  type SanitizedFieldColumnSchema,
+  type SanitizedFieldRelationSchema,
+  sanitizedFieldRelationSchema,
+} from './model'
 import type {
   EditorProviderClientProps,
   ServerConfigEditorProviderProps as EditorProviderProps,
 } from './richtext/types'
-import {
-  appendFieldNameToFields as renameFieldsFieldName,
-  type GetPrimaryColumn,
-  getPrimaryColumn,
-  getPrimaryColumnTsName,
-} from './utils'
+import { appendFieldNameToFields as renameFieldsFieldName } from './utils'
 
 import type { FileUploadOptionsProps } from '../react/components/compound/file-upload-field'
 
@@ -31,25 +26,20 @@ export type OptionCallback<TType extends string | number, in TContext extends An
 
 export interface FieldColumnClientMetadata {
   source: 'column'
-  columnTsName: string
   fieldName: string
+  column: SanitizedFieldColumnSchema
 }
-export interface FieldColumnMetadata extends FieldColumnClientMetadata {
-  column: Column
+export interface FieldColumnMetadata extends Omit<FieldColumnClientMetadata, 'column'> {
+  column: FieldColumnSchema
 }
 
 export interface FieldRelationClientMetadata {
   source: 'relation'
-  relationTsName: string
-  referencedTableTsName: string
-  sourceTableTsName: string
-  primaryColumnTsName: string
-  mode: 'one' | 'many'
   fieldName: string
+  relation: SanitizedFieldRelationSchema
 }
-export interface FieldRelationMetadata extends FieldRelationClientMetadata {
-  relation: Relation
-  primaryColumn: Column
+export interface FieldRelationMetadata extends Omit<FieldRelationClientMetadata, 'relation'> {
+  relation: FieldRelationSchema
 }
 
 export const FieldMutateModeCollection = {
@@ -462,118 +452,101 @@ export type Field<TContext extends AnyContextable = AnyContextable> =
   | FieldRelation<TContext>
 
 // Define fields (which is fields with fieldName)
-export type FieldsClient = Record<string, FieldClient>
-export type Fields = Record<string, Field>
+export interface FieldsBase {
+  config: {
+    prismaModelName: string
+  }
+}
+export interface FieldsClientShape extends Record<string, FieldClient> {}
+export interface FieldsClient extends FieldsBase {
+  shape: FieldsClientShape
+}
+export interface FieldsShape extends Record<string, Field> {}
+export interface Fields extends FieldsBase {
+  shape: FieldsShape
+}
 
 // More type utilities
-export type FieldColumnOptionsFromTable<
-  TColumn extends Column<any>,
-  TContext extends AnyContextable = AnyContextable,
-> = TColumn['_']['dataType'] extends 'string'
-  ? FieldColumnStringOptions<TContext>
-  : TColumn['_']['dataType'] extends 'number'
-    ? FieldColumnNumberOptions<TContext>
-    : TColumn['_']['dataType'] extends 'boolean'
-      ? FieldColumnBooleanOptions
-      : TColumn['_']['dataType'] extends 'date'
-        ? FieldColumnDateOptions
-        : TColumn['_']['dataType'] extends 'json'
+export type FieldColumnOptionsFromSchema<
+  TContext extends AnyContextable,
+  TColumn extends FieldColumnSchema,
+> = TColumn['dataType'] extends typeof DataType.STRING
+  ? TColumn['isList'] extends true
+    ? FieldColumnStringArrayOptions<TContext>
+    : FieldColumnStringOptions<TContext>
+  : TColumn['dataType'] extends typeof DataType.INT
+    ? TColumn['isList'] extends true
+      ? FieldColumnNumberArrayOptions<TContext>
+      : FieldColumnNumberOptions<TContext>
+    : TColumn['dataType'] extends typeof DataType.BOOLEAN
+      ? // TODO: Boolean array type is not supported yet
+        FieldColumnBooleanOptions
+      : TColumn['dataType'] extends typeof DataType.DATETIME
+        ? // TODO: Date array type is not supported yet
+          FieldColumnDateOptions
+        : TColumn['dataType'] extends typeof DataType.JSON
           ? FieldColumnJsonOptions
-          : TColumn['_']['dataType'] extends 'array'
-            ? TColumn['_']['data'] extends string[]
-              ? FieldColumnStringArrayOptions<TContext>
-              : TColumn['_']['data'] extends number[]
-                ? FieldColumnNumberArrayOptions<TContext>
-                : never
-            : never
+          : never
 
-type FieldRelationOptionsFromTable<
-  TRelationPrimaryColumn extends Column,
-  TContext extends AnyContextable = AnyContextable,
-> = TRelationPrimaryColumn['_']['data'] extends infer TType extends string | number
+// FIXME: Support only 1 foreign key relation for now
+type FieldRelationOptionsFromSchema<
+  TContext extends AnyContextable,
+  TRelationFieldSchema extends FieldRelationSchema,
+> = TRelationFieldSchema['relationDataTypes'][0] extends typeof DataType.STRING
   ?
-      | FieldRelationConnectOptions<TContext, TType>
-      | FieldRelationConnectOrCreateOptions<TContext, TType>
+      | FieldRelationConnectOptions<TContext, string>
+      | FieldRelationConnectOrCreateOptions<TContext, string>
       | FieldRelationCreateOptions
-  : TRelationPrimaryColumn
-
-type GetReferencedPrimaryColumn<
-  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
-  TRelation extends Relation,
-> =
-  FindTableByDBName<
-    TTableRelationConfigByTableTsName,
-    TRelation['referencedTableName']
-  > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
-    ? GetPrimaryColumn<TReferencedTableRelationalConfig>
+  : TRelationFieldSchema['relationDataTypes'][0] extends typeof DataType.INT
+    ?
+        | FieldRelationConnectOptions<TContext, number>
+        | FieldRelationConnectOrCreateOptions<TContext, number>
+        | FieldRelationCreateOptions
     : never
-
-type GetReferencedTableTsName<
-  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
-  TRelation extends Relation,
-> =
-  FindTableByDBName<
-    TTableRelationConfigByTableTsName,
-    TRelation['referencedTableName']
-  > extends infer TReferencedTableRelationalConfig extends TableRelationalConfig
-    ? TReferencedTableRelationalConfig['tsName']
-    : never
-
-type GetRelationMode<TRelation extends Relation> = TRelation extends One ? 'one' : 'many'
 
 export class FieldBuilder<
-  TFullSchema extends Record<string, unknown>,
-  TTableRelationConfigByTableTsName extends Record<string, TableRelationalConfig>,
-  TTableTsName extends string,
-  TContext extends AnyContextable,
+  const TContext extends AnyContextable,
+  const TModelSchemas extends ModelSchemas,
+  const TModelName extends keyof TModelSchemas,
 > {
-  private readonly tableRelationalConfig: TTableRelationConfigByTableTsName[TTableTsName]
+  private readonly model: TModelSchemas[TModelName]
 
   constructor(
-    tableTsName: TTableTsName,
-    private readonly tableRelationalConfigByTableTsName: TTableRelationConfigByTableTsName
-  ) {
-    this.tableRelationalConfig = tableRelationalConfigByTableTsName[
-      tableTsName
-    ] as TTableRelationConfigByTableTsName[TTableTsName]
-
-    if (this.tableRelationalConfig === undefined) {
-      throw new Error(
-        `Table ${tableTsName} not found in schema. Available tables: ${Object.keys(
-          tableRelationalConfigByTableTsName
-        ).join(', ')}`
-      )
+    private readonly options: {
+      context: TContext
+      modelSchemas: TModelSchemas
+      modelName: TModelName
     }
+  ) {
+    this.model = options.modelSchemas[options.modelName]
   }
 
   columns<
-    TColumnTsName extends Extract<
-      keyof TTableRelationConfigByTableTsName[TTableTsName]['columns'],
-      string
+    const TFieldColumnName extends keyof TModelSchemas[TModelName]['shape']['columns'],
+    const TOptions extends FieldColumnOptionsFromSchema<
+      TContext,
+      TModelSchemas[TModelName]['shape']['columns'][TFieldColumnName]
     >,
-    const TOptions extends FieldColumnOptionsFromTable<
-      TTableRelationConfigByTableTsName[TTableTsName]['columns'][TColumnTsName],
-      TContext
-    >,
-  >(columnTsName: TColumnTsName, options: TOptions) {
+  >(fieldColumnName: TFieldColumnName, options: TOptions) {
+    const column = this.model.shape.columns[
+      fieldColumnName as string
+    ] as TModelSchemas[TModelName]['shape']['columns'][TFieldColumnName]
+
     const fieldMetadata = {
       $client: {
         source: 'column',
-        columnTsName: columnTsName,
         // This field will be mutated by the builder to include the field name
         fieldName: '',
+        column: column,
       },
       $server: {
         source: 'column',
-        columnTsName: columnTsName,
-        // This field will be mutated by the builder to include the field name
         fieldName: '',
-        column: this.tableRelationalConfig['columns'][
-          columnTsName
-        ] as TTableRelationConfigByTableTsName[TTableTsName]['columns'][TColumnTsName],
+        column: column,
       },
     } satisfies FieldColumnBase
 
+    // TODO: Apply default value of column if it exists e.g. isRequired, isList, etc.
     return {
       ...fieldMetadata,
       ...options,
@@ -581,112 +554,51 @@ export class FieldBuilder<
   }
 
   relations<
-    TRelationTsName extends Extract<
-      keyof TTableRelationConfigByTableTsName[TTableTsName]['relations'],
-      string
-    >,
-    const TOptions extends FieldRelationOptionsFromTable<
-      GetReferencedPrimaryColumn<
-        TTableRelationConfigByTableTsName,
-        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
-      >,
-      TContext
+    const TFieldRelationName extends keyof TModelSchemas[TModelName]['shape']['relations'],
+    const TOptions extends FieldRelationOptionsFromSchema<
+      TContext,
+      TModelSchemas[TModelName]['shape']['relations'][TFieldRelationName]
     >,
   >(
-    relationTsName: TRelationTsName,
+    fieldRelationName: TFieldRelationName,
     optionsFn: (
       fb: FieldBuilder<
-        TFullSchema,
-        TTableRelationConfigByTableTsName,
-        GetReferencedTableTsName<
-          TTableRelationConfigByTableTsName,
-          TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
-        >,
-        TContext
+        TContext,
+        TModelSchemas,
+        TModelSchemas[TModelName]['shape']['relations'][TFieldRelationName]['referencedModel']['config']['prismaModelName']
       >
     ) => TOptions
   ) {
-    const relation = this.tableRelationalConfig['relations'][
-      relationTsName
-    ] as TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
+    const relation = this.model.shape.relations[
+      fieldRelationName as string
+    ] as TModelSchemas[TModelName]['shape']['relations'][TFieldRelationName]
 
-    type ReferencedTableRelationalConfig = FindTableByDBName<
-      TTableRelationConfigByTableTsName,
-      TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]['referencedTableName']
-    >
-
-    const referencedTableRelationalConfig = Object.values(
-      this.tableRelationalConfigByTableTsName
-    ).find((t) => t.dbName === relation.referencedTableName) as
-      | ReferencedTableRelationalConfig
-      | undefined
-    if (!referencedTableRelationalConfig) {
-      throw new Error(`Referenced table ${relation.referencedTableName} not found in schema`)
-    }
-
-    type SourceTableRelationalConfig = FindTableByDBName<
-      TTableRelationConfigByTableTsName,
-      TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]['sourceTable']['_']['name']
-    >
-
-    const sourceTableRelationalConfig = Object.values(this.tableRelationalConfigByTableTsName).find(
-      (t) => t.dbName === getTableName(relation.sourceTable)
-    ) as SourceTableRelationalConfig | undefined
-    if (!sourceTableRelationalConfig) {
-      throw new Error(`Source table ${relation.sourceTable._.name} not found in schema`)
-    }
-
-    const primaryColumn = getPrimaryColumn(referencedTableRelationalConfig)
-    const primaryColumnTsName = getPrimaryColumnTsName(referencedTableRelationalConfig)
-
-    const fb = new FieldBuilder(
-      referencedTableRelationalConfig.tsName,
-      this.tableRelationalConfigByTableTsName
-    ) as FieldBuilder<
-      TFullSchema,
-      TTableRelationConfigByTableTsName,
-      GetReferencedTableTsName<
-        TTableRelationConfigByTableTsName,
-        TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
-      >,
-      TContext
-    >
+    const fb = new FieldBuilder({
+      context: this.options.context,
+      modelSchemas: this.options.modelSchemas,
+      modelName: relation.referencedModel.config
+        .prismaModelName as TModelSchemas[TModelName]['shape']['relations'][TFieldRelationName]['referencedModel']['config']['prismaModelName'],
+    })
 
     const options = optionsFn(fb)
 
     if (options.type === 'connectOrCreate' || options.type === 'create') {
-      options.fields = renameFieldsFieldName(options.fields)
+      options.fields.shape = renameFieldsFieldName(options.fields.shape)
     }
-
-    const mode = (is(relation, One) ? 'one' : 'many') as GetRelationMode<
-      TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
-    >
 
     const fieldMetadata = {
       $client: {
         source: 'relation',
-        mode,
-        relationTsName: relationTsName,
-        referencedTableTsName: referencedTableRelationalConfig.tsName,
-        sourceTableTsName: sourceTableRelationalConfig.tsName,
-        primaryColumnTsName: primaryColumnTsName as string,
         // This field will be mutated by the builder to include the field name
         fieldName: '',
+        // TODO: Conver to sanitized relation schema
+        relation: sanitizedFieldRelationSchema(relation),
       },
       $server: {
         source: 'relation',
-        mode,
-        relationTsName: relationTsName,
-        referencedTableTsName: referencedTableRelationalConfig.tsName,
-        sourceTableTsName: sourceTableRelationalConfig.tsName,
-        primaryColumnTsName: primaryColumnTsName as string,
-        relation: relation,
-        primaryColumn: primaryColumn as GetReferencedPrimaryColumn<
-          TTableRelationConfigByTableTsName,
-          TTableRelationConfigByTableTsName[TTableTsName]['relations'][TRelationTsName]
-        >,
         // This field will be mutated by the builder to include the field name
         fieldName: '',
+        relation: relation,
       },
     } satisfies FieldRelationBase
 
@@ -696,29 +608,52 @@ export class FieldBuilder<
     }
   }
 
-  fields<TFields extends Fields>(
-    tableTsName: TTableTsName,
-    optionsFn: (
-      fb: FieldBuilder<TFullSchema, TTableRelationConfigByTableTsName, TTableTsName, TContext>
-    ) => TFields
-  ): Simplify<TFields> {
-    const fb = new FieldBuilder(tableTsName, this.tableRelationalConfigByTableTsName)
-    return renameFieldsFieldName(optionsFn(fb))
+  fields<TFieldsShape extends FieldsShape>(
+    modelName: TModelName,
+    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape
+  ): Simplify<{
+    shape: TFieldsShape
+    config: { prismaModelName: TModelName }
+  }> {
+    const fb = new FieldBuilder({
+      context: this.options.context,
+      modelSchemas: this.options.modelSchemas,
+      modelName,
+    })
+    const shape = renameFieldsFieldName(optionsFn(fb))
+    return {
+      shape,
+      config: { prismaModelName: modelName },
+    }
   }
 }
 
-// TODO: Add support for relation input fields
 type CastOptionalFieldToZodSchema<
   TField extends FieldBase,
   TSchema extends z.ZodTypeAny,
 > = TField['$server'] extends { source: 'column' }
-  ? TField['$server']['column']['notNull'] extends true
-    ? ZodOptional<TSchema>
+  ? TField['$server']['column']['isRequired'] extends true
+    ? z.ZodOptional<TSchema>
     : TSchema
   : TSchema
 
-type FieldToZodScheama<TField extends FieldBase> =
-  TField extends FieldColumnString<any>
+type FieldRelationToZodSchema<TField extends FieldRelation> = TField extends FieldRelationConnect
+  ? TField['$server']['relation']['isList'] extends true
+    ? z.ZodArray<FieldsToZodObject<TField['fields']['shape']>>
+    : FieldsToZodObject<TField['fields']['shape']>
+  : TField extends FieldRelationCreate
+    ? TField['$server']['relation']['isList'] extends true
+      ? z.ZodArray<FieldsToZodObject<TField['fields']['shape']>>
+      : FieldsToZodObject<TField['fields']['shape']>
+    : TField extends FieldRelationConnectOrCreate
+      ? TField['$server']['relation']['isList'] extends true
+        ? z.ZodArray<FieldsToZodObject<TField['fields']['shape']>>
+        : FieldsToZodObject<TField['fields']['shape']>
+      : never
+
+export type FieldToZodScheama<TField extends FieldBase> = TField extends FieldColumnJson
+  ? CastOptionalFieldToZodSchema<TField, z.ZodJSONSchema>
+  : TField extends FieldColumnString<any>
     ? CastOptionalFieldToZodSchema<TField, z.ZodString>
     : TField extends FieldColumnStringArray<any>
       ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodString>>
@@ -730,9 +665,15 @@ type FieldToZodScheama<TField extends FieldBase> =
             ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>
             : TField extends FieldColumnDate
               ? CastOptionalFieldToZodSchema<TField, z.ZodISODate>
-              : never
-// TODO: Relation input
-// TODO: Optioanl and default values
+              : TField extends FieldRelation
+                ? FieldRelationToZodSchema<TField>
+                : never
+
+export type FieldsToZodObject<TFieldsShape extends FieldsShape> = z.ZodObject<{
+  [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends Field
+    ? FieldToZodScheama<TFieldsShape[TKey]>
+    : never
+}>
 
 export function fieldToZodScheama<TField extends FieldBase>(
   field: TField
@@ -740,79 +681,85 @@ export function fieldToZodScheama<TField extends FieldBase>(
   // TODO: More options
   switch (field.type) {
     // Richtext JSON
-    case 'richText':
-      return z.any() as unknown as FieldToZodScheama<TField>
+    case 'richText': {
+      return z.json() as FieldToZodScheama<TField>
+    }
     // string input
     case 'text':
     case 'selectText':
     case 'time':
     case 'password':
-    case 'media':
-      if (!field.$server.column.notNull) {
+    case 'media': {
+      if (!field.$server.column.isRequired) {
         return z.string().optional() as FieldToZodScheama<TField>
       }
 
       return z.string() as FieldToZodScheama<TField>
-    case 'email':
-      if (!field.$server.column.notNull) {
+    }
+    case 'email': {
+      if (!field.$server.column.isRequired) {
         return z.string().email().optional() as FieldToZodScheama<TField>
       }
-
       return z.string().email() as FieldToZodScheama<TField>
+    }
     // string[] input
-    case 'comboboxText':
-      if (!field.$server.column.notNull) {
+    case 'comboboxText': {
+      if (!field.$server.column.isRequired) {
         return z.array(z.string()).optional() as FieldToZodScheama<TField>
       }
       return z.array(z.string()) as FieldToZodScheama<TField>
+    }
     // number input
     case 'number':
-    case 'selectNumber':
-      if (!field.$server.column.notNull) {
+    case 'selectNumber': {
+      if (!field.$server.column.isRequired) {
         return z.number().optional() as FieldToZodScheama<TField>
       }
       return z.number() as FieldToZodScheama<TField>
+    }
     // number[] input
-    case 'comboboxNumber':
-      if (!field.$server.column.notNull) {
+    case 'comboboxNumber': {
+      if (!field.$server.column.isRequired) {
         return z.array(z.number()).optional() as FieldToZodScheama<TField>
       }
       return z.array(z.number()) as FieldToZodScheama<TField>
+    }
     // boolean input
     case 'checkbox':
-    case 'switch':
-      if (!field.$server.column.notNull) {
+    case 'switch': {
+      if (!field.$server.column.isRequired) {
         return z.boolean().optional() as FieldToZodScheama<TField>
       }
       return z.boolean() as FieldToZodScheama<TField>
+    }
     // date input
-    case 'date':
-      if (!field.$server.column.notNull) {
+    case 'date': {
+      if (!field.$server.column.isRequired) {
         return z.iso.date().optional() as FieldToZodScheama<TField>
       }
       return z.iso.date() as FieldToZodScheama<TField>
+    }
     // TODO: relation input
-    case 'connect':
+    case 'connect': {
       return z.any() as unknown as FieldToZodScheama<TField>
-    case 'create':
+    }
+    case 'create': {
       return z.any() as unknown as FieldToZodScheama<TField>
-    case 'connectOrCreate':
+    }
+    case 'connectOrCreate': {
       return z.any() as unknown as FieldToZodScheama<TField>
-    default:
+    }
+    default: {
       throw new Error(`Unknown field type: ${(field as any).type}`)
+    }
   }
 }
 
-// TODO: Type is not correct, needs to be fixed
-type FieldsToZodObject<TFields extends Fields> = ZodObject<{
-  [TKey in keyof TFields]: TFields[TKey] extends Field ? z.ZodTypeAny : never
-}>
-
-export function fieldsToZodObject<TFields extends Fields>(
-  fields: TFields,
+export function fieldsToZodObject<TFieldsShape extends FieldsShape>(
+  fieldsShape: TFieldsShape,
   method?: typeof ApiDefaultMethod.CREATE | typeof ApiDefaultMethod.UPDATE
-): FieldsToZodObject<TFields> {
-  const zodObject = Object.entries(fields).reduce(
+): FieldsToZodObject<TFieldsShape> {
+  const zodObject = Object.entries(fieldsShape).reduce(
     (acc, [key, field]) => {
       if (method) {
         if (
@@ -834,5 +781,5 @@ export function fieldsToZodObject<TFields extends Fields>(
     {} as Record<string, z.ZodTypeAny>
   )
 
-  return z.object(zodObject) as FieldsToZodObject<TFields>
+  return z.object(zodObject) as FieldsToZodObject<TFieldsShape>
 }

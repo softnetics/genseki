@@ -5,6 +5,7 @@ import type { JSONSchema } from 'zod/v4/core'
 
 import type { MaybePromise } from './collection'
 import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'
+import { withValidator } from './endpoint.utils'
 import { type ConditionalExceptNever } from './utils'
 
 export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
@@ -69,21 +70,21 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
       ? {
           status: TStatus
           body: Output<TResponses[TStatus]>
-          headers?: Record<string, string>
         }
       : never
   }>
 
 export type ApiRouteHandler<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = (
   payload: ApiRouteHandlerPayload<TApiRouteSchema>,
-  request: Request
+  meta: { request: Request; response: Response }
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type ApiRouteHandlerInitial<
   TContext extends AnyRequestContextable,
   TApiRouteSchema extends ApiRouteSchema,
 > = (
-  payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext }
+  payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext },
+  meta: { request: Request; response: Response }
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
@@ -107,6 +108,7 @@ export interface ApiRouteSchema {
   description?: string
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
 }
+
 export interface ApiRouteSchemaClient {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
@@ -158,15 +160,14 @@ export function createEndpoint<
 ): ApiRoute<TApiEndpointSchema> {
   return {
     schema: schema,
-    // TODO: Recheck with Validator.
-    // handler: withValidator(schema, (payload, request) => {
-    //   const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
-    //   return handler({ ...payload, context: requestContext })
-    // }),
-    handler: (payload, request) => {
+    handler: withValidator(schema, async (payload, { request, response }) => {
       const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
-      return handler({ ...payload, context: requestContext })
-    },
+      const responseBody = await handler(
+        { ...payload, context: requestContext },
+        { request, response }
+      )
+      return responseBody
+    }),
   }
 }
 

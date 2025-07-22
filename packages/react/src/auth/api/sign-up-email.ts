@@ -4,7 +4,7 @@ import type { Contextable } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { AccountProvider } from '../constant'
-import { hashPassword, setSessionCookie } from '../utils'
+import { hashPassword, ResponseHelper } from '../utils'
 
 export function signUpEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
@@ -28,14 +28,14 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           token: z.string().nullable(),
           user: z.object({
             id: z.string(),
-            name: z.string().nullable(),
-            email: z.string().nullable(),
-            image: z.string().nullable(),
+            name: z.string().nullable().optional(),
+            email: z.string().nullable().optional(),
+            image: z.string().nullable().optional(),
           }),
         }),
       },
     },
-    async (args) => {
+    async (args, { response }) => {
       const hashedPassword = await passwordHasher(args.body.password)
 
       const user = await builderArgs.handler.user.create({
@@ -46,7 +46,7 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
 
       await builderArgs.handler.account.link({
         userId: user.id,
-        providerId: AccountProvider.CREDENTIAL,
+        provider: AccountProvider.CREDENTIAL,
         accountId: user.id,
         password: hashedPassword,
       })
@@ -54,9 +54,6 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
       // TODO: Check if sending email verification is enabled
       // NOTE: Callback URL is used for email verification
 
-      // Check if auto login is enabled
-
-      const responseHeaders = {}
       if (builderArgs.options.method.emailAndPassword?.signUp?.autoLogin !== false) {
         const session = await builderArgs.handler.session.create({
           userId: user.id,
@@ -64,7 +61,7 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
         })
         // Set session cookie if auto login is enabled
-        setSessionCookie(responseHeaders, session.token)
+        ResponseHelper.setSessionCookie(response, session.token)
 
         return {
           status: 200,
@@ -72,7 +69,6 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
             token: session.token,
             user: user,
           },
-          headers: responseHeaders,
         }
       }
 
@@ -82,7 +78,6 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           token: null,
           user: user,
         },
-        headers: responseHeaders,
       }
     }
   )

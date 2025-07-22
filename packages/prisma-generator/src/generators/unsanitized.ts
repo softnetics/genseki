@@ -1,7 +1,7 @@
 import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
-import { toCamelCase } from './utils'
+import { getAllPrimaryFields, toCamelCase } from './utils'
 
 function generateFieldBaseSchemaProperties(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
@@ -90,7 +90,23 @@ function generateFieldColumnSchemaInterface(
   )
 }
 
-function generateFieldRelationSchemaInterface(field: DMMF.Field, fields: readonly DMMF.Field[]) {
+function generateFieldRelationSchemaInterface(
+  field: DMMF.Field,
+  model: DMMF.Model,
+  datamodel: DMMF.Datamodel
+) {
+  const referencedModel = datamodel.models.find((relation) => relation.name === field.type)
+  if (!referencedModel) {
+    throw new Error(`Referenced model ${field.type} not found in datamodel`)
+  }
+  const referencedModelPrimaryFields = getAllPrimaryFields(referencedModel)
+
+  const relationDataTypes = referencedModelPrimaryFields.flatMap((f) => {
+    const found = model.fields.find((field) => field.name === f.name)
+    if (!found) return []
+    return factory.createTypeReferenceNode(`typeof DataType.${found.type.toUpperCase()}`)
+  })
+
   return factory.createPropertySignature(
     undefined,
     field.name,
@@ -133,20 +149,23 @@ function generateFieldRelationSchemaInterface(field: DMMF.Field, fields: readonl
         undefined,
         'relationDataTypes',
         undefined,
-        factory.createTupleTypeNode(
-          field.relationFromFields?.flatMap((f) => {
-            const found = fields.find((field) => field.name === f)
-            if (!found) return []
-            return factory.createTypeReferenceNode(`typeof DataType.STRING`)
-          }) ?? []
-        )
+        factory.createTupleTypeNode(relationDataTypes)
       ),
     ])
   )
 }
 
-function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
+function generateModelInterface(model: DMMF.Model, datamodel: DMMF.Datamodel) {
   const baseName = `${model.name}Model`
+
+  const primaryFields = getAllPrimaryFields(model)
+  const primaryFieldNames = primaryFields.map((field) => field.name)
+
+  const singleUniqueFieldNames = model.fields
+    .filter((field) => field.isUnique)
+    .map((field) => [field.name])
+
+  const allUniqueFields = [primaryFieldNames, ...singleUniqueFieldNames, ...model.uniqueFields]
 
   const modelShapeInterface = factory.createInterfaceDeclaration(
     [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
@@ -161,7 +180,7 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
         factory.createTypeLiteralNode(
           model.fields
             .filter((f) => !f.relationName)
-            .map((field) => generateFieldColumnSchemaInterface(field, enums))
+            .map((field) => generateFieldColumnSchemaInterface(field, datamodel.enums))
         )
       ),
       factory.createPropertySignature(
@@ -171,19 +190,33 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
         factory.createTypeLiteralNode(
           model.fields
             .filter((f) => f.relationName)
-            .map((field) => generateFieldRelationSchemaInterface(field, model.fields))
+            .map((field) => generateFieldRelationSchemaInterface(field, model, datamodel))
+        )
+      ),
+      factory.createPropertySignature(
+        undefined,
+        'primaryFields',
+        undefined,
+        factory.createTupleTypeNode(
+          primaryFieldNames.map((field) =>
+            factory.createLiteralTypeNode(factory.createStringLiteral(field))
+          )
+        )
+      ),
+      factory.createPropertySignature(
+        undefined,
+        'uniqueFields',
+        undefined,
+        factory.createTupleTypeNode(
+          allUniqueFields.map((field) =>
+            factory.createTupleTypeNode(
+              field.map((f) => factory.createLiteralTypeNode(factory.createStringLiteral(f)))
+            )
+          )
         )
       ),
     ]
   )
-
-  const primaryFieldNames = model.fields.filter((field) => field.isId).map((field) => [field.name])
-  const allPriamryFieldNames = [...primaryFieldNames, ...(model.primaryKey?.fields ?? [])].flat()
-
-  const singleUniqueFieldNames = model.fields
-    .filter((field) => field.isUnique)
-    .map((field) => [field.name])
-  const allUniqueFields = [allPriamryFieldNames, ...singleUniqueFieldNames, ...model.uniqueFields]
 
   const modelConfigInterface = factory.createInterfaceDeclaration(
     [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
@@ -208,28 +241,6 @@ function generateModelInterface(model: DMMF.Model, enums: readonly DMMF.Datamode
         'prismaModelName',
         undefined,
         factory.createTypeReferenceNode(`"${toCamelCase(model.name)}"`)
-      ),
-      factory.createPropertySignature(
-        undefined,
-        'primaryFields',
-        undefined,
-        factory.createTupleTypeNode(
-          allPriamryFieldNames.map((field) =>
-            factory.createLiteralTypeNode(factory.createStringLiteral(field))
-          )
-        )
-      ),
-      factory.createPropertySignature(
-        undefined,
-        'uniqueFields',
-        undefined,
-        factory.createTupleTypeNode(
-          allUniqueFields.map((field) =>
-            factory.createTupleTypeNode(
-              field.map((f) => factory.createLiteralTypeNode(factory.createStringLiteral(f)))
-            )
-          )
-        )
       ),
     ]
   )
@@ -277,29 +288,72 @@ export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
             undefined,
             factory.createIdentifier('type SchemaType')
           ),
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('unsanitizedModelSchemas')
+          ),
         ])
       ),
       factory.createStringLiteral('@genseki/react')
     ),
+    factory.createImportDeclaration(
+      undefined,
+      factory.createImportClause(
+        false,
+        undefined,
+        factory.createNamedImports([
+          factory.createImportSpecifier(
+            false,
+            undefined,
+            factory.createIdentifier('SanitizedFullModelSchemas')
+          ),
+        ])
+      ),
+      factory.createStringLiteral('./sanitized')
+    ),
   ]
 
   const modelInterfaces = datamodel.models.flatMap((model) => {
-    return generateModelInterface(model, datamodel.enums)
+    return generateModelInterface(model, datamodel)
   })
 
-  const modelSchemas = factory.createInterfaceDeclaration(
+  const modelSchemasType = factory.createTypeAliasDeclaration(
     [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
     `FullModelSchemas`,
     undefined,
-    undefined,
-    datamodel.models.map((model) => {
-      return factory.createPropertySignature(
-        undefined,
-        toCamelCase(model.name),
-        undefined,
-        factory.createTypeReferenceNode(`${model.name}Model`)
-      )
-    })
+    factory.createIntersectionTypeNode([
+      factory.createTypeLiteralNode(
+        datamodel.models.map((model) => {
+          return factory.createPropertySignature(
+            undefined,
+            toCamelCase(model.name),
+            undefined,
+            factory.createTypeReferenceNode(`${model.name}Model`)
+          )
+        })
+      ),
+      factory.createTypeLiteralNode([]),
+    ])
+  )
+
+  const modelSchemasVariable = factory.createVariableStatement(
+    [factory.createModifier(ts.SyntaxKind.ExportKeyword)],
+    factory.createVariableDeclarationList(
+      [
+        factory.createVariableDeclaration(
+          factory.createIdentifier('FullModelSchemas'),
+          undefined,
+          undefined,
+          factory.createCallExpression(
+            factory.createIdentifier('unsanitizedModelSchemas'),
+            [factory.createTypeReferenceNode('FullModelSchemas', undefined)],
+            [factory.createIdentifier('SanitizedFullModelSchemas')]
+          )
+        ),
+      ],
+      ts.NodeFlags.Const
+    )
   )
 
   const printer = ts.createPrinter({ newLine: ts.NewLineKind.LineFeed })
@@ -311,7 +365,7 @@ export function generateUnsanitizedCode(datamodel: DMMF.Document['datamodel']) {
     ts.ScriptKind.TS
   )
 
-  const declarartions = [...imports, ...modelInterfaces, modelSchemas]
+  const declarartions = [...imports, ...modelInterfaces, modelSchemasType, modelSchemasVariable]
 
   return declarartions
     .map((node) => printer.printNode(ts.EmitHint.Unspecified, node, sourceFile))

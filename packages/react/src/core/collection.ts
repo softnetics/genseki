@@ -1,11 +1,10 @@
-import type { Many, Table } from 'drizzle-orm'
-import type { ConditionalExcept, IsEqual, Simplify, ValueOf } from 'type-fest'
-import z from 'zod/v4'
+import type { ConditionalExcept, Simplify } from 'type-fest'
+import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
 import type { ContextToRequestContext, FieldBase } from '.'
 import { getFieldsClient } from './config'
 import type { AnyContextable } from './context'
-import { type AnyApiRouter, type ApiRoute, createEndpoint } from './endpoint'
+import { type AnyApiRouter } from './endpoint'
 import {
   type FieldClient,
   type FieldColumn,
@@ -18,9 +17,14 @@ import {
   type FieldRelationCreate,
   type Fields,
   type FieldsClient,
-  fieldsToZodObject,
 } from './field'
-import { type ToZodObject } from './utils'
+import type { InferDataType } from './model'
+
+export type ToZodObject<T extends Record<string, any>> = ZodObject<{
+  [Key in keyof T]-?: T[Key] extends undefined
+    ? ZodOptional<ZodType<NonNullable<T[Key]>>>
+    : ZodType<T[Key]>
+}>
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -88,8 +92,10 @@ export type InferOneRelationMutationField<TField extends FieldRelationBase> = {
   create?: TField extends FieldRelationCreate | FieldRelationConnectOrCreate
     ? InferCreateFields<TField['fields']>
     : never
-  connect?: TField['$server']['primaryColumn']['_']['data']
-  disconnect?: TField['$server']['primaryColumn']['_']['data']
+  // TODO: Only Support single forign key relation
+  connect?: InferDataType<TField['$server']['relation']['relationDataTypes'][0]>
+  // TODO: Only Support single forign key relation
+  disconnect?: InferDataType<TField['$server']['relation']['relationDataTypes'][0]>
 }
 
 /**
@@ -145,7 +151,7 @@ type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
       : never
 
 export type InferMutationRelationField<TField extends FieldRelationBase> =
-  TField['$server']['relation'] extends Many<any>
+  TField['$server']['relation']['isList'] extends true
     ? Simplify<InferManyRelationMutationField<TField>>
     : Simplify<InferOneRelationMutationField<TField>>
 
@@ -160,7 +166,11 @@ export type InferUpdateField<TField extends FieldBase> = TField extends FieldRel
         ? Simplify<InferMutationRelationField<TField>>
         : never
   : TField extends FieldColumn<any>
-    ? ActivateFieldMutateMode<TField['$server']['column']['_']['data'], TField, 'update'>
+    ? ActivateFieldMutateMode<
+        InferDataType<TField['$server']['column']['dataType']>,
+        TField,
+        'update'
+      >
     : never
 
 export type InferUpdateFields<TFields extends Fields> = SimplifyConditionalExcept<
@@ -181,7 +191,11 @@ export type InferCreateField<TField extends FieldBase> = TField extends FieldRel
         ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'connect'>>
         : never
   : TField extends FieldColumn<any>
-    ? ActivateFieldMutateMode<TField['$server']['column']['_']['data'], TField, 'create'>
+    ? ActivateFieldMutateMode<
+        InferDataType<TField['$server']['column']['dataType']>,
+        TField,
+        'create'
+      >
     : never
 
 export type InferCreateFields<TFields extends Fields> = SimplifyConditionalExcept<
@@ -194,7 +208,7 @@ export type InferCreateFields<TFields extends Fields> = SimplifyConditionalExcep
 >
 
 export type InferRelationField<TField extends FieldRelation<any>> =
-  TField['$server']['relation'] extends Many<any>
+  TField['$server']['relation']['isList'] extends true
     ? InferManyRelationMutationField<TField>
     : InferOneRelationMutationField<TField>
 
@@ -243,12 +257,12 @@ export type InferRelationField<TField extends FieldRelation<any>> =
  */
 export type InferField<TField extends FieldClient> =
   TField extends FieldRelation<any>
-    ? TField['$server']['relation'] extends Many<any>
+    ? TField['$server']['relation']['isList'] extends true
       ? // TODO: Order field
         Array<Simplify<InferFields<TField['fields']>>>
       : Simplify<InferFields<TField['fields']>>
     : TField extends FieldColumn<any>
-      ? TField['$server']['column']['_']['data']
+      ? InferDataType<TField['$server']['column']['dataType']>
       : never
 
 /**
@@ -327,7 +341,7 @@ export type ApiReturnType<
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? { __pk: string | number; __id: string | number }
         : TMethod extends typeof ApiDefaultMethod.DELETE
-          ? void
+          ? { success: boolean }
           : never
 
 export type ApiFindOneArgs = {
@@ -364,7 +378,7 @@ export type ApiDeleteArgs = {
 
 export type ApiConfigHandlerFn<
   TContext extends AnyContextable,
-  TFields extends Fields,
+  in out TFields extends Fields,
   TMethod extends ApiDefaultMethod,
 > = (
   args: ApiArgs<TContext, TMethod, TFields> & {
@@ -372,7 +386,10 @@ export type ApiConfigHandlerFn<
   }
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
-export type CollectionAdminApiOptions<TContext extends AnyContextable, TFields extends Fields> = {
+export type CollectionAdminApiOptions<
+  TContext extends AnyContextable,
+  in out TFields extends Fields,
+> = {
   create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
   findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
   findMany?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
@@ -390,29 +407,18 @@ export type CollectionAdminApi<TContext extends AnyContextable, TFields extends 
 
 export type CollectionAdminOptions<
   TContext extends AnyContextable,
-  TFields extends Fields,
-  TApiRouter extends AnyApiRouter,
+  in out TFields extends Fields,
+  in out TApiRouter extends AnyApiRouter,
 > = {
   api?: CollectionAdminApiOptions<TContext, TFields>
   endpoints?: TApiRouter
 }
 
-export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
-  // TODO: Currently, drizzle-orm does not provide a way to get unique and not null columns
-  // This fix this after the PR was merged: https://github.com/drizzle-team/drizzle-orm/pull/4567
-  [TColumnName in keyof TTable['_']['columns'] as TTable['_']['columns'][TColumnName]['_']['notNull'] extends true
-    ? TColumnName
-    : never]: TColumnName
-}>
-
 export interface CollectionOptions<
-  TSlug extends string,
   TContext extends AnyContextable,
-  TFields extends Fields,
-  TAppRouter extends AnyApiRouter,
+  in out TFields extends Fields,
+  in out TAppRouter extends AnyApiRouter,
 > {
-  // TODO: This should not exists, "fields" should know about this informaation. Need to refactor
-  slug: TSlug
   identifierColumn: string
   fields: TFields
   admin?: CollectionAdminOptions<TContext, TFields, TAppRouter>
@@ -424,273 +430,188 @@ export interface CollectionOptionsClient {
   fields: FieldsClient
 }
 
-export type GetAllTableTsNames<TFullSchema extends Record<string, unknown>> = Extract<
-  {
-    [TKey in keyof TFullSchema]: TFullSchema[TKey] extends Table<any> ? TKey : never
-  }[keyof TFullSchema],
-  string
->
+// export function getDefaultCollectionAdminApiRouter(
+//   context: AnyContextable,
+//   slug: string,
+//   fields: Fields,
+//   defaultHandler: CollectionAdminApiOptions<AnyContextable, Fields>
+// ): CollectionDefaultAdminApiRouter<string, Fields> {
+//   return Object.fromEntries(
+//     Object.entries(defaultHandler).map(([method, fn]) => {
+//       const endpointName = method
+//       switch (method) {
+//         case ApiDefaultMethod.CREATE: {
+//           // TODO: Create ApiRouteSchema from fields and method
+//           const body = fieldsToZodObject(fields as any, ApiDefaultMethod.CREATE)
 
-export type ConditionalAnyOutput<TFields extends Fields, TOutput> =
-  IsEqual<TFields, Fields> extends true ? any : TOutput
+//           const endpoint = createEndpoint(
+//             context,
+//             {
+//               path: `/${slug}`,
+//               method: 'POST',
+//               // TODO: fieldToZodObject but create fields
+//               body: body,
+//               responses: {
+//                 200: z.object({
+//                   __pk: z.union([z.string(), z.number()]),
+//                   __id: z.union([z.string(), z.number()]),
+//                 }),
+//               },
+//             },
+//             async (args) => {
+//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
+//                 slug: slug,
+//                 fields: fields,
+//                 context: args.context,
+//                 data: args.body as any,
+//               })
+//               return { status: 200, body: response }
+//             }
+//           )
 
-export type ConvertCollectionDefaultApiToApiRouteSchema<
-  TSlug extends string,
-  TMethod extends ApiDefaultMethod,
-  TFields extends Fields,
-> = TMethod extends typeof ApiDefaultMethod.CREATE
-  ? {
-      path: `/${TSlug}`
-      method: 'POST'
-      body: ConditionalAnyOutput<TFields, ToZodObject<InferCreateFields<TFields>>>
-      responses: {
-        200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
-      }
-    }
-  : TMethod extends typeof ApiDefaultMethod.FIND_ONE
-    ? {
-        path: `/${TSlug}/:id`
-        method: 'GET'
-        pathParams: ToZodObject<{ id: string }>
-        responses: {
-          200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
-        }
-      }
-    : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? {
-          path: `/${TSlug}`
-          method: 'GET'
-          query: ToZodObject<{
-            limit?: number
-            offset?: number
-            orderBy?: string
-            orderType?: 'asc' | 'desc'
-          }>
-          responses: {
-            200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
-          }
-        }
-      : TMethod extends typeof ApiDefaultMethod.UPDATE
-        ? {
-            path: `/${TSlug}/:id`
-            method: 'PATCH'
-            pathParams: ToZodObject<{ id: string }>
-            body: ConditionalAnyOutput<TFields, ToZodObject<InferUpdateFields<TFields>>>
-            responses: {
-              200: ToZodObject<ApiReturnType<TMethod, TFields>>
-            }
-          }
-        : TMethod extends typeof ApiDefaultMethod.DELETE
-          ? {
-              path: `/${TSlug}`
-              method: 'DELETE'
-              body: ToZodObject<{ ids: string[] | number[] }>
-              responses: {
-                // TODO: recheck this
-                200: ToZodObject<{}>
-              }
-            }
-          : never
+//           return [endpointName, endpoint]
+//         }
+//         case ApiDefaultMethod.FIND_ONE: {
+//           const response = fieldsToZodObject(fields as any)
 
-export type CollectionDefaultAdminApiRouter<TSlug extends string, TFields extends Fields> = {
-  create: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.CREATE, TFields>
-  >
-  findOne: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.FIND_ONE, TFields>
-  >
-  findMany: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.FIND_MANY, TFields>
-  >
-  update: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.UPDATE, TFields>
-  >
-  delete: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.DELETE, TFields>
-  >
-}
+//           const endpoint = createEndpoint(
+//             context,
+//             {
+//               path: `/${slug}/:id`,
+//               method: 'GET',
+//               pathParams: z.object({
+//                 id: z.union([z.string(), z.number()]),
+//               }),
+//               responses: {
+//                 200: response,
+//               },
+//             },
+//             async (args) => {
+//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
+//                 slug: slug,
+//                 fields: fields,
+//                 context: args.context,
+//                 id: args.pathParams.id,
+//               })
+//               return { status: 200, body: response }
+//             }
+//           )
 
-export function getDefaultCollectionAdminApiRouter(
-  context: AnyContextable,
-  slug: string,
-  fields: Fields,
-  defaultHandler: CollectionAdminApiOptions<AnyContextable, Fields>
-): CollectionDefaultAdminApiRouter<string, Fields> {
-  return Object.fromEntries(
-    Object.entries(defaultHandler).map(([method, fn]) => {
-      const endpointName = method
-      switch (method) {
-        case ApiDefaultMethod.CREATE: {
-          // TODO: Create ApiRouteSchema from fields and method
-          const body = fieldsToZodObject(fields as any, ApiDefaultMethod.CREATE)
+//           return [endpointName, endpoint]
+//         }
+//         case ApiDefaultMethod.FIND_MANY: {
+//           const body = fieldsToZodObject(fields as any)
+//           const response = z.object({
+//             data: z.array(body),
+//             total: z.number(),
+//             page: z.number(),
+//           })
 
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}`,
-              method: 'POST',
-              // TODO: fieldToZodObject but create fields
-              body: body,
-              responses: {
-                200: z.object({
-                  __pk: z.union([z.string(), z.number()]),
-                  __id: z.union([z.string(), z.number()]),
-                }),
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                data: args.body,
-              })
-              return { status: 200, body: response }
-            }
-          )
+//           const endpoint = createEndpoint(
+//             context,
+//             {
+//               path: `/${slug}`,
+//               method: 'GET',
+//               query: z.object({
+//                 limit: z.number().optional(),
+//                 offset: z.number().optional(),
+//                 orderBy: z.string().optional(),
+//                 orderType: z.enum(['asc', 'desc']).optional(),
+//               }),
+//               responses: {
+//                 200: response,
+//               },
+//             },
+//             async (args) => {
+//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
+//                 slug: slug,
+//                 fields: fields,
+//                 context: args.context,
+//                 limit: args.query.limit,
+//                 offset: args.query.offset,
+//                 orderBy: args.query.orderBy,
+//                 orderType: args.query.orderType,
+//               })
+//               return { status: 200, body: response }
+//             }
+//           )
 
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.FIND_ONE: {
-          const response = fieldsToZodObject(fields as any)
+//           return [endpointName, endpoint]
+//         }
+//         case ApiDefaultMethod.UPDATE: {
+//           const body = fieldsToZodObject(fields as any, ApiDefaultMethod.UPDATE)
 
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}/:id`,
-              method: 'GET',
-              pathParams: z.object({
-                id: z.union([z.string(), z.number()]),
-              }),
-              responses: {
-                200: response,
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                id: args.pathParams.id,
-              })
-              return { status: 200, body: response }
-            }
-          )
+//           const endpoint = createEndpoint(
+//             context,
+//             {
+//               path: `/${slug}/:id`,
+//               method: 'PATCH',
+//               pathParams: z.object({
+//                 id: z.union([z.string(), z.number()]),
+//               }),
+//               // TODO: fieldToZodObject but update fields
+//               body: body,
+//               responses: {
+//                 200: z.object({
+//                   __pk: z.union([z.string(), z.number()]),
+//                   __id: z.union([z.string(), z.number()]),
+//                 }),
+//               },
+//             },
+//             async (args) => {
+//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
+//                 slug: slug,
+//                 fields: fields,
+//                 context: args.context,
+//                 id: args.pathParams.id,
+//                 data: args.body as any, // TODO: Fix this
+//               })
+//               return { status: 200, body: response }
+//             }
+//           )
 
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.FIND_MANY: {
-          const body = fieldsToZodObject(fields as any)
-          const response = z.object({
-            data: z.array(body),
-            total: z.number(),
-            page: z.number(),
-          })
+//           return [endpointName, endpoint]
+//         }
+//         case ApiDefaultMethod.DELETE: {
+//           const endpoint = createEndpoint(
+//             context,
+//             {
+//               path: `/${slug}`,
+//               method: 'DELETE',
+//               body: z.object({
+//                 ids: z.union([z.string().array(), z.number().array()]),
+//               }),
+//               responses: {
+//                 200: z.object({ message: z.string() }),
+//               },
+//             },
+//             async (args) => {
+//               await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
+//                 slug,
+//                 fields,
+//                 context: args.context,
+//                 ids: args.body.ids,
+//               })
+//               return { status: 200, body: { message: 'ok' } }
+//             }
+//           )
 
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}`,
-              method: 'GET',
-              query: z.object({
-                limit: z.number().optional(),
-                offset: z.number().optional(),
-                orderBy: z.string().optional(),
-                orderType: z.enum(['asc', 'desc']).optional(),
-              }),
-              responses: {
-                200: response,
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                limit: args.query.limit,
-                offset: args.query.offset,
-                orderBy: args.query.orderBy,
-                orderType: args.query.orderType,
-              })
-              return { status: 200, body: response }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.UPDATE: {
-          const body = fieldsToZodObject(fields as any, ApiDefaultMethod.UPDATE)
-
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}/:id`,
-              method: 'PATCH',
-              pathParams: z.object({
-                id: z.union([z.string(), z.number()]),
-              }),
-              // TODO: fieldToZodObject but update fields
-              body: body,
-              responses: {
-                200: z.object({
-                  __pk: z.union([z.string(), z.number()]),
-                  __id: z.union([z.string(), z.number()]),
-                }),
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                id: args.pathParams.id,
-                data: args.body as any, // TODO: Fix this
-              })
-              return { status: 200, body: response }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.DELETE: {
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}`,
-              method: 'DELETE',
-              body: z.object({
-                ids: z.union([z.string().array(), z.number().array()]),
-              }),
-              responses: {
-                200: z.object({ message: z.string() }),
-              },
-            },
-            async (args) => {
-              await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug,
-                fields,
-                context: args.context,
-                ids: args.body.ids,
-              })
-              return { status: 200, body: { message: 'ok' } }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        default: {
-          throw new Error(`Unknown method ${method} for collection ${slug}`)
-        }
-      }
-    })
-  )
-}
+//           return [endpointName, endpoint]
+//         }
+//         default: {
+//           throw new Error(`Unknown method ${method} for collection ${slug}`)
+//         }
+//       }
+//     })
+//   )
+// }
 
 export function getCollectionOptionsClient<TContext extends AnyContextable, TFields extends Fields>(
-  collectionOptions: Omit<CollectionOptions<string, TContext, TFields, any>, 'admin'>
+  slug: string,
+  collectionOptions: Omit<CollectionOptions<TContext, TFields, any>, 'admin'>
 ): CollectionOptionsClient {
   return {
-    slug: collectionOptions.slug,
+    slug: slug,
     identifierColumn: collectionOptions.identifierColumn,
     fields: getFieldsClient(collectionOptions.fields),
   }

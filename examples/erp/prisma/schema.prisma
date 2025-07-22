@@ -22,13 +22,72 @@ datasource db {
 }
 
 model User {
-  id    String  @id @default(uuid())
-  email String  @unique
-  name  String?
+  id            String   @id @default(uuid())
+  name          String?
+  image         String?
+  email         String?  @unique
+  emailVerified Boolean? @default(false)
 
-  posts    Post[]
-  comments Comment[]
-  profiles Profile?
+  posts         Post[]
+  profile       Profile?
+  comments      Comment[]
+  accounts      Account[]
+  sessions      Session[]
+  verifications Verification[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Account {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  accountId  String
+  providerId String
+
+  idToken      String?
+  accessToken  String?
+  refreshToken String?
+
+  accessTokenExpiresAt  DateTime?
+  refreshTokenExpiresAt DateTime?
+
+  scope    String?
+  password String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Session {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  token String @unique
+
+  ipAddress String?
+  userAgent String?
+
+  expiresAt DateTime
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Verification {
+  id String @id @default(uuid())
+
+  userId String
+  user   User   @relation(fields: [userId], references: [id])
+
+  value      String
+  identifier String   @unique
+  expiresAt  DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -49,7 +108,7 @@ model Post {
   id String @id @default(uuid())
 
   title     String
-  content   String?
+  content   Json
   published Boolean @default(false)
 
   authorId String

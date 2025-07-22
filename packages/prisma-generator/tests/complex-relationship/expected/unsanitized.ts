@@ -1,11 +1,11 @@
-import { type DataType, type SchemaType } from '@genseki/react'
+import { type DataType, type SchemaType, unsanitizedModelSchemas } from '@genseki/react'
+
+import { SanitizedFullModelSchemas } from './sanitized'
 
 export interface TableAModelConfig {
   name: 'TableAModel'
   dbModelName: 'TableA'
   prismaModelName: 'tableA'
-  primaryFields: ['id']
-  uniqueFields: [['id']]
 }
 
 export interface TableAModelShape {
@@ -80,7 +80,7 @@ export interface TableAModelShape {
       referencedModel: TableBModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.STRING]
     }
     tableC: {
       schema: typeof SchemaType.RELATION
@@ -95,9 +95,11 @@ export interface TableAModelShape {
       referencedModel: TableCModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.STRING]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id']]
 }
 
 export interface TableAModel {
@@ -109,8 +111,6 @@ export interface TableBModelConfig {
   name: 'TableBModel'
   dbModelName: 'TableB'
   prismaModelName: 'tableB'
-  primaryFields: ['id']
-  uniqueFields: [['id']]
 }
 
 export interface TableBModelShape {
@@ -196,7 +196,7 @@ export interface TableBModelShape {
       referencedModel: TableAModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.STRING]
     }
     tableC: {
       schema: typeof SchemaType.RELATION
@@ -214,6 +214,8 @@ export interface TableBModelShape {
       relationDataTypes: [typeof DataType.STRING]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id']]
 }
 
 export interface TableBModel {
@@ -225,8 +227,6 @@ export interface TableCModelConfig {
   name: 'TableCModel'
   dbModelName: 'TableC'
   prismaModelName: 'tableC'
-  primaryFields: ['id']
-  uniqueFields: [['id']]
 }
 
 export interface TableCModelShape {
@@ -301,7 +301,7 @@ export interface TableCModelShape {
       referencedModel: TableAModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.STRING]
     }
     tableB: {
       schema: typeof SchemaType.RELATION
@@ -316,9 +316,11 @@ export interface TableCModelShape {
       referencedModel: TableBModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.STRING]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id']]
 }
 
 export interface TableCModel {
@@ -326,8 +328,10 @@ export interface TableCModel {
   config: TableCModelConfig
 }
 
-export interface FullModelSchemas {
+export type FullModelSchemas = {
   tableA: TableAModel
   tableB: TableBModel
   tableC: TableCModel
-}
+} & {}
+
+export const FullModelSchemas = unsanitizedModelSchemas<FullModelSchemas>(SanitizedFullModelSchemas)

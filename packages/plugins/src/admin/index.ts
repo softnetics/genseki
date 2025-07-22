@@ -1,24 +1,25 @@
 import { deepmerge } from 'deepmerge-ts'
-import { eq } from 'drizzle-orm'
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
 import type { SimplifyDeep, ValueOf } from 'type-fest'
 import { z } from 'zod/v4'
 
 import type {
   AnyContextable,
-  AnyTypedColumn,
-  WithAnyRelations,
-  WithAnyTable,
-  WithNotNull,
+  AnyTable,
+  AnyTypedFieldColumn,
+  AnyUserTable as BaseAnyUserTable,
+  DataType,
+  WithIsRequired,
 } from '@genseki/react'
-import type { AnyUserTable as BaseAnyUserTable } from '@genseki/react'
 import { Builder, createPlugin } from '@genseki/react'
 
-type AnyUserTable = WithAnyTable<{
-  role: WithNotNull<AnyTypedColumn<string>>
-  banned: AnyTypedColumn<boolean | null>
-  bannedReason: AnyTypedColumn<string | null>
-  bannedExpiresAt: AnyTypedColumn<Date | null>
+type AnyUserTable = AnyTable<{
+  columns: {
+    role: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    banned: AnyTypedFieldColumn<typeof DataType.BOOLEAN>
+    bannedReason: AnyTypedFieldColumn<typeof DataType.STRING>
+    bannedExpiresAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
+  }
+  relations: {}
 }> &
   BaseAnyUserTable
 
@@ -96,114 +97,118 @@ export function mergeAccessControl<
   )
 }
 
-type FullSchema = WithAnyRelations<{
-  user: AnyUserTable
-}>
-
 // TODO: TFullSchema should be Generic but it is not working with the current setup
 export function admin<TContext extends AnyContextable>(
   context: TContext,
-  args: {
-    db: NodePgDatabase<FullSchema>
-    schema: FullSchema
+  options: {
+    schema: {
+      user: AnyUserTable
+    }
     options: AdminPluginOptions
+    accessControl: AccessControl
   }
 ) {
-  const { db, schema, options } = args
-
-  const builder = new Builder({ db: db, schema: schema, context })
-
-  const hasPermissionEndpoint = builder.endpoint(
-    {
-      method: 'POST',
-      path: '/auth/admin/has-permission',
-      body: z.object({
-        role: z.string(),
-        permission: z.string(),
-      }),
-      responses: {
-        200: z.object({
-          ok: z.boolean(),
-        }),
-      },
-    },
-    ({ body }) => {
-      const { role, permission } = body
-      const ok = options.accessControl.hasPermission(role, permission as `${string}.${string}`)
-      return {
-        status: 200 as const,
-        body: { ok: ok },
-      }
-    }
-  )
-
-  const hasPermissionsEndpoint = builder.endpoint(
-    {
-      method: 'POST',
-      path: '/auth/admin/has-permissions',
-      body: z.object({
-        role: z.string(),
-        permissions: z.string().array(),
-      }),
-      responses: {
-        200: z.object({
-          ok: z.boolean(),
-        }),
-      },
-    },
-    ({ body }) => {
-      const { role, permissions } = body
-      const ok = options.accessControl.hasPermissions(role, permissions as `${string}.${string}`[])
-      return {
-        status: 200 as const,
-        body: { ok: ok },
-      }
-    }
-  )
-
-  const banUserEndpoint = builder.endpoint(
-    {
-      method: 'POST',
-      path: '/auth/admin/ban-user',
-      body: z.object({
-        userId: z.string(),
-        reason: z.string().optional(),
-        expiresAt: z.date().optional(),
-      }),
-      responses: {
-        200: z.object({
-          ok: z.boolean(),
-        }),
-      },
-    },
-    async ({ context, body }) => {
-      const { userId } = body
-
-      await db
-        .update(schema.user)
-        .set({
-          banned: true,
-          bannedReason: body.reason ?? 'No reason provided',
-          bannedExpiresAt: body.expiresAt ?? null, // null means no expiration
-        })
-        .where(eq(schema.user.id, userId))
-
-      return {
-        status: 200 as const,
-        body: { ok: true },
-      }
-    }
-  )
-
-  const api = {
-    hasPermission: hasPermissionEndpoint,
-    hasPermissions: hasPermissionsEndpoint,
-    banUser: banUserEndpoint,
-  } as const
-
   return createPlugin({
     name: 'admin',
     plugin: (input) => {
+      const prisma = context.getPrismaClient()
+      const builder = new Builder({ schema: options.schema, context })
+
+      const hasPermissionEndpoint = builder.endpoint(
+        {
+          method: 'POST',
+          path: '/auth/admin/has-permission',
+          body: z.object({
+            role: z.string(),
+            permission: z.string(),
+          }),
+          responses: {
+            200: z.object({
+              ok: z.boolean(),
+            }),
+          },
+        },
+        ({ body }) => {
+          const { role, permission } = body
+          const ok = options.accessControl.hasPermission(role, permission as `${string}.${string}`)
+          return {
+            status: 200 as const,
+            body: { ok: ok },
+          }
+        }
+      )
+
+      const hasPermissionsEndpoint = builder.endpoint(
+        {
+          method: 'POST',
+          path: '/auth/admin/has-permissions',
+          body: z.object({
+            role: z.string(),
+            permissions: z.string().array(),
+          }),
+          responses: {
+            200: z.object({
+              ok: z.boolean(),
+            }),
+          },
+        },
+        ({ body }) => {
+          const { role, permissions } = body
+          const ok = options.accessControl.hasPermissions(
+            role,
+            permissions as `${string}.${string}`[]
+          )
+          return {
+            status: 200 as const,
+            body: { ok: ok },
+          }
+        }
+      )
+
+      const banUserEndpoint = builder.endpoint(
+        {
+          method: 'POST',
+          path: '/auth/admin/ban-user',
+          body: z.object({
+            userId: z.string(),
+            reason: z.string().optional(),
+            expiresAt: z.date().optional(),
+          }),
+          responses: {
+            200: z.object({
+              ok: z.boolean(),
+            }),
+          },
+        },
+        async ({ body }) => {
+          const { userId } = body
+
+          const banField = options.schema.user.shape.columns.banned
+          const bannedReasonField = options.schema.user.shape.columns.bannedReason
+          const bannedExpiresAtField = options.schema.user.shape.columns.bannedExpiresAt
+
+          await prisma[options.schema.user.config.prismaModelName].update({
+            where: { id: userId },
+            data: {
+              [banField.name]: true,
+              [bannedReasonField.name]: body.reason ?? 'No reason provided',
+              [bannedExpiresAtField.name]: body.expiresAt ?? null, // null means no expiration
+            },
+          })
+
+          return {
+            status: 200 as const,
+            body: { ok: true },
+          }
+        }
+      )
+
+      const api = {
+        hasPermission: hasPermissionEndpoint,
+        hasPermissions: hasPermissionsEndpoint,
+        banUser: banUserEndpoint,
+      } as const
+
       return {
         api: {
           admin: api,

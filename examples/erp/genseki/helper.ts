@@ -1,15 +1,9 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
-
 import { Builder, type Contextable, RequestContextable } from '@genseki/react'
 
-import * as schema from '~/db/schema'
+import { FullModelSchemas } from '../generated/genseki/unsanitized'
+import { PrismaClient } from '../generated/prisma'
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-})
-
-export const db = drizzle({ client: pool, schema: schema, logger: true })
+export const prisma = new PrismaClient()
 
 interface User {
   id: string
@@ -24,34 +18,20 @@ class MyRequestContext extends RequestContextable<User> {
 
   async requiredAuthenticated() {
     const sessionValue = this.getSessionCookie()
-    if (!sessionValue) {
-      throw new Error('Authentication required')
+    return {
+      id: '123',
+      name: 'John Doe',
+      email: 'john@gmail.com',
     }
-
-    const session = await db.query.session.findFirst({
-      columns: {},
-      with: {
-        user: {
-          columns: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      where: (session, { eq }) => eq(session.token, sessionValue),
-    })
-
-    if (!session) {
-      throw new Error('Session not found')
-    }
-
-    return session.user
   }
 }
 
 export class MyContext implements Contextable<User> {
   constructor() {}
+
+  getPrismaClient() {
+    return prisma as any
+  }
 
   toRequestContext(request: Request) {
     return new MyRequestContext(request)
@@ -60,4 +40,7 @@ export class MyContext implements Contextable<User> {
 
 export const context = new MyContext()
 
-export const builder = new Builder({ db, schema, context: context })
+export const builder = new Builder({
+  schema: FullModelSchemas,
+  context: context,
+})

@@ -1,11 +1,11 @@
-import { type DataType, type SchemaType } from '@genseki/react'
+import { type DataType, type SchemaType, unsanitizedModelSchemas } from '@genseki/react'
+
+import { SanitizedFullModelSchemas } from './sanitized'
 
 export interface DataModelConfig {
   name: 'DataModel'
   dbModelName: 'Data'
   prismaModelName: 'data'
-  primaryFields: ['id']
-  uniqueFields: [['id']]
 }
 
 export interface DataModelShape {
@@ -380,7 +380,7 @@ export interface DataModelShape {
       referencedModel: RelationAModel
       relationToFields: ['id']
       relationFromFields: ['id']
-      relationDataTypes: [typeof DataType.STRING]
+      relationDataTypes: [typeof DataType.INT]
     }
     optionalRelationField: {
       schema: typeof SchemaType.RELATION
@@ -395,7 +395,7 @@ export interface DataModelShape {
       referencedModel: RelationBModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.INT]
     }
     relationArrayField: {
       schema: typeof SchemaType.RELATION
@@ -410,9 +410,11 @@ export interface DataModelShape {
       referencedModel: RelationCModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.INT]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id']]
 }
 
 export interface DataModel {
@@ -424,8 +426,6 @@ export interface RelationAModelConfig {
   name: 'RelationAModel'
   dbModelName: 'RelationA'
   prismaModelName: 'relationA'
-  primaryFields: ['id']
-  uniqueFields: [['id']]
 }
 
 export interface RelationAModelShape {
@@ -467,9 +467,11 @@ export interface RelationAModelShape {
       referencedModel: DataModel
       relationToFields: []
       relationFromFields: []
-      relationDataTypes: []
+      relationDataTypes: [typeof DataType.INT]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id']]
 }
 
 export interface RelationAModel {
@@ -481,8 +483,6 @@ export interface RelationBModelConfig {
   name: 'RelationBModel'
   dbModelName: 'RelationB'
   prismaModelName: 'relationB'
-  primaryFields: ['id']
-  uniqueFields: [['id'], ['dataId']]
 }
 
 export interface RelationBModelShape {
@@ -535,9 +535,11 @@ export interface RelationBModelShape {
       referencedModel: DataModel
       relationToFields: ['id']
       relationFromFields: ['id']
-      relationDataTypes: [typeof DataType.STRING]
+      relationDataTypes: [typeof DataType.INT]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id'], ['dataId']]
 }
 
 export interface RelationBModel {
@@ -549,8 +551,6 @@ export interface RelationCModelConfig {
   name: 'RelationCModel'
   dbModelName: 'RelationC'
   prismaModelName: 'relationC'
-  primaryFields: ['id']
-  uniqueFields: [['id']]
 }
 
 export interface RelationCModelShape {
@@ -603,9 +603,11 @@ export interface RelationCModelShape {
       referencedModel: DataModel
       relationToFields: ['id']
       relationFromFields: ['id']
-      relationDataTypes: [typeof DataType.STRING]
+      relationDataTypes: [typeof DataType.INT]
     }
   }
+  primaryFields: ['id']
+  uniqueFields: [['id']]
 }
 
 export interface RelationCModel {
@@ -613,9 +615,11 @@ export interface RelationCModel {
   config: RelationCModelConfig
 }
 
-export interface FullModelSchemas {
+export type FullModelSchemas = {
   data: DataModel
   relationA: RelationAModel
   relationB: RelationBModel
   relationC: RelationCModel
-}
+} & {}
+
+export const FullModelSchemas = unsanitizedModelSchemas<FullModelSchemas>(SanitizedFullModelSchemas)

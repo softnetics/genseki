@@ -1,7 +1,7 @@
 import type { DMMF } from '@prisma/generator-helper'
 import ts, { factory } from 'typescript'
 
-import { toCamelCase } from './utils'
+import { getAllPrimaryFields, toCamelCase } from './utils'
 
 function generateFieldBaseSchemaDefinition(field: DMMF.Field) {
   function createBooleanProperties(fieldKeys: (keyof typeof field)[]) {
@@ -79,7 +79,25 @@ function generateFieldColumnSchemaDefinition(
   )
 }
 
-function generateFieldRelationSchemaDefinition(field: DMMF.Field, fields: readonly DMMF.Field[]) {
+function generateFieldRelationSchemaDefinition(
+  field: DMMF.Field,
+  model: DMMF.Model,
+  datamodel: DMMF.Datamodel
+) {
+  const referencedModel = datamodel.models.find((relation) => relation.name === field.type)
+  if (!referencedModel) {
+    throw new Error(`Referenced model ${field.type} not found in datamodel`)
+  }
+  const referencedModelPrimaryFields = getAllPrimaryFields(referencedModel)
+  const relationDataTypes = referencedModelPrimaryFields.flatMap((f) => {
+    const found = model.fields.find((field) => field.name === f.name)
+    if (!found) return []
+    return factory.createPropertyAccessExpression(
+      factory.createIdentifier('DataType'),
+      factory.createIdentifier(found.type.toUpperCase())
+    )
+  })
+
   return factory.createPropertyAssignment(
     field.name,
     factory.createObjectLiteralExpression(
@@ -111,16 +129,7 @@ function generateFieldRelationSchemaDefinition(field: DMMF.Field, fields: readon
         ),
         factory.createPropertyAssignment(
           'relationDataTypes',
-          factory.createArrayLiteralExpression(
-            field.relationFromFields?.flatMap((f) => {
-              const found = fields.find((field) => field.name === f)
-              if (!found) return []
-              return factory.createPropertyAccessExpression(
-                factory.createIdentifier('DataType'),
-                factory.createIdentifier(found.type.toUpperCase())
-              )
-            }) ?? []
-          )
+          factory.createArrayLiteralExpression(relationDataTypes)
         ),
       ],
       true
@@ -128,7 +137,7 @@ function generateFieldRelationSchemaDefinition(field: DMMF.Field, fields: readon
   )
 }
 
-function generateModelShapeDefinition(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
+function generateModelShapeDefinition(model: DMMF.Model, datamodel: DMMF.Datamodel) {
   const primaryFieldNames = model.fields.filter((field) => field.isId).map((field) => field.name)
   const allPriamryFieldNames = [
     ...primaryFieldNames,
@@ -142,11 +151,11 @@ function generateModelShapeDefinition(model: DMMF.Model, enums: readonly DMMF.Da
 
   const columns = model.fields
     .filter((field) => !field.relationName)
-    .map((field) => generateFieldColumnSchemaDefinition(field, enums))
+    .map((field) => generateFieldColumnSchemaDefinition(field, datamodel.enums))
 
   const relations = model.fields
     .filter((field) => field.relationName)
-    .map((field) => generateFieldRelationSchemaDefinition(field, model.fields))
+    .map((field) => generateFieldRelationSchemaDefinition(field, model, datamodel))
 
   return factory.createObjectLiteralExpression(
     [
@@ -177,8 +186,8 @@ function generateModelShapeDefinition(model: DMMF.Model, enums: readonly DMMF.Da
   )
 }
 
-function generateModelSchemaDefinition(model: DMMF.Model, enums: readonly DMMF.DatamodelEnum[]) {
-  const shapeArgs = generateModelShapeDefinition(model, enums)
+function generateModelSchemaDefinition(model: DMMF.Model, datamodel: DMMF.Datamodel) {
+  const shapeArgs = generateModelShapeDefinition(model, datamodel)
 
   const configArgs = factory.createObjectLiteralExpression(
     [
@@ -366,7 +375,7 @@ export function generateSanitizedCode(datamodel: DMMF.Document['datamodel']) {
 
   const modelFunction = generateModelFunction()
   const sanitizedModels = datamodel.models.flatMap((model) => {
-    return generateModelSchemaDefinition(model, datamodel.enums)
+    return generateModelSchemaDefinition(model, datamodel)
   })
 
   const modelSchemasVariable = factory.createVariableStatement(

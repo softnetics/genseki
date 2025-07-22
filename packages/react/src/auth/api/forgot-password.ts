@@ -35,10 +35,15 @@ export function forgotPasswordEmail<TContext extends Contextable, TAuthOptions e
 
       const user = await builderArgs.handler.user.findByEmail(args.body.email)
 
-      const verification = await builderArgs.handler.verification.createWithResetPasswordToken(
-        user.id,
-        builderArgs.options.method.emailAndPassword?.resetPassword?.expiresInMs
-      )
+      const verification = await builderArgs.handler.verification.create({
+        identifier: builderArgs.handler.identifier.resetPassword(crypto.randomUUID()),
+        value: user.id,
+        expiredAt: new Date(
+          Date.now() +
+            (builderArgs.options.method.emailAndPassword?.resetPassword?.expiredInMs ??
+              1000 * 60 * 60 * 24) // TODO; make config always set default
+        ),
+      })
 
       const resetPasswordLink = `${builderArgs.options.method.emailAndPassword?.resetPassword?.resetPasswordUrl ?? '/auth/reset-password'}?token=${verification.value}`
       // Send email
