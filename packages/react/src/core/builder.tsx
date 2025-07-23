@@ -163,9 +163,15 @@ export class Builder<
           } satisfies BaseViewProps['collectionOptions'],
         }
 
-        const _collectionHomeRoute = gensekiOptions.uis.find(
+        const _collectionHomeRouteIndex = gensekiOptions.uis.findIndex(
           (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
-        ) as GensekiUiRouter<GensekiUiCommonProps['COLLECTION_HOME']> | undefined
+        )
+        const _collectionHomeRoute =
+          _collectionHomeRouteIndex >= 0
+            ? (gensekiOptions.uis[_collectionHomeRouteIndex] as GensekiUiRouter<
+                GensekiUiCommonProps['COLLECTION_HOME']
+              >)
+            : undefined
 
         const collectionHomeRoute = _collectionHomeRoute
           ? {
@@ -191,8 +197,11 @@ export class Builder<
               } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTION_HOME],
             })
 
-        const uis = [
-          collectionHomeRoute,
+        if (_collectionHomeRouteIndex >= 0) {
+          gensekiOptions.uis[_collectionHomeRouteIndex] = collectionHomeRoute
+        }
+
+        const collectionSpecificUis = [
           createGensekiUiRoute({
             path: `/collections/${options.slug}`,
             requiredAuthenticated: true,
@@ -246,6 +255,11 @@ export class Builder<
             ),
           }),
         ]
+
+        const uis =
+          _collectionHomeRouteIndex >= 0
+            ? collectionSpecificUis
+            : [collectionHomeRoute, ...collectionSpecificUis]
 
         return {
           api: {
