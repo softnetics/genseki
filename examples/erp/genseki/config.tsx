@@ -1,5 +1,5 @@
 import { withNextJs } from '@genseki/next'
-import { auth, GensekiApp, StorageAdapterS3 } from '@genseki/react'
+import { emailAndPasswordPlugin, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
@@ -37,23 +37,18 @@ const app = new GensekiApp({
   },
 })
   .apply(
-    auth(context, {
+    emailAndPasswordPlugin(context, {
       schema: {
         user: FullModelSchemas.user,
         session: FullModelSchemas.session,
         account: FullModelSchemas.account,
         verification: FullModelSchemas.verification,
       },
-      method: {
-        emailAndPassword: {
-          enabled: true,
-          resetPassword: {
-            enabled: true,
-            sendEmailResetPassword: async (email, token) => {
-              console.log('sendEmailResetPassword config', email, token)
-              return
-            },
-          },
+      resetPassword: {
+        enabled: true,
+        sendEmailResetPassword: async ({ email, token, expiredAt }) => {
+          console.log('sendEmailResetPassword config', email, token, expiredAt)
+          return
         },
       },
     })

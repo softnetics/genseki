@@ -53,6 +53,8 @@ export function createGensekiUiRoute<TProps extends Record<string, unknown>>(
 export interface GensekiAppOptions {
   title: string
   version: string
+  apiPrefix?: string
+  uiPathPrefix?: string
   components?: {
     NotFound?: () => ReactNode
   }
@@ -88,8 +90,8 @@ export function createPlugin<TName extends string, TApiRouter extends AnyApiRout
   return args
 }
 
-type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
-type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
+export type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
+export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
   TPlugin['plugin']
 >['api']
 

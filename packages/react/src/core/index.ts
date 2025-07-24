@@ -1,5 +1,5 @@
-export { AccountProvider } from '../auth/constant'
-export { hashPassword, ResponseHelper, verifyPassword } from '../auth/utils'
+export { AccountProvider } from '../auth/plugins/email-and-password/constant'
+export { ResponseHelper } from '../auth/utils'
 export type {
   AnyContextable,
   AnyRequestContextable,
@@ -19,6 +19,7 @@ export type {
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export {
+  type AnyGensekiPlugin,
   createPlugin,
   GensekiApp,
   type GensekiAppCompiled,
@@ -28,6 +29,7 @@ export {
   type GensekiPlugin,
   type GensekiUiRouter,
   getFieldsClient,
+  type InferApiRouterFromGensekiPlugin,
 } from './config'
 export type {
   AnyApiRouter,

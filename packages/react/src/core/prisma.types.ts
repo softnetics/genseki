@@ -3,6 +3,11 @@ interface PrismaUpdateArgs {
   data: any
 }
 
+interface PrismaUpdateManyArgs {
+  where: any
+  data: any
+}
+
 interface PrismaUpsertArgs {
   where: any
   create: any
@@ -49,6 +54,7 @@ export type MockPrismaClient = {
     findUnique: (args: PrismaFindUniqueArgs) => Promise<any | null>
     create: (args: PrismaCreateArgs) => Promise<any>
     update: (args: PrismaUpdateArgs) => Promise<any>
+    updateMany: (args: PrismaUpdateManyArgs) => Promise<any>
     upsert: (args: PrismaUpsertArgs) => Promise<any>
     delete: (args: PrismaDeleteArgs) => Promise<any>
     deleteMany: (args?: PrismaDeleteManyArgs) => Promise<any>
