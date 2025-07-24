@@ -17,7 +17,7 @@ export interface RichTextServerField extends Extract<Field, { type: 'richText' }
 /**
  * @description This is an editor config for client side usage, but hasn't composed in to EditorProviderProps as library need yet.
  */
-export interface ClientEditorProviderProps {
+export interface EditorProviderClientProps {
   children?: ReactNode
   slotBefore?: ReactNode
   slotAfter?: ReactNode

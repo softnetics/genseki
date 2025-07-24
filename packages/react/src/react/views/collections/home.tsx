@@ -1,7 +1,8 @@
 /**
  * @description Home page tends to be a collection of links to other `collections page`
  */
-import type { ServerConfig } from '../../../core'
+
+import { type GensekiUiCommonProps } from '../../../core/ui'
 import { CollectionCard } from '../../components/compound/collection-card'
 import { Typography } from '../../components/primitives/typography'
 
@@ -19,13 +20,10 @@ const greeting = () => {
   return 'Good evening 👋'
 }
 
-type HomeViewProps = {
-  serverConfig: ServerConfig
-}
+type Props = GensekiUiCommonProps['COLLECTION_HOME']
+interface HomeViewProps extends Props {}
 
-export const HomeView = ({ serverConfig }: HomeViewProps) => {
-  const collections = Object.values(serverConfig.collections).map((col) => col.slug)
-
+export function HomeView(props: HomeViewProps) {
   return (
     <div>
       <div className="relative min-h-[240px] w-full px-12 pt-24 [background-image:radial-gradient(100%_100%_at_10%_-30%,--alpha(var(--color-primary)/15%),var(--color-secondary))]">
@@ -43,13 +41,13 @@ export const HomeView = ({ serverConfig }: HomeViewProps) => {
       </div>
       <div className="px-12">
         <div className="mx-auto grid max-w-[800px] translate-y-[calc(var(--spacing)*-24)] gap-12 sm:grid-cols-2">
-          {collections.map((collection) => (
+          {props.cards.map((collection) => (
             <CollectionCard
-              key={collection}
-              collectionName={collection}
+              key={collection.path}
+              collectionName={collection.name}
               amounts={42}
               description="Manage your product catalog including inventory, pricing, and categories."
-              url={`/admin/collections/${collection}`}
+              url={collection.path}
             />
           ))}
         </div>

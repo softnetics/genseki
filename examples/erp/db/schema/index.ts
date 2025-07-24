@@ -30,6 +30,11 @@ export const user = pgTable('user', {
   ...timestamps,
 })
 
+export const usersRelations = relations(user, ({ many }) => ({
+  posts: many(posts),
+  sessions: many(session),
+}))
+
 export const session = pgTable('session', {
   id: uuid('id').primaryKey().defaultRandom(),
   expiresAt: timestamp('expires_at').notNull(),
@@ -41,6 +46,10 @@ export const session = pgTable('session', {
     .references(() => user.id, { onDelete: 'cascade' }),
   ...timestamps,
 })
+
+export const sessionRelations = relations(session, ({ one }) => ({
+  user: one(user, { fields: [session.userId], references: [user.id] }),
+}))
 
 export const account = pgTable('account', {
   id: uuid('id').primaryKey().defaultRandom(),
@@ -75,10 +84,6 @@ export const posts = pgTable('posts', {
   categoryId: uuid().references(() => categories.id),
   ...timestamps,
 })
-
-export const usersRelations = relations(user, ({ many }) => ({
-  posts: many(posts),
-}))
 
 export const postsRelations = relations(posts, ({ one }) => ({
   author: one(user, { fields: [posts.authorId], references: [user.id] }),

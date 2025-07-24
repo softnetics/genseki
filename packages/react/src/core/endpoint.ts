@@ -1,11 +1,26 @@
 import type { IsNever, Simplify, ValueOf } from 'type-fest'
-import { z, type ZodType } from 'zod/v4'
+import type { z } from 'zod/v4'
+import { type ZodType } from 'zod/v4'
+import type { JSONSchema } from 'zod/v4/core'
 
 import type { MaybePromise } from './collection'
-import type { AnyContext, ContextToRequestContext } from './context'
-import type { ConditionalExceptNever } from './utils'
+import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'
+import { type ConditionalExceptNever } from './utils'
 
-export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
+export type ApiHttpStatus =
+  | 200
+  | 201
+  | 204
+  | 301
+  | 302
+  | 303
+  | 400
+  | 401
+  | 403
+  | 404
+  | 409
+  | 422
+  | 500
 
 export type InputSchema = ZodType<unknown, unknown> | undefined
 export type Output<T extends InputSchema> =
@@ -19,13 +34,22 @@ export type InferPathParams<TPath extends string> = Simplify<
     : never
 >
 
+export type FlattenApiRouter<TApiRouter extends AnyApiRouter> = ValueOf<{
+  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends infer TApiRoute extends ApiRoute
+    ? Simplify<TApiRoute>
+    : TApiRouter[TKey] extends infer TApiRouter extends AnyApiRouter
+      ? Simplify<FlattenApiRouter<TApiRouter>>
+      : never
+}>
+
+export type FilterByMethod<TApiRoute extends ApiRoute, TMethod extends string> = Extract<
+  TApiRoute,
+  { schema: { method: TMethod } }
+>
+
 // TODO: With IsNever, the performance is not good. Need to fix it.
 type GetBody<TApiRouteSchema extends ApiRouteSchema> =
-  TApiRouteSchema extends ApiRouteMutationSchema
-    ? IsNever<TApiRouteSchema['body']> extends false
-      ? Output<TApiRouteSchema['body']>
-      : never
-    : never
+  IsNever<TApiRouteSchema['body']> extends false ? Output<TApiRouteSchema['body']> : never
 
 type GetHeadersObject<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<Output<TApiRouteSchema['headers']>> extends false
@@ -42,7 +66,7 @@ type GetPathParams<TApiRouteSchema extends ApiRouteSchema> =
       ? InferPathParams<TApiRouteSchema['path']>
       : never
 
-type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
+export type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
   body: GetBody<TApiRouteSchema>
   query: GetQuery<TApiRouteSchema>
   pathParams: GetPathParams<TApiRouteSchema>
@@ -51,13 +75,6 @@ type ApiRouteHandlerBasePayload<TApiRouteSchema extends ApiRouteSchema> = {
 export type ApiRouteHandlerPayload<TApiRouteSchema extends ApiRouteSchema> = ConditionalExceptNever<
   ApiRouteHandlerBasePayload<TApiRouteSchema>
 >
-
-export type ApiRouteHandlerPayloadWithContext<
-  TContext extends AnyContext,
-  TApiRouteSchema extends ApiRouteSchema,
-> = ApiRouteHandlerPayload<TApiRouteSchema> & {
-  context: ContextToRequestContext<TContext>
-}
 
 export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, InputSchema>>> =
   ValueOf<{
@@ -70,17 +87,20 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
       : never
   }>
 
-export type ApiRouteHandler<
-  TContext extends AnyContext = AnyContext,
-  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
-> = (
-  payload: ApiRouteHandlerPayloadWithContext<TContext, TApiRouteSchema>
+export type ApiRouteHandler<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = (
+  payload: ApiRouteHandlerPayload<TApiRouteSchema>,
+  request: Request
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
-export type GetApiRouteSchemaFromApiRouteHandler<
-  TApiRouteHandler extends ApiRouteHandler<any, any>,
-> =
-  TApiRouteHandler extends ApiRouteHandler<any, infer TApiRouteSchema extends ApiRouteSchema>
+export type ApiRouteHandlerInitial<
+  TContext extends AnyRequestContextable,
+  TApiRouteSchema extends ApiRouteSchema,
+> = (
+  payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext }
+) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
+
+export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
+  TApiRouteHandler extends ApiRouteHandler<infer TApiRouteSchema extends ApiRouteSchema>
     ? TApiRouteSchema
     : never
 
@@ -90,113 +110,109 @@ export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = Val
     : never
 }>
 
-export interface ApiRouteCommonSchema {
+export interface ApiRouteSchema {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
-  pathParams?: InputSchema
+  body?: InputSchema
   query?: InputSchema
   headers?: InputSchema
+  pathParams?: InputSchema
   description?: string
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
 }
-
-export interface ApiRouteQuerySchema extends ApiRouteCommonSchema {
-  method: 'GET'
-}
-
-export interface ApiRouteMutationSchema extends ApiRouteCommonSchema {
-  method: 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-  body: InputSchema
-}
-
-export type ApiRouteSchema = ApiRouteQuerySchema | ApiRouteMutationSchema
-
-export type ApiRoute<
-  TContext extends AnyContext = AnyContext,
-  TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema,
-> = {
-  schema: TApiRouteSchema
-  handler: ApiRouteHandler<TContext, TApiRouteSchema>
-}
-
-export type AppendPrefixPathToApiRoute<
-  TApiRoute extends ApiRoute<any, any>,
-  TPrefixPath extends string,
-> =
-  TApiRoute extends ApiRoute<infer TContext, any>
-    ? TApiRoute extends { schema: { path: infer TPath extends string } }
-      ? Simplify<
-          { path: `${TPrefixPath}${TPath}` } & Omit<TApiRoute['schema'], 'path'>
-        > extends infer TNewApiRouteSchema extends ApiRouteSchema
-        ? ApiRoute<TContext, TNewApiRouteSchema>
-        : never
-      : never
-    : never
-
-export interface ApiRouter<in TContext extends AnyContext = AnyContext> {
-  [key: string]: ApiRoute<TContext, any>
-}
-
-export interface ClientApiRouteSchema {
+export interface ApiRouteSchemaClient {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
-  pathParams?: z.core.JSONSchema.BaseSchema
-  query?: z.core.JSONSchema.BaseSchema
-  headers?: z.core.JSONSchema.BaseSchema
+  body?: JSONSchema.JSONSchema
+  query?: JSONSchema.JSONSchema
+  headers?: JSONSchema.JSONSchema
+  pathParams?: JSONSchema.JSONSchema
   description?: string
-  body?: z.core.JSONSchema.BaseSchema
-  responses: Partial<Record<ApiHttpStatus, z.core.JSONSchema.BaseSchema>>
+  responses: Partial<Record<ApiHttpStatus, JSONSchema.JSONSchema>>
 }
 
-export interface ClientApiRouter {
-  [key: string]: ClientApiRouteSchema
+export interface AnyApiRouteSchema {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
+  body?: any
+  pathParams?: any
+  query?: any
+  headers?: any
+  description?: string
+  responses: Partial<Record<ApiHttpStatus, any>>
 }
 
-export type ToRecordApiRouteSchema<TApiRouter extends ApiRouter<AnyContext>> = {
-  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute<any, any>
-    ? TApiRouter[TKey]['schema']
-    : never
+export type ApiRoute<TApiRouteSchema extends AnyApiRouteSchema = AnyApiRouteSchema> = {
+  schema: TApiRouteSchema
+  handler: ApiRouteHandler<TApiRouteSchema>
 }
 
-export type ToClientApiRouteSchema<TApiRouter extends ApiRouter<AnyContext>> = {
-  [TKey in keyof TApiRouter]: ClientApiRouteSchema
+export interface ApiRouter {
+  [key: string]: ApiRouter | ApiRoute
+}
+
+export interface AnyApiRouter {
+  [key: string]: AnyApiRouter | ApiRoute<AnyApiRouteSchema>
+}
+
+export function isApiRoute<TApiRoute extends ApiRoute>(
+  apiRoute: TApiRoute | ApiRouter
+): apiRoute is TApiRoute {
+  return 'schema' in apiRoute && 'handler' in apiRoute
 }
 
 export function createEndpoint<
+  const TContext extends AnyContextable,
   const TApiEndpointSchema extends ApiRouteSchema,
-  const TContext extends AnyContext = AnyContext,
->(schema: TApiEndpointSchema, handler: ApiRouteHandler<TContext, TApiEndpointSchema>) {
+>(
+  context: TContext,
+  schema: TApiEndpointSchema,
+  handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
+): ApiRoute<TApiEndpointSchema> {
   return {
-    schema,
-    handler: handler,
-    // handler: withValidator(schema, handler),
+    schema: schema,
+    // TODO: Recheck with Validator.
+    // handler: withValidator(schema, (payload, request) => {
+    //   const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
+    //   return handler({ ...payload, context: requestContext })
+    // }),
+    handler: (payload, request) => {
+      const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
+      return handler({ ...payload, context: requestContext })
+    },
   }
 }
 
-export function getClientEndpoint(endpoint: ApiRoute<any>): ClientApiRouteSchema {
-  const schema = endpoint.schema
-  const template = {
-    path: schema.path,
-    method: schema.method,
-    ...(schema.headers ? { headers: z.toJSONSchema(schema.headers) } : {}),
-    ...(schema.pathParams
-      ? {
-          pathParams: z.toJSONSchema(schema.pathParams),
+export type AppendApiPathPrefix<TPathPrefix extends string, TApiRouter extends ApiRouter> = {
+  [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute
+    ? {
+        schema: Omit<TApiRouter[TKey]['schema'], 'path'> & {
+          path: `${TPathPrefix}${TApiRouter[TKey]['schema']['path']}`
         }
-      : {}),
-    ...(schema.query ? { query: z.toJSONSchema(schema.query) } : {}),
-    responses: Object.fromEntries(
-      Object.entries(schema.responses).map(([key, value]) => {
-        return [key, value ? z.toJSONSchema(value) : undefined]
+        handler: TApiRouter[TKey]['handler']
+      }
+    : TApiRouter[TKey] extends ApiRouter
+      ? AppendApiPathPrefix<TPathPrefix, TApiRouter[TKey]>
+      : never
+}
+
+export function appendApiPathPrefix<TPathPrefix extends string, TApiRouter extends ApiRouter>(
+  prefix: TPathPrefix,
+  apiRouter: TApiRouter
+): AppendApiPathPrefix<TPathPrefix, TApiRouter> {
+  const transformedApiRouter: AppendApiPathPrefix<TPathPrefix, TApiRouter> = {} as any
+  for (const key in apiRouter) {
+    const route = apiRouter[key]
+    if (isApiRoute(route)) {
+      Object.assign(transformedApiRouter, {
+        [key]: {
+          schema: { ...route.schema, path: `${prefix}${route.schema.path}` },
+          handler: route.handler,
+        },
       })
-    ) as Partial<Record<ApiHttpStatus, z.core.JSONSchema.BaseSchema>>,
+      continue
+    }
+    Object.assign(transformedApiRouter, { [key]: appendApiPathPrefix(prefix, route) })
   }
-
-  if (schema.method === 'GET') {
-    return template as ClientApiRouteSchema
-  }
-
-  return {
-    ...template,
-    body: schema.body ? z.toJSONSchema(schema.body) : undefined,
-  } as ClientApiRouteSchema
+  return transformedApiRouter
 }

@@ -31,10 +31,9 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
-import type { Field, FieldRelation } from '../../../../core'
-import type { AnyContext } from '../../../../core/context'
+import type { FieldClient, FieldRelationClient } from '../../../../core/field'
 import { constructEditorProviderProps } from '../../../../core/richtext'
-import type { ClientEditorProviderProps } from '../../../../core/richtext/types'
+import type { EditorProviderClientProps } from '../../../../core/richtext/types'
 import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
@@ -231,7 +230,7 @@ const AutoRichTextField = (props: {
   isDisabled?: boolean
   isPending?: boolean
   errorMessage?: string
-  editor: ClientEditorProviderProps
+  editor: EditorProviderClientProps
 }) => {
   const { field, error } = useFormItemController()
 
@@ -280,12 +279,12 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 }
 
 interface AutoFieldProps {
-  // NOTE: This should be FieldClient but the type is not correct
-  field: Field<any, AnyContext> & { fieldName: string }
+  field: FieldClient
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'
   prefix?: string
+  isDisabled?: boolean
 }
 
 export function AutoField(props: AutoFieldProps) {
@@ -295,10 +294,10 @@ export function AutoField(props: AutoFieldProps) {
 
   if (visibility === 'hidden') return null
 
-  const disabled = visibility === 'disabled'
+  const disabled = visibility === 'disabled' || props.isDisabled
 
   const commonProps = {
-    name: props.prefix ? `${props.prefix}.${field.fieldName}` : field.fieldName,
+    name: props.prefix ? `${props.prefix}.${field.$client}` : field.$client.fieldName,
     label: field.label,
     className: className,
     description: field.description,
@@ -315,7 +314,8 @@ export function AutoField(props: AutoFieldProps) {
           component={
             <AutoRichTextField
               {...commonProps}
-              editor={field.editor as ClientEditorProviderProps}
+              // TODO: Fix this
+              editor={field.editor as EditorProviderClientProps}
               isDisabled={disabled}
             />
           }
@@ -392,7 +392,7 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'selectNumber':
     case 'selectText': {
-      const options = props.optionsRecord[field.fieldName] ?? []
+      const options = props.optionsRecord[field.$client.fieldName] ?? []
       return (
         <AutoFormField
           key={commonProps.name}
@@ -404,9 +404,9 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'comboboxNumber':
     case 'comboboxText': {
-      const options = props.optionsRecord[field.fieldName] ?? []
+      const options = props.optionsRecord[field.$client.fieldName] ?? []
       return (
-        <select name={field._.column.name}>
+        <select name={field.$client.fieldName}>
           {options.map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
@@ -416,9 +416,6 @@ export function AutoField(props: AutoFieldProps) {
       )
     }
 
-    case 'comboboxBoolean': {
-      return <p>COMBOBOX BOOLEAN</p>
-    }
     case 'media': {
       return (
         <AutoFormField
@@ -438,34 +435,37 @@ export function AutoField(props: AutoFieldProps) {
     case 'create':
       return (
         <AutoRelationshipField
-          name={field.fieldName}
+          name={field.$client.fieldName}
           field={field}
           allowCreate={true}
           allowConnect={false}
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
+          isDisabled={disabled}
         />
       )
     case 'connect':
       return (
         <AutoRelationshipField
-          name={field.fieldName}
+          name={field.$client.fieldName}
           field={field}
           allowConnect={true}
           allowCreate={false}
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
+          isDisabled={disabled}
         />
       )
     case 'connectOrCreate':
       return (
         <AutoRelationshipField
-          name={field.fieldName}
+          name={field.$client.fieldName}
           field={field}
           allowConnect={true}
           allowCreate={true}
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
+          isDisabled={disabled}
         />
       )
 
@@ -477,12 +477,13 @@ export function AutoField(props: AutoFieldProps) {
 interface AutoRelationshipFieldProps {
   name: string
   // NOTE: This should be FieldClient but the type is not correct
-  field: FieldRelation & { fieldName: string }
+  field: FieldRelationClient
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
   visibilityField?: 'create' | 'update'
+  isDisabled?: boolean
 }
 
 export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
@@ -491,7 +492,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
     return null
   }
 
-  switch (props.field.mode) {
+  switch (props.field.$client.mode) {
     case 'one':
       return (
         <AutoOneRelationshipField
@@ -502,6 +503,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
           visibilityField={props.visibilityField}
+          isDisabled={props.isDisabled}
         />
       )
     case 'many':
@@ -514,10 +516,11 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
           visibilityField={props.visibilityField}
+          isDisabled={props.isDisabled}
         />
       )
     default:
-      throw new Error(`Unsupported relationship mode: ${props.field.mode}`)
+      throw new Error(`Unsupported relationship mode: ${props.field.$client.mode}`)
   }
 }
 
@@ -536,13 +539,13 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
   const connectComponent = (
     <FormField
-      name={props.name}
+      name={`${props.name}.connect`}
       control={control}
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.field.fieldName] ?? []}
+            items={props.optionsRecord[props.field.$client.fieldName] ?? []}
             isDisabled={disabled}
           />
         </FormItemController>
@@ -552,16 +555,17 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
   const createComponent = Object.entries(props.field.fields).map(([key, originalField]) => (
     <AutoFormField
-      key={`${props.name}.create.${originalField.fieldName}`}
-      name={`${props.name}.create.${originalField.fieldName}`}
+      key={`${props.name}.create.${originalField.$client.fieldName}`}
+      name={`${props.name}.create.${originalField.$client.fieldName}`}
       component={
         <AutoField
           key={key}
-          field={originalField}
+          field={originalField as FieldClient}
           className="w-full"
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
           prefix={`${props.name}.create`}
+          isDisabled={disabled}
         />
       }
     />
@@ -596,13 +600,13 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
 interface AutoManyRelationshipFieldProps {
   name: string
-  // NOTE: This should be FieldClient but the type is not correct
-  field: FieldRelation & { fieldName: string }
+  field: FieldRelationClient
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
   visibilityField?: 'create' | 'update'
+  isDisabled?: boolean
 }
 
 export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
@@ -613,7 +617,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   })
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
   if (visibility === 'hidden') return null
-  const disabled = visibility === 'disabled'
+  const disabled = visibility === 'disabled' || props.isDisabled
 
   const connectComponent = (name: string) => {
     const commonProps = {
@@ -628,7 +632,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         component={
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.field.fieldName] ?? []}
+            items={props.optionsRecord[props.field.$client.fieldName] ?? []}
             isDisabled={disabled}
           />
         }
@@ -643,11 +647,12 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         name={name}
         component={
           <AutoField
-            field={childField}
+            field={childField as FieldClient}
             className="w-full"
             optionsRecord={props.optionsRecord}
             visibilityField={props.visibilityField}
             prefix={name}
+            isDisabled={disabled}
           />
         }
       />
@@ -682,7 +687,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            isDisabled={disabled}
+            onClick={() => fieldArray.append({})}
+          >
             Add
           </Button>
         </div>
@@ -700,7 +711,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            isDisabled={disabled}
+            onClick={() => fieldArray.append({})}
+          >
             Add
           </Button>
         </div>

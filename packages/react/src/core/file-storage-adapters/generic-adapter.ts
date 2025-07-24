@@ -1,9 +1,11 @@
 import type { createFileUploadHandlers } from './handlers'
 
-import type { AnyContext } from '../context'
-import type { ClientApiRouteSchema } from '../endpoint'
+import type { AnyContextable } from '../context'
+import type { ApiRouteSchemaClient } from '../endpoint'
 
-export type FileUploadHandlers = ReturnType<typeof createFileUploadHandlers<AnyContext>>['handlers']
+export type FileUploadHandlers = ReturnType<
+  typeof createFileUploadHandlers<AnyContextable>
+>['handlers']
 
 export interface UploadActionResponse<TData> {
   message: string
@@ -31,8 +33,8 @@ export interface StorageAdapter {
 
 export interface StorageAdapterClient {
   name: string
-  grabPutObjectSignedUrlApiRoute: ClientApiRouteSchema
-  grabGetObjectSignedUrlApiRoute: ClientApiRouteSchema
+  grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
 }
 
 export const getStorageAdapterClient = ({
@@ -41,8 +43,8 @@ export const getStorageAdapterClient = ({
   grabGetObjectSignedUrlApiRoute,
 }: {
   storageAdapter?: StorageAdapter
-  grabPutObjectSignedUrlApiRoute: ClientApiRouteSchema
-  grabGetObjectSignedUrlApiRoute: ClientApiRouteSchema
+  grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
 }): StorageAdapterClient => {
   if (!storageAdapter) throw new Error('Upload adapter is missing')
 

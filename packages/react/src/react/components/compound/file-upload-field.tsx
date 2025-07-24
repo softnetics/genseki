@@ -300,6 +300,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
             ref={inputRef}
             onChange={handleChange}
             className="hidden"
+            disabled={props.isDisabled}
           />
         </div>
       )}

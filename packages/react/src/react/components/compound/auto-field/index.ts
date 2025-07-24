@@ -1,12 +1,11 @@
-import type { RequestContext } from '../../../../core'
 import { type Fields } from '../../../../core'
-import type { AnyContext } from '../../../../core/context'
+import type { AnyRequestContextable } from '../../../../core/context'
 
 export * from './client'
 
 export async function createOptionsRecord(
-  context: RequestContext,
-  fields: Fields<any, AnyContext>,
+  context: AnyRequestContextable,
+  fields: Fields,
   prefix: string = ''
 ): Promise<Record<string, any[]>> {
   const promises = Object.values(fields).flatMap(async (field) => {
@@ -15,22 +14,22 @@ export async function createOptionsRecord(
         const childOptions = await createOptionsRecord(
           context,
           field.fields,
-          `${prefix}${field.fieldName}.`
+          `${prefix}${field.$client.fieldName}.`
         )
 
         const options = await field.options(context)
 
         return [
-          [`${prefix}${field.fieldName}`, options],
+          [`${prefix}${field.$client.fieldName}`, options],
           ...Object.entries(childOptions).map(([key, value]) => [
-            `${prefix}${field.fieldName}.${key}`,
+            `${prefix}${field.$client.fieldName}.${key}`,
             value,
           ]),
         ]
       }
 
       const options = await field.options(context)
-      return [[`${prefix}${field.fieldName}`, options]]
+      return [[`${prefix}${field.$client.fieldName}`, options]]
     }
 
     return []

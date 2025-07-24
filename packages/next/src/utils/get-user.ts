@@ -13,10 +13,9 @@ const getHeadersObject = (headers: Headers): Record<string, string> => {
 // TODO: Add type for user
 async function _getUser(serverFunction: ServerFunction, headers: Headers): Promise<any | null> {
   const reqHeaders = getHeadersObject(headers)
-  const response = await serverFunction({
-    method: 'auth.me',
+  const response = await serverFunction('auth.me', {
     headers: reqHeaders,
-    body: {},
+    body: undefined,
     pathParams: {},
     query: {},
   })

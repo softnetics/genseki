@@ -3,7 +3,6 @@
 import { CubeIcon, DotsThreeIcon } from '@phosphor-icons/react'
 
 import { useNavigation } from '../../../../providers'
-import { useRootContext } from '../../../../providers/root'
 import { formatSlug } from '../../../../utils/format-slug'
 import { Menu, MenuContent, MenuItem, MenuLabel, MenuTrigger } from '../../../primitives'
 import {
@@ -40,7 +39,8 @@ export function AppSidebarBreadCrumbs() {
 }
 
 function CollectionMenu() {
-  const { clientConfig } = useRootContext()
+  // This should be fetched from the context or props
+  const slugs = ['mockA', 'mockB']
 
   return (
     <Menu>
@@ -48,10 +48,10 @@ function CollectionMenu() {
         <BaseIcon icon={DotsThreeIcon} size="md" weight="bold" />
       </MenuTrigger>
       <MenuContent placement="bottom left" showArrow className="sm:min-w-64">
-        {Object.values(clientConfig.collections).map((collection) => (
-          <MenuItem key={collection.slug} href={`/admin/collections/${collection.slug}`}>
+        {Object.values(slugs).map((slug) => (
+          <MenuItem key={slug} href={`/admin/collections/${slug}`}>
             <BaseIcon icon={CubeIcon} weight="duotone" />
-            <MenuLabel>{formatSlug(collection.slug)}</MenuLabel>
+            <MenuLabel>{formatSlug(slug)}</MenuLabel>
           </MenuItem>
         ))}
       </MenuContent>

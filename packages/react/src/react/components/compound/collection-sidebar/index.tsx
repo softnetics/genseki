@@ -1,16 +1,16 @@
-import { MoonStarsIcon } from '@phosphor-icons/react/dist/ssr'
+import { DatabaseIcon, MoonStarsIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { CollectionSection } from './sections/collection-section'
-import { NavigationSection } from './sections/navigations-section'
-import { PluginSection } from './sections/plugin-section'
-
-import type { AnyCollection } from '../../../../core/collection'
 import {
   BaseIcon,
   Sidebar,
   SidebarContent,
+  SidebarDisclosure,
   SidebarDisclosureGroup,
+  SidebarDisclosurePanel,
+  SidebarDisclosureTrigger,
   SidebarHeader,
+  SidebarItem,
+  SidebarLabel,
   SidebarRail,
   Typography,
 } from '../../primitives'
@@ -18,9 +18,30 @@ import {
 export * from './nav'
 export * from './sections'
 
-export async function AppSidebar({ collections }: { collections: Record<string, AnyCollection> }) {
-  const collectionSlugs = Object.values(collections).map((collection) => collection.slug)
+export type AppSidebarItem = {
+  type: 'item'
+  label: string
+  path: string
+  icon?: React.ReactNode
+}
 
+export type AppSidebarSectionItem = {
+  type: 'section'
+  label: string
+  items: (AppSidebarSectionItem | AppSidebarItem)[]
+}
+
+export type AppSideBarBuilderProps = AppSidebarSectionItem
+
+export interface AppSidebarProps {
+  title: string
+  version: string
+  pathname: string
+  sidebar?: AppSideBarBuilderProps
+}
+
+// TODO: Revise this component
+export async function AppSidebar(props: AppSidebarProps) {
   return (
     <Sidebar
       collapsible="dock"
@@ -37,22 +58,60 @@ export async function AppSidebar({ collections }: { collections: Record<string, 
           </div>
           <div className="flex flex-col group-data-[sidebar-state=collapsed]/sidebar-container:hidden group-data-[sidebar-state=collapsed]/sidebar-container:translate-x-full">
             <Typography type="body" weight="semibold" className="text-text-nontrivial">
-              Genseki
+              {props.title}
             </Typography>
             <Typography type="label" weight="medium" className="text-text-trivial">
-              V.1.0.0
+              {props.version}
             </Typography>
           </div>
         </div>
       </SidebarHeader>
       <SidebarContent>
-        <SidebarDisclosureGroup defaultExpandedKeys={[2]} className="mt-4">
-          <NavigationSection id={0} />
-          <PluginSection id={1} />
-          <CollectionSection id={2} slugs={collectionSlugs} />
-        </SidebarDisclosureGroup>
+        {props.sidebar && (
+          <SidebarDisclosureGroup className="mt-4" defaultExpandedKeys={[1]}>
+            <SidebarDisclosure id={1}>
+              <SidebarDisclosureTrigger className="in-data-[sidebar-state=collapsed]:rounded-none rounded-md">
+                <BaseIcon icon={DatabaseIcon} size="sm" weight="duotone" className="size-8!" />
+                <SidebarLabel className="text-text-body text-sm">Collections</SidebarLabel>
+              </SidebarDisclosureTrigger>
+              <SidebarDisclosurePanel>
+                <SidebarBuilder pathname={props.pathname} {...props.sidebar} />
+              </SidebarDisclosurePanel>
+            </SidebarDisclosure>
+          </SidebarDisclosureGroup>
+        )}
       </SidebarContent>
       <SidebarRail />
     </Sidebar>
+  )
+}
+
+function CurveLine({ className }: { className?: string }) {
+  return (
+    <svg
+      xmlns="http://www.w3.org/2000/svg"
+      className={className}
+      width="17"
+      height="15"
+      viewBox="0 0 17 15"
+      fill="none"
+    >
+      <path d="M16 14C2.5 14 1 6.68747 1 1" className="stroke-primary" strokeLinecap="round" />
+    </svg>
+  )
+}
+
+export function SidebarBuilder(props: AppSideBarBuilderProps & { pathname: string }) {
+  const isCurrentPage = (path: string) => props.pathname.includes(path)
+
+  return props.items.map((item, index) =>
+    item.type === 'section' ? (
+      <SidebarBuilder pathname={props.pathname} {...item} />
+    ) : (
+      <SidebarItem key={index} ghost isCurrent={isCurrentPage(item.path)} href={item.path}>
+        <CurveLine className="absolute inset-y-0 left-7 my-auto -translate-y-3" />
+        <SidebarLabel className="ml-6">{item.label}</SidebarLabel>
+      </SidebarItem>
+    )
   )
 }
