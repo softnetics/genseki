@@ -47,5 +47,3 @@ export const handler = generatorHandler({
 })
 
 export default handler
-
-export * from './types'
