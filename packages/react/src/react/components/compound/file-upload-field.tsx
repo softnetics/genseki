@@ -2,7 +2,13 @@
 import React, { type Dispatch, type SetStateAction, useRef, useState } from 'react'
 import type { DropZoneProps } from 'react-aria-components'
 
-import { FileArrowUpIcon, FileIcon, TrashIcon } from '@phosphor-icons/react'
+import {
+  CheckCircleIcon,
+  CloudArrowUpIcon,
+  FileIcon,
+  PaperclipIcon,
+  XCircleIcon,
+} from '@phosphor-icons/react'
 import type { DropEvent, FileDropItem } from '@react-types/shared'
 import { toast } from 'sonner'
 
@@ -103,16 +109,21 @@ export interface FileUploadFieldProps extends DropZoneProps {
 
 export const FileUploadField = (props: FileUploadFieldProps) => {
   const [fileKey, setFileKey] = useState(props.value)
+  const [uploadStatus, setUploadStatus] = useState<'pending' | 'success' | 'failed' | undefined>(
+    undefined
+  )
   const storageAdapter = useStorageAdapter()
   const inputRef = useRef<HTMLInputElement>(null)
   const maxSize = props.uploadOptions?.maxSize || 1024 * 1024 * 1
   const readableMaxSize = `${maxSize / 1024 / 1024}MB`
   const limit = props.uploadOptions?.limit || 1
   const mimeTypes = props.uploadOptions?.mimeTypes || []
-  const readableMimeTypes = mimeTypes.join(', ')
+  const readableMimeTypes = mimeTypes.map((mimeType) => mimeType.split('/')[1]).join(', ')
 
   const handleUpload = async (files: File[]) => {
     // Custom handle on your own
+    setUploadStatus('pending')
+
     if (props.onUpload) {
       props.onUpload(files, setFileKey)
       return
@@ -145,6 +156,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
           }
         )
         props.onUploadFail?.('File type is not allowed')
+        setUploadStatus('failed')
         return
       }
 
@@ -173,6 +185,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
       toast.error('generating put object signed URL error', {
         description: putObjSignedUrl.message,
       })
+      setUploadStatus('failed')
       return
     }
 
@@ -184,15 +197,18 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
       toast.error('File upload error', {
         description: uploadResult.message,
       })
+      setUploadStatus('failed')
       return
     }
 
     setFileKey(key)
     props.onUploadSuccess?.(key)
+    setUploadStatus('success')
   }
 
   // For upload via clicking
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    console.log('handleChange', e)
     const files = e.target.files
 
     if (!files || files.length === 0) return
@@ -218,11 +234,12 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     <div className="group flex flex-col gap-y-4">
       {props.label && (
         <Label htmlFor={props.name}>
-          {props.label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
         </Label>
       )}
       {fileKey ? (
         <FileDisplayer
+          uploadStatus={uploadStatus}
           fileKey={fileKey}
           onRemove={props.onRemove}
           onRemoveSuccess={props.onRemoveSuccess}
@@ -230,27 +247,49 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
           resetFileKey={() => setFileKey(undefined)}
         />
       ) : (
-        <div
-          onClick={(e) => {
-            e.stopPropagation()
-            inputRef.current?.click()
-          }}
-        >
-          <DropZone onDrop={handleDrop} isDisabled={props.isDisabled}>
-            <div className="flex flex-col items-center">
-              <FileArrowUpIcon className="text-[2rem]" />
+        <div>
+          <DropZone
+            onDrop={handleDrop}
+            isDisabled={props.isDisabled}
+            className="border border-bluegray-400 bg-white rounded-lg"
+          >
+            <div className="flex flex-col items-center gap-6">
+              <Button
+                leadingIcon={<BaseIcon icon={PaperclipIcon} size="md" />}
+                variant="outline"
+                size="sm"
+                onClick={(e) => {
+                  e.stopPropagation()
+                  inputRef.current?.click()
+                }}
+              >
+                Upload a file
+              </Button>
               <div className="flex flex-col items-center gap-y-4 mt-4">
-                <Typography type="body" weight="medium" className="text-text-nontrivial">
+                <Typography type="body" weight="medium" className="text-muted-fg text-center">
                   {props.placeholder || (
                     <>
-                      <em>Click to upload</em> or drag and drop
+                      <span
+                        className="text-ocean-500 cursor-pointer"
+                        onClick={(e) => {
+                          e.stopPropagation()
+                          inputRef.current?.click()
+                        }}
+                      >
+                        Click to upload
+                      </span>{' '}
+                      or drag and drop
                     </>
                   )}
+                  <br />
+                  <span>
+                    {readableMimeTypes} (max. {readableMaxSize})
+                  </span>
                 </Typography>
 
-                <Typography type="caption" weight="normal" className="text-text-trivial">
+                {/* <Typography type="caption" weight="normal" className="text-text-trivial">
                   Maximum file size {readableMaxSize}.
-                </Typography>
+                </Typography> */}
               </div>
             </div>
           </DropZone>
@@ -273,11 +312,20 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
 
 const FileDisplayer = (props: {
   fileKey: string
+  uploadStatus?: 'pending' | 'success' | 'failed'
   resetFileKey: () => void
   onRemove?: (fileKey: string) => void
   onRemoveSuccess?: (fileKey: string) => void
   onRemoveFail?: (reason: string) => void
 }) => {
+  // checking by fileKey is end with format type
+  const isImage =
+    props.fileKey.endsWith('.webp') ||
+    props.fileKey.endsWith('.png') ||
+    props.fileKey.endsWith('.jpg') ||
+    props.fileKey.endsWith('.jpeg') ||
+    props.fileKey.endsWith('.gif')
+
   const handleRemove = () => {
     // Custom handle on your own
     if (props.onRemove) {
@@ -300,39 +348,90 @@ const FileDisplayer = (props: {
     }
   }
 
-  return (
-    <div className="w-full h-full bg-muted rounded-md p-6 grid grid-cols-[1fr_auto] items-center gap-x-4">
-      <div className="flex gap-x-2 items-center">
-        <BaseIcon icon={FileIcon} size="sm" />
-        <Typography
-          type="body"
-          weight="medium"
-          className="text-text-trivial"
-          content={props.fileKey}
-        >
-          {props.fileKey}
+  const uploadStatusVariant = {
+    pending: {
+      icon: <BaseIcon icon={CloudArrowUpIcon} size="sm" className="text-bluegray-400" />,
+      text: (
+        <Typography type="body" weight="medium" className="text-bluegray-400 text-sm">
+          Pending
         </Typography>
+      ),
+    },
+    success: {
+      icon: <BaseIcon icon={CheckCircleIcon} size="sm" className="text-palm-600" />,
+      text: (
+        <Typography type="body" weight="medium" className="text-bluegray-800 text-sm">
+          Completed
+        </Typography>
+      ),
+    },
+    failed: {
+      icon: <BaseIcon icon={XCircleIcon} size="sm" className="text-red-600" />,
+      text: (
+        <Typography type="body" weight="medium" className="text-red-600 text-sm">
+          Failed
+        </Typography>
+      ),
+    },
+  }
+
+  return (
+    <div className="w-full h-full bg-white rounded-md p-8 items-center gap-x-4">
+      <div className="flex gap-x-4 items-start">
+        {isImage && process.env.AWS_BUCKET_NAME ? (
+          <div className="size-20 rounded-md overflow-hidden bg-muted border border-bluegray-300">
+            <img
+              // I'm not sure this is the correct way to put the bucket url in the image src
+              src={`${process.env.AWS_BUCKET_NAME}/${props.fileKey}`}
+              alt={props.fileKey}
+              className="w-full h-full object-cover"
+            />
+          </div>
+        ) : (
+          <BaseIcon icon={FileIcon} size="xl" />
+        )}
+        <div className="flex flex-col gap-4">
+          <Typography
+            type="body"
+            weight="medium"
+            className="text-text-nontrivial"
+            content={props.fileKey}
+          >
+            {props.fileKey}
+          </Typography>
+
+          {props.uploadStatus && (
+            <div className="flex gap-2 items-center">
+              {uploadStatusVariant[props.uploadStatus].icon}
+              {uploadStatusVariant[props.uploadStatus].text}
+            </div>
+          )}
+
+          <div className="flex gap-6 items-center">
+            <Modal>
+              <Button variant="destruction" size="xs">
+                Remove
+              </Button>
+              <ModalContent isBlurred role="alertdialog">
+                <ModalHeader className="">
+                  <ModalTitle level={3}>Delete file</ModalTitle>
+                  <ModalDescription>
+                    This will permanently delete the selected file
+                  </ModalDescription>
+                </ModalHeader>
+                <ModalFooter className="flex justify-between">
+                  <ModalClose variant="outline" size="sm">
+                    Cancel
+                  </ModalClose>
+                  <ModalClose variant="destruction" size="sm" onClick={handleRemove}>
+                    Delete
+                  </ModalClose>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
+          </div>
+        </div>
       </div>
-      <Modal>
-        <Button variant="destruction" size="sm">
-          Delete
-          <BaseIcon icon={TrashIcon} size="md" />
-        </Button>
-        <ModalContent isBlurred role="alertdialog">
-          <ModalHeader className="">
-            <ModalTitle level={3}>Delete file</ModalTitle>
-            <ModalDescription>This will permanently delete the selected file</ModalDescription>
-          </ModalHeader>
-          <ModalFooter className="flex justify-between">
-            <ModalClose variant="outline" size="sm">
-              Cancel
-            </ModalClose>
-            <ModalClose variant="destruction" size="sm" onClick={handleRemove}>
-              Delete
-            </ModalClose>
-          </ModalFooter>
-        </ModalContent>
-      </Modal>
     </div>
   )
 }

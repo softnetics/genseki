@@ -123,13 +123,13 @@ const MultipleSelect = <T extends object>({
     <Group
       isDisabled={props.isDisabled}
       isInvalid={props.isInvalid}
-      className={composeTailwindRenderProps(className, 'group flex h-fit flex-col gap-y-1')}
+      className={composeTailwindRenderProps(className, 'group flex h-fit flex-col gap-y-4')}
     >
       {({ isInvalid, isDisabled }) => (
         <>
           {props.label && (
             <Label onClick={() => inputRef.current?.focus()}>
-              {props.label} {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+              {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
             </Label>
           )}
           <FieldGroup
