@@ -1,3 +1,5 @@
+'use client'
+
 import { UserIcon } from '@phosphor-icons/react'
 import { twMerge } from 'tailwind-merge'
 
