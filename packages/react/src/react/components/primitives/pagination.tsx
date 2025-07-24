@@ -39,7 +39,7 @@ const Pagination = (props: PaginationProps) => {
       {/* Previous Button */}
       <button
         className={clsx(
-          'flex gap-2.5 size-20 transition-colors text-lg shrink-0 items-center justify-center bg-white',
+          'flex gap-2.5 size-20 transition-colors text-lg shrink-0 items-center justify-center bg-white dark:bg-bluegray-800',
           currentPage === 1
             ? 'cursor-not-allowed text-bluegray-300'
             : 'cursor-pointer text-text-body '
@@ -58,7 +58,7 @@ const Pagination = (props: PaginationProps) => {
             return (
               <div
                 key={`elipse-${page}-${idx}`}
-                className={`size-20 shrink-0 flex items-center justify-center text-text-body transition-colors cursor-pointer text-lg border-l border-bluegray-300 bg-white`}
+                className={`size-20 shrink-0 flex items-center justify-center text-text-body transition-colors cursor-pointer text-lg border-l border-bluegray-300 bg-white dark:bg-bluegray-800`}
               >
                 <span className="text-lg">...</span>
               </div>
@@ -69,7 +69,9 @@ const Pagination = (props: PaginationProps) => {
               key={`page-${page}-${idx}`}
               className={clsx(
                 'flex size-20 shrink-0 items-center justify-center bg-accent-fg text-text-body transition-colors cursor-pointer text-lg',
-                page === currentPage ? 'bg-bluegray-50' : 'bg-white',
+                page === currentPage
+                  ? 'bg-bluegray-50 dark:bg-bluegray-700'
+                  : 'bg-white dark:bg-bluegray-800',
                 variant === 'compact' ? 'border-l border-bluegray-300' : 'rounded-lg',
                 page === totalPages && variant === 'compact' && 'border-r border-bluegray-300'
               )}
@@ -84,7 +86,7 @@ const Pagination = (props: PaginationProps) => {
       {/* Next Button */}
       <button
         className={clsx(
-          'flex gap-2.5 size-20 transition-colors cursor-pointer text-lg shrink-0 items-center justify-center bg-white',
+          'flex gap-2.5 size-20 transition-colors cursor-pointer text-lg shrink-0 items-center justify-center bg-white dark:bg-bluegray-800',
           currentPage === totalPages
             ? 'cursor-not-allowed text-bluegray-300'
             : 'cursor-pointer text-text-body'

@@ -25,11 +25,11 @@ const buttonVariants = tv({
       tertiary: `bg-pumpkin-50 hover:bg-pumpkin-100
         [&>*]:text-accent text-accent 
         focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none border border-primary-emphasis`,
-      naked: `bg-white-normal hover:bg-bluegray-100 [&>*]:text-text-body text-text-body shadow-xs border-b border-stroke-trivial/10 
+      naked: `bg-white-normal hover:bg-bluegray-100 [&>*]:text-bluegray-600 text-bluegray-600 shadow-xs border-b border-stroke-trivial/10 
       focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
-      outline: `bg-white-normal hover:bg-bluegray-50 [&>*]:text-text-body text-text-body border border-bluegray-300 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      outline: `bg-white-normal dark:bg-bluegray-800 hover:bg-bluegray-50 [&>*]:text-text-body text-text-body border border-bluegray-300 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
       ghost:
-        'bg-none [&>*]:text-text-body text-text-body hover:bg-bluegray-50 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
+        'bg-none [&>*]:text-bluegray-600 text-bluegray-600 hover:bg-bluegray-50 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
       vanish:
         '[&>*]:text-secondary-fg text-secondary-fg focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
       destruction: `[&>*]:text-white text-white bg-red-600 hover:bg-red-700

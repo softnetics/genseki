@@ -36,7 +36,7 @@ const intents = {
   },
   gray: {
     base: [
-      'bg-bluegray-100 text-text-body **:[[slot=remove]]:hover:bg-fg **:[[slot=remove]]:hover:text-bg',
+      'bg-bluegray-100 text-bluegray-600 **:[[slot=remove]]:hover:bg-fg **:[[slot=remove]]:hover:text-bg',
     ],
     selected: [
       'bg-stroke-body text-white',

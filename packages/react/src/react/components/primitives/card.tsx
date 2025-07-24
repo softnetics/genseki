@@ -34,22 +34,22 @@ const Card: React.FC<CardProps> = ({ title, itemNumber, description, buttonTitle
         <p className="text-lg font-semibold text-bluegray-800">{title}</p>
         {itemNumber && (
           <div className="flex items-center gap-2">
-            <BaseIcon icon={Folder} size="md" className="text-icon-tertiary" />
-            <span className="text-sm text-text-secondary">{itemNumber} items</span>
+            <BaseIcon icon={Folder} size="md" className="text-bluegray-600" />
+            <span className="text-sm text-bluegray-600">{itemNumber} items</span>
           </div>
         )}
       </div>
 
       <div className="px-8 pb-8 pt-6">
-        <p className="text-text-secondary leading-snug">{description}</p>
+        <p className="text-bluegray-600 leading-snug">{description}</p>
       </div>
 
       <button
         onClick={onClick}
-        className="w-full py-6 px-8 bg-gradient-to-b from-pumpkin-50 to-pumpkin-200 rounded-lg text-text-secondary font-medium flex items-center justify-end hover:from-pumpkin-100 hover:to-pumpkin-300 transition cursor-pointer gap-3"
+        className="w-full py-6 px-8 bg-gradient-to-b from-pumpkin-50 to-pumpkin-200 rounded-lg text-bluegray-600 font-medium flex items-center justify-end hover:from-pumpkin-100 hover:to-pumpkin-300 transition cursor-pointer gap-3"
       >
         <span>{buttonTitle ?? 'View'}</span>
-        <IconChevronLgRight fontSize={24} className="size-10 text-text-secondary" />
+        <IconChevronLgRight fontSize={24} className="size-10 text-bluegray-600" />
       </button>
     </div>
   )

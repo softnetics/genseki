@@ -111,7 +111,7 @@ const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
               {...attributes}
               {...listeners}
             >
-              <BaseIcon icon={DotsSixIcon} size="sm" className="rotate-90" />
+              <BaseIcon icon={DotsSixIcon} size="sm" className="rotate-90 text-bluegray-600" />
             </div>
 
             <Typography type="body" weight="semibold" className="text-bluegray-600">

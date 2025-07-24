@@ -60,8 +60,8 @@ interface ButtonGroupItemProps extends ToggleButtonProps {}
 
 const ButtonGroupItemStyles = tv({
   base: [
-    'bg-bluegray-200 cursor-pointer',
-    'text-bluegray-800 px-4 py-2',
+    'bg-bluegray-100 cursor-pointer dark:bg-bluegray-700',
+    'text-bluegray-800 px-4 py-2 dark:text-bluegray-200',
     'relative isolate inline-flex flex-row items-center font-medium outline-hidden',
   ],
   variants: {
@@ -88,7 +88,7 @@ const ButtonGroupItemStyles = tv({
     },
     isSelected: {
       // add inside shadow
-      true: `bg-white`,
+      true: `bg-white dark:bg-bluegray-800`,
     },
     isDisabled: {
       true: 'opacity-50 grayscale cursor-not-allowed',

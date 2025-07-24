@@ -77,26 +77,26 @@
   --color-ocean-800: #112a7c;
   --color-ocean-900: #08153d;
 
-  --color-red-50: #FEF2F2;
-  --color-red-100: #FEE2E2;
-  --color-red-200: #FECACA;
-  --color-red-300: #FCA5A5;
-  --color-red-400: #F87171;
-  --color-red-500: #EF4444;
-  --color-red-600: #DC2626;
-  --color-red-700: #B91C1C;
-  --color-red-800: #991B1B;
-  --color-red-900: #450A0A;
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #450a0a;
 
-  --color-yellow-50: #FEFCE8;
-  --color-yellow-100: #FEF9C3;
-  --color-yellow-200: #FEF08A;
-  --color-yellow-300: #FDE047;
-  --color-yellow-400: #FACC15;
-  --color-yellow-500: #EAB308;
-  --color-yellow-600: #CA8A04;
-  --color-yellow-700: #A16207;
-  --color-yellow-800: #854D0E;
+  --color-yellow-50: #fefce8;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-200: #fef08a;
+  --color-yellow-300: #fde047;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
+  --color-yellow-700: #a16207;
+  --color-yellow-800: #854d0e;
   --color-yellow-900: #422006;
 
   --color-black-normal: #000000;
@@ -201,7 +201,7 @@
 
 @layer base {
   /* Do we have a dark mode? */
-  /* .dark {
+  .dark {
     --color-text-correct: var(--color-palm-600);
     --color-text-incorrect: var(--color-valencia-600);
     --color-text-accent: var(--color-pumpkin-500);
@@ -210,7 +210,7 @@
     --color-text-body: var(--color-bluegray-200);
     --color-text-trivial: var(--color-bluegray-400);
     --color-text-white: var(--color-bluegray-600);
-  } */
+  }
 
   /* IntentUI | Theme for used by @theme */
   /**
