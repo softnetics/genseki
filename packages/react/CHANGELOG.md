@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.17
+
+### Minor Changes
+
+- [#79](https://github.com/softnetics/genseki/pull/79) [`082b5bc`](https://github.com/softnetics/genseki/commit/082b5bc747adff6c0adc5526f80b8ea2aedd0b8e) Thanks [@Desmenez](https://github.com/Desmenez)! - redesign components and add new component
+
+### Patch Changes
+
+- [#98](https://github.com/softnetics/genseki/pull/98) [`f2adbb5`](https://github.com/softnetics/genseki/commit/f2adbb590d9a4795eb4afebaad032cf39f25aa8d) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: home card not update
+
 ## 0.1.0-alpha.16
 
 ### Patch Changes

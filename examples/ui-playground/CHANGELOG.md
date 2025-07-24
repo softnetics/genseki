@@ -1,5 +1,21 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.16
+
+### Minor Changes
+
+- [#79](https://github.com/softnetics/genseki/pull/79) [`082b5bc`](https://github.com/softnetics/genseki/commit/082b5bc747adff6c0adc5526f80b8ea2aedd0b8e) Thanks [@Desmenez](https://github.com/Desmenez)! - redesign components and add new component
+
+- [#79](https://github.com/softnetics/genseki/pull/79) [`06da61b`](https://github.com/softnetics/genseki/commit/06da61bd96f18d690eb72ef3bf2fa919c3dae4a6) Thanks [@Desmenez](https://github.com/Desmenez)! - add darkmode switch button
+
+### Patch Changes
+
+- Updated dependencies [[`082b5bc`](https://github.com/softnetics/genseki/commit/082b5bc747adff6c0adc5526f80b8ea2aedd0b8e), [`f2adbb5`](https://github.com/softnetics/genseki/commit/f2adbb590d9a4795eb4afebaad032cf39f25aa8d)]:
+  - @genseki/react@0.1.0-alpha.17
+  - @genseki/next@0.1.0-alpha.17
+  - @genseki/react-query@0.1.0-alpha.17
+  - @genseki/rest@0.1.0-alpha.17
+
 ## 0.1.0-alpha.15
 
 ### Patch Changes
