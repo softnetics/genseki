@@ -5,7 +5,6 @@ import { getFieldsClient } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
 import {
-  type FieldClientShape,
   type FieldColumnShape,
   type FieldMutateModeCollection,
   type FieldOptionsShapeBase,
@@ -17,6 +16,7 @@ import {
   type Fields,
   type FieldsClient,
   type FieldShapeBase,
+  type FieldShapeClient,
   type FieldsShape,
 } from './field'
 import type { InferDataType } from './model'
@@ -262,7 +262,7 @@ export type InferRelationField<TFieldShape extends FieldRelationShape<any>> =
  * type UserOrganization = InferField<(typeof userField)["organization"],> // => { __pk: string; name: string; roleId: string }
  * ```
  */
-export type InferField<TField extends FieldClientShape> =
+export type InferField<TField extends FieldShapeClient> =
   TField extends FieldRelationShape<any>
     ? TField['$server']['relation']['isList'] extends true
       ? // TODO: Order field
@@ -304,11 +304,11 @@ export type InferField<TField extends FieldClientShape> =
  */
 export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldClientShape
-      ? TFields[TKey] extends FieldColumnShape<any>
-        ? Simplify<InferField<TFields[TKey]>>
+    [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeClient
+      ? TFields['shape'][TKey] extends FieldColumnShape<any>
+        ? Simplify<InferField<TFields['shape'][TKey]>>
         : // NOTE: This is to remove the __id field from the relation fields
-          Simplify<Omit<InferField<TFields[TKey]>, '__id'>>
+          Simplify<Omit<InferField<TFields['shape'][TKey]>, '__id'>>
       : never
   },
   never

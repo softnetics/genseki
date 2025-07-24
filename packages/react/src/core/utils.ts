@@ -5,11 +5,13 @@ import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
 import type {
   FieldColumnJsonRichTextShape,
+  FieldColumnJsonRichTextShapeClient,
   FieldColumnStringMediaShape,
   FieldRelationShape,
   Fields,
-  FieldsClientShape,
+  FieldsClient,
   FieldShapeBase,
+  FieldShapeClient,
   FieldsShape,
 } from './field'
 import type { StorageAdapterClient } from './file-storage-adapters'
@@ -40,6 +42,12 @@ export function isRelationFieldShape(fieldShape: FieldShapeBase): fieldShape is 
 export function isRichTextFieldShape(
   fieldShape: FieldShapeBase
 ): fieldShape is FieldColumnJsonRichTextShape {
+  return fieldShape.type === 'richText'
+}
+
+export function isRichTextFieldShapeClient(
+  fieldShape: FieldShapeClient
+): fieldShape is FieldColumnJsonRichTextShapeClient {
   return fieldShape.type === 'richText'
 }
 
@@ -103,14 +111,14 @@ export type JoinArrays<T extends any[]> = Simplify<
 /**
  * @description Return the default values for each provided fields, This should be used with `create` form
  */
-export const getDefaultValueFromFields = (
-  fieldsShape: FieldsClientShape,
+export const getDefaultValueFromFieldsClient = (
+  fields: FieldsClient,
   storageAdapter?: StorageAdapterClient
 ) => {
   const mappedCheck = Object.fromEntries(
     Object.entries(
-      R.mapValues(fieldsShape, (field) => {
-        if (isRichTextFieldShape(field)) {
+      R.mapValues(fields.shape, (field) => {
+        if (isRichTextFieldShapeClient(field)) {
           const content = field.editor.content ?? field.default ?? ''
 
           // TODO: Support JSONContent and JSONContent[]

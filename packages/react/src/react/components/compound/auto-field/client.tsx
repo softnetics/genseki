@@ -31,7 +31,7 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
-import type { FieldClientShape, FieldRelationClientShape } from '../../../../core/field'
+import type { FieldRelationShapeClient, FieldShapeClient } from '../../../../core/field'
 import { constructEditorProviderProps } from '../../../../core/richtext'
 import type { EditorProviderClientProps } from '../../../../core/richtext/types'
 import { useStorageAdapter } from '../../../providers/root'
@@ -279,7 +279,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 }
 
 interface AutoFieldProps {
-  fieldShape: FieldClientShape
+  fieldShape: FieldShapeClient
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'
@@ -473,7 +473,7 @@ export function AutoField(props: AutoFieldProps) {
 interface AutoRelationshipFieldProps {
   name: string
   // NOTE: This should be FieldClient but the type is not correct
-  field: FieldRelationClientShape
+  field: FieldRelationShapeClient
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
@@ -553,7 +553,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
       component={
         <AutoField
           key={key}
-          fieldShape={originalField as FieldClientShape}
+          fieldShape={originalField as FieldShapeClient}
           className="w-full"
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
@@ -592,7 +592,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
 interface AutoManyRelationshipFieldProps {
   name: string
-  field: FieldRelationClientShape
+  field: FieldRelationShapeClient
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
@@ -638,7 +638,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         name={name}
         component={
           <AutoField
-            fieldShape={childField as FieldClientShape}
+            fieldShape={childField as FieldShapeClient}
             className="w-full"
             optionsRecord={props.optionsRecord}
             visibilityField={props.visibilityField}

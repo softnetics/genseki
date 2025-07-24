@@ -156,8 +156,8 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                   {...args}
                   {...args.params}
                   {...defaultArgs}
-                  identifier={args.params.identifer}
-                  findOne={api.findOne}
+                  identifier={args.params.identifier}
+                  findOne={api.findOne as any}
                 />
               </CollectionAppLayout>
             ),

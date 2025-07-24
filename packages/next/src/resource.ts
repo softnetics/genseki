@@ -46,6 +46,8 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
+  const response = new Response(null)
+
   try {
     const rawResponse = await route.handler(
       {
@@ -54,15 +56,12 @@ async function makeApiRoute(
         query: reqSearchParams,
         body,
       },
-      req
+      { request: req, response }
     )
 
-    return new Response(JSON.stringify(rawResponse) as any, {
+    return new Response(rawResponse as any, {
       status: rawResponse.status,
-      headers: {
-        'Content-Type': 'application/json',
-        ...rawResponse.headers,
-      },
+      headers: response.headers,
     })
   } catch (error: any) {
     console.error('Error in API route:', error)

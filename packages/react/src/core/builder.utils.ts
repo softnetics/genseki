@@ -1,7 +1,7 @@
 import z from 'zod/v4'
 
+import type { ApiDefaultMethod } from './collection'
 import {
-  ApiDefaultMethod,
   type ApiReturnType,
   type InferCreateFieldsShape,
   type InferUpdateFieldsShape,
@@ -9,7 +9,7 @@ import {
 import { type ApiConfigHandlerFn, type CollectionOptions } from './collection'
 import type { Contextable } from './context'
 import { type AnyApiRouter, type ApiRoute, appendApiPathPrefix, createEndpoint } from './endpoint'
-import { type Fields, fieldsShapeToZodObject } from './field'
+import { type Fields } from './field'
 import type { ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
@@ -86,11 +86,15 @@ function createCollectionDefaultHandler<TContext extends Contextable, TFields ex
   > = async (args) => {
     console.log('Find one handler called with args:', args)
 
-    const response = await prisma[model.config.prismaModelName].findUnique({
+    const result = await prisma[model.config.prismaModelName].findUnique({
       where: { [primaryField.name]: args.id },
     })
 
-    return response
+    return {
+      __id: result[identifierFieldName],
+      __pk: result[primaryField.name],
+      ...result,
+    }
   }
 
   const findManyHandler: ApiConfigHandlerFn<
@@ -204,7 +208,8 @@ export function createCollectionDefaultApi<
     {
       method: 'POST',
       path: '',
-      body: fieldsShapeToZodObject(options.fields.shape, ApiDefaultMethod.CREATE),
+      // body: fieldsShapeToZodObject(options.fields.shape, ApiDefaultMethod.CREATE),
+      body: z.any(),
       responses: {
         200: z.object({
           __id: z.union([z.string(), z.number()]),
@@ -239,7 +244,8 @@ export function createCollectionDefaultApi<
       pathParams: z.object({
         id: z.union([z.string(), z.number()]),
       }),
-      body: fieldsShapeToZodObject(options.fields.shape, ApiDefaultMethod.UPDATE),
+      // body: fieldsShapeToZodObject(options.fields.shape, ApiDefaultMethod.UPDATE),
+      body: z.any(),
       responses: {
         200: z.object({
           __id: z.union([z.string(), z.number()]),

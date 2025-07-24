@@ -4,7 +4,7 @@ import * as R from 'remeda'
 
 import type { AnyContextable } from '.'
 import { type AnyApiRouter } from './endpoint'
-import type { FieldClientShape, Fields, FieldsClient, FieldShapeBase } from './field'
+import type { Fields, FieldsClient, FieldShapeBase, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
   type StorageAdapter,
@@ -142,7 +142,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 export function getFieldClient(
   name: string,
   fieldShape: FieldShapeBase
-): FieldClientShape & { $client: { fieldName: string } } {
+): FieldShapeClient & { $client: { fieldName: string } } {
   if (isRelationFieldShape(fieldShape)) {
     if (fieldShape.$client.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
@@ -157,7 +157,7 @@ export function getFieldClient(
           fields: sanitizedFields,
         },
         ['$server', 'options' as any]
-      ) as FieldClientShape & { $client: { fieldName: string } }
+      ) as FieldShapeClient & { $client: { fieldName: string } }
     }
 
     return R.omit(
@@ -167,7 +167,7 @@ export function getFieldClient(
         placeholder: fieldShape.placeholder ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldClientShape & { $client: { fieldName: string } }
+    ) as FieldShapeClient & { $client: { fieldName: string } }
   }
 
   if (isRichTextFieldShape(fieldShape)) {
@@ -177,7 +177,7 @@ export function getFieldClient(
         label: fieldShape.label ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldClientShape & { $client: { fieldName: string } }
+    ) as FieldShapeClient & { $client: { fieldName: string } }
 
     const sanitizedRichTextField = {
       ...sanitizedBaseField,
@@ -194,7 +194,7 @@ export function getFieldClient(
         label: fieldShape.label ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldClientShape & { $client: { fieldName: string } }
+    ) as FieldShapeClient & { $client: { fieldName: string } }
   }
 
   return R.omit(
@@ -204,7 +204,7 @@ export function getFieldClient(
       placeholder: fieldShape.placeholder ?? name,
     },
     ['$server', 'options' as any]
-  ) as FieldClientShape & { $client: { fieldName: string } }
+  ) as FieldShapeClient & { $client: { fieldName: string } }
 }
 
 export function getFieldsClient(fields: Fields): FieldsClient {

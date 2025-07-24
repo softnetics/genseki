@@ -20,7 +20,10 @@ interface UpdateClientViewProps {
 }
 
 export function UpdateClientView(props: UpdateClientViewProps) {
-  const form = useForm({ defaultValues: props.defaultValues })
+  const form = useForm({
+    defaultValues: props.defaultValues,
+  })
+
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
 
@@ -61,7 +64,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(props.fields).map((field) => (
+        {Object.values(props.fields.shape).map((field) => (
           <AutoField
             key={field.$client.fieldName}
             fieldShape={field}

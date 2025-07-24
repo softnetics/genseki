@@ -4,8 +4,8 @@ import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook
 
 import { toast } from 'sonner'
 
+import { getDefaultValueFromFields } from '../../../core'
 import type { FieldsClient } from '../../../core/field'
-import { getDefaultValueFromFields } from '../../../core/utils'
 import { Form } from '../../components'
 import { AutoField } from '../../components/compound/auto-field/client'
 import { SubmitButton } from '../../components/compound/submit-button'
@@ -16,14 +16,16 @@ interface CreateClientViewProps {
   slug: string
   fields: FieldsClient
   optionsRecord: Record<string, any[]>
+  defaultValues?: Record<string, any>
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
   const storageAdapter = useStorageAdapter()
+
   const form = useForm({
-    defaultValues: getDefaultValueFromFields(props.fields.shape, storageAdapter),
+    defaultValues: getDefaultValueFromFields(props.fields, storageAdapter),
   })
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {

@@ -67,10 +67,10 @@ export interface FieldColumnShapeClientBase extends Omit<FieldOptionsShapeBase, 
 export interface FieldColumnShapeBase extends FieldColumnShapeClientBase {
   $server: FieldColumnMetadata
 }
-export interface FieldRelationClientShapeBase extends Omit<FieldOptionsShapeBase, 'type'> {
+export interface FieldRelationShapeClientBase extends Omit<FieldOptionsShapeBase, 'type'> {
   $client: FieldRelationClientMetadata
 }
-export interface FieldRelationShapeBase extends FieldRelationClientShapeBase {
+export interface FieldRelationShapeBase extends FieldRelationShapeClientBase {
   $server: FieldRelationMetadata
 }
 export type FieldShapeBase =
@@ -112,7 +112,7 @@ export type FieldClientBase =
         | 'checkbox'
         | 'switch'
     })
-  | (FieldRelationClientShapeBase & {
+  | (FieldRelationShapeClientBase & {
       type: 'connect' | 'create' | 'connectOrCreate'
     })
 
@@ -376,7 +376,7 @@ export type FieldColumnOptions<TContext extends AnyContextable> =
   | FieldColumnNumberArrayOptions<TContext>
   | FieldColumnBooleanOptions
   | FieldColumnDateOptions
-export type FieldColumnClientShape =
+export type FieldColumnShapeClient =
   | FieldColumnJsonShapeClient
   | FieldColumnStringShapeClient
   | FieldColumnStringArrayShapeClient
@@ -402,9 +402,9 @@ export interface FieldRelationConnectOptions<
   fields: Fields
   options: OptionCallback<TInputType, TContext>
 }
-export interface FieldRelationConnectClientShape
+export interface FieldRelationConnectShapeClient
   extends Omit<FieldRelationConnectOptions<any>, 'options' | 'fields'>,
-    FieldRelationClientShapeBase {
+    FieldRelationShapeClientBase {
   fields: FieldsClient
 }
 
@@ -418,7 +418,7 @@ export interface FieldRelationCreateOptions extends FieldOptionsShapeBase {
   type: 'create'
   fields: Fields
 }
-export interface FieldRelationCreateClientShape
+export interface FieldRelationCreateShapeClient
   extends Omit<FieldRelationCreateOptions, 'fields'>,
     FieldRelationShapeBase {
   fields: FieldsClient
@@ -435,9 +435,9 @@ export interface FieldRelationConnectOrCreateOptions<
   fields: Fields
   options: OptionCallback<TInputType, TContext>
 }
-export interface FieldRelationConnectOrCreateClientShape
+export interface FieldRelationConnectOrCreateShapeClient
   extends Omit<FieldRelationConnectOrCreateOptions<any>, 'options' | 'fields'>,
-    FieldRelationClientShapeBase {
+    FieldRelationShapeClientBase {
   fields: FieldsClient
 }
 export interface FieldRelationConnectOrCreateShape<
@@ -453,10 +453,10 @@ export type FieldRelationOptions<
   | FieldRelationCreateOptions
   | FieldRelationConnectOptions<TContext, TInputType>
   | FieldRelationConnectOrCreateOptions<TContext, TInputType>
-export type FieldRelationClientShape =
-  | FieldRelationCreateClientShape
-  | FieldRelationConnectClientShape
-  | FieldRelationConnectOrCreateClientShape
+export type FieldRelationShapeClient =
+  | FieldRelationCreateShapeClient
+  | FieldRelationConnectShapeClient
+  | FieldRelationConnectOrCreateShapeClient
 export type FieldRelationShape<
   TContext extends AnyContextable = AnyContextable,
   TInputType extends string | number = string | number,
@@ -466,7 +466,7 @@ export type FieldRelationShape<
   | FieldRelationConnectOrCreateShape<TContext, TInputType>
 
 // Define field types
-export type FieldClientShape = FieldColumnClientShape | FieldRelationClientShape
+export type FieldShapeClient = FieldColumnShapeClient | FieldRelationShapeClient
 export type FieldShape<TContext extends AnyContextable = AnyContextable> =
   | FieldColumnShape<TContext>
   | FieldRelationShape<TContext>
@@ -477,9 +477,9 @@ export interface FieldsBase {
     prismaModelName: string
   }
 }
-export interface FieldsClientShape extends Record<string, FieldClientShape> {}
+export interface FieldsShapeClient extends Record<string, FieldShapeClient> {}
 export interface FieldsClient extends FieldsBase {
-  shape: FieldsClientShape
+  shape: FieldsShapeClient
 }
 export interface FieldsShape extends Record<string, FieldShape> {}
 export interface Fields extends FieldsBase {

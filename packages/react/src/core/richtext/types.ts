@@ -10,10 +10,6 @@ import type {
   FocusPosition,
 } from '@tiptap/react'
 
-import type { Field } from '..'
-
-export interface RichTextServerField extends Extract<Field, { type: 'richText' }> {}
-
 /**
  * @description This is an editor config for client side usage, but hasn't composed in to EditorProviderProps as library need yet.
  */

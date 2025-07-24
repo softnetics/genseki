@@ -47,13 +47,13 @@ export type {
 export { isApiRoute } from './endpoint'
 export type {
   FieldClientBase,
-  FieldClientShape,
   FieldRelationShape,
   FieldRelationShapeBase,
   Fields,
   FieldsClient,
   FieldShape,
   FieldShapeBase,
+  FieldShapeClient,
 } from './field'
 export * from './file-storage-adapters'
 export type {
@@ -88,4 +88,4 @@ export type {
   WithIsRequired,
   WithIsUnique,
 } from './table'
-export { getDefaultValueFromFields } from './utils'
+export { getDefaultValueFromFieldsClient as getDefaultValueFromFields } from './utils'
