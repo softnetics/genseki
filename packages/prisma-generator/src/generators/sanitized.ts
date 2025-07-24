@@ -113,7 +113,7 @@ function generateFieldRelationSchemaDefinition(
           : []),
         factory.createPropertyAssignment(
           'referencedModel',
-          factory.createStringLiteral(field.type)
+          factory.createStringLiteral(toCamelCase(field.type))
         ),
         factory.createPropertyAssignment(
           'relationToFields',

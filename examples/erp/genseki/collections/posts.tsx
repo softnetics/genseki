@@ -89,37 +89,3 @@ export const postsCollection = builder.collection('posts', {
     })),
   })),
 })
-
-const x = builder.fields('post', (fb) => ({
-  title: fb.columns('title', {
-    type: 'text',
-    label: 'Title',
-    description: "Post's title name",
-  }),
-  content: fb.columns('content', {
-    type: 'richText',
-    isRequired: true,
-    label: 'Food description',
-    editor: postEditorProviderProps,
-  }),
-  author: fb.relations('author', (fb) => ({
-    type: 'connect',
-    label: 'Author',
-    fields: fb.fields('user', (fb) => ({
-      name: fb.columns('name', {
-        type: 'text',
-        label: 'Name',
-        description: 'The name of the author',
-      }),
-      email: fb.columns('email', {
-        type: 'text',
-        label: 'Email',
-        description: 'The email of the author',
-      }),
-    })),
-    options: builder.options(async () => {
-      const result = await prisma.user.findMany()
-      return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
-    }),
-  })),
-}))

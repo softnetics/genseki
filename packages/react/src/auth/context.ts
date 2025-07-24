@@ -1,11 +1,13 @@
-import type { AnyAccountTable, AnyUserTable, AuthOptions } from '.'
+import type { AnyUserTable, AuthOptions } from '.'
 import { AccountProvider } from './constant'
 
-import type { AnyContextable } from '../core'
+import { type AnyContextable, hashPassword } from '../core'
 import type { InferTableType } from '../core/table'
 
 export function createAuthInternalHandler(context: AnyContextable, options: AuthOptions) {
   const prisma = context.getPrismaClient()
+
+  const passwordHasher = options.method.emailAndPassword?.passwordHasher ?? hashPassword
 
   const user = {
     async findById(id: string) {
@@ -28,35 +30,70 @@ export function createAuthInternalHandler(context: AnyContextable, options: Auth
       return user as InferTableType<AuthOptions['schema']['user']>
     },
 
-    async create(data: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>) {
-      const modelName = options.schema.user.config.prismaModelName
+    async createWithEmail(data: {
+      user: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>
+      account: { rawPassword: string }
+    }) {
+      const userModelName = options.schema.user.config.prismaModelName
+      const emailField = options.schema.user.shape.columns.email
 
-      const user = await prisma[modelName].create({
-        data: {
-          ...data,
-          emailVerified: null, // Set to null by default
-        },
+      const result = await prisma.$transaction(async (tx) => {
+        const existingUser = (await tx[userModelName].findUnique({
+          where: {
+            [emailField.name]: data.user.email,
+          },
+        })) as InferTableType<AnyUserTable>
+
+        if (existingUser) {
+          throw new Error('User with this email already exists')
+        }
+
+        const user = (await tx[userModelName].create({
+          data: {
+            ...data.user,
+            emailVerified: false, // Set to false for new users
+          },
+        })) as InferTableType<AuthOptions['schema']['user']>
+
+        const accountModelName = options.schema.account.config.prismaModelName
+        const accountProviderField = options.schema.account.shape.columns.provider
+        const accountUserIdField = options.schema.account.shape.columns.userId
+        const accountAccountIdField = options.schema.account.shape.columns.accountId
+        const accountPasswordField = options.schema.account.shape.columns.password
+
+        const existingAccount = (await tx[accountModelName].findFirst({
+          where: {
+            [accountUserIdField.name]: user.id,
+            [accountProviderField.name]: AccountProvider.CREDENTIAL,
+          },
+        })) as InferTableType<AuthOptions['schema']['account']>
+
+        if (existingAccount) {
+          throw new Error('Account with this user already exists')
+        }
+
+        const hashedPassword = await passwordHasher(data.account.rawPassword)
+
+        const account = (await tx[accountModelName].create({
+          data: {
+            [accountUserIdField.name]: user.id,
+            [accountAccountIdField.name]: user.id,
+            [accountProviderField.name]: AccountProvider.CREDENTIAL,
+            [accountPasswordField.name]: hashedPassword,
+          },
+        })) as InferTableType<AuthOptions['schema']['account']>
+
+        return {
+          user: user,
+          account: account,
+        }
       })
 
-      return user as InferTableType<AuthOptions['schema']['user']>
+      return result
     },
   }
 
   const account = {
-    async link(data: Omit<InferTableType<AnyAccountTable>, 'id' | 'emailVerified'>) {
-      const modelName = options.schema.account.config.prismaModelName
-      const accountIdField = options.schema.account.shape.columns.userId.name
-      const accountIdValue = data[accountIdField as unknown as keyof typeof data]
-
-      const account = await prisma[modelName].upsert({
-        where: { [accountIdField]: accountIdValue },
-        create: data,
-        update: data,
-      })
-
-      return account as InferTableType<AuthOptions['schema']['account']>
-    },
-
     async updatePassword(userId: string, password: string) {
       const modelName = options.schema.account.config.prismaModelName
       const userIdField = options.schema.account.shape.columns.userId.name

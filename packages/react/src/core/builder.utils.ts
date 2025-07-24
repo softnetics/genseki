@@ -3,15 +3,18 @@ import z from 'zod/v4'
 import {
   ApiDefaultMethod,
   type ApiReturnType,
-  type InferCreateFields,
-  type InferUpdateFields,
+  type InferCreateFieldsShape,
+  type InferUpdateFieldsShape,
 } from './collection'
 import { type ApiConfigHandlerFn, type CollectionOptions } from './collection'
 import type { Contextable } from './context'
-import { type AnyApiRouter, type ApiRoute, createEndpoint } from './endpoint'
-import { type Fields, fieldsToZodObject } from './field'
+import { type AnyApiRouter, type ApiRoute, appendApiPathPrefix, createEndpoint } from './endpoint'
+import { type Fields, fieldsShapeToZodObject } from './field'
 import type { ModelSchemas } from './model'
-import { transformToPrismaCreatePayload, transformToPrismaUpdatePayload } from './transformer'
+import {
+  transformFieldPayloadToPrismaCreatePayload,
+  transformFieldPayloadToPrismaUpdatePayload,
+} from './transformer'
 import type { ToZodObject } from './utils'
 
 function createCollectionDefaultHandler<TContext extends Contextable, TFields extends Fields>(
@@ -32,7 +35,7 @@ function createCollectionDefaultHandler<TContext extends Contextable, TFields ex
   > = async (args) => {
     console.log('Create handler called with args:', args)
 
-    const transformedData = transformToPrismaCreatePayload(args.fields, args.data)
+    const transformedData = transformFieldPayloadToPrismaCreatePayload(args.fields, args.data)
     const result = await prisma[model.config.prismaModelName].create({
       data: transformedData,
     })
@@ -49,7 +52,7 @@ function createCollectionDefaultHandler<TContext extends Contextable, TFields ex
   > = async (args) => {
     console.log('Update handler called with args:', args)
 
-    const transformedData = transformToPrismaUpdatePayload(args.fields, args.data)
+    const transformedData = transformFieldPayloadToPrismaUpdatePayload(args.fields, args.data)
     const result = await prisma[model.config.prismaModelName].update({
       where: { [primaryField.name]: args.id },
       data: transformedData,
@@ -109,7 +112,11 @@ function createCollectionDefaultHandler<TContext extends Contextable, TFields ex
     const page = Math.ceil(total / (args.limit || 10))
 
     return {
-      data: response,
+      data: response.map((item) => ({
+        ...item,
+        __id: item[identifierFieldName],
+        __pk: item[primaryField.name],
+      })),
       total: total,
       page: page,
     }
@@ -128,9 +135,26 @@ export type CollectionDefaultAdminApiRouter<TSlug extends string, TFields extend
   create: ApiRoute<{
     path: `/${TSlug}`
     method: 'POST'
-    body: ToZodObject<InferCreateFields<TFields>>
+    body: ToZodObject<InferCreateFieldsShape<TFields['shape']>>
     responses: {
       200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.CREATE, TFields>>
+    }
+  }>
+  update: ApiRoute<{
+    path: `/${TSlug}/:id`
+    method: 'PATCH'
+    pathParams: ToZodObject<{ id: string }>
+    body: ToZodObject<InferUpdateFieldsShape<TFields['shape']>>
+    responses: {
+      200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.UPDATE, TFields>>
+    }
+  }>
+  delete: ApiRoute<{
+    path: `/${TSlug}`
+    method: 'DELETE'
+    body: ToZodObject<{ ids: string[] | number[] }>
+    responses: {
+      200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.DELETE, TFields>>
     }
   }>
   findOne: ApiRoute<{
@@ -152,23 +176,6 @@ export type CollectionDefaultAdminApiRouter<TSlug extends string, TFields extend
     }>
     responses: {
       200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.FIND_MANY, TFields>>
-    }
-  }>
-  update: ApiRoute<{
-    path: `/${TSlug}/:id`
-    method: 'PATCH'
-    pathParams: ToZodObject<{ id: string }>
-    body: ToZodObject<InferUpdateFields<TFields>>
-    responses: {
-      200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.UPDATE, TFields>>
-    }
-  }>
-  delete: ApiRoute<{
-    path: `/${TSlug}`
-    method: 'DELETE'
-    body: ToZodObject<{ ids: string[] | number[] }>
-    responses: {
-      200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.DELETE, TFields>>
     }
   }>
 }
@@ -196,8 +203,8 @@ export function createCollectionDefaultApi<
     config.context,
     {
       method: 'POST',
-      path: `/${slug}`,
-      body: z.record(z.string(), z.any()),
+      path: '',
+      body: fieldsShapeToZodObject(options.fields.shape, ApiDefaultMethod.CREATE),
       responses: {
         200: z.object({
           __id: z.union([z.string(), z.number()]),
@@ -209,9 +216,9 @@ export function createCollectionDefaultApi<
       const response = await api.create({
         slug: slug,
         context: payload.context,
-        data: payload.body,
+        data: payload.body as any,
         fields: options.fields,
-        defaultApi: defaultHandler.create,
+        defaultApi: defaultHandler.create as any,
       })
 
       return {
@@ -232,7 +239,7 @@ export function createCollectionDefaultApi<
       pathParams: z.object({
         id: z.union([z.string(), z.number()]),
       }),
-      body: fieldsToZodObject(options.fields, ApiDefaultMethod.UPDATE),
+      body: fieldsShapeToZodObject(options.fields.shape, ApiDefaultMethod.UPDATE),
       responses: {
         200: z.object({
           __id: z.union([z.string(), z.number()]),
@@ -245,9 +252,9 @@ export function createCollectionDefaultApi<
         id: payload.pathParams.id,
         slug: slug,
         context: payload.context,
-        data: payload.body,
+        data: payload.body as any,
         fields: options.fields,
-        defaultApi: defaultHandler.create,
+        defaultApi: defaultHandler.create as any,
       })
 
       return {
@@ -264,7 +271,7 @@ export function createCollectionDefaultApi<
     config.context,
     {
       method: 'DELETE',
-      path: `/${slug}`,
+      path: '',
       body: z.object({
         ids: z.union([z.string().array(), z.number().array()]),
       }),
@@ -280,7 +287,7 @@ export function createCollectionDefaultApi<
         context: payload.context,
         ids: payload.body.ids,
         fields: options.fields,
-        defaultApi: defaultHandler.delete,
+        defaultApi: defaultHandler.delete as any,
       })
 
       return {
@@ -296,22 +303,26 @@ export function createCollectionDefaultApi<
     config.context,
     {
       method: 'GET',
-      path: `/${slug}/:id`,
+      path: '/:id',
       pathParams: z.object({
         id: z.union([z.string(), z.number()]),
       }),
       responses: {
-        200: z.object({
-          message: z.string(),
-        }),
+        200: z.any(),
       },
     },
-    async (args) => {
+    async (payload) => {
+      const result = await api.findOne({
+        id: payload.pathParams.id,
+        slug: slug,
+        context: payload.context,
+        fields: options.fields,
+        defaultApi: defaultHandler.findOne as any,
+      })
+
       return {
         status: 200,
-        body: {
-          message: `Collection ${slug} found successfully with ID ${args.pathParams.id}`,
-        },
+        body: result,
       }
     }
   )
@@ -320,28 +331,48 @@ export function createCollectionDefaultApi<
     config.context,
     {
       method: 'GET',
-      path: `/${slug}`,
+      path: '',
       responses: {
         200: z.object({
-          message: z.string(),
+          total: z.number(),
+          page: z.number(),
+          // TODO: Infer zod from fields
+          data: z.array(z.any()),
         }),
       },
     },
-    async (args) => {
+    async (payload) => {
+      const query = (payload as any).query
+
+      const result = await api.findMany({
+        slug: slug,
+        context: payload.context,
+        fields: options.fields,
+        defaultApi: defaultHandler.findMany as any,
+        limit: query.limit,
+        offset: query.offset,
+        orderBy: query.orderBy,
+        orderType: query.orderType,
+      })
+
       return {
         status: 200,
         body: {
-          message: `Collection ${slug} deleted successfully`,
+          total: result.total,
+          page: result.page,
+          data: result.data,
         },
       }
     }
   )
 
-  return {
+  const apiRouter = appendApiPathPrefix(`/${slug}`, {
     create: createApi,
     update: updateApi,
     delete: deleteApi,
     findOne: findOneApi,
     findMany: findManyApi,
-  } as CollectionDefaultAdminApiRouter<TSlug, TFields>
+  })
+
+  return apiRouter as unknown as CollectionDefaultAdminApiRouter<TSlug, TFields>
 }

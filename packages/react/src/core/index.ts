@@ -45,7 +45,16 @@ export type {
   InferApiRouteResponses,
 } from './endpoint'
 export { isApiRoute } from './endpoint'
-export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
+export type {
+  FieldClientBase,
+  FieldClientShape,
+  FieldRelationShape,
+  FieldRelationShapeBase,
+  Fields,
+  FieldsClient,
+  FieldShape,
+  FieldShapeBase,
+} from './field'
 export * from './file-storage-adapters'
 export type {
   AnyFieldRelationSchema,

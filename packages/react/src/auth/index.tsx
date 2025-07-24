@@ -40,6 +40,7 @@ export type AnyUserTable = AnyTable<{
     image: AnyTypedFieldColumn<typeof DataType.STRING>
   }
   relations: {}
+  uniqueFields: (['id'] | ['email'])[]
 }>
 
 export type AnySessionTable = AnyTable<{
@@ -73,6 +74,7 @@ export type AnyAccountTable = AnyTable<{
     password: AnyTypedFieldColumn<typeof DataType.STRING>
   }
   relations: {}
+  uniqueFields: (['id'] | ['userId', 'provider'])[]
 }>
 
 export type AnyVerificationTable = AnyTable<{
@@ -167,6 +169,7 @@ export function auth<TContext extends AnyContextable, TAuthOptions extends AuthO
       const uis: GensekiUiRouter[] = [
         {
           id: GensekiUiCommonId.AUTH_LOGIN,
+          context: context,
           path: '/auth/login',
           requiredAuthenticated: false,
           render: (args) => (
@@ -177,6 +180,7 @@ export function auth<TContext extends AnyContextable, TAuthOptions extends AuthO
         },
         {
           id: GensekiUiCommonId.AUTH_SIGNUP,
+          context: context,
           path: '/auth/sign-up',
           requiredAuthenticated: false,
           render: (args) => (
@@ -187,6 +191,7 @@ export function auth<TContext extends AnyContextable, TAuthOptions extends AuthO
         },
         {
           id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
+          context: context,
           path: '/auth/forgot-password',
           requiredAuthenticated: false,
           render: (args) => (
@@ -197,6 +202,7 @@ export function auth<TContext extends AnyContextable, TAuthOptions extends AuthO
         },
         {
           id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
+          context: context,
           path: '/auth/reset-password',
           requiredAuthenticated: false,
           render: (args) => (

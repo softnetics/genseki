@@ -1,22 +1,23 @@
 import type { ConditionalExcept, Simplify } from 'type-fest'
 import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { ContextToRequestContext, FieldBase } from '.'
 import { getFieldsClient } from './config'
-import type { AnyContextable } from './context'
+import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
 import {
-  type FieldClient,
-  type FieldColumn,
+  type FieldClientShape,
+  type FieldColumnShape,
   type FieldMutateModeCollection,
-  type FieldOptionsBase,
-  type FieldRelation,
-  type FieldRelationBase,
-  type FieldRelationConnect,
-  type FieldRelationConnectOrCreate,
-  type FieldRelationCreate,
+  type FieldOptionsShapeBase,
+  type FieldRelationConnectOrCreateShape,
+  type FieldRelationConnectShape,
+  type FieldRelationCreateShape,
+  type FieldRelationShape,
+  type FieldRelationShapeBase,
   type Fields,
   type FieldsClient,
+  type FieldShapeBase,
+  type FieldsShape,
 } from './field'
 import type { InferDataType } from './model'
 
@@ -41,7 +42,7 @@ export type MaybePromise<T> = T | Promise<T>
 
 export type ActivateFieldMutateMode<
   TType,
-  TField extends FieldOptionsBase,
+  TField extends FieldOptionsShapeBase,
   TMethod extends 'create' | 'update' | undefined = undefined,
 > = TMethod extends keyof TField
   ? TField[TMethod] extends FieldMutateModeCollection['HIDDEN']
@@ -88,14 +89,14 @@ export type ActivateFieldMutateMode<
  *
  *    Many Post can have One Category. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferOneRelationMutationField<TField extends FieldRelationBase> = {
-  create?: TField extends FieldRelationCreate | FieldRelationConnectOrCreate
-    ? InferCreateFields<TField['fields']>
+export type InferOneRelationMutationFieldShape<TFieldShape extends FieldRelationShapeBase> = {
+  create?: TFieldShape extends FieldRelationCreateShape | FieldRelationConnectOrCreateShape
+    ? InferCreateFieldsShape<TFieldShape['fields']['shape']>
     : never
   // TODO: Only Support single forign key relation
-  connect?: InferDataType<TField['$server']['relation']['relationDataTypes'][0]>
+  connect?: InferDataType<TFieldShape['$server']['relation']['relationDataTypes'][0]>
   // TODO: Only Support single forign key relation
-  disconnect?: InferDataType<TField['$server']['relation']['relationDataTypes'][0]>
+  disconnect?: InferDataType<TFieldShape['$server']['relation']['relationDataTypes'][0]>
 }
 
 /**
@@ -139,8 +140,8 @@ export type InferOneRelationMutationField<TField extends FieldRelationBase> = {
  *
  *   One Post can have Many PostTags. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferManyRelationMutationField<TField extends FieldRelationBase> = Array<
-  InferOneRelationMutationField<TField>
+export type InferManyRelationMutationFieldShape<TField extends FieldRelationShapeBase> = Array<
+  InferOneRelationMutationFieldShape<TField>
 >
 
 type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
@@ -150,67 +151,73 @@ type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
       ? Pick<TArrayOrObject, TKeys>
       : never
 
-export type InferMutationRelationField<TField extends FieldRelationBase> =
+export type InferMutationRelationField<TField extends FieldRelationShapeBase> =
   TField['$server']['relation']['isList'] extends true
-    ? Simplify<InferManyRelationMutationField<TField>>
-    : Simplify<InferOneRelationMutationField<TField>>
+    ? Simplify<InferManyRelationMutationFieldShape<TField>>
+    : Simplify<InferOneRelationMutationFieldShape<TField>>
 
-export type InferUpdateField<TField extends FieldBase> = TField extends FieldRelationBase
-  ? TField extends FieldRelationCreate
-    ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'disconnect'>>
-    : TField extends FieldRelationConnect
+export type InferUpdateFieldShape<TFieldShape extends FieldShapeBase> =
+  TFieldShape extends FieldRelationShapeBase
+    ? TFieldShape extends FieldRelationCreateShape
       ? Simplify<
-          PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect' | 'disconnect'>
+          PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create' | 'disconnect'>
         >
-      : TField extends FieldRelationConnectOrCreate
-        ? Simplify<InferMutationRelationField<TField>>
-        : never
-  : TField extends FieldColumn<any>
-    ? ActivateFieldMutateMode<
-        InferDataType<TField['$server']['column']['dataType']>,
-        TField,
-        'update'
-      >
-    : never
+      : TFieldShape extends FieldRelationConnectShape
+        ? Simplify<
+            PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'connect' | 'disconnect'>
+          >
+        : TFieldShape extends FieldRelationConnectOrCreateShape
+          ? Simplify<InferMutationRelationField<TFieldShape>>
+          : never
+    : TFieldShape extends FieldColumnShape<any>
+      ? ActivateFieldMutateMode<
+          InferDataType<TFieldShape['$server']['column']['dataType']>,
+          TFieldShape,
+          'update'
+        >
+      : never
 
-export type InferUpdateFields<TFields extends Fields> = SimplifyConditionalExcept<
+export type InferUpdateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldBase
-      ? Simplify<InferUpdateField<TFields[TKey]>>
+    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShapeBase
+      ? Simplify<InferUpdateFieldShape<TFieldsShape[TKey]>>
       : never
   },
   never
 >
 
-export type InferCreateField<TField extends FieldBase> = TField extends FieldRelationBase
-  ? TField extends FieldRelationCreate
-    ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create'>>
-    : TField extends FieldRelationConnect
-      ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect'>>
-      : TField extends FieldRelationConnectOrCreate
-        ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'connect'>>
-        : never
-  : TField extends FieldColumn<any>
-    ? ActivateFieldMutateMode<
-        InferDataType<TField['$server']['column']['dataType']>,
-        TField,
-        'create'
-      >
-    : never
+export type InferCreateFieldShape<TFieldShape extends FieldShapeBase> =
+  TFieldShape extends FieldRelationShapeBase
+    ? TFieldShape extends FieldRelationCreateShape
+      ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create'>>
+      : TFieldShape extends FieldRelationConnectShape
+        ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'connect'>>
+        : TFieldShape extends FieldRelationConnectOrCreateShape
+          ? Simplify<
+              PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create' | 'connect'>
+            >
+          : never
+    : TFieldShape extends FieldColumnShape<any>
+      ? ActivateFieldMutateMode<
+          InferDataType<TFieldShape['$server']['column']['dataType']>,
+          TFieldShape,
+          'create'
+        >
+      : never
 
-export type InferCreateFields<TFields extends Fields> = SimplifyConditionalExcept<
+export type InferCreateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldBase
-      ? InferCreateField<TFields[TKey]>
+    [TShapeKey in keyof TFieldsShape]: TFieldsShape[TShapeKey] extends FieldShapeBase
+      ? InferCreateFieldShape<TFieldsShape[TShapeKey]>
       : never
   },
   never
 >
 
-export type InferRelationField<TField extends FieldRelation<any>> =
-  TField['$server']['relation']['isList'] extends true
-    ? InferManyRelationMutationField<TField>
-    : InferOneRelationMutationField<TField>
+export type InferRelationField<TFieldShape extends FieldRelationShape<any>> =
+  TFieldShape['$server']['relation']['isList'] extends true
+    ? InferManyRelationMutationFieldShape<TFieldShape>
+    : InferOneRelationMutationFieldShape<TFieldShape>
 
 /**
  * Infer the type of a field based on the field type and the method.
@@ -255,13 +262,13 @@ export type InferRelationField<TField extends FieldRelation<any>> =
  * type UserOrganization = InferField<(typeof userField)["organization"],> // => { __pk: string; name: string; roleId: string }
  * ```
  */
-export type InferField<TField extends FieldClient> =
-  TField extends FieldRelation<any>
+export type InferField<TField extends FieldClientShape> =
+  TField extends FieldRelationShape<any>
     ? TField['$server']['relation']['isList'] extends true
       ? // TODO: Order field
         Array<Simplify<InferFields<TField['fields']>>>
       : Simplify<InferFields<TField['fields']>>
-    : TField extends FieldColumn<any>
+    : TField extends FieldColumnShape<any>
       ? InferDataType<TField['$server']['column']['dataType']>
       : never
 
@@ -297,8 +304,8 @@ export type InferField<TField extends FieldClient> =
  */
 export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldClient
-      ? TFields[TKey] extends FieldColumn<any>
+    [TKey in keyof TFields]: TFields[TKey] extends FieldClientShape
+      ? TFields[TKey] extends FieldColumnShape<any>
         ? Simplify<InferField<TFields[TKey]>>
         : // NOTE: This is to remove the __id field from the relation fields
           Simplify<Omit<InferField<TFields[TKey]>, '__id'>>
@@ -357,7 +364,7 @@ export type ApiFindManyArgs = {
 }
 
 export type ApiCreateArgs<TFields extends Fields> = {
-  data: InferCreateFields<TFields>
+  data: InferCreateFieldsShape<TFields['shape']>
 }
 
 export type ApiHandlerFn<
@@ -369,7 +376,7 @@ export type ApiHandlerFn<
 export type ApiUpdateArgs<TFields extends Fields> = {
   // This should be the primary field of the collection e.g. __pk or username
   id: string | number
-  data: InferUpdateFields<TFields>
+  data: InferUpdateFieldsShape<TFields['shape']>
 }
 
 export type ApiDeleteArgs = {

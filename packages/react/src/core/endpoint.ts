@@ -152,12 +152,12 @@ export function isApiRoute<TApiRoute extends ApiRoute>(
 
 export function createEndpoint<
   const TContext extends AnyContextable,
-  const TApiEndpointSchema extends ApiRouteSchema,
+  const TApiRouteSchema extends ApiRouteSchema,
 >(
   context: TContext,
-  schema: TApiEndpointSchema,
-  handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
-): ApiRoute<TApiEndpointSchema> {
+  schema: TApiRouteSchema,
+  handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiRouteSchema>
+): ApiRoute<TApiRouteSchema> {
   return {
     schema: schema,
     handler: withValidator(schema, async (payload, { request, response }) => {
@@ -170,6 +170,14 @@ export function createEndpoint<
     }),
   }
 }
+
+export declare function createEndpoint2<
+  const TContext extends AnyContextable,
+  const TApiRouteSchema extends ApiRouteSchema,
+>(
+  context: TContext,
+  schema: TApiRouteSchema
+): ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext }
 
 export type AppendApiPathPrefix<TPathPrefix extends string, TApiRouter extends ApiRouter> = {
   [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute

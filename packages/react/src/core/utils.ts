@@ -3,14 +3,13 @@ import * as R from 'remeda'
 import type { Except, IsNever, Simplify } from 'type-fest'
 import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { FieldBase } from '.'
 import type {
-  FieldClientBase,
-  FieldColumnJsonRichText,
-  FieldColumnStringMedia,
-  FieldRelation,
+  FieldColumnJsonRichTextShape,
+  FieldColumnStringMediaShape,
+  FieldRelationShape,
   Fields,
   FieldsClientShape,
+  FieldShapeBase,
   FieldsShape,
 } from './field'
 import type { StorageAdapterClient } from './file-storage-adapters'
@@ -34,16 +33,20 @@ export function tryParseJSONObject(jsonString: string): Record<string, unknown> 
 }
 
 // TODO: Move this to ./field.ts
-export function isRelationField(field: FieldBase): field is FieldRelation {
-  return field.$client.source === 'relation'
+export function isRelationFieldShape(fieldShape: FieldShapeBase): fieldShape is FieldRelationShape {
+  return fieldShape.$client.source === 'relation'
 }
 
-export function isRichTextField(field: FieldClientBase): field is FieldColumnJsonRichText {
-  return field.type === 'richText'
+export function isRichTextFieldShape(
+  fieldShape: FieldShapeBase
+): fieldShape is FieldColumnJsonRichTextShape {
+  return fieldShape.type === 'richText'
 }
 
-export function isMediaField(field: FieldBase): field is FieldColumnStringMedia {
-  return field.type === 'media'
+export function isMediaFieldShape(
+  fieldShape: FieldShapeBase
+): fieldShape is FieldColumnStringMediaShape {
+  return fieldShape.type === 'media'
 }
 
 export type ConditionNeverKey<T extends Record<string, unknown>> = {
@@ -107,7 +110,7 @@ export const getDefaultValueFromFields = (
   const mappedCheck = Object.fromEntries(
     Object.entries(
       R.mapValues(fieldsShape, (field) => {
-        if (isRichTextField(field)) {
+        if (isRichTextFieldShape(field)) {
           const content = field.editor.content ?? field.default ?? ''
 
           // TODO: Support JSONContent and JSONContent[]

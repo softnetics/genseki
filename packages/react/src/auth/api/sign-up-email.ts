@@ -3,14 +3,11 @@ import z from 'zod/v4'
 import type { Contextable } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import type { AuthApiBuilderArgs, AuthOptions } from '..'
-import { AccountProvider } from '../constant'
-import { hashPassword, ResponseHelper } from '../utils'
+import { ResponseHelper } from '../utils'
 
 export function signUpEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
 ) {
-  const passwordHasher = builderArgs.options.method.emailAndPassword?.passwordHasher ?? hashPassword
-
   return createEndpoint(
     builderArgs.context,
     {
@@ -18,7 +15,7 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
       path: '/auth/sign-up/email',
       body: z
         .object({
-          name: z.string(),
+          name: z.string().nullable().optional(),
           email: z.string(),
           password: z.string().min(6, { error: 'Password must be at least 6 characters' }),
         })
@@ -29,26 +26,21 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           user: z.object({
             id: z.string(),
             name: z.string().nullable().optional(),
-            email: z.string().nullable().optional(),
+            email: z.string(),
             image: z.string().nullable().optional(),
           }),
         }),
       },
     },
     async (args, { response }) => {
-      const hashedPassword = await passwordHasher(args.body.password)
-
-      const user = await builderArgs.handler.user.create({
-        name: args.body.name,
-        email: args.body.email,
-        image: null,
-      })
-
-      await builderArgs.handler.account.link({
-        userId: user.id,
-        provider: AccountProvider.CREDENTIAL,
-        accountId: user.id,
-        password: hashedPassword,
+      const { user } = await builderArgs.handler.user.createWithEmail({
+        user: {
+          name: args.body.name ?? null,
+          email: args.body.email,
+        },
+        account: {
+          rawPassword: args.body.password,
+        },
       })
 
       // TODO: Check if sending email verification is enabled
@@ -67,7 +59,10 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           status: 200,
           body: {
             token: session.token,
-            user: user,
+            user: {
+              ...user,
+              email: args.body.email,
+            },
           },
         }
       }
@@ -76,7 +71,10 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
         status: 200,
         body: {
           token: null,
-          user: user,
+          user: {
+            ...user,
+            email: args.body.email,
+          },
         },
       }
     }

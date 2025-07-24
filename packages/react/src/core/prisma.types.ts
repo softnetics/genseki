@@ -53,7 +53,7 @@ export type MockPrismaClient = {
     delete: (args: PrismaDeleteArgs) => Promise<any>
     deleteMany: (args?: PrismaDeleteManyArgs) => Promise<any>
     count: (args?: PrismaCountArgs) => Promise<number>
-  } & {
-    $transaction: (tx: Omit<MockPrismaClient, '$transaction'>) => Promise<any[]>
   } & {}
+} & {
+  $transaction<T>(cb: (tx: MockPrismaClient) => Promise<T> | T): Promise<T>
 } & {}

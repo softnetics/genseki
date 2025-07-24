@@ -3,14 +3,13 @@ import { auth, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
-import { context, prisma } from './helper'
+import { context } from './helper'
 
 import { FullModelSchemas } from '../generated/genseki/unsanitized'
 
 const app = new GensekiApp({
   title: 'Genseki ERP Example',
   version: '0.0.0',
-  prisma: prisma,
   storageAdapter: StorageAdapterS3.initailize({
     bucket: process.env.AWS_BUCKET_NAME!,
     clientConfig: {
@@ -28,16 +27,6 @@ const app = new GensekiApp({
         type: 'item',
         label: 'Users',
         path: '/admin/collections/users',
-      },
-      {
-        type: 'item',
-        label: 'Foods',
-        path: '/admin/collections/foods',
-      },
-      {
-        type: 'item',
-        label: 'Categories',
-        path: '/admin/collections/categories',
       },
       {
         type: 'item',

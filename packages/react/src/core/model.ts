@@ -52,12 +52,12 @@ export interface ModelConfig {
 export interface FieldBaseSchema {
   schema: SchemaType
   name: string
-  isId: boolean
-  isList: boolean
-  isUnique: boolean
-  isRequired: boolean
-  isReadOnly: boolean
-  hasDefaultValue: boolean
+  isId?: boolean
+  isList?: boolean
+  isUnique?: boolean
+  isRequired?: boolean
+  isReadOnly?: boolean
+  hasDefaultValue?: boolean
 }
 
 export interface SanitizedFieldColumnSchema extends FieldBaseSchema {
@@ -138,7 +138,7 @@ export function sanitizedFieldRelationSchema<T extends FieldRelationSchema>(
 ): SanitizeFieldRelationSchema<T> {
   return {
     ...field,
-    referencedModel: field.referencedModel.config.name,
+    referencedModel: field.referencedModel.config.prismaModelName,
   }
 }
 
@@ -150,8 +150,10 @@ export function unsanitizedModelSchemas<TModelSchemas extends ModelSchemas>(
       const relations = Object.fromEntries(
         Object.entries(schema.shape.relations).map(([key, value]) => {
           const _value = { ...value }
-          Object.defineProperty(value, 'referencedModel', {
-            get: () => schema.shape.relations[key].referencedModel,
+          Object.defineProperty(_value, 'referencedModel', {
+            get() {
+              return schemas[schema.shape.relations[key].referencedModel]
+            },
           })
           return [key, _value as unknown as FieldRelationSchema]
         })

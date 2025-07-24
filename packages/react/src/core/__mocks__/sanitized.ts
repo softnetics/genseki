@@ -1,0 +1,445 @@
+import {
+  DataType,
+  type ModelConfig,
+  type SanitizedModelSchema,
+  type SanitizedModelShape,
+  SchemaType,
+  type Simplify,
+} from '@genseki/react'
+
+/**
+ * Creates a sanitized model with the given shape and config.
+ * @param {TShape} shape The shape of the model
+ * @param {TConfig} config The configuration of the model
+ * @returns {SanitizedModel<TShape>} A sanitized model containing the shape and config
+ */
+function model<const TShape extends SanitizedModelShape, const TConfig extends ModelConfig>(
+  shape: TShape,
+  config: TConfig
+): SanitizedModelSchema<TShape, TConfig> {
+  return { config, shape }
+}
+
+export const UserModel = model(
+  {
+    columns: {
+      id: {
+        schema: SchemaType.COLUMN,
+        name: 'id',
+        isId: true,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.STRING,
+      },
+      name: {
+        schema: SchemaType.COLUMN,
+        name: 'name',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      image: {
+        schema: SchemaType.COLUMN,
+        name: 'image',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      email: {
+        schema: SchemaType.COLUMN,
+        name: 'email',
+        isId: false,
+        isList: false,
+        isUnique: true,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      emailVerified: {
+        schema: SchemaType.COLUMN,
+        name: 'emailVerified',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: true,
+        dataType: DataType.BOOLEAN,
+      },
+      createdAt: {
+        schema: SchemaType.COLUMN,
+        name: 'createdAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+      updatedAt: {
+        schema: SchemaType.COLUMN,
+        name: 'updatedAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+    },
+    relations: {
+      posts: {
+        schema: SchemaType.RELATION,
+        name: 'posts',
+        isId: false,
+        isList: true,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'PostToUser',
+        referencedModel: 'post',
+        relationToFields: [],
+        relationFromFields: [],
+        relationDataTypes: [DataType.STRING],
+      },
+      profile: {
+        schema: SchemaType.RELATION,
+        name: 'profile',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: false,
+        relationName: 'ProfileToUser',
+        referencedModel: 'profile',
+        relationToFields: [],
+        relationFromFields: [],
+        relationDataTypes: [DataType.STRING],
+      },
+    },
+    primaryFields: ['id'],
+    uniqueFields: [['id'], ['email']],
+  },
+  {
+    name: 'UserModel',
+    dbModelName: 'User',
+    prismaModelName: 'user',
+  }
+)
+
+export type UserModel = Simplify<typeof UserModel>
+
+export const ProfileModel = model(
+  {
+    columns: {
+      id: {
+        schema: SchemaType.COLUMN,
+        name: 'id',
+        isId: true,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.STRING,
+      },
+      bio: {
+        schema: SchemaType.COLUMN,
+        name: 'bio',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      userId: {
+        schema: SchemaType.COLUMN,
+        name: 'userId',
+        isId: false,
+        isList: false,
+        isUnique: true,
+        isReadOnly: true,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      createdAt: {
+        schema: SchemaType.COLUMN,
+        name: 'createdAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+      updatedAt: {
+        schema: SchemaType.COLUMN,
+        name: 'updatedAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+    },
+    relations: {
+      user: {
+        schema: SchemaType.RELATION,
+        name: 'user',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'ProfileToUser',
+        referencedModel: 'user',
+        relationToFields: ['id'],
+        relationFromFields: ['userId'],
+        relationDataTypes: [DataType.STRING],
+      },
+    },
+    primaryFields: ['id'],
+    uniqueFields: [['id'], ['userId']],
+  },
+  {
+    name: 'ProfileModel',
+    dbModelName: 'Profile',
+    prismaModelName: 'profile',
+  }
+)
+
+export type ProfileModel = Simplify<typeof ProfileModel>
+
+export const PostModel = model(
+  {
+    columns: {
+      id: {
+        schema: SchemaType.COLUMN,
+        name: 'id',
+        isId: true,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.STRING,
+      },
+      title: {
+        schema: SchemaType.COLUMN,
+        name: 'title',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      content: {
+        schema: SchemaType.COLUMN,
+        name: 'content',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.JSON,
+      },
+      published: {
+        schema: SchemaType.COLUMN,
+        name: 'published',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.BOOLEAN,
+      },
+      authorId: {
+        schema: SchemaType.COLUMN,
+        name: 'authorId',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: true,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      createdAt: {
+        schema: SchemaType.COLUMN,
+        name: 'createdAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+      updatedAt: {
+        schema: SchemaType.COLUMN,
+        name: 'updatedAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+    },
+    relations: {
+      author: {
+        schema: SchemaType.RELATION,
+        name: 'author',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'PostToUser',
+        referencedModel: 'user',
+        relationToFields: ['id'],
+        relationFromFields: ['authorId'],
+        relationDataTypes: [DataType.STRING],
+      },
+      tags: {
+        schema: SchemaType.RELATION,
+        name: 'tags',
+        isId: false,
+        isList: true,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'PostToTag',
+        referencedModel: 'tag',
+        relationToFields: [],
+        relationFromFields: [],
+        relationDataTypes: [DataType.STRING],
+      },
+    },
+    primaryFields: ['id'],
+    uniqueFields: [['id']],
+  },
+  {
+    name: 'PostModel',
+    dbModelName: 'Post',
+    prismaModelName: 'post',
+  }
+)
+
+export type PostModel = Simplify<typeof PostModel>
+
+export const TagModel = model(
+  {
+    columns: {
+      id: {
+        schema: SchemaType.COLUMN,
+        name: 'id',
+        isId: true,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.STRING,
+      },
+      name: {
+        schema: SchemaType.COLUMN,
+        name: 'name',
+        isId: false,
+        isList: false,
+        isUnique: true,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      createdAt: {
+        schema: SchemaType.COLUMN,
+        name: 'createdAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+      updatedAt: {
+        schema: SchemaType.COLUMN,
+        name: 'updatedAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+    },
+    relations: {
+      posts: {
+        schema: SchemaType.RELATION,
+        name: 'posts',
+        isId: false,
+        isList: true,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'PostToTag',
+        referencedModel: 'post',
+        relationToFields: [],
+        relationFromFields: [],
+        relationDataTypes: [DataType.STRING],
+      },
+    },
+    primaryFields: ['id'],
+    uniqueFields: [['id'], ['name']],
+  },
+  {
+    name: 'TagModel',
+    dbModelName: 'Tag',
+    prismaModelName: 'tag',
+  }
+)
+
+export type TagModel = Simplify<typeof TagModel>
+
+export const SanitizedFullModelSchemas = {
+  user: UserModel,
+  profile: ProfileModel,
+  post: PostModel,
+  tag: TagModel,
+}
+
+export type SanitizedFullModelSchemas = Simplify<typeof SanitizedFullModelSchemas>

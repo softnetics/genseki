@@ -7,8 +7,8 @@ export const prisma = new PrismaClient()
 
 interface User {
   id: string
-  name: string
-  email: string
+  name?: string | null
+  email?: string | null
 }
 
 class MyRequestContext extends RequestContextable<User> {
@@ -18,10 +18,34 @@ class MyRequestContext extends RequestContextable<User> {
 
   async requiredAuthenticated() {
     const sessionValue = this.getSessionCookie()
+
+    if (!sessionValue) {
+      throw new Error('User not authenticated')
+    }
+
+    const session = await prisma.session.findUnique({
+      select: {
+        user: {
+          select: {
+            id: true,
+            name: true,
+            email: true,
+          },
+        },
+      },
+      where: {
+        token: sessionValue,
+      },
+    })
+
+    if (!session) {
+      throw new Error('User not authenticated')
+    }
+
     return {
-      id: '123',
-      name: 'John Doe',
-      email: 'john@gmail.com',
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
     }
   }
 }

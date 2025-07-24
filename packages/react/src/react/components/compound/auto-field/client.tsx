@@ -31,7 +31,7 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
-import type { FieldClient, FieldRelationClient } from '../../../../core/field'
+import type { FieldClientShape, FieldRelationClientShape } from '../../../../core/field'
 import { constructEditorProviderProps } from '../../../../core/richtext'
 import type { EditorProviderClientProps } from '../../../../core/richtext/types'
 import { useStorageAdapter } from '../../../providers/root'
@@ -279,7 +279,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 }
 
 interface AutoFieldProps {
-  field: FieldClient
+  fieldShape: FieldClientShape
   optionsRecord: Record<string, any[]>
   className?: string
   visibilityField?: 'create' | 'update'
@@ -287,9 +287,9 @@ interface AutoFieldProps {
 }
 
 export function AutoField(props: AutoFieldProps) {
-  const { field, className } = props
+  const { fieldShape: field, className } = props
 
-  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
+  const visibility = props.visibilityField ? props.fieldShape[props.visibilityField] : 'enabled'
 
   if (visibility === 'hidden') return null
 
@@ -473,7 +473,7 @@ export function AutoField(props: AutoFieldProps) {
 interface AutoRelationshipFieldProps {
   name: string
   // NOTE: This should be FieldClient but the type is not correct
-  field: FieldRelationClient
+  field: FieldRelationClientShape
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
@@ -487,8 +487,8 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
     return null
   }
 
-  switch (props.field.$client.mode) {
-    case 'one':
+  switch (props.field.$client.relation.isList) {
+    case false:
       return (
         <AutoOneRelationshipField
           name={props.name}
@@ -500,7 +500,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           visibilityField={props.visibilityField}
         />
       )
-    case 'many':
+    case true:
       return (
         <AutoManyRelationshipField
           name={props.name}
@@ -513,7 +513,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
         />
       )
     default:
-      throw new Error(`Unsupported relationship mode: ${props.field.$client.mode}`)
+      throw new Error(`Unsupported relationship mode: "${(props.field.$client as any).mode}"`)
   }
 }
 
@@ -532,7 +532,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
   const connectComponent = (
     <FormField
-      name={props.name}
+      name={`${props.name}.connect`}
       control={control}
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
@@ -553,7 +553,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
       component={
         <AutoField
           key={key}
-          field={originalField as FieldClient}
+          fieldShape={originalField as FieldClientShape}
           className="w-full"
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
@@ -592,7 +592,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
 interface AutoManyRelationshipFieldProps {
   name: string
-  field: FieldRelationClient
+  field: FieldRelationClientShape
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
@@ -638,7 +638,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         name={name}
         component={
           <AutoField
-            field={childField as FieldClient}
+            fieldShape={childField as FieldClientShape}
             className="w-full"
             optionsRecord={props.optionsRecord}
             visibilityField={props.visibilityField}

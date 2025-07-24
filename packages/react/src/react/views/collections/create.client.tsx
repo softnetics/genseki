@@ -23,7 +23,7 @@ export function CreateClientView(props: CreateClientViewProps) {
   const { navigate } = useNavigation()
   const storageAdapter = useStorageAdapter()
   const form = useForm({
-    defaultValues: getDefaultValueFromFields(props.fields, storageAdapter),
+    defaultValues: getDefaultValueFromFields(props.fields.shape, storageAdapter),
   })
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
@@ -63,10 +63,10 @@ export function CreateClientView(props: CreateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(props.fields).map((field) => (
+        {Object.values(props.fields.shape).map((fieldShape) => (
           <AutoField
-            key={field.$client.fieldName}
-            field={field}
+            key={fieldShape.$client.fieldName}
+            fieldShape={fieldShape}
             visibilityField="create"
             optionsRecord={props.optionsRecord}
           />

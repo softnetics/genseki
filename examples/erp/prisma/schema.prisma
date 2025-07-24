@@ -45,21 +45,23 @@ model Account {
   userId String
   user   User   @relation(fields: [userId], references: [id])
 
-  accountId  String
-  providerId String
+  accountId String
+  provider  String
 
   idToken      String?
   accessToken  String?
   refreshToken String?
 
-  accessTokenExpiresAt  DateTime?
-  refreshTokenExpiresAt DateTime?
+  accessTokenExpiredAt  DateTime?
+  refreshTokenExpiredAt DateTime?
 
   scope    String?
   password String?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+
+  @@unique([userId, provider])
 }
 
 model Session {
@@ -73,7 +75,7 @@ model Session {
   ipAddress String?
   userAgent String?
 
-  expiresAt DateTime
+  expiredAt DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
@@ -87,7 +89,7 @@ model Verification {
 
   value      String
   identifier String   @unique
-  expiresAt  DateTime
+  expiredAt  DateTime
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

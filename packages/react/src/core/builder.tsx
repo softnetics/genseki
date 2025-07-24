@@ -67,7 +67,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           slug: slug,
           context: this.config.context,
           collectionOptions: {
-            slug: slug,
             identifierColumn: options.identifierColumn,
             fields: options.fields,
           } satisfies BaseViewProps['collectionOptions'],
@@ -89,6 +88,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
             }
           : createGensekiUiRoute({
               id: GensekiUiCommonId.COLLECTION_HOME,
+              context: this.config.context,
               path: `/collections`,
               requiredAuthenticated: true,
               render: (args) => (
@@ -106,6 +106,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           createGensekiUiRoute({
             path: `/collections/${slug}`,
             requiredAuthenticated: true,
+            context: this.config.context,
             render: (args) => (
               <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <ListView
@@ -121,6 +122,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           createGensekiUiRoute({
             path: `/collections/${slug}/:identifier`,
             requiredAuthenticated: true,
+            context: this.config.context,
             render: (args) => (
               <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <OneView
@@ -137,6 +139,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           createGensekiUiRoute({
             path: `/collections/${slug}/create`,
             requiredAuthenticated: true,
+            context: this.config.context,
             render: (args) => (
               <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <CreateView {...args} {...args.params} {...defaultArgs} />
@@ -146,6 +149,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           createGensekiUiRoute({
             path: `/collections/${slug}/update/:identifier`,
             requiredAuthenticated: true,
+            context: this.config.context,
             render: (args) => (
               <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <UpdateView
