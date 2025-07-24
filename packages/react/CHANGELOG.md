@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.18
+
+### Patch Changes
+
+- [#101](https://github.com/softnetics/genseki/pull/101) [`0b9269d`](https://github.com/softnetics/genseki/commit/0b9269dcc3830afc395363d7f1e94cecd33e6b03) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: card and avatar is not client component
+
 ## 0.1.0-alpha.17
 
 ### Minor Changes
