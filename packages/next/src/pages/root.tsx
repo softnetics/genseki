@@ -1,6 +1,6 @@
+import type { RequestContextable } from '@genseki/react'
 import { NotAuthorizedPage, NotfoundPage, type ServerFunction } from '@genseki/react'
 
-import { getUser } from '../utils/get-user'
 import type { NextJsGensekiApp } from '../with'
 
 interface RootProps {
@@ -25,9 +25,14 @@ export async function RootPage(props: RootProps) {
     return <NotfoundPage redirectURL="/admin/collections" />
   }
 
+  const request = new Request(`http://localhost${pathname}`, {
+    headers: headers,
+  })
+  const requestContext = result.context.toRequestContext(request) as RequestContextable
+
   let user: any = {}
   if (result.requiredAuthenticated) {
-    user = await getUser(props.serverFunction, headers)
+    user = await requestContext.requiredAuthenticated()
     if (!user) {
       return <NotAuthorizedPage redirectURL="/admin/auth/login" />
     }

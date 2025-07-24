@@ -3,11 +3,9 @@ import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 import { ListTable } from './list.client'
 import type { BaseViewProps } from './types'
 
-import type { ApiDefaultMethod, ApiRoute, Fields } from '../../../core'
-import {
-  type ConvertCollectionDefaultApiToApiRouteSchema,
-  getCollectionOptionsClient,
-} from '../../../core/collection'
+import type { CollectionDefaultAdminApiRouter } from '../../../core/builder.utils'
+import { getCollectionOptionsClient } from '../../../core/collection'
+import type { Fields } from '../../../core/field'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
@@ -17,13 +15,7 @@ import { getHeadersObject } from '../../utils/headers'
 interface ListViewProps extends BaseViewProps {
   headers: Headers
   searchParams: Record<string, string | string[]>
-  findMany: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<
-      string,
-      (typeof ApiDefaultMethod)['FIND_MANY'],
-      Fields
-    >
-  >
+  findMany: CollectionDefaultAdminApiRouter<string, Fields>['findMany']
 }
 
 export async function ListView(props: ListViewProps) {
@@ -34,10 +26,13 @@ export async function ListView(props: ListViewProps) {
   const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
   const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
 
-  // TODO: Fix this dummy request
+  // TODO: Fix this dummy request and response
   const request = new Request('http://localhost', {
     method: 'GET',
     headers: headersValue,
+  })
+  const response = new Response(null, {
+    headers: { 'Content-Type': 'application/json' },
   })
 
   // TODO: Consider moving to client component
@@ -46,7 +41,7 @@ export async function ListView(props: ListViewProps) {
       query: { limit, offset, orderBy, orderType },
       headers: headersValue,
     },
-    request
+    { request, response }
   )
 
   if (result.status !== 200) {
@@ -55,7 +50,7 @@ export async function ListView(props: ListViewProps) {
     )
   }
 
-  const collectionOptionsClient = getCollectionOptionsClient(props.collectionOptions)
+  const collectionOptionsClient = getCollectionOptionsClient(props.slug, props.collectionOptions)
 
   return (
     <div>

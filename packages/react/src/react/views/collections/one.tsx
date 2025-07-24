@@ -1,19 +1,14 @@
 import type { BaseViewProps } from './types'
 
-import type {
-  ApiDefaultMethod,
-  ConvertCollectionDefaultApiToApiRouteSchema,
-} from '../../../core/collection'
-import type { ApiRoute } from '../../../core/endpoint'
+import type { CollectionDefaultAdminApiRouter } from '../../../core/builder.utils'
+import type { Fields } from '../../../core/field'
 import { getHeadersObject } from '../../utils/headers'
 
 interface OneViewProps extends BaseViewProps {
   slug: string
   headers: Headers
   identifier: string
-  findOne: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<string, (typeof ApiDefaultMethod)['FIND_ONE'], any>
-  >
+  findOne: CollectionDefaultAdminApiRouter<string, Fields>['findOne']
 }
 
 export async function OneView(props: OneViewProps) {
@@ -24,12 +19,15 @@ export async function OneView(props: OneViewProps) {
     method: 'GET',
     headers: headersValue,
   })
+  const response = new Response(null, {
+    headers: { 'Content-Type': 'application/json' },
+  })
 
   const result = await props.findOne.handler(
     {
       pathParams: { id: props.identifier },
     },
-    request
+    { request, response }
   )
 
   return <div>{JSON.stringify(result)}</div>

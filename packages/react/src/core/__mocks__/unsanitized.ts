@@ -2,13 +2,13 @@ import { type DataType, type SchemaType, unsanitizedModelSchemas } from '@gensek
 
 import { SanitizedFullModelSchemas } from './sanitized'
 
-export interface TableAModelConfig {
-  name: 'TableAModel'
-  dbModelName: 'TableA'
-  prismaModelName: 'tableA'
+export interface UserModelConfig {
+  name: 'UserModel'
+  dbModelName: 'User'
+  prismaModelName: 'user'
 }
 
-export interface TableAModelShape {
+export interface UserModelShape {
   columns: {
     id: {
       schema: typeof SchemaType.COLUMN
@@ -18,7 +18,7 @@ export interface TableAModelShape {
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
+      hasDefaultValue: true
       dataType: typeof DataType.STRING
     }
     name: {
@@ -28,13 +28,13 @@ export interface TableAModelShape {
       isList: false
       isUnique: false
       isReadOnly: false
-      isRequired: true
+      isRequired: false
       hasDefaultValue: false
       dataType: typeof DataType.STRING
     }
-    description: {
+    image: {
       schema: typeof SchemaType.COLUMN
-      name: 'description'
+      name: 'image'
       isId: false
       isList: false
       isUnique: false
@@ -42,6 +42,28 @@ export interface TableAModelShape {
       isRequired: false
       hasDefaultValue: false
       dataType: typeof DataType.STRING
+    }
+    email: {
+      schema: typeof SchemaType.COLUMN
+      name: 'email'
+      isId: false
+      isList: false
+      isUnique: true
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    emailVerified: {
+      schema: typeof SchemaType.COLUMN
+      name: 'emailVerified'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: true
+      dataType: typeof DataType.BOOLEAN
     }
     createdAt: {
       schema: typeof SchemaType.COLUMN
@@ -62,58 +84,58 @@ export interface TableAModelShape {
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
+      hasDefaultValue: true
       dataType: typeof DataType.DATETIME
     }
   }
   relations: {
-    tableB: {
+    posts: {
       schema: typeof SchemaType.RELATION
-      name: 'tableB'
+      name: 'posts'
       isId: false
       isList: true
       isUnique: false
       isReadOnly: false
       isRequired: true
       hasDefaultValue: false
-      relationName: 'TableAToTableB'
-      referencedModel: TableBModel
+      relationName: 'PostToUser'
+      referencedModel: PostModel
       relationToFields: []
       relationFromFields: []
       relationDataTypes: [typeof DataType.STRING]
     }
-    tableC: {
+    profile: {
       schema: typeof SchemaType.RELATION
-      name: 'tableC'
+      name: 'profile'
       isId: false
-      isList: true
+      isList: false
       isUnique: false
       isReadOnly: false
-      isRequired: true
+      isRequired: false
       hasDefaultValue: false
-      relationName: 'TableAToTableC'
-      referencedModel: TableCModel
+      relationName: 'ProfileToUser'
+      referencedModel: ProfileModel
       relationToFields: []
       relationFromFields: []
       relationDataTypes: [typeof DataType.STRING]
     }
   }
   primaryFields: ['id']
-  uniqueFields: [['id']]
+  uniqueFields: [['id'], ['email']]
 }
 
-export interface TableAModel {
-  shape: TableAModelShape
-  config: TableAModelConfig
+export interface UserModel {
+  shape: UserModelShape
+  config: UserModelConfig
 }
 
-export interface TableBModelConfig {
-  name: 'TableBModel'
-  dbModelName: 'TableB'
-  prismaModelName: 'tableB'
+export interface ProfileModelConfig {
+  name: 'ProfileModel'
+  dbModelName: 'Profile'
+  prismaModelName: 'profile'
 }
 
-export interface TableBModelShape {
+export interface ProfileModelShape {
   columns: {
     id: {
       schema: typeof SchemaType.COLUMN
@@ -123,28 +145,28 @@ export interface TableBModelShape {
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
+      hasDefaultValue: true
       dataType: typeof DataType.STRING
     }
-    name: {
+    bio: {
       schema: typeof SchemaType.COLUMN
-      name: 'name'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      dataType: typeof DataType.STRING
-    }
-    description: {
-      schema: typeof SchemaType.COLUMN
-      name: 'description'
+      name: 'bio'
       isId: false
       isList: false
       isUnique: false
       isReadOnly: false
       isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    userId: {
+      schema: typeof SchemaType.COLUMN
+      name: 'userId'
+      isId: false
+      isList: false
+      isUnique: true
+      isReadOnly: true
+      isRequired: true
       hasDefaultValue: false
       dataType: typeof DataType.STRING
     }
@@ -167,12 +189,91 @@ export interface TableBModelShape {
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
+      hasDefaultValue: true
       dataType: typeof DataType.DATETIME
     }
-    tableCId: {
+  }
+  relations: {
+    user: {
+      schema: typeof SchemaType.RELATION
+      name: 'user'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'ProfileToUser'
+      referencedModel: UserModel
+      relationToFields: ['id']
+      relationFromFields: ['id']
+      relationDataTypes: [typeof DataType.STRING]
+    }
+  }
+  primaryFields: ['id']
+  uniqueFields: [['id'], ['userId']]
+}
+
+export interface ProfileModel {
+  shape: ProfileModelShape
+  config: ProfileModelConfig
+}
+
+export interface PostModelConfig {
+  name: 'PostModel'
+  dbModelName: 'Post'
+  prismaModelName: 'post'
+}
+
+export interface PostModelShape {
+  columns: {
+    id: {
       schema: typeof SchemaType.COLUMN
-      name: 'tableCId'
+      name: 'id'
+      isId: true
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: true
+      dataType: typeof DataType.STRING
+    }
+    title: {
+      schema: typeof SchemaType.COLUMN
+      name: 'title'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    content: {
+      schema: typeof SchemaType.COLUMN
+      name: 'content'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.JSON
+    }
+    published: {
+      schema: typeof SchemaType.COLUMN
+      name: 'published'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: true
+      dataType: typeof DataType.BOOLEAN
+    }
+    authorId: {
+      schema: typeof SchemaType.COLUMN
+      name: 'authorId'
       isId: false
       isList: false
       isUnique: false
@@ -181,36 +282,58 @@ export interface TableBModelShape {
       hasDefaultValue: false
       dataType: typeof DataType.STRING
     }
-  }
-  relations: {
-    tableA: {
-      schema: typeof SchemaType.RELATION
-      name: 'tableA'
+    createdAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'createdAt'
       isId: false
-      isList: true
+      isList: false
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
-      relationName: 'TableAToTableB'
-      referencedModel: TableAModel
-      relationToFields: []
-      relationFromFields: []
-      relationDataTypes: [typeof DataType.STRING]
+      hasDefaultValue: true
+      dataType: typeof DataType.DATETIME
     }
-    tableC: {
+    updatedAt: {
+      schema: typeof SchemaType.COLUMN
+      name: 'updatedAt'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: true
+      dataType: typeof DataType.DATETIME
+    }
+  }
+  relations: {
+    author: {
       schema: typeof SchemaType.RELATION
-      name: 'tableC'
+      name: 'author'
       isId: false
       isList: false
       isUnique: false
       isReadOnly: false
       isRequired: true
       hasDefaultValue: false
-      relationName: 'TableBToTableC'
-      referencedModel: TableCModel
+      relationName: 'PostToUser'
+      referencedModel: UserModel
       relationToFields: ['id']
       relationFromFields: ['id']
+      relationDataTypes: [typeof DataType.STRING]
+    }
+    tags: {
+      schema: typeof SchemaType.RELATION
+      name: 'tags'
+      isId: false
+      isList: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      relationName: 'PostToTag'
+      referencedModel: TagModel
+      relationToFields: []
+      relationFromFields: []
       relationDataTypes: [typeof DataType.STRING]
     }
   }
@@ -218,18 +341,18 @@ export interface TableBModelShape {
   uniqueFields: [['id']]
 }
 
-export interface TableBModel {
-  shape: TableBModelShape
-  config: TableBModelConfig
+export interface PostModel {
+  shape: PostModelShape
+  config: PostModelConfig
 }
 
-export interface TableCModelConfig {
-  name: 'TableCModel'
-  dbModelName: 'TableC'
-  prismaModelName: 'tableC'
+export interface TagModelConfig {
+  name: 'TagModel'
+  dbModelName: 'Tag'
+  prismaModelName: 'tag'
 }
 
-export interface TableCModelShape {
+export interface TagModelShape {
   columns: {
     id: {
       schema: typeof SchemaType.COLUMN
@@ -239,7 +362,7 @@ export interface TableCModelShape {
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
+      hasDefaultValue: true
       dataType: typeof DataType.STRING
     }
     name: {
@@ -247,20 +370,9 @@ export interface TableCModelShape {
       name: 'name'
       isId: false
       isList: false
-      isUnique: false
+      isUnique: true
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
-      dataType: typeof DataType.STRING
-    }
-    description: {
-      schema: typeof SchemaType.COLUMN
-      name: 'description'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: false
       hasDefaultValue: false
       dataType: typeof DataType.STRING
     }
@@ -283,55 +395,41 @@ export interface TableCModelShape {
       isUnique: false
       isReadOnly: false
       isRequired: true
-      hasDefaultValue: false
+      hasDefaultValue: true
       dataType: typeof DataType.DATETIME
     }
   }
   relations: {
-    tableA: {
+    posts: {
       schema: typeof SchemaType.RELATION
-      name: 'tableA'
+      name: 'posts'
       isId: false
       isList: true
       isUnique: false
       isReadOnly: false
       isRequired: true
       hasDefaultValue: false
-      relationName: 'TableAToTableC'
-      referencedModel: TableAModel
-      relationToFields: []
-      relationFromFields: []
-      relationDataTypes: [typeof DataType.STRING]
-    }
-    tableB: {
-      schema: typeof SchemaType.RELATION
-      name: 'tableB'
-      isId: false
-      isList: true
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      relationName: 'TableBToTableC'
-      referencedModel: TableBModel
+      relationName: 'PostToTag'
+      referencedModel: PostModel
       relationToFields: []
       relationFromFields: []
       relationDataTypes: [typeof DataType.STRING]
     }
   }
   primaryFields: ['id']
-  uniqueFields: [['id']]
+  uniqueFields: [['id'], ['name']]
 }
 
-export interface TableCModel {
-  shape: TableCModelShape
-  config: TableCModelConfig
+export interface TagModel {
+  shape: TagModelShape
+  config: TagModelConfig
 }
 
 export type FullModelSchemas = {
-  tableA: TableAModel
-  tableB: TableBModel
-  tableC: TableCModel
+  user: UserModel
+  profile: ProfileModel
+  post: PostModel
+  tag: TagModel
 } & {}
 
 export const FullModelSchemas = unsanitizedModelSchemas<FullModelSchemas>(SanitizedFullModelSchemas)

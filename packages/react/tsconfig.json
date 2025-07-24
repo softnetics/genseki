@@ -5,6 +5,7 @@
     "baseUrl": ".",
     "module": "ESNext",
     "moduleResolution": "bundler",
+    "types": ["node"],
     "noEmit": true
   },
   "include": ["src"],

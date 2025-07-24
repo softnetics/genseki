@@ -20,7 +20,7 @@ function model<const TShape extends SanitizedModelShape, const TConfig extends M
   return { config, shape }
 }
 
-export const TableAModel = model(
+export const UserModel = model(
   {
     columns: {
       id: {
@@ -31,7 +31,7 @@ export const TableAModel = model(
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
+        hasDefaultValue: true,
         dataType: DataType.STRING,
       },
       name: {
@@ -41,13 +41,13 @@ export const TableAModel = model(
         isList: false,
         isUnique: false,
         isReadOnly: false,
-        isRequired: true,
+        isRequired: false,
         hasDefaultValue: false,
         dataType: DataType.STRING,
       },
-      description: {
+      image: {
         schema: SchemaType.COLUMN,
-        name: 'description',
+        name: 'image',
         isId: false,
         isList: false,
         isUnique: false,
@@ -55,6 +55,28 @@ export const TableAModel = model(
         isRequired: false,
         hasDefaultValue: false,
         dataType: DataType.STRING,
+      },
+      email: {
+        schema: SchemaType.COLUMN,
+        name: 'email',
+        isId: false,
+        isList: false,
+        isUnique: true,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      emailVerified: {
+        schema: SchemaType.COLUMN,
+        name: 'emailVerified',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: false,
+        hasDefaultValue: true,
+        dataType: DataType.BOOLEAN,
       },
       createdAt: {
         schema: SchemaType.COLUMN,
@@ -75,55 +97,55 @@ export const TableAModel = model(
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
+        hasDefaultValue: true,
         dataType: DataType.DATETIME,
       },
     },
     relations: {
-      tableB: {
+      posts: {
         schema: SchemaType.RELATION,
-        name: 'tableB',
+        name: 'posts',
         isId: false,
         isList: true,
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
         hasDefaultValue: false,
-        relationName: 'TableAToTableB',
-        referencedModel: 'tableB',
+        relationName: 'PostToUser',
+        referencedModel: 'post',
         relationToFields: [],
         relationFromFields: [],
         relationDataTypes: [DataType.STRING],
       },
-      tableC: {
+      profile: {
         schema: SchemaType.RELATION,
-        name: 'tableC',
+        name: 'profile',
         isId: false,
-        isList: true,
+        isList: false,
         isUnique: false,
         isReadOnly: false,
-        isRequired: true,
+        isRequired: false,
         hasDefaultValue: false,
-        relationName: 'TableAToTableC',
-        referencedModel: 'tableC',
+        relationName: 'ProfileToUser',
+        referencedModel: 'profile',
         relationToFields: [],
         relationFromFields: [],
         relationDataTypes: [DataType.STRING],
       },
     },
     primaryFields: ['id'],
-    uniqueFields: [['id']],
+    uniqueFields: [['id'], ['email']],
   },
   {
-    name: 'TableAModel',
-    dbModelName: 'TableA',
-    prismaModelName: 'tableA',
+    name: 'UserModel',
+    dbModelName: 'User',
+    prismaModelName: 'user',
   }
 )
 
-export type TableAModel = Simplify<typeof TableAModel>
+export type UserModel = Simplify<typeof UserModel>
 
-export const TableBModel = model(
+export const ProfileModel = model(
   {
     columns: {
       id: {
@@ -134,28 +156,28 @@ export const TableBModel = model(
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
+        hasDefaultValue: true,
         dataType: DataType.STRING,
       },
-      name: {
+      bio: {
         schema: SchemaType.COLUMN,
-        name: 'name',
-        isId: false,
-        isList: false,
-        isUnique: false,
-        isReadOnly: false,
-        isRequired: true,
-        hasDefaultValue: false,
-        dataType: DataType.STRING,
-      },
-      description: {
-        schema: SchemaType.COLUMN,
-        name: 'description',
+        name: 'bio',
         isId: false,
         isList: false,
         isUnique: false,
         isReadOnly: false,
         isRequired: false,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      userId: {
+        schema: SchemaType.COLUMN,
+        name: 'userId',
+        isId: false,
+        isList: false,
+        isUnique: true,
+        isReadOnly: true,
+        isRequired: true,
         hasDefaultValue: false,
         dataType: DataType.STRING,
       },
@@ -178,12 +200,89 @@ export const TableBModel = model(
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
+        hasDefaultValue: true,
         dataType: DataType.DATETIME,
       },
-      tableCId: {
+    },
+    relations: {
+      user: {
+        schema: SchemaType.RELATION,
+        name: 'user',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'ProfileToUser',
+        referencedModel: 'user',
+        relationToFields: ['id'],
+        relationFromFields: ['userId'],
+        relationDataTypes: [DataType.STRING],
+      },
+    },
+    primaryFields: ['id'],
+    uniqueFields: [['id'], ['userId']],
+  },
+  {
+    name: 'ProfileModel',
+    dbModelName: 'Profile',
+    prismaModelName: 'profile',
+  }
+)
+
+export type ProfileModel = Simplify<typeof ProfileModel>
+
+export const PostModel = model(
+  {
+    columns: {
+      id: {
         schema: SchemaType.COLUMN,
-        name: 'tableCId',
+        name: 'id',
+        isId: true,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.STRING,
+      },
+      title: {
+        schema: SchemaType.COLUMN,
+        name: 'title',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.STRING,
+      },
+      content: {
+        schema: SchemaType.COLUMN,
+        name: 'content',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        dataType: DataType.JSON,
+      },
+      published: {
+        schema: SchemaType.COLUMN,
+        name: 'published',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.BOOLEAN,
+      },
+      authorId: {
+        schema: SchemaType.COLUMN,
+        name: 'authorId',
         isId: false,
         isList: false,
         isUnique: false,
@@ -192,36 +291,58 @@ export const TableBModel = model(
         hasDefaultValue: false,
         dataType: DataType.STRING,
       },
-    },
-    relations: {
-      tableA: {
-        schema: SchemaType.RELATION,
-        name: 'tableA',
+      createdAt: {
+        schema: SchemaType.COLUMN,
+        name: 'createdAt',
         isId: false,
-        isList: true,
+        isList: false,
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
-        relationName: 'TableAToTableB',
-        referencedModel: 'tableA',
-        relationToFields: [],
-        relationFromFields: [],
-        relationDataTypes: [DataType.STRING],
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
       },
-      tableC: {
+      updatedAt: {
+        schema: SchemaType.COLUMN,
+        name: 'updatedAt',
+        isId: false,
+        isList: false,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: true,
+        dataType: DataType.DATETIME,
+      },
+    },
+    relations: {
+      author: {
         schema: SchemaType.RELATION,
-        name: 'tableC',
+        name: 'author',
         isId: false,
         isList: false,
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
         hasDefaultValue: false,
-        relationName: 'TableBToTableC',
-        referencedModel: 'tableC',
+        relationName: 'PostToUser',
+        referencedModel: 'user',
         relationToFields: ['id'],
-        relationFromFields: ['tableCId'],
+        relationFromFields: ['authorId'],
+        relationDataTypes: [DataType.STRING],
+      },
+      tags: {
+        schema: SchemaType.RELATION,
+        name: 'tags',
+        isId: false,
+        isList: true,
+        isUnique: false,
+        isReadOnly: false,
+        isRequired: true,
+        hasDefaultValue: false,
+        relationName: 'PostToTag',
+        referencedModel: 'tag',
+        relationToFields: [],
+        relationFromFields: [],
         relationDataTypes: [DataType.STRING],
       },
     },
@@ -229,15 +350,15 @@ export const TableBModel = model(
     uniqueFields: [['id']],
   },
   {
-    name: 'TableBModel',
-    dbModelName: 'TableB',
-    prismaModelName: 'tableB',
+    name: 'PostModel',
+    dbModelName: 'Post',
+    prismaModelName: 'post',
   }
 )
 
-export type TableBModel = Simplify<typeof TableBModel>
+export type PostModel = Simplify<typeof PostModel>
 
-export const TableCModel = model(
+export const TagModel = model(
   {
     columns: {
       id: {
@@ -248,7 +369,7 @@ export const TableCModel = model(
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
+        hasDefaultValue: true,
         dataType: DataType.STRING,
       },
       name: {
@@ -256,20 +377,9 @@ export const TableCModel = model(
         name: 'name',
         isId: false,
         isList: false,
-        isUnique: false,
+        isUnique: true,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
-        dataType: DataType.STRING,
-      },
-      description: {
-        schema: SchemaType.COLUMN,
-        name: 'description',
-        isId: false,
-        isList: false,
-        isUnique: false,
-        isReadOnly: false,
-        isRequired: false,
         hasDefaultValue: false,
         dataType: DataType.STRING,
       },
@@ -292,58 +402,44 @@ export const TableCModel = model(
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
-        hasDefaultValue: false,
+        hasDefaultValue: true,
         dataType: DataType.DATETIME,
       },
     },
     relations: {
-      tableA: {
+      posts: {
         schema: SchemaType.RELATION,
-        name: 'tableA',
+        name: 'posts',
         isId: false,
         isList: true,
         isUnique: false,
         isReadOnly: false,
         isRequired: true,
         hasDefaultValue: false,
-        relationName: 'TableAToTableC',
-        referencedModel: 'tableA',
-        relationToFields: [],
-        relationFromFields: [],
-        relationDataTypes: [DataType.STRING],
-      },
-      tableB: {
-        schema: SchemaType.RELATION,
-        name: 'tableB',
-        isId: false,
-        isList: true,
-        isUnique: false,
-        isReadOnly: false,
-        isRequired: true,
-        hasDefaultValue: false,
-        relationName: 'TableBToTableC',
-        referencedModel: 'tableB',
+        relationName: 'PostToTag',
+        referencedModel: 'post',
         relationToFields: [],
         relationFromFields: [],
         relationDataTypes: [DataType.STRING],
       },
     },
     primaryFields: ['id'],
-    uniqueFields: [['id']],
+    uniqueFields: [['id'], ['name']],
   },
   {
-    name: 'TableCModel',
-    dbModelName: 'TableC',
-    prismaModelName: 'tableC',
+    name: 'TagModel',
+    dbModelName: 'Tag',
+    prismaModelName: 'tag',
   }
 )
 
-export type TableCModel = Simplify<typeof TableCModel>
+export type TagModel = Simplify<typeof TagModel>
 
 export const SanitizedFullModelSchemas = {
-  tableA: TableAModel,
-  tableB: TableBModel,
-  tableC: TableCModel,
+  user: UserModel,
+  profile: ProfileModel,
+  post: PostModel,
+  tag: TagModel,
 }
 
 export type SanitizedFullModelSchemas = Simplify<typeof SanitizedFullModelSchemas>

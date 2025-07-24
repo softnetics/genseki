@@ -57,18 +57,16 @@ export function sendResetPasswordEmail<
 
       // Generate a secure random token
       const token = crypto.randomUUID()
-      const identifier = `reset-password:${token}`
-      await builderArgs.handler.verification.deleteByUserIdAndIdentifierPrefix(
-        user.id,
-        'reset-password:'
-      )
+      const identifier = builderArgs.handler.identifier.resetPassword(token)
+
+      await builderArgs.handler.verification.deleteByIdentifier(identifier)
 
       await builderArgs.handler.verification.create({
-        identifier,
+        identifier: identifier,
         value: user.id,
-        expiresAt: new Date(
+        expiredAt: new Date(
           Date.now() +
-            (builderArgs.options.method.emailAndPassword?.resetPassword?.expiresInMs ??
+            (builderArgs.options.method.emailAndPassword?.resetPassword?.expiredInMs ??
               1000 * 60 * 60 * 24) // TODO; make config always set default
         ),
       })

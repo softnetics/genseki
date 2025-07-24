@@ -1,9 +1,9 @@
 import type { IsAny } from 'type-fest'
 
 import type { MaybePromise } from './collection'
+import type { MockPrismaClient } from './prisma.types'
 
 import { getSessionCookie } from '../auth/utils'
-import { getHeadersObject } from '../react/utils/headers'
 
 interface BaseUser {
   id: string
@@ -17,7 +17,7 @@ export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
   }
 
   getSessionCookie() {
-    return getSessionCookie(getHeadersObject(this.request.headers))
+    return getSessionCookie(this.request)
   }
 
   abstract requiredAuthenticated(): MaybePromise<TUser>
@@ -26,6 +26,7 @@ export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
 export type AnyRequestContextable = RequestContextable<any>
 
 export interface Contextable<TUser extends BaseUser = BaseUser> {
+  getPrismaClient(): MockPrismaClient
   toRequestContext(request: Request): RequestContextable<TUser>
 }
 

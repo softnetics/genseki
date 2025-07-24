@@ -1,5 +1,3 @@
-import type { NodePgDatabase } from 'drizzle-orm/node-postgres'
-
 import { forgotPasswordEmail } from './api/forgot-password'
 import { loginEmail } from './api/login-email'
 import { me } from './api/me'
@@ -19,54 +17,78 @@ import { ResetPasswordView } from './views/reset-password/reset-password'
 import { SignUpView } from './views/sign-up'
 
 import { createPlugin, type GensekiUiRouter } from '../core/config'
-import { type Contextable } from '../core/context'
+import { type AnyContextable } from '../core/context'
 import type { Fields } from '../core/field'
-import type { AnyTypedColumn, WithAnyTable, WithHasDefault, WithNotNull } from '../core/table'
+import type { DataType } from '../core/model'
+import type {
+  AnyTable,
+  AnyTypedFieldColumn,
+  WithHasDefaultValue,
+  WithIsRequired,
+} from '../core/table'
 import { GensekiUiCommonId } from '../core/ui'
 
 export * from './constant'
 export * from './utils'
 
-export type AnyUserTable = WithAnyTable<{
-  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
-  name: AnyTypedColumn<string>
-  email: AnyTypedColumn<string>
-  emailVerified: AnyTypedColumn<boolean>
-  image: AnyTypedColumn<string>
+export type AnyUserTable = AnyTable<{
+  columns: {
+    id: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
+    name: AnyTypedFieldColumn<typeof DataType.STRING>
+    email: AnyTypedFieldColumn<typeof DataType.STRING>
+    emailVerified: AnyTypedFieldColumn<typeof DataType.BOOLEAN>
+    image: AnyTypedFieldColumn<typeof DataType.STRING>
+  }
+  relations: {}
+  uniqueFields: (['id'] | ['email'])[]
 }>
 
-export type AnySessionTable = WithAnyTable<{
-  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
-  expiresAt: WithNotNull<AnyTypedColumn<Date>>
-  token: WithNotNull<AnyTypedColumn<string>>
-  ipAddress: AnyTypedColumn<string>
-  userAgent: AnyTypedColumn<string>
-  userId: WithNotNull<AnyTypedColumn<string>>
+export type AnySessionTable = AnyTable<{
+  columns: {
+    id: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
+    expiredAt: WithIsRequired<AnyTypedFieldColumn<typeof DataType.DATETIME>>
+    token: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    ipAddress: AnyTypedFieldColumn<typeof DataType.STRING>
+    userAgent: AnyTypedFieldColumn<typeof DataType.STRING>
+    userId: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+  }
+  relations: {}
 }>
 
-export type AnyAccountTable = WithAnyTable<{
-  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
-  accountId: WithNotNull<AnyTypedColumn<string>>
-  providerId: WithNotNull<AnyTypedColumn<string>>
-  userId: WithNotNull<AnyTypedColumn<string>>
-  accessToken: AnyTypedColumn<string>
-  refreshToken: AnyTypedColumn<string>
-  idToken: AnyTypedColumn<string>
-  accessTokenExpiresAt: AnyTypedColumn<Date>
-  refreshTokenExpiresAt: AnyTypedColumn<Date>
-  scope: AnyTypedColumn<string>
-  password: AnyTypedColumn<string>
+export type AnyAccountTable = AnyTable<{
+  columns: {
+    id: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
+    // Account ID is a unique identifier for the account (e.g., Google ID, Facebook ID, User ID)
+    accountId: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    // Provider ID is the identifier for the provider (e.g., google, facebook, credentials)
+    provider: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    // User ID is the identifier for the user in the system
+    userId: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    idToken: AnyTypedFieldColumn<typeof DataType.STRING>
+    accessToken: AnyTypedFieldColumn<typeof DataType.STRING>
+    refreshToken: AnyTypedFieldColumn<typeof DataType.STRING>
+    accessTokenExpiredAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
+    refreshTokenExpiredAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
+    scope: AnyTypedFieldColumn<typeof DataType.STRING>
+    // Password is used for email and password authentication
+    password: AnyTypedFieldColumn<typeof DataType.STRING>
+  }
+  relations: {}
+  uniqueFields: (['id'] | ['userId', 'provider'])[]
 }>
 
-export type AnyVerificationTable = WithAnyTable<{
-  id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
-  identifier: WithNotNull<AnyTypedColumn<string>>
-  value: AnyTypedColumn<string>
-  expiresAt: WithNotNull<AnyTypedColumn<Date>>
+export type AnyVerificationTable = AnyTable<{
+  columns: {
+    id: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
+    identifier: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    value: AnyTypedFieldColumn<typeof DataType.STRING>
+    expiredAt: WithIsRequired<AnyTypedFieldColumn<typeof DataType.DATETIME>>
+    createdAt: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.DATETIME>>>
+  }
+  relations: {}
 }>
 
 export interface AuthOptions {
-  db: NodePgDatabase<Record<string, unknown>>
   schema: {
     user: AnyUserTable
     session: AnySessionTable
@@ -93,11 +115,14 @@ export interface AuthOptions {
         autoLogin?: boolean // default: true
         additionalFields?: Fields
       }
+      changePassword?: {
+        enabled?: boolean // default: true
+        enabledPasswordNotSameAsCurrent?: boolean // default: true
+      }
       resetPassword?: {
         enabled?: boolean // default: false
-        expiresInMs?: number // default: 1 day (1000 * 60 * 60 * 24)
+        expiredInMs?: number // default: 1 day (1000 * 60 * 60 * 24)
         resetPasswordUrl?: string // default: `/auth/reset-password`
-        redirectTo?: string // default: `/auth/login`
         sendEmailResetPassword: (email: string, token: string) => Promise<void>
       }
     }
@@ -105,7 +130,7 @@ export interface AuthOptions {
 }
 
 export interface AuthApiBuilderArgs<
-  TContext extends Contextable,
+  TContext extends AnyContextable,
   TAuthOptions extends AuthOptions,
 > {
   context: TContext
@@ -113,88 +138,100 @@ export interface AuthApiBuilderArgs<
   options: TAuthOptions
 }
 
-export function auth<TContext extends Contextable, TAuthOptions extends AuthOptions>(
+export function auth<TContext extends AnyContextable, TAuthOptions extends AuthOptions>(
   context: TContext,
   options: TAuthOptions
 ) {
-  const authHandler = createAuthInternalHandler(options)
-
-  const apiOptions = {
-    context,
-    handler: authHandler,
-    options,
-  } satisfies AuthApiBuilderArgs<TContext, TAuthOptions>
-
-  const api = {
-    //  No authentication required
-    signUpEmail: signUpEmail(apiOptions),
-    loginEmail: loginEmail(apiOptions),
-    signOut: signOut(apiOptions),
-    forgotPasswordEmail: forgotPasswordEmail(apiOptions),
-    resetPasswordEmail: resetPasswordEmail(apiOptions),
-    validateResetToken: validateResetToken(apiOptions),
-    sendEmailResetPassword: sendResetPasswordEmail(apiOptions),
-    // Authentication required
-    me: me(apiOptions),
-  } as const
-
-  const uis: GensekiUiRouter[] = [
-    {
-      id: GensekiUiCommonId.AUTH_LOGIN,
-      path: '/auth/login',
-      requiredAuthenticated: false,
-      render: (args) => (
-        <AuthLayout>
-          <LoginView {...args} {...args.params} />
-        </AuthLayout>
-      ),
-    },
-    {
-      id: GensekiUiCommonId.AUTH_SIGNUP,
-      path: '/auth/sign-up',
-      requiredAuthenticated: false,
-      render: (args) => (
-        <AuthLayout>
-          <SignUpView {...args} {...args.params} />
-        </AuthLayout>
-      ),
-    },
-    {
-      id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
-      path: '/auth/forgot-password',
-      requiredAuthenticated: false,
-      render: (args) => (
-        <AuthLayout>
-          <ForgotPasswordView {...args} {...args.params} />
-        </AuthLayout>
-      ),
-    },
-    {
-      id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
-      path: '/auth/reset-password',
-      requiredAuthenticated: false,
-      render: (args) => (
-        <AuthLayout>
-          <ResetPasswordView
-            {...args}
-            validateToken={async (token) => {
-              const verification = await authHandler.verification.findByResetPasswordToken(token)
-              const validation = await validateVerification(verification)
-              return !!validation
-            }}
-          />
-        </AuthLayout>
-      ),
-    },
-  ]
-
   return createPlugin({
     name: 'auth',
-    plugin: () => ({
-      api: {
-        auth: api,
-      },
-      uis: uis,
-    }),
+    plugin: (input) => {
+      const authHandler = createAuthInternalHandler(context, options)
+
+      const apiOptions = {
+        context,
+        handler: authHandler,
+        options,
+      } satisfies AuthApiBuilderArgs<TContext, TAuthOptions>
+
+      const api = {
+        //  No authentication required
+        signUpEmail: signUpEmail(apiOptions),
+        loginEmail: loginEmail(apiOptions),
+        signOut: signOut(apiOptions),
+        forgotPasswordEmail: forgotPasswordEmail(apiOptions),
+        resetPasswordEmail: resetPasswordEmail(apiOptions),
+        validateResetToken: validateResetToken(apiOptions),
+        sendEmailResetPassword: sendResetPasswordEmail(apiOptions),
+        // Authentication required
+        me: me(apiOptions),
+      } as const
+
+      const uis: GensekiUiRouter[] = [
+        {
+          id: GensekiUiCommonId.AUTH_LOGIN,
+          context: context,
+          path: '/auth/login',
+          requiredAuthenticated: false,
+          render: (args) => (
+            <AuthLayout>
+              <LoginView {...args} {...args.params} />
+            </AuthLayout>
+          ),
+        },
+        {
+          id: GensekiUiCommonId.AUTH_SIGNUP,
+          context: context,
+          path: '/auth/sign-up',
+          requiredAuthenticated: false,
+          render: (args) => (
+            <AuthLayout>
+              <SignUpView {...args} {...args.params} />
+            </AuthLayout>
+          ),
+        },
+        {
+          id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
+          context: context,
+          path: '/auth/forgot-password',
+          requiredAuthenticated: false,
+          render: (args) => (
+            <AuthLayout>
+              <ForgotPasswordView {...args} {...args.params} />
+            </AuthLayout>
+          ),
+        },
+        {
+          id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
+          context: context,
+          path: '/auth/reset-password',
+          requiredAuthenticated: false,
+          render: (args) => (
+            <AuthLayout>
+              <ResetPasswordView
+                {...args}
+                validateToken={async (token) => {
+                  const verification = await authHandler.verification.create({
+                    identifier: authHandler.identifier.resetPassword(token),
+                    value: token,
+                    expiredAt: new Date(
+                      Date.now() +
+                        (options.method.emailAndPassword?.resetPassword?.expiredInMs ??
+                          1000 * 60 * 60 * 24)
+                    ),
+                  })
+                  const validation = await validateVerification(verification)
+                  return !!validation
+                }}
+              />
+            </AuthLayout>
+          ),
+        },
+      ]
+
+      return {
+        api: { auth: api },
+        uis: uis,
+      }
+    },
   })
 }

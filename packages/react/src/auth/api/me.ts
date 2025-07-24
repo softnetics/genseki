@@ -15,9 +15,9 @@ export function me<TContext extends Contextable, TAuthOptions extends AuthOption
       responses: {
         200: z.object({
           id: z.string(),
-          name: z.string().nullable(),
-          email: z.string().nullable(),
-          image: z.string().nullable(),
+          name: z.string().nullable().optional(),
+          email: z.string().nullable().optional(),
+          image: z.string().nullable().optional(),
         }),
         401: z.object({
           status: z.string(),
@@ -27,7 +27,6 @@ export function me<TContext extends Contextable, TAuthOptions extends AuthOption
     async (args) => {
       const { id } = await args.context.requiredAuthenticated()
       const user = await builderArgs.handler.user.findById(id)
-
       return {
         status: 200,
         body: user,

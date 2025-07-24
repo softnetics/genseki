@@ -8,7 +8,7 @@ export async function createOptionsRecord(
   fields: Fields,
   prefix: string = ''
 ): Promise<Record<string, any[]>> {
-  const promises = Object.values(fields).flatMap(async (field) => {
+  const promises = Object.values(fields.shape).flatMap(async (field) => {
     if ('options' in field) {
       if (field.type === 'connect' || field.type === 'connectOrCreate') {
         const childOptions = await createOptionsRecord(

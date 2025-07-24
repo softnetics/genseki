@@ -36,7 +36,6 @@
     "@types/react": "19.1.4",
     "@types/react-dom": "19.1.5",
     "@vitejs/plugin-react": "^4.3.4",
-    "drizzle-kit": "^0.30.6",
     "type-fest": "^4.38.0",
     "vite-tsconfig-paths": "^5.1.4",
     "vitest": "^3.0.9"

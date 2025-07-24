@@ -37,7 +37,7 @@ const tableDataExtract = (
   data: any[],
   options: { clientFields: FieldsClient; identifierColumn: string }
 ) => {
-  const headers = Object.values(options.clientFields).map((column) => {
+  const headers = Object.values(options.clientFields.shape).map((column) => {
     return { ...column, label: column.$client.fieldName /* Fallback to key if no label */ }
   })
 

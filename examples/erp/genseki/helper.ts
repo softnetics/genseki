@@ -1,20 +1,14 @@
-import { drizzle } from 'drizzle-orm/node-postgres'
-import { Pool } from 'pg'
-
 import { Builder, type Contextable, RequestContextable } from '@genseki/react'
 
-import * as schema from '~/db/schema'
+import { FullModelSchemas } from '../generated/genseki/unsanitized'
+import { PrismaClient } from '../generated/prisma'
 
-const pool = new Pool({
-  connectionString: process.env.DATABASE_URL,
-})
-
-export const db = drizzle({ client: pool, schema: schema, logger: true })
+export const prisma = new PrismaClient()
 
 interface User {
   id: string
-  name: string
-  email: string
+  name?: string | null
+  email?: string | null
 }
 
 class MyRequestContext extends RequestContextable<User> {
@@ -24,34 +18,44 @@ class MyRequestContext extends RequestContextable<User> {
 
   async requiredAuthenticated() {
     const sessionValue = this.getSessionCookie()
+
     if (!sessionValue) {
-      throw new Error('Authentication required')
+      throw new Error('User not authenticated')
     }
 
-    const session = await db.query.session.findFirst({
-      columns: {},
-      with: {
+    const session = await prisma.session.findUnique({
+      select: {
         user: {
-          columns: {
+          select: {
             id: true,
             name: true,
             email: true,
           },
         },
       },
-      where: (session, { eq }) => eq(session.token, sessionValue),
+      where: {
+        token: sessionValue,
+      },
     })
 
     if (!session) {
-      throw new Error('Session not found')
+      throw new Error('User not authenticated')
     }
 
-    return session.user
+    return {
+      id: session.user.id,
+      name: session.user.name,
+      email: session.user.email,
+    }
   }
 }
 
 export class MyContext implements Contextable<User> {
   constructor() {}
+
+  getPrismaClient() {
+    return prisma as any
+  }
 
   toRequestContext(request: Request) {
     return new MyRequestContext(request)
@@ -60,4 +64,7 @@ export class MyContext implements Contextable<User> {
 
 export const context = new MyContext()
 
-export const builder = new Builder({ db, schema, context: context })
+export const builder = new Builder({
+  schema: FullModelSchemas,
+  context: context,
+})
