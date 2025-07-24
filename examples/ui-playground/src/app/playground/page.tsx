@@ -1164,14 +1164,14 @@ export default function UIPlayground() {
               label="Package name"
               description="This is a helper text"
               placeholder="Data"
-              className="w-[320px]"
+              className="w-full"
               isRequired
             />
             <Textarea
               label="Package name"
               description="This is a helper text"
               placeholder="Data"
-              className="w-[320px]"
+              className="w-full"
               isRequired
               isDisabled
             />
@@ -1780,6 +1780,20 @@ export default function UIPlayground() {
                       onPageChange={() => {}}
                     />
                   </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+
+          <Table aria-label="not-found">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn isRowHeader>Name</TableColumn>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={2} className="text-center h-64">
+                  <p>Not founds</p>
                 </TableCell>
               </TableRow>
             </TableBody>

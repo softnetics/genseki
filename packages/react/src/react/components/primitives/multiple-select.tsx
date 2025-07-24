@@ -123,7 +123,7 @@ const MultipleSelect = <T extends object>({
     <Group
       isDisabled={props.isDisabled}
       isInvalid={props.isInvalid}
-      className={composeTailwindRenderProps(className, 'group flex h-fit flex-col gap-y-1')}
+      className={composeTailwindRenderProps(className, 'group flex h-fit flex-col gap-y-4')}
     >
       {({ isInvalid, isDisabled }) => (
         <>
