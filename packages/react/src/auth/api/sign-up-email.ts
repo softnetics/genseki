@@ -29,8 +29,8 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           token: z.string().nullable(),
           user: z.object({
             id: z.string(),
-            name: z.string(),
-            email: z.string(),
+            name: z.string().nullable(),
+            email: z.string().nullable(),
             image: z.string().nullable(),
           }),
         }),

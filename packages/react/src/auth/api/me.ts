@@ -15,9 +15,9 @@ export function me<TContext extends Contextable, TAuthOptions extends AuthOption
       responses: {
         200: z.object({
           id: z.string(),
-          name: z.string(),
-          email: z.string(),
-          image: z.string().nullable().optional(),
+          name: z.string().nullable(),
+          email: z.string().nullable(),
+          image: z.string().nullable(),
         }),
         401: z.object({
           status: z.string(),
