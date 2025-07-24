@@ -30,19 +30,6 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
 
-  examples/demo-prisma-generator:
-    dependencies:
-      '@prisma/client':
-        specifier: ^6.10.1
-        version: 6.10.1(prisma@6.10.1(typescript@5.8.2))(typescript@5.8.2)
-    devDependencies:
-      '@genseki/prisma-generator':
-        specifier: workspace:^
-        version: link:../../packages/prisma-generator
-      prisma:
-        specifier: ^6.10.1
-        version: 6.10.1(typescript@5.8.2)
-
   examples/erp:
     dependencies:
       '@genseki/next':
@@ -377,6 +364,9 @@ importers:
         specifier: 5.8.2
         version: 5.8.2
     devDependencies:
+      '@genseki/react':
+        specifier: workspace:^
+        version: link:../react
       '@internal/project-config':
         specifier: workspace:^
         version: link:../../internals/project-config
@@ -6857,6 +6847,7 @@ snapshots:
     optionalDependencies:
       prisma: 6.10.1(typescript@5.8.2)
       typescript: 5.8.2
+    optional: true
 
   '@prisma/config@6.10.1':
     dependencies:
