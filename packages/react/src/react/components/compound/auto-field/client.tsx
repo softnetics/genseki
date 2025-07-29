@@ -252,7 +252,7 @@ const AutoRichTextField = (props: {
         ...editorProviderProps,
         onUpdate(updateCb) {
           startTransition(() => {
-            field.onChange(JSON.stringify(updateCb.editor.getJSON()))
+            field.onChange(updateCb.editor.getJSON())
           })
           editorProviderProps.onUpdate?.(updateCb)
         },

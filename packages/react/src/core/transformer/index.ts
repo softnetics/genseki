@@ -141,13 +141,19 @@ export function transformFieldPayloadToPrismaUpdatePayload(
       throw new Error(`Field "${fieldShape.$server.fieldName}" does not have a valid schema key`)
     }
 
-    const transformedValue =
-      fieldShape.$server.source === 'column'
-        ? inputValue
-        : isRelationFieldShape(fieldShape)
-          ? transformFieldRelationPayloadToPrismaUpdatePayload(fieldShape, inputValue)
-          : undefined
+    let transformedValue: any = undefined
 
+    if (fieldShape.$server.source === 'column') {
+      transformedValue = inputValue
+      if (fieldShape.$server.column.dataType === DataType.JSON) {
+        transformedValue = JSON.parse(JSON.stringify(transformedValue))
+      }
+    }
+    if (isRelationFieldShape(fieldShape)) {
+      transformedValue = transformFieldRelationPayloadToPrismaUpdatePayload(fieldShape, inputValue)
+    }
+
+    if (transformedValue === undefined) return acc
     return { ...acc, [schemaKey]: transformedValue }
   }, {})
 }

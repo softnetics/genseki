@@ -52,14 +52,23 @@ const userFields = builder.fields('user', (fb) => ({
 }))
 
 describe('transformToPrismaCreatePayload', () => {
-  test('should transform payload correctly 1', () => {
+  test('should transform payload correctly', () => {
     const input = {
       nameField: 'John Doe',
       postsField: [
         {
           create: {
             titleField: 'Hello World',
-            contentField: {},
+            contentField: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'heading',
+                  attrs: { textAlign: 'left', level: 1 },
+                  content: [{ type: 'text', text: 'Hello' }],
+                },
+              ],
+            },
             tagsField: [
               { connect: 'mock-tag-id' },
               {
@@ -82,7 +91,16 @@ describe('transformToPrismaCreatePayload', () => {
         create: [
           {
             title: 'Hello World',
-            content: {},
+            content: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'heading',
+                  attrs: { textAlign: 'left', level: 1 },
+                  content: [{ type: 'text', text: 'Hello' }],
+                },
+              ],
+            },
             tags: {
               connect: [{ id: 'mock-tag-id' }],
               create: { name: 'New Tag' },
@@ -110,7 +128,16 @@ describe('transformToPrismaUpdatePayload', () => {
         {
           create: {
             titleField: 'Hello World',
-            contentField: {},
+            contentField: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'heading',
+                  attrs: { textAlign: 'left', level: 1 },
+                  content: [{ type: 'text', text: 'Hello' }],
+                },
+              ],
+            },
             tagsField: [
               {
                 connect: 'mock-tag-id',
@@ -135,7 +162,16 @@ describe('transformToPrismaUpdatePayload', () => {
         create: [
           {
             title: 'Hello World',
-            content: {},
+            content: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'heading',
+                  attrs: { textAlign: 'left', level: 1 },
+                  content: [{ type: 'text', text: 'Hello' }],
+                },
+              ],
+            },
             tags: {
               connect: [{ id: 'mock-tag-id' }],
               create: { name: 'New Tag' },
