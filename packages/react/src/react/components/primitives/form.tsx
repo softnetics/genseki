@@ -279,8 +279,13 @@ function FormFieldValue<
     | readonly FieldPath<TFieldValues>[]
     | undefined = undefined,
 >(props: FormFieldValueProps<TFieldValues, TFieldName>) {
-  const { control, getValues } = useFormContext<TFieldValues>()
-  const data = useWatch({ control: control, ...props })
+  const { control: _control, getValues } = useFormContext<TFieldValues>()
+  const control = props.control ?? _control
+  const data = useWatch({
+    control: control,
+    disabled: props.disabled,
+    exact: props.exact,
+  })
 
   let value: any
   if ('name' in props && Array.isArray(props.name)) {
