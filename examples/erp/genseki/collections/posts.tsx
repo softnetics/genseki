@@ -82,10 +82,10 @@ export const postsCollection = builder.collection('posts', {
           description: 'The email of the author',
         }),
       })),
-      options: builder.options(async () => {
+      options: async () => {
         const result = await prisma.user.findMany()
         return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
-      }),
+      },
     })),
   })),
 })

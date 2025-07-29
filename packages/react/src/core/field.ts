@@ -481,9 +481,10 @@ export interface FieldsShapeClient extends Record<string, FieldShapeClient> {}
 export interface FieldsClient extends FieldsBase {
   shape: FieldsShapeClient
 }
-export interface FieldsShape extends Record<string, FieldShape> {}
-export interface Fields extends FieldsBase {
-  shape: FieldsShape
+export interface FieldsShape<TContext extends AnyContextable = AnyContextable>
+  extends Record<string, FieldShape<TContext>> {}
+export interface Fields<TContext extends AnyContextable = AnyContextable> extends FieldsBase {
+  shape: FieldsShape<TContext>
 }
 
 // More type utilities
