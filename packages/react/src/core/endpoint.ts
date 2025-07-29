@@ -187,14 +187,6 @@ export function createEndpoint<
   }
 }
 
-export declare function createEndpoint2<
-  const TContext extends AnyContextable,
-  const TApiRouteSchema extends ApiRouteSchema,
->(
-  context: TContext,
-  schema: TApiRouteSchema
-): ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext }
-
 export type AppendApiPathPrefix<TPathPrefix extends string, TApiRouter extends ApiRouter> = {
   [TKey in keyof TApiRouter]: TApiRouter[TKey] extends ApiRoute
     ? {
