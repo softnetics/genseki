@@ -46,7 +46,8 @@ export type {
   FlattenApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export { createEndpoint, isApiRoute } from './endpoint'
+export { createEndpoint, flattenApiRouter, isApiRoute } from './endpoint'
+export * from './error'
 export type {
   FieldClientBase,
   FieldRelationShape,
@@ -87,6 +88,7 @@ export type {
   AnyTypedFieldColumn,
   InferTableType,
   WithHasDefaultValue,
+  WithIsList,
   WithIsRequired,
   WithIsUnique,
 } from './table'
