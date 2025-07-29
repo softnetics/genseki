@@ -796,7 +796,7 @@ export function fieldsShapeToZodObject<TFieldsShape extends FieldsShape>(
           return acc
         }
       }
-      acc[key] = fieldToZodScheama(field)
+      acc[key] = fieldToZodScheama(field) as any
       return acc
     },
     {} as Record<string, z.ZodTypeAny>
