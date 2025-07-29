@@ -45,7 +45,7 @@ async function makeFetch(
 
   const response = await fetch(request)
 
-  return response.json() as any
+  return response.json()
 }
 
 export function createRestClient<TCore extends GensekiCore>(

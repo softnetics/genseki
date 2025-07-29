@@ -44,7 +44,7 @@ export type {
   FlattenApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export { isApiRoute } from './endpoint'
+export { createEndpoint, flattenApiRouter, isApiRoute } from './endpoint'
 export type {
   FieldClientBase,
   FieldRelationShape,

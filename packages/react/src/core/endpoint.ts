@@ -30,6 +30,22 @@ export type FlattenApiRouter<TApiRouter extends AnyApiRouter> = ValueOf<{
       : never
 }>
 
+export function flattenApiRouter<TApiRouter extends AnyApiRouter>(
+  apiRouter: TApiRouter,
+  prefix: string = ''
+): Record<string, ApiRoute> {
+  const flattened: Record<string, ApiRoute> = {}
+  for (const key in apiRouter) {
+    const route = apiRouter[key]
+    if (isApiRoute(route)) {
+      flattened[`${prefix}${key}`] = route
+      continue
+    }
+    Object.assign(flattened, flattenApiRouter(route, `${prefix}${key}.`))
+  }
+  return flattened
+}
+
 export type FilterByMethod<TApiRoute extends ApiRoute, TMethod extends string> = Extract<
   TApiRoute,
   { schema: { method: TMethod } }
