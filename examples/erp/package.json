@@ -10,11 +10,10 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc --noEmit",
+    "codegen": "prisma generate",
     "db:migrate": "prisma migrate dev",
     "db:generate": "prisma generate",
-    "codegen": "prisma generate",
-    "db:reset": "prisma migrate reset",
-    "prisma": "prisma"
+    "db:reset": "prisma migrate reset"
   },
   "dependencies": {
     "@genseki/next": "workspace:^",
@@ -23,7 +22,7 @@
     "@genseki/react": "workspace:^",
     "@genseki/react-query": "workspace:^",
     "@genseki/rest": "workspace:^",
-    "@prisma/client": "6.10.1",
+    "@hookform/resolvers": "^5.2.0",
     "@tailwindcss/postcss": "^4.1.7",
     "@tanstack/react-query": "^5.71.5",
     "@tiptap/extension-color": "^2.14.0",
@@ -39,7 +38,7 @@
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "tailwindcss": "^4.1.7",
-    "zod": "3.25.67"
+    "zod": "4.0.11"
   },
   "devDependencies": {
     "@internal/project-config": "workspace:^",
