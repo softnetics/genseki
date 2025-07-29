@@ -1,6 +1,6 @@
-import type { EmailAndPasswordPluginOptionsWithDefaults } from '.'
+import { type EmailAndPasswordPluginOptionsWithDefaults } from '.'
 import { AccountProvider } from './constant'
-import { verifyPassword } from './utilts'
+import { Password } from './utils'
 
 import type { AnyContextable } from '../../../core/context'
 import { HttpInternalServerError } from '../../../core/error'
@@ -40,7 +40,7 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
     if (!account.password)
       throw new HttpInternalServerError('This account does not support password login')
 
-    const status = verifyPassword(password, account.password)
+    const status = Password.verifyPassword(password, account.password)
     if (!status) throw new HttpInternalServerError('Invalid email or password')
 
     return user.id

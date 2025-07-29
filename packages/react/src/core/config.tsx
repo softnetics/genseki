@@ -1,9 +1,10 @@
 import { type ReactNode } from 'react'
 
+import { deepmerge } from 'deepmerge-ts'
 import * as R from 'remeda'
 
-import type { AnyContextable } from '.'
-import { type AnyApiRouter } from './endpoint'
+import type { AnyContextable, ApiRouter } from '.'
+import { type AnyApiRouter, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
@@ -98,6 +99,7 @@ export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = 
 export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
   // private readonly apiPathPrefix: string
   private readonly plugins: AnyGensekiPlugin[] = []
+  private core: GensekiCore<TMainApiRouter> = {} as GensekiCore<TMainApiRouter>
 
   constructor(private readonly options: GensekiAppOptions) {
     // this.apiPathPrefix = options.apiPrefix ?? '/api'
@@ -105,13 +107,36 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
   apply<const TPlugin extends AnyGensekiPlugin>(
     plugin: TPlugin
-  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
-    this.plugins.push(plugin)
-    // TODO: I don't know why this is needed, need to investigate
-    return this as unknown as GensekiApp<
-      TApiPrefix,
-      TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>
-    >
+  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
+
+  apply<const TApiRouter extends AnyApiRouter = AnyApiRouter>(
+    core: Partial<GensekiCore<TApiRouter>>
+  ): GensekiApp<TApiPrefix, TMainApiRouter & TApiRouter>
+
+  apply(input: any) {
+    if (isGensekiPlugin(input)) {
+      this.plugins.push(input)
+    } else {
+      this.core = {
+        api: { ...(this.core.api ?? {}), ...(input.api ?? {}) },
+        uis: [...(this.core.uis ?? []), ...(input.uis ?? [])],
+      }
+    }
+    return this
+  }
+
+  _logging(router: ApiRouter): string[] {
+    const logs: string[] = []
+    if (isApiRoute(router)) {
+      logs.push(`API Route: ${router.schema.method} ${router.schema.path}`)
+      return logs
+    }
+    Object.entries(router).forEach(([key, value]) => {
+      if (typeof value === 'object' && value !== null) {
+        logs.push(...this._logging(value as ApiRouter))
+      }
+    })
+    return logs
   }
 
   build(): GensekiAppCompiled<TMainApiRouter> {
@@ -122,12 +147,18 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
           ...acc,
         })
         return {
-          api: { ...acc.api, ...pluginCore.api },
+          api: deepmerge(acc.api, pluginCore.api) as TMainApiRouter,
           uis: [...acc.uis, ...(pluginCore.uis ?? [])],
         }
       },
-      { uis: [], api: {} } as unknown as GensekiCore<TMainApiRouter>
+      {
+        uis: this.core.uis ?? [],
+        api: this.core.api ?? {},
+      } as unknown as GensekiCore<TMainApiRouter>
     )
+
+    const logs = this._logging(core.api).sort((a, b) => a.localeCompare(b))
+    logs.forEach((log) => console.log(`${log}`))
 
     return {
       storageAdapter: getStorageAdapterClient({
@@ -214,4 +245,8 @@ export function getFieldsClient(fields: Fields): FieldsClient {
     shape: R.mapValues(fields.shape, (value, key) => getFieldShapeClient(key, value)),
     config: fields.config,
   }
+}
+
+function isGensekiPlugin<TPlugin extends AnyGensekiPlugin>(plugin: any): plugin is TPlugin {
+  return 'name' in plugin && 'plugin' in plugin
 }

@@ -8,13 +8,14 @@ import type {
   AnyTypedFieldColumn,
   AnyUserTable as BaseAnyUserTable,
   DataType,
+  WithIsList,
   WithIsRequired,
 } from '@genseki/react'
 import { Builder, createPlugin } from '@genseki/react'
 
 type AnyUserTable = AnyTable<{
   columns: {
-    role: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
+    roles: WithIsList<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
     banned: AnyTypedFieldColumn<typeof DataType.BOOLEAN>
     bannedReason: AnyTypedFieldColumn<typeof DataType.STRING>
     bannedExpiresAt: AnyTypedFieldColumn<typeof DataType.DATETIME>

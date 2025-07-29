@@ -16,6 +16,7 @@ export interface AnyTypedFieldColumn<T extends DataType> extends FieldColumnSche
 export type WithHasDefaultValue<T> = T & { hasDefaultValue: true }
 export type WithIsRequired<T> = T & { isRequired: true }
 export type WithIsUnique<T> = T & { isUnique: true }
+export type WithIsList<T> = T & { isList: true }
 
 export interface AnyTable<TShape extends ModelShape = ModelShape>
   extends ModelSchema<TShape, ModelConfig> {}

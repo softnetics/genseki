@@ -10,7 +10,7 @@ import { resetPasswordEmail } from './api/reset-password-email'
 import { signOut } from './api/sign-out'
 import { validateResetPasswordToken } from './api/validate-reset-password-token'
 import { EmailAndPasswordService } from './service'
-import { hashPassword } from './utilts'
+import { Password } from './utils'
 import { ForgotPasswordView } from './views/forgot-password/forgot-password'
 import { AuthLayout } from './views/layout'
 import { LoginView } from './views/login'
@@ -64,7 +64,7 @@ interface EmailAndPasswordPluginOptions {
 }
 
 const defaultOptions = {
-  passwordHasher: hashPassword,
+  passwordHasher: Password.hashPassword,
   login: {
     sessionExpiredInMs: 1000 * 60 * 60 * 24, // Default to 24 hours
   },
@@ -170,6 +170,20 @@ export function emailAndPasswordPlugin<
         },
       ]
 
+      if (optionsWithDefaults.setUp?.enabled ?? true) {
+        const View = optionsWithDefaults.setUp.ui
+        uis.push({
+          context: context,
+          path: '/auth/setup',
+          requiredAuthenticated: false,
+          render: (args) => (
+            <AuthLayout>
+              <View />
+            </AuthLayout>
+          ),
+        })
+      }
+
       return {
         api: {
           auth: {
@@ -182,3 +196,5 @@ export function emailAndPasswordPlugin<
     },
   })
 }
+
+export { Password } from './utils'

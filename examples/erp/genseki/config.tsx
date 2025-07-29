@@ -1,7 +1,10 @@
 import { withNextJs } from '@genseki/next'
+import { admin } from '@genseki/plugins'
 import { emailAndPasswordPlugin, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
-import { SignUpPage } from './auth/sign-up'
+import { accessControl } from './access-control'
+import { SetupPage } from './auth/setup/setup'
+import { setupApi } from './auth/setup/setup-api'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
 import { context } from './helper'
@@ -48,7 +51,7 @@ const app = new GensekiApp({
       setUp: {
         enabled: true,
         autoLogin: true,
-        ui: SignUpPage,
+        ui: SetupPage,
       },
       resetPassword: {
         enabled: true,
@@ -59,8 +62,23 @@ const app = new GensekiApp({
       },
     })
   )
+  .apply(
+    admin(context, {
+      schema: {
+        user: FullModelSchemas.user,
+      },
+      accessControl: accessControl,
+    })
+  )
   .apply(usersCollection)
   .apply(postsCollection)
+  .apply({
+    api: {
+      auth: {
+        setup: setupApi,
+      },
+    },
+  })
   .build()
 
 const nextjsApp = withNextJs(app)
