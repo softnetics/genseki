@@ -97,12 +97,13 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
     // Deactivate existing reset password tokens for this user. Set expiredAt to now
     const identifierField = this.options.schema.verification.shape.columns.identifier
     const valueField = this.options.schema.verification.shape.columns.value
+    const userIdField = this.options.schema.verification.shape.columns.userId
     const expiredAtField = this.options.schema.verification.shape.columns.expiredAt
 
     await this.prisma[this.options.schema.verification.config.prismaModelName].updateMany({
       where: {
         [identifierField.name]: { contains: identifier.prefix },
-        [valueField.name]: user.id,
+        [userIdField.name]: user.id,
       },
       data: { [expiredAtField.name]: new Date() },
     })
@@ -111,6 +112,7 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
     const expiredAt = new Date(Date.now() + this.options.resetPassword.expiredInMs)
     await this.prisma[this.options.schema.verification.config.prismaModelName].create({
       data: {
+        [userIdField.name]: user.id,
         [valueField.name]: user.id,
         [identifierField.name]: identifier.value,
         [expiredAtField.name]: expiredAt,
@@ -148,9 +150,16 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
       const accountModelName = this.options.schema.account.config.prismaModelName
       const accountUserIdField = this.options.schema.account.shape.columns.userId
       const accountPasswordField = this.options.schema.account.shape.columns.password
+      const accountProviderField = this.options.schema.account.shape.columns.provider
+      const uniqueFieldName = `${accountUserIdField.name}_provider`
 
       await tx[accountModelName].update({
-        where: { [accountUserIdField.name]: payload.userId, provider: AccountProvider.CREDENTIAL },
+        where: {
+          [uniqueFieldName]: {
+            [accountUserIdField.name]: payload.userId,
+            [accountProviderField.name]: AccountProvider.CREDENTIAL,
+          },
+        },
         data: { [accountPasswordField.name]: hashedPassword },
       })
 

@@ -39,7 +39,7 @@ interface EmailAndPasswordPluginOptions {
   login?: {
     sessionExpiredInMs?: number
   }
-  setUp: {
+  setup: {
     enabled?: boolean
     autoLogin?: boolean
     ui: () => ReactNode
@@ -67,7 +67,7 @@ const defaultOptions = {
   login: {
     sessionExpiredInMs: 1000 * 60 * 60 * 24, // Default to 24 hours
   },
-  setUp: {
+  setup: {
     enabled: true,
   },
   changePassword: {
@@ -111,8 +111,8 @@ export function emailAndPasswordPlugin<
 
   const service = new EmailAndPasswordService(context, options)
 
-  const setUpMiddleware: GensekiMiddleware = async (args) => {
-    if (!options.setUp.enabled) return
+  const setupMiddleware: GensekiMiddleware = async (args) => {
+    if (!options.setup.enabled) return
     const count = await service.userCounts()
     if (count > 0) return
     if (args.pathname.includes('/auth/setup')) return
@@ -122,8 +122,8 @@ export function emailAndPasswordPlugin<
   return createPlugin({
     name: 'auth',
     plugin: (input) => {
-      if (_options.setUp.enabled) {
-        input.middlewares?.push(setUpMiddleware)
+      if (_options.setup.enabled) {
+        input.middlewares?.push(setupMiddleware)
       }
 
       const api = {
@@ -196,15 +196,15 @@ export function emailAndPasswordPlugin<
         }),
       ]
 
-      if (options.setUp?.enabled ?? true) {
-        const View = options.setUp.ui
+      if (options.setup?.enabled ?? true) {
+        const View = options.setup.ui
         uis.push(
           createGensekiUiRoute({
             context: context,
             path: '/auth/setup',
             requiredAuthenticated: false,
             render: async () => {
-              if (!options.setUp?.enabled) {
+              if (!options.setup?.enabled) {
                 throw new Error('Set up is not enabled')
               }
 

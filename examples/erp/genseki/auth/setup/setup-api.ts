@@ -1,11 +1,9 @@
 import { z } from 'zod/v4'
 
-import { createEndpoint } from '../../../../../packages/react/src/core/endpoint'
-import { context } from '../../helper'
+import { builder } from '../../helper'
 import { AuthService } from '../../services/auth.service'
 
-export const setupApi = createEndpoint(
-  context,
+export const setupApi = builder.endpoint(
   {
     method: 'POST',
     path: '/auth/setup',

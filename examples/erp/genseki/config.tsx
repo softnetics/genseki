@@ -48,7 +48,7 @@ const app = new GensekiApp({
         account: FullModelSchemas.account,
         verification: FullModelSchemas.verification,
       },
-      setUp: {
+      setup: {
         enabled: true,
         autoLogin: true,
         ui: SetupPage,

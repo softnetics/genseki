@@ -61,6 +61,7 @@ export type AnyVerificationTable = AnyTable<{
     id: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
     identifier: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
     value: AnyTypedFieldColumn<typeof DataType.STRING>
+    userId: WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>
     expiredAt: WithIsRequired<AnyTypedFieldColumn<typeof DataType.DATETIME>>
     createdAt: WithHasDefaultValue<WithIsRequired<AnyTypedFieldColumn<typeof DataType.DATETIME>>>
   }
