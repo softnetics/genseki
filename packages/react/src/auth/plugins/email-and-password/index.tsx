@@ -1,3 +1,5 @@
+import type { ReactNode } from 'react'
+
 import { defu } from 'defu'
 import type { PartialDeep } from 'type-fest'
 import { z, type ZodString } from 'zod/v4'
@@ -6,7 +8,6 @@ import { loginEmail } from './api/login'
 import { requestResetPassword } from './api/request-reset-password'
 import { resetPasswordEmail } from './api/reset-password-email'
 import { signOut } from './api/sign-out'
-import { signUpEmail } from './api/sign-up'
 import { validateResetPasswordToken } from './api/validate-reset-password-token'
 import { EmailAndPasswordService } from './service'
 import { hashPassword } from './utilts'
@@ -14,12 +15,11 @@ import { ForgotPasswordView } from './views/forgot-password/forgot-password'
 import { AuthLayout } from './views/layout'
 import { LoginView } from './views/login'
 import { ResetPasswordView } from './views/reset-password/reset-password'
-import { SignUpView } from './views/sign-up'
 
+import type { MaybePromise } from '../../../core/collection'
 import { createPlugin, type GensekiUiRouter } from '../../../core/config'
 import type { AnyContextable } from '../../../core/context'
 import { createEndpoint } from '../../../core/endpoint'
-import type { Fields } from '../../../core/field'
 import { GensekiUiCommonId } from '../../../core/ui'
 import type {
   AnyAccountTable,
@@ -28,7 +28,7 @@ import type {
   AnyVerificationTable,
 } from '../../base'
 
-interface EmailAndPasswordPluginOptions<TFields extends Fields = Fields> {
+interface EmailAndPasswordPluginOptions {
   schema: {
     user: AnyUserTable
     session: AnySessionTable
@@ -40,13 +40,14 @@ interface EmailAndPasswordPluginOptions<TFields extends Fields = Fields> {
   login?: {
     sessionExpiredInMs?: number
   }
-  signUp?: {
+  setUp: {
+    enabled?: boolean | (() => MaybePromise<boolean>)
     autoLogin?: boolean
-    additionalFields?: TFields
+    ui: () => ReactNode
   }
   changePassword?: {
     enabled?: boolean
-    enabledPasswordNotSameAsCurrent?: boolean
+    enableSamePassword?: boolean
   }
   resetPassword?: {
     enabled?: boolean
@@ -67,12 +68,9 @@ const defaultOptions = {
   login: {
     sessionExpiredInMs: 1000 * 60 * 60 * 24, // Default to 24 hours
   },
-  signUp: {
-    autoLogin: true,
-  },
   changePassword: {
     enabled: true,
-    enabledPasswordNotSameAsCurrent: true,
+    enableSamePassword: true,
   },
   resetPassword: {
     enabled: false,
@@ -81,14 +79,12 @@ const defaultOptions = {
   },
 } satisfies PartialDeep<EmailAndPasswordPluginOptions>
 
-export type EmailAndPasswordPluginOptionsWithDefaults<TFields extends Fields = Fields> = ReturnType<
-  typeof defu<EmailAndPasswordPluginOptions<TFields>, [typeof defaultOptions]>
+export type EmailAndPasswordPluginOptionsWithDefaults = ReturnType<
+  typeof defu<EmailAndPasswordPluginOptions, [typeof defaultOptions]>
 >
-
 export function emailAndPasswordPlugin<
   TContext extends AnyContextable,
-  TSignUpFields extends Fields,
-  TOptions extends EmailAndPasswordPluginOptions<TSignUpFields>,
+  TOptions extends EmailAndPasswordPluginOptions,
 >(context: TContext, options: TOptions) {
   const optionsWithDefaults = defu(options, defaultOptions)
 
@@ -118,7 +114,6 @@ export function emailAndPasswordPlugin<
 
       const api = {
         //  No authentication required
-        signUpEmail: signUpEmail(service),
         loginEmail: loginEmail(service),
         signOut: signOut(service),
         resetPasswordEmail: resetPasswordEmail(service),
@@ -135,17 +130,6 @@ export function emailAndPasswordPlugin<
           render: (args) => (
             <AuthLayout>
               <LoginView {...args} {...args.params} />
-            </AuthLayout>
-          ),
-        },
-        {
-          id: GensekiUiCommonId.AUTH_SIGNUP,
-          context: context,
-          path: '/auth/sign-up',
-          requiredAuthenticated: false,
-          render: (args) => (
-            <AuthLayout>
-              <SignUpView {...args} {...args.params} />
             </AuthLayout>
           ),
         },

@@ -1,3 +1,5 @@
+'use client'
+
 import { createQueryClient } from '@genseki/react-query'
 import { createRestClient } from '@genseki/rest'
 

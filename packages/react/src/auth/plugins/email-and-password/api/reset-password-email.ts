@@ -3,13 +3,11 @@ import z from 'zod/v4'
 import type { AnyContextable } from '../../../../core/context'
 import { createEndpoint } from '../../../../core/endpoint'
 import { HttpUnauthorizedError } from '../../../../core/error'
-import type { Fields } from '../../../../core/field'
 import type { EmailAndPasswordService } from '../service'
 
 export function resetPasswordEmail<
   TContext extends AnyContextable,
-  TSignUpFields extends Fields,
-  TService extends EmailAndPasswordService<TContext, TSignUpFields>,
+  TService extends EmailAndPasswordService<TContext>,
 >(service: TService) {
   return createEndpoint(
     service.context,
@@ -41,7 +39,9 @@ export function resetPasswordEmail<
         rawPassword: payload.body.password,
       })
 
-      response.headers.set('Location', service.options.resetPassword.successRedirectUrl)
+      if (service.options.resetPassword.successRedirectUrl) {
+        response.headers.set('Location', service.options.resetPassword.successRedirectUrl)
+      }
 
       return {
         status: 200,

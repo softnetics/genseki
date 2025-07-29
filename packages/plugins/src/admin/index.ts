@@ -20,24 +20,36 @@ type AnyUserTable = AnyTable<{
     bannedExpiresAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
   }
   relations: {}
+  uniqueFields: string[][]
+  primaryFields: string[]
 }> &
   BaseAnyUserTable
 
-interface AccessControlStatements extends Record<string, string[]> {}
+type AccessControlStatements = {
+  [K in string]: string[] | AccessControlStatements
+}
 
-// TODO: Add its UI page for this plugin
 export interface AdminPluginOptions {
+  schema: {
+    user: AnyUserTable
+  }
   accessControl: AccessControl<any, any>
 }
 
 type GetAccessControlPermission<TStatements extends AccessControlStatements> = ValueOf<{
   [K in keyof TStatements]: TStatements[K] extends (infer U extends string)[]
     ? `${Extract<K, string>}.${U}`
-    : never
+    : TStatements[K] extends AccessControlStatements
+      ? `${Extract<K, string>}.${GetAccessControlPermission<TStatements[K]>}`
+      : never
 }>
 
 type GetPartialStatement<TStatements extends AccessControlStatements> = {
-  [K in keyof TStatements]?: TStatements[K] extends (infer U extends string)[] ? U[] : never
+  [K in keyof TStatements]?: TStatements[K] extends (infer U extends string)[]
+    ? U[]
+    : TStatements[K] extends AccessControlStatements
+      ? GetPartialStatement<TStatements[K]>
+      : never
 }
 
 type AccessControlRoles<TStatements extends AccessControlStatements> = {
@@ -53,15 +65,27 @@ class AccessControl<
     public readonly roles: TRoles
   ) {}
 
+  private _isNestedContain(
+    rolePermissions: AccessControlStatements,
+    permissions: string[]
+  ): boolean {
+    if (permissions.length === 0) return false
+    const head = permissions.shift()
+    if (!head) return false
+    const value = rolePermissions[head]
+    if (Array.isArray(value) && value.includes(permissions[0])) {
+      return true
+    } else if (typeof value === 'object' && !Array.isArray(value)) {
+      return this._isNestedContain(value, permissions)
+    }
+    return false
+  }
+
   hasPermission(role: string, permission: GetAccessControlPermission<TStatements>): boolean {
     const rolePermissions = this.roles[role]
     if (!rolePermissions) return false
-
-    const [statement, action] = permission.split('.')
-    const actions = rolePermissions[statement as keyof typeof rolePermissions]
-    if (!actions) return false
-
-    return actions.includes(action as string)
+    const permissions = permission.split('.')
+    return this._isNestedContain(rolePermissions as AccessControlStatements, permissions)
   }
 
   hasPermissions(role: string, permissions: GetAccessControlPermission<TStatements>[]): boolean {
@@ -97,16 +121,9 @@ export function mergeAccessControl<
   )
 }
 
-// TODO: TFullSchema should be Generic but it is not working with the current setup
 export function admin<TContext extends AnyContextable>(
   context: TContext,
-  options: {
-    schema: {
-      user: AnyUserTable
-    }
-    options: AdminPluginOptions
-    accessControl: AccessControl
-  }
+  options: AdminPluginOptions
 ) {
   return createPlugin({
     name: 'admin',
@@ -130,7 +147,7 @@ export function admin<TContext extends AnyContextable>(
         },
         ({ body }) => {
           const { role, permission } = body
-          const ok = options.accessControl.hasPermission(role, permission as `${string}.${string}`)
+          const ok = options.accessControl.hasPermission(role, permission as never)
           return {
             status: 200 as const,
             body: { ok: ok },
@@ -154,10 +171,7 @@ export function admin<TContext extends AnyContextable>(
         },
         ({ body }) => {
           const { role, permissions } = body
-          const ok = options.accessControl.hasPermissions(
-            role,
-            permissions as `${string}.${string}`[]
-          )
+          const ok = options.accessControl.hasPermissions(role, permissions as never[])
           return {
             status: 200 as const,
             body: { ok: ok },

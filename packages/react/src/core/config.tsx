@@ -4,7 +4,7 @@ import * as R from 'remeda'
 
 import type { AnyContextable } from '.'
 import { type AnyApiRouter } from './endpoint'
-import type { Fields, FieldsClient, FieldShapeBase, FieldShapeClient } from './field'
+import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
   type StorageAdapter,
@@ -141,15 +141,15 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 }
 
-export function getFieldClient(
+export function getFieldShapeClient(
   name: string,
-  fieldShape: FieldShapeBase
+  fieldShape: FieldShape
 ): FieldShapeClient & { $client: { fieldName: string } } {
   if (isRelationFieldShape(fieldShape)) {
     if (fieldShape.$client.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
         Object.entries(fieldShape.fields.shape).map(([key, value]) => {
-          return [key, getFieldClient(key, value)]
+          return [key, getFieldShapeClient(key, value)]
         })
       )
 
@@ -211,7 +211,7 @@ export function getFieldClient(
 
 export function getFieldsClient(fields: Fields): FieldsClient {
   return {
-    shape: R.mapValues(fields.shape, (value, key) => getFieldClient(key, value)),
+    shape: R.mapValues(fields.shape, (value, key) => getFieldShapeClient(key, value)),
     config: fields.config,
   }
 }

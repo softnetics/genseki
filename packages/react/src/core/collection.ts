@@ -15,7 +15,7 @@ import {
   type FieldRelationShapeBase,
   type Fields,
   type FieldsClient,
-  type FieldShapeBase,
+  type FieldShape,
   type FieldShapeClient,
   type FieldsShape,
 } from './field'
@@ -156,7 +156,7 @@ export type InferMutationRelationField<TField extends FieldRelationShapeBase> =
     ? Simplify<InferManyRelationMutationFieldShape<TField>>
     : Simplify<InferOneRelationMutationFieldShape<TField>>
 
-export type InferUpdateFieldShape<TFieldShape extends FieldShapeBase> =
+export type InferUpdateFieldShape<TFieldShape extends FieldShape> =
   TFieldShape extends FieldRelationShapeBase
     ? TFieldShape extends FieldRelationCreateShape
       ? Simplify<
@@ -179,14 +179,14 @@ export type InferUpdateFieldShape<TFieldShape extends FieldShapeBase> =
 
 export type InferUpdateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShapeBase
+    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShape
       ? Simplify<InferUpdateFieldShape<TFieldsShape[TKey]>>
       : never
   },
   never
 >
 
-export type InferCreateFieldShape<TFieldShape extends FieldShapeBase> =
+export type InferCreateFieldShape<TFieldShape extends FieldShape> =
   TFieldShape extends FieldRelationShapeBase
     ? TFieldShape extends FieldRelationCreateShape
       ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create'>>
@@ -207,7 +207,7 @@ export type InferCreateFieldShape<TFieldShape extends FieldShapeBase> =
 
 export type InferCreateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TShapeKey in keyof TFieldsShape]: TFieldsShape[TShapeKey] extends FieldShapeBase
+    [TShapeKey in keyof TFieldsShape]: TFieldsShape[TShapeKey] extends FieldShape
       ? InferCreateFieldShape<TFieldsShape[TShapeKey]>
       : never
   },
@@ -436,182 +436,6 @@ export interface CollectionOptionsClient {
   identifierColumn: string
   fields: FieldsClient
 }
-
-// export function getDefaultCollectionAdminApiRouter(
-//   context: AnyContextable,
-//   slug: string,
-//   fields: Fields,
-//   defaultHandler: CollectionAdminApiOptions<AnyContextable, Fields>
-// ): CollectionDefaultAdminApiRouter<string, Fields> {
-//   return Object.fromEntries(
-//     Object.entries(defaultHandler).map(([method, fn]) => {
-//       const endpointName = method
-//       switch (method) {
-//         case ApiDefaultMethod.CREATE: {
-//           // TODO: Create ApiRouteSchema from fields and method
-//           const body = fieldsToZodObject(fields as any, ApiDefaultMethod.CREATE)
-
-//           const endpoint = createEndpoint(
-//             context,
-//             {
-//               path: `/${slug}`,
-//               method: 'POST',
-//               // TODO: fieldToZodObject but create fields
-//               body: body,
-//               responses: {
-//                 200: z.object({
-//                   __pk: z.union([z.string(), z.number()]),
-//                   __id: z.union([z.string(), z.number()]),
-//                 }),
-//               },
-//             },
-//             async (args) => {
-//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-//                 slug: slug,
-//                 fields: fields,
-//                 context: args.context,
-//                 data: args.body as any,
-//               })
-//               return { status: 200, body: response }
-//             }
-//           )
-
-//           return [endpointName, endpoint]
-//         }
-//         case ApiDefaultMethod.FIND_ONE: {
-//           const response = fieldsToZodObject(fields as any)
-
-//           const endpoint = createEndpoint(
-//             context,
-//             {
-//               path: `/${slug}/:id`,
-//               method: 'GET',
-//               pathParams: z.object({
-//                 id: z.union([z.string(), z.number()]),
-//               }),
-//               responses: {
-//                 200: response,
-//               },
-//             },
-//             async (args) => {
-//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-//                 slug: slug,
-//                 fields: fields,
-//                 context: args.context,
-//                 id: args.pathParams.id,
-//               })
-//               return { status: 200, body: response }
-//             }
-//           )
-
-//           return [endpointName, endpoint]
-//         }
-//         case ApiDefaultMethod.FIND_MANY: {
-//           const body = fieldsToZodObject(fields as any)
-//           const response = z.object({
-//             data: z.array(body),
-//             total: z.number(),
-//             page: z.number(),
-//           })
-
-//           const endpoint = createEndpoint(
-//             context,
-//             {
-//               path: `/${slug}`,
-//               method: 'GET',
-//               query: z.object({
-//                 limit: z.number().optional(),
-//                 offset: z.number().optional(),
-//                 orderBy: z.string().optional(),
-//                 orderType: z.enum(['asc', 'desc']).optional(),
-//               }),
-//               responses: {
-//                 200: response,
-//               },
-//             },
-//             async (args) => {
-//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-//                 slug: slug,
-//                 fields: fields,
-//                 context: args.context,
-//                 limit: args.query.limit,
-//                 offset: args.query.offset,
-//                 orderBy: args.query.orderBy,
-//                 orderType: args.query.orderType,
-//               })
-//               return { status: 200, body: response }
-//             }
-//           )
-
-//           return [endpointName, endpoint]
-//         }
-//         case ApiDefaultMethod.UPDATE: {
-//           const body = fieldsToZodObject(fields as any, ApiDefaultMethod.UPDATE)
-
-//           const endpoint = createEndpoint(
-//             context,
-//             {
-//               path: `/${slug}/:id`,
-//               method: 'PATCH',
-//               pathParams: z.object({
-//                 id: z.union([z.string(), z.number()]),
-//               }),
-//               // TODO: fieldToZodObject but update fields
-//               body: body,
-//               responses: {
-//                 200: z.object({
-//                   __pk: z.union([z.string(), z.number()]),
-//                   __id: z.union([z.string(), z.number()]),
-//                 }),
-//               },
-//             },
-//             async (args) => {
-//               const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-//                 slug: slug,
-//                 fields: fields,
-//                 context: args.context,
-//                 id: args.pathParams.id,
-//                 data: args.body as any, // TODO: Fix this
-//               })
-//               return { status: 200, body: response }
-//             }
-//           )
-
-//           return [endpointName, endpoint]
-//         }
-//         case ApiDefaultMethod.DELETE: {
-//           const endpoint = createEndpoint(
-//             context,
-//             {
-//               path: `/${slug}`,
-//               method: 'DELETE',
-//               body: z.object({
-//                 ids: z.union([z.string().array(), z.number().array()]),
-//               }),
-//               responses: {
-//                 200: z.object({ message: z.string() }),
-//               },
-//             },
-//             async (args) => {
-//               await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-//                 slug,
-//                 fields,
-//                 context: args.context,
-//                 ids: args.body.ids,
-//               })
-//               return { status: 200, body: { message: 'ok' } }
-//             }
-//           )
-
-//           return [endpointName, endpoint]
-//         }
-//         default: {
-//           throw new Error(`Unknown method ${method} for collection ${slug}`)
-//         }
-//       }
-//     })
-//   )
-// }
 
 export function getCollectionOptionsClient<TContext extends AnyContextable, TFields extends Fields>(
   slug: string,

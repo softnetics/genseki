@@ -2,14 +2,12 @@ import z from 'zod/v4'
 
 import type { AnyContextable } from '../../../../core/context'
 import { createEndpoint } from '../../../../core/endpoint'
-import type { Fields } from '../../../../core/field'
 import { ResponseHelper } from '../../../utils'
 import type { EmailAndPasswordService } from '../service'
 
 export function loginEmail<
   TContext extends AnyContextable,
-  TSignUpFields extends Fields,
-  TService extends EmailAndPasswordService<TContext, TSignUpFields>,
+  TService extends EmailAndPasswordService<TContext>,
 >(service: TService) {
   return createEndpoint(
     service.context,

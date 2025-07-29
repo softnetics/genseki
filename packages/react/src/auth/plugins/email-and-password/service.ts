@@ -4,84 +4,18 @@ import { verifyPassword } from './utilts'
 
 import type { AnyContextable } from '../../../core/context'
 import { HttpInternalServerError } from '../../../core/error'
-import type { Fields } from '../../../core/field'
 import type { MockPrismaClient } from '../../../core/prisma.types'
 import type { InferTableType } from '../../../core/table'
 import type { AnyAccountTable, AnyUserTable, AnyVerificationTable } from '../../base'
 
-export class EmailAndPasswordService<
-  TContext extends AnyContextable,
-  TSignUpFields extends Fields,
-> {
+export class EmailAndPasswordService<TContext extends AnyContextable> {
   private readonly prisma: MockPrismaClient
 
   constructor(
     public readonly context: TContext,
-    public readonly options: EmailAndPasswordPluginOptionsWithDefaults<TSignUpFields>
+    public readonly options: EmailAndPasswordPluginOptionsWithDefaults
   ) {
     this.prisma = context.getPrismaClient()
-  }
-
-  async createUserWithEmail(data: {
-    user: Omit<InferTableType<AnyUserTable>, 'id' | 'emailVerified'>
-    account: { rawPassword: string }
-  }) {
-    const userModelName = this.options.schema.user.config.prismaModelName
-    const emailField = this.options.schema.user.shape.columns.email
-
-    const result = await this.prisma.$transaction(async (tx) => {
-      const existingUser = (await tx[userModelName].findUnique({
-        where: {
-          [emailField.name]: data.user.email,
-        },
-      })) as InferTableType<AnyUserTable> | undefined
-
-      if (existingUser) {
-        throw new Error('User with this email already exists')
-      }
-
-      const user = (await tx[userModelName].create({
-        data: {
-          ...data.user,
-          emailVerified: false, // Set to false for new users
-        },
-      })) as InferTableType<AnyUserTable>
-
-      const accountModelName = this.options.schema.account.config.prismaModelName
-      const accountProviderField = this.options.schema.account.shape.columns.provider
-      const accountUserIdField = this.options.schema.account.shape.columns.userId
-      const accountAccountIdField = this.options.schema.account.shape.columns.accountId
-      const accountPasswordField = this.options.schema.account.shape.columns.password
-
-      const existingAccount = (await tx[accountModelName].findFirst({
-        where: {
-          [accountUserIdField.name]: user.id,
-          [accountProviderField.name]: AccountProvider.CREDENTIAL,
-        },
-      })) as InferTableType<AnyAccountTable> | undefined
-
-      if (existingAccount) {
-        throw new Error('Account with this user already exists')
-      }
-
-      const hashedPassword = await this.options.passwordHasher(data.account.rawPassword)
-
-      const account = (await tx[accountModelName].create({
-        data: {
-          [accountUserIdField.name]: user.id,
-          [accountAccountIdField.name]: user.id,
-          [accountProviderField.name]: AccountProvider.CREDENTIAL,
-          [accountPasswordField.name]: hashedPassword,
-        },
-      })) as InferTableType<AnyAccountTable>
-
-      return {
-        user: user,
-        account: account,
-      }
-    })
-
-    return result
   }
 
   async loginWithEmail(email: string, password: string) {

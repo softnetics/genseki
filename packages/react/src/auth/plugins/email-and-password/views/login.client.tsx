@@ -6,18 +6,18 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
 import { z } from 'zod'
 
-import { SubmitButton } from '../../react/components/compound/submit-button'
+import { SubmitButton } from '../../../../react/components/compound/submit-button'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
-  Link,
-  TextField,
-} from '../../react/components/primitives'
-import { useNavigation } from '../../react/providers/navigation'
-import { useServerFunction } from '../../react/providers/root'
+} from '../../../../react/components/primitives/form'
+import { Link } from '../../../../react/components/primitives/link'
+import { TextField } from '../../../../react/components/primitives/text-field'
+import { useNavigation } from '../../../../react/providers/navigation'
+import { useServerFunction } from '../../../../react/providers/root'
 
 const FormSchema = z.object({
   email: z.string().email({ message: 'Invalid email address' }),

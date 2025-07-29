@@ -1,6 +1,7 @@
 import { LoginClientForm } from './login.client'
 
-import { ButtonLink, Typography } from '../../react/components/primitives'
+import { ButtonLink } from '../../../../react/components/primitives/button'
+import { Typography } from '../../../../react/components/primitives/typography'
 
 interface SignInViewProps {}
 

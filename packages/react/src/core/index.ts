@@ -46,7 +46,7 @@ export type {
   FlattenApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export { isApiRoute } from './endpoint'
+export { createEndpoint, isApiRoute } from './endpoint'
 export type {
   FieldClientBase,
   FieldRelationShape,
@@ -90,4 +90,4 @@ export type {
   WithIsRequired,
   WithIsUnique,
 } from './table'
-export { getDefaultValueFromFieldsClient as getDefaultValueFromFields } from './utils'
+export { getDefaultValueFromFieldsClient } from './utils'

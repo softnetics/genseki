@@ -1,6 +1,7 @@
 import { withNextJs } from '@genseki/next'
 import { emailAndPasswordPlugin, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
+import { SignUpPage } from './auth/sign-up'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
 import { context } from './helper'
@@ -43,6 +44,11 @@ const app = new GensekiApp({
         session: FullModelSchemas.session,
         account: FullModelSchemas.account,
         verification: FullModelSchemas.verification,
+      },
+      setUp: {
+        enabled: true,
+        autoLogin: true,
+        ui: SignUpPage,
       },
       resetPassword: {
         enabled: true,
