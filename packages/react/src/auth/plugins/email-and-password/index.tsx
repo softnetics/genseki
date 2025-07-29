@@ -13,11 +13,10 @@ import { EmailAndPasswordService } from './service'
 import { Password } from './utils'
 import { ForgotPasswordView } from './views/forgot-password/forgot-password'
 import { AuthLayout } from './views/layout'
-import { LoginView } from './views/login'
+import { LoginView } from './views/login/login'
 import { ResetPasswordView } from './views/reset-password/reset-password'
 
-import type { MaybePromise } from '../../../core/collection'
-import { createPlugin, type GensekiUiRouter } from '../../../core/config'
+import { createGensekiUiRoute, createPlugin, type GensekiMiddleware } from '../../../core/config'
 import type { AnyContextable } from '../../../core/context'
 import { createEndpoint } from '../../../core/endpoint'
 import { GensekiUiCommonId } from '../../../core/ui'
@@ -41,7 +40,7 @@ interface EmailAndPasswordPluginOptions {
     sessionExpiredInMs?: number
   }
   setUp: {
-    enabled?: boolean | (() => MaybePromise<boolean>)
+    enabled?: boolean
     autoLogin?: boolean
     ui: () => ReactNode
   }
@@ -68,6 +67,9 @@ const defaultOptions = {
   login: {
     sessionExpiredInMs: 1000 * 60 * 60 * 24, // Default to 24 hours
   },
+  setUp: {
+    enabled: true,
+  },
   changePassword: {
     enabled: true,
     enableSamePassword: true,
@@ -85,8 +87,8 @@ export type EmailAndPasswordPluginOptionsWithDefaults = ReturnType<
 export function emailAndPasswordPlugin<
   TContext extends AnyContextable,
   TOptions extends EmailAndPasswordPluginOptions,
->(context: TContext, options: TOptions) {
-  const optionsWithDefaults = defu(options, defaultOptions)
+>(context: TContext, _options: TOptions) {
+  const options = defu(_options, defaultOptions)
 
   const meApi = createEndpoint(
     context,
@@ -107,10 +109,22 @@ export function emailAndPasswordPlugin<
     }
   )
 
+  const service = new EmailAndPasswordService(context, options)
+
+  const setUpMiddleware: GensekiMiddleware = async (args) => {
+    if (!options.setUp.enabled) return
+    const count = await service.userCounts()
+    if (count > 0) return
+    if (args.pathname.includes('/auth/setup')) return
+    return { redirect: `/admin/auth/setup` }
+  }
+
   return createPlugin({
     name: 'auth',
     plugin: (input) => {
-      const service = new EmailAndPasswordService(context, optionsWithDefaults)
+      if (_options.setUp.enabled) {
+        input.middlewares?.push(setUpMiddleware)
+      }
 
       const api = {
         //  No authentication required
@@ -121,35 +135,47 @@ export function emailAndPasswordPlugin<
         sendEmailResetPassword: requestResetPassword(service),
       } as const
 
-      const uis: GensekiUiRouter[] = [
-        {
+      const uis = [
+        createGensekiUiRoute({
           id: GensekiUiCommonId.AUTH_LOGIN,
           context: context,
           path: '/auth/login',
           requiredAuthenticated: false,
-          render: (args) => (
-            <AuthLayout>
-              <LoginView {...args} {...args.params} />
-            </AuthLayout>
-          ),
-        },
-        {
+          render: (args) => {
+            return (
+              <AuthLayout>
+                <LoginView {...args} {...args.params} />
+              </AuthLayout>
+            )
+          },
+        }),
+        createGensekiUiRoute({
           id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
           context: context,
           path: '/auth/forgot-password',
           requiredAuthenticated: false,
-          render: (args) => (
-            <AuthLayout>
-              <ForgotPasswordView {...args} {...args.params} />
-            </AuthLayout>
-          ),
-        },
-        {
+          render: (args) => {
+            if (!options.resetPassword.enabled) {
+              throw new Error('Reset password is not enabled')
+            }
+
+            return (
+              <AuthLayout>
+                <ForgotPasswordView {...args} {...args.params} />
+              </AuthLayout>
+            )
+          },
+        }),
+        createGensekiUiRoute({
           id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
           context: context,
           path: '/auth/reset-password',
           requiredAuthenticated: false,
           render: (args) => {
+            if (!options.resetPassword.enabled) {
+              throw new Error('Reset password is not enabled')
+            }
+
             return (
               <AuthLayout>
                 <ResetPasswordView
@@ -167,21 +193,34 @@ export function emailAndPasswordPlugin<
               </AuthLayout>
             )
           },
-        },
+        }),
       ]
 
-      if (optionsWithDefaults.setUp?.enabled ?? true) {
-        const View = optionsWithDefaults.setUp.ui
-        uis.push({
-          context: context,
-          path: '/auth/setup',
-          requiredAuthenticated: false,
-          render: (args) => (
-            <AuthLayout>
-              <View />
-            </AuthLayout>
-          ),
-        })
+      if (options.setUp?.enabled ?? true) {
+        const View = options.setUp.ui
+        uis.push(
+          createGensekiUiRoute({
+            context: context,
+            path: '/auth/setup',
+            requiredAuthenticated: false,
+            render: async () => {
+              if (!options.setUp?.enabled) {
+                throw new Error('Set up is not enabled')
+              }
+
+              const count = await service.userCounts()
+              if (count > 0) {
+                return { redirect: '/admin/auth/login', type: 'replace' }
+              }
+
+              return (
+                <AuthLayout>
+                  <View />
+                </AuthLayout>
+              )
+            },
+          })
+        )
       }
 
       return {

@@ -18,6 +18,11 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
     this.prisma = context.getPrismaClient()
   }
 
+  async userCounts() {
+    const modelName = this.options.schema.user.config.prismaModelName
+    return this.prisma[modelName].count()
+  }
+
   async loginWithEmail(email: string, password: string) {
     const modelName = this.options.schema.user.config.prismaModelName
     const emailField = this.options.schema.user.shape.columns.email

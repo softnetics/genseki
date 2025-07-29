@@ -3,7 +3,8 @@ import { type ReactNode } from 'react'
 import { deepmerge } from 'deepmerge-ts'
 import * as R from 'remeda'
 
-import type { AnyContextable, ApiRouter } from '.'
+import type { AnyContextable, AnyRequestContextable, ApiRouter } from '.'
+import type { MaybePromise } from './collection'
 import { type AnyApiRouter, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
@@ -14,7 +15,7 @@ import {
 import { getEditorProviderClientProps } from './richtext'
 import { isMediaFieldShape, isRelationFieldShape, isRichTextFieldShape } from './utils'
 
-import type { AppSideBarBuilderProps } from '../react'
+import { type AppSideBarBuilderProps, NotAuthorizedPage } from '../react'
 
 interface RenderArgs {
   pathname: string
@@ -26,6 +27,8 @@ interface RenderArgs {
 // TODO: Fix this type
 interface AuthenticatedRenderArgs extends RenderArgs {}
 
+type RenderResult = MaybePromise<ReactNode | { redirect: string; type: 'push' | 'replace' }>
+
 // TODO: Revise this one
 export type GensekiUiRouter<TProps = any> =
   | {
@@ -33,7 +36,7 @@ export type GensekiUiRouter<TProps = any> =
       context: AnyContextable
       id?: string
       path: string
-      render: (args: AuthenticatedRenderArgs & { props: TProps }) => ReactNode
+      render: (args: AuthenticatedRenderArgs & { props: TProps }) => RenderResult
       props?: TProps
     }
   | {
@@ -41,7 +44,7 @@ export type GensekiUiRouter<TProps = any> =
       context: AnyContextable
       id?: string
       path: string
-      render: (args: RenderArgs & { props: TProps }) => ReactNode
+      render: (args: RenderArgs & { props: TProps }) => RenderResult
       props?: TProps
     }
 
@@ -50,6 +53,18 @@ export function createGensekiUiRoute<TProps extends Record<string, unknown>>(
 ): GensekiUiRouter<TProps> {
   return args
 }
+
+interface GensekiMiddlewareArgs {
+  context: AnyRequestContextable
+  pathname: string
+  params: Record<string, string>
+  searchParams: { [key: string]: string | string[] }
+  ui: GensekiUiRouter
+}
+
+export type GensekiMiddleware = (
+  args: GensekiMiddlewareArgs
+) => MaybePromise<void | ReactNode | { redirect: string } | Error>
 
 export interface GensekiAppOptions {
   title: string
@@ -61,6 +76,7 @@ export interface GensekiAppOptions {
   }
   sidebar?: AppSideBarBuilderProps
   storageAdapter?: StorageAdapter
+  middlewares?: GensekiMiddleware[]
 }
 
 export interface GensekiPluginOptions extends GensekiAppOptions, GensekiCore<AnyApiRouter> {}
@@ -72,6 +88,7 @@ export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
 
 export interface GensekiAppCompiled<TApiRouter extends AnyApiRouter = AnyApiRouter>
   extends GensekiCore<TApiRouter> {
+  middlewares?: GensekiMiddleware[]
   storageAdapter?: StorageAdapterClient
 }
 
@@ -96,13 +113,24 @@ export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = 
   TPlugin['plugin']
 >['api']
 
+const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddlewareArgs) => {
+  if (args.ui.requiredAuthenticated) {
+    try {
+      await args.context.requiredAuthenticated()
+    } catch (error) {
+      return <NotAuthorizedPage redirectURL="/admin/auth/login" />
+    }
+  }
+}
+
 export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
   // private readonly apiPathPrefix: string
   private readonly plugins: AnyGensekiPlugin[] = []
   private core: GensekiCore<TMainApiRouter> = {} as GensekiCore<TMainApiRouter>
 
   constructor(private readonly options: GensekiAppOptions) {
-    // this.apiPathPrefix = options.apiPrefix ?? '/api'
+    this.options.middlewares = this.options.middlewares ?? []
+    this.options.middlewares.push(unauthorizedMiddleware)
   }
 
   apply<const TPlugin extends AnyGensekiPlugin>(
@@ -161,6 +189,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     logs.forEach((log) => console.log(`${log}`))
 
     return {
+      middlewares: this.options.middlewares,
       storageAdapter: getStorageAdapterClient({
         storageAdapter: this.options.storageAdapter,
         grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
