@@ -16,7 +16,6 @@ interface CreateClientViewProps {
   slug: string
   fields: FieldsClient
   optionsRecord: Record<string, any[]>
-  defaultValues?: Record<string, any>
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
