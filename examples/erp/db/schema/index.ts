@@ -85,6 +85,17 @@ export const posts = pgTable('posts', {
   ...timestamps,
 })
 
+export const manyCategories = pgTable('manyCategories', {
+  id: uuid('id').primaryKey().defaultRandom(),
+  name: varchar().notNull(),
+  categoryIds: uuid('category_ids').array(),
+  ...timestamps,
+})
+
+export const manyCategoriesRelations = relations(manyCategories, ({ many }) => ({
+  categories: many(categories),
+}))
+
 export const postsRelations = relations(posts, ({ one }) => ({
   author: one(user, { fields: [posts.authorId], references: [user.id] }),
   category: one(categories, { fields: [posts.categoryId], references: [categories.id] }),
