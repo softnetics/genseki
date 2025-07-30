@@ -1,3 +1,4 @@
+import type { ColumnDef } from '@tanstack/react-table'
 import type { ConditionalExcept, Simplify } from 'type-fest'
 import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
@@ -301,9 +302,12 @@ export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
         : // NOTE: This is to remove the __id field from the relation fields
           Simplify<Omit<InferField<TFields['shape'][TKey]>, '__id'>>
       : never
+  } & {
+    readonly __pk: string | number
+    readonly __id: string | number
   },
   never
-> & { __pk: string | number; __id: string | number }
+>
 
 export interface ServerApiHandlerArgs<TContext extends AnyContextable, TFields extends Fields> {
   slug: string
@@ -410,6 +414,7 @@ export interface CollectionListOptions<
 > {
   identifierColumn: string
   fields: TFields
+  columns: ColumnDef<InferFields<TFields>, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
 }
 

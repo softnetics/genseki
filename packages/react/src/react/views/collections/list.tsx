@@ -1,4 +1,5 @@
 import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
+import type { ColumnDef } from '@tanstack/react-table'
 
 import { ListTable } from './list.client'
 import type { BaseViewProps } from './types'
@@ -15,6 +16,7 @@ import { getHeadersObject } from '../../utils/headers'
 interface ListViewProps extends BaseViewProps {
   headers: Headers
   searchParams: Record<string, string | string[]>
+  columns: ColumnDef<any>[]
   findMany: CollectionFindManyApiRoute<string, Fields>
 }
 
@@ -86,7 +88,8 @@ export async function ListView(props: ListViewProps) {
             slug={props.slug}
             identifierColumn={props.identifierColumn}
             fields={fieldsClient}
-            data={result.body.data}
+            data={result.body.data as any}
+            columns={props.columns as any}
           />
         </div>
       </div>

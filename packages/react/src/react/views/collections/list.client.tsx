@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 
 import { TrashIcon } from '@phosphor-icons/react'
 import {
@@ -9,6 +9,12 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
+import {
+  type ColumnDef,
+  createColumnHelper,
+  getCoreRowModel,
+  useReactTable,
+} from '@tanstack/react-table'
 
 import type { FieldsClient } from '../../../core'
 import {
@@ -19,41 +25,12 @@ import {
   MenuItem,
   MenuSeparator,
   MenuTrigger,
-  Table,
-  TableBody,
-  TableCell,
-  TableColumn,
-  TableHeader,
-  TableRow,
   TextField,
 } from '../../components'
 import { BaseIcon } from '../../components/primitives/base-icon'
+import { TanstackTable } from '../../components/primitives/tanstack-table'
 import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
-
-// Maybe tanstack-hooks-form is more reasonable for this, but the clock is ticking fr fr nocap
-const tableDataExtract = (
-  data: any[],
-  options: { fields: FieldsClient; identifierColumn: string }
-) => {
-  const headers = Object.values(options.fields.shape).map((column) => {
-    return { ...column, label: column.$client.fieldName /* Fallback to key if no label */ }
-  })
-
-  headers.sort((a, b) => (b.label === options.identifierColumn ? 1 : -1))
-
-  // `isCooked` header is not sent
-  const rows = data.map((record) => ({
-    key: record.__id,
-    rows: headers.map(
-      (header) =>
-        record[header.$client.fieldName] ??
-        'Unknown' /* Unknown meant that it's missing a correct heading label */
-    ),
-  }))
-
-  return { headers, rows }
-}
 
 const Toolbar = (props: {
   slug: string
@@ -109,11 +86,17 @@ const Toolbar = (props: {
   )
 }
 
+type BaseData = {
+  __id: string
+  __pk: string
+} & {}
+
 interface ListTableProps {
   slug: string
   identifierColumn: string
   fields: FieldsClient
-  data: any[]
+  data: BaseData[]
+  columns: ColumnDef<BaseData>[]
 }
 
 export function ListTable(props: ListTableProps) {
@@ -122,72 +105,56 @@ export function ListTable(props: ListTableProps) {
 
   const [selection, setSelection] = useState<string[]>([])
 
-  const { headers, rows } = tableDataExtract(props.data, {
-    fields: props.fields,
-    identifierColumn: props.identifierColumn,
+  console.log('WWWW', props.data)
+
+  const enhancedColumns = useMemo(() => {
+    const columnHelper = createColumnHelper<BaseData>()
+    return [
+      ...props.columns,
+      columnHelper.display({
+        id: 'actions',
+        cell: ({ row }) => (
+          <div className="grid place-items-center">
+            <Menu>
+              <MenuTrigger className="cursor-pointer">
+                <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
+              </MenuTrigger>
+              <MenuContent aria-label="Actions" placement="left top">
+                <MenuItem>View</MenuItem>
+                <MenuItem>Edit</MenuItem>
+                <MenuSeparator />
+                <MenuItem
+                  isDanger
+                  onAction={async () => {
+                    await serverFunction(`${props.slug}.delete`, {
+                      body: { ids: [row.original.__id] },
+                      headers: {},
+                      pathParams: {},
+                      query: {},
+                    })
+                    navigation.refresh()
+                  }}
+                >
+                  Delete
+                </MenuItem>
+              </MenuContent>
+            </Menu>
+          </div>
+        ),
+      }),
+    ]
+  }, [])
+
+  const table = useReactTable({
+    data: props.data,
+    columns: enhancedColumns,
+    getCoreRowModel: getCoreRowModel(),
   })
 
   return (
     <>
       <Toolbar slug={props.slug} selection={selection} setSelection={setSelection} />
-      <Table
-        bleed
-        aria-label="Items"
-        selectionMode="multiple"
-        className="overflow-clip rounded-xl"
-        allowResize
-        onSelectionChange={(data) => {
-          if (data === 'all') setSelection(rows.map((r) => r.key))
-          else setSelection(Array.from(data) as string[])
-        }}
-      >
-        <TableHeader>
-          {headers.map(({ label }) => (
-            <TableColumn isResizable isRowHeader key={label}>
-              {label}
-            </TableColumn>
-          ))}
-          <TableColumn className="w-24!" />
-        </TableHeader>
-        <TableBody items={rows}>
-          {({ key, rows }) => (
-            <TableRow href={`./${props.slug}/update/${key}`} id={key}>
-              {rows.map((cell) => (
-                // TODO: Make this right
-                <TableCell key={JSON.stringify(cell)}>{JSON.stringify(cell, null)}</TableCell>
-              ))}
-              <TableCell>
-                <div className="grid place-items-center">
-                  <Menu>
-                    <MenuTrigger className="cursor-pointer">
-                      <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
-                    </MenuTrigger>
-                    <MenuContent aria-label="Actions" placement="left top">
-                      <MenuItem>View</MenuItem>
-                      <MenuItem>Edit</MenuItem>
-                      <MenuSeparator />
-                      <MenuItem
-                        isDanger
-                        onAction={async () => {
-                          await serverFunction(`${props.slug}.delete`, {
-                            body: { ids: [key] },
-                            headers: {},
-                            pathParams: {},
-                            query: {},
-                          })
-                          navigation.refresh()
-                        }}
-                      >
-                        Delete
-                      </MenuItem>
-                    </MenuContent>
-                  </Menu>
-                </div>
-              </TableCell>
-            </TableRow>
-          )}
-        </TableBody>
-      </Table>
+      <TanstackTable table={table} className="static" onRowClick="toggleSelect" />
     </>
   )
 }

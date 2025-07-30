@@ -136,7 +136,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               render: (args) => {
                 return (
                   <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                    <ListView {...args} {...args.params} {...defaultArgs} findMany={route} />
+                    <ListView
+                      {...args}
+                      {...args.params}
+                      {...defaultArgs}
+                      findMany={route}
+                      columns={options.list?.columns ?? []}
+                    />
                   </CollectionAppLayout>
                 )
               },
