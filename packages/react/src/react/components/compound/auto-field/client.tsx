@@ -282,18 +282,15 @@ interface AutoFieldProps {
   fieldShape: FieldShapeClient
   optionsRecord: Record<string, any[]>
   className?: string
-  visibilityField?: 'create' | 'update'
   prefix?: string
 }
 
 export function AutoField(props: AutoFieldProps) {
   const { fieldShape: field, className } = props
 
-  const visibility = props.visibilityField ? props.fieldShape[props.visibilityField] : 'enabled'
+  if (props.fieldShape.hidden) return null
 
-  if (visibility === 'hidden') return null
-
-  const disabled = visibility === 'disabled'
+  const disabled = props.fieldShape.disabled || false
 
   const commonProps = {
     name: props.prefix ? `${props.prefix}.${field.$client}` : field.$client.fieldName,
@@ -301,7 +298,7 @@ export function AutoField(props: AutoFieldProps) {
     className: className,
     description: field.description,
     placeholder: field.placeholder,
-    isRequired: field.isRequired,
+    isRequired: field.required,
   }
 
   switch (field.type) {
@@ -435,33 +432,30 @@ export function AutoField(props: AutoFieldProps) {
       return (
         <AutoRelationshipField
           name={field.$client.fieldName}
-          field={field}
+          fieldShape={field}
           allowCreate={true}
           allowConnect={false}
           optionsRecord={props.optionsRecord}
-          visibilityField={props.visibilityField}
         />
       )
     case 'connect':
       return (
         <AutoRelationshipField
           name={field.$client.fieldName}
-          field={field}
+          fieldShape={field}
           allowConnect={true}
           allowCreate={false}
           optionsRecord={props.optionsRecord}
-          visibilityField={props.visibilityField}
         />
       )
     case 'connectOrCreate':
       return (
         <AutoRelationshipField
           name={field.$client.fieldName}
-          field={field}
+          fieldShape={field}
           allowConnect={true}
           allowCreate={true}
           optionsRecord={props.optionsRecord}
-          visibilityField={props.visibilityField}
         />
       )
 
@@ -473,61 +467,57 @@ export function AutoField(props: AutoFieldProps) {
 interface AutoRelationshipFieldProps {
   name: string
   // NOTE: This should be FieldClient but the type is not correct
-  field: FieldRelationShapeClient
+  fieldShape: FieldRelationShapeClient
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
-  visibilityField?: 'create' | 'update'
 }
 
 export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
-  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') {
+  if (props.fieldShape.hidden) {
     return null
   }
 
-  switch (props.field.$client.relation.isList) {
+  switch (props.fieldShape.$client.relation.isList) {
     case false:
       return (
         <AutoOneRelationshipField
           name={props.name}
-          field={props.field}
+          fieldShape={props.fieldShape}
           optionsRecord={props.optionsRecord}
           className={props.className}
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
-          visibilityField={props.visibilityField}
         />
       )
     case true:
       return (
         <AutoManyRelationshipField
           name={props.name}
-          field={props.field}
+          fieldShape={props.fieldShape}
           optionsRecord={props.optionsRecord}
           className={props.className}
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
-          visibilityField={props.visibilityField}
         />
       )
     default:
-      throw new Error(`Unsupported relationship mode: "${(props.field.$client as any).mode}"`)
+      throw new Error(`Unsupported relationship mode: "${(props.fieldShape.$client as any).mode}"`)
   }
 }
 
 export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   const { control } = useFormContext()
-  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') return null
-  const disabled = visibility === 'disabled'
+
+  if (props.fieldShape.hidden) return null
+  const disabled = props.fieldShape.disabled || false
 
   const commonProps = {
-    label: props.field.label,
+    label: props.fieldShape.label,
     className: props.className,
-    description: props.field.description,
-    placeholder: props.field.placeholder,
+    description: props.fieldShape.description,
+    placeholder: props.fieldShape.placeholder,
   }
 
   const connectComponent = (
@@ -538,7 +528,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.field.$client.fieldName] ?? []}
+            items={props.optionsRecord[props.fieldShape.$client.fieldName] ?? []}
             isDisabled={disabled}
           />
         </FormItemController>
@@ -546,7 +536,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
     />
   )
 
-  const createComponent = Object.entries(props.field.fields).map(([key, originalField]) => (
+  const createComponent = Object.entries(props.fieldShape.fields).map(([key, originalField]) => (
     <AutoFormField
       key={`${props.name}.create.${originalField.$client.fieldName}`}
       name={`${props.name}.create.${originalField.$client.fieldName}`}
@@ -556,25 +546,24 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
           fieldShape={originalField as FieldShapeClient}
           className="w-full"
           optionsRecord={props.optionsRecord}
-          visibilityField={props.visibilityField}
           prefix={`${props.name}.create`}
         />
       }
     />
   ))
 
-  switch (props.field.type) {
+  switch (props.fieldShape.type) {
     case 'connect':
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          <div>{props.field.label}</div>
+          <div>{props.fieldShape.label}</div>
           {connectComponent}
         </div>
       )
     case 'create':
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          <div>{props.field.label}</div>
+          <div>{props.fieldShape.label}</div>
           {createComponent}
         </div>
       )
@@ -592,12 +581,11 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
 interface AutoManyRelationshipFieldProps {
   name: string
-  field: FieldRelationShapeClient
+  fieldShape: FieldRelationShapeClient
   optionsRecord: Record<string, any[]>
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
-  visibilityField?: 'create' | 'update'
 }
 
 export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
@@ -606,16 +594,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     control: control,
     name: props.name,
   })
-  const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
-  if (visibility === 'hidden') return null
-  const disabled = visibility === 'disabled'
+
+  if (props.fieldShape.hidden) return null
+  const disabled = props.fieldShape.disabled || false
 
   const connectComponent = (name: string) => {
     const commonProps = {
-      label: props.field.label,
+      label: props.fieldShape.label,
       className: props.className,
-      description: props.field.description,
-      placeholder: props.field.placeholder,
+      description: props.fieldShape.description,
+      placeholder: props.fieldShape.placeholder,
     }
     return (
       <AutoFormField
@@ -623,7 +611,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         component={
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.field.$client.fieldName] ?? []}
+            items={props.optionsRecord[props.fieldShape.$client.fieldName] ?? []}
             isDisabled={disabled}
           />
         }
@@ -632,7 +620,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 
   const createComponent = (name: string) => {
-    return Object.entries(props.field.fields).map(([key, childField]) => (
+    return Object.entries(props.fieldShape.fields).map(([key, childField]) => (
       <AutoFormField
         key={key}
         name={name}
@@ -641,7 +629,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             fieldShape={childField as FieldShapeClient}
             className="w-full"
             optionsRecord={props.optionsRecord}
-            visibilityField={props.visibilityField}
             prefix={name}
           />
         }
@@ -649,14 +636,14 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     ))
   }
 
-  switch (props.field.type) {
+  switch (props.fieldShape.type) {
     case 'connect':
       return (
         <div className="border border-red-500 p-6">
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>
-                {props.field.label} #{index + 1}
+                {props.fieldShape.label} #{index + 1}
               </div>
               {connectComponent(`${props.name}.${index}.connect`)}
             </div>
@@ -672,7 +659,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>
-                {props.field.label} #{index + 1}
+                {props.fieldShape.label} #{index + 1}
               </div>
               {createComponent(`${props.name}.${index}.create`)}
             </div>
@@ -689,7 +676,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>
-                {props.field.label} #{index + 1}
+                {props.fieldShape.label} #{index + 1}
               </div>
               {connectComponent(`${props.name}.${index}.connect`)}
               {createComponent(`${props.name}.${index}.create`)}

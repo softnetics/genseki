@@ -61,7 +61,7 @@ const fields = builder.fields('post', (fb) => ({
   }),
   content: fb.columns('content', {
     type: 'richText',
-    isRequired: true,
+    required: true,
     label: 'Food description',
     editor: postEditorProviderProps,
   }),

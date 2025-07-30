@@ -5,7 +5,6 @@ import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
 import {
   type FieldColumnShape,
-  type FieldMutateModeCollection,
   type FieldOptionsShapeBase,
   type FieldRelationConnectOrCreateShape,
   type FieldRelationConnectShape,
@@ -42,12 +41,7 @@ export type MaybePromise<T> = T | Promise<T>
 export type ActivateFieldMutateMode<
   TType,
   TField extends FieldOptionsShapeBase,
-  TMethod extends 'create' | 'update' | undefined = undefined,
-> = TMethod extends keyof TField
-  ? TField[TMethod] extends FieldMutateModeCollection['HIDDEN']
-    ? never
-    : TType
-  : TType
+> = TField['hidden'] extends true ? never : TType
 
 /**
  * For updating a single relation field. There's 2 scenarios to consider for One relations:
@@ -171,8 +165,7 @@ export type InferUpdateFieldShape<TFieldShape extends FieldShape> =
     : TFieldShape extends FieldColumnShape<any>
       ? ActivateFieldMutateMode<
           InferDataType<TFieldShape['$server']['column']['dataType']>,
-          TFieldShape,
-          'update'
+          TFieldShape
         >
       : never
 
@@ -199,8 +192,7 @@ export type InferCreateFieldShape<TFieldShape extends FieldShape> =
     : TFieldShape extends FieldColumnShape<any>
       ? ActivateFieldMutateMode<
           InferDataType<TFieldShape['$server']['column']['dataType']>,
-          TFieldShape,
-          'create'
+          TFieldShape
         >
       : never
 

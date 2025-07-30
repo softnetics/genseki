@@ -1,7 +1,7 @@
 import type { Simplify } from 'type-fest'
 import z from 'zod/v4'
 
-import { ApiDefaultMethod, type MaybePromise } from './collection'
+import { type MaybePromise } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
   type DataType,
@@ -42,23 +42,14 @@ export interface FieldRelationMetadata extends Omit<FieldRelationClientMetadata,
   relation: FieldRelationSchema
 }
 
-export const FieldMutateModeCollection = {
-  ENABLED: 'enabled',
-  DISABLED: 'disabled',
-  HIDDEN: 'hidden',
-} as const
-export type FieldMutateModeCollection = typeof FieldMutateModeCollection
-export type FieldMutateMode =
-  (typeof FieldMutateModeCollection)[keyof typeof FieldMutateModeCollection]
-
 export interface FieldOptionsShapeBase {
   type: string
   label?: string
   description?: string
   placeholder?: string
-  isRequired?: boolean
-  update?: FieldMutateMode
-  create?: FieldMutateMode
+  required?: boolean
+  disabled?: boolean
+  hidden?: boolean
 }
 
 export interface FieldColumnShapeClientBase extends Omit<FieldOptionsShapeBase, 'type'> {
@@ -779,25 +770,10 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase>(
 }
 
 export function fieldsShapeToZodObject<TFieldsShape extends FieldsShape>(
-  fieldsShape: TFieldsShape,
-  method?: typeof ApiDefaultMethod.CREATE | typeof ApiDefaultMethod.UPDATE
+  fieldsShape: TFieldsShape
 ): FieldsShapeToZodObject<TFieldsShape> {
   const zodObject = Object.entries(fieldsShape).reduce(
     (acc, [key, field]) => {
-      if (method) {
-        if (
-          method === ApiDefaultMethod.UPDATE &&
-          field.update !== FieldMutateModeCollection.ENABLED
-        ) {
-          return acc
-        }
-        if (
-          method === ApiDefaultMethod.CREATE &&
-          field.create !== FieldMutateModeCollection.ENABLED
-        ) {
-          return acc
-        }
-      }
       acc[key] = fieldToZodScheama(field) as any
       return acc
     },
