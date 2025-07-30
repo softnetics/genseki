@@ -3,8 +3,8 @@ import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 import { ListTable } from './list.client'
 import type { BaseViewProps } from './types'
 
-import type { CollectionDefaultAdminApiRouter } from '../../../core/builder.utils'
-import { getCollectionOptionsClient } from '../../../core/collection'
+import { getFieldsClient } from '../../../core'
+import type { CollectionFindManyApiRoute } from '../../../core/builder.utils'
 import type { Fields } from '../../../core/field'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
@@ -15,7 +15,7 @@ import { getHeadersObject } from '../../utils/headers'
 interface ListViewProps extends BaseViewProps {
   headers: Headers
   searchParams: Record<string, string | string[]>
-  findMany: CollectionDefaultAdminApiRouter<string, Fields>['findMany']
+  findMany: CollectionFindManyApiRoute<string, Fields>
 }
 
 export async function ListView(props: ListViewProps) {
@@ -50,7 +50,7 @@ export async function ListView(props: ListViewProps) {
     )
   }
 
-  const collectionOptionsClient = getCollectionOptionsClient(props.slug, props.collectionOptions)
+  const fieldsClient = getFieldsClient(props.fields)
 
   return (
     <div>
@@ -84,7 +84,8 @@ export async function ListView(props: ListViewProps) {
         <div className="mx-auto flex w-full max-w-[1200px] flex-col gap-y-12">
           <ListTable
             slug={props.slug}
-            collectionOptions={collectionOptionsClient}
+            identifierColumn={props.identifierColumn}
+            fields={fieldsClient}
             data={result.body.data}
           />
         </div>

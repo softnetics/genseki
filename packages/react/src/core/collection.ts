@@ -1,7 +1,6 @@
 import type { ConditionalExcept, Simplify } from 'type-fest'
 import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import { getFieldsClient } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
 import {
@@ -385,7 +384,7 @@ export type ApiDeleteArgs = {
 
 export type ApiConfigHandlerFn<
   TContext extends AnyContextable,
-  in out TFields extends Fields,
+  TFields extends Fields,
   TMethod extends ApiDefaultMethod,
 > = (
   args: ApiArgs<TContext, TMethod, TFields> & {
@@ -393,57 +392,81 @@ export type ApiConfigHandlerFn<
   }
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
-export type CollectionAdminApiOptions<
-  TContext extends AnyContextable,
-  in out TFields extends Fields,
-> = {
-  create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
-  findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
-  findMany?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
-  update?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
-  delete?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
+export interface CollectionCreateOptions<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+> {
+  fields: TFields
+  api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
 }
 
-export type CollectionAdminApi<TContext extends AnyContextable, TFields extends Fields> = {
-  create: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
-  findOne: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
-  findMany: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
-  update: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
-  delete: ApiHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
+export interface CollectionUpdateOptions<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+> {
+  fields: TFields
+  updateApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
+  // TODO: This is not correct, it should return default value of form instead of just simple findOne response
+  updateDefaultApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
 }
 
-export type CollectionAdminOptions<
-  TContext extends AnyContextable,
-  in out TFields extends Fields,
-  in out TApiRouter extends AnyApiRouter,
-> = {
-  api?: CollectionAdminApiOptions<TContext, TFields>
-  endpoints?: TApiRouter
+export interface CollectionListOptions<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+> {
+  fields: TFields
+  api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
+}
+
+export interface CollectionOneOptions<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+> {
+  fields: TFields
+  api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
+}
+
+export interface CollectionDeleteOptions<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+> {
+  fields: TFields
+  api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
 }
 
 export interface CollectionOptions<
-  TContext extends AnyContextable,
-  in out TFields extends Fields,
-  in out TAppRouter extends AnyApiRouter,
+  TContext extends AnyContextable = AnyContextable,
+  TSlug extends string = string,
+  TCreateFields extends Fields = Fields,
+  TUpdateFields extends Fields = Fields,
+  TListFields extends Fields = Fields,
+  TOneFields extends Fields = Fields,
+  TDeleteFields extends Fields = Fields,
+  TApiRouter extends AnyApiRouter = AnyApiRouter,
 > {
+  slug: TSlug
   identifierColumn: string
-  fields: TFields
-  admin?: CollectionAdminOptions<TContext, TFields, TAppRouter>
+  create?: CollectionCreateOptions<TContext, TCreateFields>
+  update?: CollectionUpdateOptions<TContext, TUpdateFields>
+  list?: CollectionListOptions<TContext, TListFields>
+  one?: CollectionOneOptions<TContext, TOneFields>
+  delete?: CollectionDeleteOptions<TContext, TDeleteFields>
+  api?: TApiRouter
 }
 
 export interface CollectionOptionsClient {
   slug: string
   identifierColumn: string
-  fields: FieldsClient
-}
-
-export function getCollectionOptionsClient<TContext extends AnyContextable, TFields extends Fields>(
-  slug: string,
-  collectionOptions: Omit<CollectionOptions<TContext, TFields, any>, 'admin'>
-): CollectionOptionsClient {
-  return {
-    slug: slug,
-    identifierColumn: collectionOptions.identifierColumn,
-    fields: getFieldsClient(collectionOptions.fields),
+  create?: {
+    fields: FieldsClient
+  }
+  update?: {
+    fields: FieldsClient
+  }
+  list?: {
+    fields: FieldsClient
+  }
+  one?: {
+    fields: FieldsClient
   }
 }

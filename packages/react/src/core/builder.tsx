@@ -1,18 +1,24 @@
 import type { Simplify } from 'type-fest'
 
-import { type CollectionDefaultAdminApiRouter, createCollectionDefaultApi } from './builder.utils'
-import { type CollectionOptions } from './collection'
+import {
+  type CollectionDefaultAdminApiRouter,
+  getCollectionDefaultCreateApiRoute,
+  getCollectionDefaultFindManyApiRoute,
+  getCollectionDefaultFindOneApiRoute,
+  getCollectionDefaultUpdateApiRoute,
+  getCollectionDefaultUpdateDefaultApiRoute,
+} from './builder.utils'
+import type { CollectionOptions } from './collection'
 import { createGensekiUiRoute, type GensekiPlugin, type GensekiUiRouter } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
-  type AnyApiRouter,
   type ApiRoute,
   type ApiRouteHandlerInitial,
   type ApiRouteSchema,
   type AppendApiPathPrefix,
   appendApiPathPrefix,
 } from './endpoint'
-import { FieldBuilder, type Fields, type FieldsShape } from './field'
+import { FieldBuilder, type FieldsShape } from './field'
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
 import { appendFieldNameToFields } from './utils'
@@ -32,45 +38,46 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
     }
   ) {}
 
-  collection<
-    const TSlug extends string,
-    const TFields extends Fields,
-    const TApiRouter extends AnyApiRouter = {},
-  >(
-    slug: TSlug,
-    options: CollectionOptions<TContext, TFields, TApiRouter>
+  collection<const TOptions extends CollectionOptions<TContext, any, any, any, any, any, any, any>>(
+    options: TOptions
   ): GensekiPlugin<
-    TSlug,
+    TOptions['slug'],
     {
-      [K in TSlug]: AppendApiPathPrefix<`/${TSlug}`, TApiRouter> &
-        CollectionDefaultAdminApiRouter<TSlug, TFields>
+      [K in TOptions['slug']]: AppendApiPathPrefix<`/${TOptions['slug']}`, TOptions['api']> &
+        CollectionDefaultAdminApiRouter<
+          TOptions['slug'],
+          {
+            create: TOptions['create']
+            update: TOptions['update']
+            list: TOptions['list']
+            one: TOptions['one']
+            delete: TOptions['delete']
+          }
+        >
     }
   > {
-    const defaultApi = createCollectionDefaultApi(slug, this.config, options)
+    const slug = options.slug
 
-    const api = {
-      ...defaultApi,
-      ...appendApiPathPrefix(`/${slug}`, options.admin?.endpoints ?? {}),
-    }
+    const api = appendApiPathPrefix(`/${slug}`, options.api ?? {})
 
     const plugin: GensekiPlugin<
-      TSlug,
+      TOptions['slug'],
       {
-        [K in TSlug]: AppendApiPathPrefix<`/${TSlug}`, TApiRouter> &
-          CollectionDefaultAdminApiRouter<TSlug, TFields>
+        [K in TOptions['slug']]: AppendApiPathPrefix<`/${TOptions['slug']}`, TOptions['api']> &
+          CollectionDefaultAdminApiRouter<
+            TOptions['slug'],
+            {
+              create: TOptions['create']
+              update: TOptions['update']
+              list: TOptions['list']
+              one: TOptions['one']
+              delete: TOptions['delete']
+            }
+          >
       }
     > = {
       name: slug,
       plugin: (gensekiOptions) => {
-        const defaultArgs = {
-          slug: slug,
-          context: this.config.context,
-          collectionOptions: {
-            identifierColumn: options.identifierColumn,
-            fields: options.fields,
-          } satisfies BaseViewProps['collectionOptions'],
-        }
-
         const _collectionHomeRoute = gensekiOptions.uis.find(
           (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
         ) as GensekiUiRouter<GensekiUiCommonProps['COLLECTION_HOME']> | undefined
@@ -100,75 +107,185 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTION_HOME],
             })
 
-        const uis = [
-          collectionHomeRoute,
-          createGensekiUiRoute({
-            path: `/collections/${slug}`,
-            requiredAuthenticated: true,
+        const uis = [collectionHomeRoute]
+
+        if (options.list) {
+          const defaultArgs = {
+            slug: slug,
             context: this.config.context,
-            render: (args) => (
-              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                <ListView
-                  {...args}
-                  {...args.params}
-                  {...defaultArgs}
-                  // TODO: Fix this
-                  findMany={api.findMany as any}
-                />
-              </CollectionAppLayout>
-            ),
-          }),
-          createGensekiUiRoute({
-            path: `/collections/${slug}/:identifier`,
-            requiredAuthenticated: true,
+            identifierColumn: options.identifierColumn,
+            fields: options.list.fields,
+          } satisfies BaseViewProps
+
+          const { route } = getCollectionDefaultFindManyApiRoute({
+            slug: slug,
+            identifierColumn: options.identifierColumn,
             context: this.config.context,
-            render: (args) => (
-              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                <OneView
-                  {...args}
-                  {...args.params}
-                  {...defaultArgs}
-                  identifier={args.params.identifier}
-                  // TODO: Fix this
-                  findOne={api.findOne as any}
-                />
-              </CollectionAppLayout>
-            ),
-          }),
-          createGensekiUiRoute({
-            path: `/collections/${slug}/create`,
-            requiredAuthenticated: true,
+            schema: this.config.schema,
+            fields: options.list.fields,
+            customHandler: options.list.api as any,
+          })
+
+          Object.assign(api, { findMany: route })
+
+          uis.push(
+            createGensekiUiRoute({
+              path: `/collections/${slug}`,
+              requiredAuthenticated: true,
+              context: this.config.context,
+              render: (args) => {
+                return (
+                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                    <ListView {...args} {...args.params} {...defaultArgs} findMany={route} />
+                  </CollectionAppLayout>
+                )
+              },
+            })
+          )
+        }
+
+        if (options.create) {
+          const defaultArgs = {
+            slug: slug,
             context: this.config.context,
-            render: (args) => (
-              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                <CreateView {...args} {...args.params} {...defaultArgs} />
-              </CollectionAppLayout>
-            ),
-          }),
-          createGensekiUiRoute({
-            path: `/collections/${slug}/update/:identifier`,
-            requiredAuthenticated: true,
+            identifierColumn: options.identifierColumn,
+            fields: options.create.fields,
+          } satisfies BaseViewProps
+
+          const { route } = getCollectionDefaultCreateApiRoute({
+            slug: slug,
+            identifierColumn: options.identifierColumn,
             context: this.config.context,
-            render: (args) => (
-              <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                <UpdateView
-                  {...args}
-                  {...args.params}
-                  {...defaultArgs}
-                  identifier={args.params.identifier}
-                  findOne={api.findOne as any}
-                />
-              </CollectionAppLayout>
-            ),
-          }),
-        ]
+            schema: this.config.schema,
+            fields: options.create.fields,
+            customHandler: options.create.api as any,
+          })
+
+          Object.assign(api, { create: route })
+
+          uis.push(
+            createGensekiUiRoute({
+              path: `/collections/${slug}/create`,
+              requiredAuthenticated: true,
+              context: this.config.context,
+              render: (args) => {
+                return (
+                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                    <CreateView {...args} {...args.params} {...defaultArgs} />
+                  </CollectionAppLayout>
+                )
+              },
+            })
+          )
+        }
+
+        if (options.update) {
+          const defaultArgs = {
+            slug: slug,
+            context: this.config.context,
+            identifierColumn: options.identifierColumn,
+            fields: options.update.fields,
+          } satisfies BaseViewProps
+
+          const { route: updateRoute } = getCollectionDefaultUpdateApiRoute({
+            slug: slug,
+            identifierColumn: options.identifierColumn,
+            context: this.config.context,
+            schema: this.config.schema,
+            fields: options.update.fields,
+            customHandler: options.update.updateApi as any,
+          })
+
+          Object.assign(api, { update: updateRoute })
+
+          const { route: updateDefaultRoute } = getCollectionDefaultUpdateDefaultApiRoute({
+            slug: slug,
+            identifierColumn: options.identifierColumn,
+            context: this.config.context,
+            schema: this.config.schema,
+            fields: options.update.fields,
+            customHandler: options.update.updateDefaultApi as any,
+          })
+
+          Object.assign(api, { updateDefault: updateDefaultRoute })
+
+          uis.push(
+            createGensekiUiRoute({
+              path: `/collections/${slug}/update/:identifier`,
+              requiredAuthenticated: true,
+              context: this.config.context,
+              render: (args) => {
+                return (
+                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                    <UpdateView
+                      {...args}
+                      {...args.params}
+                      {...defaultArgs}
+                      identifier={args.params.identifier}
+                      updateDefault={updateDefaultRoute}
+                    />
+                  </CollectionAppLayout>
+                )
+              },
+            })
+          )
+        }
+
+        if (options.one) {
+          const defaultArgs = {
+            slug: slug,
+            context: this.config.context,
+            identifierColumn: options.identifierColumn,
+            fields: options.one.fields,
+          } satisfies BaseViewProps
+
+          const { route } = getCollectionDefaultFindOneApiRoute({
+            slug: slug,
+            identifierColumn: options.identifierColumn,
+            context: this.config.context,
+            schema: this.config.schema,
+            fields: options.one.fields,
+            customHandler: options.one.api as any,
+          })
+          Object.assign(api, { findOne: route })
+
+          uis.push(
+            createGensekiUiRoute({
+              path: `/collections/${slug}/:identifier`,
+              requiredAuthenticated: true,
+              context: this.config.context,
+              render: (args) => {
+                return (
+                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                    <OneView
+                      {...args}
+                      {...args.params}
+                      {...defaultArgs}
+                      identifier={args.params.identifier}
+                      findOne={route}
+                    />
+                  </CollectionAppLayout>
+                )
+              },
+            })
+          )
+        }
 
         return {
           api: {
             [slug]: api,
           } as {
-            [K in TSlug]: AppendApiPathPrefix<`/${TSlug}`, TApiRouter> &
-              CollectionDefaultAdminApiRouter<TSlug, TFields>
+            [K in TOptions['slug']]: AppendApiPathPrefix<`/${TOptions['slug']}`, TOptions['api']> &
+              CollectionDefaultAdminApiRouter<
+                TOptions['slug'],
+                {
+                  create: TOptions['create']
+                  update: TOptions['update']
+                  list: TOptions['list']
+                  one: TOptions['one']
+                  delete: TOptions['delete']
+                }
+              >
           },
           uis: uis,
         }

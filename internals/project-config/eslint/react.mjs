@@ -15,17 +15,6 @@ const config = tseslint.config(
   {
     rules: {
       'react/react-in-jsx-scope': 'off',
-      'no-restricted-imports': [
-        'error',
-        {
-          paths: [
-            {
-              name: 'zod',
-              message: 'Please import from zod/v4 instead.',
-            },
-          ],
-        },
-      ],
     },
     settings: {
       react: {

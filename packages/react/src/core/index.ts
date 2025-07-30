@@ -8,15 +8,7 @@ export type {
 } from '../core/context'
 export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
-export type {
-  ApiReturnType,
-  CollectionAdminApi,
-  CollectionAdminApiOptions,
-  CollectionAdminOptions,
-  CollectionOptions,
-  InferField,
-  InferFields,
-} from './collection'
+export type { ApiReturnType, CollectionOptions, InferField, InferFields } from './collection'
 export { ApiDefaultMethod } from './collection'
 export {
   type AnyGensekiPlugin,
