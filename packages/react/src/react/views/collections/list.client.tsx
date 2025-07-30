@@ -105,8 +105,6 @@ export function ListTable(props: ListTableProps) {
 
   const [selection, setSelection] = useState<string[]>([])
 
-  console.log('WWWW', props.data)
-
   const enhancedColumns = useMemo(() => {
     const columnHelper = createColumnHelper<BaseData>()
     return [
