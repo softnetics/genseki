@@ -57,6 +57,10 @@ export interface GensekiAppOptions {
   storageAdapter?: StorageAdapter
 }
 
+export interface GensekiApiOptions {
+  apiPrefix: string
+}
+
 export interface GensekiPluginOptions extends GensekiAppOptions, GensekiCore<AnyApiRouter> {}
 
 export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
