@@ -113,13 +113,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.list.identifierColumn,
             fields: options.list.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultFindManyApiRoute({
             slug: slug,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.list.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.list.fields,
@@ -148,13 +148,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.create.identifierColumn,
             fields: options.create.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultCreateApiRoute({
             slug: slug,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.create.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.create.fields,
@@ -183,13 +183,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.update.identifierColumn,
             fields: options.update.fields,
           } satisfies BaseViewProps
 
           const { route: updateRoute } = getCollectionDefaultUpdateApiRoute({
             slug: slug,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.update.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -200,7 +200,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route: updateDefaultRoute } = getCollectionDefaultUpdateDefaultApiRoute({
             slug: slug,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.update.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -235,13 +235,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.one.identifierColumn,
             fields: options.one.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultFindOneApiRoute({
             slug: slug,
-            identifierColumn: options.identifierColumn,
+            identifierColumn: options.one.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.one.fields,

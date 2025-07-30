@@ -17,11 +17,12 @@ const userFields = builder.fields('user', (fb) => ({
 
 export const usersCollection = builder.collection({
   slug: 'users',
-  identifierColumn: 'id',
   create: {
+    identifierColumn: 'id',
     fields: userFields,
   },
   list: {
+    identifierColumn: 'id',
     fields: userFields,
   },
   api: {

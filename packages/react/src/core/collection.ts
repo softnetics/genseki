@@ -388,6 +388,7 @@ export interface CollectionCreateOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
 > {
+  identifierColumn: string
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
 }
@@ -396,6 +397,7 @@ export interface CollectionUpdateOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
 > {
+  identifierColumn: string
   fields: TFields
   updateApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
   // TODO: This is not correct, it should return default value of form instead of just simple findOne response
@@ -406,6 +408,7 @@ export interface CollectionListOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
 > {
+  identifierColumn: string
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
 }
@@ -414,6 +417,7 @@ export interface CollectionOneOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
 > {
+  identifierColumn: string
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
 }
@@ -422,6 +426,7 @@ export interface CollectionDeleteOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
 > {
+  identifierColumn: string
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
 }
@@ -437,7 +442,6 @@ export interface CollectionOptions<
   TApiRouter extends AnyApiRouter = AnyApiRouter,
 > {
   slug: TSlug
-  identifierColumn: string
   create?: CollectionCreateOptions<TContext, TCreateFields>
   update?: CollectionUpdateOptions<TContext, TUpdateFields>
   list?: CollectionListOptions<TContext, TListFields>
@@ -448,17 +452,20 @@ export interface CollectionOptions<
 
 export interface CollectionOptionsClient {
   slug: string
-  identifierColumn: string
   create?: {
+    identifierColumn: string
     fields: FieldsClient
   }
   update?: {
+    identifierColumn: string
     fields: FieldsClient
   }
   list?: {
+    identifierColumn: string
     fields: FieldsClient
   }
   one?: {
+    identifierColumn: string
     fields: FieldsClient
   }
 }
