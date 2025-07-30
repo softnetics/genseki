@@ -3,6 +3,7 @@ import { auth, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
 import { categoriesCollection } from './collections/categories'
 import { foodsCollection } from './collections/foods'
+import { manyCategoriesCollection } from './collections/manyCategories'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
 import { context, db } from './helper'
@@ -45,6 +46,11 @@ const app = new GensekiApp({
         label: 'Posts',
         path: '/admin/collections/posts',
       },
+      {
+        type: 'item',
+        label: 'Many Categories',
+        path: '/admin/collections/manyCategories',
+      },
     ],
   },
 })
@@ -75,6 +81,7 @@ const app = new GensekiApp({
   .apply(foodsCollection)
   .apply(categoriesCollection)
   .apply(postsCollection)
+  .apply(manyCategoriesCollection)
   .build()
 
 // {

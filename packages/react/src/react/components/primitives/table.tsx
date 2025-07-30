@@ -61,7 +61,7 @@ const Table = ({ allowResize, className, bleed, ref, ...props }: TableProps) => 
       <div className="flow-root">
         <div
           className={twMerge(
-            '-mx-(--gutter) has-data-[slot=table-resizable-container]:overflow-auto relative overflow-x-auto whitespace-nowrap',
+            '-mx-(--gutter) px-4 has-data-[slot=table-resizable-container]:overflow-auto relative overflow-x-auto whitespace-nowrap',
             '[--gutter-y:--spacing(6)] [--gutter:--spacing(6)]',
             className
           )}
@@ -233,7 +233,7 @@ const TableRow = <T extends object>({
           }
         ) =>
           twMerge(
-            'text-muted-fg ring-primary border-muted group relative cursor-default border-b outline-transparent last:border-b-0',
+            'text-muted-fg ring-primary border-muted group relative cursor-default border-b outline-transparent last:border-b-0 ยปขภ',
             isDragging && 'outline outline-blue-500',
             isSelected && 'bg-(--table-selected-bg) text-fg hover:bg-(--table-selected-bg)/50',
             (props.href || props.onAction || selectionMode === 'multiple') &&
