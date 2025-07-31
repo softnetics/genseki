@@ -1,7 +1,9 @@
 import { withNextJs } from '@genseki/next'
 import { auth, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
+import { categoriesCollection } from './collections/categories'
 import { postsCollection } from './collections/posts'
+import { subCategoriesCollection } from './collections/sub-categories'
 import { usersCollection } from './collections/users'
 import { context } from './helper'
 
@@ -33,6 +35,16 @@ const app = new GensekiApp({
         label: 'Posts',
         path: '/admin/collections/posts',
       },
+      {
+        type: 'item',
+        label: 'Categories',
+        path: '/admin/collections/categories',
+      },
+      {
+        type: 'item',
+        label: 'Sub Categories',
+        path: '/admin/collections/sub-categories',
+      },
     ],
   },
 })
@@ -60,6 +72,8 @@ const app = new GensekiApp({
   )
   .apply(usersCollection)
   .apply(postsCollection)
+  .apply(categoriesCollection)
+  .apply(subCategoriesCollection)
   .build()
 
 const nextjsApp = withNextJs(app)

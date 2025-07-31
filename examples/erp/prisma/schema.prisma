@@ -136,3 +136,27 @@ model Comment {
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
+
+model Category {
+  id String @id @default(uuid())
+
+  name String
+
+  subCategoryIds String[]
+  subCategories  SubCategory[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model SubCategory {
+  id String @id @default(uuid())
+
+  name String
+
+  categoryIds String[]
+  categories  Category[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
