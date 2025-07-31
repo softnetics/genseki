@@ -10,7 +10,7 @@ import type {
   FieldRelationShape,
   Fields,
   FieldsClient,
-  FieldShapeBase,
+  FieldShape,
   FieldShapeClient,
   FieldsShape,
 } from './field'
@@ -35,12 +35,12 @@ export function tryParseJSONObject(jsonString: string): Record<string, unknown> 
 }
 
 // TODO: Move this to ./field.ts
-export function isRelationFieldShape(fieldShape: FieldShapeBase): fieldShape is FieldRelationShape {
+export function isRelationFieldShape(fieldShape: FieldShape): fieldShape is FieldRelationShape {
   return fieldShape.$client.source === 'relation'
 }
 
 export function isRichTextFieldShape(
-  fieldShape: FieldShapeBase
+  fieldShape: FieldShape
 ): fieldShape is FieldColumnJsonRichTextShape {
   return fieldShape.type === 'richText'
 }
@@ -52,7 +52,7 @@ export function isRichTextFieldShapeClient(
 }
 
 export function isMediaFieldShape(
-  fieldShape: FieldShapeBase
+  fieldShape: FieldShape
 ): fieldShape is FieldColumnStringMediaShape {
   return fieldShape.type === 'media'
 }

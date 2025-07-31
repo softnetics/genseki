@@ -3,25 +3,26 @@
 import { useForm } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import { toast } from 'sonner'
-import { z } from 'zod'
+import { useRouter } from 'next/navigation'
+import z from 'zod/v4'
 
-import { SubmitButton } from '../../react/components/compound/submit-button'
 import {
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
+  SubmitButton,
   TextField,
-} from '../../react/components/primitives'
-import { useNavigation } from '../../react/providers/navigation'
-import { useServerFunction } from '../../react/providers/root'
+  toast,
+} from '@genseki/react'
+
+import { queryClient } from '../../client'
 
 const FormSchema = z
   .object({
     name: z.string().min(1, { message: 'Full name is required' }).trim(),
-    email: z.string().email({ message: 'Invalid email address' }),
+    email: z.email({ message: 'Invalid email address' }),
     password: z
       .string()
       .min(8, { message: 'Password must be at least 8 characters long' })
@@ -37,42 +38,31 @@ const FormSchema = z
 
 type FormSchema = z.infer<typeof FormSchema>
 
-interface SignUpClientFormProps {
-  autoLogin?: boolean
-}
-
-export function SignUpClientForm(props: SignUpClientFormProps) {
-  const serverFunction = useServerFunction()
-  const { navigate } = useNavigation()
-
+export function SetupClientForm() {
+  const router = useRouter()
   const form = useForm<FormSchema>({
     resolver: standardSchemaResolver(FormSchema),
   })
 
+  const mutation = queryClient.useMutation('POST', '/auth/setup')
+
   const onValid = async (data: FormSchema) => {
-    const response = await serverFunction('auth.signUpEmail', {
-      body: data,
-      headers: {},
-      query: {},
-      pathParams: {},
-    })
+    const response = await mutation.mutateAsync(
+      { body: { name: data.name, email: data.email, password: data.password } },
+      {
+        onError: (error) => {
+          console.error('Setup failed', error)
+        },
+      }
+    )
 
     if (response.status !== 200) {
-      toast.error('Failed to sign up', {
-        // description: response.body.status || 'Failed to sign up',
-        description: 'Failed to sign up',
-      })
+      toast.error('Setup failed')
       return
     }
 
-    // TODO: Move redirect logic to server function
-    if (props.autoLogin) return navigate('../collections')
-
-    toast.success('Successfully signed up', {
-      description: 'You can now log in with your credentials.',
-    })
-
-    return navigate('../auth/login')
+    toast.success('Setup completed successfully')
+    router.push('/admin/auth/login')
   }
 
   return (

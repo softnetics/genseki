@@ -1,5 +1,5 @@
-export { AccountProvider } from '../auth/constant'
-export { defaultHashPassword, ResponseHelper, verifyPassword } from '../auth/utils'
+export { AccountProvider } from '../auth/plugins/email-and-password/constant'
+export { defaultHashPassword, ResponseHelper } from '../auth/utils'
 export type {
   AnyContextable,
   AnyRequestContextable,
@@ -19,6 +19,7 @@ export type {
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export {
+  type AnyGensekiPlugin,
   createPlugin,
   GensekiApp,
   type GensekiAppCompiled,
@@ -28,6 +29,7 @@ export {
   type GensekiPlugin,
   type GensekiUiRouter,
   getFieldsClient,
+  type InferApiRouterFromGensekiPlugin,
 } from './config'
 export type {
   AnyApiRouter,
@@ -45,6 +47,7 @@ export type {
   InferApiRouteResponses,
 } from './endpoint'
 export { createEndpoint, flattenApiRouter, isApiRoute } from './endpoint'
+export * from './error'
 export type {
   FieldClientBase,
   FieldRelationShape,
@@ -85,7 +88,8 @@ export type {
   AnyTypedFieldColumn,
   InferTableType,
   WithHasDefaultValue,
+  WithIsList,
   WithIsRequired,
   WithIsUnique,
 } from './table'
-export { getDefaultValueFromFieldsClient as getDefaultValueFromFields } from './utils'
+export { getDefaultValueFromFieldsClient } from './utils'

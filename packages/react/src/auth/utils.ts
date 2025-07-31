@@ -1,6 +1,7 @@
+import { promisify } from 'node:util'
+
 import { parse as parseCookies, serialize } from 'cookie-es'
 import crypto, { randomBytes } from 'crypto'
-import { promisify } from 'util'
 
 const scrypt = promisify(crypto.scrypt)
 
@@ -12,12 +13,12 @@ export function getSessionCookie(request: Request): string | undefined {
 }
 
 export abstract class ResponseHelper {
-  static setSessionCookie(response: Response, value: string) {
+  static setSessionCookie(response: Response, value: string, options: { expiredAt: Date }) {
     response.headers.set(
       'Set-Cookie',
       serialize(SESSION_COOKIE_NAME, value, {
         httpOnly: true,
-        expires: new Date(Date.now() + 1000 * 60 * 60 * 24),
+        expires: options.expiredAt,
         sameSite: 'strict',
       })
     )

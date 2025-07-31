@@ -26,6 +26,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc",
+    "test": "vitest",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
     "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
   },

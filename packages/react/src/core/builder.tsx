@@ -8,12 +8,11 @@ import {
   type AnyApiRouter,
   type ApiRoute,
   type ApiRouteHandlerInitial,
-  type ApiRouter,
   type ApiRouteSchema,
   type AppendApiPathPrefix,
   appendApiPathPrefix,
 } from './endpoint'
-import { FieldBuilder, type Fields, type FieldsShape, type OptionCallback } from './field'
+import { FieldBuilder, type Fields, type FieldsShape } from './field'
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
 import { appendFieldNameToFields } from './utils'
@@ -191,7 +190,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
     return plugin
   }
 
-  fields<const TModelName extends keyof TModelSchemas, TFieldsShape extends FieldsShape>(
+  fields<const TModelName extends keyof TModelSchemas, const TFieldsShape extends FieldsShape>(
     modelName: TModelName,
     optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape
   ): Simplify<{
@@ -210,10 +209,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
     }
   }
 
-  options<TType extends string | number>(callback: OptionCallback<TType, TContext>) {
-    return callback
-  }
-
   endpoint<const TApiEndpointSchema extends ApiRouteSchema>(
     schema: TApiEndpointSchema,
     handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
@@ -228,9 +223,5 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         )
       },
     }
-  }
-
-  endpoints<const TApiRouter extends ApiRouter>(endpoints: TApiRouter): Simplify<TApiRouter> {
-    return endpoints
   }
 }

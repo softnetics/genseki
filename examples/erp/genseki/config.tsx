@@ -1,6 +1,10 @@
 import { withNextJs } from '@genseki/next'
-import { auth, GensekiApp, StorageAdapterS3 } from '@genseki/react'
+import { admin } from '@genseki/plugins'
+import { emailAndPasswordPlugin, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
+import { accessControl } from './access-control'
+import { SetupPage } from './auth/setup/setup'
+import { setupApi } from './auth/setup/setup-api'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
 import { context } from './helper'
@@ -37,29 +41,44 @@ const app = new GensekiApp({
   },
 })
   .apply(
-    auth(context, {
+    emailAndPasswordPlugin(context, {
       schema: {
         user: FullModelSchemas.user,
         session: FullModelSchemas.session,
         account: FullModelSchemas.account,
         verification: FullModelSchemas.verification,
       },
-      method: {
-        emailAndPassword: {
-          enabled: true,
-          resetPassword: {
-            enabled: true,
-            sendEmailResetPassword: async (email, token) => {
-              console.log('sendEmailResetPassword config', email, token)
-              return
-            },
-          },
+      setup: {
+        enabled: true,
+        autoLogin: true,
+        ui: SetupPage,
+      },
+      resetPassword: {
+        enabled: true,
+        sendEmailResetPassword: async ({ email, token, expiredAt }) => {
+          console.log('sendEmailResetPassword config', email, token, expiredAt)
+          return
         },
       },
     })
   )
+  .apply(
+    admin(context, {
+      schema: {
+        user: FullModelSchemas.user,
+      },
+      accessControl: accessControl,
+    })
+  )
   .apply(usersCollection)
   .apply(postsCollection)
+  .apply({
+    api: {
+      auth: {
+        setup: setupApi,
+      },
+    },
+  })
   .build()
 
 const nextjsApp = withNextJs(app)

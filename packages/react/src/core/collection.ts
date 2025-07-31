@@ -15,7 +15,7 @@ import {
   type FieldRelationShapeBase,
   type Fields,
   type FieldsClient,
-  type FieldShapeBase,
+  type FieldShape,
   type FieldShapeClient,
   type FieldsShape,
 } from './field'
@@ -156,7 +156,7 @@ export type InferMutationRelationField<TField extends FieldRelationShapeBase> =
     ? Simplify<InferManyRelationMutationFieldShape<TField>>
     : Simplify<InferOneRelationMutationFieldShape<TField>>
 
-export type InferUpdateFieldShape<TFieldShape extends FieldShapeBase> =
+export type InferUpdateFieldShape<TFieldShape extends FieldShape> =
   TFieldShape extends FieldRelationShapeBase
     ? TFieldShape extends FieldRelationCreateShape
       ? Simplify<
@@ -179,14 +179,14 @@ export type InferUpdateFieldShape<TFieldShape extends FieldShapeBase> =
 
 export type InferUpdateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShapeBase
+    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShape
       ? Simplify<InferUpdateFieldShape<TFieldsShape[TKey]>>
       : never
   },
   never
 >
 
-export type InferCreateFieldShape<TFieldShape extends FieldShapeBase> =
+export type InferCreateFieldShape<TFieldShape extends FieldShape> =
   TFieldShape extends FieldRelationShapeBase
     ? TFieldShape extends FieldRelationCreateShape
       ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create'>>
@@ -207,7 +207,7 @@ export type InferCreateFieldShape<TFieldShape extends FieldShapeBase> =
 
 export type InferCreateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TShapeKey in keyof TFieldsShape]: TFieldsShape[TShapeKey] extends FieldShapeBase
+    [TShapeKey in keyof TFieldsShape]: TFieldsShape[TShapeKey] extends FieldShape
       ? InferCreateFieldShape<TFieldsShape[TShapeKey]>
       : never
   },

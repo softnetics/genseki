@@ -35,6 +35,12 @@ model User {
   sessions      Session[]
   verifications Verification[]
 
+  roles           String[]
+  banned          Boolean   @default(false)
+  bannedReason    String?
+  bannedAt        DateTime?
+  bannedExpiresAt DateTime?
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }
