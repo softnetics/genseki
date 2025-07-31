@@ -29,7 +29,6 @@ const ignores = [
   'dist',
   'data',
   '__generated__',
-  'generated',
 ]
 
 /**

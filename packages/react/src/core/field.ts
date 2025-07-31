@@ -804,11 +804,11 @@ export function fieldToZodScheama<TField extends FieldBase>(
 }
 
 // TODO: Type is not correct, needs to be fixed
-type FieldsToZodObject<TFields extends Fields> = ZodObject<{
+type FieldsToZodObject<TFields extends FieldBase> = ZodObject<{
   [TKey in keyof TFields]: TFields[TKey] extends Field ? z.ZodTypeAny : never
 }>
 
-export function fieldsToZodObject<TFields extends Fields>(
+export function fieldsToZodObject<TFields extends FieldBase>(
   fields: TFields,
   method?: typeof ApiDefaultMethod.CREATE | typeof ApiDefaultMethod.UPDATE
 ): FieldsToZodObject<TFields> {

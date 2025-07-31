@@ -29,9 +29,9 @@ export * from './utils'
 
 export type AnyUserTable = WithAnyTable<{
   id: WithHasDefault<WithNotNull<AnyTypedColumn<string>>>
-  name: AnyTypedColumn<string>
-  email: AnyTypedColumn<string>
-  emailVerified: AnyTypedColumn<boolean>
+  name: WithNotNull<AnyTypedColumn<string>>
+  email: WithNotNull<AnyTypedColumn<string>>
+  emailVerified: WithNotNull<AnyTypedColumn<boolean>>
   image: AnyTypedColumn<string>
 }>
 

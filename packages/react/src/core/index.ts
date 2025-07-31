@@ -52,23 +52,6 @@ export { isApiRoute } from './endpoint'
 export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
 export * from './file-storage-adapters'
 export type {
-  FieldBaseSchema,
-  FieldColumnSchema,
-  FieldRelationSchema,
-  ModelConfig,
-  ModelSchema,
-  ModelSchemas,
-  ModelShape,
-  ModelShapeBase,
-  SanitizedFieldColumnSchema,
-  SanitizedFieldRelationSchema,
-  SanitizedModelSchema,
-  SanitizedModelSchemas,
-  SanitizedModelShape,
-  Simplify,
-} from './model'
-export { DataType, sanitizedFieldRelationSchema, SchemaType } from './model'
-export type {
   AnyTypedColumn,
   WithAnyRelations,
   WithAnyTable,

@@ -117,7 +117,7 @@ export function phone<TContext extends AnyContextable>(
           token: z.string().nullable(),
           user: z.object({
             id: z.string(),
-            name: z.string().nullable().optional(),
+            name: z.string(),
             email: z.string().nullable().optional(),
             phone: z.string().nullable().optional(),
             phoneVerified: z.boolean().nullable().optional(),
@@ -186,8 +186,8 @@ export function phone<TContext extends AnyContextable>(
           token: z.string().nullable(),
           user: z.object({
             id: z.string(),
-            name: z.string().nullable().optional(),
-            email: z.string().nullable().optional(),
+            name: z.string(),
+            email: z.string(),
             phone: z.string().nullable().optional(),
             image: z.string().nullable(),
           }),
