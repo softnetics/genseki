@@ -11,13 +11,13 @@
   ],
   "scripts": {
     "dev": "tsx ./scripts/dev.ts",
-    "build": "tsx ./scripts/build.ts",
     "typecheck": "tsc --noEmit",
     "lint": "eslint .",
     "lint:fix": "eslint . --fix",
     "format": "prettier --write .",
     "format:check": "prettier --check .",
-    "codegen": "tsx ./scripts/build.ts"
+    "codegen": "tsx ./scripts/build.ts",
+    "bundle": "rm -rf dist && tsx ./scripts/build.ts"
   },
   "keywords": [],
   "author": "",
@@ -32,7 +32,6 @@
   },
   "dependencies": {
     "@prisma/generator-helper": "^6.10.1",
-    "prisma": "^6.10.1",
     "typescript": "5.8.2"
   }
 }
