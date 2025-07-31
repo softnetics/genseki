@@ -1,5 +1,17 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.18
+
+## 0.1.0-alpha.17
+
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- [#94](https://github.com/softnetics/genseki/pull/94) [`7acbdc9`](https://github.com/softnetics/genseki/commit/7acbdc902aace63590a0a45f8ac9d67a57c1c7de) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Change core model of Genseki
+
+## 0.1.0-alpha.15
+
 ## 0.1.0-alpha.14
 
 ## 0.1.0-alpha.13

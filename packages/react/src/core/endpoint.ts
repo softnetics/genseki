@@ -8,7 +8,20 @@ import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } f
 import { withValidator } from './endpoint.utils'
 import { type ConditionalExceptNever } from './utils'
 
-export type ApiHttpStatus = 200 | 201 | 204 | 301 | 302 | 400 | 401 | 403 | 404 | 409 | 422 | 500
+export type ApiHttpStatus =
+  | 200
+  | 201
+  | 204
+  | 301
+  | 302
+  | 303
+  | 400
+  | 401
+  | 403
+  | 404
+  | 409
+  | 422
+  | 500
 
 export type InputSchema = ZodType<unknown, unknown> | undefined
 export type Output<T extends InputSchema> =
