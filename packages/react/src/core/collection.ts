@@ -1,26 +1,31 @@
-import type { Many, Table } from 'drizzle-orm'
-import type { ConditionalExcept, IsEqual, Simplify, ValueOf } from 'type-fest'
-import z from 'zod/v4'
+import type { ConditionalExcept, Simplify } from 'type-fest'
+import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
 
-import type { ContextToRequestContext, FieldBase } from '.'
 import { getFieldsClient } from './config'
-import type { AnyContextable } from './context'
-import { type AnyApiRouter, type ApiRoute, createEndpoint } from './endpoint'
+import type { AnyContextable, ContextToRequestContext } from './context'
+import { type AnyApiRouter } from './endpoint'
 import {
-  type FieldClient,
-  type FieldColumn,
+  type FieldColumnShape,
   type FieldMutateModeCollection,
-  type FieldOptionsBase,
-  type FieldRelation,
-  type FieldRelationBase,
-  type FieldRelationConnect,
-  type FieldRelationConnectOrCreate,
-  type FieldRelationCreate,
+  type FieldOptionsShapeBase,
+  type FieldRelationConnectOrCreateShape,
+  type FieldRelationConnectShape,
+  type FieldRelationCreateShape,
+  type FieldRelationShape,
+  type FieldRelationShapeBase,
   type Fields,
   type FieldsClient,
-  fieldsToZodObject,
+  type FieldShapeBase,
+  type FieldShapeClient,
+  type FieldsShape,
 } from './field'
-import { type ToZodObject } from './utils'
+import type { InferDataType } from './model'
+
+export type ToZodObject<T extends Record<string, any>> = ZodObject<{
+  [Key in keyof T]-?: T[Key] extends undefined
+    ? ZodOptional<ZodType<NonNullable<T[Key]>>>
+    : ZodType<T[Key]>
+}>
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 
@@ -37,7 +42,7 @@ export type MaybePromise<T> = T | Promise<T>
 
 export type ActivateFieldMutateMode<
   TType,
-  TField extends FieldOptionsBase,
+  TField extends FieldOptionsShapeBase,
   TMethod extends 'create' | 'update' | undefined = undefined,
 > = TMethod extends keyof TField
   ? TField[TMethod] extends FieldMutateModeCollection['HIDDEN']
@@ -84,12 +89,14 @@ export type ActivateFieldMutateMode<
  *
  *    Many Post can have One Category. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferOneRelationMutationField<TField extends FieldRelationBase> = {
-  create?: TField extends FieldRelationCreate | FieldRelationConnectOrCreate
-    ? InferCreateFields<TField['fields']>
+export type InferOneRelationMutationFieldShape<TFieldShape extends FieldRelationShapeBase> = {
+  create?: TFieldShape extends FieldRelationCreateShape | FieldRelationConnectOrCreateShape
+    ? InferCreateFieldsShape<TFieldShape['fields']['shape']>
     : never
-  connect?: TField['$server']['primaryColumn']['_']['data']
-  disconnect?: TField['$server']['primaryColumn']['_']['data']
+  // TODO: Only Support single forign key relation
+  connect?: InferDataType<TFieldShape['$server']['relation']['relationDataTypes'][0]>
+  // TODO: Only Support single forign key relation
+  disconnect?: InferDataType<TFieldShape['$server']['relation']['relationDataTypes'][0]>
 }
 
 /**
@@ -133,8 +140,8 @@ export type InferOneRelationMutationField<TField extends FieldRelationBase> = {
  *
  *   One Post can have Many PostTags. This means that the user "post_1" is connecting the relation with "category_1".
  */
-export type InferManyRelationMutationField<TField extends FieldRelationBase> = Array<
-  InferOneRelationMutationField<TField>
+export type InferManyRelationMutationFieldShape<TField extends FieldRelationShapeBase> = Array<
+  InferOneRelationMutationFieldShape<TField>
 >
 
 type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
@@ -144,59 +151,73 @@ type PickFromArrayOrObject<TArrayOrObject, TKeys extends string> =
       ? Pick<TArrayOrObject, TKeys>
       : never
 
-export type InferMutationRelationField<TField extends FieldRelationBase> =
-  TField['$server']['relation'] extends Many<any>
-    ? Simplify<InferManyRelationMutationField<TField>>
-    : Simplify<InferOneRelationMutationField<TField>>
+export type InferMutationRelationField<TField extends FieldRelationShapeBase> =
+  TField['$server']['relation']['isList'] extends true
+    ? Simplify<InferManyRelationMutationFieldShape<TField>>
+    : Simplify<InferOneRelationMutationFieldShape<TField>>
 
-export type InferUpdateField<TField extends FieldBase> = TField extends FieldRelationBase
-  ? TField extends FieldRelationCreate
-    ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'disconnect'>>
-    : TField extends FieldRelationConnect
+export type InferUpdateFieldShape<TFieldShape extends FieldShapeBase> =
+  TFieldShape extends FieldRelationShapeBase
+    ? TFieldShape extends FieldRelationCreateShape
       ? Simplify<
-          PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect' | 'disconnect'>
+          PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create' | 'disconnect'>
         >
-      : TField extends FieldRelationConnectOrCreate
-        ? Simplify<InferMutationRelationField<TField>>
-        : never
-  : TField extends FieldColumn<any>
-    ? ActivateFieldMutateMode<TField['$server']['column']['_']['data'], TField, 'update'>
-    : never
+      : TFieldShape extends FieldRelationConnectShape
+        ? Simplify<
+            PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'connect' | 'disconnect'>
+          >
+        : TFieldShape extends FieldRelationConnectOrCreateShape
+          ? Simplify<InferMutationRelationField<TFieldShape>>
+          : never
+    : TFieldShape extends FieldColumnShape<any>
+      ? ActivateFieldMutateMode<
+          InferDataType<TFieldShape['$server']['column']['dataType']>,
+          TFieldShape,
+          'update'
+        >
+      : never
 
-export type InferUpdateFields<TFields extends Fields> = SimplifyConditionalExcept<
+export type InferUpdateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldBase
-      ? Simplify<InferUpdateField<TFields[TKey]>>
+    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShapeBase
+      ? Simplify<InferUpdateFieldShape<TFieldsShape[TKey]>>
       : never
   },
   never
 >
 
-export type InferCreateField<TField extends FieldBase> = TField extends FieldRelationBase
-  ? TField extends FieldRelationCreate
-    ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create'>>
-    : TField extends FieldRelationConnect
-      ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'connect'>>
-      : TField extends FieldRelationConnectOrCreate
-        ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TField>, 'create' | 'connect'>>
-        : never
-  : TField extends FieldColumn<any>
-    ? ActivateFieldMutateMode<TField['$server']['column']['_']['data'], TField, 'create'>
-    : never
+export type InferCreateFieldShape<TFieldShape extends FieldShapeBase> =
+  TFieldShape extends FieldRelationShapeBase
+    ? TFieldShape extends FieldRelationCreateShape
+      ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create'>>
+      : TFieldShape extends FieldRelationConnectShape
+        ? Simplify<PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'connect'>>
+        : TFieldShape extends FieldRelationConnectOrCreateShape
+          ? Simplify<
+              PickFromArrayOrObject<InferMutationRelationField<TFieldShape>, 'create' | 'connect'>
+            >
+          : never
+    : TFieldShape extends FieldColumnShape<any>
+      ? ActivateFieldMutateMode<
+          InferDataType<TFieldShape['$server']['column']['dataType']>,
+          TFieldShape,
+          'create'
+        >
+      : never
 
-export type InferCreateFields<TFields extends Fields> = SimplifyConditionalExcept<
+export type InferCreateFieldsShape<TFieldsShape extends FieldsShape> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldBase
-      ? InferCreateField<TFields[TKey]>
+    [TShapeKey in keyof TFieldsShape]: TFieldsShape[TShapeKey] extends FieldShapeBase
+      ? InferCreateFieldShape<TFieldsShape[TShapeKey]>
       : never
   },
   never
 >
 
-export type InferRelationField<TField extends FieldRelation<any>> =
-  TField['$server']['relation'] extends Many<any>
-    ? InferManyRelationMutationField<TField>
-    : InferOneRelationMutationField<TField>
+export type InferRelationField<TFieldShape extends FieldRelationShape<any>> =
+  TFieldShape['$server']['relation']['isList'] extends true
+    ? InferManyRelationMutationFieldShape<TFieldShape>
+    : InferOneRelationMutationFieldShape<TFieldShape>
 
 /**
  * Infer the type of a field based on the field type and the method.
@@ -241,14 +262,14 @@ export type InferRelationField<TField extends FieldRelation<any>> =
  * type UserOrganization = InferField<(typeof userField)["organization"],> // => { __pk: string; name: string; roleId: string }
  * ```
  */
-export type InferField<TField extends FieldClient> =
-  TField extends FieldRelation<any>
-    ? TField['$server']['relation'] extends Many<any>
+export type InferField<TField extends FieldShapeClient> =
+  TField extends FieldRelationShape<any>
+    ? TField['$server']['relation']['isList'] extends true
       ? // TODO: Order field
         Array<Simplify<InferFields<TField['fields']>>>
       : Simplify<InferFields<TField['fields']>>
-    : TField extends FieldColumn<any>
-      ? TField['$server']['column']['_']['data']
+    : TField extends FieldColumnShape<any>
+      ? InferDataType<TField['$server']['column']['dataType']>
       : never
 
 /**
@@ -283,11 +304,11 @@ export type InferField<TField extends FieldClient> =
  */
 export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
-    [TKey in keyof TFields]: TFields[TKey] extends FieldClient
-      ? TFields[TKey] extends FieldColumn<any>
-        ? Simplify<InferField<TFields[TKey]>>
+    [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeClient
+      ? TFields['shape'][TKey] extends FieldColumnShape<any>
+        ? Simplify<InferField<TFields['shape'][TKey]>>
         : // NOTE: This is to remove the __id field from the relation fields
-          Simplify<Omit<InferField<TFields[TKey]>, '__id'>>
+          Simplify<Omit<InferField<TFields['shape'][TKey]>, '__id'>>
       : never
   },
   never
@@ -327,7 +348,7 @@ export type ApiReturnType<
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? { __pk: string | number; __id: string | number }
         : TMethod extends typeof ApiDefaultMethod.DELETE
-          ? void
+          ? { success: boolean }
           : never
 
 export type ApiFindOneArgs = {
@@ -343,7 +364,7 @@ export type ApiFindManyArgs = {
 }
 
 export type ApiCreateArgs<TFields extends Fields> = {
-  data: InferCreateFields<TFields>
+  data: InferCreateFieldsShape<TFields['shape']>
 }
 
 export type ApiHandlerFn<
@@ -355,7 +376,7 @@ export type ApiHandlerFn<
 export type ApiUpdateArgs<TFields extends Fields> = {
   // This should be the primary field of the collection e.g. __pk or username
   id: string | number
-  data: InferUpdateFields<TFields>
+  data: InferUpdateFieldsShape<TFields['shape']>
 }
 
 export type ApiDeleteArgs = {
@@ -364,7 +385,7 @@ export type ApiDeleteArgs = {
 
 export type ApiConfigHandlerFn<
   TContext extends AnyContextable,
-  TFields extends Fields,
+  in out TFields extends Fields,
   TMethod extends ApiDefaultMethod,
 > = (
   args: ApiArgs<TContext, TMethod, TFields> & {
@@ -372,7 +393,10 @@ export type ApiConfigHandlerFn<
   }
 ) => MaybePromise<ApiReturnType<TMethod, TFields>>
 
-export type CollectionAdminApiOptions<TContext extends AnyContextable, TFields extends Fields> = {
+export type CollectionAdminApiOptions<
+  TContext extends AnyContextable,
+  in out TFields extends Fields,
+> = {
   create?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
   findOne?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
   findMany?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
@@ -390,29 +414,18 @@ export type CollectionAdminApi<TContext extends AnyContextable, TFields extends 
 
 export type CollectionAdminOptions<
   TContext extends AnyContextable,
-  TFields extends Fields,
-  TApiRouter extends AnyApiRouter,
+  in out TFields extends Fields,
+  in out TApiRouter extends AnyApiRouter,
 > = {
   api?: CollectionAdminApiOptions<TContext, TFields>
   endpoints?: TApiRouter
 }
 
-export type GetUniqueNotNullColumnNames<TTable extends Table> = ValueOf<{
-  // TODO: Currently, drizzle-orm does not provide a way to get unique and not null columns
-  // This fix this after the PR was merged: https://github.com/drizzle-team/drizzle-orm/pull/4567
-  [TColumnName in keyof TTable['_']['columns'] as TTable['_']['columns'][TColumnName]['_']['notNull'] extends true
-    ? TColumnName
-    : never]: TColumnName
-}>
-
 export interface CollectionOptions<
-  TSlug extends string,
   TContext extends AnyContextable,
-  TFields extends Fields,
-  TAppRouter extends AnyApiRouter,
+  in out TFields extends Fields,
+  in out TAppRouter extends AnyApiRouter,
 > {
-  // TODO: This should not exists, "fields" should know about this information. Need to refactor
-  slug: TSlug
   identifierColumn: string
   fields: TFields
   admin?: CollectionAdminOptions<TContext, TFields, TAppRouter>
@@ -424,273 +437,12 @@ export interface CollectionOptionsClient {
   fields: FieldsClient
 }
 
-export type GetAllTableTsNames<TFullSchema extends Record<string, unknown>> = Extract<
-  {
-    [TKey in keyof TFullSchema]: TFullSchema[TKey] extends Table<any> ? TKey : never
-  }[keyof TFullSchema],
-  string
->
-
-export type ConditionalAnyOutput<TFields extends Fields, TOutput> =
-  IsEqual<TFields, Fields> extends true ? any : TOutput
-
-export type ConvertCollectionDefaultApiToApiRouteSchema<
-  TSlug extends string,
-  TMethod extends ApiDefaultMethod,
-  TFields extends Fields,
-> = TMethod extends typeof ApiDefaultMethod.CREATE
-  ? {
-      path: `/${TSlug}`
-      method: 'POST'
-      body: ConditionalAnyOutput<TFields, ToZodObject<InferCreateFields<TFields>>>
-      responses: {
-        200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
-      }
-    }
-  : TMethod extends typeof ApiDefaultMethod.FIND_ONE
-    ? {
-        path: `/${TSlug}/:id`
-        method: 'GET'
-        pathParams: ToZodObject<{ id: string }>
-        responses: {
-          200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
-        }
-      }
-    : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? {
-          path: `/${TSlug}`
-          method: 'GET'
-          query: ToZodObject<{
-            limit?: number
-            offset?: number
-            orderBy?: string
-            orderType?: 'asc' | 'desc'
-          }>
-          responses: {
-            200: ConditionalAnyOutput<TFields, ToZodObject<ApiReturnType<TMethod, TFields>>>
-          }
-        }
-      : TMethod extends typeof ApiDefaultMethod.UPDATE
-        ? {
-            path: `/${TSlug}/:id`
-            method: 'PATCH'
-            pathParams: ToZodObject<{ id: string }>
-            body: ConditionalAnyOutput<TFields, ToZodObject<InferUpdateFields<TFields>>>
-            responses: {
-              200: ToZodObject<ApiReturnType<TMethod, TFields>>
-            }
-          }
-        : TMethod extends typeof ApiDefaultMethod.DELETE
-          ? {
-              path: `/${TSlug}`
-              method: 'DELETE'
-              body: ToZodObject<{ ids: string[] | number[] }>
-              responses: {
-                // TODO: recheck this
-                200: ToZodObject<{}>
-              }
-            }
-          : never
-
-export type CollectionDefaultAdminApiRouter<TSlug extends string, TFields extends Fields> = {
-  create: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.CREATE, TFields>
-  >
-  findOne: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.FIND_ONE, TFields>
-  >
-  findMany: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.FIND_MANY, TFields>
-  >
-  update: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.UPDATE, TFields>
-  >
-  delete: ApiRoute<
-    ConvertCollectionDefaultApiToApiRouteSchema<TSlug, typeof ApiDefaultMethod.DELETE, TFields>
-  >
-}
-
-export function getDefaultCollectionAdminApiRouter(
-  context: AnyContextable,
-  slug: string,
-  fields: Fields,
-  defaultHandler: CollectionAdminApiOptions<AnyContextable, Fields>
-): CollectionDefaultAdminApiRouter<string, Fields> {
-  return Object.fromEntries(
-    Object.entries(defaultHandler).map(([method, fn]) => {
-      const endpointName = method
-      switch (method) {
-        case ApiDefaultMethod.CREATE: {
-          // TODO: Create ApiRouteSchema from fields and method
-          const body = fieldsToZodObject(fields as any, ApiDefaultMethod.CREATE)
-
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}`,
-              method: 'POST',
-              // TODO: fieldToZodObject but create fields
-              body: body,
-              responses: {
-                200: z.object({
-                  __pk: z.union([z.string(), z.number()]),
-                  __id: z.union([z.string(), z.number()]),
-                }),
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                data: args.body,
-              })
-              return { status: 200, body: response }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.FIND_ONE: {
-          const response = fieldsToZodObject(fields as any)
-
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}/:id`,
-              method: 'GET',
-              pathParams: z.object({
-                id: z.union([z.string(), z.number()]),
-              }),
-              responses: {
-                200: response,
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                id: args.pathParams.id,
-              })
-              return { status: 200, body: response }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.FIND_MANY: {
-          const body = fieldsToZodObject(fields as any)
-          const response = z.object({
-            data: z.array(body),
-            total: z.number(),
-            page: z.number(),
-          })
-
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}`,
-              method: 'GET',
-              query: z.object({
-                limit: z.number().optional(),
-                offset: z.number().optional(),
-                orderBy: z.string().optional(),
-                orderType: z.enum(['asc', 'desc']).optional(),
-              }),
-              responses: {
-                200: response,
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                limit: args.query.limit,
-                offset: args.query.offset,
-                orderBy: args.query.orderBy,
-                orderType: args.query.orderType,
-              })
-              return { status: 200, body: response }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.UPDATE: {
-          const body = fieldsToZodObject(fields as any, ApiDefaultMethod.UPDATE)
-
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}/:id`,
-              method: 'PATCH',
-              pathParams: z.object({
-                id: z.union([z.string(), z.number()]),
-              }),
-              // TODO: fieldToZodObject but update fields
-              body: body,
-              responses: {
-                200: z.object({
-                  __pk: z.union([z.string(), z.number()]),
-                  __id: z.union([z.string(), z.number()]),
-                }),
-              },
-            },
-            async (args) => {
-              const response = await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug: slug,
-                fields: fields,
-                context: args.context,
-                id: args.pathParams.id,
-                data: args.body as any, // TODO: Fix this
-              })
-              return { status: 200, body: response }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        case ApiDefaultMethod.DELETE: {
-          const endpoint = createEndpoint(
-            context,
-            {
-              path: `/${slug}`,
-              method: 'DELETE',
-              body: z.object({
-                ids: z.union([z.string().array(), z.number().array()]),
-              }),
-              responses: {
-                200: z.object({ message: z.string() }),
-              },
-            },
-            async (args) => {
-              await (fn as ApiHandlerFn<AnyContextable, Fields, typeof method>)({
-                slug,
-                fields,
-                context: args.context,
-                ids: args.body.ids,
-              })
-              return { status: 200, body: { message: 'ok' } }
-            }
-          )
-
-          return [endpointName, endpoint]
-        }
-        default: {
-          throw new Error(`Unknown method ${method} for collection ${slug}`)
-        }
-      }
-    })
-  )
-}
-
 export function getCollectionOptionsClient<TContext extends AnyContextable, TFields extends Fields>(
-  collectionOptions: Omit<CollectionOptions<string, TContext, TFields, any>, 'admin'>
+  slug: string,
+  collectionOptions: Omit<CollectionOptions<TContext, TFields, any>, 'admin'>
 ): CollectionOptionsClient {
   return {
-    slug: collectionOptions.slug,
+    slug: slug,
     identifierColumn: collectionOptions.identifierColumn,
     fields: getFieldsClient(collectionOptions.fields),
   }

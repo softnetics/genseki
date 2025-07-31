@@ -12,6 +12,30 @@ export const DataType = {
 
 export type DataType = (typeof DataType)[keyof typeof DataType]
 
+export type InferDataType<T extends DataType> = T extends typeof DataType.STRING
+  ? string
+  : T extends typeof DataType.INT
+    ? number
+    : T extends typeof DataType.FLOAT
+      ? number
+      : T extends typeof DataType.BOOLEAN
+        ? boolean
+        : T extends typeof DataType.DATETIME
+          ? Date
+          : T extends typeof DataType.JSON
+            ? Record<string, any>
+            : T extends typeof DataType.BYTES
+              ? Uint8Array
+              : T extends typeof DataType.BIGINT
+                ? bigint
+                : T extends typeof DataType.DECIMAL
+                  ? string
+                  : never
+
+export type InferDataTypes<T extends DataType[]> = {
+  [K in T[number]]: InferDataType<K>
+}
+
 export const SchemaType = {
   COLUMN: 'COLUMN',
   RELATION: 'RELATION',
@@ -28,12 +52,12 @@ export interface ModelConfig {
 export interface FieldBaseSchema {
   schema: SchemaType
   name: string
-  isId: boolean
-  isList: boolean
-  isUnique: boolean
-  isRequired: boolean
-  isReadOnly: boolean
-  hasDefaultValue: boolean
+  isId?: boolean
+  isList?: boolean
+  isUnique?: boolean
+  isRequired?: boolean
+  isReadOnly?: boolean
+  hasDefaultValue?: boolean
 }
 
 export interface SanitizedFieldColumnSchema extends FieldBaseSchema {
@@ -50,11 +74,16 @@ export interface SanitizedFieldRelationSchema extends FieldBaseSchema {
 
   relationToFields: string[]
   relationFromFields: string[]
-  relationDataTypes: string[]
+  relationDataTypes: DataType[]
 }
 
 export interface FieldRelationSchema extends Omit<SanitizedFieldRelationSchema, 'referencedModel'> {
   referencedModel: ModelSchema<ModelShape, ModelConfig>
+}
+
+export interface AnyFieldRelationSchema
+  extends Omit<SanitizedFieldRelationSchema, 'referencedModel'> {
+  referencedModel: ModelSchema<any, ModelConfig>
 }
 
 export interface ModelShapeBase {
@@ -72,18 +101,23 @@ export interface ModelShape extends ModelShapeBase {
   relations: Record<string, FieldRelationSchema>
 }
 
+export interface AnyModelShape extends ModelShapeBase {
+  columns: Record<string, FieldColumnSchema>
+  relations: Record<string, AnyFieldRelationSchema>
+}
+
 export interface SanitizedModelSchema<
-  TShape extends SanitizedModelShape,
-  TConfig extends ModelConfig,
+  TShape extends SanitizedModelShape = SanitizedModelShape,
+  TConfig extends ModelConfig = ModelConfig,
 > {
   shape: TShape
   config: TConfig
 }
 
-export interface SanitizedModelSchemas extends Record<string, SanitizedModelSchema<any, any>> {}
+export interface SanitizedModelSchemas extends Record<string, SanitizedModelSchema> {}
 
 export interface ModelSchema<
-  TShape extends ModelShape = ModelShape,
+  TShape extends ModelShape = AnyModelShape,
   TConfig extends ModelConfig = ModelConfig,
 > {
   shape: TShape
@@ -104,8 +138,30 @@ export function sanitizedFieldRelationSchema<T extends FieldRelationSchema>(
 ): SanitizeFieldRelationSchema<T> {
   return {
     ...field,
-    referencedModel: field.referencedModel.config.name,
+    referencedModel: field.referencedModel.config.prismaModelName,
   }
+}
+
+export function unsanitizedModelSchemas<TModelSchemas extends ModelSchemas>(
+  schemas: SanitizedModelSchemas
+): TModelSchemas {
+  const result: ModelSchemas = Object.fromEntries(
+    Object.entries(schemas).map(([name, schema]) => {
+      const relations = Object.fromEntries(
+        Object.entries(schema.shape.relations).map(([key, value]) => {
+          const _value = { ...value }
+          Object.defineProperty(_value, 'referencedModel', {
+            get() {
+              return schemas[schema.shape.relations[key].referencedModel]
+            },
+          })
+          return [key, _value as unknown as FieldRelationSchema]
+        })
+      )
+      return [name, { ...schema, shape: { ...schema.shape, relations } }]
+    })
+  )
+  return result as TModelSchemas
 }
 
 export type Simplify<T> = {

@@ -37,8 +37,8 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
         }
       }
 
-      const verification = await builderArgs.handler.verification.findByResetPasswordToken(
-        args.query.token
+      const verification = await builderArgs.handler.verification.findByIdentifier(
+        builderArgs.handler.identifier.resetPassword(args.query.token)
       )
 
       if (!verification || !verification.value) {
@@ -65,12 +65,15 @@ export function resetPasswordEmail<TContext extends Contextable, TAuthOptions ex
       }
 
       // delete the verification token
-      await builderArgs.handler.verification.delete(verification.id)
+      await builderArgs.handler.verification.deleteByIdentifier(
+        builderArgs.handler.identifier.resetPassword(args.query.token)
+      )
 
       const hashedPassword = await defaultHashPassword(args.body.password)
       await builderArgs.handler.account.updatePassword(user.id, hashedPassword)
 
-      const redirectTo = `${builderArgs.options.method.emailAndPassword?.resetPassword?.redirectTo ?? '/auth/login'}`
+      // const redirectTo = `${builderArgs.options.method.emailAndPassword?.resetPassword?.redirectTo ?? '/auth/login'}`
+      const redirectTo = '/auth/login'
 
       const responseHeaders = {
         Location: redirectTo,
@@ -131,8 +134,8 @@ export function validateResetToken<TContext extends Contextable, TAuthOptions ex
     },
     async (args) => {
       try {
-        const verification = await builderArgs.handler.verification.findByResetPasswordToken(
-          args.body.token
+        const verification = await builderArgs.handler.verification.findByIdentifier(
+          builderArgs.handler.identifier.resetPassword(args.body.token)
         )
 
         const validatedVerification = validateVerification(verification)

@@ -4,10 +4,15 @@ import { createRouter } from 'radix3'
 import {
   type ApiRoute,
   type ApiRouter,
-  type ApiRouteSchema,
+  flattenApiRouter,
   type GensekiCore,
   isApiRoute,
 } from '@genseki/react'
+
+interface RouteData {
+  route: ApiRoute
+  methodName: string
+}
 
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}
@@ -46,6 +51,10 @@ async function makeApiRoute(
     // This is useful for file uploads or plain text requests
   }
 
+  const response = new Response(null, {
+    headers: { 'Content-Type': 'application/json' },
+  })
+
   try {
     const rawResponse = await route.handler(
       {
@@ -54,15 +63,18 @@ async function makeApiRoute(
         query: reqSearchParams,
         body,
       },
-      req
+      { request: req, response }
     )
 
-    return new Response(JSON.stringify(rawResponse) as any, {
+    if (response.headers.get('Content-Type') === 'application/json') {
+      return Response.json(rawResponse, {
+        status: rawResponse.status,
+        headers: response.headers,
+      })
+    }
+    return new Response(rawResponse as any, {
       status: rawResponse.status,
-      headers: {
-        'Content-Type': 'application/json',
-        ...rawResponse.headers,
-      },
+      headers: response.headers,
     })
   } catch (error: any) {
     console.error('Error in API route:', error)
@@ -78,31 +90,40 @@ async function makeApiRoute(
   }
 }
 
-async function lookupRoute(radixRouter: ReturnType<typeof createRouter>, req: NextRequest) {
+async function lookupRoute(
+  radixRouter: ReturnType<typeof createRouter<RouteData>>,
+  req: NextRequest
+) {
   const match = radixRouter.lookup(req.nextUrl.pathname)
   if (!match) return Response.json({ message: 'Not Found' }, { status: 404 })
   const pathParams = match.params
-  const route = match.route as ApiRoute<any>
+  const route = match.route
   return makeApiRoute(req, route, pathParams)
 }
 
-export function createApiResourceRouter(core: GensekiCore) {
-  const apiRouter = core.api
+interface ApiResourceRouterOptions {
+  pathPrefix?: string
+}
 
-  const radixGetRouter = createRouter({
-    routes: createRadixRoutesFromApiRouter(apiRouter, 'GET'),
+export function createApiResourceRouter(core: GensekiCore, options: ApiResourceRouterOptions = {}) {
+  const pathPrefix = options.pathPrefix ?? ''
+
+  const flatApiRouter = flattenApiRouter(core.api)
+
+  const radixGetRouter = createRouter<RouteData>({
+    routes: createRadixRoutesFromApiRouter(flatApiRouter, 'GET', { ...options, pathPrefix }),
   })
-  const radixPostRouter = createRouter({
-    routes: createRadixRoutesFromApiRouter(apiRouter, 'POST'),
+  const radixPostRouter = createRouter<RouteData>({
+    routes: createRadixRoutesFromApiRouter(flatApiRouter, 'POST', { ...options, pathPrefix }),
   })
-  const radixPutRouter = createRouter({
-    routes: createRadixRoutesFromApiRouter(apiRouter, 'PUT'),
+  const radixPutRouter = createRouter<RouteData>({
+    routes: createRadixRoutesFromApiRouter(flatApiRouter, 'PUT', { ...options, pathPrefix }),
   })
-  const radixPatchRouter = createRouter({
-    routes: createRadixRoutesFromApiRouter(apiRouter, 'PATCH'),
+  const radixPatchRouter = createRouter<RouteData>({
+    routes: createRadixRoutesFromApiRouter(flatApiRouter, 'PATCH', { ...options, pathPrefix }),
   })
-  const radixDeleteRouter = createRouter({
-    routes: createRadixRoutesFromApiRouter(apiRouter, 'DELETE'),
+  const radixDeleteRouter = createRouter<RouteData>({
+    routes: createRadixRoutesFromApiRouter(flatApiRouter, 'DELETE', { ...options, pathPrefix }),
   })
 
   return {
@@ -124,10 +145,15 @@ export function createApiResourceRouter(core: GensekiCore) {
   }
 }
 
+interface CreateRadixRoutesFromApiRouterOptions {
+  pathPrefix: string
+}
+
 function createRadixRoutesFromApiRouter(
   apiRoutes: ApiRouter,
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
-): Record<string, { route: ApiRouteSchema; methodName: string }> {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE',
+  options: CreateRadixRoutesFromApiRouterOptions
+): Record<string, RouteData> {
   const filteredRoutes = Object.entries(apiRoutes).filter(([, router]) => {
     if (isApiRoute(router)) {
       return router.schema.method === method
@@ -136,9 +162,13 @@ function createRadixRoutesFromApiRouter(
 
   const routes = filteredRoutes.flatMap(([methodName, router]) => {
     if (isApiRoute(router)) {
-      return [[router.schema.path, { route: router.schema, methodName }]] as const
+      return [
+        [`${options.pathPrefix}${router.schema.path}`, { route: router, methodName }],
+      ] as const
     }
-    const nestedRoutes = Object.entries(createRadixRoutesFromApiRouter(router, method)).map(
+    const nestedRoutes = Object.entries(
+      createRadixRoutesFromApiRouter(router, method, options)
+    ).map(
       ([path, route]) =>
         [path, { route: route.route, methodName: `${methodName}.${route.methodName}` }] as const
     )

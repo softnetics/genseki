@@ -3,15 +3,11 @@ import z from 'zod/v4'
 import type { Contextable } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import type { AuthApiBuilderArgs, AuthOptions } from '..'
-import { AccountProvider } from '../constant'
-import { defaultHashPassword, setSessionCookie } from '../utils'
+import { ResponseHelper } from '../utils'
 
 export function signUpEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
 ) {
-  const passwordHasher =
-    builderArgs.options.method.emailAndPassword?.passwordHasher ?? defaultHashPassword
-
   return createEndpoint(
     builderArgs.context,
     {
@@ -19,7 +15,7 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
       path: '/auth/sign-up/email',
       body: z
         .object({
-          name: z.string(),
+          name: z.string().nullable().optional(),
           email: z.string(),
           password: z.string().min(6, { error: 'Password must be at least 6 characters' }),
         })
@@ -29,35 +25,27 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           token: z.string().nullable(),
           user: z.object({
             id: z.string(),
-            name: z.string().nullable(),
-            email: z.string().nullable(),
-            image: z.string().nullable(),
+            name: z.string().nullable().optional(),
+            email: z.string(),
+            image: z.string().nullable().optional(),
           }),
         }),
       },
     },
-    async (args) => {
-      const hashedPassword = await passwordHasher(args.body.password)
-
-      const user = await builderArgs.handler.user.create({
-        name: args.body.name,
-        email: args.body.email,
-        image: null,
-      })
-
-      await builderArgs.handler.account.link({
-        userId: user.id,
-        providerId: AccountProvider.CREDENTIAL,
-        accountId: user.id,
-        password: hashedPassword,
+    async (args, { response }) => {
+      const { user } = await builderArgs.handler.user.createWithEmail({
+        user: {
+          name: args.body.name ?? null,
+          email: args.body.email,
+        },
+        account: {
+          rawPassword: args.body.password,
+        },
       })
 
       // TODO: Check if sending email verification is enabled
       // NOTE: Callback URL is used for email verification
 
-      // Check if auto login is enabled
-
-      const responseHeaders = {}
       if (builderArgs.options.method.emailAndPassword?.signUp?.autoLogin !== false) {
         const session = await builderArgs.handler.session.create({
           userId: user.id,
@@ -65,15 +53,17 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
           expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
         })
         // Set session cookie if auto login is enabled
-        setSessionCookie(responseHeaders, session.token)
+        ResponseHelper.setSessionCookie(response, session.token)
 
         return {
           status: 200,
           body: {
             token: session.token,
-            user: user,
+            user: {
+              ...user,
+              email: args.body.email,
+            },
           },
-          headers: responseHeaders,
         }
       }
 
@@ -81,9 +71,11 @@ export function signUpEmail<TContext extends Contextable, TAuthOptions extends A
         status: 200,
         body: {
           token: null,
-          user: user,
+          user: {
+            ...user,
+            email: args.body.email,
+          },
         },
-        headers: responseHeaders,
       }
     }
   )

@@ -5,6 +5,7 @@ import type { JSONSchema } from 'zod/v4/core'
 
 import type { MaybePromise } from './collection'
 import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'
+import { withValidator } from './endpoint.utils'
 import { type ConditionalExceptNever } from './utils'
 
 export type ApiHttpStatus =
@@ -41,6 +42,22 @@ export type FlattenApiRouter<TApiRouter extends AnyApiRouter> = ValueOf<{
       ? Simplify<FlattenApiRouter<TApiRouter>>
       : never
 }>
+
+export function flattenApiRouter<TApiRouter extends AnyApiRouter>(
+  apiRouter: TApiRouter,
+  prefix: string = ''
+): Record<string, ApiRoute> {
+  const flattened: Record<string, ApiRoute> = {}
+  for (const key in apiRouter) {
+    const route = apiRouter[key]
+    if (isApiRoute(route)) {
+      flattened[`${prefix}${key}`] = route
+      continue
+    }
+    Object.assign(flattened, flattenApiRouter(route, `${prefix}${key}.`))
+  }
+  return flattened
+}
 
 export type FilterByMethod<TApiRoute extends ApiRoute, TMethod extends string> = Extract<
   TApiRoute,
@@ -82,21 +99,21 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
       ? {
           status: TStatus
           body: Output<TResponses[TStatus]>
-          headers?: Record<string, string>
         }
       : never
   }>
 
 export type ApiRouteHandler<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = (
   payload: ApiRouteHandlerPayload<TApiRouteSchema>,
-  request: Request
+  meta: { request: Request; response: Response }
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type ApiRouteHandlerInitial<
   TContext extends AnyRequestContextable,
   TApiRouteSchema extends ApiRouteSchema,
 > = (
-  payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext }
+  payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext },
+  meta: { request: Request; response: Response }
 ) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
@@ -120,6 +137,7 @@ export interface ApiRouteSchema {
   description?: string
   responses: Partial<Record<ApiHttpStatus, InputSchema>>
 }
+
 export interface ApiRouteSchemaClient {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
@@ -163,23 +181,22 @@ export function isApiRoute<TApiRoute extends ApiRoute>(
 
 export function createEndpoint<
   const TContext extends AnyContextable,
-  const TApiEndpointSchema extends ApiRouteSchema,
+  const TApiRouteSchema extends ApiRouteSchema,
 >(
   context: TContext,
-  schema: TApiEndpointSchema,
-  handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
-): ApiRoute<TApiEndpointSchema> {
+  schema: TApiRouteSchema,
+  handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiRouteSchema>
+): ApiRoute<TApiRouteSchema> {
   return {
     schema: schema,
-    // TODO: Recheck with Validator.
-    // handler: withValidator(schema, (payload, request) => {
-    //   const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
-    //   return handler({ ...payload, context: requestContext })
-    // }),
-    handler: (payload, request) => {
+    handler: withValidator(schema, async (payload, { request, response }) => {
       const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
-      return handler({ ...payload, context: requestContext })
-    },
+      const responseBody = await handler(
+        { ...payload, context: requestContext },
+        { request, response }
+      )
+      return responseBody
+    }),
   }
 }
 

@@ -4,7 +4,7 @@ import type { Contextable } from '../../core/context'
 import { createEndpoint } from '../../core/endpoint'
 import type { AuthApiBuilderArgs, AuthOptions } from '..'
 import { AccountProvider } from '../constant'
-import { setSessionCookie, verifyPassword } from '../utils'
+import { ResponseHelper, verifyPassword } from '../utils'
 
 export function loginEmail<TContext extends Contextable, TAuthOptions extends AuthOptions>(
   builderArgs: AuthApiBuilderArgs<TContext, TAuthOptions>
@@ -30,8 +30,8 @@ export function loginEmail<TContext extends Contextable, TAuthOptions extends Au
         }),
       },
     },
-    async (args) => {
-      const account = await builderArgs.handler.account.findByUserEmailAndProvider(
+    async (args, { response, request }) => {
+      const { account, user } = await builderArgs.handler.account.findByUserEmailAndProvider(
         args.body.email,
         AccountProvider.CREDENTIAL
       )
@@ -42,20 +42,18 @@ export function loginEmail<TContext extends Contextable, TAuthOptions extends Au
       }
 
       const session = await builderArgs.handler.session.create({
-        userId: account.user.id,
+        userId: user.id,
         // TODO: Customize expiresAt
         expiresAt: new Date(Date.now() + 1000 * 60 * 60 * 24),
       })
 
-      const responseHeaders = {}
-      setSessionCookie(responseHeaders, session.token)
+      ResponseHelper.setSessionCookie(response, session.token)
 
       return {
         status: 200,
-        headers: responseHeaders,
         body: {
           token: session.token,
-          user: account.user,
+          user: user,
         },
       }
     }

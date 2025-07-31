@@ -1,48 +1,44 @@
-import type { AnyColumn, AnyTable, Relations } from 'drizzle-orm'
-import type { Merge, UnionToIntersection } from 'type-fest'
+import type { UndefinedToOptional } from 'type-fest/source/internal'
 
-export type AnyTypedColumn<T> = AnyColumn & {
-  _: {
-    data: T
-    dataType: T extends string
-      ? 'string'
-      : T extends number
-        ? 'number'
-        : T extends boolean
-          ? 'boolean'
-          : T extends Date
-            ? 'date'
-            : never
-    dialect: 'pg'
-  }
-} & {}
-export type WithHasDefault<T> = T & { _: { hasDefault: true } }
-export type WithNotNull<T> = T & { _: { notNull: true } }
-export type WithAnyTable<
-  TColumns extends Record<string, AnyColumn>,
-  TName extends string = string,
-> = AnyTable<{
-  name: TName
-  dialect: 'pg'
-  columns: TColumns
-}> &
-  TColumns
+import type {
+  DataType,
+  FieldColumnSchema,
+  InferDataType,
+  ModelConfig,
+  ModelSchema,
+  ModelShape,
+} from './model'
 
-type AnyRelationsFromTableKey<T extends string | number | symbol> = T extends string
-  ? {
-      [key: string]: Relations<T>
-    }
-  : never
-
-type AnyRelations<T extends Record<string, unknown>> = UnionToIntersection<
-  AnyRelationsFromTableKey<keyof T>
->
-
-type WithAnyTableSchema<T extends Record<string, unknown>> = T & {
-  [key: string]: WithAnyTable<any, string>
+export interface AnyTypedFieldColumn<T extends DataType> extends FieldColumnSchema {
+  dataType: T
 }
 
-export type WithAnyRelations<
-  T extends Record<string, unknown>,
-  U extends WithAnyTableSchema<T> = WithAnyTableSchema<T>,
-> = Merge<AnyRelations<U>, U>
+export type WithHasDefaultValue<T> = T & { hasDefaultValue: true }
+export type WithIsRequired<T> = T & { isRequired: true }
+export type WithIsUnique<T> = T & { isUnique: true }
+
+export interface AnyTable<
+  TShape extends Omit<ModelShape, 'primaryFields' | 'uniqueFields'> = Omit<
+    ModelShape,
+    'primaryFields' | 'uniqueFields'
+  >,
+> extends ModelSchema<
+    TShape & {
+      primaryFields: string[]
+      uniqueFields: string[][]
+    },
+    ModelConfig
+  > {}
+
+export type InferTableType<T extends AnyTable> = UndefinedToOptional<
+  {
+    [K in keyof T['shape']['columns']]: T['shape']['columns'][K]['isRequired'] extends true
+      ? InferDataType<T['shape']['columns'][K]['dataType']>
+      : InferDataType<T['shape']['columns'][K]['dataType']> | null | undefined
+  } & {
+    [K in keyof T['shape']['relations']]: T['shape']['relations'][K]['isRequired'] extends true
+      ? // TODO: Only support one relation data type for now
+        InferDataType<T['shape']['relations'][K]['relationDataTypes'][0]>
+      : InferDataType<T['shape']['relations'][K]['relationDataTypes'][0]> | null | undefined
+  }
+>

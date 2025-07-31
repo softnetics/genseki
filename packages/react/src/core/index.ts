@@ -1,9 +1,5 @@
 export { AccountProvider } from '../auth/constant'
-export {
-  defaultHashPassword as hashPassword,
-  setSessionCookie,
-  verifyPassword,
-} from '../auth/utils'
+export { defaultHashPassword, ResponseHelper, verifyPassword } from '../auth/utils'
 export type {
   AnyContextable,
   AnyRequestContextable,
@@ -48,10 +44,21 @@ export type {
   FlattenApiRouter,
   InferApiRouteResponses,
 } from './endpoint'
-export { isApiRoute } from './endpoint'
-export type { Field, FieldBase, FieldClient, FieldRelation, Fields, FieldsClient } from './field'
+export { createEndpoint, flattenApiRouter, isApiRoute } from './endpoint'
+export type {
+  FieldClientBase,
+  FieldRelationShape,
+  FieldRelationShapeBase,
+  Fields,
+  FieldsClient,
+  FieldShape,
+  FieldShapeBase,
+  FieldShapeClient,
+} from './field'
 export * from './file-storage-adapters'
 export type {
+  AnyFieldRelationSchema,
+  AnyModelShape,
   FieldBaseSchema,
   FieldColumnSchema,
   FieldRelationSchema,
@@ -67,12 +74,18 @@ export type {
   SanitizedModelShape,
   Simplify,
 } from './model'
-export { DataType, sanitizedFieldRelationSchema, SchemaType } from './model'
+export {
+  DataType,
+  sanitizedFieldRelationSchema,
+  SchemaType,
+  unsanitizedModelSchemas,
+} from './model'
 export type {
-  AnyTypedColumn,
-  WithAnyRelations,
-  WithAnyTable,
-  WithHasDefault,
-  WithNotNull,
+  AnyTable,
+  AnyTypedFieldColumn,
+  InferTableType,
+  WithHasDefaultValue,
+  WithIsRequired,
+  WithIsUnique,
 } from './table'
-export { getDefaultValueFromFields } from './utils'
+export { getDefaultValueFromFieldsClient as getDefaultValueFromFields } from './utils'

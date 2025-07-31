@@ -3,7 +3,6 @@ import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
 import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
-import { z } from 'zod/v4'
 
 import {
   BackColorExtension,
@@ -13,7 +12,7 @@ import {
 } from '@genseki/react'
 
 import { EditorSlotBefore } from '../editor/slot-before'
-import { builder, db } from '../helper'
+import { builder, prisma } from '../helper'
 
 export const postEditorProviderProps = {
   immediatelyRender: false,
@@ -55,42 +54,8 @@ export const postEditorProviderProps = {
 }
 
 export const postsCollection = builder.collection('posts', {
-  slug: 'posts',
   identifierColumn: 'id',
-  admin: {
-    api: {
-      findMany: async (args) => {
-        console.log('Custom findMany for posts collection')
-        return await args.defaultApi(args)
-      },
-    },
-    endpoints: {
-      customOne: builder.endpoint(
-        {
-          path: '/custom-one',
-          method: 'POST',
-          body: z.object({
-            name: z.string(),
-          }),
-          responses: {
-            200: z.object({
-              message: z.string(),
-            }),
-          },
-        },
-        async ({ body }) => {
-          const name = body.name
-          return {
-            status: 200 as const,
-            body: {
-              message: `Hello, ${name}! This is a custom endpoint for posts.`,
-            },
-          }
-        }
-      ),
-    },
-  },
-  fields: builder.fields('posts', (fb) => ({
+  fields: builder.fields('post', (fb) => ({
     title: fb.columns('title', {
       type: 'text',
       label: 'Title',
@@ -102,7 +67,7 @@ export const postsCollection = builder.collection('posts', {
       label: 'Food description',
       editor: postEditorProviderProps,
     }),
-    authorId: fb.relations('author', (fb) => ({
+    author: fb.relations('author', (fb) => ({
       type: 'connect',
       label: 'Author',
       fields: fb.fields('user', (fb) => ({
@@ -116,28 +81,10 @@ export const postsCollection = builder.collection('posts', {
           label: 'Email',
           description: 'The email of the author',
         }),
-        posts: fb.relations('posts', (fb) => ({
-          type: 'create',
-          label: 'Posts',
-          description: 'Posts written by the author',
-          fields: fb.fields('posts', (fb) => ({
-            title: fb.columns('title', {
-              type: 'text',
-              label: 'Title',
-              description: 'The title of the post',
-            }),
-            content: fb.columns('content', {
-              type: 'richText',
-              label: 'Content',
-              description: 'The content of the post',
-              editor: postEditorProviderProps,
-            }),
-          })),
-        })),
       })),
       options: builder.options(async () => {
-        const result = await db.query.user.findMany({ columns: { id: true, name: true } })
-        return result.map((user) => ({ label: user.name, value: user.id }))
+        const result = await prisma.user.findMany()
+        return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
       }),
     })),
   })),

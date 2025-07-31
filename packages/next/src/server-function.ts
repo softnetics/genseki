@@ -54,6 +54,12 @@ function createRequest(
   return request
 }
 
+function createResponse() {
+  const response = new Response(null)
+  response.headers.set('Content-Type', 'application/json')
+  return response
+}
+
 export async function handleServerFunction<
   TCore extends GensekiCore,
   TMethod extends GetGensekiApiRouterMethod<TCore['api']>,
@@ -70,20 +76,18 @@ export async function handleServerFunction<
       throw new Error(`No API route found for method: ${methodName as string}`)
     }
 
-    // TODO: Recheck if the dummy request is correct
+    const request = createRequest(apiRoute.schema, args as any)
+    const response = createResponse()
+    const result = await apiRoute.handler(args as any, { request: request, response: response })
 
-    const response = await apiRoute.handler(
-      args as any,
-      createRequest(apiRoute.schema, args as any)
-    )
-
-    if (response.headers?.['Set-Cookie']) {
-      const setCookieData = parseSetCookie(response.headers['Set-Cookie'])
+    if (response.headers.getSetCookie().length) {
+      // TODO: Recheck getSetCookie method and response
+      const setCookieData = parseSetCookie(response.headers.getSetCookie()[0])
       const c = await cookies()
       c.set(setCookieData.name, setCookieData.value, setCookieData)
     }
 
-    return response as GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>
+    return result as GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>
   } catch (error) {
     console.error('Error handling server function:', error)
     return {

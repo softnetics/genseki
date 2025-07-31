@@ -2,15 +2,16 @@ import { type ReactNode } from 'react'
 
 import * as R from 'remeda'
 
+import type { AnyContextable } from '.'
 import { type AnyApiRouter } from './endpoint'
-import type { FieldBase, FieldClient, Fields, FieldsClient } from './field'
+import type { Fields, FieldsClient, FieldShapeBase, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
   type StorageAdapter,
   type StorageAdapterClient,
 } from './file-storage-adapters/generic-adapter'
 import { getEditorProviderClientProps } from './richtext'
-import { isMediaField, isRelationField, isRichTextField } from './utils'
+import { isMediaFieldShape, isRelationFieldShape, isRichTextFieldShape } from './utils'
 
 import type { AppSideBarBuilderProps } from '../react'
 
@@ -28,6 +29,7 @@ interface AuthenticatedRenderArgs extends RenderArgs {}
 export type GensekiUiRouter<TProps = any> =
   | {
       requiredAuthenticated: true
+      context: AnyContextable
       id?: string
       path: string
       render: (args: AuthenticatedRenderArgs & { props: TProps }) => ReactNode
@@ -35,6 +37,7 @@ export type GensekiUiRouter<TProps = any> =
     }
   | {
       requiredAuthenticated: false
+      context: AnyContextable
       id?: string
       path: string
       render: (args: RenderArgs & { props: TProps }) => ReactNode
@@ -134,72 +137,75 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
 export function getFieldClient(
   name: string,
-  field: FieldBase
-): FieldClient & { $client: { fieldName: string } } {
-  if (isRelationField(field)) {
-    if (field.$client.source === 'relation') {
+  fieldShape: FieldShapeBase
+): FieldShapeClient & { $client: { fieldName: string } } {
+  if (isRelationFieldShape(fieldShape)) {
+    if (fieldShape.$client.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
-        Object.entries(field.fields).map(([key, value]) => {
+        Object.entries(fieldShape.fields.shape).map(([key, value]) => {
           return [key, getFieldClient(key, value)]
         })
       )
 
       return R.omit(
         {
-          ...field,
+          ...fieldShape,
           fields: sanitizedFields,
         },
         ['$server', 'options' as any]
-      ) as FieldClient & { $client: { fieldName: string } }
+      ) as FieldShapeClient & { $client: { fieldName: string } }
     }
 
     return R.omit(
       {
-        ...field,
-        label: field.label ?? name,
-        placeholder: field.placeholder ?? name,
+        ...fieldShape,
+        label: fieldShape.label ?? name,
+        placeholder: fieldShape.placeholder ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldClient & { $client: { fieldName: string } }
+    ) as FieldShapeClient & { $client: { fieldName: string } }
   }
 
-  if (isRichTextField(field)) {
+  if (isRichTextFieldShape(fieldShape)) {
     const sanitizedBaseField = R.omit(
       {
-        ...field,
-        label: field.label ?? name,
+        ...fieldShape,
+        label: fieldShape.label ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldClient & { $client: { fieldName: string } }
+    ) as FieldShapeClient & { $client: { fieldName: string } }
 
     const sanitizedRichTextField = {
       ...sanitizedBaseField,
-      editor: getEditorProviderClientProps(field.editor),
+      editor: getEditorProviderClientProps(fieldShape.editor),
     }
 
     return sanitizedRichTextField
   }
 
-  if (isMediaField(field)) {
+  if (isMediaFieldShape(fieldShape)) {
     return R.omit(
       {
-        ...field,
-        label: field.label ?? name,
+        ...fieldShape,
+        label: fieldShape.label ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldClient & { $client: { fieldName: string } }
+    ) as FieldShapeClient & { $client: { fieldName: string } }
   }
 
   return R.omit(
     {
-      ...field,
-      label: field.label ?? name,
-      placeholder: field.placeholder ?? name,
+      ...fieldShape,
+      label: fieldShape.label ?? name,
+      placeholder: fieldShape.placeholder ?? name,
     },
     ['$server', 'options' as any]
-  ) as FieldClient & { $client: { fieldName: string } }
+  ) as FieldShapeClient & { $client: { fieldName: string } }
 }
 
 export function getFieldsClient(fields: Fields): FieldsClient {
-  return R.mapValues(fields, (value, key) => getFieldClient(key, value))
+  return {
+    shape: R.mapValues(fields.shape, (value, key) => getFieldClient(key, value)),
+    config: fields.config,
+  }
 }
