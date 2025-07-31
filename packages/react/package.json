@@ -83,8 +83,10 @@
     "@types/json-schema": "^7.0.15",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.3.4",
     "tsup": "^8.5.0",
     "type-fest": "^4.38.0",
-    "vitest": "^3.0.9"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.3"
   }
 }

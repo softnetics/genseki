@@ -1,11 +1,7 @@
 import z from 'zod/v4'
 
 import type { ApiDefaultMethod } from './collection'
-import {
-  type ApiReturnType,
-  type InferCreateFieldsShape,
-  type InferUpdateFieldsShape,
-} from './collection'
+import { type ApiReturnType, type InferCreateFields, type InferUpdateFields } from './collection'
 import { type ApiConfigHandlerFn } from './collection'
 import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
@@ -14,6 +10,7 @@ import type { ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
+  transformPrismaResultToFieldsPayload,
 } from './transformer'
 import type { ToZodObject } from './utils'
 
@@ -89,19 +86,12 @@ function createCollectionDefaultFindOneHandler<
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> {
   const prisma = config.context.getPrismaClient()
 
-  const model = config.schema[fields.config.prismaModelName]
-  const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-
   return async (args) => {
-    const result = await prisma[model.config.prismaModelName].findUnique({
-      where: { [primaryField.name]: args.id },
+    const result = await prisma[fields.config.prismaModelName].findUnique({
+      where: { [fields.config.primaryColumn]: args.id },
     })
-
-    return {
-      __id: result[config.identifierColumn],
-      __pk: result[primaryField.name],
-      ...result,
-    }
+    const transformedResult = transformPrismaResultToFieldsPayload(fields, result)
+    return transformedResult as any
   }
 }
 
@@ -115,7 +105,6 @@ function createCollectionDefaultFindManyHandler<
   const prisma = config.context.getPrismaClient()
 
   const model = config.schema[fields.config.prismaModelName]
-  const primaryField = model.shape.columns[model.shape.primaryFields[0]]
 
   return async (args) => {
     const response = await prisma[model.config.prismaModelName].findMany({
@@ -129,11 +118,7 @@ function createCollectionDefaultFindManyHandler<
     return {
       total,
       page: Math.ceil(total / (args.limit || 10)),
-      data: response.map((item) => ({
-        __id: item[config.identifierColumn],
-        __pk: item[primaryField.name],
-        ...item,
-      })),
+      data: response.map((item) => transformPrismaResultToFieldsPayload(fields, item) as any),
     }
   }
 }
@@ -141,7 +126,7 @@ function createCollectionDefaultFindManyHandler<
 export type CollectionCreateApiRoute<TSlug extends string, TFields extends Fields> = ApiRoute<{
   path: `/${TSlug}`
   method: 'POST'
-  body: ToZodObject<InferCreateFieldsShape<TFields['shape']>>
+  body: ToZodObject<InferCreateFields<TFields>>
   responses: {
     200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.CREATE, TFields>>
   }
@@ -206,7 +191,7 @@ export type CollectionUpdateApiRoute<TSlug extends string, TFields extends Field
   path: `/${TSlug}/:id`
   method: 'PATCH'
   pathParams: ToZodObject<{ id: string }>
-  body: ToZodObject<InferUpdateFieldsShape<TFields['shape']>>
+  body: ToZodObject<InferUpdateFields<TFields>>
   responses: {
     200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.UPDATE, TFields>>
   }

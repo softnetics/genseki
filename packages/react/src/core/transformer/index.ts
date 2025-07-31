@@ -237,3 +237,75 @@ function transformFieldRelationPayloadToPrismaUpdatePayload(
       throw new Error(`Unsupported relation type: ${fieldShape}`)
   }
 }
+
+export function transformFieldsToPrismaSelectPayload(fields: Fields) {
+  const pkField = fields.config.primaryColumn
+  const idField = fields.config.identifierColumn
+
+  const initial: Record<string, any> = {
+    ...{ [pkField]: true },
+    ...{ [idField]: true },
+  }
+
+  return Object.entries(fields.shape).reduce((acc, [_, fieldShape]) => {
+    if (fieldShape.$server.source === 'column') {
+      acc[fieldShape.$server.column.name] = true
+    } else if (isRelationFieldShape(fieldShape)) {
+      acc[fieldShape.$server.relation.name] = {
+        select: transformFieldsToPrismaSelectPayload(fieldShape.fields),
+      }
+    }
+    return acc
+  }, initial)
+}
+
+export function transformPrismaResultToFieldsPayload(
+  fields: Fields,
+  result: Record<string, any>
+): Record<string, any> {
+  const pkField = fields.config.primaryColumn
+  const idField = fields.config.identifierColumn
+
+  return Object.entries(fields.shape).reduce(
+    (acc, [fieldKey, fieldShape]) => {
+      const schemaKey =
+        fieldShape.$server.source === 'column'
+          ? fieldShape.$server.column.name
+          : fieldShape.$server.source === 'relation'
+            ? fieldShape.$server.relation.name
+            : undefined
+
+      if (!schemaKey) {
+        throw new Error(`Field "${fieldShape.$server.fieldName}" does not have a valid schema key`)
+      }
+
+      let value = result[schemaKey]
+      if (value === undefined) return acc
+
+      if (
+        fieldShape.$server.source === 'column' &&
+        fieldShape.$server.column.dataType === DataType.JSON
+      ) {
+        value = JSON.parse(JSON.stringify(value))
+      }
+
+      if (isRelationFieldShape(fieldShape)) {
+        if (fieldShape.$server.relation.isList) {
+          if (!Array.isArray(value)) {
+            throw new Error(
+              `Expected an array for relation field "${fieldShape.$server.fieldName}", but got ${typeof value}`
+            )
+          }
+          value = (value as any[]).map((v) =>
+            transformPrismaResultToFieldsPayload(fieldShape.fields, v)
+          )
+        } else {
+          value = transformPrismaResultToFieldsPayload(fieldShape.fields, value)
+        }
+      }
+
+      return { ...acc, [fieldKey]: value }
+    },
+    { __pk: result[pkField], __id: result[idField] }
+  )
+}

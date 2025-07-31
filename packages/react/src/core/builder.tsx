@@ -1,5 +1,3 @@
-import type { Simplify } from 'type-fest'
-
 import {
   type CollectionDefaultAdminApiRouter,
   getCollectionDefaultCreateApiRoute,
@@ -28,7 +26,6 @@ import {
 import { FieldBuilder, type Fields, type FieldsShape } from './field'
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
-import { appendFieldNameToFields } from './utils'
 
 import { CollectionAppLayout, HomeView } from '../react'
 import { CreateView } from '../react/views/collections/create'
@@ -123,13 +120,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.list.identifierColumn,
+            identifierColumn: options.list.fields.identifierColumn,
             fields: options.list.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultFindManyApiRoute({
             slug: slug,
-            identifierColumn: options.list.identifierColumn,
+            identifierColumn: options.list.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.list.fields,
@@ -164,13 +161,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.create.identifierColumn,
+            identifierColumn: options.create.fields.identifierColumn,
             fields: options.create.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultCreateApiRoute({
             slug: slug,
-            identifierColumn: options.create.identifierColumn,
+            identifierColumn: options.create.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.create.fields,
@@ -199,13 +196,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.update.identifierColumn,
+            identifierColumn: options.update.fields.identifierColumn,
             fields: options.update.fields,
           } satisfies BaseViewProps
 
           const { route: updateRoute } = getCollectionDefaultUpdateApiRoute({
             slug: slug,
-            identifierColumn: options.update.identifierColumn,
+            identifierColumn: options.update.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -216,7 +213,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route: updateDefaultRoute } = getCollectionDefaultUpdateDefaultApiRoute({
             slug: slug,
-            identifierColumn: options.update.identifierColumn,
+            identifierColumn: options.update.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -251,13 +248,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.one.identifierColumn,
+            identifierColumn: options.one.fields.identifierColumn,
             fields: options.one.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultFindOneApiRoute({
             slug: slug,
-            identifierColumn: options.one.identifierColumn,
+            identifierColumn: options.one.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.one.fields,
@@ -312,21 +309,15 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
   fields<const TModelName extends keyof TModelSchemas, const TFieldsShape extends FieldsShape>(
     modelName: TModelName,
-    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape
-  ): Simplify<{
-    shape: TFieldsShape
-    config: { prismaModelName: TModelName }
-  }> {
+    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape,
+    config?: { identifierColumn?: string }
+  ) {
     const fb = new FieldBuilder({
       context: this.config.context,
       modelSchemas: this.config.schema,
       modelName: modelName,
     }) as FieldBuilder<TContext, TModelSchemas, TModelName>
-    const shape = appendFieldNameToFields(optionsFn(fb))
-    return {
-      shape,
-      config: { prismaModelName: modelName },
-    }
+    return fb.fields(modelName, optionsFn, config)
   }
 
   endpoint<const TApiEndpointSchema extends ApiRouteSchema>(

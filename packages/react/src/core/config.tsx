@@ -2,9 +2,9 @@ import { type ReactNode } from 'react'
 
 import { deepmerge } from 'deepmerge-ts'
 import * as R from 'remeda'
+import type { Promisable } from 'type-fest'
 
 import type { AnyContextable, AnyRequestContextable, ApiRouter } from '.'
-import type { MaybePromise } from './collection'
 import { type AnyApiRouter, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
@@ -27,7 +27,7 @@ interface RenderArgs {
 // TODO: Fix this type
 interface AuthenticatedRenderArgs extends RenderArgs {}
 
-type RenderResult = MaybePromise<ReactNode | { redirect: string; type: 'push' | 'replace' }>
+type RenderResult = Promisable<ReactNode | { redirect: string; type: 'push' | 'replace' }>
 
 // TODO: Revise this one
 export type GensekiUiRouter<TProps = any> =
@@ -64,7 +64,7 @@ interface GensekiMiddlewareArgs {
 
 export type GensekiMiddleware = (
   args: GensekiMiddlewareArgs
-) => MaybePromise<void | ReactNode | { redirect: string } | Error>
+) => Promisable<void | ReactNode | { redirect: string } | Error>
 
 export interface GensekiAppOptions {
   title: string

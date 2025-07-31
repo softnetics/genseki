@@ -92,16 +92,13 @@ export const fields = builder.fields('post', (fb) => ({
 export const postsCollection = builder.collection((b) => ({
   slug: 'posts',
   list: b.list({
-    identifierColumn: 'id',
     fields: fields,
     columns: columns,
   }),
   create: b.create({
-    identifierColumn: 'id',
     fields: fields,
   }),
   update: b.update({
-    identifierColumn: 'id',
     fields: fields,
   }),
 }))
