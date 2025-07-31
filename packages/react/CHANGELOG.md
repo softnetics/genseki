@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.19
+
+### Minor Changes
+
+- [#104](https://github.com/softnetics/genseki/pull/104) [`5ac7bc7`](https://github.com/softnetics/genseki/commit/5ac7bc745e526423a88ad83e8f050e18ffb22f86) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Improve Email and Password flexibility
+
+### Patch Changes
+
+- [#108](https://github.com/softnetics/genseki/pull/108) [`9f3aa3a`](https://github.com/softnetics/genseki/commit/9f3aa3a3aaafb970c091146979ee0e26dd5ca919) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Allow multiple fields in one collection
+
 ## 0.1.0-alpha.18
 
 ### Patch Changes

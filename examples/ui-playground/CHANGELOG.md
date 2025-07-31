@@ -1,5 +1,17 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.18
+
+### Patch Changes
+
+- [#100](https://github.com/softnetics/genseki/pull/100) [`c227c3f`](https://github.com/softnetics/genseki/commit/c227c3f476349511033b23b7080010e786d650a4) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Replace Drizzle with Prisma
+
+- Updated dependencies [[`5ac7bc7`](https://github.com/softnetics/genseki/commit/5ac7bc745e526423a88ad83e8f050e18ffb22f86), [`c227c3f`](https://github.com/softnetics/genseki/commit/c227c3f476349511033b23b7080010e786d650a4), [`9f3aa3a`](https://github.com/softnetics/genseki/commit/9f3aa3a3aaafb970c091146979ee0e26dd5ca919)]:
+  - @genseki/react@0.1.0-alpha.19
+  - @genseki/next@0.1.0-alpha.19
+  - @genseki/react-query@0.1.0-alpha.19
+  - @genseki/rest@0.1.0-alpha.19
+
 ## 0.1.0-alpha.17
 
 ### Patch Changes
