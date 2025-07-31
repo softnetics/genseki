@@ -53,39 +53,52 @@ export const postEditorProviderProps = {
   ],
 }
 
-export const postsCollection = builder.collection('posts', {
-  identifierColumn: 'id',
-  fields: builder.fields('post', (fb) => ({
-    title: fb.columns('title', {
-      type: 'text',
-      label: 'Title',
-      description: "Post's title name",
-    }),
-    content: fb.columns('content', {
-      type: 'richText',
-      isRequired: true,
-      label: 'Food description',
-      editor: postEditorProviderProps,
-    }),
-    author: fb.relations('author', (fb) => ({
-      type: 'connect',
-      label: 'Author',
-      fields: fb.fields('user', (fb) => ({
-        name: fb.columns('name', {
-          type: 'text',
-          label: 'Name',
-          description: 'The name of the author',
-        }),
-        email: fb.columns('email', {
-          type: 'text',
-          label: 'Email',
-          description: 'The email of the author',
-        }),
-      })),
-      options: async () => {
-        const result = await prisma.user.findMany()
-        return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
-      },
+const fields = builder.fields('post', (fb) => ({
+  title: fb.columns('title', {
+    type: 'text',
+    label: 'Title',
+    description: "Post's title name",
+  }),
+  content: fb.columns('content', {
+    type: 'richText',
+    required: true,
+    label: 'Food description',
+    editor: postEditorProviderProps,
+  }),
+  author: fb.relations('author', (fb) => ({
+    type: 'connect',
+    label: 'Author',
+    fields: fb.fields('user', (fb) => ({
+      name: fb.columns('name', {
+        type: 'text',
+        label: 'Name',
+        description: 'The name of the author',
+      }),
+      email: fb.columns('email', {
+        type: 'text',
+        label: 'Email',
+        description: 'The email of the author',
+      }),
     })),
+    options: async () => {
+      const result = await prisma.user.findMany()
+      return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
+    },
   })),
+}))
+
+export const postsCollection = builder.collection({
+  slug: 'posts',
+  list: {
+    identifierColumn: 'id',
+    fields: fields,
+  },
+  create: {
+    identifierColumn: 'id',
+    fields: fields,
+  },
+  update: {
+    identifierColumn: 'id',
+    fields: fields,
+  },
 })

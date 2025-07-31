@@ -11,7 +11,6 @@ import {
 } from '@phosphor-icons/react/dist/ssr'
 
 import type { FieldsClient } from '../../../core'
-import type { CollectionOptionsClient } from '../../../core/collection'
 import {
   Button,
   ButtonLink,
@@ -35,9 +34,9 @@ import { useServerFunction } from '../../providers/root'
 // Maybe tanstack-hooks-form is more reasonable for this, but the clock is ticking fr fr nocap
 const tableDataExtract = (
   data: any[],
-  options: { clientFields: FieldsClient; identifierColumn: string }
+  options: { fields: FieldsClient; identifierColumn: string }
 ) => {
-  const headers = Object.values(options.clientFields.shape).map((column) => {
+  const headers = Object.values(options.fields.shape).map((column) => {
     return { ...column, label: column.$client.fieldName /* Fallback to key if no label */ }
   })
 
@@ -112,7 +111,8 @@ const Toolbar = (props: {
 
 interface ListTableProps {
   slug: string
-  collectionOptions: CollectionOptionsClient
+  identifierColumn: string
+  fields: FieldsClient
   data: any[]
 }
 
@@ -123,8 +123,8 @@ export function ListTable(props: ListTableProps) {
   const [selection, setSelection] = useState<string[]>([])
 
   const { headers, rows } = tableDataExtract(props.data, {
-    clientFields: props.collectionOptions.fields,
-    identifierColumn: props.collectionOptions.identifierColumn,
+    fields: props.fields,
+    identifierColumn: props.identifierColumn,
   })
 
   return (

@@ -1,6 +1,6 @@
 import type { BaseViewProps } from './types'
 
-import type { CollectionDefaultAdminApiRouter } from '../../../core/builder.utils'
+import type { CollectionFindOneApiRoute } from '../../../core/builder.utils'
 import type { Fields } from '../../../core/field'
 import { getHeadersObject } from '../../utils/headers'
 
@@ -8,7 +8,7 @@ interface OneViewProps extends BaseViewProps {
   slug: string
   headers: Headers
   identifier: string
-  findOne: CollectionDefaultAdminApiRouter<string, Fields>['findOne']
+  findOne: CollectionFindOneApiRoute<string, Fields>
 }
 
 export async function OneView(props: OneViewProps) {

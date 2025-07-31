@@ -3,7 +3,7 @@ import type { BaseViewProps } from './types'
 import { UpdateClientView } from './update.client'
 
 import { type Fields, getFieldsClient } from '../../../core'
-import type { CollectionDefaultAdminApiRouter } from '../../../core/builder.utils'
+import type { CollectionUpdateDefaultApiRoute } from '../../../core/builder.utils'
 import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
@@ -12,7 +12,7 @@ interface UpdateViewProps extends BaseViewProps {
   slug: string
   headers: Headers
   identifier: string
-  findOne: CollectionDefaultAdminApiRouter<string, Fields>['findOne']
+  updateDefault: CollectionUpdateDefaultApiRoute<string, Fields>
 }
 
 export async function UpdateView(props: UpdateViewProps) {
@@ -29,13 +29,13 @@ export async function UpdateView(props: UpdateViewProps) {
 
   const context = props.context.toRequestContext(request)
 
-  const result = await props.findOne.handler(
+  const result = await props.updateDefault.handler(
     { pathParams: { id: props.identifier } },
     { request, response }
   )
 
-  const optionsRecord = await createOptionsRecord(context, props.collectionOptions.fields)
-  const fieldsClient = getFieldsClient(props.collectionOptions.fields)
+  const optionsRecord = await createOptionsRecord(context, props.fields)
+  const fieldsClient = getFieldsClient(props.fields)
 
   return (
     <CollectionFormLayout>

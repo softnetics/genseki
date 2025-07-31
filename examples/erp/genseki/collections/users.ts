@@ -1,22 +1,49 @@
+import z from 'zod'
+
 import { builder } from '../helper'
 
-export const usersCollection = builder.collection('users', {
-  identifierColumn: 'id',
-  fields: builder.fields('user', (fb) => ({
-    id: fb.columns('id', {
-      type: 'text',
-      create: 'hidden',
-      update: 'disabled',
-    }),
-    name: fb.columns('name', {
-      type: 'text',
-    }),
-    email: fb.columns('email', {
-      type: 'text',
-    }),
-    image: fb.columns('image', {
-      type: 'media',
-      mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-    }),
-  })),
+const userFields = builder.fields('user', (fb) => ({
+  name: fb.columns('name', {
+    type: 'text',
+  }),
+  email: fb.columns('email', {
+    type: 'text',
+  }),
+  image: fb.columns('image', {
+    type: 'media',
+    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+  }),
+}))
+
+export const usersCollection = builder.collection({
+  slug: 'users',
+  create: {
+    identifierColumn: 'id',
+    fields: userFields,
+  },
+  list: {
+    identifierColumn: 'id',
+    fields: userFields,
+  },
+  api: {
+    example: builder.endpoint(
+      {
+        method: 'GET',
+        path: '/',
+        responses: {
+          200: z.object({
+            data: z.any(),
+          }),
+        },
+      },
+      async () => {
+        return {
+          status: 200,
+          body: {
+            data: 'Hello from users collection',
+          },
+        }
+      }
+    ),
+  },
 })

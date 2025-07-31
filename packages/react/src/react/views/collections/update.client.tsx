@@ -67,7 +67,6 @@ export function UpdateClientView(props: UpdateClientViewProps) {
           <AutoField
             key={field.$client.fieldName}
             fieldShape={field}
-            visibilityField="update"
             optionsRecord={props.optionsRecord}
           />
         ))}

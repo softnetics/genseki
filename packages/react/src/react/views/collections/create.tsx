@@ -20,8 +20,8 @@ export async function CreateView(props: CreateViewProps) {
     headers: headersValue,
   })
   const context = props.context.toRequestContext(request)
-  const fieldsClient = getFieldsClient(props.collectionOptions.fields)
-  const optionsRecord = await createOptionsRecord(context, props.collectionOptions.fields)
+  const fieldsClient = getFieldsClient(props.fields)
+  const optionsRecord = await createOptionsRecord(context, props.fields)
 
   return (
     <CollectionFormLayout size="md">

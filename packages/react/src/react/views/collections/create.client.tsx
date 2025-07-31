@@ -67,7 +67,6 @@ export function CreateClientView(props: CreateClientViewProps) {
           <AutoField
             key={fieldShape.$client.fieldName}
             fieldShape={fieldShape}
-            visibilityField="create"
             optionsRecord={props.optionsRecord}
           />
         ))}
