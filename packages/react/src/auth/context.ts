@@ -1,13 +1,13 @@
 import type { AnyUserTable, AuthOptions } from '.'
 import { AccountProvider } from './constant'
 
-import { type AnyContextable, hashPassword } from '../core'
+import { type AnyContextable, defaultHashPassword } from '../core'
 import type { InferTableType } from '../core/table'
 
 export function createAuthInternalHandler(context: AnyContextable, options: AuthOptions) {
   const prisma = context.getPrismaClient()
 
-  const passwordHasher = options.method.emailAndPassword?.passwordHasher ?? hashPassword
+  const passwordHasher = options.method.emailAndPassword?.passwordHasher ?? defaultHashPassword
 
   const user = {
     async findById(id: string) {
