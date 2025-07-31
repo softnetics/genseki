@@ -9,6 +9,7 @@ import {
   FunnelIcon,
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
+import { useQuery } from '@tanstack/react-query'
 import {
   type ColumnDef,
   createColumnHelper,
@@ -95,8 +96,8 @@ interface ListTableProps {
   slug: string
   identifierColumn: string
   fields: FieldsClient
-  data: BaseData[]
   columns: ColumnDef<BaseData>[]
+  searchParams: Record<string, string | string[]>
 }
 
 export function ListTable(props: ListTableProps) {
@@ -105,8 +106,20 @@ export function ListTable(props: ListTableProps) {
 
   const [selection, setSelection] = useState<string[]>([])
 
+  const query = useQuery({
+    queryKey: ['GET', `/api/${props.slug}`, props.searchParams],
+    queryFn: () => {
+      // TODO: Need to pass baseUrl from the server
+      // TODO: Pagination from searchParams
+      return fetch(`/api/${props.slug}`)
+        .then((res) => res.json())
+        .then((data) => data.body as { data: BaseData[]; total: number; page: number })
+    },
+  })
+
   const enhancedColumns = useMemo(() => {
     const columnHelper = createColumnHelper<BaseData>()
+    if (query.isLoading) return props.columns
     return [
       ...props.columns,
       columnHelper.display({
@@ -141,10 +154,10 @@ export function ListTable(props: ListTableProps) {
         ),
       }),
     ]
-  }, [])
+  }, [query.isLoading])
 
   const table = useReactTable({
-    data: props.data,
+    data: query.data?.data ?? [],
     columns: enhancedColumns,
     getCoreRowModel: getCoreRowModel(),
   })
@@ -152,7 +165,13 @@ export function ListTable(props: ListTableProps) {
   return (
     <>
       <Toolbar slug={props.slug} selection={selection} setSelection={setSelection} />
-      <TanstackTable table={table} className="static" onRowClick="toggleSelect" />
+      <TanstackTable
+        table={table}
+        className="static"
+        onRowClick="toggleSelect"
+        isLoading={query.isLoading}
+        isError={query.isError}
+      />
     </>
   )
 }
