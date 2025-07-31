@@ -10,6 +10,7 @@ import type { ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
+  transformFieldsToPrismaSelectPayload,
   transformPrismaResultToFieldsPayload,
 } from './transformer'
 import type { ToZodObject } from './utils'
@@ -88,6 +89,7 @@ function createCollectionDefaultFindOneHandler<
 
   return async (args) => {
     const result = await prisma[fields.config.prismaModelName].findUnique({
+      select: transformFieldsToPrismaSelectPayload(fields),
       where: { [fields.config.primaryColumn]: args.id },
     })
     const transformedResult = transformPrismaResultToFieldsPayload(fields, result)
@@ -108,6 +110,7 @@ function createCollectionDefaultFindManyHandler<
 
   return async (args) => {
     const response = await prisma[model.config.prismaModelName].findMany({
+      select: transformFieldsToPrismaSelectPayload(fields),
       orderBy: args.orderBy,
       skip: args.offset,
       take: args.limit,

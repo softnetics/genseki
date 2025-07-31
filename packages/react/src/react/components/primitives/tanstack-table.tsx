@@ -94,6 +94,7 @@ export function TanstackTable<T>({
               const canSort = header.column.getCanSort()
               return (
                 <TableColumn
+                  isRowHeader
                   key={header.id}
                   className={clsx('focus-visible:ring-focus ring-inset', classNames?.tableHead)}
                   // colSpan={header.colSpan}
