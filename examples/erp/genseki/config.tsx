@@ -43,7 +43,7 @@ const app = new GensekiApp({
       {
         type: 'item',
         label: 'Sub Categories',
-        path: '/admin/collections/sub-categories',
+        path: '/admin/collections/subCategories',
       },
     ],
   },

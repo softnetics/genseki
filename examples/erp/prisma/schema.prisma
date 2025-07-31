@@ -142,7 +142,6 @@ model Category {
 
   name String
 
-  subCategoryIds String[]
   subCategories  SubCategory[]
 
   createdAt DateTime @default(now())
@@ -154,7 +153,6 @@ model SubCategory {
 
   name String
 
-  categoryIds String[]
   categories  Category[]
 
   createdAt DateTime @default(now())

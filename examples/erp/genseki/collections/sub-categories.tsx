@@ -9,16 +9,6 @@ export const subCategoriesCollection = builder.collection('subCategories', {
       label: 'Name',
       description: 'The name of the sub category',
     }),
-    // categories: fb.columns('categoryIds', {
-    //   type: 'comboboxText',
-    //   isRequired: true,
-    //   label: 'Categories',
-    //   description: 'The categories of the sub category',
-    //   options: builder.options(async () => {
-    //     const result = await prisma.category.findMany()
-    //     return result.map((category) => ({ label: category.name ?? 'Unknown', value: category.id }))
-    //   }),
-    // }),
     categories: fb.relations('categories', (fb) => ({
       type: 'connect',
       label: 'Categories',
