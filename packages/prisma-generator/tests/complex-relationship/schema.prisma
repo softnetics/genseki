@@ -1,0 +1,48 @@
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+generator gesenki {
+  // NOTE: This should be "@genseki/prisma-generator" but we use a local path for testing
+  provider = "tsx ./src/index.ts"
+  output   = "./expected"
+}
+
+model TableA {
+  id          String   @id
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tableB TableB[]
+  tableC TableC[]
+}
+
+model TableB {
+  id          String   @id
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tableA TableA[]
+
+  tableCId String
+  tableC   TableC @relation(fields: [tableCId], references: [id])
+}
+
+model TableC {
+  id          String   @id
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  // Relations
+  tableA TableA[]
+  tableB TableB[]
+}
