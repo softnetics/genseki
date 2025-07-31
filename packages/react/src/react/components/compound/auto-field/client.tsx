@@ -227,7 +227,7 @@ const AutoRichTextField = (props: {
   description?: string
   isRequired?: boolean
   placeholder?: string
-  isDisabled?: boolean
+  disabled?: boolean
   isPending?: boolean
   errorMessage?: string
   editor: EditorProviderClientProps
@@ -246,7 +246,7 @@ const AutoRichTextField = (props: {
       label={props.label}
       errorMessage={error?.message}
       isRequired={props.isRequired}
-      isDisabled={props.isDisabled}
+      isDisabled={props.disabled}
       description={props.description}
       editorProviderProps={{
         ...editorProviderProps,
@@ -283,6 +283,7 @@ interface AutoFieldProps {
   optionsRecord: Record<string, any[]>
   className?: string
   prefix?: string
+  disabled?: boolean
 }
 
 export function AutoField(props: AutoFieldProps) {
@@ -290,7 +291,7 @@ export function AutoField(props: AutoFieldProps) {
 
   if (props.fieldShape.hidden) return null
 
-  const disabled = props.fieldShape.disabled || false
+  const disabled = props.fieldShape.disabled || props.disabled
 
   const commonProps = {
     name: props.prefix ? `${props.prefix}.${field.$client}` : field.$client.fieldName,
@@ -312,7 +313,7 @@ export function AutoField(props: AutoFieldProps) {
               {...commonProps}
               // TODO: Fix this
               editor={field.editor as EditorProviderClientProps}
-              isDisabled={disabled}
+              disabled={disabled}
             />
           }
         />
@@ -400,7 +401,7 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'comboboxNumber':
     case 'comboboxText': {
-      const options = props.optionsRecord[field.$client.source] ?? []
+      const options = props.optionsRecord[field.$client.fieldName] ?? []
       return (
         <select name={field.$client.fieldName}>
           {options.map((option) => (
@@ -436,6 +437,7 @@ export function AutoField(props: AutoFieldProps) {
           allowCreate={true}
           allowConnect={false}
           optionsRecord={props.optionsRecord}
+          disabled={disabled}
         />
       )
     case 'connect':
@@ -446,6 +448,7 @@ export function AutoField(props: AutoFieldProps) {
           allowConnect={true}
           allowCreate={false}
           optionsRecord={props.optionsRecord}
+          disabled={disabled}
         />
       )
     case 'connectOrCreate':
@@ -456,6 +459,7 @@ export function AutoField(props: AutoFieldProps) {
           allowConnect={true}
           allowCreate={true}
           optionsRecord={props.optionsRecord}
+          disabled={disabled}
         />
       )
 
@@ -472,6 +476,7 @@ interface AutoRelationshipFieldProps {
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
+  disabled?: boolean
 }
 
 export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
@@ -489,6 +494,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           className={props.className}
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
+          disabled={props.disabled}
         />
       )
     case true:
@@ -500,6 +506,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           className={props.className}
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
+          disabled={props.disabled}
         />
       )
     default:
@@ -547,6 +554,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
           className="w-full"
           optionsRecord={props.optionsRecord}
           prefix={`${props.name}.create`}
+          disabled={disabled}
         />
       }
     />
@@ -586,6 +594,7 @@ interface AutoManyRelationshipFieldProps {
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
+  disabled?: boolean
 }
 
 export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
@@ -596,7 +605,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   })
 
   if (props.fieldShape.hidden) return null
-  const disabled = props.fieldShape.disabled || false
+  const disabled = props.fieldShape.disabled || props.disabled
 
   const connectComponent = (name: string) => {
     const commonProps = {
@@ -630,6 +639,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             className="w-full"
             optionsRecord={props.optionsRecord}
             prefix={name}
+            disabled={disabled}
           />
         }
       />
@@ -664,7 +674,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            isDisabled={disabled}
+            onClick={() => fieldArray.append({})}
+          >
             Add
           </Button>
         </div>
@@ -682,7 +698,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            isDisabled={disabled}
+            onClick={() => fieldArray.append({})}
+          >
             Add
           </Button>
         </div>

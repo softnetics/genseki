@@ -67,7 +67,7 @@ const RangeCalendar = <T extends DateValue>({
                     }) => (
                       <span
                         className={twMerge(
-                          'flex size-full items-center justify-center rounded-lg tabular-nums forced-color-adjust-none',
+                          'flex size-full items-center justify-center rounded-full tabular-nums forced-color-adjust-none',
                           isSelected && (isSelectionStart || isSelectionEnd)
                             ? 'bg-primary text-primary-fg group-invalid/calendar-cell:bg-danger group-invalid/calendar-cell:text-danger-fg forced-colors:bg-[Highlight] forced-colors:text-[HighlightText] forced-colors:group-invalid/calendar-cell:bg-[Mark]'
                             : isSelected

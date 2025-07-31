@@ -90,7 +90,6 @@ export function mapValueToTsValue(fields: Fields, value: Record<string, any>): R
     if (field.$client.source !== 'column') return []
     return [[field.$client.column.name, value[fieldName]]]
   })
-
   return Object.fromEntries(mappedEntries.filter((r) => r.length > 0))
 }
 

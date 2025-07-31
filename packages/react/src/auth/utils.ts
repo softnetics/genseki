@@ -1,4 +1,9 @@
+import { promisify } from 'node:util'
+
 import { parse as parseCookies, serialize } from 'cookie-es'
+import crypto, { randomBytes } from 'crypto'
+
+const scrypt = promisify(crypto.scrypt)
 
 const SESSION_COOKIE_NAME = 'GENSEKI_SESSION'
 
@@ -29,4 +34,17 @@ export abstract class ResponseHelper {
       })
     )
   }
+}
+
+export async function defaultHashPassword(password: string): Promise<string> {
+  const salt = randomBytes(8).toString('hex')
+  const derivedKey = await scrypt(password, salt, 64)
+  return salt + ':' + (derivedKey as Buffer).toString('hex')
+}
+
+export async function verifyPassword(password: string, hashedPassword: string): Promise<boolean> {
+  const [salt, key] = hashedPassword.split(':')
+  const keyBuffer = Buffer.from(key, 'hex')
+  const derivedKey = await scrypt(password, salt, 64)
+  return crypto.timingSafeEqual(keyBuffer, derivedKey as any)
 }

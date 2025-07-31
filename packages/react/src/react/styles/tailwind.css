@@ -77,6 +77,28 @@
   --color-ocean-800: #112a7c;
   --color-ocean-900: #08153d;
 
+  --color-red-50: #fef2f2;
+  --color-red-100: #fee2e2;
+  --color-red-200: #fecaca;
+  --color-red-300: #fca5a5;
+  --color-red-400: #f87171;
+  --color-red-500: #ef4444;
+  --color-red-600: #dc2626;
+  --color-red-700: #b91c1c;
+  --color-red-800: #991b1b;
+  --color-red-900: #450a0a;
+
+  --color-yellow-50: #fefce8;
+  --color-yellow-100: #fef9c3;
+  --color-yellow-200: #fef08a;
+  --color-yellow-300: #fde047;
+  --color-yellow-400: #facc15;
+  --color-yellow-500: #eab308;
+  --color-yellow-600: #ca8a04;
+  --color-yellow-700: #a16207;
+  --color-yellow-800: #854d0e;
+  --color-yellow-900: #422006;
+
   --color-black-normal: #000000;
   --color-black-vanish: rgba(0, 0, 0, 0);
 
@@ -155,6 +177,9 @@
   --color-warning: var(--warning);
   --color-warning-fg: var(--warning-fg);
 
+  --color-yellow: var(--yellow);
+  --color-yellow-fg: var(--yellow-fg);
+
   --color-muted: var(--muted);
   --color-muted-fg: var(--muted-fg);
 
@@ -175,6 +200,7 @@
 }
 
 @layer base {
+  /* Do we have a dark mode? */
   .dark {
     --color-text-correct: var(--color-palm-600);
     --color-text-incorrect: var(--color-valencia-600);
@@ -196,7 +222,7 @@
 
     --primary: var(--color-pumpkin-500);
     --primary-fg: var(--color-pumpkin-50);
-    --primary-emphasis: var(--color-pumpkin-600);
+    --primary-emphasis: var(--color-pumpkin-400);
 
     --secondary: var(--color-bluegray-200);
     --secondary-fg: var(--color-bluegray-600);
@@ -222,6 +248,8 @@
     --border: var(--color-bluegray-300);
     --input: var(--color-bluegray-300);
     --ring: var(--color-pumpkin-500);
+
+    --icon-tertiary: var(--color-bluegray-400);
 
     --navbar: var(--color-bluegray-100);
     --navbar-fg: var(--color-bluegray-500);

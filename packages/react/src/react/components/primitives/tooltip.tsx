@@ -14,11 +14,11 @@ import { tv } from 'tailwind-variants'
 
 const tooltipStyles = tv({
   base: [
-    'group rounded-lg border px-2.5 py-1.5 text-sm will-change-transform dark:shadow-none [&_strong]:font-medium',
+    'group rounded-lg p-6 text-base will-change-transform dark:shadow-none [&_strong]:font-medium',
   ],
   variants: {
     intent: {
-      default: 'bg-overlay text-overlay-fg [&_.arx]:fill-overlay [&_.arx]:stroke-border',
+      default: 'bg-black text-white [&_.arx]:fill-overlay [&_.arx]:stroke-border',
       inverse:
         'border-transparent bg-fg text-bg [&_.arx]:fill-fg [&_.arx]:stroke-transparent dark:[&_.arx]:fill-white [&_.text-muted-fg]:text-bg/70 dark:[&_.text-muted-fg]:text-fg/70',
     },
@@ -75,9 +75,9 @@ const TooltipContent = ({
             width={12}
             height={12}
             viewBox="0 0 12 12"
-            className="arx group-data-[placement=bottom]:rotate-180 group-data-[placement=left]:-rotate-90 group-data-[placement=right]:rotate-90 forced-colors:fill-[Canvas] forced-colors:stroke-[ButtonBorder]"
+            className="arx group-data-[placement=bottom]:rotate-180 group-data-[placement=left]:-rotate-90 group-data-[placement=right]:rotate-90"
           >
-            <path d="M0 0 L6 6 L12 0" />
+            <path d="M0 0 L6 6 L12 0" fill="black" />
           </svg>
         </OverlayArrow>
       )}

@@ -12,22 +12,28 @@ import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '../../utils/cn'
 
 const buttonVariants = tv({
-  base: 'cursor-pointer flex items-center justify-center',
+  base: 'cursor-pointer flex items-center justify-center transition-all duration-200',
   variants: {
     variant: {
-      primary: `brand-primary-gradient-25% hover:brand-primary-gradient-15% [&>*]:text-white text-white
-        shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_3px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]`,
-      secondary: `brand-secondary-gradient-10% hover:brand-secondary-gradient-20% [&>*]:text-accent text-accent
-        shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_2px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]`,
-      tertiary: `bg-primary/15 dark:bg-primary/20 dark:hover:bg-primary/15 hover:bg-primary/25 [&>*]:text-accent text-accent`,
-      naked:
-        '[&>*]:text-secondary-fg text-secondary-fg bg-bg hover:shadow-sm transition-shadow shadow-md dark:shadow-bg border-b border-stroke-trivial/10',
-      outline:
-        '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary bg-bg border border-input',
-      ghost: '[&>*]:text-secondary-fg text-secondary-fg hover:bg-secondary',
-      vanish: '[&>*]:text-secondary-fg text-secondary-fg',
-      destruction:
-        '[&>*]:text-white text-white bg-valencia-500 hover:bg-valencia-600 shadow-[inset_0_0_0_1px_var(--color-valencia-600),inset_0_2px_0_0_--alpha(var(--color-white)/20%)]',
+      primary: `[&>*]:text-white text-white
+        shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_3px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]
+        focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      secondary: `
+        bg-pumpkin-50 hover:bg-pumpkin-100
+        [&>*]:text-accent text-accent
+        focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      tertiary: `bg-pumpkin-50 hover:bg-pumpkin-100
+        [&>*]:text-accent text-accent 
+        focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none border border-primary-emphasis`,
+      naked: `bg-white-normal hover:bg-bluegray-100 [&>*]:text-bluegray-600 text-bluegray-600 shadow-xs border-b border-stroke-trivial/10 
+      focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      outline: `bg-white-normal dark:bg-bluegray-800 hover:bg-bluegray-50 [&>*]:text-text-body text-text-body border border-bluegray-300 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      ghost:
+        'bg-none [&>*]:text-bluegray-600 text-bluegray-600 hover:bg-bluegray-50 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
+      vanish:
+        '[&>*]:text-secondary-fg text-secondary-fg focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
+      destruction: `[&>*]:text-white text-white bg-red-600 hover:bg-red-700
+        focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
     },
     size: {
       'square-petite': 'size-14 p-0 rounded-md text-base font-medium',
@@ -37,10 +43,27 @@ const buttonVariants = tv({
       xxs: 'p-1 gap-x-1 rounded-xs text-xs font-medium',
     },
     isDisabled: {
-      true: 'opacity-50 cursor-not-allowed pointer-events-none',
+      true: 'cursor-not-allowed bg-accent-fg [&>*]:text-bluegray-300 text-bluegray-300 border-secondary shadow-none',
       false: null,
     },
   },
+  compoundVariants: [
+    {
+      variant: 'primary',
+      isDisabled: false,
+      className: 'brand-primary-gradient-25% hover:brand-primary-gradient-0%',
+    },
+    {
+      variant: 'secondary',
+      isDisabled: false,
+      className: 'brand-secondary-gradient-10% hover:brand-secondary-gradient-0%',
+    },
+    {
+      variant: 'tertiary',
+      isDisabled: false,
+      className: 'brand-secondary-gradient-10% hover:brand-secondary-gradient-0% ',
+    },
+  ],
   defaultVariants: {
     variant: 'primary',
     size: 'md',

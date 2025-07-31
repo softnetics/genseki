@@ -78,9 +78,15 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
     > = {
       name: slug,
       plugin: (gensekiOptions) => {
-        const _collectionHomeRoute = gensekiOptions.uis.find(
+        const _collectionHomeRouteIndex = gensekiOptions.uis.findIndex(
           (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
-        ) as GensekiUiRouter<GensekiUiCommonProps['COLLECTION_HOME']> | undefined
+        )
+        const _collectionHomeRoute =
+          _collectionHomeRouteIndex >= 0
+            ? (gensekiOptions.uis[_collectionHomeRouteIndex] as GensekiUiRouter<
+                GensekiUiCommonProps['COLLECTION_HOME']
+              >)
+            : undefined
 
         const collectionHomeRoute = _collectionHomeRoute
           ? {
@@ -107,7 +113,11 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTION_HOME],
             })
 
-        const uis = [collectionHomeRoute]
+        const uis = []
+
+        if (_collectionHomeRouteIndex >= 0) {
+          gensekiOptions.uis[_collectionHomeRouteIndex] = collectionHomeRoute
+        }
 
         if (options.list) {
           const defaultArgs = {
