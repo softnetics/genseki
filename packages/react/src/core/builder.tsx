@@ -8,7 +8,14 @@ import {
   getCollectionDefaultUpdateApiRoute,
   getCollectionDefaultUpdateDefaultApiRoute,
 } from './builder.utils'
-import type { CollectionOptions } from './collection'
+import type {
+  CollectionCreateOptions,
+  CollectionDeleteOptions,
+  CollectionListOptions,
+  CollectionOneOptions,
+  CollectionOptions,
+  CollectionUpdateOptions,
+} from './collection'
 import { createGensekiUiRoute, type GensekiPlugin, type GensekiUiRouter } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
@@ -18,7 +25,7 @@ import {
   type AppendApiPathPrefix,
   appendApiPathPrefix,
 } from './endpoint'
-import { FieldBuilder, type FieldsShape } from './field'
+import { FieldBuilder, type Fields, type FieldsShape } from './field'
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
 import { appendFieldNameToFields } from './utils'
@@ -39,7 +46,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
   ) {}
 
   collection<const TOptions extends CollectionOptions<TContext, any, any, any, any, any, any, any>>(
-    options: TOptions
+    optionsFn: (builder: CollectionBuilder<TContext>) => TOptions
   ): GensekiPlugin<
     TOptions['slug'],
     {
@@ -56,6 +63,9 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         >
     }
   > {
+    const builder = new CollectionBuilder<TContext>()
+    const options = optionsFn(builder)
+
     const slug = options.slug
 
     const api = appendApiPathPrefix(`/${slug}`, options.api ?? {})
@@ -333,5 +343,25 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         )
       },
     }
+  }
+}
+
+export class CollectionBuilder<in out TContext extends AnyContextable> {
+  constructor() {}
+
+  list<TFields extends Fields>(options: CollectionListOptions<TContext, TFields>) {
+    return options
+  }
+  one<TFields extends Fields>(options: CollectionOneOptions<TContext, TFields>) {
+    return options
+  }
+  create<TFields extends Fields>(options: CollectionCreateOptions<TContext, TFields>) {
+    return options
+  }
+  update<TFields extends Fields>(options: CollectionUpdateOptions<TContext, TFields>) {
+    return options
+  }
+  delete<TFields extends Fields>(options: CollectionDeleteOptions<TContext, TFields>) {
+    return options
   }
 }

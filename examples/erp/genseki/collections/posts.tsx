@@ -89,19 +89,19 @@ export const fields = builder.fields('post', (fb) => ({
   })),
 }))
 
-export const postsCollection = builder.collection({
+export const postsCollection = builder.collection((b) => ({
   slug: 'posts',
-  list: {
+  list: b.list({
     identifierColumn: 'id',
     fields: fields,
     columns: columns,
-  },
-  create: {
+  }),
+  create: b.create({
     identifierColumn: 'id',
     fields: fields,
-  },
-  update: {
+  }),
+  update: b.update({
     identifierColumn: 'id',
     fields: fields,
-  },
-})
+  }),
+}))
