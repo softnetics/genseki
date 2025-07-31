@@ -1,5 +1,15 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.19
+
+### Minor Changes
+
+- [#104](https://github.com/softnetics/genseki/pull/104) [`5ac7bc7`](https://github.com/softnetics/genseki/commit/5ac7bc745e526423a88ad83e8f050e18ffb22f86) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Improve Email and Password flexibility
+
+### Patch Changes
+
+- [#100](https://github.com/softnetics/genseki/pull/100) [`c227c3f`](https://github.com/softnetics/genseki/commit/c227c3f476349511033b23b7080010e786d650a4) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Replace Drizzle with Prisma
+
 ## 0.1.0-alpha.18
 
 ## 0.1.0-alpha.17

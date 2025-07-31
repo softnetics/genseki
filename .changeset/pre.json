@@ -9,7 +9,8 @@
     "@genseki/react": "0.0.0",
     "@genseki/react-query": "0.0.0",
     "@genseki/rest": "0.0.0",
-    "@example/ui-playground": "0.0.0"
+    "@example/ui-playground": "0.0.0",
+    "@genseki/prisma-generator": "0.0.0"
   },
   "changesets": [
     "blue-ghosts-rush",
@@ -33,8 +34,10 @@
     "hip-impalas-hunt",
     "hot-paws-battle",
     "itchy-peaches-peel",
+    "kind-maps-travel",
     "kind-rivers-obey",
     "late-adults-hammer",
+    "lazy-maps-relax",
     "legal-candies-accept",
     "light-tigers-doubt",
     "lucky-cats-bet",
@@ -46,6 +49,7 @@
     "orange-falcons-listen",
     "orange-worms-stare",
     "plenty-zebras-smile",
+    "polite-forks-lay",
     "polite-games-help",
     "popular-tips-draw",
     "pretty-hats-appear",
