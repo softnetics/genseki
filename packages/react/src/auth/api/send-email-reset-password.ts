@@ -29,7 +29,6 @@ export function sendResetPasswordEmail<
       },
     },
     async (args) => {
-      console.log('sendEmailResetPassword called with args:', args)
       if (!builderArgs.options.method.emailAndPassword?.resetPassword?.enabled) {
         // TODO: Log not enabled
         return {
@@ -37,9 +36,10 @@ export function sendResetPasswordEmail<
           body: { status: 'reset password not enabled' },
         }
       }
+
+      // TODO: Proper error handling. Separate user or database connection failed
       let user
       try {
-        console.log('Finding user by email:', args.body.email)
         user = await builderArgs.handler.user.findByEmail(args.body.email)
       } catch {
         return {

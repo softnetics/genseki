@@ -80,14 +80,29 @@ interface CheckboxProps extends CheckboxPrimitiveProps {
   description?: string
   errorMessage?: string
   label?: string
+  size?: 'md' | 'lg'
+  isTextCenter?: boolean
 }
 
 const Checkbox = forwardRef(function Checkbox(
-  { className, ...props }: CheckboxProps,
+  { className, size = 'md', isTextCenter = true, ...props }: CheckboxProps,
   ref: React.ForwardedRef<HTMLLabelElement>
 ) {
   // If provide only 1 thing then center
-  const shouldCenter = [props.description, props.label].filter((item) => !!item).length == 1
+  // const shouldCenter = [props.description, props.label].filter((item) => !!item).length == 1
+
+  const sizeClasses = {
+    md: {
+      box: 'size-8',
+      label: 'text-base font-medium',
+      description: 'text-base',
+    },
+    lg: {
+      box: 'size-10',
+      label: 'text-lg font-medium',
+      description: 'text-lg',
+    },
+  }
 
   return (
     <CheckboxPrimitive
@@ -97,12 +112,13 @@ const Checkbox = forwardRef(function Checkbox(
         checkboxStyles({ ...renderProps, className })
       )}
     >
-      {({ isSelected, isIndeterminate, ...renderProps }) => {
+      {({ isSelected, isDisabled, isIndeterminate, ...renderProps }) => {
         return (
           <div
             className={twMerge(
-              'grid grid-cols-[40px_auto]',
-              shouldCenter ? 'items-center' : 'items-start'
+              'flex gap-4',
+              isTextCenter ? 'items-center' : 'items-start',
+              isDisabled && 'cursor-not-allowed'
             )}
           >
             <div
@@ -121,9 +137,9 @@ const Checkbox = forwardRef(function Checkbox(
             <div className="flex flex-col gap-1">
               <>
                 {props.label ? (
-                  <Label className={cn(props.description && 'text-sm/4 font-normal')}>
+                  <Label className={cn(props.description, sizeClasses[size].label)}>
                     {props.label}
-                    {props.isRequired && <span className="ml-1 text-red-500">*</span>}
+                    {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
                   </Label>
                 ) : (
                   (props.children as React.ReactNode)

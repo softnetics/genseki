@@ -1,5 +1,5 @@
 export { AccountProvider } from '../auth/constant'
-export { hashPassword, ResponseHelper, verifyPassword } from '../auth/utils'
+export { defaultHashPassword, ResponseHelper, verifyPassword } from '../auth/utils'
 export type {
   AnyContextable,
   AnyRequestContextable,

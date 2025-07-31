@@ -2,7 +2,7 @@
   "name": "@genseki/react",
   "sideEffects": false,
   "type": "module",
-  "version": "0.1.0-alpha.14",
+  "version": "0.1.0-alpha.18",
   "files": [
     "dist"
   ],
@@ -36,6 +36,9 @@
   "dependencies": {
     "@aws-sdk/client-s3": "^3.826.0",
     "@aws-sdk/s3-request-presigner": "^3.826.0",
+    "@dnd-kit/core": "^6.3.1",
+    "@dnd-kit/sortable": "^10.0.0",
+    "@dnd-kit/utilities": "^3.2.2",
     "@hookform/resolvers": "^5.0.1",
     "@intentui/icons": "^1.10.31",
     "@internationalized/date": "^3.8.2",

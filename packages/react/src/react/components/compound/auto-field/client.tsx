@@ -284,6 +284,7 @@ interface AutoFieldProps {
   className?: string
   visibilityField?: 'create' | 'update'
   prefix?: string
+  isDisabled?: boolean
 }
 
 export function AutoField(props: AutoFieldProps) {
@@ -293,7 +294,7 @@ export function AutoField(props: AutoFieldProps) {
 
   if (visibility === 'hidden') return null
 
-  const disabled = visibility === 'disabled'
+  const disabled = visibility === 'disabled' || props.isDisabled
 
   const commonProps = {
     name: props.prefix ? `${props.prefix}.${field.$client}` : field.$client.fieldName,
@@ -403,7 +404,7 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'comboboxNumber':
     case 'comboboxText': {
-      const options = props.optionsRecord[field.$client.source] ?? []
+      const options = props.optionsRecord[field.$client.fieldName] ?? []
       return (
         <select name={field.$client.fieldName}>
           {options.map((option) => (
@@ -440,6 +441,7 @@ export function AutoField(props: AutoFieldProps) {
           allowConnect={false}
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
+          isDisabled={disabled}
         />
       )
     case 'connect':
@@ -451,6 +453,7 @@ export function AutoField(props: AutoFieldProps) {
           allowCreate={false}
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
+          isDisabled={disabled}
         />
       )
     case 'connectOrCreate':
@@ -462,6 +465,7 @@ export function AutoField(props: AutoFieldProps) {
           allowCreate={true}
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
+          isDisabled={disabled}
         />
       )
 
@@ -479,6 +483,7 @@ interface AutoRelationshipFieldProps {
   allowCreate?: boolean
   allowConnect?: boolean
   visibilityField?: 'create' | 'update'
+  isDisabled?: boolean
 }
 
 export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
@@ -498,6 +503,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
           visibilityField={props.visibilityField}
+          isDisabled={props.isDisabled}
         />
       )
     case true:
@@ -510,6 +516,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
           visibilityField={props.visibilityField}
+          isDisabled={props.isDisabled}
         />
       )
     default:
@@ -558,6 +565,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
           optionsRecord={props.optionsRecord}
           visibilityField={props.visibilityField}
           prefix={`${props.name}.create`}
+          isDisabled={disabled}
         />
       }
     />
@@ -598,6 +606,7 @@ interface AutoManyRelationshipFieldProps {
   allowCreate?: boolean
   allowConnect?: boolean
   visibilityField?: 'create' | 'update'
+  isDisabled?: boolean
 }
 
 export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
@@ -608,7 +617,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   })
   const visibility = props.visibilityField ? props.field[props.visibilityField] : 'enabled'
   if (visibility === 'hidden') return null
-  const disabled = visibility === 'disabled'
+  const disabled = visibility === 'disabled' || props.isDisabled
 
   const connectComponent = (name: string) => {
     const commonProps = {
@@ -643,6 +652,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             optionsRecord={props.optionsRecord}
             visibilityField={props.visibilityField}
             prefix={name}
+            isDisabled={disabled}
           />
         }
       />
@@ -677,7 +687,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            isDisabled={disabled}
+            onClick={() => fieldArray.append({})}
+          >
             Add
           </Button>
         </div>
@@ -695,7 +711,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            isDisabled={disabled}
+            onClick={() => fieldArray.append({})}
+          >
             Add
           </Button>
         </div>

@@ -72,9 +72,15 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           } satisfies BaseViewProps['collectionOptions'],
         }
 
-        const _collectionHomeRoute = gensekiOptions.uis.find(
+        const _collectionHomeRouteIndex = gensekiOptions.uis.findIndex(
           (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
-        ) as GensekiUiRouter<GensekiUiCommonProps['COLLECTION_HOME']> | undefined
+        )
+        const _collectionHomeRoute =
+          _collectionHomeRouteIndex >= 0
+            ? (gensekiOptions.uis[_collectionHomeRouteIndex] as GensekiUiRouter<
+                GensekiUiCommonProps['COLLECTION_HOME']
+              >)
+            : undefined
 
         const collectionHomeRoute = _collectionHomeRoute
           ? {
@@ -101,8 +107,11 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTION_HOME],
             })
 
-        const uis = [
-          collectionHomeRoute,
+        if (_collectionHomeRouteIndex >= 0) {
+          gensekiOptions.uis[_collectionHomeRouteIndex] = collectionHomeRoute
+        }
+
+        const collectionSpecificUis = [
           createGensekiUiRoute({
             path: `/collections/${slug}`,
             requiredAuthenticated: true,
@@ -154,7 +163,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
                 <UpdateView
                   {...args}
-                  {...args.params}
                   {...defaultArgs}
                   identifier={args.params.identifier}
                   findOne={api.findOne as any}
@@ -163,6 +171,11 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
             ),
           }),
         ]
+
+        const uis =
+          _collectionHomeRouteIndex >= 0
+            ? collectionSpecificUis
+            : [collectionHomeRoute, ...collectionSpecificUis]
 
         return {
           api: {

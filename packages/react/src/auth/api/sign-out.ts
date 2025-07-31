@@ -13,7 +13,6 @@ export function signOut<TContext extends Contextable, TAuthOptions extends AuthO
     {
       method: 'POST',
       path: '/auth/sign-out',
-      body: undefined,
       responses: {
         200: z.object({
           status: z.string(),
