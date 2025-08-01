@@ -1,3 +1,4 @@
+import type { IsAny, Join } from 'type-fest'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 
 import type {
@@ -33,3 +34,28 @@ export type InferTableType<T extends AnyTable> = UndefinedToOptional<
       : InferDataType<T['shape']['relations'][K]['relationDataTypes'][0]> | null | undefined
   }
 >
+
+type IsContains<TInput extends any[], TCheck extends any[] | undefined> = (
+  IsAny<TCheck> extends true
+    ? true[]
+    : TCheck extends any[]
+      ? { [K in keyof TCheck]: TCheck[K] extends TInput[number] ? true : false }
+      : true[]
+) extends true[]
+  ? true
+  : false
+
+export type IsValidTable<TRequiredTable extends AnyTable, TInputTable extends AnyTable> =
+  IsContains<
+    TInputTable['shape']['uniqueFields'],
+    TRequiredTable['shape']['uniqueFields']
+  > extends true
+    ? IsContains<
+        TInputTable['shape']['primaryFields'],
+        TRequiredTable['shape']['primaryFields']
+      > extends true
+      ? TInputTable['shape']['columns'] extends TRequiredTable['shape']['columns']
+        ? true
+        : "Columns of InputTable do not match the required table's columns"
+      : `Primary fields of InputTable do not match the required table's primary fields. Required: ${Join<TRequiredTable['shape']['primaryFields'], '.'>}, Input: ${Join<TInputTable['shape']['primaryFields'], '.'>}`
+    : `Unique fields of InputTable do not match the required table's unique fields. Required: ${Join<TRequiredTable['shape']['uniqueFields'][number], '.'>}, Input: ${Join<TInputTable['shape']['uniqueFields'][number], '.'>}`

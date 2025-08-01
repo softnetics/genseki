@@ -30,7 +30,7 @@ export type AnySessionTable = AnyTable<{
   }
   relations: {}
   primaryFields: ['id']
-  uniqueFields: string[][]
+  uniqueFields: any
 }>
 
 export type AnyAccountTable = AnyTable<{
@@ -67,5 +67,5 @@ export type AnyVerificationTable = AnyTable<{
   }
   relations: {}
   primaryFields: ['id']
-  uniqueFields: string[][]
+  uniqueFields: any
 }>

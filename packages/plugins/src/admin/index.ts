@@ -8,6 +8,7 @@ import type {
   AnyTypedFieldColumn,
   AnyUserTable as BaseAnyUserTable,
   DataType,
+  IsValidTable,
   WithIsList,
   WithIsRequired,
 } from '@genseki/react'
@@ -21,8 +22,8 @@ type AnyUserTable = AnyTable<{
     bannedExpiresAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
   }
   relations: {}
-  uniqueFields: string[][]
-  primaryFields: string[]
+  uniqueFields: any
+  primaryFields: any
 }> &
   BaseAnyUserTable
 
@@ -30,10 +31,21 @@ type AccessControlStatements = {
   [K in string]: string[] | AccessControlStatements
 }
 
+type PluginSchema = {
+  user: AnyUserTable
+}
+
+type ValidateSchema<TSchema extends PluginSchema> = {
+  user: IsValidTable<AnyUserTable, TSchema['user']>
+} extends {
+  user: true
+}
+  ? AdminPluginOptions
+  : {
+      user: IsValidTable<AnyUserTable, TSchema['user']>
+    }
+
 export interface AdminPluginOptions {
-  schema: {
-    user: AnyUserTable
-  }
   accessControl: AccessControl<any, any>
 }
 
@@ -122,15 +134,24 @@ export function mergeAccessControl<
   )
 }
 
-export function admin<TContext extends AnyContextable>(
+function isOptions(options: any): options is AdminPluginOptions {
+  return !('user' in options)
+}
+
+export function admin<TContext extends AnyContextable, TSchema extends PluginSchema>(
   context: TContext,
-  options: AdminPluginOptions
+  schema: TSchema,
+  options: ValidateSchema<TSchema>
 ) {
+  if (!isOptions(options)) {
+    throw new Error('Invalid options provided to admin plugin')
+  }
+
   return createPlugin({
     name: 'admin',
     plugin: (input) => {
       const prisma = context.getPrismaClient()
-      const builder = new Builder({ schema: options.schema, context })
+      const builder = new Builder({ schema: schema, context })
 
       const hasPermissionEndpoint = builder.endpoint(
         {
@@ -198,11 +219,11 @@ export function admin<TContext extends AnyContextable>(
         async ({ body }) => {
           const { userId } = body
 
-          const banField = options.schema.user.shape.columns.banned
-          const bannedReasonField = options.schema.user.shape.columns.bannedReason
-          const bannedExpiresAtField = options.schema.user.shape.columns.bannedExpiresAt
+          const banField = schema.user.shape.columns.banned
+          const bannedReasonField = schema.user.shape.columns.bannedReason
+          const bannedExpiresAtField = schema.user.shape.columns.bannedExpiresAt
 
-          await prisma[options.schema.user.config.prismaModelName].update({
+          await prisma[schema.user.config.prismaModelName].update({
             where: { id: userId },
             data: {
               [banField.name]: true,
