@@ -31,18 +31,22 @@ type AccessControlStatements = {
   [K in string]: string[] | AccessControlStatements
 }
 
+export type AnyPluginSchema = {
+  user: any
+}
+
 type PluginSchema = {
   user: AnyUserTable
 }
 
-type ValidateSchema<TSchema extends PluginSchema> = {
-  user: IsValidTable<AnyUserTable, TSchema['user']>
+type ValidateSchema<TSchema extends AnyPluginSchema> = {
+  user: IsValidTable<PluginSchema['user'], TSchema['user']>
 } extends {
   user: true
 }
   ? AdminPluginOptions
   : {
-      user: IsValidTable<AnyUserTable, TSchema['user']>
+      user: IsValidTable<PluginSchema['user'], TSchema['user']>
     }
 
 export interface AdminPluginOptions {
@@ -138,7 +142,7 @@ function isOptions(options: any): options is AdminPluginOptions {
   return !('user' in options)
 }
 
-export function admin<TContext extends AnyContextable, TSchema extends PluginSchema>(
+export function admin<TContext extends AnyContextable, TSchema extends AnyPluginSchema>(
   context: TContext,
   schema: TSchema,
   options: ValidateSchema<TSchema>
