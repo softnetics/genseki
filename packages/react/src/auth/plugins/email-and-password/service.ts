@@ -6,7 +6,6 @@ import type { AnyContextable } from '../../../core/context'
 import { HttpInternalServerError } from '../../../core/error'
 import type { MockPrismaClient } from '../../../core/prisma.types'
 import type { InferTableType } from '../../../core/table'
-import type { AnyAccountTable, AnyUserTable, AnyVerificationTable } from '../../base'
 
 export class EmailAndPasswordService<TContext extends AnyContextable> {
   private readonly prisma: MockPrismaClient
@@ -32,13 +31,13 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
       where: {
         [emailField.name]: email,
       },
-    })) as InferTableType<AnyUserTable> | undefined
+    })) as InferTableType<PluginSchema['user']> | undefined
 
     if (!user) throw new HttpInternalServerError('User not found')
 
     const account = (await this.prisma[this.schema.account.config.prismaModelName].findFirst({
       where: { accountId: user.id, provider: AccountProvider.CREDENTIAL },
-    })) as InferTableType<AnyAccountTable> | undefined
+    })) as InferTableType<PluginSchema['account']> | undefined
 
     if (!account) throw new HttpInternalServerError('Account not found')
     if (!account.password)
@@ -84,7 +83,7 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
     const emailField = this.schema.user.shape.columns.email
     const user = (await this.prisma[this.schema.user.config.prismaModelName].findUnique({
       where: { [emailField.name]: email },
-    })) as InferTableType<AnyUserTable> | undefined
+    })) as InferTableType<PluginSchema['user']> | undefined
 
     if (!user) {
       throw new HttpInternalServerError('User not found')
@@ -129,7 +128,7 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
       this.schema.verification.config.prismaModelName
     ].findUnique({
       where: { [identifierField.name]: identifier.value },
-    })) as InferTableType<AnyVerificationTable> | undefined
+    })) as InferTableType<PluginSchema['verification']> | undefined
 
     if (!verification || verification.expiredAt < new Date()) {
       throw new HttpInternalServerError('Reset password token not found or expired')

@@ -28,6 +28,13 @@ import type {
   AnyVerificationTable,
 } from '../../base'
 
+export type AnyPluginSchema = {
+  user: any
+  session: any
+  account: any
+  verification: any
+}
+
 export type PluginSchema = {
   user: AnyUserTable
   session: AnySessionTable
@@ -35,11 +42,11 @@ export type PluginSchema = {
   verification: AnyVerificationTable
 }
 
-type ValidateSchema<TSchema extends PluginSchema> = {
-  user: IsValidTable<AnyUserTable, TSchema['user']>
-  session: IsValidTable<AnySessionTable, TSchema['session']>
-  account: IsValidTable<AnyAccountTable, TSchema['account']>
-  verification: IsValidTable<AnyVerificationTable, TSchema['verification']>
+type ValidateSchema<TSchema extends AnyPluginSchema> = {
+  user: IsValidTable<PluginSchema['user'], TSchema['user']>
+  session: IsValidTable<PluginSchema['session'], TSchema['session']>
+  account: IsValidTable<PluginSchema['account'], TSchema['account']>
+  verification: IsValidTable<PluginSchema['verification'], TSchema['verification']>
 } extends {
   user: true
   session: true
@@ -48,10 +55,10 @@ type ValidateSchema<TSchema extends PluginSchema> = {
 }
   ? EmailAndPasswordPluginOptions
   : {
-      user: IsValidTable<AnyUserTable, TSchema['user']>
-      session: IsValidTable<AnySessionTable, TSchema['session']>
-      account: IsValidTable<AnyAccountTable, TSchema['account']>
-      verification: IsValidTable<AnyVerificationTable, TSchema['verification']>
+      user: IsValidTable<PluginSchema['user'], TSchema['user']>
+      session: IsValidTable<PluginSchema['session'], TSchema['session']>
+      account: IsValidTable<PluginSchema['account'], TSchema['account']>
+      verification: IsValidTable<PluginSchema['verification'], TSchema['verification']>
     }
 
 interface EmailAndPasswordPluginOptions {
@@ -117,7 +124,7 @@ function isOptions(options: any): options is EmailAndPasswordPluginOptions {
 
 export function emailAndPasswordPlugin<
   TContext extends AnyContextable,
-  TSchema extends PluginSchema,
+  TSchema extends AnyPluginSchema,
   TOptions extends ValidateSchema<TSchema>,
 >(context: TContext, schema: TSchema, _options: TOptions) {
   if (!isOptions(_options)) {
