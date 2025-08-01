@@ -15,6 +15,7 @@ interface PrismaUpsertArgs {
 }
 
 interface PrismaFindManyArgs {
+  select?: Record<string, any>
   where?: any
   orderBy?: any
   take?: number
@@ -22,13 +23,15 @@ interface PrismaFindManyArgs {
 }
 
 interface PrismaFindFirstArgs {
+  select?: Record<string, any>
   where?: any
   orderBy?: any
-  select?: any
 }
 
 interface PrismaFindUniqueArgs {
+  select?: Record<string, any>
   where: any
+  orderBy?: any
 }
 
 interface PrismaCreateArgs {

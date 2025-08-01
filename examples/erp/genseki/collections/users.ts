@@ -1,8 +1,10 @@
 import z from 'zod'
 
+import { columns } from './users.client'
+
 import { builder } from '../helper'
 
-const userFields = builder.fields('user', (fb) => ({
+export const fields = builder.fields('user', (fb) => ({
   name: fb.columns('name', {
     type: 'text',
   }),
@@ -15,16 +17,15 @@ const userFields = builder.fields('user', (fb) => ({
   }),
 }))
 
-export const usersCollection = builder.collection({
+export const usersCollection = builder.collection((b) => ({
   slug: 'users',
-  create: {
-    identifierColumn: 'id',
-    fields: userFields,
-  },
-  list: {
-    identifierColumn: 'id',
-    fields: userFields,
-  },
+  create: b.create({
+    fields: fields,
+  }),
+  list: b.list({
+    fields: fields,
+    columns: columns,
+  }),
   api: {
     example: builder.endpoint(
       {
@@ -46,4 +47,4 @@ export const usersCollection = builder.collection({
       }
     ),
   },
-})
+}))

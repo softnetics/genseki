@@ -1,9 +1,8 @@
-import type { IsNever, Simplify, ValueOf } from 'type-fest'
+import type { IsNever, Promisable, Simplify, ValueOf } from 'type-fest'
 import type { z } from 'zod/v4'
 import { type ZodType } from 'zod/v4'
 import type { JSONSchema } from 'zod/v4/core'
 
-import type { MaybePromise } from './collection'
 import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'
 import { withValidator } from './endpoint.utils'
 import { type ConditionalExceptNever } from './utils'
@@ -106,7 +105,7 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
 export type ApiRouteHandler<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = (
   payload: ApiRouteHandlerPayload<TApiRouteSchema>,
   meta: { request: Request; response: Response }
-) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
+) => Promisable<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type ApiRouteHandlerInitial<
   TContext extends AnyRequestContextable,
@@ -114,7 +113,7 @@ export type ApiRouteHandlerInitial<
 > = (
   payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext },
   meta: { request: Request; response: Response }
-) => MaybePromise<ApiRouteResponse<TApiRouteSchema['responses']>>
+) => Promisable<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
   TApiRouteHandler extends ApiRouteHandler<infer TApiRouteSchema extends ApiRouteSchema>

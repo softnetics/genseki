@@ -1,3 +1,5 @@
+import type { JsonValue } from 'type-fest'
+
 export const DataType = {
   STRING: 'STRING',
   INT: 'INT',
@@ -23,7 +25,7 @@ export type InferDataType<T extends DataType> = T extends typeof DataType.STRING
         : T extends typeof DataType.DATETIME
           ? Date
           : T extends typeof DataType.JSON
-            ? Record<string, any>
+            ? JsonValue
             : T extends typeof DataType.BYTES
               ? Uint8Array
               : T extends typeof DataType.BIGINT
