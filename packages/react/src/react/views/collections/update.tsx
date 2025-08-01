@@ -18,6 +18,7 @@ interface UpdateViewProps extends BaseViewProps {
 export async function UpdateView(props: UpdateViewProps) {
   const headersValue = getHeadersObject(props.headers)
 
+  // TODO: Make the right request
   const request = new Request('http://localhost', {
     method: 'GET',
     headers: headersValue,
@@ -43,7 +44,7 @@ export async function UpdateView(props: UpdateViewProps) {
       </Typography>
       <UpdateClientView
         fields={fieldsClient}
-        identifer={props.identifier}
+        identifier={props.identifier}
         slug={props.slug}
         defaultValues={result.body}
         optionsRecord={optionsRecord}

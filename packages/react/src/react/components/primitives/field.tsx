@@ -36,7 +36,7 @@ const fieldStyles = tv({
   slots: {
     description: 'text-pretty text-secondary-fg text-sm',
     label: 'w-fit cursor-default font-semibold text-fg text-base',
-    fieldError: 'text-danger text-sm forced-colors:text-[Mark]',
+    fieldError: 'text-red-500 text-sm forced-colors:text-[Mark]',
   },
 })
 

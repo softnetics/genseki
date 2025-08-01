@@ -1,5 +1,47 @@
 # @genseki/react
 
+## 0.1.0-alpha.20
+
+## 0.1.0-alpha.19
+
+### Minor Changes
+
+- [#104](https://github.com/softnetics/genseki/pull/104) [`5ac7bc7`](https://github.com/softnetics/genseki/commit/5ac7bc745e526423a88ad83e8f050e18ffb22f86) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Improve Email and Password flexibility
+
+### Patch Changes
+
+- [#108](https://github.com/softnetics/genseki/pull/108) [`9f3aa3a`](https://github.com/softnetics/genseki/commit/9f3aa3a3aaafb970c091146979ee0e26dd5ca919) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Allow multiple fields in one collection
+
+## 0.1.0-alpha.18
+
+### Patch Changes
+
+- [#101](https://github.com/softnetics/genseki/pull/101) [`0b9269d`](https://github.com/softnetics/genseki/commit/0b9269dcc3830afc395363d7f1e94cecd33e6b03) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: card and avatar is not client component
+
+## 0.1.0-alpha.17
+
+### Minor Changes
+
+- [#79](https://github.com/softnetics/genseki/pull/79) [`082b5bc`](https://github.com/softnetics/genseki/commit/082b5bc747adff6c0adc5526f80b8ea2aedd0b8e) Thanks [@Desmenez](https://github.com/Desmenez)! - redesign components and add new component
+
+### Patch Changes
+
+- [#98](https://github.com/softnetics/genseki/pull/98) [`f2adbb5`](https://github.com/softnetics/genseki/commit/f2adbb590d9a4795eb4afebaad032cf39f25aa8d) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: home card not update
+
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- [#93](https://github.com/softnetics/genseki/pull/93) [`b56cc5e`](https://github.com/softnetics/genseki/commit/b56cc5e2135a7e15cccb0595fc266d329e027a87) Thanks [@t0ngk](https://github.com/t0ngk)! - feat: can disable in autofield
+
+- [#90](https://github.com/softnetics/genseki/pull/90) [`63c94ed`](https://github.com/softnetics/genseki/commit/63c94ed9ff12730d2fa6121f6d3215ec906aff23) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Change context model to user-defined context
+
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- [#88](https://github.com/softnetics/genseki/pull/88) [`9ad485e`](https://github.com/softnetics/genseki/commit/9ad485eedfd3e890d8f58158b7c7b25b27cdbe87) Thanks [@t0ngk](https://github.com/t0ngk)! - export getDefaultValueFromFields for custom page
+
 ## 0.1.0-alpha.14
 
 ### Patch Changes

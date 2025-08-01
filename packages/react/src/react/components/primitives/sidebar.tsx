@@ -489,7 +489,7 @@ const SidebarItem = ({
             (state !== 'collapsed' ? (
               <Badge
                 shape="square"
-                intent="primary"
+                intent="brand"
                 data-slot="sidebar-badge"
                 className="inset-ring-1 inset-ring-ring/20 group-data-current:inset-ring-transparent absolute inset-y-1/2 right-1.5 h-auto w-auto -translate-y-1/2 p-4 text-[10px] transition-colors"
               >

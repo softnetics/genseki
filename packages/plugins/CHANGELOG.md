@@ -1,5 +1,35 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.20
+
+## 0.1.0-alpha.19
+
+### Minor Changes
+
+- [#104](https://github.com/softnetics/genseki/pull/104) [`5ac7bc7`](https://github.com/softnetics/genseki/commit/5ac7bc745e526423a88ad83e8f050e18ffb22f86) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Improve Email and Password flexibility
+
+### Patch Changes
+
+- [#100](https://github.com/softnetics/genseki/pull/100) [`c227c3f`](https://github.com/softnetics/genseki/commit/c227c3f476349511033b23b7080010e786d650a4) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Replace Drizzle with Prisma
+
+## 0.1.0-alpha.18
+
+## 0.1.0-alpha.17
+
+## 0.1.0-alpha.16
+
+### Patch Changes
+
+- [#90](https://github.com/softnetics/genseki/pull/90) [`63c94ed`](https://github.com/softnetics/genseki/commit/63c94ed9ff12730d2fa6121f6d3215ec906aff23) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Change context model to user-defined context
+
+- [#94](https://github.com/softnetics/genseki/pull/94) [`7acbdc9`](https://github.com/softnetics/genseki/commit/7acbdc902aace63590a0a45f8ac9d67a57c1c7de) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Breaking] Change core model of Genseki
+
+## 0.1.0-alpha.15
+
+### Patch Changes
+
+- [#92](https://github.com/softnetics/genseki/pull/92) [`5b9967f`](https://github.com/softnetics/genseki/commit/5b9967f2882419867d860045e977bd3834f7bd17) Thanks [@intaniger](https://github.com/intaniger)! - fix: :coffin: remove user collection from plugin
+
 ## 0.1.0-alpha.14
 
 ## 0.1.0-alpha.13

@@ -1,2 +1,2 @@
 export const generatorName = 'Genseki Prisma Generators'
-export const defaultPath = './src/genseki/'
+export const defaultPath = './generated/genseki/'

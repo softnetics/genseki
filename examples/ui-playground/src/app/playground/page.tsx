@@ -1,12 +1,13 @@
 'use client'
 
-import { Suspense } from 'react'
+import { Suspense, useState } from 'react'
 
 import { IconGallery, IconGrid4, IconLink, IconRedo, IconUndo } from '@intentui/icons'
 import {
   CaretDownIcon,
   DiscordLogoIcon,
   GithubLogoIcon,
+  MagnifyingGlassIcon,
   PlusCircleIcon,
   TextAlignCenterIcon,
   TextAlignJustifyIcon,
@@ -19,13 +20,37 @@ import {
   TrashIcon,
 } from '@phosphor-icons/react'
 import { StarterKit } from '@tiptap/starter-kit'
+import { useTheme } from 'next-themes'
 
 import {
+  Annotation,
+  Avatar,
+  Breadcrumbs,
+  BreadcrumbsItem,
+  ButtonGroup,
+  ButtonGroupItem,
+  Card,
   Link,
+  Pagination,
+  PaginationWithDropdown,
+  ProgressBar,
+  Radio,
+  RadioGroup,
+  ReorderGroup,
   Switch,
+  Tab,
+  Table,
+  TableBody,
+  TableCell,
+  TableColumn,
+  TableHeader,
+  TableRow,
+  TabList,
+  Tabs,
   Tag,
   TagGroup,
   TagList,
+  Textarea,
   TextField,
   TimeField,
   ToggleGroup,
@@ -33,6 +58,8 @@ import {
   ToolbarGroup,
   ToolbarItem,
   ToolbarSeparator,
+  Tooltip,
+  TooltipContent,
 } from '@genseki/react'
 import { RichTextEditor } from '@genseki/react'
 import { BaseIcon } from '@genseki/react'
@@ -262,9 +289,42 @@ const countries = [
   },
 ]
 
+interface ReorderMockData {
+  id: string
+  text: string
+}
+
+const mockDataReorder: ReorderMockData[] = [
+  { id: 'id1', text: 'Button 1' },
+  { id: 'id2', text: 'Button 2' },
+  { id: 'id3', text: 'Button 3' },
+  { id: 'id4', text: 'Button 4' },
+  { id: 'id5', text: 'Button 5' },
+]
+
 export default function UIPlayground() {
+  const { setTheme, theme } = useTheme()
+  const [btnData, setBtnData] = useState<ReorderMockData[]>(mockDataReorder)
+
+  // Map new order
+  const handleReorder = (newOrder: string[]) => {
+    setBtnData((prev) => {
+      const map = new Map(prev.map((item) => [item.id, item]))
+      return newOrder.map((id) => map.get(id)).filter((b): b is ReorderMockData => Boolean(b))
+    })
+  }
+
   return (
-    <div className="bg-bg pb-24">
+    <div className="bg-white pb-24 relative dark:bg-black">
+      <div className="fixed top-6 right-6 z-50">
+        <Button
+          variant={theme === 'dark' ? 'secondary' : 'primary'}
+          size="md"
+          onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
+        >
+          {theme === 'dark' ? 'Light' : 'Dark'}
+        </Button>
+      </div>
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" categoryTitle="Theme playground">
           <div className="bg-bg border-border rounded-sm border px-8 py-4">
@@ -471,9 +531,49 @@ export default function UIPlayground() {
           <Calendar aria-label="Event date" />
         </div>
       </Wrapper>
+      <Wrapper title="Switch">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size" categoryTitle="Switch">
+            <Switch size="md" />
+          </PlaygroundCard>
+          <PlaygroundCard title="Large size" categoryTitle="Switch">
+            <Switch size="lg" />
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
       <Wrapper title="Multi select">
         <PlaygroundCard title="Multi select" categoryTitle="Multi select">
-          <Select label="Design software" placeholder="Select a software">
+          <Select
+            label="Design software"
+            placeholder="Select a software"
+            className="w-[320px]"
+            isRequired
+          >
+            <SelectTrigger
+              prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" weight="regular" />}
+            />
+            <SelectList
+              items={[
+                { id: 0, name: 'A' },
+                { id: 1, name: 'B' },
+                { id: 2, name: 'C' },
+                { id: 3, name: 'D' },
+              ]}
+            >
+              {(item) => (
+                <SelectOption id={item.id} textValue={item.name}>
+                  {item.name}
+                </SelectOption>
+              )}
+            </SelectList>
+          </Select>
+          <Select
+            label="Design software"
+            placeholder="Select a software"
+            className="w-[320px]"
+            isRequired
+            isDisabled
+          >
             <SelectTrigger />
             <SelectList
               items={[
@@ -511,21 +611,23 @@ export default function UIPlayground() {
       <Wrapper title="Tag group">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Tag group" categoryTitle="Tag group">
-            <TagGroup label="Android Brands" selectionMode="multiple">
+            <TagGroup label="Colors" selectionMode="multiple">
               <TagList
                 items={[
-                  { id: '1', name: 'Samsung', available: false },
-                  { id: '2', name: 'OnePlus', available: true },
-                  { id: '3', name: 'Google', available: true },
-                  { id: '4', name: 'Xiaomi', available: false },
+                  { id: '1', name: 'Brand', available: false, intent: 'primary' },
+                  { id: '2', name: 'Gray', available: true, intent: 'gray' },
+                  { id: '3', name: 'Correct', available: true, intent: 'correct' },
+                  { id: '4', name: 'Incorrect', available: false, intent: 'incorrect' },
+                  { id: '5', name: 'Accent', available: false, intent: 'accent' },
+                  { id: '6', name: 'Info', available: false, intent: 'info' },
                 ]}
               >
-                {(item) => <Tag>{item.name}</Tag>}
+                {(item) => <Tag intent={item.intent as any}>{item.name}</Tag>}
               </TagList>
             </TagGroup>
           </PlaygroundCard>
           <PlaygroundCard title="Tag group with remove" categoryTitle="Tag group">
-            <TagGroup label="Android Brands" selectionMode="multiple" onRemove={() => {}}>
+            <TagGroup label="Android Brands (sm)" selectionMode="multiple" onRemove={() => {}}>
               <TagList
                 items={[
                   { id: '1', name: 'Samsung', available: false },
@@ -534,18 +636,40 @@ export default function UIPlayground() {
                   { id: '4', name: 'Xiaomi', available: false },
                 ]}
               >
-                {(item) => <Tag>{item.name}</Tag>}
+                {(item) => <Tag size="sm">{item.name}</Tag>}
               </TagList>
             </TagGroup>
           </PlaygroundCard>
         </div>
       </Wrapper>
       <Wrapper title="Badge">
-        <PlaygroundCard title="Single badge" categoryTitle="Badge">
+        <PlaygroundCard title="Small size (sm)" categoryTitle="Badge">
           <div className="flex flex-wrap gap-2">
-            {['primary', 'secondary', 'success', 'info', 'warning', 'danger'].map(
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+              (intent, index) => (
+                <Badge key={index} intent={intent as any} shape="circle" size="sm">
+                  {intent}
+                </Badge>
+              )
+            )}
+          </div>
+        </PlaygroundCard>
+        <PlaygroundCard title="Medium size (md)" categoryTitle="Badge">
+          <div className="flex flex-wrap gap-2">
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
               (intent, index) => (
                 <Badge key={index} intent={intent as any} shape="circle">
+                  {intent}
+                </Badge>
+              )
+            )}
+          </div>
+        </PlaygroundCard>
+        <PlaygroundCard title="Large size (lg)" categoryTitle="Badge">
+          <div className="flex flex-wrap gap-2">
+            {['gray', 'brand', 'blue', 'red', 'yellow', 'green', 'purple', 'cyan'].map(
+              (intent, index) => (
+                <Badge key={index} intent={intent as any} shape="circle" size="lg">
                   {intent}
                 </Badge>
               )
@@ -571,10 +695,10 @@ export default function UIPlayground() {
                 </ModalDescription>
               </ModalHeader>
               <ModalFooter className="flex justify-between">
-                <ModalClose variant="outline" size="sm">
+                <ModalClose variant="outline" size="sm" className="w-1/2">
                   Cancel
                 </ModalClose>
-                <ModalClose variant="destruction" size="sm">
+                <ModalClose variant="destruction" size="sm" className="w-1/2">
                   Delete
                   <BaseIcon icon={TrashIcon} size="sm" />
                 </ModalClose>
@@ -969,7 +1093,14 @@ export default function UIPlayground() {
                 isDisabled
                 placeholder="Data"
               />
-
+              <TextField
+                isRequired
+                type="password"
+                label="Package name"
+                isPending
+                description="This is a helper text"
+                size="md"
+              />
               <TextField
                 isRequired
                 type="password"
@@ -1019,8 +1150,31 @@ export default function UIPlayground() {
                 size="xs"
                 prefix={'MR.'}
                 suffix={'Right?'}
+                isDisabled
               />
+              <TextField type="text" description="copy" size="md" isShowCopyButton isShowHttp />
             </div>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+      <Wrapper title="Textarea">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Textarea">
+            <Textarea
+              label="Package name"
+              description="This is a helper text"
+              placeholder="Data"
+              className="w-full"
+              isRequired
+            />
+            <Textarea
+              label="Package name"
+              description="This is a helper text"
+              placeholder="Data"
+              className="w-full"
+              isRequired
+              isDisabled
+            />
           </PlaygroundCard>
         </div>
       </Wrapper>
@@ -1355,6 +1509,310 @@ export default function UIPlayground() {
             </div>
           </div>
         </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Button group">
+        <PlaygroundCard title="Medium size (md)" categoryTitle="Button group">
+          <div className="flex items-center gap-x-4">
+            <ButtonGroup>
+              <ButtonGroupItem id="1d">1d</ButtonGroupItem>
+              <ButtonGroupItem id="1w">1w</ButtonGroupItem>
+              <ButtonGroupItem id="1m">1m</ButtonGroupItem>
+              <ButtonGroupItem id="1y">1y</ButtonGroupItem>
+            </ButtonGroup>
+          </div>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Breadcrumbs">
+        <PlaygroundCard title="4 items" categoryTitle="Breadcrumbs">
+          <Breadcrumbs>
+            <BreadcrumbsItem href="/">Home</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page1</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page2</BreadcrumbsItem>
+            <BreadcrumbsItem href="/">Page3</BreadcrumbsItem>
+          </Breadcrumbs>
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Pagination">
+        <PlaygroundCard title="Default" categoryTitle="Pagination">
+          <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
+        </PlaygroundCard>
+        <PlaygroundCard title="With dropdown" categoryTitle="Pagination">
+          <PaginationWithDropdown
+            currentPage={1}
+            totalPages={10}
+            defaultPageSize={10}
+            onPageChange={() => {}}
+          />
+        </PlaygroundCard>
+      </Wrapper>
+      <Wrapper title="Radio group">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Radio group">
+            <RadioGroup aria-label="Radio">
+              <Radio value="x">X</Radio>
+              <Radio value="y">Y</Radio>
+              <Radio value="z" isDisabled>
+                Z
+              </Radio>
+            </RadioGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Small size (sm)" categoryTitle="Radio group">
+            <RadioGroup aria-label="Radio">
+              <Radio value="x" size="sm">
+                X
+              </Radio>
+              <Radio value="y" size="sm">
+                Y
+              </Radio>
+              <Radio value="z" isDisabled size="sm">
+                Z
+              </Radio>
+            </RadioGroup>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Checkbox">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
+          <PlaygroundCard title="Medium size (md)" categoryTitle="Checkbox">
+            <CheckboxGroup>
+              <Checkbox value="x">X</Checkbox>
+              <Checkbox
+                value="y"
+                label="Remember me"
+                description="Save my login details for next time"
+              ></Checkbox>
+              <Checkbox isDisabled value="z">
+                Z
+              </Checkbox>
+            </CheckboxGroup>
+          </PlaygroundCard>
+          <PlaygroundCard title="Large size (lg)" categoryTitle="Checkbox">
+            <CheckboxGroup>
+              <Checkbox value="x" size="lg">
+                X
+              </Checkbox>
+              <Checkbox
+                value="y"
+                label="Remember me"
+                description="Save my login details for next time"
+              ></Checkbox>
+              <Checkbox isDisabled value="z">
+                Z
+              </Checkbox>
+            </CheckboxGroup>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Reorder group">
+        <ReorderGroup title="Reorder Item" onReorder={handleReorder}>
+          {btnData.map((b) => (
+            // key use for reorder group
+            <div key={b.id} className="p-4 bg-bluegray-600 text-bluegray-50">
+              {b.text}
+            </div>
+          ))}
+        </ReorderGroup>
+      </Wrapper>
+
+      <Wrapper title="Progress bar">
+        <div className="grid grid-cols-3 gap-4">
+          <PlaygroundCard title="Default" categoryTitle="Progress bar">
+            <ProgressBar value={0} className="w-full" />
+            <ProgressBar value={25} className="w-full" />
+            <ProgressBar value={50} className="w-full" />
+            <ProgressBar value={75} className="w-full" />
+            <ProgressBar value={100} className="w-full" />
+          </PlaygroundCard>
+
+          <PlaygroundCard title="isShowPercent" categoryTitle="Progress bar">
+            <ProgressBar value={0} className="w-full" />
+            <ProgressBar value={25} className="w-full" isShowPercent />
+            <ProgressBar value={50} className="w-full" isShowPercent />
+            <ProgressBar value={75} className="w-full" isShowPercent />
+            <ProgressBar value={100} className="w-full" isShowPercent />
+          </PlaygroundCard>
+          <PlaygroundCard title="isShowPercentPopup" categoryTitle="Progress bar">
+            <ProgressBar value={0} className="w-full" isShowPercentPopup />
+            <ProgressBar value={25} className="w-full" isShowPercentPopup />
+            <ProgressBar value={50} className="w-full" isShowPercentPopup />
+            <ProgressBar value={75} className="w-full" isShowPercentPopup />
+            <ProgressBar value={100} className="w-full" isShowPercentPopup />
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Avatar">
+        <PlaygroundCard title="Normal" categoryTitle="Avatar">
+          <Avatar src="https://github.com/shadcn.png" size="xl" isShowIndicator />
+          <Avatar src="https://github.com/shadcn.png" size="lg" isShowIndicator />
+          <Avatar size="md" isShowIndicator />
+          <Avatar src="https://github.com/shadcn.png" size="sm" isShowIndicator label="test" />
+          <Avatar
+            src="https://github.com/shadcn.png"
+            size="xs"
+            isShowIndicator
+            label="test"
+            subLabel="test"
+          />
+        </PlaygroundCard>
+      </Wrapper>
+
+      <Wrapper title="Tabs">
+        <div className="grid grid-cols-3 gap-4">
+          <PlaygroundCard title="Default" categoryTitle="Tabs">
+            <Tabs size="lg">
+              <TabList>
+                <Tab>Label 1</Tab>
+                <Tab>Label 2</Tab>
+                <Tab>Label 3</Tab>
+              </TabList>
+            </Tabs>
+          </PlaygroundCard>
+          <PlaygroundCard title="With badgeNumber" categoryTitle="Tabs">
+            <Tabs size="md">
+              <TabList>
+                <Tab badgeNumber={1}>Label 1</Tab>
+                <Tab badgeNumber={2}>Label 2</Tab>
+                <Tab badgeNumber={3}>Label 3</Tab>
+              </TabList>
+            </Tabs>
+          </PlaygroundCard>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Card">
+        <PlaygroundCard title="Default" categoryTitle="Card">
+          <Card
+            title="Card Title"
+            itemNumber={10}
+            description="Manage your product catalog including inventory, pricing, and categories."
+            buttonTitle="Card Action"
+          />
+        </PlaygroundCard>
+      </Wrapper>
+
+      <Wrapper title="Annotation">
+        <Annotation>Annotation</Annotation>
+        <Annotation className="bg-red-50 text-red-700">Annotation</Annotation>
+      </Wrapper>
+
+      <Wrapper title="Tools Tip group">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3 lg:grid-cols-6 **:[button]:w-full">
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Bottom
+            </Button>
+            <TooltipContent placement="bottom">
+              Tooltip shown at <strong>bottom</strong>.
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Top
+            </Button>
+            <TooltipContent placement="top">
+              Tooltip shown at <strong>top</strong>.
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Left
+            </Button>
+            <TooltipContent placement="left">
+              Tooltip shown at <strong>left</strong>.
+            </TooltipContent>
+          </Tooltip>
+          <Tooltip>
+            <Button className="mx-auto" size="sm" variant="outline">
+              Right
+            </Button>
+            <TooltipContent placement="right">
+              Tooltip shown at <strong>right</strong>.
+            </TooltipContent>
+          </Tooltip>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Table">
+        <div className="flex flex-col gap-4">
+          <Table aria-label="Bands">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn isRowHeader>Name</TableColumn>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>1</TableCell>
+                <TableCell>Nirvana</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2</TableCell>
+                <TableCell>The Beatles</TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+
+          <Table aria-label="Bands">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn isRowHeader>Name</TableColumn>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell>1</TableCell>
+                <TableCell>Nirvana</TableCell>
+              </TableRow>
+              <TableRow>
+                <TableCell>2</TableCell>
+                <TableCell>The Beatles</TableCell>
+              </TableRow>
+              {/* Pagination */}
+              <TableRow>
+                <TableCell colSpan={2}>
+                  <div className="flex justify-between items-center w-full">
+                    <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
+                    <PaginationWithDropdown
+                      currentPage={1}
+                      totalPages={10}
+                      defaultPageSize={10}
+                      onPageChange={() => {}}
+                    />
+                  </div>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+
+          <Table aria-label="not-found">
+            <TableHeader>
+              <TableColumn>#</TableColumn>
+              <TableColumn isRowHeader>Name</TableColumn>
+            </TableHeader>
+            <TableBody>
+              <TableRow>
+                <TableCell colSpan={2} className="text-center h-64">
+                  <p>Not founds</p>
+                </TableCell>
+              </TableRow>
+            </TableBody>
+          </Table>
+        </div>
+      </Wrapper>
+
+      <Wrapper title="Form">
+        <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
+          <TextField label="Name" placeholder="Enter your name" isRequired />
+          <Textarea
+            label="Description"
+            placeholder="Enter your description"
+            errorMessage="Description is required"
+          />
+          <Button type="submit" variant="primary" size="sm">
+            Submit
+          </Button>
+        </form>
       </Wrapper>
     </div>
   )
