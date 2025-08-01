@@ -1,5 +1,7 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.23
+
 ## 0.1.0-alpha.22
 
 ### Patch Changes

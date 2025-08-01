@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.23
+
+### Patch Changes
+
+- [#119](https://github.com/softnetics/genseki/pull/119) [`1a8874b`](https://github.com/softnetics/genseki/commit/1a8874b1c74515b6e8af33aed9b400e1e2b6345d) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Build error due to using node-specific module
+
 ## 0.1.0-alpha.22
 
 ### Patch Changes
