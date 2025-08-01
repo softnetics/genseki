@@ -52,3 +52,6 @@ jobs:
 
       - name: Run bundle
         run: pnpm turbo bundle
+
+      - name: Run build
+        run: pnpm turbo build

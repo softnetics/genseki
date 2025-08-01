@@ -1,7 +1,6 @@
-import { promisify } from 'node:util'
-
 import { parse as parseCookies, serialize } from 'cookie-es'
 import crypto, { randomBytes } from 'crypto'
+import { promisify } from 'util'
 
 const scrypt = promisify(crypto.scrypt)
 
