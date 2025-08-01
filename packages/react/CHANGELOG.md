@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.22
+
+### Patch Changes
+
+- [#117](https://github.com/softnetics/genseki/pull/117) [`d6f819f`](https://github.com/softnetics/genseki/commit/d6f819fa8a24ec94a26ce15d6f6acf507eed0d65) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] plugin type and make `userId` in verification to be optional
+
 ## 0.1.0-alpha.21
 
 ### Patch Changes
