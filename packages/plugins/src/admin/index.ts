@@ -19,7 +19,7 @@ type AnyUserTable = AnyTable<{
     roles: WithIsList<WithIsRequired<AnyTypedFieldColumn<typeof DataType.STRING>>>
     banned: AnyTypedFieldColumn<typeof DataType.BOOLEAN>
     bannedReason: AnyTypedFieldColumn<typeof DataType.STRING>
-    bannedExpiresAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
+    bannedExpiredAt: AnyTypedFieldColumn<typeof DataType.DATETIME>
   }
   relations: {}
   uniqueFields: any
@@ -221,14 +221,14 @@ export function admin<TContext extends AnyContextable, TSchema extends PluginSch
 
           const banField = schema.user.shape.columns.banned
           const bannedReasonField = schema.user.shape.columns.bannedReason
-          const bannedExpiresAtField = schema.user.shape.columns.bannedExpiresAt
+          const bannedExpiredAtField = schema.user.shape.columns.bannedExpiredAt
 
           await prisma[schema.user.config.prismaModelName].update({
             where: { id: userId },
             data: {
               [banField.name]: true,
               [bannedReasonField.name]: body.reason ?? 'No reason provided',
-              [bannedExpiresAtField.name]: body.expiresAt ?? null, // null means no expiration
+              [bannedExpiredAtField.name]: body.expiresAt ?? null, // null means no expiration
             },
           })
 
