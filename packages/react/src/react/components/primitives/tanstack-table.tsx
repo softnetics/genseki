@@ -3,13 +3,8 @@
 import type { CSSProperties, RefObject } from 'react'
 import React, { useCallback, useEffect, useRef, useState } from 'react'
 
-import { SortDescendingIcon } from '@phosphor-icons/react'
-import {
-  ArrowsDownUpIcon,
-  EmptyIcon,
-  SortAscendingIcon,
-  XIcon,
-} from '@phosphor-icons/react/dist/ssr'
+import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react'
+import { EmptyIcon, XIcon } from '@phosphor-icons/react/dist/ssr'
 import {
   type Column,
   flexRender,
@@ -50,11 +45,11 @@ interface TanstackTableProps<T> {
 export const getSortIcon = (isSorted: false | SortDirection) => {
   switch (isSorted) {
     case false:
-      return <ArrowsDownUpIcon />
+      return <CaretUpDownIcon className="size-8 cursor-pointer" weight="fill" />
     case 'asc':
-      return <SortAscendingIcon />
+      return <CaretUpIcon className="size-8 cursor-pointer" weight="fill" />
     case 'desc':
-      return <SortDescendingIcon />
+      return <CaretDownIcon className="size-8 cursor-pointer" weight="fill" />
   }
 }
 
@@ -83,7 +78,7 @@ export function TanstackTable<T>({
       : onRowClickProp
 
   return (
-    <Table ref={containerRef} className={className}>
+    <Table bleed ref={containerRef} className={`rounded-lg overflow-hidden ${className}`}>
       <TableHeader className={classNames?.tableHeader}>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id} className={classNames?.tableHeadRow}>
@@ -96,12 +91,15 @@ export function TanstackTable<T>({
                 <TableColumn
                   isRowHeader
                   key={header.id}
-                  className={clsx('focus-visible:ring-focus ring-inset', classNames?.tableHead)}
+                  className={clsx(
+                    'focus-visible:ring-focus ring-inset px- shrink-0',
+                    classNames?.tableHead
+                  )}
                   // colSpan={header.colSpan}
-                  allowsSorting={canSort}
+                  // allowsSorting={canSort}
                 >
                   <span
-                    className="inline-flex items-center"
+                    className="inline-flex items-center gap-2"
                     onClick={header.column.getToggleSortingHandler()}
                   >
                     {children}
