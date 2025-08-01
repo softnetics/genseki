@@ -79,6 +79,7 @@ export type {
   AnyTable,
   AnyTypedFieldColumn,
   InferTableType,
+  IsValidTable,
   WithHasDefaultValue,
   WithIsList,
   WithIsRequired,

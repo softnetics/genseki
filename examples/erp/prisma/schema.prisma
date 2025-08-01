@@ -39,7 +39,7 @@ model User {
   banned          Boolean   @default(false)
   bannedReason    String?
   bannedAt        DateTime?
-  bannedExpiresAt DateTime?
+  bannedExpiredAt DateTime?
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

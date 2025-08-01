@@ -41,34 +41,38 @@ const app = new GensekiApp({
   },
 })
   .apply(
-    emailAndPasswordPlugin(context, {
-      schema: {
+    emailAndPasswordPlugin(
+      context,
+      {
         user: FullModelSchemas.user,
         session: FullModelSchemas.session,
         account: FullModelSchemas.account,
         verification: FullModelSchemas.verification,
       },
-      setup: {
-        enabled: true,
-        autoLogin: true,
-        ui: SetupPage,
-      },
-      resetPassword: {
-        enabled: true,
-        sendEmailResetPassword: async ({ email, token, expiredAt }) => {
-          console.log('sendEmailResetPassword config', email, token, expiredAt)
-          return
+      {
+        setup: {
+          enabled: true,
+          autoLogin: true,
+          ui: SetupPage,
         },
-      },
-    })
+        resetPassword: {
+          enabled: true,
+          sendEmailResetPassword: async ({ email, token, expiredAt }) => {
+            console.log('sendEmailResetPassword config', email, token, expiredAt)
+            return
+          },
+        },
+      }
+    )
   )
   .apply(
-    admin(context, {
-      schema: {
-        user: FullModelSchemas.user,
-      },
-      accessControl: accessControl,
-    })
+    admin(
+      context,
+      { user: FullModelSchemas.user },
+      {
+        accessControl: accessControl,
+      }
+    )
   )
   .apply(usersCollection)
   .apply(postsCollection)

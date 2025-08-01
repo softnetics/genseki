@@ -19,6 +19,7 @@ import { ResetPasswordView } from './views/reset-password/reset-password'
 import { createGensekiUiRoute, createPlugin, type GensekiMiddleware } from '../../../core/config'
 import type { AnyContextable } from '../../../core/context'
 import { createEndpoint } from '../../../core/endpoint'
+import type { IsValidTable } from '../../../core/table'
 import { GensekiUiCommonId } from '../../../core/ui'
 import type {
   AnyAccountTable,
@@ -27,13 +28,33 @@ import type {
   AnyVerificationTable,
 } from '../../base'
 
+export type PluginSchema = {
+  user: AnyUserTable
+  session: AnySessionTable
+  account: AnyAccountTable
+  verification: AnyVerificationTable
+}
+
+type ValidateSchema<TSchema extends PluginSchema> = {
+  user: IsValidTable<AnyUserTable, TSchema['user']>
+  session: IsValidTable<AnySessionTable, TSchema['session']>
+  account: IsValidTable<AnyAccountTable, TSchema['account']>
+  verification: IsValidTable<AnyVerificationTable, TSchema['verification']>
+} extends {
+  user: true
+  session: true
+  account: true
+  verification: true
+}
+  ? EmailAndPasswordPluginOptions
+  : {
+      user: IsValidTable<AnyUserTable, TSchema['user']>
+      session: IsValidTable<AnySessionTable, TSchema['session']>
+      account: IsValidTable<AnyAccountTable, TSchema['account']>
+      verification: IsValidTable<AnyVerificationTable, TSchema['verification']>
+    }
+
 interface EmailAndPasswordPluginOptions {
-  schema: {
-    user: AnyUserTable
-    session: AnySessionTable
-    account: AnyAccountTable
-    verification: AnyVerificationTable
-  }
   passwordRequirements?: ZodString
   passwordHasher?: (password: string) => Promise<string>
   login?: {
@@ -84,10 +105,25 @@ const defaultOptions = {
 export type EmailAndPasswordPluginOptionsWithDefaults = ReturnType<
   typeof defu<EmailAndPasswordPluginOptions, [typeof defaultOptions]>
 >
+
+function isOptions(options: any): options is EmailAndPasswordPluginOptions {
+  return !(
+    'user' in options &&
+    'session' in options &&
+    'account' in options &&
+    'verification' in options
+  )
+}
+
 export function emailAndPasswordPlugin<
   TContext extends AnyContextable,
-  TOptions extends EmailAndPasswordPluginOptions,
->(context: TContext, _options: TOptions) {
+  TSchema extends PluginSchema,
+  TOptions extends ValidateSchema<TSchema>,
+>(context: TContext, schema: TSchema, _options: TOptions) {
+  if (!isOptions(_options)) {
+    throw new Error('Invalid options provided to emailAndPasswordPlugin')
+  }
+
   const options = defu(_options, defaultOptions)
 
   const meApi = createEndpoint(
@@ -109,7 +145,7 @@ export function emailAndPasswordPlugin<
     }
   )
 
-  const service = new EmailAndPasswordService(context, options)
+  const service = new EmailAndPasswordService(context, schema, options)
 
   const setupMiddleware: GensekiMiddleware = async (args) => {
     if (!options.setup.enabled) return
