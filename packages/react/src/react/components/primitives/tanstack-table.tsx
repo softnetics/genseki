@@ -78,7 +78,7 @@ export function TanstackTable<T>({
       : onRowClickProp
 
   return (
-    <Table bleed ref={containerRef} className={`rounded-lg overflow-hidden ${className}`}>
+    <Table bleed ref={containerRef} className={`rounded-sm overflow-hidden ${className}`}>
       <TableHeader className={classNames?.tableHeader}>
         {table.getHeaderGroups().map((headerGroup) => (
           <TableRow key={headerGroup.id} className={classNames?.tableHeadRow}>
