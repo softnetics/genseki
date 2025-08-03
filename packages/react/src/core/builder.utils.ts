@@ -15,8 +15,19 @@ import {
 } from './transformer'
 import type { ToZodObject } from './utils'
 
+const zStringPositiveNumberOptional = z
+  .string()
+  .optional()
+  .refine((val) => val === undefined || !isNaN(Number(val)), {
+    message: 'Value must be a positive number or undefined',
+  })
+  .refine((val) => val === undefined || Number(val) > 0, {
+    message: 'Value must be a positive number',
+  })
+  .transform((val) => (val ? Number(val) : undefined))
+
 function createCollectionDefaultCreateHandler<TContext extends Contextable, TFields extends Fields>(
-  config: { schema: ModelSchemas; context: TContext; identifierColumn: string },
+  config: { schema: ModelSchemas; context: TContext },
   fields: Fields
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> {
   const prisma = config.context.getPrismaClient()
@@ -30,14 +41,14 @@ function createCollectionDefaultCreateHandler<TContext extends Contextable, TFie
       data: transformedData,
     })
 
-    const __id = result[config.identifierColumn]
+    const __id = result[fields.config.identifierColumn]
     const __pk = result[primaryField.name]
     return { __id: __id, __pk: __pk }
   }
 }
 
 function createCollectionDefaultUpdateHandler<TContext extends Contextable, TFields extends Fields>(
-  config: { schema: ModelSchemas; context: TContext; identifierColumn: string },
+  config: { schema: ModelSchemas; context: TContext },
   fields: Fields
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> {
   const prisma = config.context.getPrismaClient()
@@ -52,14 +63,14 @@ function createCollectionDefaultUpdateHandler<TContext extends Contextable, TFie
       data: transformedData,
     })
 
-    const __id = result[config.identifierColumn]
+    const __id = result[fields.config.identifierColumn]
     const __pk = result[primaryField.name]
     return { __id: __id, __pk: __pk }
   }
 }
 
 function createCollectionDefaultDeleteHandler<TContext extends Contextable, TFields extends Fields>(
-  config: { schema: ModelSchemas; context: TContext; identifierColumn: string },
+  config: { schema: ModelSchemas; context: TContext },
   fields: Fields
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE> {
   const prisma = config.context.getPrismaClient()
@@ -82,7 +93,7 @@ function createCollectionDefaultFindOneHandler<
   TContext extends Contextable,
   TFields extends Fields,
 >(
-  config: { schema: ModelSchemas; context: TContext; identifierColumn: string },
+  config: { schema: ModelSchemas; context: TContext },
   fields: Fields
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> {
   const prisma = config.context.getPrismaClient()
@@ -101,7 +112,7 @@ function createCollectionDefaultFindManyHandler<
   TContext extends Contextable,
   TFields extends Fields,
 >(
-  config: { schema: ModelSchemas; context: TContext; identifierColumn: string },
+  config: { schema: ModelSchemas; context: TContext },
   fields: Fields
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> {
   const prisma = config.context.getPrismaClient()
@@ -109,18 +120,21 @@ function createCollectionDefaultFindManyHandler<
   const model = config.schema[fields.config.prismaModelName]
 
   return async (args) => {
+    const page = args.page || 1
+    const pageSize = args.pageSize || 10
+
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
-      orderBy: args.orderBy,
-      skip: args.offset,
-      take: args.limit,
+      skip: (page - 1) * pageSize,
+      take: pageSize,
     })
 
     const total = await prisma[model.config.prismaModelName].count()
 
     return {
       total,
-      page: Math.ceil(total / (args.limit || 10)),
+      totalPage: Math.ceil(total / pageSize),
+      currentPage: Math.ceil((page - 1) / pageSize) + 1,
       data: response.map((item) => transformPrismaResultToFieldsPayload(fields, item) as any),
     }
   }
@@ -137,14 +151,13 @@ export type CollectionCreateApiRoute<TSlug extends string, TFields extends Field
 
 export function getCollectionDefaultCreateApiRoute(args: {
   slug: string
-  identifierColumn: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.CREATE>
 }) {
   const defaultHandler = createCollectionDefaultCreateHandler(
-    { schema: args.schema, context: args.context, identifierColumn: args.identifierColumn },
+    { schema: args.schema, context: args.context },
     args.fields
   )
 
@@ -202,14 +215,13 @@ export type CollectionUpdateApiRoute<TSlug extends string, TFields extends Field
 
 export function getCollectionDefaultUpdateApiRoute(args: {
   slug: string
-  identifierColumn: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.UPDATE>
 }) {
   const defaultHandler = createCollectionDefaultUpdateHandler(
-    { schema: args.schema, context: args.context, identifierColumn: args.identifierColumn },
+    { schema: args.schema, context: args.context },
     args.fields
   )
 
@@ -269,7 +281,6 @@ export type CollectionUpdateDefaultApiRoute<
 
 export function getCollectionDefaultUpdateDefaultApiRoute(args: {
   slug: string
-  identifierColumn: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
@@ -277,7 +288,7 @@ export function getCollectionDefaultUpdateDefaultApiRoute(args: {
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_ONE>
 }) {
   const defaultHandler = createCollectionDefaultFindOneHandler(
-    { schema: args.schema, context: args.context, identifierColumn: args.identifierColumn },
+    { schema: args.schema, context: args.context },
     args.fields
   )
 
@@ -331,14 +342,13 @@ export type CollectionDeleteApiRoute<TSlug extends string> = ApiRoute<{
 
 export function getCollectionDefaultDeleteApiRoute(args: {
   slug: string
-  identifierColumn: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.DELETE>
 }) {
   const defaultHandler = createCollectionDefaultDeleteHandler(
-    { schema: args.schema, context: args.context, identifierColumn: args.identifierColumn },
+    { schema: args.schema, context: args.context },
     args.fields
   )
 
@@ -394,14 +404,13 @@ export type CollectionFindOneApiRoute<TSlug extends string, TFields extends Fiel
 
 export function getCollectionDefaultFindOneApiRoute(args: {
   slug: string
-  identifierColumn: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_ONE>
 }) {
   const defaultHandler = createCollectionDefaultFindOneHandler(
-    { schema: args.schema, context: args.context, identifierColumn: args.identifierColumn },
+    { schema: args.schema, context: args.context },
     args.fields
   )
 
@@ -446,8 +455,8 @@ export type CollectionFindManyApiRoute<TSlug extends string, TFields extends Fie
   path: `/${TSlug}`
   method: 'GET'
   query: ToZodObject<{
-    limit?: number
-    offset?: number
+    limit?: string
+    offset?: string
     orderBy?: string
     orderType?: 'asc' | 'desc'
   }>
@@ -458,14 +467,13 @@ export type CollectionFindManyApiRoute<TSlug extends string, TFields extends Fie
 
 export function getCollectionDefaultFindManyApiRoute(args: {
   slug: string
-  identifierColumn: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_MANY>
 }) {
   const defaultHandler = createCollectionDefaultFindManyHandler(
-    { schema: args.schema, context: args.context, identifierColumn: args.identifierColumn },
+    { schema: args.schema, context: args.context },
     args.fields
   )
   const handler = args.customHandler ?? defaultHandler
@@ -476,15 +484,14 @@ export function getCollectionDefaultFindManyApiRoute(args: {
       method: 'GET',
       path: `/${args.slug}`,
       query: z.object({
-        limit: z.number().min(1).optional(),
-        offset: z.number().min(0).optional(),
-        orderBy: z.string().optional(),
-        orderType: z.enum(['asc', 'desc']).optional(),
+        page: zStringPositiveNumberOptional,
+        pageSize: zStringPositiveNumberOptional,
       }),
       responses: {
         200: z.object({
           total: z.number(),
-          page: z.number(),
+          totalPage: z.number(),
+          currentPage: z.number(),
           data: z.array(z.any()),
         }),
       },
@@ -495,13 +502,16 @@ export function getCollectionDefaultFindManyApiRoute(args: {
         context: payload.context,
         fields: args.fields,
         defaultApi: defaultHandler as any,
+        page: payload.query.page ?? 1,
+        pageSize: payload.query.pageSize ?? 10,
       })
 
       return {
         status: 200,
         body: {
           total: response.total,
-          page: response.page,
+          totalPage: response.totalPage,
+          currentPage: response.currentPage,
           data: response.data,
         },
       }

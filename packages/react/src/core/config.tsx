@@ -153,7 +153,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     return this
   }
 
-  _logging(router: ApiRouter): string[] {
+  private _logApiRouter(router: ApiRouter): string[] {
     const logs: string[] = []
     if (isApiRoute(router)) {
       logs.push(`API Route: ${router.schema.method} ${router.schema.path}`)
@@ -161,8 +161,15 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     }
     Object.entries(router).forEach(([key, value]) => {
       if (typeof value === 'object' && value !== null) {
-        logs.push(...this._logging(value as ApiRouter))
+        logs.push(...this._logApiRouter(value as ApiRouter))
       }
+    })
+    return logs
+  }
+
+  private _logUis(uis: GensekiUiRouter[]): string[] {
+    const logs = uis.map((ui) => {
+      return `UI Route: ${ui.path} (${ui.requiredAuthenticated ? 'Required Authenticated' : 'Not Required Authenticated'})`
     })
     return logs
   }
@@ -185,8 +192,10 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       } as unknown as GensekiCore<TMainApiRouter>
     )
 
-    const logs = this._logging(core.api).sort((a, b) => a.localeCompare(b))
+    const logs = this._logApiRouter(core.api).sort((a, b) => a.localeCompare(b))
+    const uiLogs = this._logUis(core.uis).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
+    uiLogs.forEach((log) => console.log(`${log}`))
 
     return {
       middlewares: this.options.middlewares,

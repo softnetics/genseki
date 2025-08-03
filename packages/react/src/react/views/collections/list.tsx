@@ -57,7 +57,6 @@ export async function ListView(props: ListViewProps) {
             identifierColumn={props.identifierColumn}
             fields={fieldsClient}
             columns={props.columns as any}
-            searchParams={props.searchParams}
           />
         </div>
       </div>

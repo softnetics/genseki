@@ -2,30 +2,36 @@
 
 import { useMemo, useState } from 'react'
 
-import { TrashIcon } from '@phosphor-icons/react'
 import {
   CaretLeftIcon,
   DotsThreeVerticalIcon,
   FunnelIcon,
   MagnifyingGlassIcon,
 } from '@phosphor-icons/react/dist/ssr'
-import { useQuery } from '@tanstack/react-query'
+import { keepPreviousData, useQuery, type UseQueryResult } from '@tanstack/react-query'
 import {
   type ColumnDef,
   createColumnHelper,
   getCoreRowModel,
+  getPaginationRowModel,
+  getSortedRowModel,
+  type RowSelectionState,
+  type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
+import { parseAsInteger, useQueryStates } from 'nuqs'
 
 import type { FieldsClient } from '../../../core'
 import {
   Button,
   ButtonLink,
+  Checkbox,
   Menu,
   MenuContent,
   MenuItem,
   MenuSeparator,
   MenuTrigger,
+  Pagination,
   TextField,
 } from '../../components'
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -33,14 +39,7 @@ import { TanstackTable } from '../../components/primitives/tanstack-table'
 import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
 
-const Toolbar = (props: {
-  slug: string
-  selection: string[]
-  setSelection: (args: string[]) => void
-}) => {
-  const navigation = useNavigation()
-  const serverFunction = useServerFunction()
-
+const Toolbar = (props: { slug: string }) => {
   return (
     <div className="flex items-center justify-between gap-x-3">
       <ButtonLink
@@ -52,29 +51,11 @@ const Toolbar = (props: {
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
-        {props.selection.length ? (
-          <Button
-            variant="destruction"
-            size="md"
-            leadingIcon={<BaseIcon icon={TrashIcon} size="md" />}
-            onClick={async () => {
-              await serverFunction(`${props.slug}.delete`, {
-                body: { ids: props.selection },
-                headers: {},
-                pathParams: {},
-                query: {},
-              })
-              props.setSelection([])
-              navigation.refresh()
-            }}
-          >
-            Delete
-          </Button>
-        ) : null}
         <TextField
           placeholder="Search"
           prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
           className="w-full"
+          aria-label="Search"
         />
         <Button variant="outline" size="md" leadingIcon={<BaseIcon icon={FunnelIcon} size="md" />}>
           Filter
@@ -97,30 +78,61 @@ interface ListTableProps {
   identifierColumn: string
   fields: FieldsClient
   columns: ColumnDef<BaseData>[]
-  searchParams: Record<string, string | string[]>
 }
 
 export function ListTable(props: ListTableProps) {
-  const serverFunction = useServerFunction()
   const navigation = useNavigation()
+  const serverFunction = useServerFunction()
 
-  const [selection, setSelection] = useState<string[]>([])
+  const [sorting, setSorting] = useState<SortingState>([])
+  const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
+  const [pagination, setPagination] = useQueryStates({
+    page: parseAsInteger.withDefault(1),
+    // TODO: Change this to 10
+    pageSize: parseAsInteger.withDefault(2),
+  })
 
-  const query = useQuery({
-    queryKey: ['GET', `/api/${props.slug}`, props.searchParams],
-    queryFn: () => {
-      // TODO: Need to pass baseUrl from the server
-      // TODO: Pagination from searchParams
-      return fetch(`/api/${props.slug}`)
+  const query: UseQueryResult<{
+    data: BaseData[]
+    total: number
+    totalPage: number
+    currentPage: number
+  }> = useQuery({
+    queryKey: ['GET', `/api/${props.slug}`, { query: pagination }] as const,
+    queryFn: async (context) => {
+      const [, , payload] = context.queryKey
+      const params = new URLSearchParams([
+        ['pageSize', payload.query.pageSize.toString()],
+        ['page', payload.query.page.toString()],
+      ])
+      return fetch(`/api/${props.slug}?${params.toString()}`)
         .then((res) => res.json())
-        .then((data) => data.body as { data: BaseData[]; total: number; page: number })
+        .then((data) => data.body)
     },
+    placeholderData: keepPreviousData,
   })
 
   const enhancedColumns = useMemo(() => {
     const columnHelper = createColumnHelper<BaseData>()
     if (query.isLoading) return props.columns
     return [
+      columnHelper.display({
+        id: 'select',
+        header: ({ table }) => (
+          <Checkbox
+            isSelected={table.getIsAllRowsSelected()}
+            isIndeterminate={table.getIsSomeRowsSelected()}
+            onChange={(checked) => table.getToggleAllRowsSelectedHandler()({ target: { checked } })}
+          />
+        ),
+        cell: ({ row }) => (
+          <Checkbox
+            isSelected={row.getIsSelected()}
+            isDisabled={!row.getCanSelect()}
+            onChange={(checked) => row.getToggleSelectedHandler()({ target: { checked } })}
+          />
+        ),
+      }),
       ...props.columns,
       columnHelper.display({
         id: 'actions',
@@ -159,18 +171,52 @@ export function ListTable(props: ListTableProps) {
   const table = useReactTable({
     data: query.data?.data ?? [],
     columns: enhancedColumns,
+    enableMultiRowSelection: true,
+    getRowId: (row) => row.__id,
+    onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
+    getSortedRowModel: getSortedRowModel(),
+    onSortingChange: setSorting,
+    // Pagination settings
+    manualPagination: true,
+    rowCount: query.data?.total ?? 0,
+    onPaginationChange: (updater) => {
+      const newPagination =
+        typeof updater === 'function'
+          ? updater({ pageIndex: pagination.page - 1, pageSize: pagination.pageSize })
+          : updater
+      setPagination({
+        page: newPagination.pageIndex + 1,
+        pageSize: newPagination.pageSize,
+      })
+    },
+    getPaginationRowModel: getPaginationRowModel(),
+    state: {
+      rowSelection,
+      sorting,
+      pagination: {
+        pageIndex: pagination.page - 1,
+        pageSize: pagination.pageSize,
+      },
+    },
   })
 
   return (
     <>
-      <Toolbar slug={props.slug} selection={selection} setSelection={setSelection} />
+      <Toolbar slug={props.slug} />
       <TanstackTable
         table={table}
         className="static"
         onRowClick="toggleSelect"
         isLoading={query.isLoading}
         isError={query.isError}
+      />
+      <Pagination
+        currentPage={pagination.page}
+        totalPages={query.data?.totalPage ?? 0}
+        onPageChange={(page) =>
+          setPagination((pagination) => ({ page: page, pageSize: pagination.pageSize }))
+        }
       />
     </>
   )

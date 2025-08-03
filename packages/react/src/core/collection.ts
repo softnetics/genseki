@@ -211,7 +211,7 @@ export type ApiReturnType<
   : TMethod extends typeof ApiDefaultMethod.FIND_ONE
     ? InferFields<TFields>
     : TMethod extends typeof ApiDefaultMethod.FIND_MANY
-      ? { data: InferFields<TFields>[]; total: number; page: number }
+      ? { data: InferFields<TFields>[]; total: number; totalPage: number; currentPage: number }
       : TMethod extends typeof ApiDefaultMethod.UPDATE
         ? { __pk: string | number; __id: string | number }
         : TMethod extends typeof ApiDefaultMethod.DELETE
@@ -224,10 +224,8 @@ export type ApiFindOneArgs = {
 }
 
 export type ApiFindManyArgs = {
-  limit?: number
-  offset?: number
-  orderBy?: string
-  orderType?: 'asc' | 'desc'
+  page?: number
+  pageSize?: number
 }
 
 export type ApiCreateArgs<TFields extends Fields> = {

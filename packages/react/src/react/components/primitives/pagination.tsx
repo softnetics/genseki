@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import { IconArrowLeft, IconArrowRight } from '@intentui/icons'
 import clsx from 'clsx'
 
@@ -25,7 +27,9 @@ const Pagination = (props: PaginationProps) => {
 
   if (totalPages <= 1) return null
 
-  const pages = generatePages(currentPage, totalPages, maxVisiblePages)
+  const pages = useMemo(() => {
+    return generatePages(currentPage, totalPages, maxVisiblePages)
+  }, [currentPage, totalPages, maxVisiblePages])
 
   return (
     <div

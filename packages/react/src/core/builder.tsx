@@ -1,6 +1,7 @@
 import {
   type CollectionDefaultAdminApiRouter,
   getCollectionDefaultCreateApiRoute,
+  getCollectionDefaultDeleteApiRoute,
   getCollectionDefaultFindManyApiRoute,
   getCollectionDefaultFindOneApiRoute,
   getCollectionDefaultUpdateApiRoute,
@@ -136,7 +137,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route } = getCollectionDefaultFindManyApiRoute({
             slug: slug,
-            identifierColumn: options.list.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.list.fields,
@@ -177,7 +177,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route } = getCollectionDefaultCreateApiRoute({
             slug: slug,
-            identifierColumn: options.create.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.create.fields,
@@ -212,7 +211,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route: updateRoute } = getCollectionDefaultUpdateApiRoute({
             slug: slug,
-            identifierColumn: options.update.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -223,7 +221,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route: updateDefaultRoute } = getCollectionDefaultUpdateDefaultApiRoute({
             slug: slug,
-            identifierColumn: options.update.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -264,7 +261,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route } = getCollectionDefaultFindOneApiRoute({
             slug: slug,
-            identifierColumn: options.one.fields.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.one.fields,
@@ -292,6 +288,17 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               },
             })
           )
+        }
+
+        if (options.delete) {
+          const { route } = getCollectionDefaultDeleteApiRoute({
+            slug: slug,
+            context: this.config.context,
+            schema: this.config.schema,
+            fields: options.delete.fields,
+            customHandler: options.delete.api as any,
+          })
+          Object.assign(api, { delete: route })
         }
 
         return {
