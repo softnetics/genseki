@@ -31,6 +31,7 @@ import {
   MenuItem,
   MenuSeparator,
   MenuTrigger,
+  PageSizeSelect,
   Pagination,
   TextField,
 } from '../../components'
@@ -88,8 +89,7 @@ export function ListTable(props: ListTableProps) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [pagination, setPagination] = useQueryStates({
     page: parseAsInteger.withDefault(1),
-    // TODO: Change this to 10
-    pageSize: parseAsInteger.withDefault(2),
+    pageSize: parseAsInteger.withDefault(10),
   })
 
   const query: UseQueryResult<{
@@ -175,6 +175,7 @@ export function ListTable(props: ListTableProps) {
     getRowId: (row) => row.__id,
     onRowSelectionChange: setRowSelection,
     getCoreRowModel: getCoreRowModel(),
+    // Sorting settings
     getSortedRowModel: getSortedRowModel(),
     onSortingChange: setSorting,
     // Pagination settings
@@ -211,13 +212,21 @@ export function ListTable(props: ListTableProps) {
         isLoading={query.isLoading}
         isError={query.isError}
       />
-      <Pagination
-        currentPage={pagination.page}
-        totalPages={query.data?.totalPage ?? 0}
-        onPageChange={(page) =>
-          setPagination((pagination) => ({ page: page, pageSize: pagination.pageSize }))
-        }
-      />
+      <div className="flex flex-row items-center justify-between gap-x-4 mt-6">
+        <PageSizeSelect
+          pageSize={pagination.pageSize}
+          onPageSizeChange={(pageSize) =>
+            setPagination((pagination) => ({ page: pagination.page, pageSize }))
+          }
+        />
+        <Pagination
+          currentPage={pagination.page}
+          totalPages={query.data?.totalPage ?? 0}
+          onPageChange={(page) =>
+            setPagination((pagination) => ({ page: page, pageSize: pagination.pageSize }))
+          }
+        />
+      </div>
     </>
   )
 }

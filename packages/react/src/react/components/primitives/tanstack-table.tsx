@@ -97,8 +97,8 @@ export function TanstackTable<T>({
                   role={canSort ? 'button' : undefined}
                   tabIndex={canSort ? 0 : -1}
                 >
-                  <span className="inline-flex items-center gap-2">
-                    {children}
+                  <span className="inline-flex items-center gap-2 w-full">
+                    <span className="flex-1">{children}</span>
                     {canSort && getSortIcon(header.column.getIsSorted())}
                   </span>
                 </TableHead>
