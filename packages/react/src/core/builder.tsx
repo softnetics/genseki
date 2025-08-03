@@ -78,22 +78,22 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
     > = {
       name: slug,
       plugin: (gensekiOptions) => {
-        const _collectionHomeRouteIndex = gensekiOptions.uis.findIndex(
+        const previousCollectionHomeRouteIndex = gensekiOptions.uis.findIndex(
           (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
         )
-        const _collectionHomeRoute =
-          _collectionHomeRouteIndex >= 0
-            ? (gensekiOptions.uis[_collectionHomeRouteIndex] as GensekiUiRouter<
+        const previousCollectionHomeRoute =
+          previousCollectionHomeRouteIndex >= 0
+            ? (gensekiOptions.uis[previousCollectionHomeRouteIndex] as GensekiUiRouter<
                 GensekiUiCommonProps['COLLECTION_HOME']
               >)
             : undefined
 
-        const collectionHomeRoute = _collectionHomeRoute
+        const collectionHomeRoute = previousCollectionHomeRoute
           ? {
-              ..._collectionHomeRoute,
+              ...previousCollectionHomeRoute,
               props: {
                 cards: [
-                  ...(_collectionHomeRoute.props?.cards ?? []),
+                  ...(previousCollectionHomeRoute.props?.cards ?? []),
                   { name: slug, path: `/admin/collections/${slug}` },
                 ],
               },
@@ -115,8 +115,10 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
         const uis = []
 
-        if (_collectionHomeRouteIndex >= 0) {
-          gensekiOptions.uis[_collectionHomeRouteIndex] = collectionHomeRoute
+        if (previousCollectionHomeRouteIndex >= 0) {
+          gensekiOptions.uis[previousCollectionHomeRouteIndex] = collectionHomeRoute
+        } else {
+          uis.push(collectionHomeRoute)
         }
 
         if (options.list) {
