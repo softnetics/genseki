@@ -248,10 +248,12 @@ export function emailAndPasswordPlugin<
 
       return {
         api: {
-          auth: api,
+          emailAndPassword: api,
         },
         uis: uis,
       }
     },
   })
 }
+
+export * from './utils'

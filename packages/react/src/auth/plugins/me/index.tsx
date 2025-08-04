@@ -27,7 +27,7 @@ export function mePlugin<TContext extends Contextable<any>>(context: TContext) {
     plugin: () => {
       return {
         api: {
-          auth: meApi,
+          me: meApi,
         },
         uis: [],
       }
