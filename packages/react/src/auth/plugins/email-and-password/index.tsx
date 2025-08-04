@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { defu } from 'defu'
 import type { PartialDeep } from 'type-fest'
-import { z, type ZodString } from 'zod/v4'
+import { type ZodString } from 'zod/v4'
 
 import { loginEmail } from './api/login'
 import { requestResetPassword } from './api/request-reset-password'
@@ -18,7 +18,6 @@ import { ResetPasswordView } from './views/reset-password/reset-password'
 
 import { createGensekiUiRoute, createPlugin, type GensekiMiddleware } from '../../../core/config'
 import type { AnyContextable } from '../../../core/context'
-import { createEndpoint } from '../../../core/endpoint'
 import type { IsValidTable } from '../../../core/table'
 import { GensekiUiCommonId } from '../../../core/ui'
 import type {
@@ -42,7 +41,7 @@ export type PluginSchema = {
   verification: AnyVerificationTable
 }
 
-type ValidateSchema<TSchema extends AnyPluginSchema> = {
+type ValidateSchema<TSchema extends AnyPluginSchema, TContext extends AnyContextable> = {
   user: IsValidTable<PluginSchema['user'], TSchema['user']>
   session: IsValidTable<PluginSchema['session'], TSchema['session']>
   account: IsValidTable<PluginSchema['account'], TSchema['account']>
@@ -125,32 +124,13 @@ function isOptions(options: any): options is EmailAndPasswordPluginOptions {
 export function emailAndPasswordPlugin<
   TContext extends AnyContextable,
   TSchema extends AnyPluginSchema,
-  TOptions extends ValidateSchema<TSchema>,
+  TOptions extends ValidateSchema<TSchema, TContext>,
 >(context: TContext, schema: TSchema, _options: TOptions) {
   if (!isOptions(_options)) {
     throw new Error('Invalid options provided to emailAndPasswordPlugin')
   }
 
   const options = defu(_options, defaultOptions)
-
-  const meApi = createEndpoint(
-    context,
-    {
-      method: 'GET',
-      path: '/auth/me',
-      responses: {
-        // TODO: Make it type-safe
-        200: z.any(),
-      },
-    },
-    async (payload) => {
-      const user = await payload.context.requiredAuthenticated()
-      return {
-        status: 200,
-        body: user,
-      }
-    }
-  )
 
   const service = new EmailAndPasswordService(context, schema, options)
 
@@ -268,15 +248,10 @@ export function emailAndPasswordPlugin<
 
       return {
         api: {
-          auth: {
-            ...api,
-            me: meApi,
-          },
+          auth: api,
         },
         uis: uis,
       }
     },
   })
 }
-
-export { Password } from './utils'

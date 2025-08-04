@@ -1,6 +1,6 @@
 import { withNextJs } from '@genseki/next'
 import { admin } from '@genseki/plugins'
-import { emailAndPasswordPlugin, GensekiApp, StorageAdapterS3 } from '@genseki/react'
+import { emailAndPasswordPlugin, GensekiApp, mePlugin, StorageAdapterS3 } from '@genseki/react'
 
 import { accessControl } from './access-control'
 import { SetupPage } from './auth/setup/setup'
@@ -40,6 +40,7 @@ const app = new GensekiApp({
     ],
   },
 })
+  .apply(mePlugin(context))
   .apply(
     emailAndPasswordPlugin(
       context,
