@@ -1,5 +1,16 @@
 # @genseki/react
 
+## 0.1.0-alpha.23
+
+### Patch Changes
+
+- [#109](https://github.com/softnetics/genseki/pull/109) [`0c2645b`](https://github.com/softnetics/genseki/commit/0c2645bc6f36ae2f6857442352705056b8c121e7) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Add options to customize Table using Tanstack table
+  [Fix] Move identifierColumn under Fields
+
+- [#119](https://github.com/softnetics/genseki/pull/119) [`1a8874b`](https://github.com/softnetics/genseki/commit/1a8874b1c74515b6e8af33aed9b400e1e2b6345d) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Build error due to using node-specific module
+
+- [#121](https://github.com/softnetics/genseki/pull/121) [`454c82d`](https://github.com/softnetics/genseki/commit/454c82d7c5b3ecb1c68b9fdc8e73a4c3d604ec00) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Missing collection home page
+
 ## 0.1.0-alpha.22
 
 ### Patch Changes
