@@ -11,7 +11,10 @@ export interface TableProps extends React.HTMLAttributes<HTMLTableElement> {
 
 const Table = React.forwardRef<HTMLTableElement, TableProps>(
   ({ className, containerRef, containerClassName, ...props }, ref) => (
-    <div ref={containerRef} className={cn('w-full overflow-auto rounded-sm', containerClassName)}>
+    <div
+      ref={containerRef}
+      className={cn('w-full overflow-auto rounded-sm border border-border', containerClassName)}
+    >
       <table ref={ref} className={cn('relative w-full caption-bottom', className)} {...props} />
     </div>
   )
@@ -24,7 +27,7 @@ const TableHeader = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <thead
     ref={ref}
-    className={cn('text-text-body font-medium text-base py-4', className)}
+    className={cn('text-foreground px-6 py-7 text-left border-border border-b text-sm', className)}
     {...props}
   />
 ))
@@ -48,7 +51,15 @@ TableFooter.displayName = 'TableFooter'
 
 const TableRow = React.forwardRef<HTMLTableRowElement, React.HTMLAttributes<HTMLTableRowElement>>(
   ({ className, ...props }, ref) => (
-    <tr ref={ref} className={cn('transition-colors', className)} {...props} />
+    <tr
+      ref={ref}
+      className={cn(
+        'transition-colors',
+        props.datatype === 'selected' && 'bg-bluegray-50',
+        className
+      )}
+      {...props}
+    />
   )
 )
 TableRow.displayName = 'TableRow'
@@ -62,7 +73,7 @@ const TableHead = React.forwardRef<
     <Comp
       ref={ref}
       className={cn(
-        'px-2 py-4 text-left align-middle text-body-s font-semibold bg-secondary',
+        'text-foreground px-6 py-7 text-left align-middle font-semibold bg-muted',
         className
       )}
       {...props}
@@ -77,7 +88,10 @@ const TableCell = React.forwardRef<
 >(({ className, ...props }, ref) => (
   <td
     ref={ref}
-    className={cn('px-2 py-4 text-left align-middle text-body-s font-normal', className)}
+    className={cn(
+      'text-foreground px-6 py-7 text-left align-middle whitespace-nowrap text-body-s font-normal',
+      className
+    )}
     {...props}
   />
 ))

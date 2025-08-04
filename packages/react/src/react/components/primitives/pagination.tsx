@@ -114,7 +114,6 @@ const PageSizeSelect = (props: PageSizeSelectProps) => {
 
   return (
     <div className="flex items-center gap-6">
-      Show
       <Select
         placeholder="show"
         className="w-72"

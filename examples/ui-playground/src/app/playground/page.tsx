@@ -32,7 +32,7 @@ import {
   Card,
   Link,
   Pagination,
-  PaginationWithDropdown,
+  // PaginationWithDropdown,
   ProgressBar,
   Radio,
   RadioGroup,
@@ -42,7 +42,8 @@ import {
   Table,
   TableBody,
   TableCell,
-  TableColumn,
+  TableHead,
+  // TableColumn,
   TableHeader,
   TableRow,
   TabList,
@@ -1537,12 +1538,12 @@ export default function UIPlayground() {
           <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
         </PlaygroundCard>
         <PlaygroundCard title="With dropdown" categoryTitle="Pagination">
-          <PaginationWithDropdown
+          {/* <PaginationWithDropdown
             currentPage={1}
             totalPages={10}
             defaultPageSize={10}
             onPageChange={() => {}}
-          />
+          /> */}
         </PlaygroundCard>
       </Wrapper>
       <Wrapper title="Radio group">
@@ -1739,8 +1740,8 @@ export default function UIPlayground() {
         <div className="flex flex-col gap-4">
           <Table aria-label="Bands">
             <TableHeader>
-              <TableColumn>#</TableColumn>
-              <TableColumn isRowHeader>Name</TableColumn>
+              <TableHead>#</TableHead>
+              <TableHead>Name</TableHead>
             </TableHeader>
             <TableBody>
               <TableRow>
@@ -1756,8 +1757,8 @@ export default function UIPlayground() {
 
           <Table aria-label="Bands">
             <TableHeader>
-              <TableColumn>#</TableColumn>
-              <TableColumn isRowHeader>Name</TableColumn>
+              <TableHead>#</TableHead>
+              <TableHead>Name</TableHead>
             </TableHeader>
             <TableBody>
               <TableRow>
@@ -1773,12 +1774,12 @@ export default function UIPlayground() {
                 <TableCell colSpan={2}>
                   <div className="flex justify-between items-center w-full">
                     <Pagination currentPage={1} totalPages={10} onPageChange={() => {}} />
-                    <PaginationWithDropdown
+                    {/* <PaginationWithDropdown
                       currentPage={1}
                       totalPages={10}
                       defaultPageSize={10}
                       onPageChange={() => {}}
-                    />
+                    /> */}
                   </div>
                 </TableCell>
               </TableRow>
@@ -1787,8 +1788,8 @@ export default function UIPlayground() {
 
           <Table aria-label="not-found">
             <TableHeader>
-              <TableColumn>#</TableColumn>
-              <TableColumn isRowHeader>Name</TableColumn>
+              <TableHead>#</TableHead>
+              <TableHead>Name</TableHead>
             </TableHeader>
             <TableBody>
               <TableRow>

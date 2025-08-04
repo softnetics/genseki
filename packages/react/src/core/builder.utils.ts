@@ -122,14 +122,50 @@ function createCollectionDefaultFindManyHandler<
   return async (args) => {
     const page = args.page || 1
     const pageSize = args.pageSize || 10
+    const search = args.search
+    const sortBy = args.sortBy
+    const sortOrder = args.sortOrder
+
+    const where: any = {}
+    if (search && search.trim()) {
+      const searchFields = Object.keys(model.shape.columns).filter(
+        (key) => model.shape.columns[key].dataType === 'STRING'
+      )
+
+      if (searchFields.length > 0) {
+        where.OR = searchFields.map((field) => ({
+          [field]: {
+            contains: search.trim(),
+            mode: 'insensitive',
+          },
+        }))
+      }
+    }
+
+    const orderBy: any = {}
+    if (sortBy && sortOrder) {
+      if (model.shape.columns[sortBy]) {
+        orderBy[sortBy] = sortOrder
+      } else {
+        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+        orderBy[primaryField.name] = 'asc'
+      }
+    } else {
+      const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+      orderBy[primaryField.name] = 'asc'
+    }
 
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
       skip: (page - 1) * pageSize,
       take: pageSize,
+      orderBy,
+      where,
     })
 
-    const total = await prisma[model.config.prismaModelName].count()
+    const total = await prisma[model.config.prismaModelName].count({
+      where,
+    })
 
     return {
       total,
@@ -486,6 +522,9 @@ export function getCollectionDefaultFindManyApiRoute(args: {
       query: z.object({
         page: zStringPositiveNumberOptional,
         pageSize: zStringPositiveNumberOptional,
+        search: z.string().optional(),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(['asc', 'desc']).optional(),
       }),
       responses: {
         200: z.object({
@@ -504,6 +543,9 @@ export function getCollectionDefaultFindManyApiRoute(args: {
         defaultApi: defaultHandler as any,
         page: payload.query.page ?? 1,
         pageSize: payload.query.pageSize ?? 10,
+        search: payload.query.search,
+        sortBy: payload.query.sortBy === '__id' ? 'id' : payload.query.sortBy,
+        sortOrder: payload.query.sortOrder,
       })
 
       return {

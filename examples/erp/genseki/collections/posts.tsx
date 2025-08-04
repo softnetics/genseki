@@ -101,4 +101,10 @@ export const postsCollection = builder.collection((b) => ({
   update: b.update({
     fields: fields,
   }),
+  delete: b.delete({
+    fields: fields,
+  }),
+  one: b.one({
+    fields: fields,
+  }),
 }))

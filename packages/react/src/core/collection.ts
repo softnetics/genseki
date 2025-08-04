@@ -226,6 +226,9 @@ export type ApiFindOneArgs = {
 export type ApiFindManyArgs = {
   page?: number
   pageSize?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
 }
 
 export type ApiCreateArgs<TFields extends Fields> = {
