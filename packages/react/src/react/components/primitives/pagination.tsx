@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import { IconArrowLeft, IconArrowRight } from '@intentui/icons'
 import clsx from 'clsx'
 
@@ -13,19 +15,14 @@ interface PaginationProps {
   maxVisiblePages?: number
 }
 
-interface PaginationWithDropdownProps {
-  currentPage: number
-  totalPages: number
-  defaultPageSize?: number
-  onPageChange: (page: number) => void
-}
-
 const Pagination = (props: PaginationProps) => {
   const { currentPage, totalPages, onPageChange, maxVisiblePages = 5, variant = 'compact' } = props
 
   if (totalPages <= 1) return null
 
-  const pages = generatePages(currentPage, totalPages, maxVisiblePages)
+  const pages = useMemo(() => {
+    return generatePages(currentPage, totalPages, maxVisiblePages)
+  }, [currentPage, totalPages, maxVisiblePages])
 
   return (
     <div
@@ -101,37 +98,34 @@ const Pagination = (props: PaginationProps) => {
   )
 }
 
-const PaginationWithDropdown = (props: PaginationWithDropdownProps) => {
-  const { currentPage, totalPages, defaultPageSize = 10, onPageChange } = props
+interface PageSizeSelectProps {
+  pageSize: number
+  onPageSizeChange: (pageSize: number) => void
+  options?: { value: number; label: string }[]
+}
 
-  const pageSizeOptions = [
-    { id: 10, title: '10' },
-    { id: 25, title: '25' },
-    { id: 50, title: '50' },
-    { id: 100, title: '100' },
+const PageSizeSelect = (props: PageSizeSelectProps) => {
+  const pageSizeOptions = props.options ?? [
+    { value: 10, label: '10' },
+    { value: 25, label: '25' },
+    { value: 50, label: '50' },
+    { value: 100, label: '100' },
   ]
 
   return (
     <div className="flex items-center gap-6">
-      <div className="flex items-center gap-2 text-bluegray-400">
-        <p>Page</p>
-        <p className="font-semibold text-bluegray-800 dark:text-bluegray-200">{currentPage}</p>
-        <p>of</p>
-        <p className="font-semibold text-bluegray-800 dark:text-bluegray-200">{totalPages}</p>
-      </div>
-
-      {/* Select Page Size */}
+      Show
       <Select
-        defaultSelectedKey={defaultPageSize}
-        placeholder="Select a page size"
+        placeholder="show"
         className="w-72"
-        onSelectionChange={(e) => onPageChange(Number(e))}
+        selectedKey={String(props.pageSize)}
+        onSelectionChange={(key) => props.onPageSizeChange(Number(key))}
       >
         <SelectTrigger />
         <SelectList>
           {pageSizeOptions.map((option) => (
-            <SelectOption key={option.id} id={option.id} textValue={option.title}>
-              Per Page : {option.title}
+            <SelectOption key={option.value} id={String(option.value)}>
+              {option.label}
             </SelectOption>
           ))}
         </SelectList>
@@ -188,5 +182,5 @@ function generatePages(current: number, total: number, maxVisible: number) {
   return pages
 }
 
-export type { PaginationProps, PaginationWithDropdownProps }
-export { Pagination, PaginationWithDropdown }
+export type { PageSizeSelectProps, PaginationProps }
+export { PageSizeSelect, Pagination }

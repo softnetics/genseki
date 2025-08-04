@@ -1,6 +1,5 @@
-import type { IsAny } from 'type-fest'
+import type { IsAny, Promisable } from 'type-fest'
 
-import type { MaybePromise } from './collection'
 import type { MockPrismaClient } from './prisma.types'
 
 import { getSessionCookie } from '../auth/utils'
@@ -20,7 +19,7 @@ export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
     return getSessionCookie(this.request)
   }
 
-  abstract requiredAuthenticated(): MaybePromise<TUser>
+  abstract requiredAuthenticated(): Promisable<TUser>
 }
 
 export type AnyRequestContextable = RequestContextable<any>

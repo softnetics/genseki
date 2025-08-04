@@ -1,7 +1,6 @@
-import type { Simplify } from 'type-fest'
+import type { Promisable, Simplify } from 'type-fest'
 import z from 'zod/v4'
 
-import { type MaybePromise } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
   type DataType,
@@ -22,7 +21,7 @@ import type { FileUploadOptionsProps } from '../react/components/compound/file-u
 
 export type OptionCallback<TType extends string | number, in TContext extends AnyContextable> = (
   args: ContextToRequestContext<TContext>
-) => MaybePromise<Array<{ label: string; value: TType }>>
+) => Promisable<Array<{ label: string; value: TType }>>
 
 export interface FieldColumnClientMetadata {
   source: 'column'
@@ -465,6 +464,8 @@ export type FieldShape<TContext extends AnyContextable = AnyContextable> =
 // Define fields (which is fields with fieldName)
 export interface FieldsBase {
   config: {
+    primaryColumn: string
+    identifierColumn: string
     prismaModelName: string
   }
 }
@@ -622,10 +623,15 @@ export class FieldBuilder<
 
   fields<TFieldsShape extends FieldsShape>(
     modelName: TModelName,
-    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape
+    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape,
+    config?: { identifierColumn?: string }
   ): Simplify<{
     shape: TFieldsShape
-    config: { prismaModelName: TModelName }
+    config: {
+      primaryColumn: string
+      identifierColumn: string
+      prismaModelName: TModelName
+    }
   }> {
     const fb = new FieldBuilder({
       context: this.options.context,
@@ -633,9 +639,14 @@ export class FieldBuilder<
       modelName,
     })
     const shape = renameFieldsFieldName(optionsFn(fb))
+    const primaryColumn = this.model.shape.primaryFields[0]
     return {
       shape,
-      config: { prismaModelName: modelName },
+      config: {
+        primaryColumn: primaryColumn,
+        identifierColumn: config?.identifierColumn ?? primaryColumn,
+        prismaModelName: modelName,
+      },
     }
   }
 }

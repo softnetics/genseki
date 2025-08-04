@@ -1,14 +1,16 @@
-import { describe, expect, test } from 'vitest'
+import { describe, expect, it } from 'vitest'
 
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
+  transformFieldsToPrismaSelectPayload,
+  transformPrismaResultToFieldsPayload,
 } from '.'
 
 import { mockContext } from '../__mocks__/context'
 import { FullModelSchemas } from '../__mocks__/unsanitized'
 import { Builder } from '../builder'
-import type { InferCreateFieldsShape } from '../collection'
+import type { InferCreateFields, InferFields } from '../collection'
 
 const builder = new Builder({
   context: mockContext,
@@ -51,82 +53,217 @@ const userFields = builder.fields('user', (fb) => ({
   })),
 }))
 
-describe('transformToPrismaCreatePayload', () => {
-  test('should transform payload correctly', () => {
-    const input = {
-      nameField: 'John Doe',
-      postsField: [
-        {
-          create: {
-            titleField: 'Hello World',
-            contentField: {
-              type: 'doc',
-              content: [
-                {
-                  type: 'heading',
-                  attrs: { textAlign: 'left', level: 1 },
-                  content: [{ type: 'text', text: 'Hello' }],
-                },
-              ],
-            },
-            tagsField: [
-              { connect: 'mock-tag-id' },
-              {
-                create: {
-                  nameField: 'New Tag',
-                },
-              },
-            ],
-          },
-        },
-      ],
-      profileField: {
-        connect: 'mock-profile-id',
-      },
-    } satisfies InferCreateFieldsShape<(typeof userFields)['shape']>
-
-    const expected = {
-      name: 'John Doe',
-      posts: {
-        create: [
+describe('transformer', () => {
+  describe('transformToPrismaCreatePayload', () => {
+    it('should transform payload correctly', () => {
+      const input = {
+        nameField: 'John Doe',
+        postsField: [
           {
-            title: 'Hello World',
-            content: {
-              type: 'doc',
-              content: [
+            create: {
+              titleField: 'Hello World',
+              contentField: {
+                type: 'doc',
+                content: [
+                  {
+                    type: 'heading',
+                    attrs: { textAlign: 'left', level: 1 },
+                    content: [{ type: 'text', text: 'Hello' }],
+                  },
+                ],
+              },
+              tagsField: [
+                { connect: 'mock-tag-id' },
                 {
-                  type: 'heading',
-                  attrs: { textAlign: 'left', level: 1 },
-                  content: [{ type: 'text', text: 'Hello' }],
+                  create: {
+                    nameField: 'New Tag',
+                  },
                 },
               ],
-            },
-            tags: {
-              connect: [{ id: 'mock-tag-id' }],
-              create: { name: 'New Tag' },
             },
           },
         ],
-      },
-      profile: {
-        connect: {
-          id: 'mock-profile-id',
+        profileField: {
+          connect: 'mock-profile-id',
         },
-      },
-    }
+      } satisfies InferCreateFields<typeof userFields>
 
-    const output = transformFieldPayloadToPrismaCreatePayload(userFields, input)
-    expect(output).toEqual(expected)
+      const expected = {
+        name: 'John Doe',
+        posts: {
+          create: [
+            {
+              title: 'Hello World',
+              content: {
+                type: 'doc',
+                content: [
+                  {
+                    type: 'heading',
+                    attrs: { textAlign: 'left', level: 1 },
+                    content: [{ type: 'text', text: 'Hello' }],
+                  },
+                ],
+              },
+              tags: {
+                connect: [{ id: 'mock-tag-id' }],
+                create: { name: 'New Tag' },
+              },
+            },
+          ],
+        },
+        profile: {
+          connect: {
+            id: 'mock-profile-id',
+          },
+        },
+      }
+
+      const output = transformFieldPayloadToPrismaCreatePayload(userFields, input)
+      expect(output).toEqual(expected)
+    })
   })
-})
 
-describe('transformToPrismaUpdatePayload', () => {
-  test('should transform payload correctly', () => {
-    const input = {
-      nameField: 'John Doe',
-      postsField: [
-        {
-          create: {
+  describe('transformToPrismaUpdatePayload', () => {
+    it('should transform payload correctly', () => {
+      const input = {
+        nameField: 'John Doe',
+        postsField: [
+          {
+            create: {
+              titleField: 'Hello World',
+              contentField: {
+                type: 'doc',
+                content: [
+                  {
+                    type: 'heading',
+                    attrs: { textAlign: 'left', level: 1 },
+                    content: [{ type: 'text', text: 'Hello' }],
+                  },
+                ],
+              },
+              tagsField: [
+                {
+                  connect: 'mock-tag-id',
+                },
+                {
+                  create: {
+                    nameField: 'New Tag',
+                  },
+                },
+              ],
+            },
+          },
+        ],
+        profileField: {
+          connect: 'mock-profile-id',
+        },
+      } satisfies InferCreateFields<typeof userFields>
+
+      const expected = {
+        name: 'John Doe',
+        posts: {
+          create: [
+            {
+              title: 'Hello World',
+              content: {
+                type: 'doc',
+                content: [
+                  {
+                    type: 'heading',
+                    attrs: { textAlign: 'left', level: 1 },
+                    content: [{ type: 'text', text: 'Hello' }],
+                  },
+                ],
+              },
+              tags: {
+                connect: [{ id: 'mock-tag-id' }],
+                create: { name: 'New Tag' },
+              },
+            },
+          ],
+        },
+        profile: {
+          connect: {
+            id: 'mock-profile-id',
+          },
+        },
+      }
+
+      const output = transformFieldPayloadToPrismaUpdatePayload(userFields, input)
+      expect(output).toEqual(expected)
+    })
+  })
+
+  describe('transformFieldsToPrismaSelectPayload', () => {
+    it('should transform fields to Prisma select payload', () => {
+      const expected = {
+        id: true,
+        name: true,
+        posts: {
+          select: {
+            id: true,
+            title: true,
+            content: true,
+            tags: {
+              select: {
+                id: true,
+                name: true,
+              },
+            },
+          },
+        },
+        profile: {
+          select: {
+            id: true,
+            userId: true,
+          },
+        },
+      }
+
+      const output = transformFieldsToPrismaSelectPayload(userFields)
+      expect(output).toEqual(expected)
+    })
+  })
+
+  describe('transformPrismaResultToFieldsPayload', () => {
+    it('should transform prisma result to fields payload', () => {
+      const payload = {
+        id: 'mock-user-id',
+        name: 'John Doe',
+        posts: [
+          {
+            id: 'mock-post-id',
+            title: 'Hello World',
+            content: {
+              type: 'doc',
+              content: [
+                {
+                  type: 'heading',
+                  attrs: { textAlign: 'left', level: 1 },
+                  content: [{ type: 'text', text: 'Hello' }],
+                },
+              ],
+            },
+            tags: [
+              { id: 'mock-tag-id', name: 'Tag 1' },
+              { id: 'mock-tag-id-2', name: 'Tag 2' },
+            ],
+          },
+        ],
+        profile: {
+          id: 'mock-profile-id',
+          userId: 'mock-user-id',
+        },
+      }
+
+      const expected = {
+        __pk: 'mock-user-id',
+        __id: 'mock-user-id',
+        nameField: 'John Doe',
+        postsField: [
+          {
+            __id: 'mock-post-id',
+            __pk: 'mock-post-id',
             titleField: 'Hello World',
             contentField: {
               type: 'doc',
@@ -140,53 +277,27 @@ describe('transformToPrismaUpdatePayload', () => {
             },
             tagsField: [
               {
-                connect: 'mock-tag-id',
+                __id: 'mock-tag-id',
+                __pk: 'mock-tag-id',
+                nameField: 'Tag 1',
               },
               {
-                create: {
-                  nameField: 'New Tag',
-                },
+                __id: 'mock-tag-id-2',
+                __pk: 'mock-tag-id-2',
+                nameField: 'Tag 2',
               },
             ],
           },
-        },
-      ],
-      profileField: {
-        connect: 'mock-profile-id',
-      },
-    } satisfies InferCreateFieldsShape<(typeof userFields)['shape']>
-
-    const expected = {
-      name: 'John Doe',
-      posts: {
-        create: [
-          {
-            title: 'Hello World',
-            content: {
-              type: 'doc',
-              content: [
-                {
-                  type: 'heading',
-                  attrs: { textAlign: 'left', level: 1 },
-                  content: [{ type: 'text', text: 'Hello' }],
-                },
-              ],
-            },
-            tags: {
-              connect: [{ id: 'mock-tag-id' }],
-              create: { name: 'New Tag' },
-            },
-          },
         ],
-      },
-      profile: {
-        connect: {
-          id: 'mock-profile-id',
+        profileField: {
+          __id: 'mock-profile-id',
+          __pk: 'mock-profile-id',
+          userIdField: 'mock-user-id',
         },
-      },
-    }
+      } satisfies InferFields<typeof userFields>
 
-    const output = transformFieldPayloadToPrismaUpdatePayload(userFields, input)
-    expect(output).toEqual(expected)
+      const output = transformPrismaResultToFieldsPayload(userFields, payload)
+      expect(output).toEqual(expected)
+    })
   })
 })

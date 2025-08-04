@@ -1,14 +1,20 @@
-import type { Simplify } from 'type-fest'
-
 import {
   type CollectionDefaultAdminApiRouter,
   getCollectionDefaultCreateApiRoute,
+  getCollectionDefaultDeleteApiRoute,
   getCollectionDefaultFindManyApiRoute,
   getCollectionDefaultFindOneApiRoute,
   getCollectionDefaultUpdateApiRoute,
   getCollectionDefaultUpdateDefaultApiRoute,
 } from './builder.utils'
-import type { CollectionOptions } from './collection'
+import type {
+  CollectionCreateOptions,
+  CollectionDeleteOptions,
+  CollectionListOptions,
+  CollectionOneOptions,
+  CollectionOptions,
+  CollectionUpdateOptions,
+} from './collection'
 import { createGensekiUiRoute, type GensekiPlugin, type GensekiUiRouter } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
@@ -18,10 +24,9 @@ import {
   type AppendApiPathPrefix,
   appendApiPathPrefix,
 } from './endpoint'
-import { FieldBuilder, type FieldsShape } from './field'
+import { FieldBuilder, type Fields, type FieldsShape } from './field'
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
-import { appendFieldNameToFields } from './utils'
 
 import { CollectionAppLayout, HomeView } from '../react'
 import { CreateView } from '../react/views/collections/create'
@@ -39,7 +44,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
   ) {}
 
   collection<const TOptions extends CollectionOptions<TContext, any, any, any, any, any, any, any>>(
-    options: TOptions
+    optionsFn: (builder: CollectionBuilder<TContext>) => TOptions
   ): GensekiPlugin<
     TOptions['slug'],
     {
@@ -56,6 +61,9 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         >
     }
   > {
+    const builder = new CollectionBuilder<TContext>()
+    const options = optionsFn(builder)
+
     const slug = options.slug
 
     const api = appendApiPathPrefix(`/${slug}`, options.api ?? {})
@@ -125,13 +133,12 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.list.identifierColumn,
+            identifierColumn: options.list.fields.identifierColumn,
             fields: options.list.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultFindManyApiRoute({
             slug: slug,
-            identifierColumn: options.list.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.list.fields,
@@ -148,7 +155,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               render: (args) => {
                 return (
                   <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                    <ListView {...args} {...args.params} {...defaultArgs} findMany={route} />
+                    <ListView
+                      {...args}
+                      {...args.params}
+                      {...defaultArgs}
+                      findMany={route}
+                      columns={options.list?.columns ?? []}
+                    />
                   </CollectionAppLayout>
                 )
               },
@@ -160,13 +173,12 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.create.identifierColumn,
+            identifierColumn: options.create.fields.identifierColumn,
             fields: options.create.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultCreateApiRoute({
             slug: slug,
-            identifierColumn: options.create.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.create.fields,
@@ -195,13 +207,12 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.update.identifierColumn,
+            identifierColumn: options.update.fields.identifierColumn,
             fields: options.update.fields,
           } satisfies BaseViewProps
 
           const { route: updateRoute } = getCollectionDefaultUpdateApiRoute({
             slug: slug,
-            identifierColumn: options.update.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -212,7 +223,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           const { route: updateDefaultRoute } = getCollectionDefaultUpdateDefaultApiRoute({
             slug: slug,
-            identifierColumn: options.update.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.update.fields,
@@ -247,13 +257,12 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           const defaultArgs = {
             slug: slug,
             context: this.config.context,
-            identifierColumn: options.one.identifierColumn,
+            identifierColumn: options.one.fields.identifierColumn,
             fields: options.one.fields,
           } satisfies BaseViewProps
 
           const { route } = getCollectionDefaultFindOneApiRoute({
             slug: slug,
-            identifierColumn: options.one.identifierColumn,
             context: this.config.context,
             schema: this.config.schema,
             fields: options.one.fields,
@@ -283,6 +292,17 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
           )
         }
 
+        if (options.delete) {
+          const { route } = getCollectionDefaultDeleteApiRoute({
+            slug: slug,
+            context: this.config.context,
+            schema: this.config.schema,
+            fields: options.delete.fields,
+            customHandler: options.delete.api as any,
+          })
+          Object.assign(api, { delete: route })
+        }
+
         return {
           api: {
             [slug]: api,
@@ -308,21 +328,15 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
   fields<const TModelName extends keyof TModelSchemas, const TFieldsShape extends FieldsShape>(
     modelName: TModelName,
-    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape
-  ): Simplify<{
-    shape: TFieldsShape
-    config: { prismaModelName: TModelName }
-  }> {
+    optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape,
+    config?: { identifierColumn?: string }
+  ) {
     const fb = new FieldBuilder({
       context: this.config.context,
       modelSchemas: this.config.schema,
       modelName: modelName,
     }) as FieldBuilder<TContext, TModelSchemas, TModelName>
-    const shape = appendFieldNameToFields(optionsFn(fb))
-    return {
-      shape,
-      config: { prismaModelName: modelName },
-    }
+    return fb.fields(modelName, optionsFn, config)
   }
 
   endpoint<const TApiEndpointSchema extends ApiRouteSchema>(
@@ -339,5 +353,25 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         )
       },
     }
+  }
+}
+
+export class CollectionBuilder<in out TContext extends AnyContextable> {
+  constructor() {}
+
+  list<TFields extends Fields>(options: CollectionListOptions<TContext, TFields>) {
+    return options
+  }
+  one<TFields extends Fields>(options: CollectionOneOptions<TContext, TFields>) {
+    return options
+  }
+  create<TFields extends Fields>(options: CollectionCreateOptions<TContext, TFields>) {
+    return options
+  }
+  update<TFields extends Fields>(options: CollectionUpdateOptions<TContext, TFields>) {
+    return options
+  }
+  delete<TFields extends Fields>(options: CollectionDeleteOptions<TContext, TFields>) {
+    return options
   }
 }

@@ -1,5 +1,7 @@
 import { type ReactNode } from 'react'
 
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
+
 import { RootProvider, type ServerFunction } from '@genseki/react'
 
 import { NextNavigationProvider } from './navigation'
@@ -16,10 +18,12 @@ export function RootLayout(props: RootLayoutProps) {
   const clientApp = props.app.toClient()
 
   return (
-    <NextNavigationProvider>
-      <RootProvider app={clientApp} serverFunction={props.serverFunction}>
-        {props.children}
-      </RootProvider>
-    </NextNavigationProvider>
+    <NuqsAdapter>
+      <NextNavigationProvider>
+        <RootProvider app={clientApp} serverFunction={props.serverFunction}>
+          {props.children}
+        </RootProvider>
+      </NextNavigationProvider>
+    </NuqsAdapter>
   )
 }

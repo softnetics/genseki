@@ -49,6 +49,8 @@
     "@react-stately/calendar": "^3.8.2",
     "@react-stately/color": "^3.8.6",
     "@react-types/shared": "^3.30.0",
+    "@tanstack/react-query": "^5.71.5",
+    "@tanstack/react-table": "^8.21.3",
     "@tiptap/core": "^2.14.0",
     "@tiptap/extension-color": "^2.14.0",
     "@tiptap/extension-image": "^2.14.0",
@@ -67,6 +69,7 @@
     "defu": "^6.1.4",
     "input-otp": "^1.4.2",
     "motion": "^12.7.4",
+    "nuqs": "^2.4.3",
     "radix3": "^1.1.2",
     "react": "^19.1.0",
     "react-aria-components": "^1.10.1",
@@ -85,8 +88,10 @@
     "@types/json-schema": "^7.0.15",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.3.4",
     "tsup": "^8.5.0",
     "type-fest": "^4.38.0",
-    "vitest": "^3.0.9"
+    "vite-tsconfig-paths": "^5.1.4",
+    "vitest": "^3.1.3"
   }
 }

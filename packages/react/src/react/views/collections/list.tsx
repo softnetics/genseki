@@ -1,4 +1,5 @@
 import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
+import type { ColumnDef } from '@tanstack/react-table'
 
 import { ListTable } from './list.client'
 import type { BaseViewProps } from './types'
@@ -10,46 +11,15 @@ import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { Badge } from '../../icons/badge'
 import { formatSlug } from '../../utils/format-slug'
-import { getHeadersObject } from '../../utils/headers'
 
 interface ListViewProps extends BaseViewProps {
   headers: Headers
   searchParams: Record<string, string | string[]>
+  columns: ColumnDef<any>[]
   findMany: CollectionFindManyApiRoute<string, Fields>
 }
 
 export async function ListView(props: ListViewProps) {
-  const headersValue = getHeadersObject(props.headers)
-
-  const limit = parseInt((props.searchParams['limit'] as string) ?? '10')
-  const offset = parseInt((props.searchParams['offset'] as string) ?? '0')
-  const orderBy = (props.searchParams['orderBy'] as string) ?? undefined
-  const orderType = (props.searchParams['orderType'] as 'asc' | 'desc') ?? undefined
-
-  // TODO: Fix this dummy request and response
-  const request = new Request('http://localhost', {
-    method: 'GET',
-    headers: headersValue,
-  })
-  const response = new Response(null, {
-    headers: { 'Content-Type': 'application/json' },
-  })
-
-  // TODO: Consider moving to client component
-  const result = await props.findMany.handler(
-    {
-      query: { limit, offset, orderBy, orderType },
-      headers: headersValue,
-    },
-    { request, response }
-  )
-
-  if (result.status !== 200) {
-    throw new Error(
-      `Failed to fetch data: ${result.status} ${JSON.stringify(result.body, null, 2)}`
-    )
-  }
-
   const fieldsClient = getFieldsClient(props.fields)
 
   return (
@@ -86,7 +56,7 @@ export async function ListView(props: ListViewProps) {
             slug={props.slug}
             identifierColumn={props.identifierColumn}
             fields={fieldsClient}
-            data={result.body.data}
+            columns={props.columns as any}
           />
         </div>
       </div>

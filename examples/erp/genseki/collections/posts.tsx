@@ -11,6 +11,8 @@ import {
   SelectionExtension,
 } from '@genseki/react'
 
+import { columns } from './posts.client'
+
 import { EditorSlotBefore } from '../editor/slot-before'
 import { builder, prisma } from '../helper'
 
@@ -53,7 +55,7 @@ export const postEditorProviderProps = {
   ],
 }
 
-const fields = builder.fields('post', (fb) => ({
+export const fields = builder.fields('post', (fb) => ({
   title: fb.columns('title', {
     type: 'text',
     label: 'Title',
@@ -87,18 +89,16 @@ const fields = builder.fields('post', (fb) => ({
   })),
 }))
 
-export const postsCollection = builder.collection({
+export const postsCollection = builder.collection((b) => ({
   slug: 'posts',
-  list: {
-    identifierColumn: 'id',
+  list: b.list({
     fields: fields,
-  },
-  create: {
-    identifierColumn: 'id',
+    columns: columns,
+  }),
+  create: b.create({
     fields: fields,
-  },
-  update: {
-    identifierColumn: 'id',
+  }),
+  update: b.update({
     fields: fields,
-  },
-})
+  }),
+}))
