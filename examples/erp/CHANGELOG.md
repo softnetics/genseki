@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.21
+
+### Patch Changes
+
+- [#109](https://github.com/softnetics/genseki/pull/109) [`0c2645b`](https://github.com/softnetics/genseki/commit/0c2645bc6f36ae2f6857442352705056b8c121e7) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Add options to customize Table using Tanstack table
+  [Fix] Move identifierColumn under Fields
+- Updated dependencies [[`0c2645b`](https://github.com/softnetics/genseki/commit/0c2645bc6f36ae2f6857442352705056b8c121e7), [`1a8874b`](https://github.com/softnetics/genseki/commit/1a8874b1c74515b6e8af33aed9b400e1e2b6345d), [`454c82d`](https://github.com/softnetics/genseki/commit/454c82d7c5b3ecb1c68b9fdc8e73a4c3d604ec00)]:
+  - @genseki/react@0.1.0-alpha.23
+  - @genseki/next@0.1.0-alpha.23
+  - @genseki/plugins@0.1.0-alpha.23
+  - @genseki/prisma-generator@0.1.0-alpha.23
+  - @genseki/react-query@0.1.0-alpha.23
+  - @genseki/rest@0.1.0-alpha.23
+
 ## 0.1.0-alpha.20
 
 ### Patch Changes
