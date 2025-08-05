@@ -74,7 +74,12 @@ export function SetupClientForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField {...field} placeholder="full name..." label="Full Name" />
+                <TextField
+                  {...field}
+                  placeholder="full name..."
+                  label="Full Name"
+                  isDisabled={mutation.isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -86,7 +91,13 @@ export function SetupClientForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField {...field} type="email" placeholder="email..." label="Email" />
+                <TextField
+                  {...field}
+                  type="email"
+                  placeholder="email..."
+                  label="Email"
+                  isDisabled={mutation.isPending}
+                />
               </FormControl>
               <FormMessage />
             </FormItem>
@@ -104,6 +115,7 @@ export function SetupClientForm() {
                   placeholder="password..."
                   label="Password"
                   isRevealable
+                  isDisabled={mutation.isPending}
                 />
               </FormControl>
               <FormMessage />
@@ -122,13 +134,14 @@ export function SetupClientForm() {
                   placeholder="confirm password..."
                   label="Confirm Password"
                   isRevealable
+                  isDisabled={mutation.isPending}
                 />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <SubmitButton>Sign Up</SubmitButton>
+        <SubmitButton pending={mutation.isPending}>Sign Up</SubmitButton>
       </form>
     </Form>
   )
