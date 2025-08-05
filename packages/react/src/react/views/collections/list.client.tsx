@@ -26,6 +26,7 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
+import { toast } from 'sonner'
 
 import type { FieldsClient } from '../../../core'
 import {
@@ -43,9 +44,9 @@ import {
 } from '../../components'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { TanstackTable } from '../../components/primitives/tanstack-table'
+import { useDebounce } from '../../hooks/use-debounce'
 import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
-import { useDebounce } from '../../utils/use-debounce'
 
 interface ToolbarProps {
   slug: string
@@ -165,6 +166,7 @@ export function ListTable(props: ListTableProps) {
     await queryClient.invalidateQueries({
       queryKey: ['GET', `/api/${props.slug}`],
     })
+    toast.success('Deletion successfully')
     navigation.refresh()
   }
 
@@ -184,7 +186,7 @@ export function ListTable(props: ListTableProps) {
 
       // Add search parameter if it exists
       if (payload.query.search && payload.query.search.trim()) {
-        params.append('search', payload.query.search)
+        params.append('search', payload.query.search.trim())
       }
 
       // Add sorting parameters if they exist
@@ -259,6 +261,7 @@ export function ListTable(props: ListTableProps) {
                     await queryClient.invalidateQueries({
                       queryKey: ['GET', `/api/${props.slug}`],
                     })
+                    toast.success('Deletion successfully')
                     navigation.refresh()
                   }}
                 >
