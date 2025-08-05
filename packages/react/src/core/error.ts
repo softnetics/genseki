@@ -66,3 +66,18 @@ export class HttpNotFoundError implements HttpError<{ message: string }> {
     }
   }
 }
+
+export class HttpUnprocessableEntityError
+  implements HttpError<{ message: string; issues: $ZodIssue[] }>
+{
+  status: number
+  body: { message: string; issues: $ZodIssue[] }
+
+  constructor(error: ZodError, message?: string) {
+    this.status = 422
+    this.body = {
+      message: message || 'Unprocessable Entity',
+      issues: error.issues,
+    }
+  }
+}

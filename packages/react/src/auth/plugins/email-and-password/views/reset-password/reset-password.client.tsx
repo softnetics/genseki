@@ -54,7 +54,7 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
   const { handleSubmit, control } = form
 
   const handleResetPassword = async (data: z.infer<typeof FormSchema>) => {
-    const response = await serverFunction('auth.resetPasswordEmail', {
+    const response = await serverFunction('emailAndPassword.resetPasswordEmail', {
       body: {
         password: data.password,
       },
