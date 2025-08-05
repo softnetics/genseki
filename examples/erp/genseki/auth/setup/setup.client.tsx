@@ -44,7 +44,7 @@ export function SetupClientForm() {
     resolver: standardSchemaResolver(FormSchema),
   })
 
-  const mutation = queryClient.useMutation('POST', '/auth/setup')
+  const mutation = queryClient.useMutation('POST', '/auth/setup', {})
 
   const onValid = async (data: FormSchema) => {
     const response = await mutation.mutateAsync(

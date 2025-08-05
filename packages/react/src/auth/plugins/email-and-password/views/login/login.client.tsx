@@ -1,5 +1,6 @@
 'use client'
 
+import { useState } from 'react'
 import { useForm } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -20,7 +21,7 @@ import { useNavigation } from '../../../../../react/providers/navigation'
 import { useServerFunction } from '../../../../../react/providers/root'
 
 const FormSchema = z.object({
-  email: z.string().email({ message: 'Invalid email address' }),
+  email: z.email({ message: 'Invalid email address' }),
   // TODO: custom password validation
   password: z
     .string()
@@ -34,6 +35,7 @@ type FormSchema = z.infer<typeof FormSchema>
 
 export function LoginClientForm() {
   const serverFunction = useServerFunction()
+  const [isLoading, setIsLoading] = useState(false)
 
   const form = useForm<FormSchema>({
     resolver: standardSchemaResolver(FormSchema),
@@ -44,7 +46,9 @@ export function LoginClientForm() {
   async function login(data: z.infer<typeof FormSchema>) {
     form.clearErrors('email')
     form.clearErrors('password')
-    const response = await serverFunction('auth.loginEmail', {
+    setIsLoading(true)
+
+    const response = await serverFunction('emailAndPassword.loginEmail', {
       body: {
         email: data.email,
         password: data.password,
@@ -53,6 +57,8 @@ export function LoginClientForm() {
       query: {},
       pathParams: {},
     })
+
+    console.log('Login response:', response)
 
     if (response.status !== 200) {
       toast.error('Login failed', {
@@ -65,6 +71,7 @@ export function LoginClientForm() {
         message: 'Failed to login',
       })
 
+      setIsLoading(false)
       return
     }
 
@@ -91,6 +98,7 @@ export function LoginClientForm() {
                     type="email"
                     placeholder="email..."
                     label="Email"
+                    isDisabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -110,6 +118,7 @@ export function LoginClientForm() {
                     placeholder="password..."
                     label="Password"
                     isRevealable
+                    isDisabled={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -119,7 +128,7 @@ export function LoginClientForm() {
           <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
             Forgot Password?
           </Link>
-          <SubmitButton>Login</SubmitButton>
+          <SubmitButton pending={isLoading}>Login</SubmitButton>
         </form>
       </Form>
     </div>

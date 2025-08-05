@@ -19,7 +19,7 @@ export class StorageAdapterS3 implements StorageAdapter {
   }
 
   // Incase where you need to create the client automatically
-  public static initailize(options: { bucket: string; clientConfig: S3ClientConfig }) {
+  public static initialize(options: { bucket: string; clientConfig: S3ClientConfig }) {
     return new StorageAdapterS3(options)
   }
 

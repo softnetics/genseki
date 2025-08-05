@@ -103,7 +103,7 @@ export type QueryClient<TApiRouter extends ApiRouter> =
       }
     : never
 
-export function queryKey(method: string, path: string | number | symbol, payload: any) {
+export function queryKey(method: string, path: string | number | symbol, payload?: any) {
   const payloadKey = {
     pathParams: payload?.pathParams ?? {},
     query: payload?.query ?? {},
@@ -135,18 +135,18 @@ export function createQueryClient<TCore extends GensekiCore>(
         ...options,
       }
     },
-    useMutation: function (method: string, path: string, payload: any, options?: any) {
+    useMutation: function (method: string, path: string, options?: any) {
       return useMutation({
-        mutationKey: queryKey(method, path, payload),
+        mutationKey: queryKey(method, path),
         mutationFn: (data: any) => {
           return (restClient as any)[method](path, data)
         },
         ...options,
       })
     },
-    mutationOptions: function (method: string, path: string, payload: any, options?: any) {
+    mutationOptions: function (method: string, path: string, options?: any) {
       return {
-        mutationKey: queryKey(method, path, payload),
+        mutationKey: queryKey(method, path),
         mutationFn: (data: any) => {
           return (restClient as any)[method](path, data)
         },

@@ -14,7 +14,7 @@ import { FullModelSchemas } from '../generated/genseki/unsanitized'
 const app = new GensekiApp({
   title: 'Genseki ERP Example',
   version: '0.0.0',
-  storageAdapter: StorageAdapterS3.initailize({
+  storageAdapter: StorageAdapterS3.initialize({
     bucket: process.env.AWS_BUCKET_NAME!,
     clientConfig: {
       credentials: {
