@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.22
+
+### Patch Changes
+
+- [#122](https://github.com/softnetics/genseki/pull/122) [`b493941`](https://github.com/softnetics/genseki/commit/b493941c52e942dd93cce906624afe0e52cfe50f) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Type-safe me API endpoint
+
+- Updated dependencies [[`b493941`](https://github.com/softnetics/genseki/commit/b493941c52e942dd93cce906624afe0e52cfe50f), [`5aca910`](https://github.com/softnetics/genseki/commit/5aca9102e847100fee50672e397f618e99f1eac2)]:
+  - @genseki/react@0.1.0-alpha.24
+  - @genseki/next@0.1.0-alpha.24
+  - @genseki/plugins@0.1.0-alpha.24
+  - @genseki/prisma-generator@0.1.0-alpha.24
+  - @genseki/react-query@0.1.0-alpha.24
+  - @genseki/rest@0.1.0-alpha.24
+
 ## 0.1.0-alpha.21
 
 ### Patch Changes

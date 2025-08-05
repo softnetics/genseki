@@ -1,5 +1,14 @@
 # @genseki/next
 
+## 0.1.0-alpha.24
+
+### Patch Changes
+
+- [#123](https://github.com/softnetics/genseki/pull/123) [`5aca910`](https://github.com/softnetics/genseki/commit/5aca9102e847100fee50672e397f618e99f1eac2) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Chore] Add peer dependencies
+
+- Updated dependencies [[`b493941`](https://github.com/softnetics/genseki/commit/b493941c52e942dd93cce906624afe0e52cfe50f), [`5aca910`](https://github.com/softnetics/genseki/commit/5aca9102e847100fee50672e397f618e99f1eac2)]:
+  - @genseki/react@0.1.0-alpha.24
+
 ## 0.1.0-alpha.23
 
 ### Patch Changes
