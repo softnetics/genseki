@@ -544,8 +544,8 @@ export function getCollectionDefaultFindManyApiRoute(args: {
         page: payload.query.page ?? 1,
         pageSize: payload.query.pageSize ?? 10,
         search: payload.query.search,
-        sortBy: payload.query.sortBy ?? 'updatedAt',
-        sortOrder: payload.query.sortOrder ?? 'desc',
+        sortBy: payload.query.sortBy,
+        sortOrder: payload.query.sortOrder,
       })
 
       return {
