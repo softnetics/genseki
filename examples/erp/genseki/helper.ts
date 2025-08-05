@@ -1,5 +1,12 @@
+import z from 'zod'
+
 import { createAccessControl } from '@genseki/plugins'
-import { Builder, type Contextable, RequestContextable } from '@genseki/react'
+import {
+  Builder,
+  type Contextable,
+  HttpUnauthorizedError,
+  RequestContextable,
+} from '@genseki/react'
 
 import { FullModelSchemas } from '../generated/genseki/unsanitized'
 import { PrismaClient } from '../generated/prisma'
@@ -52,39 +59,24 @@ const accessControl = createAccessControl({
 })
 
 class MyRequestContext extends RequestContextable<User> {
-  constructor(request: Request) {
-    super(request)
+  constructor(context: MyContext, request: Request) {
+    super(context, request)
   }
 
   async getAccessControl() {
     return accessControl
   }
 
-  async requiredAuthenticated() {
+  async authenticate() {
     const sessionValue = this.getSessionCookie()
-
-    if (!sessionValue) {
-      throw new Error('User not authenticated')
-    }
+    if (!sessionValue) throw new HttpUnauthorizedError('No session cookie found')
 
     const session = await prisma.session.findUnique({
-      select: {
-        user: {
-          select: {
-            id: true,
-            name: true,
-            email: true,
-          },
-        },
-      },
-      where: {
-        token: sessionValue,
-      },
+      select: { user: { select: { id: true, name: true, email: true } } },
+      where: { token: sessionValue },
     })
 
-    if (!session) {
-      throw new Error('User not authenticated')
-    }
+    if (!session) throw new HttpUnauthorizedError('User not authenticated')
 
     return {
       id: session.user.id,
@@ -97,12 +89,20 @@ class MyRequestContext extends RequestContextable<User> {
 export class MyContext implements Contextable<User> {
   constructor() {}
 
+  getUserSchema() {
+    return z.object({
+      id: z.string(),
+      name: z.string().optional(),
+      email: z.email().optional(),
+    })
+  }
+
   getPrismaClient() {
     return prisma as any
   }
 
   toRequestContext(request: Request) {
-    return new MyRequestContext(request)
+    return new MyRequestContext(this, request)
   }
 }
 

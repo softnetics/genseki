@@ -1,5 +1,7 @@
 import type { IsAny, Promisable } from 'type-fest'
+import type z from 'zod'
 
+import { HttpUnprocessableEntityError } from './error'
 import type { MockPrismaClient } from './prisma.types'
 
 import { getSessionCookie } from '../auth/utils'
@@ -9,7 +11,12 @@ interface BaseUser {
 }
 
 export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
-  constructor(private readonly request: Request) {}
+  constructor(
+    private readonly context: AnyContextable,
+    private readonly request: Request
+  ) {}
+
+  abstract authenticate(): Promisable<TUser>
 
   getRequest() {
     return this.request
@@ -19,12 +26,23 @@ export abstract class RequestContextable<TUser extends BaseUser = BaseUser> {
     return getSessionCookie(this.request)
   }
 
-  abstract requiredAuthenticated(): Promisable<TUser>
+  getUserSchema(): z.ZodType<TUser> {
+    return this.context.getUserSchema()
+  }
+
+  async requiredAuthenticated() {
+    const result = await this.authenticate()
+    const schema = this.getUserSchema()
+    const parsed = schema.safeParse(result)
+    if (!parsed.success) throw new HttpUnprocessableEntityError(parsed.error)
+    return parsed.data
+  }
 }
 
 export type AnyRequestContextable = RequestContextable<any>
 
 export interface Contextable<TUser extends BaseUser = BaseUser> {
+  getUserSchema(): z.ZodType<TUser>
   getPrismaClient(): MockPrismaClient
   toRequestContext(request: Request): RequestContextable<TUser>
 }

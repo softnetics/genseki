@@ -21,7 +21,7 @@ export function ForgotPasswordClientForm() {
       return (
         <InputEmailSection
           onNext={async (email) => {
-            const response = await serverFunction('auth.sendEmailResetPassword', {
+            const response = await serverFunction('emailAndPassword.sendEmailResetPassword', {
               body: {
                 email,
               },
