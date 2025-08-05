@@ -1,6 +1,7 @@
 import z from 'zod/v4'
 
 import type { ApiDefaultMethod } from './collection'
+import type { ListConfiguration } from './collection'
 import { type ApiReturnType, type InferCreateFields, type InferUpdateFields } from './collection'
 import { type ApiConfigHandlerFn } from './collection'
 import type { AnyContextable, Contextable } from './context'
@@ -113,10 +114,10 @@ function createCollectionDefaultFindManyHandler<
   TFields extends Fields,
 >(
   config: { schema: ModelSchemas; context: TContext },
-  fields: Fields
+  fields: Fields,
+  listConfiguration?: ListConfiguration<TFields>
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> {
   const prisma = config.context.getPrismaClient()
-
   const model = config.schema[fields.config.prismaModelName]
 
   return async (args) => {
@@ -127,10 +128,16 @@ function createCollectionDefaultFindManyHandler<
     const sortOrder = args.sortOrder
 
     const where: any = {}
+
+    // Configured searchable columns.
     if (search && search.trim()) {
-      const searchFields = Object.keys(model.shape.columns).filter(
-        (key) => model.shape.columns[key].dataType === 'STRING'
-      )
+      const searchFields = listConfiguration?.searchString
+        ? listConfiguration.searchString.filter(
+            (field) => model.shape.columns[field as string]?.dataType === 'STRING'
+          )
+        : Object.keys(model.shape.columns).filter(
+            (key) => model.shape.columns[key].dataType === 'STRING'
+          )
 
       if (searchFields.length > 0) {
         where.OR = searchFields.map((field) => ({
@@ -142,17 +149,32 @@ function createCollectionDefaultFindManyHandler<
       }
     }
 
+    // Configured sortable columns.
     const orderBy: any = {}
     if (sortBy && sortOrder) {
-      if (model.shape.columns[sortBy]) {
+      const isValidSortField =
+        !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy as any)
+
+      if (isValidSortField && model.shape.columns[sortBy]) {
         orderBy[sortBy] = sortOrder
       } else {
         const primaryField = model.shape.columns[model.shape.primaryFields[0]]
         orderBy[primaryField.name] = 'asc'
       }
     } else {
-      const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-      orderBy[primaryField.name] = 'asc'
+      // Use default sort configuration.
+      if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
+        const defaultSortField = listConfiguration.sortBy[0]
+        if (model.shape.columns[defaultSortField as string]) {
+          orderBy[defaultSortField] = 'asc'
+        } else {
+          const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+          orderBy[primaryField.name] = 'asc'
+        }
+      } else {
+        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+        orderBy[primaryField.name] = 'asc'
+      }
     }
 
     const response = await prisma[model.config.prismaModelName].findMany({
@@ -507,10 +529,12 @@ export function getCollectionDefaultFindManyApiRoute(args: {
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_MANY>
+  listConfiguration?: ListConfiguration<Fields>
 }) {
   const defaultHandler = createCollectionDefaultFindManyHandler(
     { schema: args.schema, context: args.context },
-    args.fields
+    args.fields,
+    args.listConfiguration
   )
   const handler = args.customHandler ?? defaultHandler
 

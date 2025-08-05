@@ -36,6 +36,10 @@ interface TanstackTableProps<T> {
   errorMessage?: React.ReactNode
   emptyFallback?: React.ReactNode
   emptyMessage?: React.ReactNode
+  configuration?: {
+    searchString?: string[]
+    sortBy?: string[]
+  }
 }
 
 export const getSortIcon = (isSorted: false | SortDirection) => {
@@ -59,6 +63,7 @@ export function TanstackTable<T>({
   onRowClick: onRowClickProp,
   emptyFallback: emptyFallback,
   errorFallback,
+  configuration,
 }: TanstackTableProps<T>) {
   const errorMessage = 'Error'
   const emptyMessage = 'No data'
@@ -82,7 +87,8 @@ export function TanstackTable<T>({
               const children = header.isPlaceholder
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())
-              const canSort = header.column.getCanSort()
+              // const canSort = header.column.getCanSort()
+              const canSort = configuration?.sortBy?.includes(header.column.id)
               return (
                 <TableHead
                   key={header.id}
@@ -91,7 +97,9 @@ export function TanstackTable<T>({
                     header.colSpan > 1 && 'border-bluegray-300 border-b',
                     classNames?.tableHead
                   )}
-                  onClick={header.column.getToggleSortingHandler()}
+                  onClick={
+                    canSort && children ? header.column.getToggleSortingHandler() : undefined
+                  }
                   colSpan={header.colSpan}
                   role={canSort ? 'button' : undefined}
                   tabIndex={canSort ? 0 : -1}

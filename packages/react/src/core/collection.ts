@@ -279,6 +279,36 @@ export interface CollectionUpdateOptions<
   updateDefaultApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
 }
 
+// Extract searchable columns from fields
+export type ExtractSearchableColumns<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
+    ? TFields['shape'][K]['$server']['column']['dataType'] extends 'STRING'
+      ? K
+      : never
+    : never
+}[keyof TFields['shape']]
+
+// Extract sortable columns from fields
+export type ExtractSortableColumns<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
+    ? TFields['shape'][K]['$server']['column']['dataType'] extends
+        | 'STRING'
+        | 'INT'
+        | 'FLOAT'
+        | 'DATETIME'
+        | 'BIGINT'
+        | 'DECIMAL'
+      ? K
+      : never
+    : never
+}[keyof TFields['shape']]
+
+// ListConfiguration
+export interface ListConfiguration<TFields extends Fields> {
+  searchString?: ExtractSearchableColumns<TFields>[]
+  sortBy?: ExtractSortableColumns<TFields>[]
+}
+
 export interface CollectionListOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
@@ -286,6 +316,7 @@ export interface CollectionListOptions<
   fields: TFields
   columns: ColumnDef<InferFields<TFields>, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  configuration?: ListConfiguration<TFields>
 }
 
 export interface CollectionOneOptions<

@@ -29,7 +29,8 @@ import {
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { toast } from 'sonner'
 
-import type { FieldsClient } from '../../../core'
+import type { Fields, FieldsClient } from '../../../core'
+import type { ListConfiguration } from '../../../core/collection'
 import {
   Button,
   ButtonLink,
@@ -133,6 +134,7 @@ interface ListTableProps {
   identifierColumn: string
   fields: FieldsClient
   columns: ColumnDef<BaseData>[]
+  listConfiguration?: ListConfiguration<Fields>
 }
 
 export function ListTable(props: ListTableProps) {
@@ -162,11 +164,19 @@ export function ListTable(props: ListTableProps) {
   // Debounce the search input by 500ms
   useDebounce(searchInput, handleDebouncedSearch, 500)
 
+  // Get default sort field from configuration
+  const getDefaultSortField = () => {
+    if (props.listConfiguration?.sortBy && props.listConfiguration.sortBy.length > 0) {
+      return props.listConfiguration.sortBy[0]
+    }
+    return ''
+  }
+
   // Initialize sorting from URL
   const initialSorting: SortingState =
     pagination.sortBy && pagination.sortOrder
       ? [{ id: pagination.sortBy, desc: pagination.sortOrder === 'desc' }]
-      : []
+      : [{ id: getDefaultSortField(), desc: true }]
 
   // Delete mutation
   const deleteMutation = useMutation({
@@ -351,7 +361,9 @@ export function ListTable(props: ListTableProps) {
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       rowSelection,
-      sorting: [{ id: pagination.sortBy ?? 'updatedAt', desc: pagination.sortOrder === 'desc' }],
+      sorting: [
+        { id: pagination.sortBy ?? getDefaultSortField(), desc: pagination.sortOrder === 'desc' },
+      ],
       pagination: {
         pageIndex: pagination.page - 1,
         pageSize: pagination.pageSize,
@@ -384,6 +396,7 @@ export function ListTable(props: ListTableProps) {
         onRowClick="toggleSelect"
         isLoading={isLoading}
         isError={query.isError}
+        configuration={props.listConfiguration}
       />
       <div className="flex flex-row items-center justify-between gap-x-4 mt-6">
         <div>

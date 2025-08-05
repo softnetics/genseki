@@ -82,11 +82,22 @@ export const fields = builder.fields('post', (fb) => ({
         description: 'The email of the author',
       }),
     })),
+    updatedAt: fb.columns('updatedAt', {
+      type: 'date',
+      label: 'Updated At',
+      description: 'The date the post was updated',
+    }),
     options: async () => {
       const result = await prisma.user.findMany()
       return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
     },
   })),
+  updatedAt: fb.columns('updatedAt', {
+    type: 'date',
+    label: 'Updated At',
+    hidden: true,
+    description: 'The date the post was updated',
+  }),
 }))
 
 export const postsCollection = builder.collection((b) => ({
@@ -94,6 +105,10 @@ export const postsCollection = builder.collection((b) => ({
   list: b.list({
     fields: fields,
     columns: columns,
+    configuration: {
+      searchString: ['title'],
+      sortBy: ['updatedAt', 'title'],
+    },
   }),
   create: b.create({
     fields: fields,

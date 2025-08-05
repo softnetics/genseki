@@ -6,6 +6,7 @@ import type { BaseViewProps } from './types'
 
 import { getFieldsClient } from '../../../core'
 import type { CollectionFindManyApiRoute } from '../../../core/builder.utils'
+import type { ListConfiguration } from '../../../core/collection'
 import type { Fields } from '../../../core/field'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
@@ -17,6 +18,7 @@ interface ListViewProps extends BaseViewProps {
   searchParams: Record<string, string | string[]>
   columns: ColumnDef<any>[]
   findMany: CollectionFindManyApiRoute<string, Fields>
+  listConfiguration?: ListConfiguration<Fields>
 }
 
 export async function ListView(props: ListViewProps) {
@@ -57,6 +59,7 @@ export async function ListView(props: ListViewProps) {
             identifierColumn={props.identifierColumn}
             fields={fieldsClient}
             columns={props.columns as any}
+            listConfiguration={props.listConfiguration}
           />
         </div>
       </div>

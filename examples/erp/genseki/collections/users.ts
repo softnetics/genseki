@@ -25,6 +25,10 @@ export const usersCollection = builder.collection((b) => ({
   list: b.list({
     fields: fields,
     columns: columns,
+    configuration: {
+      searchString: ['name'],
+      sortBy: ['name'],
+    },
   }),
   api: {
     example: builder.endpoint(

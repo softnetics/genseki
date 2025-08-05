@@ -28,4 +28,8 @@ export const columns = [
     header: 'Author Email',
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor('updatedAt', {
+    header: 'Updated At',
+    cell: (info) => <div>{new Date(info.getValue()).toLocaleDateString('en-GB')}</div>,
+  }),
 ]
