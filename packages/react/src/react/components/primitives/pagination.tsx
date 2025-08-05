@@ -115,13 +115,14 @@ const PageSizeSelect = (props: PageSizeSelectProps) => {
   return (
     <div className="flex items-center gap-6">
       <Select
+        aria-label="Show"
         placeholder="show"
         className="w-72"
         selectedKey={String(props.pageSize)}
         onSelectionChange={(key) => props.onPageSizeChange(Number(key))}
       >
         <SelectTrigger />
-        <SelectList>
+        <SelectList aria-label="Page Size">
           {pageSizeOptions.map((option) => (
             <SelectOption key={option.value} id={String(option.value)}>
               {option.label}

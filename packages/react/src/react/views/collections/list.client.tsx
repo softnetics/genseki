@@ -11,6 +11,7 @@ import {
 } from '@phosphor-icons/react/dist/ssr'
 import {
   keepPreviousData,
+  useMutation,
   useQuery,
   useQueryClient,
   type UseQueryResult,
@@ -52,15 +53,24 @@ interface ToolbarProps {
   slug: string
   searchValue: string
   onSearchChange: (value: string) => void
+  isLoading?: boolean
   isShowDeleteButton?: boolean
   onDelete?: () => void
 }
 
 const Toolbar = (props: ToolbarProps) => {
-  const { slug, searchValue, onSearchChange, isShowDeleteButton = false, onDelete } = props
+  const {
+    slug,
+    searchValue,
+    onSearchChange,
+    isShowDeleteButton = false,
+    onDelete,
+    isLoading = false,
+  } = props
   return (
     <div className="flex items-center justify-between gap-x-3">
       <ButtonLink
+        aria-label="Back"
         href="."
         variant="ghost"
         size="md"
@@ -71,26 +81,41 @@ const Toolbar = (props: ToolbarProps) => {
       <div className="flex items-center gap-x-4">
         {isShowDeleteButton && (
           <Button
+            aria-label="Delete"
             variant="destruction"
             size="md"
             leadingIcon={<BaseIcon icon={TrashIcon} size="md" />}
             onClick={onDelete}
+            isPending={isLoading}
           >
             Delete
           </Button>
         )}
         <TextField
+          aria-label="Search"
           placeholder="Search"
           prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
           className="w-full"
-          aria-label="Search"
           value={searchValue}
+          isDisabled={isLoading}
           onChange={onSearchChange}
         />
-        <Button variant="outline" size="md" leadingIcon={<BaseIcon icon={FunnelIcon} size="md" />}>
+        <Button
+          aria-label="Filter"
+          variant="outline"
+          size="md"
+          leadingIcon={<BaseIcon icon={FunnelIcon} size="md" />}
+          isDisabled={isLoading}
+        >
           Filter
         </Button>
-        <ButtonLink variant="primary" size="md" href={`./${slug}/create`}>
+        <ButtonLink
+          aria-label="Create"
+          variant="primary"
+          size="md"
+          href={`./${slug}/create`}
+          isDisabled={isLoading}
+        >
           Create
         </ButtonLink>
       </div>
@@ -118,30 +143,24 @@ export function ListTable(props: ListTableProps) {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
   const [searchInput, setSearchInput] = useState('')
 
-  // Debounce the search input by 500ms
-  const debouncedSearch = useDebounce(searchInput, 500)
-
   const [pagination, setPagination] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     pageSize: parseAsInteger.withDefault(10),
-    search: parseAsString.withDefault(''),
-    sortBy: parseAsString.withDefault(''),
-    sortOrder: parseAsString.withDefault(''),
+    search: parseAsString,
+    sortBy: parseAsString,
+    sortOrder: parseAsString,
   })
 
-  // Update pagination search when debounced search changes
-  const [prevDebouncedSearch, setPrevDebouncedSearch] = useState(debouncedSearch)
-
-  if (prevDebouncedSearch !== debouncedSearch) {
-    setPagination({
-      page: 1, // Reset page
-      pageSize: pagination.pageSize,
+  const handleDebouncedSearch = (debouncedSearch: string) => {
+    setPagination((prev) => ({
+      ...prev,
+      page: 1,
       search: debouncedSearch,
-      sortBy: pagination.sortBy,
-      sortOrder: pagination.sortOrder,
-    })
-    setPrevDebouncedSearch(debouncedSearch)
+    }))
   }
+
+  // Debounce the search input by 500ms
+  useDebounce(searchInput, handleDebouncedSearch, 500)
 
   // Initialize sorting from URL
   const initialSorting: SortingState =
@@ -149,25 +168,34 @@ export function ListTable(props: ListTableProps) {
       ? [{ id: pagination.sortBy, desc: pagination.sortOrder === 'desc' }]
       : []
 
+  // Delete mutation
+  const deleteMutation = useMutation({
+    mutationFn: async (selectedRowIds: string[]) => {
+      return serverFunction(`${props.slug}.delete`, {
+        body: { ids: selectedRowIds },
+        headers: {},
+        pathParams: {},
+        query: {},
+      })
+    },
+    onSuccess: async () => {
+      setRowSelection({})
+      await queryClient.invalidateQueries({
+        queryKey: ['GET', `/api/${props.slug}`],
+      })
+      toast.success('Deletion successfully')
+    },
+    onError: () => {
+      toast.error('Failed to delete items')
+    },
+  })
+
   const handleBulkDelete = async () => {
     const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key])
 
     if (selectedRowIds.length === 0) return
 
-    await serverFunction(`${props.slug}.delete`, {
-      body: { ids: selectedRowIds },
-      headers: {},
-      pathParams: {},
-      query: {},
-    })
-
-    setRowSelection({})
-    // Invalidate the query
-    await queryClient.invalidateQueries({
-      queryKey: ['GET', `/api/${props.slug}`],
-    })
-    toast.success('Deletion successfully')
-    navigation.refresh()
+    deleteMutation.mutate(selectedRowIds)
   }
 
   const query: UseQueryResult<{
@@ -229,11 +257,12 @@ export function ListTable(props: ListTableProps) {
         cell: ({ row }) => (
           <div className="grid place-items-center">
             <Menu>
-              <MenuTrigger className="cursor-pointer">
+              <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
                 <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
               </MenuTrigger>
               <MenuContent aria-label="Actions" placement="left top">
                 <MenuItem
+                  aria-label="View"
                   onAction={() => {
                     navigation.navigate(`./${props.slug}/${row.original.__id}`)
                   }}
@@ -241,6 +270,7 @@ export function ListTable(props: ListTableProps) {
                   View
                 </MenuItem>
                 <MenuItem
+                  aria-label="Edit"
                   onAction={() => {
                     navigation.navigate(`./${props.slug}/update/${row.original.__id}`)
                   }}
@@ -249,20 +279,10 @@ export function ListTable(props: ListTableProps) {
                 </MenuItem>
                 <MenuSeparator />
                 <MenuItem
+                  aria-label="Delete"
                   isDanger
-                  onAction={async () => {
-                    await serverFunction(`${props.slug}.delete`, {
-                      body: { ids: [row.original.__id] },
-                      headers: {},
-                      pathParams: {},
-                      query: {},
-                    })
-                    // Invalidate the query
-                    await queryClient.invalidateQueries({
-                      queryKey: ['GET', `/api/${props.slug}`],
-                    })
-                    toast.success('Deletion successfully')
-                    navigation.refresh()
+                  onAction={() => {
+                    deleteMutation.mutate([row.original.__id])
                   }}
                 >
                   Delete
@@ -306,8 +326,8 @@ export function ListTable(props: ListTableProps) {
           page: pagination.page,
           pageSize: pagination.pageSize,
           search: pagination.search,
-          sortBy: '',
-          sortOrder: '',
+          sortBy: null,
+          sortOrder: null,
         })
       }
     },
@@ -331,7 +351,7 @@ export function ListTable(props: ListTableProps) {
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       rowSelection,
-      sorting: initialSorting,
+      sorting: [{ id: pagination.sortBy ?? 'updatedAt', desc: pagination.sortOrder === 'desc' }],
       pagination: {
         pageIndex: pagination.page - 1,
         pageSize: pagination.pageSize,
@@ -344,12 +364,16 @@ export function ListTable(props: ListTableProps) {
     setSearchInput(searchValue)
   }
 
+  // Loading state
+  const isLoading = deleteMutation.isPending || query.isLoading || query.isFetching
+
   return (
     <>
       <Toolbar
         slug={props.slug}
         searchValue={searchInput}
         onSearchChange={handleSearchChange}
+        isLoading={isLoading}
         isShowDeleteButton={Object.keys(rowSelection).some((key) => rowSelection[key])}
         onDelete={handleBulkDelete}
       />
@@ -358,7 +382,7 @@ export function ListTable(props: ListTableProps) {
         loadingItems={pagination.pageSize}
         className="static"
         onRowClick="toggleSelect"
-        isLoading={query.isLoading}
+        isLoading={isLoading}
         isError={query.isError}
       />
       <div className="flex flex-row items-center justify-between gap-x-4 mt-6">
