@@ -2,7 +2,7 @@ import { CubeIcon } from '@phosphor-icons/react/dist/ssr'
 import type { ColumnDef } from '@tanstack/react-table'
 
 import { ListTable } from './list.client'
-import type { BaseViewProps } from './types'
+import type { BaseViewProps, ListFeatures } from './types'
 
 import { getFieldsClient } from '../../../core'
 import type { CollectionFindManyApiRoute } from '../../../core/builder.utils'
@@ -19,6 +19,7 @@ interface ListViewProps extends BaseViewProps {
   columns: ColumnDef<any>[]
   findMany: CollectionFindManyApiRoute<string, Fields>
   listConfiguration?: ListConfiguration<Fields>
+  features?: ListFeatures
 }
 
 export async function ListView(props: ListViewProps) {
@@ -60,6 +61,7 @@ export async function ListView(props: ListViewProps) {
             fields={fieldsClient}
             columns={props.columns as any}
             listConfiguration={props.listConfiguration}
+            features={props.features}
           />
         </div>
       </div>

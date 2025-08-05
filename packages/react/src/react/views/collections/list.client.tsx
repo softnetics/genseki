@@ -23,11 +23,12 @@ import {
   getPaginationRowModel,
   getSortedRowModel,
   type RowSelectionState,
-  type SortingState,
   useReactTable,
 } from '@tanstack/react-table'
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { toast } from 'sonner'
+
+import type { ListFeatures } from './types'
 
 import type { Fields, FieldsClient } from '../../../core'
 import type { ListConfiguration } from '../../../core/collection'
@@ -57,6 +58,7 @@ interface ToolbarProps {
   isLoading?: boolean
   isShowDeleteButton?: boolean
   onDelete?: () => void
+  features?: ListFeatures
 }
 
 const Toolbar = (props: ToolbarProps) => {
@@ -67,6 +69,7 @@ const Toolbar = (props: ToolbarProps) => {
     isShowDeleteButton = false,
     onDelete,
     isLoading = false,
+    features,
   } = props
   return (
     <div className="flex items-center justify-between gap-x-3">
@@ -80,7 +83,7 @@ const Toolbar = (props: ToolbarProps) => {
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
-        {isShowDeleteButton && (
+        {features?.delete && isShowDeleteButton && (
           <Button
             aria-label="Delete"
             variant="destruction"
@@ -110,15 +113,17 @@ const Toolbar = (props: ToolbarProps) => {
         >
           Filter
         </Button>
-        <ButtonLink
-          aria-label="Create"
-          variant="primary"
-          size="md"
-          href={`./${slug}/create`}
-          isDisabled={isLoading}
-        >
-          Create
-        </ButtonLink>
+        {features?.create && (
+          <ButtonLink
+            aria-label="Create"
+            variant="primary"
+            size="md"
+            href={`./${slug}/create`}
+            isDisabled={isLoading}
+          >
+            Create
+          </ButtonLink>
+        )}
       </div>
     </div>
   )
@@ -135,6 +140,7 @@ interface ListTableProps {
   fields: FieldsClient
   columns: ColumnDef<BaseData>[]
   listConfiguration?: ListConfiguration<Fields>
+  features?: ListFeatures
 }
 
 export function ListTable(props: ListTableProps) {
@@ -172,12 +178,6 @@ export function ListTable(props: ListTableProps) {
     return ''
   }
 
-  // Initialize sorting from URL
-  const initialSorting: SortingState =
-    pagination.sortBy && pagination.sortOrder
-      ? [{ id: pagination.sortBy, desc: pagination.sortOrder === 'desc' }]
-      : [{ id: getDefaultSortField(), desc: true }]
-
   // Delete mutation
   const deleteMutation = useMutation({
     mutationFn: async (selectedRowIds: string[]) => {
@@ -201,6 +201,9 @@ export function ListTable(props: ListTableProps) {
   })
 
   const handleBulkDelete = async () => {
+    // Return immediately if delete is not enabled
+    if (!props.features?.delete) return
+
     const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key])
 
     if (selectedRowIds.length === 0) return
@@ -244,66 +247,86 @@ export function ListTable(props: ListTableProps) {
     const columnHelper = createColumnHelper<BaseData>()
     if (query.isLoading) return props.columns
     return [
-      columnHelper.display({
-        id: 'select',
-        header: ({ table }) => (
-          <Checkbox
-            isSelected={table.getIsAllRowsSelected()}
-            isIndeterminate={table.getIsSomeRowsSelected()}
-            onChange={(checked) => table.getToggleAllRowsSelectedHandler()({ target: { checked } })}
-          />
-        ),
-        cell: ({ row }) => (
-          <Checkbox
-            isSelected={row.getIsSelected()}
-            isDisabled={!row.getCanSelect()}
-            onChange={(checked) => row.getToggleSelectedHandler()({ target: { checked } })}
-          />
-        ),
-      }),
+      // Only show checkbox if delete is enabled
+      ...(props.features?.delete
+        ? [
+            columnHelper.display({
+              id: 'select',
+              header: ({ table }) => (
+                <Checkbox
+                  isSelected={table.getIsAllRowsSelected()}
+                  isIndeterminate={table.getIsSomeRowsSelected()}
+                  onChange={(checked) =>
+                    table.getToggleAllRowsSelectedHandler()({ target: { checked } })
+                  }
+                />
+              ),
+              cell: ({ row }) => (
+                <Checkbox
+                  isSelected={row.getIsSelected()}
+                  isDisabled={!row.getCanSelect()}
+                  onChange={(checked) => row.getToggleSelectedHandler()({ target: { checked } })}
+                />
+              ),
+            }),
+          ]
+        : []),
       ...props.columns,
       columnHelper.display({
         id: 'actions',
-        cell: ({ row }) => (
-          <div className="grid place-items-center">
-            <Menu>
-              <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
-                <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
-              </MenuTrigger>
-              <MenuContent aria-label="Actions" placement="left top">
-                <MenuItem
-                  aria-label="View"
-                  onAction={() => {
-                    navigation.navigate(`./${props.slug}/${row.original.__id}`)
-                  }}
-                >
-                  View
-                </MenuItem>
-                <MenuItem
-                  aria-label="Edit"
-                  onAction={() => {
-                    navigation.navigate(`./${props.slug}/update/${row.original.__id}`)
-                  }}
-                >
-                  Edit
-                </MenuItem>
-                <MenuSeparator />
-                <MenuItem
-                  aria-label="Delete"
-                  isDanger
-                  onAction={() => {
-                    deleteMutation.mutate([row.original.__id])
-                  }}
-                >
-                  Delete
-                </MenuItem>
-              </MenuContent>
-            </Menu>
-          </div>
-        ),
+        cell: ({ row }) => {
+          if (!props.features?.one && !props.features?.update && !props.features?.delete) {
+            return null
+          }
+          return (
+            <div className="grid place-items-center">
+              <Menu>
+                <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
+                  <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
+                </MenuTrigger>
+                <MenuContent aria-label="Actions" placement="left top">
+                  {props.features?.one && (
+                    <MenuItem
+                      aria-label="View"
+                      onAction={() => {
+                        navigation.navigate(`./${props.slug}/${row.original.__id}`)
+                      }}
+                    >
+                      View
+                    </MenuItem>
+                  )}
+                  {props.features?.update && (
+                    <MenuItem
+                      aria-label="Edit"
+                      onAction={() => {
+                        navigation.navigate(`./${props.slug}/update/${row.original.__id}`)
+                      }}
+                    >
+                      Edit
+                    </MenuItem>
+                  )}
+                  {props.features?.delete && (
+                    <>
+                      {props.features?.one || (props.features?.update && <MenuSeparator />)}
+                      <MenuItem
+                        aria-label="Delete"
+                        isDanger
+                        onAction={() => {
+                          deleteMutation.mutate([row.original.__id])
+                        }}
+                      >
+                        Delete
+                      </MenuItem>
+                    </>
+                  )}
+                </MenuContent>
+              </Menu>
+            </div>
+          )
+        },
       }),
     ]
-  }, [query.isLoading])
+  }, [query.isLoading, props.features])
 
   const table = useReactTable({
     data: query.data?.data ?? [],
@@ -316,7 +339,7 @@ export function ListTable(props: ListTableProps) {
     getSortedRowModel: getSortedRowModel(),
     manualSorting: true,
     initialState: {
-      sorting: initialSorting,
+      sorting: [{ id: getDefaultSortField(), desc: true }],
     },
     onSortingChange: (updater) => {
       const currentSorting = table?.getState().sorting
@@ -388,6 +411,7 @@ export function ListTable(props: ListTableProps) {
         isLoading={isLoading}
         isShowDeleteButton={Object.keys(rowSelection).some((key) => rowSelection[key])}
         onDelete={handleBulkDelete}
+        features={props.features}
       />
       <TanstackTable
         table={table}

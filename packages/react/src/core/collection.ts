@@ -317,6 +317,12 @@ export interface CollectionListOptions<
   columns: ColumnDef<InferFields<TFields>, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
   configuration?: ListConfiguration<TFields>
+  features?: {
+    create?: boolean
+    update?: boolean
+    delete?: boolean
+    one?: boolean
+  }
 }
 
 export interface CollectionOneOptions<

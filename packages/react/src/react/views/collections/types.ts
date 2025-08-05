@@ -7,3 +7,10 @@ export interface BaseViewProps {
   identifierColumn: string
   fields: Fields
 }
+
+export interface ListFeatures {
+  create?: boolean
+  update?: boolean
+  delete?: boolean
+  one?: boolean
+}

@@ -163,6 +163,12 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                       findMany={route}
                       columns={options.list?.columns ?? []}
                       listConfiguration={options.list?.configuration}
+                      features={{
+                        create: !!options.create,
+                        update: !!options.update,
+                        delete: !!options.delete,
+                        one: !!options.one,
+                      }}
                     />
                   </CollectionAppLayout>
                 )
