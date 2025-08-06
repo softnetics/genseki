@@ -40,12 +40,6 @@ interface TanstackTableProps<T> {
     searchString?: string[]
     sortBy?: string[]
   }
-  features?: {
-    create?: boolean
-    update?: boolean
-    delete?: boolean
-    one?: boolean
-  }
 }
 
 export const getSortIcon = (isSorted: false | SortDirection) => {
@@ -70,7 +64,6 @@ export function TanstackTable<T>({
   emptyFallback: emptyFallback,
   errorFallback,
   configuration,
-  features,
 }: TanstackTableProps<T>) {
   const errorMessage = 'Error'
   const emptyMessage = 'No data'

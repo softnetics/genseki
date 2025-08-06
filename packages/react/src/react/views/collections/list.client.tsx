@@ -359,8 +359,8 @@ export function ListTable(props: ListTableProps) {
           page: pagination.page,
           pageSize: pagination.pageSize,
           search: pagination.search,
-          sortBy: null,
-          sortOrder: null,
+          sortBy: getDefaultSortField(),
+          sortOrder: 'asc',
         })
       }
     },

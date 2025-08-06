@@ -166,7 +166,7 @@ function createCollectionDefaultFindManyHandler<
       if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
         const defaultSortField = listConfiguration.sortBy[0]
         if (model.shape.columns[defaultSortField as string]) {
-          orderBy[defaultSortField] = 'asc'
+          orderBy[defaultSortField] = 'desc'
         } else {
           const primaryField = model.shape.columns[model.shape.primaryFields[0]]
           orderBy[primaryField.name] = 'asc'

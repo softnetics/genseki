@@ -16,4 +16,7 @@ export const columns = [
   columnHelper.accessor('name', {
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor('email', {
+    cell: (info) => info.getValue(),
+  }),
 ]
