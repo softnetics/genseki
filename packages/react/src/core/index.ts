@@ -12,6 +12,7 @@ export type { ApiReturnType, CollectionOptions, InferField, InferFields } from '
 export { ApiDefaultMethod } from './collection'
 export {
   type AnyGensekiPlugin,
+  createGensekiUiRoute,
   createPlugin,
   GensekiApp,
   type GensekiAppCompiled,
