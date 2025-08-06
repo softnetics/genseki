@@ -51,6 +51,19 @@ const userFields = builder.fields('user', (fb) => ({
     })),
     options: () => [],
   })),
+  staffInfo: fb.relations('staffInfo', (fb) => ({
+    type: 'connect',
+    required: false,
+    fields: fb.fields('staffInfo', (fb) => ({
+      position: fb.columns('position', {
+        type: 'text',
+      }),
+      department: fb.columns('department', {
+        type: 'text',
+      }),
+    })),
+    options: () => [],
+  })),
 }))
 
 describe('transformer', () => {
@@ -58,6 +71,9 @@ describe('transformer', () => {
     it('should transform payload correctly', () => {
       const input = {
         nameField: 'John Doe',
+        staffInfo: {
+          connect: undefined,
+        },
         postsField: [
           {
             create: {
@@ -127,6 +143,9 @@ describe('transformer', () => {
     it('should transform payload correctly', () => {
       const input = {
         nameField: 'John Doe',
+        staffInfo: {
+          connect: undefined,
+        },
         postsField: [
           {
             create: {
@@ -199,6 +218,13 @@ describe('transformer', () => {
       const expected = {
         id: true,
         name: true,
+        staffInfo: {
+          select: {
+            department: true,
+            id: true,
+            position: true,
+          },
+        },
         posts: {
           select: {
             id: true,
@@ -260,6 +286,7 @@ describe('transformer', () => {
         __pk: 'mock-user-id',
         __id: 'mock-user-id',
         nameField: 'John Doe',
+        staffInfo: undefined,
         postsField: [
           {
             __id: 'mock-post-id',

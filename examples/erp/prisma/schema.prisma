@@ -41,8 +41,10 @@ model User {
   bannedAt        DateTime?
   bannedExpiredAt DateTime?
 
-  createdAt DateTime @default(now())
-  updatedAt DateTime @default(now()) @updatedAt
+  createdAt   DateTime   @default(now())
+  updatedAt   DateTime   @default(now()) @updatedAt
+  staffInfo   StaffInfo? @relation(fields: [staffInfoId], references: [id])
+  staffInfoId String?
 }
 
 model Account {
@@ -123,9 +125,21 @@ model Post {
   author   User   @relation(fields: [authorId], references: [id])
 
   comments Comment[]
+  tags     Tag[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Tag {
+  id String @id @default(uuid())
+
+  name String @unique
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  Post      Post?    @relation(fields: [postId], references: [id])
+  postId    String?
 }
 
 model Comment {
@@ -141,4 +155,15 @@ model Comment {
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
+}
+
+model StaffInfo {
+  id String @id @default(uuid())
+
+  position   String?
+  department String?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+  User      User[]
 }
