@@ -37,7 +37,7 @@ interface TanstackTableProps<T> {
   emptyFallback?: React.ReactNode
   emptyMessage?: React.ReactNode
   configuration?: {
-    searchString?: string[]
+    search?: string[]
     sortBy?: string[]
   }
 }

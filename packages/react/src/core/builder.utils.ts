@@ -7,7 +7,7 @@ import { type ApiConfigHandlerFn } from './collection'
 import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
 import { type Fields } from './field'
-import type { ModelSchemas } from './model'
+import { DataType, type ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
@@ -131,12 +131,12 @@ function createCollectionDefaultFindManyHandler<
 
     // Configured searchable columns.
     if (search && search.trim()) {
-      const searchFields = listConfiguration?.searchString
-        ? listConfiguration.searchString.filter(
-            (field) => model.shape.columns[field as string]?.dataType === 'STRING'
+      const searchFields = listConfiguration?.search
+        ? listConfiguration.search.filter(
+            (field) => model.shape.columns[field as string]?.dataType === DataType.STRING
           )
         : Object.keys(model.shape.columns).filter(
-            (key) => model.shape.columns[key].dataType === 'STRING'
+            (key) => model.shape.columns[key].dataType === DataType.STRING
           )
 
       if (searchFields.length > 0) {
@@ -151,15 +151,15 @@ function createCollectionDefaultFindManyHandler<
 
     // Configured sortable columns.
     const orderBy: any = {}
-    if (sortBy && sortOrder) {
+    if (sortBy) {
       const isValidSortField =
         !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy as any)
 
       if (isValidSortField && model.shape.columns[sortBy]) {
-        orderBy[sortBy] = sortOrder
+        orderBy[sortBy] = sortOrder ?? 'asc'
       } else {
         const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = 'asc'
+        orderBy[primaryField.name] = sortOrder ?? 'asc'
       }
     } else {
       // Use default sort configuration.

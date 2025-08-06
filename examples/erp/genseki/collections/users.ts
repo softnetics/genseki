@@ -23,7 +23,7 @@ export const usersCollection = builder.collection((b) => ({
     fields: fields,
     columns: columns,
     configuration: {
-      searchString: ['name'],
+      search: ['name'],
       sortBy: ['name'],
     },
   }),

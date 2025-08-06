@@ -101,7 +101,7 @@ const Toolbar = (props: ToolbarProps) => {
           prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
           className="w-full"
           value={searchValue}
-          isDisabled={isLoading}
+          isPending={isLoading}
           onChange={onSearchChange}
         />
         <Button
@@ -109,7 +109,7 @@ const Toolbar = (props: ToolbarProps) => {
           variant="outline"
           size="md"
           leadingIcon={<BaseIcon icon={FunnelIcon} size="md" />}
-          isDisabled={isLoading}
+          isPending={isLoading}
         >
           Filter
         </Button>
@@ -119,7 +119,7 @@ const Toolbar = (props: ToolbarProps) => {
             variant="primary"
             size="md"
             href={`./${slug}/create`}
-            isDisabled={isLoading}
+            isPending={isLoading}
           >
             Create
           </ButtonLink>
@@ -401,6 +401,7 @@ export function ListTable(props: ListTableProps) {
 
   // Loading state
   const isLoading = deleteMutation.isPending || query.isLoading || query.isFetching
+  const isShowDeleteButton = Object.keys(rowSelection).some((key) => rowSelection[key])
 
   return (
     <>
@@ -409,7 +410,7 @@ export function ListTable(props: ListTableProps) {
         searchValue={searchInput}
         onSearchChange={handleSearchChange}
         isLoading={isLoading}
-        isShowDeleteButton={Object.keys(rowSelection).some((key) => rowSelection[key])}
+        isShowDeleteButton={isShowDeleteButton}
         onDelete={handleBulkDelete}
         features={props.features}
       />

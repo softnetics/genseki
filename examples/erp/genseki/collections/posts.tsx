@@ -106,7 +106,7 @@ export const postsCollection = builder.collection((b) => ({
     fields: fields,
     columns: columns,
     configuration: {
-      searchString: ['title'],
+      search: ['title'],
       sortBy: ['updatedAt', 'title'],
     },
   }),

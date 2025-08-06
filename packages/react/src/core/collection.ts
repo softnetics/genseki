@@ -17,7 +17,7 @@ import {
   type FieldShape,
   type FieldShapeBase,
 } from './field'
-import type { InferDataType } from './model'
+import type { DataType, InferDataType } from './model'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
@@ -282,7 +282,7 @@ export interface CollectionUpdateOptions<
 // Extract searchable columns from fields
 export type ExtractSearchableColumns<TFields extends Fields> = {
   [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
-    ? TFields['shape'][K]['$server']['column']['dataType'] extends 'STRING'
+    ? TFields['shape'][K]['$server']['column']['dataType'] extends typeof DataType.STRING
       ? K
       : never
     : never
@@ -292,12 +292,12 @@ export type ExtractSearchableColumns<TFields extends Fields> = {
 export type ExtractSortableColumns<TFields extends Fields> = {
   [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
     ? TFields['shape'][K]['$server']['column']['dataType'] extends
-        | 'STRING'
-        | 'INT'
-        | 'FLOAT'
-        | 'DATETIME'
-        | 'BIGINT'
-        | 'DECIMAL'
+        | typeof DataType.STRING
+        | typeof DataType.INT
+        | typeof DataType.FLOAT
+        | typeof DataType.DATETIME
+        | typeof DataType.BIGINT
+        | typeof DataType.DECIMAL
       ? K
       : never
     : never
@@ -305,7 +305,7 @@ export type ExtractSortableColumns<TFields extends Fields> = {
 
 // ListConfiguration
 export interface ListConfiguration<TFields extends Fields> {
-  searchString?: ExtractSearchableColumns<TFields>[]
+  search?: ExtractSearchableColumns<TFields>[]
   sortBy?: ExtractSortableColumns<TFields>[]
 }
 
