@@ -98,7 +98,7 @@ export function LoginClientForm() {
                     type="email"
                     placeholder="email..."
                     label="Email"
-                    isDisabled={isLoading}
+                    isPending={isLoading}
                   />
                 </FormControl>
                 <FormMessage />
@@ -118,7 +118,7 @@ export function LoginClientForm() {
                     placeholder="password..."
                     label="Password"
                     isRevealable
-                    isDisabled={isLoading}
+                    isPending={isLoading}
                   />
                 </FormControl>
                 <FormMessage />

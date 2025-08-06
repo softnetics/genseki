@@ -7,7 +7,10 @@ import {
   Link,
 } from 'react-aria-components'
 
+import { Spinner } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
+
+import { BaseIcon } from './base-icon'
 
 import { cn } from '../../utils/cn'
 
@@ -83,12 +86,13 @@ interface ButtonProps
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   ({ className, variant, size, ...props }, ref) => {
-    const { isDisabled } = props
+    const { isDisabled, isPending = false } = props
 
     return (
       <ButtonPrimitive
         ref={ref}
         {...props}
+        isDisabled={isDisabled || isPending}
         className={(value) =>
           cn(
             buttonVariants({
@@ -104,7 +108,11 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
           <>
             {props.leadingIcon}
             {typeof props.children === 'function' ? props.children(values) : props.children}
-            {props.trailingIcon}
+            {isPending ? (
+              <BaseIcon icon={Spinner} size="sm" className="animate-spin" />
+            ) : (
+              props.trailingIcon
+            )}
           </>
         )}
       </ButtonPrimitive>
@@ -118,16 +126,18 @@ interface ButtonLinkProps
     Pick<ButtonVariants, 'isDisabled'> {
   leadingIcon?: React.ReactElement
   trailingIcon?: React.ReactElement
+  isPending?: boolean
 }
 
 const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
-  { className, variant, size, isDisabled = false, children, ...props },
+  { className, variant, size, isDisabled = false, isPending = false, children, ...props },
   ref
 ) {
   return (
     <Link
       ref={ref}
       data-slot="button"
+      isDisabled={isDisabled || isPending}
       className={(value) =>
         cn(
           buttonVariants({
@@ -144,7 +154,11 @@ const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function Butto
         <>
           {props.leadingIcon}
           {typeof children === 'function' ? children(values) : children}
-          {props.trailingIcon}
+          {isPending ? (
+            <BaseIcon icon={Spinner} size="sm" className="animate-spin" />
+          ) : (
+            props.trailingIcon
+          )}
         </>
       )}
     </Link>

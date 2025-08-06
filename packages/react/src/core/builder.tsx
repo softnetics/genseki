@@ -143,6 +143,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
             schema: this.config.schema,
             fields: options.list.fields,
             customHandler: options.list.api as any,
+            listConfiguration: options.list.configuration,
           })
 
           Object.assign(api, { findMany: route })
@@ -161,6 +162,13 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                       {...defaultArgs}
                       findMany={route}
                       columns={options.list?.columns ?? []}
+                      listConfiguration={options.list?.configuration}
+                      features={{
+                        create: !!options.create,
+                        update: !!options.update,
+                        delete: !!options.delete,
+                        one: !!options.one,
+                      }}
                     />
                   </CollectionAppLayout>
                 )

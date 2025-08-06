@@ -2,13 +2,8 @@
 
 import React, { useRef } from 'react'
 
-import {
-  CaretDownIcon,
-  CaretUpDownIcon,
-  CaretUpIcon,
-  EmptyIcon,
-  XIcon,
-} from '@phosphor-icons/react/dist/ssr'
+import { CircleNotchIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
+import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react/dist/ssr'
 import {
   flexRender,
   type Row,
@@ -41,6 +36,10 @@ interface TanstackTableProps<T> {
   errorMessage?: React.ReactNode
   emptyFallback?: React.ReactNode
   emptyMessage?: React.ReactNode
+  configuration?: {
+    search?: string[]
+    sortBy?: string[]
+  }
 }
 
 export const getSortIcon = (isSorted: false | SortDirection) => {
@@ -59,13 +58,14 @@ export function TanstackTable<T>({
   classNames,
   table,
   isLoading = false,
-  loadingItems = 5,
+  // loadingItems = 5,
   isError = false,
   onRowClick: onRowClickProp,
   emptyFallback: emptyFallback,
   errorFallback,
+  configuration,
 }: TanstackTableProps<T>) {
-  const errorMessage = 'An error occurred while loading data'
+  const errorMessage = 'Error'
   const emptyMessage = 'No data'
 
   const containerRef = useRef<HTMLTableElement>(null)
@@ -87,19 +87,31 @@ export function TanstackTable<T>({
               const children = header.isPlaceholder
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())
-              const canSort = header.column.getCanSort()
+              // const canSort = header.column.getCanSort()
+              const canSort = configuration?.sortBy?.includes(header.column.id)
               return (
                 <TableHead
                   key={header.id}
-                  className={clsx('focus-visible:ring-focus ring-inset', classNames?.tableHead)}
-                  onClick={header.column.getToggleSortingHandler()}
+                  className={clsx(
+                    'focus-visible:ring-focus ring-inset',
+                    header.colSpan > 1 && 'border-bluegray-300 border-b',
+                    classNames?.tableHead
+                  )}
+                  onClick={
+                    canSort && children ? header.column.getToggleSortingHandler() : undefined
+                  }
                   colSpan={header.colSpan}
                   role={canSort ? 'button' : undefined}
                   tabIndex={canSort ? 0 : -1}
                 >
-                  <span className="inline-flex items-center gap-2 w-full">
-                    <span className="flex-1">{children}</span>
-                    {canSort && getSortIcon(header.column.getIsSorted())}
+                  <span
+                    className={clsx(
+                      'inline-flex items-center gap-2 w-full',
+                      header.colSpan > 1 && 'justify-center'
+                    )}
+                  >
+                    <span>{children}</span>
+                    {canSort && children && getSortIcon(header.column.getIsSorted())}
                   </span>
                 </TableHead>
               )
@@ -107,9 +119,9 @@ export function TanstackTable<T>({
           </TableRow>
         ))}
       </TableHeader>
-      <TableBody className={classNames?.tableBody}>
+      <TableBody className={clsx(classNames?.tableBody)}>
         {isLoading ? (
-          <TableLoading table={table} loadingItems={loadingItems} />
+          <TableLoading table={table} />
         ) : isError ? (
           <TableError table={table} errorFallback={errorFallback} errorMessage={errorMessage} />
         ) : table.getRowCount() === 0 ? (
@@ -119,7 +131,7 @@ export function TanstackTable<T>({
             <TableRow
               key={row.id}
               data-state={row.getIsSelected() && 'selected'}
-              className={classNames?.tableBodyRow}
+              className={clsx('border-b border-border last:border-b-0', classNames?.tableBodyRow)}
             >
               {row.getVisibleCells().map((cell) => {
                 return (
@@ -140,21 +152,17 @@ export function TanstackTable<T>({
   )
 }
 
-export const TableLoading = (props: {
-  table: TanstackTableCore<any>
-  loadingItems: number
-  tableCell?: string
-}) => {
-  return Array.from({ length: props.loadingItems }).map((_, i) => (
-    <TableRow key={i}>
-      {props.table.getAllColumns().map((col, i) => (
-        <TableCell key={i} className={clsx(props?.tableCell)}>
-          {/* TODO: Skeleton */}
-          Loading...
-        </TableCell>
-      ))}
+export const TableLoading = (props: { table: TanstackTableCore<any> }) => {
+  return (
+    <TableRow className="h-[560px]">
+      <TableCell colSpan={props.table.getAllLeafColumns().length} className="h-32 text-center">
+        <div className="flex flex-col items-center py-10 gap-8">
+          <CircleNotchIcon className="text-xl size-auto text-input-text-placeholder animate-spin" />
+          <p className="text-base font-regular text-typo-secondary">Loading</p>
+        </div>
+      </TableCell>
     </TableRow>
-  ))
+  )
 }
 
 export const TableError = (props: {
@@ -163,13 +171,13 @@ export const TableError = (props: {
   errorMessage?: React.ReactNode
 }) => {
   return (
-    <TableRow>
+    <TableRow className="h-[560px]">
       <TableCell colSpan={props.table.getAllLeafColumns().length} className="h-32 text-center">
         {props.errorFallback ?? (
-          <div className="flex flex-col items-center py-10 gap-spacing-16">
-            <XIcon className="text-6xl size-auto text-input-text-placeholder" />
-            <p className="text-body-l font-regular text-typo-secondary">
-              {props.errorMessage ?? 'An error occurred while loading data'}
+          <div className="flex flex-col items-center py-10 gap-8">
+            <WarningIcon className="text-xl size-auto text-input-text-placeholder" weight="fill" />
+            <p className="text-base font-regular text-typo-secondary">
+              {props.errorMessage ?? 'Error'}
             </p>
           </div>
         )}
@@ -183,12 +191,15 @@ export const TableEmpty = (props: {
   emptyMessage?: React.ReactNode
 }) => {
   return (
-    <TableRow>
+    <TableRow className="h-[560px]">
       <TableCell colSpan={props.table.getAllLeafColumns().length} className="h-24 text-center">
         {props.emptyFallback ?? (
-          <div className="flex flex-col items-center py-10 gap-spacing-16">
-            <EmptyIcon className="text-6xl size-auto text-input-text-placeholder" />
-            <p className="text-body-l font-regular text-typo-secondary">
+          <div className="flex flex-col items-center py-10 gap-8">
+            <WarningCircleIcon
+              className="text-xl size-auto text-input-text-placeholder"
+              weight="fill"
+            />
+            <p className="text-base font-regular text-typo-secondary">
               {props.emptyMessage ?? 'No data'}
             </p>
           </div>

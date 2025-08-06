@@ -17,7 +17,7 @@ import {
   type FieldShape,
   type FieldShapeBase,
 } from './field'
-import type { InferDataType } from './model'
+import type { DataType, InferDataType } from './model'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
@@ -226,6 +226,9 @@ export type ApiFindOneArgs = {
 export type ApiFindManyArgs = {
   page?: number
   pageSize?: number
+  search?: string
+  sortBy?: string
+  sortOrder?: 'asc' | 'desc'
 }
 
 export type ApiCreateArgs<TFields extends Fields> = {
@@ -276,6 +279,36 @@ export interface CollectionUpdateOptions<
   updateDefaultApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
 }
 
+// Extract searchable columns from fields
+export type ExtractSearchableColumns<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
+    ? TFields['shape'][K]['$server']['column']['dataType'] extends typeof DataType.STRING
+      ? K
+      : never
+    : never
+}[keyof TFields['shape']]
+
+// Extract sortable columns from fields
+export type ExtractSortableColumns<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
+    ? TFields['shape'][K]['$server']['column']['dataType'] extends
+        | typeof DataType.STRING
+        | typeof DataType.INT
+        | typeof DataType.FLOAT
+        | typeof DataType.DATETIME
+        | typeof DataType.BIGINT
+        | typeof DataType.DECIMAL
+      ? K
+      : never
+    : never
+}[keyof TFields['shape']]
+
+// ListConfiguration
+export interface ListConfiguration<TFields extends Fields> {
+  search?: ExtractSearchableColumns<TFields>[]
+  sortBy?: ExtractSortableColumns<TFields>[]
+}
+
 export interface CollectionListOptions<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
@@ -283,6 +316,13 @@ export interface CollectionListOptions<
   fields: TFields
   columns: ColumnDef<InferFields<TFields>, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  configuration?: ListConfiguration<TFields>
+  features?: {
+    create?: boolean
+    update?: boolean
+    delete?: boolean
+    one?: boolean
+  }
 }
 
 export interface CollectionOneOptions<

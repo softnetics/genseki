@@ -19,12 +19,13 @@ export const fields = builder.fields('user', (fb) => ({
 
 export const usersCollection = builder.collection((b) => ({
   slug: 'users',
-  create: b.create({
-    fields: fields,
-  }),
   list: b.list({
     fields: fields,
     columns: columns,
+    configuration: {
+      search: ['name'],
+      sortBy: ['name'],
+    },
   }),
   api: {
     example: builder.endpoint(

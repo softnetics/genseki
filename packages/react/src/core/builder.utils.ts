@@ -1,12 +1,13 @@
 import z from 'zod/v4'
 
 import type { ApiDefaultMethod } from './collection'
+import type { ListConfiguration } from './collection'
 import { type ApiReturnType, type InferCreateFields, type InferUpdateFields } from './collection'
 import { type ApiConfigHandlerFn } from './collection'
 import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
 import { type Fields } from './field'
-import type { ModelSchemas } from './model'
+import { DataType, type ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
@@ -113,23 +114,80 @@ function createCollectionDefaultFindManyHandler<
   TFields extends Fields,
 >(
   config: { schema: ModelSchemas; context: TContext },
-  fields: Fields
+  fields: Fields,
+  listConfiguration?: ListConfiguration<TFields>
 ): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> {
   const prisma = config.context.getPrismaClient()
-
   const model = config.schema[fields.config.prismaModelName]
 
   return async (args) => {
     const page = args.page || 1
     const pageSize = args.pageSize || 10
+    const search = args.search
+    const sortBy = args.sortBy
+    const sortOrder = args.sortOrder
+
+    const where: any = {}
+
+    // Configured searchable columns.
+    if (search && search.trim()) {
+      const searchFields = listConfiguration?.search
+        ? listConfiguration.search.filter(
+            (field) => model.shape.columns[field as string]?.dataType === DataType.STRING
+          )
+        : Object.keys(model.shape.columns).filter(
+            (key) => model.shape.columns[key].dataType === DataType.STRING
+          )
+
+      if (searchFields.length > 0) {
+        where.OR = searchFields.map((field) => ({
+          [field]: {
+            contains: search.trim(),
+            mode: 'insensitive',
+          },
+        }))
+      }
+    }
+
+    // Configured sortable columns.
+    const orderBy: any = {}
+    if (sortBy) {
+      const isValidSortField =
+        !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy as any)
+
+      if (isValidSortField && model.shape.columns[sortBy]) {
+        orderBy[sortBy] = sortOrder ?? 'asc'
+      } else {
+        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+        orderBy[primaryField.name] = sortOrder ?? 'asc'
+      }
+    } else {
+      // Use default sort configuration.
+      if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
+        const defaultSortField = listConfiguration.sortBy[0]
+        if (model.shape.columns[defaultSortField as string]) {
+          orderBy[defaultSortField] = 'desc'
+        } else {
+          const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+          orderBy[primaryField.name] = 'asc'
+        }
+      } else {
+        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+        orderBy[primaryField.name] = 'asc'
+      }
+    }
 
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
       skip: (page - 1) * pageSize,
       take: pageSize,
+      orderBy,
+      where,
     })
 
-    const total = await prisma[model.config.prismaModelName].count()
+    const total = await prisma[model.config.prismaModelName].count({
+      where,
+    })
 
     return {
       total,
@@ -471,10 +529,12 @@ export function getCollectionDefaultFindManyApiRoute(args: {
   schema: ModelSchemas
   fields: Fields
   customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_MANY>
+  listConfiguration?: ListConfiguration<Fields>
 }) {
   const defaultHandler = createCollectionDefaultFindManyHandler(
     { schema: args.schema, context: args.context },
-    args.fields
+    args.fields,
+    args.listConfiguration
   )
   const handler = args.customHandler ?? defaultHandler
 
@@ -486,6 +546,9 @@ export function getCollectionDefaultFindManyApiRoute(args: {
       query: z.object({
         page: zStringPositiveNumberOptional,
         pageSize: zStringPositiveNumberOptional,
+        search: z.string().optional(),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(['asc', 'desc']).optional(),
       }),
       responses: {
         200: z.object({
@@ -504,6 +567,9 @@ export function getCollectionDefaultFindManyApiRoute(args: {
         defaultApi: defaultHandler as any,
         page: payload.query.page ?? 1,
         pageSize: payload.query.pageSize ?? 10,
+        search: payload.query.search,
+        sortBy: payload.query.sortBy,
+        sortOrder: payload.query.sortOrder,
       })
 
       return {
