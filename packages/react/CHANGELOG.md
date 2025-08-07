@@ -1,5 +1,13 @@
 # @genseki/react
 
+## 0.1.0-alpha.26
+
+### Patch Changes
+
+- [#128](https://github.com/softnetics/genseki/pull/128) [`983ce71`](https://github.com/softnetics/genseki/commit/983ce71ff2ba07f182ed7edf898bb05bfd785be9) Thanks [@t0ngk](https://github.com/t0ngk)! - export `createGensekiUiRoute`
+
+- [#132](https://github.com/softnetics/genseki/pull/132) [`2006302`](https://github.com/softnetics/genseki/commit/2006302a31dfda6c5d15de0b756340e0a37b30b3) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Allow passing options for setting cookie via response helper
+
 ## 0.1.0-alpha.25
 
 ### Minor Changes

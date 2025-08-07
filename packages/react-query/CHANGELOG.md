@@ -1,5 +1,7 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.26
+
 ## 0.1.0-alpha.25
 
 ## 0.1.0-alpha.24
