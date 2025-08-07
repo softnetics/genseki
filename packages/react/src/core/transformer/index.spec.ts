@@ -71,9 +71,7 @@ describe('transformer', () => {
     it('should transform payload correctly', () => {
       const input = {
         nameField: 'John Doe',
-        staffInfo: {
-          connect: undefined,
-        },
+        staffInfo: undefined,
         postsField: [
           {
             create: {
@@ -143,9 +141,7 @@ describe('transformer', () => {
     it('should transform payload correctly', () => {
       const input = {
         nameField: 'John Doe',
-        staffInfo: {
-          connect: undefined,
-        },
+        staffInfo: undefined,
         postsField: [
           {
             create: {
