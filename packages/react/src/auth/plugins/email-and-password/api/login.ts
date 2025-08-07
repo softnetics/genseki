@@ -29,7 +29,7 @@ export function loginEmail<
 
       // Create session
       const { sessionToken, expiredAt } = await service.createSession({ userId: userId })
-      ResponseHelper.setSessionCookie(response, sessionToken, { expires: expiredAt })
+      ResponseHelper.setSessionCookie(response, sessionToken, { expiredAt })
 
       return {
         status: 200 as const,
