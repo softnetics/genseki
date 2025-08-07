@@ -23,6 +23,7 @@ import {
   type ApiRouteSchema,
   type AppendApiPathPrefix,
   appendApiPathPrefix,
+  createEndpoint,
 } from './endpoint'
 import { FieldBuilder, type Fields, type FieldsShape } from './field'
 import type { ModelSchemas } from './model'
@@ -351,16 +352,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
     schema: TApiEndpointSchema,
     handler: ApiRouteHandlerInitial<ContextToRequestContext<TContext>, TApiEndpointSchema>
   ): ApiRoute<TApiEndpointSchema> {
-    return {
-      schema: schema,
-      handler: (payload, { request, response }) => {
-        const context = this.config.context.toRequestContext(request)
-        return handler(
-          { ...payload, context: context as ContextToRequestContext<TContext> },
-          { request, response }
-        )
-      },
-    }
+    return createEndpoint(this.config.context, schema, handler)
   }
 }
 
