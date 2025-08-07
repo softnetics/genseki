@@ -1,4 +1,4 @@
-import { type CookieSerializeOptions, parse as parseCookies, serialize } from 'cookie-es'
+import { parse as parseCookies, serialize } from 'cookie-es'
 import crypto, { randomBytes } from 'crypto'
 import { promisify } from 'util'
 
@@ -12,14 +12,13 @@ export function getSessionCookie(request: Request): string | undefined {
 }
 
 export abstract class ResponseHelper {
-  static setSessionCookie(response: Response, value: string, options: CookieSerializeOptions) {
+  static setSessionCookie(response: Response, value: string, options: { expiredAt: Date }) {
     response.headers.set(
       'Set-Cookie',
       serialize(SESSION_COOKIE_NAME, value, {
         httpOnly: true,
-        path: '/',
+        expires: options.expiredAt,
         sameSite: 'strict',
-        ...options,
       })
     )
   }
