@@ -2,4 +2,4 @@
 "@genseki/react": patch
 ---
 
-feat export createGensekiUiRoute
+export `createGensekiUiRoute`
