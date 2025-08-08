@@ -1,12 +1,18 @@
+import { useCallback } from 'react'
+
 import {
   type DefaultError,
-  useMutation,
+  type InvalidateOptions,
+  type InvalidateQueryFilters,
+  useMutation as useTanstackMutation,
   type UseMutationOptions,
   type UseMutationResult,
-  useQuery,
+  useQuery as useTanstackQuery,
+  useQueryClient,
   type UseQueryOptions,
   type UseQueryResult,
 } from '@tanstack/react-query'
+import type { PartialDeep } from 'type-fest'
 
 import type {
   ApiRoute,
@@ -37,69 +43,168 @@ type ApiRouteSchemaFromMethodAndPath<
   }
 >['schema']
 
+type UseQuery<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends QueryMethod,
+    const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
+    >,
+    const TError extends DefaultError = DefaultError,
+  >(
+    method: TMethod,
+    path: TPath,
+    payload: TPayload,
+    options?: Omit<UseQueryOptions<TResponse, TError, TPayload>, 'queryKey'>
+  ): UseQueryResult<TResponse, TError>
+}
+
+type QueryOptions<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends QueryMethod,
+    const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
+    >,
+    const TError extends DefaultError = DefaultError,
+  >(
+    method: TMethod,
+    path: TPath,
+    payload: TPayload,
+    options?: Omit<UseQueryOptions<TResponse, TError, TPayload>, 'queryKey'>
+  ): UseQueryOptions<TResponse, TError, TPayload>
+}
+
+type UseMutation<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends MutationMethod,
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+    >,
+    const TError extends DefaultError = DefaultError,
+    const TContext = unknown,
+  >(
+    method: TMethod,
+    path: TPath,
+    options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
+  ): UseMutationResult<TResponse, TError, TPayload, TContext>
+}
+
+type MutationOptions<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends MutationMethod,
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+    >,
+    const TError extends DefaultError = DefaultError,
+    const TContext = unknown,
+  >(
+    method: TMethod,
+    path: TPath,
+    options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
+  ): UseMutationResult<TResponse, TError, TPayload, TContext>
+}
+
+type UseInvalidateQueries<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends QueryMethod,
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+    >,
+  >(
+    method: TMethod,
+    path: TPath,
+    payload?: PartialDeep<TPayload>,
+    options?: {
+      filters?: Omit<InvalidateQueryFilters<any>, 'queryKey'>
+      options?: InvalidateOptions
+    }
+  ): () => Promise<void>
+}
+
+type UseGetQueryData<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends QueryMethod,
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+    >,
+  >(
+    method: TMethod,
+    path: TPath,
+    payload: TPayload
+  ): () => TResponse | undefined
+}
+
+type UseSetQueryData<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends QueryMethod,
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+    >,
+  >(
+    method: TMethod,
+    path: TPath,
+    payload: TPayload
+  ): (data: TResponse) => void
+}
+
+type UseOptimisticUpdateQuery<TApiRoute extends ApiRoute> = {
+  <
+    const TMethod extends QueryMethod,
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPayload extends ApiRouteHandlerPayload<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+    >,
+    const TResponse extends ApiRouteResponse<
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+    >,
+  >(
+    method: TMethod,
+    path: TPath,
+    payload: TPayload
+  ): (updater: (prev: TResponse) => TResponse) =>
+    | {
+        previous: TResponse
+        updated: TResponse
+        revert: () => void
+      }
+    | undefined
+}
+
 export type QueryClient<TApiRouter extends ApiRouter> =
   FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
     ? {
-        useQuery: <
-          const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
-          const TPayload extends ApiRouteHandlerPayload<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
-          >,
-          const TResponse extends ApiRouteResponse<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
-          >,
-          const TError extends DefaultError = DefaultError,
-        >(
-          path: TPath,
-          payload: TPayload,
-          options?: Omit<UseQueryOptions<TResponse, TError, TPayload>, 'queryKey'>
-        ) => UseQueryResult<TResponse, TError>
-        queryOptions: <
-          const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
-          const TPayload extends ApiRouteHandlerPayload<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
-          >,
-          const TResponse extends ApiRouteResponse<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
-          >,
-          const TError extends DefaultError = DefaultError,
-        >(
-          path: TPath,
-          payload: TPayload,
-          options?: Omit<UseQueryOptions<TResponse, TError, TPayload>, 'queryKey'>
-        ) => UseQueryOptions<TResponse, TError, TPayload>
-        useMutation: <
-          const TMethod extends MutationMethod,
-          const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
-          const TPayload extends ApiRouteHandlerPayload<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
-          >,
-          const TResponse extends ApiRouteResponse<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
-          >,
-          const TError extends DefaultError = DefaultError,
-          const TContext = unknown,
-        >(
-          method: TMethod,
-          path: TPath,
-          options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
-        ) => UseMutationResult<TResponse, TError, TPayload, TContext>
-        mutationOptions: <
-          const TMethod extends MutationMethod,
-          const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
-          const TPayload extends ApiRouteHandlerPayload<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
-          >,
-          const TResponse extends ApiRouteResponse<
-            ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
-          >,
-          const TError extends DefaultError = DefaultError,
-          const TContext = unknown,
-        >(
-          method: TMethod,
-          path: TPath,
-          options?: UseMutationOptions<TResponse, TError, TPayload, TContext>
-        ) => UseMutationResult<TResponse, TError, TPayload, TContext>
+        useQuery: UseQuery<TApiRoute>
+        queryOptions: QueryOptions<TApiRoute>
+        useMutation: UseMutation<TApiRoute>
+        mutationOptions: MutationOptions<TApiRoute>
+        useInvalidateQueries: UseInvalidateQueries<TApiRoute>
+        useGetQueryData: UseGetQueryData<TApiRoute>
+        useSetQueryData: UseSetQueryData<TApiRoute>
+        useOptimisticUpdateQuery: UseOptimisticUpdateQuery<TApiRoute>
       }
     : never
 
@@ -116,42 +221,129 @@ export function createQueryClient<TCore extends GensekiCore>(
   config: CreateRestClientConfig
 ): QueryClient<TCore['api']> {
   const restClient = createRestClient(config)
+
+  const useQuery = function (method: string, path: string, payload: any, options?: any) {
+    return useTanstackQuery({
+      queryKey: queryKey(method, path, payload),
+      queryFn: () => {
+        return (restClient as any)[method](path, payload)
+      },
+      ...options,
+    })
+  } as UseQuery<ApiRoute>
+
+  const queryOptions = function (method: string, path: string, payload: any, options?: any) {
+    return {
+      queryKey: queryKey(method, path, payload),
+      queryFn: () => {
+        return (restClient as any)[method](path, payload)
+      },
+      ...options,
+    }
+  } as QueryOptions<ApiRoute>
+
+  const useMutation = function (method: string, path: string, options?: any) {
+    return useTanstackMutation({
+      mutationKey: queryKey(method, path),
+      mutationFn: (data: any) => {
+        return (restClient as any)[method](path, data)
+      },
+      ...options,
+    })
+  } as UseMutation<ApiRoute>
+
+  const mutationOptions = function (method: string, path: string, options?: any) {
+    return {
+      mutationKey: queryKey(method, path),
+      mutationFn: (data: any) => {
+        return (restClient as any)[method](path, data)
+      },
+      ...options,
+    }
+  } as MutationOptions<ApiRoute>
+
+  const useInvalidateQueries = function (method: string, path: string, ...args: any[]) {
+    const queryClient = useQueryClient()
+
+    const invalidateQueries = useCallback(async () => {
+      let payload = undefined
+      let options = {
+        filters: {},
+        options: undefined,
+      }
+
+      if (method === 'GET') {
+        payload = args[0]
+        options = args[1]
+      } else {
+        options = args[0]
+      }
+
+      const key = queryKey(method, path, payload)
+      return await queryClient.invalidateQueries(
+        { ...options.filters, queryKey: key },
+        options.options
+      )
+    }, [queryClient, method, path, ...args])
+
+    return invalidateQueries
+  } as UseInvalidateQueries<ApiRoute>
+
+  const useGetQueryData = function (method: string, path: string, payload: any) {
+    const queryClient = useQueryClient()
+
+    return useCallback(() => {
+      const key = queryKey(method, path, payload)
+      return queryClient.getQueryData(key)
+    }, [queryClient, method, path, payload])
+  } as UseGetQueryData<ApiRoute>
+
+  const useSetQueryData = function (method: string, path: string, payload: any) {
+    const queryClient = useQueryClient()
+    return useCallback(
+      (data: any) => {
+        const key = queryKey(method, path, payload)
+        queryClient.setQueryData(key, data)
+      },
+      [queryClient, method, path, payload]
+    )
+  } as UseSetQueryData<ApiRoute>
+
+  const useOptimisticUpdateQuery = function (method: string, path: string, payload: any) {
+    const queryClient = useQueryClient()
+
+    const optimisticallyUpdate = useCallback(
+      (updater: (prev: any) => any) => {
+        const key = queryKey(method, path, payload)
+        const previousData = queryClient.getQueryData(key) as
+          | { status: string; body: any }
+          | undefined
+
+        if (!previousData) return
+
+        const updatedData = updater(previousData)
+        queryClient.setQueryData(key, updatedData)
+
+        return {
+          previous: previousData,
+          updated: updatedData,
+          revert: () => queryClient.setQueryData(key, previousData),
+        }
+      },
+      [queryClient, method, path, payload]
+    )
+
+    return optimisticallyUpdate
+  } as UseOptimisticUpdateQuery<ApiRoute>
+
   return {
-    useQuery: function (path: string, payload: any, options?: any) {
-      return useQuery({
-        queryKey: queryKey('GET', path, payload),
-        queryFn: () => {
-          return (restClient as any)['GET'](path, payload)
-        },
-        ...options,
-      })
-    },
-    queryOptions: function (path: string, payload: any, options?: any) {
-      return {
-        queryKey: queryKey('GET', path, payload),
-        queryFn: () => {
-          return (restClient as any)['GET'](path, payload)
-        },
-        ...options,
-      }
-    },
-    useMutation: function (method: string, path: string, options?: any) {
-      return useMutation({
-        mutationKey: queryKey(method, path),
-        mutationFn: (data: any) => {
-          return (restClient as any)[method](path, data)
-        },
-        ...options,
-      })
-    },
-    mutationOptions: function (method: string, path: string, options?: any) {
-      return {
-        mutationKey: queryKey(method, path),
-        mutationFn: (data: any) => {
-          return (restClient as any)[method](path, data)
-        },
-        ...options,
-      }
-    },
+    useQuery,
+    queryOptions,
+    useMutation,
+    mutationOptions,
+    useInvalidateQueries,
+    useGetQueryData,
+    useSetQueryData,
+    useOptimisticUpdateQuery,
   } as QueryClient<TCore['api']>
 }
