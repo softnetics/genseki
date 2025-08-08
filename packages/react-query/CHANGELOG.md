@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.27
+
+### Minor Changes
+
+- [#135](https://github.com/softnetics/genseki/pull/135) [`e66eaa3`](https://github.com/softnetics/genseki/commit/e66eaa3477b2af61244cac5fea5fb60d7c02c976) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Add `useGetQueryData`, `useSetQueryData`, and `useOptimisticUpdateQuery`
+
 ## 0.1.0-alpha.26
 
 ## 0.1.0-alpha.25

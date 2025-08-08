@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.25
+
+### Patch Changes
+
+- [#135](https://github.com/softnetics/genseki/pull/135) [`b651962`](https://github.com/softnetics/genseki/commit/b651962d991bd956285a80e08ebddd51bf5506f7) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Prisma generator bin name
+
+- Updated dependencies [[`b651962`](https://github.com/softnetics/genseki/commit/b651962d991bd956285a80e08ebddd51bf5506f7), [`164983e`](https://github.com/softnetics/genseki/commit/164983e46de25b2f016fa6208906f67e4211e3b8), [`e66eaa3`](https://github.com/softnetics/genseki/commit/e66eaa3477b2af61244cac5fea5fb60d7c02c976)]:
+  - @genseki/prisma-generator@0.1.0-alpha.27
+  - @genseki/react@0.1.0-alpha.27
+  - @genseki/react-query@0.1.0-alpha.27
+  - @genseki/next@0.1.0-alpha.27
+  - @genseki/plugins@0.1.0-alpha.27
+  - @genseki/rest@0.1.0-alpha.27
+
 ## 0.1.0-alpha.24
 
 ### Patch Changes

@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.27
+
+### Patch Changes
+
+- [#133](https://github.com/softnetics/genseki/pull/133) [`164983e`](https://github.com/softnetics/genseki/commit/164983e46de25b2f016fa6208906f67e4211e3b8) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Use `createEndpoint` for `builder.endpoint`
+
 ## 0.1.0-alpha.26
 
 ### Patch Changes
