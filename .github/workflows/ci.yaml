@@ -38,6 +38,12 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
+      - name: Codegen
+        run: pnpm codegen
+
+      - name: Install dependencies (again)
+        run: pnpm install --frozen-lockfile
+
       - name: Run typecheck
         run: pnpm turbo typecheck
 
