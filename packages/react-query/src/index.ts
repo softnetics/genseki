@@ -185,11 +185,13 @@ type UseOptimisticUpdateQuery<TApiRoute extends ApiRoute> = {
     method: TMethod,
     path: TPath,
     payload: TPayload
-  ): (updater: (prev: TResponse) => TResponse) => {
-    previous: TResponse
-    updated: TResponse
-    revert: () => void
-  }
+  ): (updater: (prev: TResponse) => TResponse) =>
+    | {
+        previous: TResponse
+        updated: TResponse
+        revert: () => void
+      }
+    | undefined
 }
 
 export type QueryClient<TApiRouter extends ApiRouter> =
