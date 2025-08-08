@@ -38,8 +38,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
 
-      - name: Codegen
-        run: pnpm codegen
+      - name: Build Genseki Prisma generator
+        run: pnpm --filter @genseki/prisma-generator codegen
 
       - name: Install dependencies (again)
         run: pnpm install --frozen-lockfile
