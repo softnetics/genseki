@@ -128,9 +128,9 @@ const Checkbox = forwardRef(function Checkbox(
               })}
             >
               {isIndeterminate ? (
-                <MinusIcon weight="bold" />
+                <MinusIcon weight="bold" size={size === 'md' ? 16 : 20} />
               ) : isSelected ? (
-                <CheckIcon weight="bold" />
+                <CheckIcon weight="bold" size={size === 'md' ? 16 : 20} />
               ) : null}
             </div>
 
