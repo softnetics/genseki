@@ -262,7 +262,7 @@ export function createQueryClient<TCore extends GensekiCore>(
     }
   } as MutationOptions<ApiRoute>
 
-  const useInvalidateQueries = function (method: string, path: string, payload: any, options: any) {
+  const useInvalidateQueries = function (method: string, path: string, payload?: any, options?: any) {
     const queryClient = useQueryClient()
 
     const invalidateQueries = useCallback(async () => {
