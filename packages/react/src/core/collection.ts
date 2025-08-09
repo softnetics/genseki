@@ -163,13 +163,19 @@ export type InferField<TField extends FieldShapeBase> =
   TField extends FieldRelationShape<any>
     ? TField['$server']['relation']['isList'] extends true
       ? // TODO: Order field
-        InferFields<TField['fields']>[]
-      : InferFields<TField['fields']>
+        TField['$server']['relation']['isRequired'] extends true
+        ? _InferFields<TField['fields']>[]
+        : _InferFields<TField['fields']>[] | undefined | null
+      : TField['$server']['relation']['isRequired'] extends true
+        ? _InferFields<TField['fields']>
+        : _InferFields<TField['fields']> | undefined | null
     : TField extends FieldColumnShape<any>
-      ? InferDataType<TField['$server']['column']['dataType']>
+      ? TField['$server']['column']['isRequired'] extends true
+        ? InferDataType<TField['$server']['column']['dataType']>
+        : InferDataType<TField['$server']['column']['dataType']> | undefined | null
       : never
 
-export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
+type _InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
     -readonly [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeBase
       ? InferField<TFields['shape'][TKey]>
@@ -180,6 +186,8 @@ export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   },
   never
 >
+
+export type InferFields<TFields extends Fields> = UndefinedToOptional<_InferFields<TFields>>
 
 export interface ServerApiHandlerArgs<TContext extends AnyContextable, TFields extends Fields> {
   slug: string
