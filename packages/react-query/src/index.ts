@@ -268,7 +268,7 @@ export function createQueryClient<TCore extends GensekiCore>(
     const invalidateQueries = useCallback(async () => {
       const key = queryKey(method, path, payload)
       return await queryClient.invalidateQueries(
-        { ...options?.filters, queryKey: key },
+        { ...(options?.filters ?? {}), queryKey: key },
         options?.options
       )
     }, [queryClient, method, path, payload, options])
