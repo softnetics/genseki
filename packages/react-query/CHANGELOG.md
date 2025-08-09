@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.28
+
+### Patch Changes
+
+- [#138](https://github.com/softnetics/genseki/pull/138) [`1b99806`](https://github.com/softnetics/genseki/commit/1b998067c7745169c9787cdd96257e5e122dfcad) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix `useInvalidateQuery` does not match its type
+
 ## 0.1.0-alpha.27
 
 ### Minor Changes
