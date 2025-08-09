@@ -2,6 +2,7 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { FieldsClient } from '../../../core'
@@ -26,10 +27,26 @@ export function UpdateClientView(props: UpdateClientViewProps) {
 
   const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
+  const queryClient = useQueryClient()
 
   const onSubmit: SubmitHandler<any> = async (data: any) => {
+    // Filter out hidden fields
+    const filteredData = Object.keys(data).reduce(
+      (acc, key) => {
+        const field = Object.values(props.fields.shape).find(
+          (field) => field.$client.fieldName === key
+        )
+        if (!field || !field.hidden) {
+          acc[key] = data[key]
+        }
+
+        return acc
+      },
+      {} as Record<string, any>
+    )
+
     const result = await serverFunction(`${props.slug}.update`, {
-      body: data,
+      body: filteredData,
       headers: {},
       pathParams: { id: props.identifier },
       query: {},
@@ -37,6 +54,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
 
     if (result.status === 200) {
       toast.success('Updation successfully')
+      queryClient.invalidateQueries({ queryKey: ['GET', `/api/${props.slug}`] })
       return navigate(`../`)
     } else {
       const description =
