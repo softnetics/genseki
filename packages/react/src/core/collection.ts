@@ -1,7 +1,7 @@
 import type { ColumnDef } from '@tanstack/react-table'
-import type { ConditionalExcept, Promisable, Simplify } from 'type-fest'
+import type { ConditionalExcept, IsEmptyObject, Promisable, Simplify } from 'type-fest'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
-import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
+import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
 import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
@@ -16,6 +16,7 @@ import {
   type FieldsClient,
   type FieldShape,
   type FieldShapeBase,
+  type FieldsOptions,
 } from './field'
 import type { DataType, InferDataType } from './model'
 
@@ -86,7 +87,7 @@ export type InferUpdateFieldShape<TFieldShape extends FieldShape> = ApplyFieldPr
         : TFieldShape extends FieldRelationConnectOrCreateShape
           ? Simplify<InferUpdateRelationField<TFieldShape, 'create' | 'connect' | 'disconnect'>>
           : never
-    : TFieldShape extends FieldColumnShape<any>
+    : TFieldShape extends FieldColumnShape
       ? InferDataType<TFieldShape['$server']['column']['dataType']>
       : never,
   TFieldShape
@@ -140,7 +141,7 @@ export type InferCreateFieldShape<TFieldShape extends FieldShape> = ApplyFieldPr
         : TFieldShape extends FieldRelationConnectOrCreateShape
           ? Simplify<InferCreateRelationField<TFieldShape, 'create' | 'connect'>>
           : never
-    : TFieldShape extends FieldColumnShape<any>
+    : TFieldShape extends FieldColumnShape
       ? InferDataType<TFieldShape['$server']['column']['dataType']>
       : never,
   TFieldShape
@@ -153,21 +154,20 @@ export type InferCreateFields<TFields extends Fields> = UndefinedToOptional<{
 }>
 
 export type InferRelationField<
-  TFieldShape extends FieldRelationShape<any>,
+  TFieldShape extends FieldRelationShape,
   TKeys extends 'create' | 'connect' | 'disconnect',
 > = TFieldShape['$server']['relation']['isList'] extends true
   ? InferCreateManyRelationFieldShape<TFieldShape, TKeys>
   : InferCreateOneRelationFieldShape<TFieldShape, TKeys>
 
-export type InferField<TField extends FieldShapeBase> =
-  TField extends FieldRelationShape<any>
-    ? TField['$server']['relation']['isList'] extends true
-      ? // TODO: Order field
-        InferFields<TField['fields']>[]
-      : InferFields<TField['fields']>
-    : TField extends FieldColumnShape<any>
-      ? InferDataType<TField['$server']['column']['dataType']>
-      : never
+export type InferField<TField extends FieldShapeBase> = TField extends FieldRelationShape
+  ? TField['$server']['relation']['isList'] extends true
+    ? // TODO: Order field
+      InferFields<TField['fields']>[]
+    : InferFields<TField['fields']>
+  : TField extends FieldColumnShape
+    ? InferDataType<TField['$server']['column']['dataType']>
+    : never
 
 export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
@@ -261,27 +261,34 @@ export type ApiConfigHandlerFn<
   }
 ) => Promisable<ApiReturnType<TMethod, TFields>>
 
-export interface CollectionCreateOptions<
+export type CollectionFieldsOptions<TContext extends AnyContextable, TFields extends Fields> =
+  FieldsOptions<TContext, TFields> extends infer TOptions
+    ? IsEmptyObject<TOptions> extends true
+      ? {}
+      : { options: Simplify<TOptions> }
+    : {}
+
+export type CollectionCreateConfig<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
-> {
+> = {
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE>
-}
+} & CollectionFieldsOptions<TContext, TFields>
 
-export interface CollectionUpdateOptions<
+export type CollectionUpdateConfig<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
-> {
+> = {
   fields: TFields
   updateApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE>
   // TODO: This is not correct, it should return default value of form instead of just simple findOne response
   updateDefaultApi?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
-}
+} & CollectionFieldsOptions<TContext, TFields>
 
 // Extract searchable columns from fields
 export type ExtractSearchableColumns<TFields extends Fields> = {
-  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
     ? TFields['shape'][K]['$server']['column']['dataType'] extends typeof DataType.STRING
       ? K
       : never
@@ -290,7 +297,7 @@ export type ExtractSearchableColumns<TFields extends Fields> = {
 
 // Extract sortable columns from fields
 export type ExtractSortableColumns<TFields extends Fields> = {
-  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape<any>
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
     ? TFields['shape'][K]['$server']['column']['dataType'] extends
         | typeof DataType.STRING
         | typeof DataType.INT
@@ -309,12 +316,13 @@ export interface ListConfiguration<TFields extends Fields> {
   sortBy?: ExtractSortableColumns<TFields>[]
 }
 
-export interface CollectionListOptions<
+export type CollectionListConfig<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
-> {
+  TFieldsData = any,
+> = {
   fields: TFields
-  columns: ColumnDef<InferFields<TFields>, any>[]
+  columns: ColumnDef<TFieldsData, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
   configuration?: ListConfiguration<TFields>
   features?: {
@@ -323,44 +331,44 @@ export interface CollectionListOptions<
     delete?: boolean
     one?: boolean
   }
-}
+} & CollectionFieldsOptions<TContext, TFields>
 
-export interface CollectionOneOptions<
+export type CollectionOneConfig<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
-> {
+> = {
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE>
-}
+} & CollectionFieldsOptions<TContext, TFields>
 
-export interface CollectionDeleteOptions<
+export type CollectionDeleteConfig<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
-> {
+> = {
   fields: TFields
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE>
-}
+} & CollectionFieldsOptions<TContext, TFields>
 
-export interface CollectionOptions<
-  TContext extends AnyContextable = AnyContextable,
-  TSlug extends string = string,
-  TCreateFields extends Fields = Fields,
-  TUpdateFields extends Fields = Fields,
-  TListFields extends Fields = Fields,
-  TOneFields extends Fields = Fields,
-  TDeleteFields extends Fields = Fields,
-  TApiRouter extends AnyApiRouter = AnyApiRouter,
+export interface CollectionConfig<
+  TContext extends AnyContextable,
+  TSlug extends string,
+  TCreateFields extends Fields,
+  TUpdateFields extends Fields,
+  TListFields extends Fields,
+  TOneFields extends Fields,
+  TDeleteFields extends Fields,
+  TApiRouter extends AnyApiRouter,
 > {
   slug: TSlug
-  create?: CollectionCreateOptions<TContext, TCreateFields>
-  update?: CollectionUpdateOptions<TContext, TUpdateFields>
-  list?: CollectionListOptions<TContext, TListFields>
-  one?: CollectionOneOptions<TContext, TOneFields>
-  delete?: CollectionDeleteOptions<TContext, TDeleteFields>
+  create?: CollectionCreateConfig<TContext, TCreateFields>
+  update?: CollectionUpdateConfig<TContext, TUpdateFields>
+  list?: CollectionListConfig<TContext, TListFields>
+  one?: CollectionOneConfig<TContext, TOneFields>
+  delete?: CollectionDeleteConfig<TContext, TDeleteFields>
   api?: TApiRouter
 }
 
-export interface CollectionOptionsClient {
+export interface CollectionConfigClient {
   slug: string
   create?: {
     fields: FieldsClient

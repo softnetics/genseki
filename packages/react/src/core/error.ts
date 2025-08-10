@@ -1,4 +1,4 @@
-import type { ZodError } from 'zod/v4'
+import type { ZodError } from 'zod'
 import type { $ZodIssue } from 'zod/v4/core'
 
 interface HttpError<TBody> {

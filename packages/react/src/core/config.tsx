@@ -210,10 +210,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 }
 
-export function getFieldShapeClient(
-  name: string,
-  fieldShape: FieldShape
-): FieldShapeClient & { $client: { fieldName: string } } {
+export function getFieldShapeClient(name: string, fieldShape: FieldShape): FieldShapeClient {
   if (isRelationFieldShape(fieldShape)) {
     if (fieldShape.$client.source === 'relation') {
       const sanitizedFields = Object.fromEntries(
@@ -222,13 +219,9 @@ export function getFieldShapeClient(
         })
       )
 
-      return R.omit(
-        {
-          ...fieldShape,
-          fields: sanitizedFields,
-        },
-        ['$server', 'options' as any]
-      ) as FieldShapeClient & { $client: { fieldName: string } }
+      return R.omit({ ...fieldShape, fields: sanitizedFields }, [
+        '$server',
+      ]) as unknown as FieldShapeClient
     }
 
     return R.omit(
@@ -237,8 +230,8 @@ export function getFieldShapeClient(
         label: fieldShape.label ?? name,
         placeholder: fieldShape.placeholder ?? name,
       },
-      ['$server', 'options' as any]
-    ) as FieldShapeClient & { $client: { fieldName: string } }
+      ['$server']
+    ) as FieldShapeClient
   }
 
   if (isRichTextFieldShape(fieldShape)) {
@@ -247,7 +240,7 @@ export function getFieldShapeClient(
         ...fieldShape,
         label: fieldShape.label ?? name,
       },
-      ['$server', 'options' as any]
+      ['$server']
     ) as FieldShapeClient & { $client: { fieldName: string } }
 
     const sanitizedRichTextField = {

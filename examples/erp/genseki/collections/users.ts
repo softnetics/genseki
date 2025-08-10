@@ -17,35 +17,38 @@ export const fields = builder.fields('user', (fb) => ({
   }),
 }))
 
-export const usersCollection = builder.collection((b) => ({
-  slug: 'users',
-  list: b.list({
-    fields: fields,
-    columns: columns,
-    configuration: {
-      search: ['name'],
-      sortBy: ['name'],
-    },
-  }),
-  api: {
-    example: builder.endpoint(
-      {
-        method: 'GET',
-        path: '/',
-        responses: {
-          200: z.object({
-            data: z.any(),
-          }),
-        },
-      },
-      async () => {
-        return {
-          status: 200,
-          body: {
-            data: 'Hello from users collection',
-          },
-        }
-      }
-    ),
+const list = builder.list(fields, {
+  columns: columns,
+  configuration: {
+    search: ['name'],
+    sortBy: ['name'],
   },
-}))
+})
+
+const api = {
+  example: builder.endpoint(
+    {
+      method: 'GET',
+      path: '/',
+      responses: {
+        200: z.object({
+          data: z.any(),
+        }),
+      },
+    },
+    async () => {
+      return {
+        status: 200,
+        body: {
+          data: 'Hello from users collection',
+        },
+      }
+    }
+  ),
+}
+
+export const usersCollection = builder.collection({
+  slug: 'users',
+  list: list,
+  api: api,
+})

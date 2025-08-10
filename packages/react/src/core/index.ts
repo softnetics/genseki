@@ -8,7 +8,12 @@ export type {
 } from '../core/context'
 export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
-export type { ApiReturnType, CollectionOptions, InferField, InferFields } from './collection'
+export type {
+  ApiReturnType,
+  CollectionConfig as CollectionOptions,
+  InferField,
+  InferFields,
+} from './collection'
 export { ApiDefaultMethod } from './collection'
 export {
   type AnyGensekiPlugin,
@@ -51,6 +56,7 @@ export type {
   FieldShapeBase,
   FieldShapeClient,
 } from './field'
+export { FieldBuilder } from './field'
 export * from './file-storage-adapters'
 export type {
   AnyFieldRelationSchema,

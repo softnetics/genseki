@@ -1,4 +1,4 @@
-import z from 'zod/v4'
+import z from 'zod'
 
 import type { AnyContextable } from '../../context'
 import { createEndpoint } from '../../endpoint'

@@ -1,7 +1,7 @@
 import { generateJSON } from '@tiptap/html'
 import * as R from 'remeda'
 import type { Except, IsNever, Simplify } from 'type-fest'
-import type { ZodObject, ZodOptional, ZodType } from 'zod/v4'
+import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
 import type {
   FieldColumnJsonRichTextShape,

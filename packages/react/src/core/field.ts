@@ -1,6 +1,7 @@
-import type { Promisable, Simplify } from 'type-fest'
-import z from 'zod/v4'
+import type { PartialDeep, Promisable, Simplify } from 'type-fest'
+import z from 'zod'
 
+import type { InferFields } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import {
   type DataType,
@@ -18,10 +19,6 @@ import type {
 import { appendFieldNameToFields as renameFieldsFieldName } from './utils'
 
 import type { FileUploadOptionsProps } from '../react/components/compound/file-upload-field'
-
-export type OptionCallback<TType extends string | number, in TContext extends AnyContextable> = (
-  args: ContextToRequestContext<TContext>
-) => Promisable<Array<{ label: string; value: TType }>>
 
 export interface FieldColumnClientMetadata {
   source: 'column'
@@ -159,19 +156,16 @@ export interface FieldColumnStringEmailShape
   extends FieldColumnStringEmailOptions,
     FieldColumnShapeBase {}
 
-export interface FieldColumnStringSelectTextOptions<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldOptionsShapeBase {
+export interface FieldColumnStringSelectTextOptions extends FieldOptionsShapeBase {
   type: 'selectText'
   default?: string
-  options: OptionCallback<string, TContext>
+  options: string
 }
 export interface FieldColumnStringSelectTextShapeClient
-  extends Omit<FieldColumnStringSelectTextOptions, 'options'>,
+  extends FieldColumnStringSelectTextOptions,
     FieldColumnShapeClientBase {}
-export interface FieldColumnStringSelectTextShape<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldColumnStringSelectTextOptions<TContext>,
+export interface FieldColumnStringSelectTextShape
+  extends FieldColumnStringSelectTextOptions,
     FieldColumnShapeBase {}
 
 export interface FieldColumnStringTimeOptions extends FieldOptionsShapeBase {
@@ -207,11 +201,11 @@ export interface FieldColumnStringMediaShape
   extends FieldColumnStringMediaOptions,
     FieldColumnShapeBase {}
 
-export type FieldColumnStringOptions<TContext extends AnyContextable> =
+export type FieldColumnStringOptions =
   | FieldColumnStringTextOptions
   | FieldColumnStringPasswordOptions
   | FieldColumnStringEmailOptions
-  | FieldColumnStringSelectTextOptions<TContext>
+  | FieldColumnStringSelectTextOptions
   | FieldColumnStringTimeOptions
   | FieldColumnStringDateOptions
   | FieldColumnStringMediaOptions
@@ -223,35 +217,30 @@ export type FieldColumnStringShapeClient =
   | FieldColumnStringTimeShapeClient
   | FieldColumnStringDateShapeClient
   | FieldColumnStringMediaShapeClient
-export type FieldColumnStringShape<TContext extends AnyContextable> =
+export type FieldColumnStringShape =
   | FieldColumnStringTextShape
   | FieldColumnStringPasswordShape
   | FieldColumnStringEmailShape
-  | FieldColumnStringSelectTextShape<TContext>
+  | FieldColumnStringSelectTextShape
   | FieldColumnStringTimeShape
   | FieldColumnStringDateShape
   | FieldColumnStringMediaShape
 
-export interface FieldColumnStringArrayComboboxTextOptions<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldOptionsShapeBase {
+export interface FieldColumnStringArrayComboboxTextOptions extends FieldOptionsShapeBase {
   type: 'comboboxText'
   label?: string
-  options: OptionCallback<string, TContext>
+  options: string
 }
 export interface FieldColumnStringArrayComboboxTextShapeClient
-  extends Omit<FieldColumnStringArrayComboboxTextOptions, 'options'>,
+  extends FieldColumnStringArrayComboboxTextOptions,
     FieldColumnShapeClientBase {}
-export interface FieldColumnStringArrayComboboxTextShape<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldColumnStringArrayComboboxTextOptions<TContext>,
+export interface FieldColumnStringArrayComboboxTextShape
+  extends FieldColumnStringArrayComboboxTextOptions,
     FieldColumnShapeBase {}
 
-export type FieldColumnStringArrayOptions<TContext extends AnyContextable> =
-  FieldColumnStringArrayComboboxTextOptions<TContext>
+export type FieldColumnStringArrayOptions = FieldColumnStringArrayComboboxTextOptions
 export type FieldColumnStringArrayShapeClient = FieldColumnStringArrayComboboxTextShapeClient
-export type FieldColumnStringArrayShape<TContext extends AnyContextable> =
-  FieldColumnStringArrayComboboxTextShape<TContext>
+export type FieldColumnStringArrayShape = FieldColumnStringArrayComboboxTextShape
 
 // Number field types
 export interface FieldColumnNumberNumberOptions extends FieldOptionsShapeBase {
@@ -264,52 +253,44 @@ export interface FieldColumnNumberNumberShapeClient
 export interface FieldColumnNumberNumberShape
   extends FieldColumnNumberNumberOptions,
     FieldColumnShapeBase {}
-export interface FieldColumnNumberSelectNumberOptions<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldOptionsShapeBase {
+export interface FieldColumnNumberSelectNumberOptions extends FieldOptionsShapeBase {
   type: 'selectNumber'
   default?: number
-  options: OptionCallback<number, TContext>
+  options: string
 }
 export interface FieldColumnNumberSelectNumberShapeClient
-  extends Omit<FieldColumnNumberSelectNumberOptions, 'options'>,
+  extends FieldColumnNumberSelectNumberOptions,
     FieldColumnShapeClientBase {}
-export interface FieldColumnNumberSelectNumberShape<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldColumnNumberSelectNumberOptions<TContext>,
+export interface FieldColumnNumberSelectNumberShape
+  extends FieldColumnNumberSelectNumberOptions,
     FieldColumnShapeBase {}
 
-export type FieldColumnNumberOptions<TContext extends AnyContextable> =
+export type FieldColumnNumberOptions =
   | FieldColumnNumberNumberOptions
-  | FieldColumnNumberSelectNumberOptions<TContext>
+  | FieldColumnNumberSelectNumberOptions
 export type FieldColumnNumberShapeClient =
   | FieldColumnNumberNumberShapeClient
   | FieldColumnNumberSelectNumberShapeClient
-export type FieldColumnNumberShape<TContext extends AnyContextable> =
+export type FieldColumnNumberShape =
   | FieldColumnNumberNumberShape
-  | FieldColumnNumberSelectNumberShape<TContext>
+  | FieldColumnNumberSelectNumberShape
 
 // Number array field types
-export interface FieldColumnNumberArrayComboboxNumberOptions<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldOptionsShapeBase {
+export interface FieldColumnNumberArrayComboboxNumberOptions extends FieldOptionsShapeBase {
   type: 'comboboxNumber'
   label?: string
-  options: OptionCallback<number, TContext>
+  options: string
 }
 export interface FieldColumnNumberArrayComboboxNumberShapeClient
   extends Omit<FieldColumnNumberArrayComboboxNumberOptions, 'options'>,
     FieldColumnShapeClientBase {}
-export interface FieldColumnNumberArrayComboboxNumberShape<
-  in TContext extends AnyContextable = AnyContextable,
-> extends FieldColumnNumberArrayComboboxNumberOptions<TContext>,
+export interface FieldColumnNumberArrayComboboxNumberShape
+  extends FieldColumnNumberArrayComboboxNumberOptions,
     FieldColumnShapeBase {}
 
-export type FieldColumnNumberArrayOptions<TContext extends AnyContextable> =
-  FieldColumnNumberArrayComboboxNumberOptions<TContext>
+export type FieldColumnNumberArrayOptions = FieldColumnNumberArrayComboboxNumberOptions
 export type FieldColumnNumberArrayShapeClient = FieldColumnNumberArrayComboboxNumberShapeClient
-export type FieldColumnNumberArrayShape<TContext extends AnyContextable> =
-  FieldColumnNumberArrayComboboxNumberShape<TContext>
+export type FieldColumnNumberArrayShape = FieldColumnNumberArrayComboboxNumberShape
 
 // Boolean field types
 export interface FieldColumnBooleanCheckboxOptions extends FieldOptionsShapeBase {
@@ -358,12 +339,12 @@ export type FieldColumnDateShapeClient = FieldColumnDataDateClient
 export type FieldColumnDateShape = FieldColumnDataDate
 
 // All field columns types
-export type FieldColumnOptions<TContext extends AnyContextable> =
+export type FieldColumnOptions =
   | FieldColumnJsonOptions
-  | FieldColumnStringOptions<TContext>
-  | FieldColumnStringArrayOptions<TContext>
-  | FieldColumnNumberOptions<TContext>
-  | FieldColumnNumberArrayOptions<TContext>
+  | FieldColumnStringOptions
+  | FieldColumnStringArrayOptions
+  | FieldColumnNumberOptions
+  | FieldColumnNumberArrayOptions
   | FieldColumnBooleanOptions
   | FieldColumnDateOptions
 export type FieldColumnShapeClient =
@@ -374,34 +355,29 @@ export type FieldColumnShapeClient =
   | FieldColumnNumberArrayShapeClient
   | FieldColumnBooleanShapeClient
   | FieldColumnDateShapeClient
-export type FieldColumnShape<TContext extends AnyContextable> =
+export type FieldColumnShape =
   | FieldColumnJsonShape
-  | FieldColumnStringShape<TContext>
-  | FieldColumnStringArrayShape<TContext>
-  | FieldColumnNumberShape<TContext>
-  | FieldColumnNumberArrayShape<TContext>
+  | FieldColumnStringShape
+  | FieldColumnStringArrayShape
+  | FieldColumnNumberShape
+  | FieldColumnNumberArrayShape
   | FieldColumnBooleanShape
   | FieldColumnDateShape
 
 // Relation field types
-export interface FieldRelationConnectOptions<
-  TContext extends AnyContextable = AnyContextable,
-  TInputType extends string | number = string | number,
-> extends FieldOptionsShapeBase {
+export interface FieldRelationConnectOptions extends FieldOptionsShapeBase {
   type: 'connect'
   fields: Fields
-  options: OptionCallback<TInputType, TContext>
+  options: string
 }
 export interface FieldRelationConnectShapeClient
-  extends Omit<FieldRelationConnectOptions<any>, 'options' | 'fields'>,
+  extends Omit<FieldRelationConnectOptions, 'fields'>,
     FieldRelationShapeClientBase {
   fields: FieldsClient
 }
 
-export interface FieldRelationConnectShape<
-  TContext extends AnyContextable = AnyContextable,
-  TInputType extends string | number = string | number,
-> extends FieldRelationConnectOptions<TContext, TInputType>,
+export interface FieldRelationConnectShape
+  extends FieldRelationConnectOptions,
     FieldRelationShapeBase {}
 
 export interface FieldRelationCreateOptions extends FieldOptionsShapeBase {
@@ -417,51 +393,38 @@ export interface FieldRelationCreateShape
   extends FieldRelationCreateOptions,
     FieldRelationShapeBase {}
 
-export interface FieldRelationConnectOrCreateOptions<
-  TContext extends AnyContextable = AnyContextable,
-  TInputType extends string | number = string | number,
-> extends FieldOptionsShapeBase {
+export interface FieldRelationConnectOrCreateOptions extends FieldOptionsShapeBase {
   type: 'connectOrCreate'
   fields: Fields
-  options: OptionCallback<TInputType, TContext>
+  options: string
 }
 export interface FieldRelationConnectOrCreateShapeClient
-  extends Omit<FieldRelationConnectOrCreateOptions<any>, 'options' | 'fields'>,
+  extends Omit<FieldRelationConnectOrCreateOptions, 'fields'>,
     FieldRelationShapeClientBase {
   fields: FieldsClient
 }
-export interface FieldRelationConnectOrCreateShape<
-  TContext extends AnyContextable = AnyContextable,
-  TInputType extends string | number = string | number,
-> extends FieldRelationConnectOrCreateOptions<TContext, TInputType>,
+export interface FieldRelationConnectOrCreateShape
+  extends FieldRelationConnectOrCreateOptions,
     FieldRelationShapeBase {}
 
-export type FieldRelationOptions<
-  TContext extends AnyContextable = AnyContextable,
-  TInputType extends string | number = string | number,
-> =
+export type FieldRelationOptions =
   | FieldRelationCreateOptions
-  | FieldRelationConnectOptions<TContext, TInputType>
-  | FieldRelationConnectOrCreateOptions<TContext, TInputType>
+  | FieldRelationConnectOptions
+  | FieldRelationConnectOrCreateOptions
 export type FieldRelationShapeClient =
   | FieldRelationCreateShapeClient
   | FieldRelationConnectShapeClient
   | FieldRelationConnectOrCreateShapeClient
-export type FieldRelationShape<
-  TContext extends AnyContextable = AnyContextable,
-  TInputType extends string | number = string | number,
-> =
+export type FieldRelationShape =
   | FieldRelationCreateShape
-  | FieldRelationConnectShape<TContext, TInputType>
-  | FieldRelationConnectOrCreateShape<TContext, TInputType>
+  | FieldRelationConnectShape
+  | FieldRelationConnectOrCreateShape
 
 // Define field types
 export type FieldShapeClient = FieldColumnShapeClient | FieldRelationShapeClient
-export type FieldShape<TContext extends AnyContextable = AnyContextable> =
-  | FieldColumnShape<TContext>
-  | FieldRelationShape<TContext>
+export type FieldShape = FieldColumnShape | FieldRelationShape
 
-// Define fields (which is fields with fieldName)
+// Define fields type (Record of field)
 export interface FieldsBase {
   config: {
     primaryColumn: string
@@ -473,49 +436,61 @@ export interface FieldsShapeClient extends Record<string, FieldShapeClient> {}
 export interface FieldsClient extends FieldsBase {
   shape: FieldsShapeClient
 }
-export interface FieldsShape<TContext extends AnyContextable = AnyContextable>
-  extends Record<string, FieldShape<TContext>> {}
-export interface Fields<TContext extends AnyContextable = AnyContextable> extends FieldsBase {
-  shape: FieldsShape<TContext>
+
+export interface FieldsShape extends Record<string, FieldShape> {}
+export interface Fields extends FieldsBase {
+  shape: FieldsShape
 }
 
 // More type utilities
-export type FieldColumnOptionsFromSchema<
-  TContext extends AnyContextable,
-  TColumn extends FieldColumnSchema,
-> = TColumn['dataType'] extends typeof DataType.STRING
-  ? TColumn['isList'] extends true
-    ? FieldColumnStringArrayOptions<TContext>
-    : FieldColumnStringOptions<TContext>
-  : TColumn['dataType'] extends typeof DataType.INT
+export type FieldColumnConfigFromSchema<TColumn extends FieldColumnSchema> =
+  TColumn['dataType'] extends typeof DataType.STRING
     ? TColumn['isList'] extends true
-      ? FieldColumnNumberArrayOptions<TContext>
-      : FieldColumnNumberOptions<TContext>
-    : TColumn['dataType'] extends typeof DataType.BOOLEAN
-      ? // TODO: Boolean array type is not supported yet
-        FieldColumnBooleanOptions
-      : TColumn['dataType'] extends typeof DataType.DATETIME
-        ? // TODO: Date array type is not supported yet
-          FieldColumnDateOptions
-        : TColumn['dataType'] extends typeof DataType.JSON
-          ? FieldColumnJsonOptions
-          : never
+      ? FieldColumnStringArrayOptions
+      : FieldColumnStringOptions
+    : TColumn['dataType'] extends typeof DataType.INT
+      ? TColumn['isList'] extends true
+        ? FieldColumnNumberArrayOptions
+        : FieldColumnNumberOptions
+      : TColumn['dataType'] extends typeof DataType.BOOLEAN
+        ? // TODO: Boolean array type is not supported yet
+          FieldColumnBooleanOptions
+        : TColumn['dataType'] extends typeof DataType.DATETIME
+          ? // TODO: Date array type is not supported yet
+            FieldColumnDateOptions
+          : TColumn['dataType'] extends typeof DataType.JSON
+            ? FieldColumnJsonOptions
+            : never
 
-// FIXME: Support only 1 foreign key relation for now
-type FieldRelationOptionsFromSchema<
-  TContext extends AnyContextable,
-  TRelationFieldSchema extends FieldRelationSchema,
-> = TRelationFieldSchema['relationDataTypes'][0] extends typeof DataType.STRING
-  ?
-      | FieldRelationConnectOptions<TContext, string>
-      | FieldRelationConnectOrCreateOptions<TContext, string>
-      | FieldRelationCreateOptions
-  : TRelationFieldSchema['relationDataTypes'][0] extends typeof DataType.INT
-    ?
-        | FieldRelationConnectOptions<TContext, number>
-        | FieldRelationConnectOrCreateOptions<TContext, number>
-        | FieldRelationCreateOptions
-    : never
+type FieldRelationOptionsFromSchema =
+  | FieldRelationConnectOptions
+  | FieldRelationConnectOrCreateOptions
+  | FieldRelationCreateOptions
+
+export interface FieldOptionsCallbackReturn<TType extends string | number = string | number> {
+  options: { value: TType; label: string }[]
+  disabled?: boolean
+}
+
+export type FieldOptionsCallback<
+  TContext extends AnyContextable = AnyContextable,
+  TType extends string | number = string | number,
+  TBody = unknown,
+> = (args: {
+  context: ContextToRequestContext<TContext>
+  body: TBody
+}) => Promisable<FieldOptionsCallbackReturn<TType>>
+
+export type FieldsOptions<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+> = {
+  [TFieldShapeKey in keyof TFields['shape'] as TFields['shape'][TFieldShapeKey] extends {
+    options: infer TOptionsName extends string
+  }
+    ? TOptionsName
+    : never]: FieldOptionsCallback<TContext, string | number, PartialDeep<InferFields<TFields>>>
+}
 
 export class FieldBuilder<
   const TContext extends AnyContextable,
@@ -536,8 +511,7 @@ export class FieldBuilder<
 
   columns<
     const TFieldColumnName extends keyof TModelSchemas[TModelName]['shape']['columns'],
-    const TOptions extends FieldColumnOptionsFromSchema<
-      TContext,
+    const TOptions extends FieldColumnConfigFromSchema<
       TModelSchemas[TModelName]['shape']['columns'][TFieldColumnName]
     >,
   >(fieldColumnName: TFieldColumnName, options: TOptions) {
@@ -568,10 +542,7 @@ export class FieldBuilder<
 
   relations<
     const TFieldRelationName extends keyof TModelSchemas[TModelName]['shape']['relations'],
-    const TOptions extends FieldRelationOptionsFromSchema<
-      TContext,
-      TModelSchemas[TModelName]['shape']['relations'][TFieldRelationName]
-    >,
+    const TOptions extends FieldRelationOptionsFromSchema,
   >(
     fieldRelationName: TFieldRelationName,
     optionsFn: (
@@ -678,13 +649,13 @@ type FieldRelationToZodSchema<TField extends FieldRelationShape> =
 export type FieldShapeToZodSchema<TField extends FieldShapeBase> =
   TField extends FieldColumnJsonShape
     ? CastOptionalFieldToZodSchema<TField, z.ZodJSONSchema>
-    : TField extends FieldColumnStringShape<any>
+    : TField extends FieldColumnStringShape
       ? CastOptionalFieldToZodSchema<TField, z.ZodString>
-      : TField extends FieldColumnStringArrayShape<any>
+      : TField extends FieldColumnStringArrayShape
         ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodString>>
-        : TField extends FieldColumnNumberShape<any>
+        : TField extends FieldColumnNumberShape
           ? CastOptionalFieldToZodSchema<TField, z.ZodNumber>
-          : TField extends FieldColumnNumberArrayShape<any>
+          : TField extends FieldColumnNumberArrayShape
             ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodNumber>>
             : TField extends FieldColumnBooleanShape
               ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>

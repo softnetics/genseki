@@ -7,7 +7,7 @@ import { toast } from 'sonner'
 import { getDefaultValueFromFieldsClient } from '../../../core'
 import type { FieldsClient } from '../../../core/field'
 import { Form } from '../../components'
-import { AutoField } from '../../components/compound/auto-field/client'
+import { AutoFields } from '../../components/compound/auto-field'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
 import { useServerFunction, useStorageAdapter } from '../../providers/root'
@@ -15,7 +15,6 @@ import { useServerFunction, useStorageAdapter } from '../../providers/root'
 interface CreateClientViewProps {
   slug: string
   fields: FieldsClient
-  optionsRecord: Record<string, any[]>
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
@@ -63,13 +62,7 @@ export function CreateClientView(props: CreateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(props.fields.shape).map((fieldShape) => (
-          <AutoField
-            key={fieldShape.$client.fieldName}
-            fieldShape={fieldShape}
-            optionsRecord={props.optionsRecord}
-          />
-        ))}
+        <AutoFields fields={props.fields} optionsFetchPath={`/${props.slug}/create/options`} />
         <SubmitButton>Create</SubmitButton>
       </form>
     </Form>

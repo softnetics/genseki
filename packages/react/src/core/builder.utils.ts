@@ -1,4 +1,4 @@
-import z from 'zod/v4'
+import z from 'zod'
 
 import type { ApiDefaultMethod } from './collection'
 import type { ListConfiguration } from './collection'
@@ -6,7 +6,8 @@ import { type ApiReturnType, type InferCreateFields, type InferUpdateFields } fr
 import { type ApiConfigHandlerFn } from './collection'
 import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
-import { type Fields } from './field'
+import { HttpInternalServerError } from './error'
+import { type FieldOptionsCallback, type Fields, type FieldsOptions } from './field'
 import { DataType, type ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
@@ -591,6 +592,66 @@ export function getCollectionDefaultFindManyApiRoute(args: {
   }
 }
 
+export type CollectionFieldsOptionsApiRoute<TPath extends string> = ApiRoute<{
+  path: TPath
+  method: 'GET'
+  query: ToZodObject<{ name: string }>
+  body: z.ZodOptional<z.ZodAny>
+  responses: {
+    200: ToZodObject<{
+      label: string
+      value: string | number
+    }>
+  }
+}>
+
+export function getOptionsRoute(
+  context: AnyContextable,
+  path: string,
+  fieldsOptions: FieldsOptions
+) {
+  const route = createEndpoint(
+    context,
+    {
+      method: 'POST',
+      path: path,
+      query: z.object({
+        name: z.string(),
+      }),
+      body: z.any(),
+      responses: {
+        200: z.object({
+          disabled: z.boolean().optional(),
+          options: z
+            .object({
+              label: z.string(),
+              value: z.union([z.string(), z.number()]),
+            })
+            .array(),
+        }),
+      },
+    },
+    async (payload) => {
+      const optionsFn = fieldsOptions[
+        payload.query.name as keyof FieldsOptions
+      ] as FieldOptionsCallback
+
+      if (!optionsFn) {
+        throw new HttpInternalServerError(`Field options "${payload.query.name}" not found`)
+      }
+
+      const result = await optionsFn({ context: payload.context, body: payload.body })
+
+      return {
+        status: 200,
+        body: result,
+      }
+    }
+  )
+
+  return { route }
+}
+
 export type CollectionDefaultAdminApiRouter<
   TSlug extends string,
   TOptions extends {
@@ -605,10 +666,20 @@ export type CollectionDefaultAdminApiRouter<
       create: CollectionCreateApiRoute<TSlug, TOptions['create']['fields']>
     }
   : {}) &
+  (TOptions['create'] extends { options: FieldsOptions<any, any> }
+    ? {
+        createOptions: CollectionFieldsOptionsApiRoute<`/${TSlug}/create/options`>
+      }
+    : {}) &
   (TOptions['update'] extends { fields: Fields }
     ? {
         update: CollectionUpdateApiRoute<TSlug, TOptions['update']['fields']>
         updateDefault: CollectionUpdateDefaultApiRoute<TSlug, TOptions['update']['fields']>
+      }
+    : {}) &
+  (TOptions['update'] extends { options: FieldsOptions<any, any> }
+    ? {
+        updateOptions: CollectionFieldsOptionsApiRoute<`/${TSlug}/update/options`>
       }
     : {}) &
   (TOptions['list'] extends { fields: Fields }
