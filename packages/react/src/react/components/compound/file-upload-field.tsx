@@ -14,6 +14,7 @@ import { toast } from 'sonner'
 
 import { mimeTypeValidate } from '../../../core/utils'
 import { useStorageAdapter } from '../../providers/root'
+import { isImageKey } from '../../utils/is-image-key'
 import {
   BaseIcon,
   Button,
@@ -69,6 +70,7 @@ const uploadObject = async (
   try {
     await fetch(signedUrl, {
       method: 'PUT',
+      headers: { 'Content-Type': file.type },
       body: file,
     })
 
@@ -119,6 +121,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   const limit = props.uploadOptions?.limit || 1
   const mimeTypes = props.uploadOptions?.mimeTypes || []
   const readableMimeTypes = mimeTypes.map((mimeType) => mimeType.split('/')[1]).join(', ')
+  const acceptType = mimeTypes.length > 0 ? mimeTypes.join(',') : undefined
 
   const handleUpload = async (files: File[]) => {
     // Custom handle on your own
@@ -172,13 +175,14 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     // TODO: Allow for multiples file, currently one at a time
     const targetFile = files[0]
 
-    const key = `${crypto.randomUUID()}-${targetFile.name}`
+    // I created a folder called prod-uploader to store the files. Do we need to change this to .env for custom folder?
+    const key = `prod-uploader/${crypto.randomUUID()}-${targetFile.name}`
+
+    const signedUrlPath =
+      storageAdapter?.grabPutObjectSignedUrlApiRoute?.path ?? '/api/storage/put-obj-signed-url'
 
     // Get signed URL
-    const putObjSignedUrl = await generatePutObjSignedUrlData(
-      storageAdapter.grabPutObjectSignedUrlApiRoute.path,
-      key
-    )
+    const putObjSignedUrl = await generatePutObjSignedUrlData(signedUrlPath, key)
 
     if (!putObjSignedUrl.ok) {
       props.onUploadFail?.(putObjSignedUrl.message || 'generating put object signed URL error')
@@ -190,7 +194,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     }
 
     // Upload file using signed URL
-    const uploadResult = await uploadObject(putObjSignedUrl.data.signedUrl, targetFile)
+    const uploadResult = await uploadObject(putObjSignedUrl.data.body.signedUrl, targetFile)
 
     if (!uploadResult.ok) {
       props.onUploadFail?.(uploadResult.message || 'File upload error')
@@ -208,7 +212,6 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
 
   // For upload via clicking
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    console.log('handleChange', e)
     const files = e.target.files
 
     if (!files || files.length === 0) return
@@ -300,6 +303,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
             ref={inputRef}
             onChange={handleChange}
             className="hidden"
+            accept={acceptType}
             disabled={props.isDisabled}
           />
         </div>
@@ -318,13 +322,9 @@ const FileDisplayer = (props: {
   onRemoveSuccess?: (fileKey: string) => void
   onRemoveFail?: (reason: string) => void
 }) => {
-  // checking by fileKey is end with format type
-  const isImage =
-    props.fileKey.endsWith('.webp') ||
-    props.fileKey.endsWith('.png') ||
-    props.fileKey.endsWith('.jpg') ||
-    props.fileKey.endsWith('.jpeg') ||
-    props.fileKey.endsWith('.gif')
+  const baseUrl = process.env.NEXT_PUBLIC_AWS_IMAGE_URL
+
+  const isImage = isImageKey(props.fileKey)
 
   const handleRemove = () => {
     // Custom handle on your own
@@ -350,9 +350,9 @@ const FileDisplayer = (props: {
 
   const uploadStatusVariant = {
     pending: {
-      icon: <BaseIcon icon={CloudArrowUpIcon} size="sm" className="text-bluegray-400" />,
+      icon: <BaseIcon icon={CloudArrowUpIcon} size="sm" className="text-muted-fg" />,
       text: (
-        <Typography type="body" weight="medium" className="text-bluegray-400 text-sm">
+        <Typography type="body" weight="medium" className="text-muted-fg text-sm">
           Pending
         </Typography>
       ),
@@ -360,7 +360,7 @@ const FileDisplayer = (props: {
     success: {
       icon: <BaseIcon icon={CheckCircleIcon} size="sm" className="text-palm-600" />,
       text: (
-        <Typography type="body" weight="medium" className="text-bluegray-800 text-sm">
+        <Typography type="body" weight="medium" className="text-muted-fg text-sm">
           Completed
         </Typography>
       ),
@@ -376,13 +376,12 @@ const FileDisplayer = (props: {
   }
 
   return (
-    <div className="w-full h-full bg-white rounded-md p-8 items-center gap-x-4">
+    <div className="w-full h-full bg-white dark:bg-transparent rounded-md p-8 items-center gap-x-4 border border-bluegray-300 dark:border-bluegray-700">
       <div className="flex gap-x-4 items-start">
-        {isImage && process.env.AWS_BUCKET_NAME ? (
+        {isImage && baseUrl ? (
           <div className="size-20 rounded-md overflow-hidden bg-muted border border-bluegray-300">
             <img
-              // I'm not sure this is the correct way to put the bucket url in the image src
-              src={`${process.env.AWS_BUCKET_NAME}/${props.fileKey}`}
+              src={`${baseUrl}/${props.fileKey}`}
               alt={props.fileKey}
               className="w-full h-full object-cover"
             />
@@ -391,17 +390,12 @@ const FileDisplayer = (props: {
           <BaseIcon icon={FileIcon} size="xl" />
         )}
         <div className="flex flex-col gap-4">
-          <Typography
-            type="body"
-            weight="medium"
-            className="text-text-nontrivial"
-            content={props.fileKey}
-          >
+          <Typography type="body" weight="medium" className="text-muted-fg" content={props.fileKey}>
             {props.fileKey}
           </Typography>
 
           {props.uploadStatus && (
-            <div className="flex gap-2 items-center">
+            <div className="flex gap-2 items-center text-muted-fg">
               {uploadStatusVariant[props.uploadStatus].icon}
               {uploadStatusVariant[props.uploadStatus].text}
             </div>

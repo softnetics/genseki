@@ -12,7 +12,7 @@ export function grabPermanentObject<const TContext extends AnyContextable>(
     context,
     {
       method: 'GET',
-      path: '/api/storage/permanent-obj',
+      path: '/storage/permanent-obj',
       query: z.object({
         key: z.string(),
       }),

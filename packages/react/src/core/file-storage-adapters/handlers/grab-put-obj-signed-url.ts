@@ -12,7 +12,7 @@ export function grabPutObjUrl<const TContext extends AnyContextable>(
     context,
     {
       method: 'GET',
-      path: '/api/storage/put-obj-signed-url',
+      path: '/storage/put-obj-signed-url',
       query: z.object({
         key: z.string(),
       }),

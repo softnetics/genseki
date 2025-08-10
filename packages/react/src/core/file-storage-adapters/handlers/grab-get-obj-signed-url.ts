@@ -12,7 +12,7 @@ export function grabGetObjUrl<const TContext extends AnyContextable>(
     context,
     {
       method: 'GET',
-      path: '/api/storage/get-obj-signed-url',
+      path: '/storage/get-obj-signed-url',
       query: z.object({
         key: z.string(),
       }),

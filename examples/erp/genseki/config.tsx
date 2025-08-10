@@ -1,6 +1,12 @@
 import { withNextJs } from '@genseki/next'
 import { admin } from '@genseki/plugins'
-import { emailAndPasswordPlugin, GensekiApp, mePlugin, StorageAdapterS3 } from '@genseki/react'
+import {
+  createFileUploadHandlers,
+  emailAndPasswordPlugin,
+  GensekiApp,
+  mePlugin,
+  StorageAdapterS3,
+} from '@genseki/react'
 
 import { accessControl } from './access-control'
 import { SetupPage } from './auth/setup/setup'
@@ -11,18 +17,23 @@ import { context } from './helper'
 
 import { FullModelSchemas } from '../generated/genseki/unsanitized'
 
+const storageAdapter = StorageAdapterS3.initialize({
+  bucket: process.env.AWS_BUCKET_NAME!,
+  clientConfig: {
+    region: process.env.AWS_REGION!,
+    credentials: {
+      accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
+      secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
+    },
+  },
+})
+
+const { handlers: uploadHandlers } = createFileUploadHandlers(context, storageAdapter)
+
 const app = new GensekiApp({
   title: 'Genseki ERP Example',
   version: '0.0.0',
-  storageAdapter: StorageAdapterS3.initialize({
-    bucket: process.env.AWS_BUCKET_NAME!,
-    clientConfig: {
-      credentials: {
-        accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_KEY!,
-      },
-    },
-  }),
+  storageAdapter,
   sidebar: {
     type: 'section',
     label: 'Collections',
@@ -36,6 +47,11 @@ const app = new GensekiApp({
         type: 'item',
         label: 'Posts',
         path: '/admin/collections/posts',
+      },
+      {
+        type: 'item',
+        label: 'Types',
+        path: '/admin/collections/types',
       },
     ],
   },
@@ -81,6 +97,14 @@ const app = new GensekiApp({
     api: {
       auth: {
         setup: setupApi,
+      },
+    },
+  })
+  .apply({
+    api: {
+      storage: {
+        putObjSignedUrl: uploadHandlers['file.generatePutObjSignedUrl'],
+        getObjSignedUrl: uploadHandlers['file.generateGetObjSignedUrl'],
       },
     },
   })

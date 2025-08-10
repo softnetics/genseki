@@ -259,13 +259,20 @@ export function getFieldShapeClient(
   }
 
   if (isMediaFieldShape(fieldShape)) {
-    return R.omit(
-      {
-        ...fieldShape,
-        label: fieldShape.label ?? name,
-      },
-      ['$server', 'options' as any]
-    ) as FieldShapeClient & { $client: { fieldName: string } }
+    const base = {
+      ...fieldShape,
+      label: fieldShape.label ?? name,
+    } as any
+    const uploadOptions =
+      base.uploadOptions ??
+      (base.options ? base.options : undefined) ??
+      (base.mimeTypes ? { mimeTypes: base.mimeTypes } : undefined)
+
+    const sanitized = {
+      ...base,
+      uploadOptions,
+    }
+    return R.omit(sanitized, ['$server']) as FieldShapeClient & { $client: { fieldName: string } }
   }
 
   return R.omit(
