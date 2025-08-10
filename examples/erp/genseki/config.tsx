@@ -48,11 +48,6 @@ const app = new GensekiApp({
         label: 'Posts',
         path: '/admin/collections/posts',
       },
-      {
-        type: 'item',
-        label: 'Types',
-        path: '/admin/collections/types',
-      },
     ],
   },
 })
