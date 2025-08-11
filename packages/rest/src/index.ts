@@ -55,6 +55,9 @@ export function createRestClient<TCore extends GensekiCore>(
     GET: async (path: string, payload: AnyPayload) => {
       return makeFetch('GET', path, payload, config)
     },
+    QUERY: async (path: string, payload: AnyPayload) => {
+      return makeFetch('QUERY', path, payload, config)
+    },
     POST: async (path: string, payload: AnyPayload) => {
       return makeFetch('POST', path, payload, config)
     },
@@ -91,6 +94,7 @@ export type RestClient<TApiRouter extends ApiRouter> =
   FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
     ? {
         GET: RestMethod<FilterByMethod<TApiRoute, 'GET'>>
+        QUERY: RestMethod<FilterByMethod<TApiRoute, 'QUERY'>>
         POST: RestMethod<FilterByMethod<TApiRoute, 'POST'>>
         PUT: RestMethod<FilterByMethod<TApiRoute, 'PUT'>>
         DELETE: RestMethod<FilterByMethod<TApiRoute, 'DELETE'>>

@@ -594,7 +594,7 @@ export function getCollectionDefaultFindManyApiRoute(args: {
 
 export type CollectionFieldsOptionsApiRoute<TPath extends string> = ApiRoute<{
   path: TPath
-  method: 'GET'
+  method: 'QUERY'
   query: ToZodObject<{ name: string }>
   body: z.ZodOptional<z.ZodAny>
   responses: {
@@ -613,7 +613,7 @@ export function getOptionsRoute(
   const route = createEndpoint(
     context,
     {
-      method: 'POST',
+      method: 'QUERY',
       path: path,
       query: z.object({
         name: z.string(),
