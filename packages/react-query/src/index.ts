@@ -25,7 +25,7 @@ import type {
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
 
-type QueryMethod = 'GET' | 'QUERY'
+type QueryMethod = 'GET'
 type MutationMethod = 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 type Method = QueryMethod | MutationMethod
 
@@ -46,12 +46,12 @@ type ApiRouteSchemaFromMethodAndPath<
 type UseQuery<TApiRoute extends ApiRoute> = {
   <
     const TMethod extends QueryMethod,
-    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
     const TPayload extends ApiRouteHandlerPayload<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
     >,
     const TResponse extends ApiRouteResponse<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
     >,
     const TError extends DefaultError = DefaultError,
   >(
@@ -65,12 +65,12 @@ type UseQuery<TApiRoute extends ApiRoute> = {
 type QueryOptions<TApiRoute extends ApiRoute> = {
   <
     const TMethod extends QueryMethod,
-    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
+    const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
     const TPayload extends ApiRouteHandlerPayload<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
     >,
     const TResponse extends ApiRouteResponse<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
     >,
     const TError extends DefaultError = DefaultError,
   >(

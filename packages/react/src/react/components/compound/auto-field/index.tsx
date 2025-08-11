@@ -207,10 +207,10 @@ export function AutoSelectField(props: AutoSelectField) {
   })
 
   const query = useQuery<{ status: 200; body: FieldOptionsCallbackReturn }>({
-    queryKey: ['QUERY', props.optionsFetchPath, { pathParams: { name: props.optionsName } }],
+    queryKey: ['POST', props.optionsFetchPath, { pathParams: { name: props.optionsName } }],
     queryFn: async () => {
       const response = await fetch(`/api${props.optionsFetchPath}?name=${props.optionsName}`, {
-        method: 'QUERY',
+        method: 'POST',
         body: JSON.stringify(value),
         headers: { 'Content-Type': 'application/json' },
       })

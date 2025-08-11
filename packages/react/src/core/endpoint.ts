@@ -127,7 +127,7 @@ export type InferApiRouteResponses<TApiRouteSchema extends ApiRouteSchema> = Val
 }>
 
 export interface ApiRouteSchema {
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'QUERY'
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
   body?: InputSchema
   query?: InputSchema
@@ -138,7 +138,7 @@ export interface ApiRouteSchema {
 }
 
 export interface ApiRouteSchemaClient {
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'QUERY'
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
   body?: JSONSchema.JSONSchema
   query?: JSONSchema.JSONSchema
@@ -149,7 +149,7 @@ export interface ApiRouteSchemaClient {
 }
 
 export interface AnyApiRouteSchema {
-  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE' | 'QUERY'
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string
   body?: any
   pathParams?: any
