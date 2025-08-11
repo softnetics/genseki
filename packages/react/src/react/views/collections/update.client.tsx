@@ -31,7 +31,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   }>({
     mutationKey: ['PATCH', `/api/${props.slug}`],
     mutationFn: async (data: any) => {
-      // TODO: This should be provied from App Config
+      // TODO: This should be provided from App Config
       const response = await fetch(`/api/${props.slug}/${props.identifier}`, {
         method: 'PATCH',
         body: JSON.stringify(data),
