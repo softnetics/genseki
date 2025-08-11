@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.32
+
+### Minor Changes
+
+- [#140](https://github.com/softnetics/genseki/pull/140) [`bd93756`](https://github.com/softnetics/genseki/commit/bd93756ef1db834e49e67e6bf62e8b31fcba546d) Thanks [@PondC](https://github.com/PondC)! - [Fix] any password can login due to unawaited Promise leak
+
+### Patch Changes
+
+- [#148](https://github.com/softnetics/genseki/pull/148) [`3a9f911`](https://github.com/softnetics/genseki/commit/3a9f911e96104c9f7d82fc5aef4b0ddd435a0a47) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] use useMutation in CRUD page instead of serverFunction
+
 ## 0.1.0-alpha.31
 
 ### Patch Changes
