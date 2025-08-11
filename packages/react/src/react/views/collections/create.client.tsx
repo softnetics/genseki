@@ -2,6 +2,7 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { useMutation } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import { getDefaultValueFromFieldsClient } from '../../../core'
@@ -10,7 +11,7 @@ import { Form } from '../../components'
 import { AutoFields } from '../../components/compound/auto-field'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
-import { useServerFunction, useStorageAdapter } from '../../providers/root'
+import { useStorageAdapter } from '../../providers/root'
 
 interface CreateClientViewProps {
   slug: string
@@ -18,7 +19,6 @@ interface CreateClientViewProps {
 }
 
 export function CreateClientView(props: CreateClientViewProps) {
-  const serverFunction = useServerFunction()
   const { navigate } = useNavigation()
   const storageAdapter = useStorageAdapter()
 
@@ -26,13 +26,41 @@ export function CreateClientView(props: CreateClientViewProps) {
     defaultValues: getDefaultValueFromFieldsClient(props.fields, storageAdapter),
   })
 
+  const mutation = useMutation<{
+    status: number
+    body: { __pk: string; __id: string }
+  }>({
+    mutationKey: ['POST', `/api/${props.slug}`],
+    mutationFn: async (data: any) => {
+      // TODO: This should be provided from App Config
+      const response = await fetch(`/api/${props.slug}`, {
+        method: 'POST',
+        body: JSON.stringify(data),
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) {
+        let errorBody
+        try {
+          errorBody = await response.json()
+        } catch (e) {
+          errorBody = await response.text()
+        }
+        const errorMessage =
+          typeof errorBody === 'object' && errorBody && errorBody.message
+            ? errorBody.message
+            : typeof errorBody === 'string' && errorBody
+              ? errorBody
+              : 'Failed to create'
+        throw new Error(
+          `Failed to create (status: ${response.status})${errorMessage ? `: ${errorMessage}` : ''}`
+        )
+      }
+      return response.json()
+    },
+  })
+
   const onSubmit: SubmitHandler<any> = async (data: any) => {
-    const result = await serverFunction(`${props.slug}.create`, {
-      body: data,
-      headers: {},
-      pathParams: {},
-      query: {},
-    })
+    const result = await mutation.mutateAsync(data)
 
     if (result.status === 200) {
       toast.success('Creation successfully')
@@ -62,8 +90,12 @@ export function CreateClientView(props: CreateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        <AutoFields fields={props.fields} optionsFetchPath={`/${props.slug}/create/options`} />
-        <SubmitButton>Create</SubmitButton>
+        <AutoFields
+          fields={props.fields}
+          optionsFetchPath={`/${props.slug}/create/options`}
+          disabled={mutation.isPending}
+        />
+        <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
       </form>
     </Form>
   )
