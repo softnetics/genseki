@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.29
+
+### Patch Changes
+
+- [#146](https://github.com/softnetics/genseki/pull/146) [`650bcad`](https://github.com/softnetics/genseki/commit/650bcad59781c3e32b8a28f91e22e6e23759035b) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] `getFieldsClient` wrong omit field
+
+- Updated dependencies [[`650bcad`](https://github.com/softnetics/genseki/commit/650bcad59781c3e32b8a28f91e22e6e23759035b)]:
+  - @genseki/react@0.1.0-alpha.31
+  - @genseki/next@0.1.0-alpha.31
+  - @genseki/plugins@0.1.0-alpha.31
+  - @genseki/prisma-generator@0.1.0-alpha.31
+  - @genseki/react-query@0.1.0-alpha.31
+  - @genseki/rest@0.1.0-alpha.31
+
 ## 0.1.0-alpha.28
 
 ### Patch Changes
