@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { toast } from 'sonner'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import {
   Form,

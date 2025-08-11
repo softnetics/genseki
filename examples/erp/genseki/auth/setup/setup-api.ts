@@ -1,4 +1,4 @@
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import { builder } from '../../helper'
 import { AuthService } from '../../services/auth.service'

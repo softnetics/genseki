@@ -2,7 +2,7 @@ import type { ReactNode } from 'react'
 
 import { defu } from 'defu'
 import type { PartialDeep } from 'type-fest'
-import { type ZodString } from 'zod/v4'
+import { type ZodString } from 'zod'
 
 import { loginEmail } from './api/login'
 import { requestResetPassword } from './api/request-reset-password'

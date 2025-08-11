@@ -1,6 +1,6 @@
 import type { IsNever, Promisable, Simplify, ValueOf } from 'type-fest'
-import type { z } from 'zod/v4'
-import { type ZodType } from 'zod/v4'
+import type { z } from 'zod'
+import { type ZodType } from 'zod'
 import type { JSONSchema } from 'zod/v4/core'
 
 import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'

@@ -38,7 +38,7 @@ const userFields = builder.fields('user', (fb) => ({
             type: 'text',
           }),
         })),
-        options: () => [],
+        options: 'posts',
       })),
     })),
   })),
@@ -49,7 +49,7 @@ const userFields = builder.fields('user', (fb) => ({
         type: 'text',
       }),
     })),
-    options: () => [],
+    options: 'profile',
   })),
 }))
 

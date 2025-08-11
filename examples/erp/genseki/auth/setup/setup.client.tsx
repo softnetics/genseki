@@ -4,7 +4,7 @@ import { useForm } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useRouter } from 'next/navigation'
-import z from 'zod/v4'
+import z from 'zod'
 
 import {
   Form,

@@ -87,10 +87,7 @@ export const fields = builder.fields('post', (fb) => ({
       label: 'Updated At',
       description: 'The date the post was updated',
     }),
-    options: async () => {
-      const result = await prisma.user.findMany()
-      return result.map((user) => ({ label: user.name ?? 'Unknown', value: user.id }))
-    },
+    options: 'author',
   })),
   updatedAt: fb.columns('updatedAt', {
     type: 'date',
@@ -100,26 +97,52 @@ export const fields = builder.fields('post', (fb) => ({
   }),
 }))
 
-export const postsCollection = builder.collection((b) => ({
+export const options = builder.options(fields, {
+  author: async ({ body }) => {
+    if (body.title === 'DISABLED') {
+      return {
+        disabled: true,
+        options: [],
+      }
+    }
+    const authors = await prisma.user.findMany({ select: { id: true, name: true } })
+    return {
+      disabled: false,
+      options: authors.map((author) => ({ label: author.name ?? '(No Name)', value: author.id })),
+    }
+  },
+})
+
+const list = builder.list(fields, {
+  columns: columns,
+  configuration: {
+    search: ['title'],
+    sortBy: ['updatedAt', 'title'],
+  },
+  options: options,
+})
+
+const create = builder.create(fields, {
+  options: options,
+})
+
+const update = builder.update(fields, {
+  options: options,
+})
+
+const _delete = builder.delete(fields, {
+  options: options,
+})
+
+const one = builder.one(fields, {
+  options: options,
+})
+
+export const postsCollection = builder.collection({
   slug: 'posts',
-  list: b.list({
-    fields: fields,
-    columns: columns,
-    configuration: {
-      search: ['title'],
-      sortBy: ['updatedAt', 'title'],
-    },
-  }),
-  create: b.create({
-    fields: fields,
-  }),
-  update: b.update({
-    fields: fields,
-  }),
-  delete: b.delete({
-    fields: fields,
-  }),
-  one: b.one({
-    fields: fields,
-  }),
-}))
+  list: list,
+  create: create,
+  update: update,
+  delete: _delete,
+  one: one,
+})

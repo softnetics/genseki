@@ -6,7 +6,7 @@ import { toast } from 'sonner'
 
 import type { FieldsClient } from '../../../core'
 import { Form } from '../../components'
-import { AutoField } from '../../components/compound/auto-field/client'
+import { AutoFields } from '../../components/compound/auto-field'
 import { SubmitButton } from '../../components/compound/submit-button'
 import { useNavigation } from '../../providers'
 import { useServerFunction } from '../../providers/root'
@@ -15,7 +15,6 @@ interface UpdateClientViewProps {
   slug: string
   identifier: string
   fields: FieldsClient
-  optionsRecord: Record<string, any[]>
   defaultValues?: Record<string, any>
 }
 
@@ -63,13 +62,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
-        {Object.values(props.fields.shape).map((field) => (
-          <AutoField
-            key={field.$client.fieldName}
-            fieldShape={field}
-            optionsRecord={props.optionsRecord}
-          />
-        ))}
+        <AutoFields fields={props.fields} optionsFetchPath={`/${props.slug}/update/options`} />
         <SubmitButton>Update</SubmitButton>
       </form>
     </Form>
