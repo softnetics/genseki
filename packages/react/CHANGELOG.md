@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.29
+
+### Minor Changes
+
+- [#143](https://github.com/softnetics/genseki/pull/143) [`16e83a3`](https://github.com/softnetics/genseki/commit/16e83a305e9387389856b4d566c79df9742a301a) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Export Tanstack table component
+
 ## 0.1.0-alpha.28
 
 ## 0.1.0-alpha.27
