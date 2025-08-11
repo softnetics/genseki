@@ -38,7 +38,23 @@ export function CreateClientView(props: CreateClientViewProps) {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to create')
+      if (!response.ok) {
+        let errorBody;
+        try {
+          errorBody = await response.json();
+        } catch (e) {
+          errorBody = await response.text();
+        }
+        const errorMessage =
+          typeof errorBody === 'object' && errorBody && errorBody.message
+            ? errorBody.message
+            : typeof errorBody === 'string' && errorBody
+            ? errorBody
+            : 'Failed to create';
+        throw new Error(
+          `Failed to create (status: ${response.status})${errorMessage ? `: ${errorMessage}` : ''}`
+        );
+      }
       return response.json()
     },
   })
