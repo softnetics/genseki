@@ -38,15 +38,13 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         headers: { 'Content-Type': 'application/json' },
       })
       if (!response.ok) {
-        let errorBody;
+        let errorBody
         try {
-          errorBody = await response.text();
+          errorBody = await response.text()
         } catch (e) {
-          errorBody = '<unable to read response body>';
+          errorBody = '<unable to read response body>'
         }
-        throw new Error(
-          `Failed to update (status: ${response.status}): ${errorBody}`
-        );
+        throw new Error(`Failed to update (status: ${response.status}): ${errorBody}`)
       }
       return response.json()
     },
