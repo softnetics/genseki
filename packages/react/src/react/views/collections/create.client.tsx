@@ -32,7 +32,7 @@ export function CreateClientView(props: CreateClientViewProps) {
   }>({
     mutationKey: ['POST', `/api/${props.slug}`],
     mutationFn: async (data: any) => {
-      // TODO: This should be provied from App Config
+      // TODO: This should be provided from App Config
       const response = await fetch(`/api/${props.slug}`, {
         method: 'POST',
         body: JSON.stringify(data),
