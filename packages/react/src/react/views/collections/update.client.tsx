@@ -37,7 +37,17 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         body: JSON.stringify(data),
         headers: { 'Content-Type': 'application/json' },
       })
-      if (!response.ok) throw new Error('Failed to update')
+      if (!response.ok) {
+        let errorBody;
+        try {
+          errorBody = await response.text();
+        } catch (e) {
+          errorBody = '<unable to read response body>';
+        }
+        throw new Error(
+          `Failed to update (status: ${response.status}): ${errorBody}`
+        );
+      }
       return response.json()
     },
   })
