@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.31
+
+### Patch Changes
+
+- [#146](https://github.com/softnetics/genseki/pull/146) [`650bcad`](https://github.com/softnetics/genseki/commit/650bcad59781c3e32b8a28f91e22e6e23759035b) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] `getFieldsClient` wrong omit field
+
 ## 0.1.0-alpha.30
 
 ### Minor Changes

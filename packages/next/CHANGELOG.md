@@ -1,5 +1,12 @@
 # @genseki/next
 
+## 0.1.0-alpha.31
+
+### Patch Changes
+
+- Updated dependencies [[`650bcad`](https://github.com/softnetics/genseki/commit/650bcad59781c3e32b8a28f91e22e6e23759035b)]:
+  - @genseki/react@0.1.0-alpha.31
+
 ## 0.1.0-alpha.30
 
 ### Patch Changes
