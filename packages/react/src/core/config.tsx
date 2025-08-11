@@ -192,6 +192,11 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       } as unknown as GensekiCore<TMainApiRouter>
     )
 
+    if (this.options.storageAdapter?.getApiRouter) {
+      const storageApi = this.options.storageAdapter.getApiRouter()
+      core.api = deepmerge(core.api, storageApi as any) as TMainApiRouter
+    }
+
     const logs = this._logApiRouter(core.api).sort((a, b) => a.localeCompare(b))
     const uiLogs = this._logUis(core.uis).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
@@ -201,8 +206,14 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       middlewares: this.options.middlewares,
       storageAdapter: getStorageAdapterClient({
         storageAdapter: this.options.storageAdapter,
-        grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
-        grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
+        grabPutObjectSignedUrlApiRoute: {
+          method: 'GET',
+          path: '/api/storage/put-obj-signed-url',
+        } as any, // TODO: Fix client endpoint types,
+        grabGetObjectSignedUrlApiRoute: {
+          method: 'GET',
+          path: '/api/storage/get-obj-signed-url',
+        } as any, // TODO: Fix client endpoint types
       }),
       api: core.api,
       uis: core.uis,
@@ -259,20 +270,13 @@ export function getFieldShapeClient(
   }
 
   if (isMediaFieldShape(fieldShape)) {
-    const base = {
-      ...fieldShape,
-      label: fieldShape.label ?? name,
-    } as any
-    const uploadOptions =
-      base.uploadOptions ??
-      (base.options ? base.options : undefined) ??
-      (base.mimeTypes ? { mimeTypes: base.mimeTypes } : undefined)
-
-    const sanitized = {
-      ...base,
-      uploadOptions,
-    }
-    return R.omit(sanitized, ['$server']) as FieldShapeClient & { $client: { fieldName: string } }
+    return R.omit(
+      {
+        ...fieldShape,
+        label: fieldShape.label ?? name,
+      },
+      ['$server', 'options' as any]
+    ) as FieldShapeClient
   }
 
   return R.omit(
@@ -281,8 +285,8 @@ export function getFieldShapeClient(
       label: fieldShape.label ?? name,
       placeholder: fieldShape.placeholder ?? name,
     },
-    ['$server', 'options' as any]
-  ) as FieldShapeClient & { $client: { fieldName: string } }
+    ['$server']
+  ) as FieldShapeClient
 }
 
 export function getFieldsClient(fields: Fields): FieldsClient {

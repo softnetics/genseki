@@ -1,5 +1,5 @@
 ---
-'@genseki/react': minor
+'@genseki/react': path
 ---
 
-add media file uploader v1
+[Fix] Media file uploader not working

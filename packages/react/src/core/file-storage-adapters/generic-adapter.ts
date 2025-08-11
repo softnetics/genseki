@@ -1,7 +1,7 @@
 import type { createFileUploadHandlers } from './handlers'
 
 import type { AnyContextable } from '../context'
-import type { ApiRouteSchemaClient } from '../endpoint'
+import type { ApiRouter, ApiRouteSchemaClient } from '../endpoint'
 
 export type FileUploadHandlers = ReturnType<
   typeof createFileUploadHandlers<AnyContextable>
@@ -29,12 +29,15 @@ export interface StorageAdapter {
   generateGetObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ readObjectUrl: string }>>
+  getApiRouter?: () => ApiRouter
+  getImageBaseUrl?: () => string | undefined
 }
 
 export interface StorageAdapterClient {
   name: string
   grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
   grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  imageBaseUrl?: string
 }
 
 export const getStorageAdapterClient = ({
@@ -52,6 +55,7 @@ export const getStorageAdapterClient = ({
     name: storageAdapter.name,
     grabPutObjectSignedUrlApiRoute,
     grabGetObjectSignedUrlApiRoute,
+    imageBaseUrl: storageAdapter.getImageBaseUrl?.(),
   }
 }
 
