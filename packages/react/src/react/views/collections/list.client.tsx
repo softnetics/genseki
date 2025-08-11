@@ -185,7 +185,16 @@ export function ListTable(props: ListTableProps) {
         method: 'DELETE',
         body: JSON.stringify({ ids: selectedRowIds }),
         headers: { 'Content-Type': 'application/json' },
-      })
+      const res = await fetch(`/api/${props.slug}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ ids: selectedRowIds }),
+        headers: { 'Content-Type': 'application/json' },
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        throw new Error(data?.message || 'Failed to delete items');
+      }
+      return data;
     },
     onSuccess: async () => {
       setRowSelection({})
