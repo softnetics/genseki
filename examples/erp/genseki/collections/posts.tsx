@@ -56,6 +56,12 @@ export const postEditorProviderProps = {
 }
 
 export const fields = builder.fields('post', (fb) => ({
+  example: fb.columns('id', {
+    type: 'selectText',
+    label: 'Example',
+    description: 'This is an example of a select text field',
+    options: 'example',
+  }),
   title: fb.columns('title', {
     type: 'text',
     label: 'Title',
@@ -98,6 +104,20 @@ export const fields = builder.fields('post', (fb) => ({
 }))
 
 export const options = builder.options(fields, {
+  example: () => {
+    return {
+      options: [
+        {
+          label: 'example1',
+          value: 'example1',
+        },
+        {
+          label: 'example2',
+          value: 'example2',
+        },
+      ],
+    }
+  },
   author: async ({ body }) => {
     if (body.title === 'DISABLED') {
       return {
