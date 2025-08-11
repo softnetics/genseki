@@ -14,7 +14,7 @@ import {
 import { columns } from './posts.client'
 
 import { EditorSlotBefore } from '../editor/slot-before'
-import { builder } from '../helper'
+import { builder, prisma } from '../helper'
 
 export const postEditorProviderProps = {
   immediatelyRender: false,
@@ -99,15 +99,16 @@ export const fields = builder.fields('post', (fb) => ({
 
 export const options = builder.options(fields, {
   author: async ({ body }) => {
-    if (body.title === 'NAME') {
+    if (body.title === 'DISABLED') {
       return {
-        disabled: false,
-        options: [{ label: 'Author Name', value: 'author_id' }],
+        disabled: true,
+        options: [],
       }
     }
+    const authors = await prisma.user.findMany({ select: { id: true, name: true } })
     return {
-      disabled: true,
-      options: [{ label: 'Author Name', value: 'author_id' }],
+      disabled: false,
+      options: authors.map((author) => ({ label: author.name ?? '(No Name)', value: author.id })),
     }
   },
 })
