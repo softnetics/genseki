@@ -786,6 +786,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
 interface AutoFieldsProps {
   fields: FieldsClient
   optionsFetchPath?: string
+  disabled?: boolean
 }
 
 export function AutoFields(props: AutoFieldsProps) {
@@ -796,6 +797,7 @@ export function AutoFields(props: AutoFieldsProps) {
           key={fieldShape.$client.fieldName}
           fieldShape={fieldShape}
           optionsFetchPath={props.optionsFetchPath}
+          disabled={props.disabled}
         />
       ))}
     </>

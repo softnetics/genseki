@@ -49,7 +49,6 @@ import { BaseIcon } from '../../components/primitives/base-icon'
 import { TanstackTable } from '../../components/primitives/tanstack-table'
 import { useDebounce } from '../../hooks/use-debounce'
 import { useNavigation } from '../../providers'
-import { useServerFunction } from '../../providers/root'
 
 interface ToolbarProps {
   slug: string
@@ -145,7 +144,6 @@ interface ListTableProps {
 
 export function ListTable(props: ListTableProps) {
   const navigation = useNavigation()
-  const serverFunction = useServerFunction()
   const queryClient = useQueryClient()
 
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
@@ -180,12 +178,13 @@ export function ListTable(props: ListTableProps) {
 
   // Delete mutation
   const deleteMutation = useMutation({
+    // TODO: path prefix should be provided from App Config
+    mutationKey: ['DELETE', `/api/${props.slug}`],
     mutationFn: async (selectedRowIds: string[]) => {
-      return serverFunction(`${props.slug}.delete`, {
-        body: { ids: selectedRowIds },
-        headers: {},
-        pathParams: {},
-        query: {},
+      return fetch(`/api/${props.slug}`, {
+        method: 'DELETE',
+        body: JSON.stringify({ ids: selectedRowIds }),
+        headers: { 'Content-Type': 'application/json' },
       })
     },
     onSuccess: async () => {
