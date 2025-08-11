@@ -241,7 +241,7 @@ export function getFieldShapeClient(name: string, fieldShape: FieldShape): Field
         label: fieldShape.label ?? name,
       },
       ['$server']
-    ) as FieldShapeClient & { $client: { fieldName: string } }
+    ) as FieldShapeClient
 
     const sanitizedRichTextField = {
       ...sanitizedBaseField,
@@ -258,7 +258,7 @@ export function getFieldShapeClient(name: string, fieldShape: FieldShape): Field
         label: fieldShape.label ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldShapeClient & { $client: { fieldName: string } }
+    ) as FieldShapeClient
   }
 
   return R.omit(
@@ -267,8 +267,8 @@ export function getFieldShapeClient(name: string, fieldShape: FieldShape): Field
       label: fieldShape.label ?? name,
       placeholder: fieldShape.placeholder ?? name,
     },
-    ['$server', 'options' as any]
-  ) as FieldShapeClient & { $client: { fieldName: string } }
+    ['$server']
+  ) as FieldShapeClient
 }
 
 export function getFieldsClient(fields: Fields): FieldsClient {

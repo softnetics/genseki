@@ -15,10 +15,12 @@ import {
   type DatePickerProps,
   FormField,
   FormItemController,
+  Label,
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
   Select,
+  SelectLabel,
   SelectList,
   SelectOption,
   type SelectProps,
@@ -247,11 +249,16 @@ export function AutoSelectField(props: AutoSelectField) {
         }
       }}
     >
+      {props.label && (
+        <Label>
+          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+        </Label>
+      )}
       <SelectTrigger className="h-auto" isPending={query.isLoading} />
       <SelectList items={items}>
         {(item) => (
           <SelectOption key={item.value} id={item.value} textValue={item.label}>
-            {item.label}
+            <SelectLabel>{item.label}</SelectLabel>
           </SelectOption>
         )}
       </SelectList>
