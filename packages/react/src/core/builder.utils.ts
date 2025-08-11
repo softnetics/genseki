@@ -153,10 +153,7 @@ function createCollectionDefaultFindManyHandler<
     // Configured sortable columns.
     const orderBy: any = {}
     if (sortBy) {
-      const isValidSortField =
-        !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy as any)
-
-      if (isValidSortField && model.shape.columns[sortBy]) {
+      if (model.shape.columns[sortBy]) {
         orderBy[sortBy] = sortOrder ?? 'asc'
       } else {
         const primaryField = model.shape.columns[model.shape.primaryFields[0]]
@@ -167,14 +164,11 @@ function createCollectionDefaultFindManyHandler<
       if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
         const defaultSortField = listConfiguration.sortBy[0]
         if (model.shape.columns[defaultSortField as string]) {
-          orderBy[defaultSortField] = 'desc'
-        } else {
-          const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-          orderBy[primaryField.name] = 'asc'
+          orderBy[defaultSortField] = listConfiguration.sortOrder ?? 'asc'
         }
       } else {
         const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = 'asc'
+        orderBy[primaryField.name] = listConfiguration?.sortOrder ?? 'asc'
       }
     }
 

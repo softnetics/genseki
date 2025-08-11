@@ -359,8 +359,8 @@ export function ListTable(props: ListTableProps) {
           page: pagination.page,
           pageSize: pagination.pageSize,
           search: pagination.search,
-          sortBy: getDefaultSortField(),
-          sortOrder: 'asc',
+          sortBy: '',
+          sortOrder: '',
         })
       }
     },
@@ -385,7 +385,10 @@ export function ListTable(props: ListTableProps) {
     state: {
       rowSelection,
       sorting: [
-        { id: pagination.sortBy ?? getDefaultSortField(), desc: pagination.sortOrder === 'desc' },
+        {
+          id: pagination.sortBy ?? '',
+          desc: pagination.sortOrder === 'desc',
+        },
       ],
       pagination: {
         pageIndex: pagination.page - 1,

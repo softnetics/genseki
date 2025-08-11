@@ -314,6 +314,7 @@ export type ExtractSortableColumns<TFields extends Fields> = {
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
   sortBy?: ExtractSortableColumns<TFields>[]
+  sortOrder?: 'asc' | 'desc'
 }
 
 export type CollectionListConfig<
