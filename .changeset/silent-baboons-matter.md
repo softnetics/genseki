@@ -2,4 +2,4 @@
 "@genseki/react": minor
 ---
 
-[Fix] promise password checking function
+[Fix] any password can login due to unawaited Promise leak
