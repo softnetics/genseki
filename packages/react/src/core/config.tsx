@@ -276,7 +276,7 @@ export function getFieldShapeClient(
         label: fieldShape.label ?? name,
       },
       ['$server', 'options' as any]
-    ) as FieldShapeClient
+    ) as FieldShapeClient & { $client: { fieldName: string } }
   }
 
   return R.omit(
@@ -285,8 +285,8 @@ export function getFieldShapeClient(
       label: fieldShape.label ?? name,
       placeholder: fieldShape.placeholder ?? name,
     },
-    ['$server']
-  ) as FieldShapeClient
+    ['$server', 'options' as any]
+  ) as FieldShapeClient & { $client: { fieldName: string } }
 }
 
 export function getFieldsClient(fields: Fields): FieldsClient {
