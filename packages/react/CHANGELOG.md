@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.33
+
+### Patch Changes
+
+- [#142](https://github.com/softnetics/genseki/pull/142) [`b1908d1`](https://github.com/softnetics/genseki/commit/b1908d164c623e2e9e409e7426e5948c75783e40) Thanks [@Desmenez](https://github.com/Desmenez)! - [Fix] Media file uploader not working (https://github.com/softnetics/genseki/pull/142)
+
 ## 0.1.0-alpha.32
 
 ### Minor Changes
