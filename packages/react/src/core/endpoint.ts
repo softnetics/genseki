@@ -148,6 +148,11 @@ export interface ApiRouteSchemaClient {
   responses: Partial<Record<ApiHttpStatus, JSONSchema.JSONSchema>>
 }
 
+export type ApiRoutePath = {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
+}
+
 export interface AnyApiRouteSchema {
   method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
   path: string

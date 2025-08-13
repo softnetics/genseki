@@ -1,7 +1,7 @@
 import type { createFileUploadHandlers } from './handlers'
 
 import type { AnyContextable } from '../context'
-import type { ApiRouteSchemaClient } from '../endpoint'
+import type { ApiRoutePath } from '../endpoint'
 
 export type FileUploadHandlers = ReturnType<
   typeof createFileUploadHandlers<AnyContextable>
@@ -21,8 +21,10 @@ export type UploadFunction = (
   abortSignal: AbortSignal
 ) => Promise<{ key: string }>
 
-export interface StorageAdapter {
+export interface StorageAdapter<TContext extends AnyContextable = AnyContextable> {
   name: string
+  context: TContext
+  imageBaseUrl: string
   generatePutObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ putObjectUrl: string }>>
@@ -33,18 +35,19 @@ export interface StorageAdapter {
 
 export interface StorageAdapterClient {
   name: string
-  grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
-  grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  grabPutObjectSignedUrlApiRoute: ApiRoutePath
+  grabGetObjectSignedUrlApiRoute: ApiRoutePath
+  imageBaseUrl?: string
 }
 
-export const getStorageAdapterClient = ({
+export const getStorageAdapterClient = <TContext extends AnyContextable = AnyContextable>({
   storageAdapter,
   grabPutObjectSignedUrlApiRoute,
   grabGetObjectSignedUrlApiRoute,
 }: {
-  storageAdapter?: StorageAdapter
-  grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
-  grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  storageAdapter?: StorageAdapter<TContext>
+  grabPutObjectSignedUrlApiRoute: ApiRoutePath
+  grabGetObjectSignedUrlApiRoute: ApiRoutePath
 }): StorageAdapterClient => {
   if (!storageAdapter) throw new Error('Upload adapter is missing')
 
@@ -52,18 +55,23 @@ export const getStorageAdapterClient = ({
     name: storageAdapter.name,
     grabPutObjectSignedUrlApiRoute,
     grabGetObjectSignedUrlApiRoute,
+    imageBaseUrl: storageAdapter.imageBaseUrl,
   }
 }
 
-export const handleStorageAdapter = (adapter: StorageAdapter): StorageAdapter => {
+export const handleStorageAdapter = <TContext extends AnyContextable = AnyContextable>(
+  adapter: StorageAdapter<TContext>
+): StorageAdapter<TContext> => {
   // Middleware
   return {
     name: adapter.name,
+    context: adapter.context,
+    imageBaseUrl: adapter.imageBaseUrl,
     generatePutObjectSignedUrl(...args) {
       return adapter.generatePutObjectSignedUrl(...args)
     },
     generateGetObjectSignedUrl(...args) {
       return adapter.generateGetObjectSignedUrl(...args)
     },
-  } satisfies StorageAdapter
+  }
 }

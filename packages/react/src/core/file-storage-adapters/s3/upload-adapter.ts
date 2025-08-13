@@ -6,21 +6,42 @@ import {
 } from '@aws-sdk/client-s3'
 import { getSignedUrl } from '@aws-sdk/s3-request-presigner'
 
+import type { AnyContextable } from '../../context'
 import type { StorageAdapter } from '../generic-adapter'
 
-export class StorageAdapterS3 implements StorageAdapter {
+export class StorageAdapterS3<TContext extends AnyContextable = AnyContextable>
+  implements StorageAdapter<TContext>
+{
   private AWSClient: S3Client
   private bucket: string
   public name = 'S3'
 
-  private constructor(options: { bucket: string; clientConfig: S3ClientConfig }) {
+  public readonly context: TContext
+  public imageBaseUrl: string
+
+  private constructor(options: {
+    bucket: string
+    clientConfig: S3ClientConfig
+    context: TContext
+    imageBaseUrl: string
+  }) {
     this.AWSClient = new S3Client(options.clientConfig)
     this.bucket = options.bucket
+    this.context = options.context
+    this.imageBaseUrl = options.imageBaseUrl
   }
 
   // Incase where you need to create the client automatically
-  public static initialize(options: { bucket: string; clientConfig: S3ClientConfig }) {
-    return new StorageAdapterS3(options)
+  public static initialize(
+    context: AnyContextable,
+    options: { bucket: string; clientConfig: S3ClientConfig; imageBaseUrl: string }
+  ) {
+    return new StorageAdapterS3({
+      context,
+      bucket: options.bucket,
+      clientConfig: options.clientConfig,
+      imageBaseUrl: options.imageBaseUrl,
+    })
   }
 
   /**

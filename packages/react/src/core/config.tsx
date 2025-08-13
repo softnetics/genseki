@@ -4,8 +4,13 @@ import { deepmerge } from 'deepmerge-ts'
 import * as R from 'remeda'
 import type { Promisable } from 'type-fest'
 
-import type { AnyContextable, AnyRequestContextable, ApiRouter } from '.'
-import { type AnyApiRouter, isApiRoute } from './endpoint'
+import {
+  type AnyContextable,
+  type AnyRequestContextable,
+  type ApiRouter,
+  createFileUploadHandlers,
+} from '.'
+import { type AnyApiRouter, type ApiRoutePath, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
@@ -128,9 +133,36 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   private readonly plugins: AnyGensekiPlugin[] = []
   private core: GensekiCore<TMainApiRouter> = {} as GensekiCore<TMainApiRouter>
 
+  private storageRoutesForClient?: {
+    putObjSignedUrl: ApiRoutePath
+    getObjSignedUrl: ApiRoutePath
+  }
+
   constructor(private readonly options: GensekiAppOptions) {
     this.options.middlewares = this.options.middlewares ?? []
     this.options.middlewares.push(unauthorizedMiddleware)
+
+    if (this.options.storageAdapter) {
+      const { handlers } = createFileUploadHandlers(
+        this.options.storageAdapter.context,
+        this.options.storageAdapter
+      )
+      const apiPrefix = this.options.apiPrefix ?? '/api'
+
+      const putHandler = handlers['file.generatePutObjSignedUrl']
+      const getHandler = handlers['file.generateGetObjSignedUrl']
+
+      this.storageRoutesForClient = {
+        putObjSignedUrl: {
+          method: putHandler.schema.method,
+          path: `${apiPrefix}${putHandler.schema.path}`,
+        },
+        getObjSignedUrl: {
+          method: getHandler.schema.method,
+          path: `${apiPrefix}${getHandler.schema.path}`,
+        },
+      }
+    }
   }
 
   apply<const TPlugin extends AnyGensekiPlugin>(
@@ -192,6 +224,19 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       } as unknown as GensekiCore<TMainApiRouter>
     )
 
+    if (this.options.storageAdapter) {
+      const { handlers } = createFileUploadHandlers(
+        this.options.storageAdapter.context,
+        this.options.storageAdapter
+      )
+      core.api = deepmerge(core.api, {
+        storage: {
+          putObjSignedUrl: handlers['file.generatePutObjSignedUrl'],
+          getObjSignedUrl: handlers['file.generateGetObjSignedUrl'],
+        },
+      }) as TMainApiRouter
+    }
+
     const logs = this._logApiRouter(core.api).sort((a, b) => a.localeCompare(b))
     const uiLogs = this._logUis(core.uis).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
@@ -201,8 +246,8 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       middlewares: this.options.middlewares,
       storageAdapter: getStorageAdapterClient({
         storageAdapter: this.options.storageAdapter,
-        grabPutObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types,
-        grabGetObjectSignedUrlApiRoute: {} as any, // TODO: Fix client endpoint types
+        grabGetObjectSignedUrlApiRoute: this.storageRoutesForClient!.getObjSignedUrl,
+        grabPutObjectSignedUrlApiRoute: this.storageRoutesForClient!.putObjSignedUrl,
       }),
       api: core.api,
       uis: core.uis,
