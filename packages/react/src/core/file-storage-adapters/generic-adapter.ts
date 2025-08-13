@@ -44,17 +44,38 @@ export const getStorageAdapterClient = ({
   storageAdapter,
   grabPutObjectSignedUrlApiRoute,
   grabGetObjectSignedUrlApiRoute,
+  apiPrefix = '/api',
 }: {
   storageAdapter?: StorageAdapter
-  grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
-  grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  grabPutObjectSignedUrlApiRoute?: ApiRouteSchemaClient
+  grabGetObjectSignedUrlApiRoute?: ApiRouteSchemaClient
+  apiPrefix?: string
 }): StorageAdapterClient => {
   if (!storageAdapter) throw new Error('Upload adapter is missing')
 
+  if (
+    (!grabPutObjectSignedUrlApiRoute || !grabGetObjectSignedUrlApiRoute) &&
+    storageAdapter.getApiRouter
+  ) {
+    const storageApi = storageAdapter.getApiRouter()
+    const putRoute: any = (storageApi as any)?.storage?.putObjSignedUrl
+    const getRoute: any = (storageApi as any)?.storage?.getObjSignedUrl
+
+    grabPutObjectSignedUrlApiRoute ??= {
+      method: putRoute?.schema?.method ?? 'GET',
+      path: `${apiPrefix}${putRoute?.schema?.path ?? '/storage/put-obj-signed-url'}`,
+    } as any
+
+    grabGetObjectSignedUrlApiRoute ??= {
+      method: getRoute?.schema?.method ?? 'GET',
+      path: `${apiPrefix}${getRoute?.schema?.path ?? '/storage/get-obj-signed-url'}`,
+    } as any
+  }
+
   return {
     name: storageAdapter.name,
-    grabPutObjectSignedUrlApiRoute,
-    grabGetObjectSignedUrlApiRoute,
+    grabPutObjectSignedUrlApiRoute: grabPutObjectSignedUrlApiRoute!,
+    grabGetObjectSignedUrlApiRoute: grabGetObjectSignedUrlApiRoute!,
     imageBaseUrl: storageAdapter.getImageBaseUrl?.(),
   }
 }

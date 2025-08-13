@@ -206,14 +206,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       middlewares: this.options.middlewares,
       storageAdapter: getStorageAdapterClient({
         storageAdapter: this.options.storageAdapter,
-        grabPutObjectSignedUrlApiRoute: {
-          method: 'GET',
-          path: '/api/storage/put-obj-signed-url',
-        } as any, // TODO: Fix client endpoint types,
-        grabGetObjectSignedUrlApiRoute: {
-          method: 'GET',
-          path: '/api/storage/get-obj-signed-url',
-        } as any, // TODO: Fix client endpoint types
+        apiPrefix: this.options.apiPrefix,
       }),
       api: core.api,
       uis: core.uis,

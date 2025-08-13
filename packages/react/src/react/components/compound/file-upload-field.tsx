@@ -97,8 +97,16 @@ const uploadObject = async (
 
     return res
   } catch (error) {
-    const message = (error as { message?: string })?.message ?? 'Upload error'
-    return { ok: false, message }
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      typeof error.message === 'string'
+    ) {
+      return { ok: false, message: error.message }
+    }
+
+    return { ok: false, message: 'Upload error' }
   }
 }
 
@@ -202,13 +210,18 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
 
     // TODO: Allow for multiples file, currently one at a time
     const targetFile = files[0]
+    const name = targetFile.name.split('.').slice(0, -1).join('.')
+    const extension = targetFile.name.split('.').pop()
 
-    const key = `${pathName ? `${pathName}/` : ''}${crypto.randomUUID()}-${targetFile.name}`
+    const key = `${pathName ? `${pathName}/` : ''}${name}-${crypto.randomUUID()}.${extension}`
     setTempFileKey(key)
 
     const signedUrlPath = storageAdapter.grabPutObjectSignedUrlApiRoute.path
 
     if (!signedUrlPath) {
+      toast.error('Storage adater is missing', {
+        description: 'Check the config file if you have provided the adapter',
+      })
       props.onUploadFail?.('Storage adater is missing')
       return
     }
@@ -232,14 +245,12 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
 
     if (!uploadResult.ok) {
       props.onUploadFail?.(uploadResult.message || 'File upload error')
-      toast.error('File upload error', {
-        description: uploadResult.message,
-      })
-
       if (uploadResult.message === 'Upload aborted') {
         setTempFileKey(undefined)
       }
-
+      toast.error('File upload error', {
+        description: uploadResult.message,
+      })
       setUploadStatus('failed')
       setProgress(undefined)
       return
@@ -438,7 +449,7 @@ const FileDisplayer = (props: {
         )}
         <div className="flex flex-col gap-4">
           <Typography type="body" weight="medium" className="text-muted-fg" content={props.fileKey}>
-            {props.fileKey}
+            {props.fileKey.split('/').pop() || ''}
           </Typography>
 
           {props.uploadStatus && (
