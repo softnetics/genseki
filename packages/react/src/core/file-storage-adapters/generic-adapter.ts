@@ -1,7 +1,7 @@
 import type { createFileUploadHandlers } from './handlers'
 
 import type { AnyContextable } from '../context'
-import type { ApiRouter, ApiRouteSchemaClient } from '../endpoint'
+import type { ApiRoutePath } from '../endpoint'
 
 export type FileUploadHandlers = ReturnType<
   typeof createFileUploadHandlers<AnyContextable>
@@ -21,74 +21,57 @@ export type UploadFunction = (
   abortSignal: AbortSignal
 ) => Promise<{ key: string }>
 
-export interface StorageAdapter {
+export interface StorageAdapter<TContext extends AnyContextable = AnyContextable> {
   name: string
+  context: TContext
+  imageBaseUrl: string
   generatePutObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ putObjectUrl: string }>>
   generateGetObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ readObjectUrl: string }>>
-  getApiRouter?: () => ApiRouter
-  getImageBaseUrl?: () => string | undefined
 }
 
 export interface StorageAdapterClient {
   name: string
-  grabPutObjectSignedUrlApiRoute: ApiRouteSchemaClient
-  grabGetObjectSignedUrlApiRoute: ApiRouteSchemaClient
+  grabPutObjectSignedUrlApiRoute: ApiRoutePath
+  grabGetObjectSignedUrlApiRoute: ApiRoutePath
   imageBaseUrl?: string
 }
 
-export const getStorageAdapterClient = ({
+export const getStorageAdapterClient = <TContext extends AnyContextable = AnyContextable>({
   storageAdapter,
   grabPutObjectSignedUrlApiRoute,
   grabGetObjectSignedUrlApiRoute,
-  apiPrefix = '/api',
 }: {
-  storageAdapter?: StorageAdapter
-  grabPutObjectSignedUrlApiRoute?: ApiRouteSchemaClient
-  grabGetObjectSignedUrlApiRoute?: ApiRouteSchemaClient
-  apiPrefix?: string
+  storageAdapter?: StorageAdapter<TContext>
+  grabPutObjectSignedUrlApiRoute: ApiRoutePath
+  grabGetObjectSignedUrlApiRoute: ApiRoutePath
 }): StorageAdapterClient => {
   if (!storageAdapter) throw new Error('Upload adapter is missing')
 
-  if (
-    (!grabPutObjectSignedUrlApiRoute || !grabGetObjectSignedUrlApiRoute) &&
-    storageAdapter.getApiRouter
-  ) {
-    const storageApi = storageAdapter.getApiRouter()
-    const putRoute: any = (storageApi as any)?.storage?.putObjSignedUrl
-    const getRoute: any = (storageApi as any)?.storage?.getObjSignedUrl
-
-    grabPutObjectSignedUrlApiRoute ??= {
-      method: putRoute?.schema?.method ?? 'GET',
-      path: `${apiPrefix}${putRoute?.schema?.path ?? '/storage/put-obj-signed-url'}`,
-    } as any
-
-    grabGetObjectSignedUrlApiRoute ??= {
-      method: getRoute?.schema?.method ?? 'GET',
-      path: `${apiPrefix}${getRoute?.schema?.path ?? '/storage/get-obj-signed-url'}`,
-    } as any
-  }
-
   return {
     name: storageAdapter.name,
-    grabPutObjectSignedUrlApiRoute: grabPutObjectSignedUrlApiRoute!,
-    grabGetObjectSignedUrlApiRoute: grabGetObjectSignedUrlApiRoute!,
-    imageBaseUrl: storageAdapter.getImageBaseUrl?.(),
+    grabPutObjectSignedUrlApiRoute,
+    grabGetObjectSignedUrlApiRoute,
+    imageBaseUrl: storageAdapter.imageBaseUrl,
   }
 }
 
-export const handleStorageAdapter = (adapter: StorageAdapter): StorageAdapter => {
+export const handleStorageAdapter = <TContext extends AnyContextable = AnyContextable>(
+  adapter: StorageAdapter<TContext>
+): StorageAdapter<TContext> => {
   // Middleware
   return {
     name: adapter.name,
+    context: adapter.context,
+    imageBaseUrl: adapter.imageBaseUrl,
     generatePutObjectSignedUrl(...args) {
       return adapter.generatePutObjectSignedUrl(...args)
     },
     generateGetObjectSignedUrl(...args) {
       return adapter.generateGetObjectSignedUrl(...args)
     },
-  } satisfies StorageAdapter
+  }
 }

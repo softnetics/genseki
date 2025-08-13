@@ -152,7 +152,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   const accept = props.uploadOptions?.accept || undefined
   const pathName = props.uploadOptions?.pathName
   const readableMimeTypes = mimeTypes.map((mimeType) => mimeType.split('/')[1]).join(', ')
-  const imageBaseUrl = storageAdapter?.imageBaseUrl
+  const imageBaseUrl = storageAdapter.imageBaseUrl
 
   // Upload progress
   const [progress, setProgress] = useState<number | undefined>(undefined)

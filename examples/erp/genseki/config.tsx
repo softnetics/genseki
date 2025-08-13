@@ -16,7 +16,7 @@ const app = new GensekiApp({
   version: '0.0.0',
   storageAdapter: StorageAdapterS3.initialize(context, {
     bucket: process.env.AWS_BUCKET_NAME!,
-    imageBaseUrl: process.env.NEXT_PUBLIC_AWS_IMAGE_URL,
+    imageBaseUrl: process.env.NEXT_PUBLIC_AWS_IMAGE_URL!,
     clientConfig: {
       region: process.env.AWS_REGION!,
       credentials: {
