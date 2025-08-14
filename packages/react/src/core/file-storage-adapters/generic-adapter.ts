@@ -31,12 +31,16 @@ export interface StorageAdapter<TContext extends AnyContextable = AnyContextable
   generateGetObjectSignedUrl(arg: {
     key: string
   }): Promise<UploadActionResponse<{ readObjectUrl: string }>>
+  generateDeleteObjectSignedUrl(arg: {
+    key: string
+  }): Promise<UploadActionResponse<{ deleteObjectUrl: string }>>
 }
 
 export interface StorageAdapterClient {
   name: string
   grabPutObjectSignedUrlApiRoute: ApiRoutePath
   grabGetObjectSignedUrlApiRoute: ApiRoutePath
+  grabDeleteObjectSignedUrlApiRoute: ApiRoutePath
   imageBaseUrl?: string
 }
 
@@ -44,10 +48,12 @@ export const getStorageAdapterClient = <TContext extends AnyContextable = AnyCon
   storageAdapter,
   grabPutObjectSignedUrlApiRoute,
   grabGetObjectSignedUrlApiRoute,
+  grabDeleteObjectSignedUrlApiRoute,
 }: {
   storageAdapter?: StorageAdapter<TContext>
   grabPutObjectSignedUrlApiRoute: ApiRoutePath
   grabGetObjectSignedUrlApiRoute: ApiRoutePath
+  grabDeleteObjectSignedUrlApiRoute: ApiRoutePath
 }): StorageAdapterClient => {
   if (!storageAdapter) throw new Error('Upload adapter is missing')
 
@@ -55,6 +61,7 @@ export const getStorageAdapterClient = <TContext extends AnyContextable = AnyCon
     name: storageAdapter.name,
     grabPutObjectSignedUrlApiRoute,
     grabGetObjectSignedUrlApiRoute,
+    grabDeleteObjectSignedUrlApiRoute,
     imageBaseUrl: storageAdapter.imageBaseUrl,
   }
 }
@@ -72,6 +79,9 @@ export const handleStorageAdapter = <TContext extends AnyContextable = AnyContex
     },
     generateGetObjectSignedUrl(...args) {
       return adapter.generateGetObjectSignedUrl(...args)
+    },
+    generateDeleteObjectSignedUrl(...args) {
+      return adapter.generateDeleteObjectSignedUrl(...args)
     },
   }
 }

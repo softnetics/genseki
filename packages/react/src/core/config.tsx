@@ -136,6 +136,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   private storageRoutesForClient?: {
     putObjSignedUrl: ApiRoutePath
     getObjSignedUrl: ApiRoutePath
+    deleteObjSignedUrl: ApiRoutePath
   }
 
   constructor(private readonly options: GensekiAppOptions) {
@@ -151,6 +152,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
       const putHandler = handlers['file.generatePutObjSignedUrl']
       const getHandler = handlers['file.generateGetObjSignedUrl']
+      const deleteHandler = handlers['file.generateDeleteObjSignedUrl']
 
       this.storageRoutesForClient = {
         putObjSignedUrl: {
@@ -160,6 +162,10 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
         getObjSignedUrl: {
           method: getHandler.schema.method,
           path: `${apiPrefix}${getHandler.schema.path}`,
+        },
+        deleteObjSignedUrl: {
+          method: deleteHandler.schema.method,
+          path: `${apiPrefix}${deleteHandler.schema.path}`,
         },
       }
     }
@@ -233,6 +239,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
         storage: {
           putObjSignedUrl: handlers['file.generatePutObjSignedUrl'],
           getObjSignedUrl: handlers['file.generateGetObjSignedUrl'],
+          deleteObjSignedUrl: handlers['file.generateDeleteObjSignedUrl'],
         },
       }) as TMainApiRouter
     }
@@ -244,11 +251,14 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
     return {
       middlewares: this.options.middlewares,
-      storageAdapter: getStorageAdapterClient({
-        storageAdapter: this.options.storageAdapter,
-        grabGetObjectSignedUrlApiRoute: this.storageRoutesForClient!.getObjSignedUrl,
-        grabPutObjectSignedUrlApiRoute: this.storageRoutesForClient!.putObjSignedUrl,
-      }),
+      storageAdapter: this.storageRoutesForClient
+        ? getStorageAdapterClient({
+            storageAdapter: this.options.storageAdapter,
+            grabGetObjectSignedUrlApiRoute: this.storageRoutesForClient.getObjSignedUrl,
+            grabPutObjectSignedUrlApiRoute: this.storageRoutesForClient.putObjSignedUrl,
+            grabDeleteObjectSignedUrlApiRoute: this.storageRoutesForClient.deleteObjSignedUrl,
+          })
+        : undefined,
       api: core.api,
       uis: core.uis,
     }

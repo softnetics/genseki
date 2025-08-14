@@ -1,3 +1,4 @@
+import { grabDeleteObjUrl } from './grab-delete-obj-signed-url'
 import { grabGetObjUrl } from './grab-get-obj-signed-url'
 import { grabPutObjUrl } from './grab-put-obj-signed-url'
 
@@ -11,6 +12,7 @@ export function createFileUploadHandlers<TContext extends AnyContextable = AnyCo
   const handlers = {
     'file.generatePutObjSignedUrl': grabPutObjUrl<TContext>(context, uploadAdapter),
     'file.generateGetObjSignedUrl': grabGetObjUrl<TContext>(context, uploadAdapter),
+    'file.generateDeleteObjSignedUrl': grabDeleteObjUrl<TContext>(context, uploadAdapter),
   } as const
 
   return {

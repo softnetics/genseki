@@ -1,4 +1,5 @@
 import {
+  DeleteObjectCommand,
   GetObjectCommand,
   PutObjectCommand,
   S3Client,
@@ -75,6 +76,23 @@ export class StorageAdapterS3<TContext extends AnyContextable = AnyContextable>
     return {
       message: 'File upload signed URL request success',
       data: { putObjectUrl: uploadSignedUrl },
+    }
+  }
+
+  /**
+   * @description Get the signed URL for deleting the object from S3
+   */
+  public async generateDeleteObjectSignedUrl(arg: { key: string }) {
+    const deleteCommand = new DeleteObjectCommand({
+      Bucket: this.bucket,
+      Key: arg.key,
+    })
+
+    const deleteSignedUrl = await getSignedUrl(this.AWSClient, deleteCommand, { expiresIn: 3600 })
+
+    return {
+      message: 'File delete signed URL request success',
+      data: { deleteObjectUrl: deleteSignedUrl },
     }
   }
 }
