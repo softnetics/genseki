@@ -13,14 +13,14 @@ export const fields = builder.fields('user', (fb) => ({
   }),
   image: fb.columns('image', {
     type: 'media',
-    label: 'Thumbnail',
+    label: 'Image',
     isRequired: true,
     uploadOptions: {
       maxSize: 1024 * 1024 * 2, // 2MB
       limit: 1,
       accept: 'image/*',
       mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
-      pathName: 'dev-uploads/test',
+      pathName: 'dev-uploads/test', // storage name
     },
   }),
 }))
