@@ -62,7 +62,37 @@ const generatePutObjSignedUrlData = async (
 }
 
 /**
- * @description
+ * @description Generates a signed URL for deleting a file from object storage
+ */
+const generateDeleteObjSignedUrlData = async (
+  path: string,
+  key: string
+): Promise<{ ok: true; data: any } | { ok: false; message: string }> => {
+  try {
+    const deleteObjUrlEndpoint = new URL(path, window.location.origin)
+
+    deleteObjUrlEndpoint.searchParams.append('key', key)
+
+    const deleteObjSignedUrl = await fetch(deleteObjUrlEndpoint.toString(), {
+      method: 'DELETE',
+    })
+
+    return {
+      ok: true,
+      data: await deleteObjSignedUrl.json(),
+    }
+  } catch (error) {
+    const message = (error as Error).message
+
+    return {
+      ok: false,
+      message: message,
+    }
+  }
+}
+
+/**
+ * @description Uploads a file using a signed URL
  */
 const uploadObject = async (
   signedUrl: string,
@@ -110,6 +140,36 @@ const uploadObject = async (
   }
 }
 
+/**
+ * @description Deletes a file using a signed URL
+ */
+const deleteObject = async (
+  signedUrl: string
+): Promise<{ ok: true } | { ok: false; message: string }> => {
+  try {
+    const response = await fetch(signedUrl, {
+      method: 'DELETE',
+    })
+
+    if (response.ok) {
+      return { ok: true }
+    } else {
+      return { ok: false, message: `HTTP ${response.status} ${response.statusText}` }
+    }
+  } catch (error) {
+    if (
+      typeof error === 'object' &&
+      error !== null &&
+      'message' in error &&
+      typeof error.message === 'string'
+    ) {
+      return { ok: false, message: error.message }
+    }
+
+    return { ok: false, message: 'Delete error' }
+  }
+}
+
 export interface FileUploadOptionsProps {
   mimeTypes?: string[]
   maxSize?: number // Bytes (Default is 1024 * 1024 = 1 MB)
@@ -143,6 +203,9 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   const [uploadStatus, setUploadStatus] = useState<'pending' | 'success' | 'failed' | undefined>(
     undefined
   )
+  const [deleteStatus, setDeleteStatus] = useState<'pending' | 'success' | 'failed' | undefined>(
+    undefined
+  )
   const storageAdapter = useStorageAdapter()
   const inputRef = useRef<HTMLInputElement>(null)
   const maxSize = props.uploadOptions?.maxSize || 1024 * 1024 * 1
@@ -170,10 +233,10 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
 
     // Check for storage adapter availability
     if (!storageAdapter) {
-      toast.error('Storage adater is missing', {
+      toast.error('Storage adapter is missing', {
         description: 'Check the config file if you have provided the adapter',
       })
-      props.onUploadFail?.('Storage adater is missing')
+      props.onUploadFail?.('Storage adapter is missing')
       return
     }
 
@@ -189,7 +252,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
       const mimeValidateResult = mimeTypeValidate(mimeTypes, file.type)
       if (!mimeValidateResult) {
         toast.error(
-          `File type is not alloed, only ${readableMimeTypes} ${mimeTypes.length > 1 ? 'are' : 'is'} allowed`,
+          `File type is not allowed, only ${readableMimeTypes} ${mimeTypes.length > 1 ? 'are' : 'is'} allowed`,
           {
             description: `${file.name} is ${file.type} which is not allowed`,
           }
@@ -219,10 +282,10 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     const signedUrlPath = storageAdapter.grabPutObjectSignedUrlApiRoute.path
 
     if (!signedUrlPath) {
-      toast.error('Storage adater is missing', {
+      toast.error('Storage adapter is missing', {
         description: 'Check the config file if you have provided the adapter',
       })
-      props.onUploadFail?.('Storage adater is missing')
+      props.onUploadFail?.('Storage adapter is missing')
       return
     }
 
@@ -262,6 +325,72 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     setProgress(undefined)
   }
 
+  const handleRemove = async (fileKey: string) => {
+    if (props.onRemove) {
+      props.onRemove(fileKey)
+      return
+    }
+
+    setDeleteStatus('pending')
+
+    if (!storageAdapter) {
+      toast.error('Storage adapter is missing', {
+        description: 'Check the config file if you have provided the adapter',
+      })
+      props.onRemoveFail?.('Storage adapter is missing')
+      setDeleteStatus('failed')
+      return
+    }
+
+    const deleteSignedUrlPath = storageAdapter.grabDeleteObjectSignedUrlApiRoute?.path
+
+    if (!deleteSignedUrlPath) {
+      toast.error('Delete functionality not configured', {
+        description: 'Delete API route is not configured in the storage adapter',
+      })
+      props.onRemoveFail?.('Delete functionality not configured')
+      setDeleteStatus('failed')
+      return
+    }
+
+    try {
+      const deleteObjSignedUrl = await generateDeleteObjSignedUrlData(deleteSignedUrlPath, fileKey)
+
+      if (!deleteObjSignedUrl.ok) {
+        props.onRemoveFail?.(
+          deleteObjSignedUrl.message || 'generating delete object signed URL error'
+        )
+        toast.error('generating delete object signed URL error', {
+          description: deleteObjSignedUrl.message,
+        })
+        setDeleteStatus('failed')
+        return
+      }
+
+      const deleteResult = await deleteObject(deleteObjSignedUrl.data.body.signedUrl)
+
+      if (!deleteResult.ok) {
+        props.onRemoveFail?.(deleteResult.message || 'File delete error')
+        toast.error('File delete error', {
+          description: deleteResult.message,
+        })
+        setDeleteStatus('failed')
+        return
+      }
+
+      setFileKey(undefined)
+      setUploadStatus(undefined)
+      setDeleteStatus('success')
+      props.onRemoveSuccess?.(fileKey)
+      toast.success('File deleted successfully')
+    } catch (error) {
+      const message = (error as Error).message
+      props.onRemoveFail?.(message || 'Remove file fail')
+      toast.error('Remove file fail', { description: message })
+      setDeleteStatus('failed')
+    }
+  }
+
   // For upload via clicking
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = e.target.files
@@ -296,11 +425,9 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
         <FileDisplayer
           imageBaseUrl={imageBaseUrl}
           uploadStatus={uploadStatus}
+          deleteStatus={deleteStatus}
           fileKey={fileKey}
-          onRemove={props.onRemove}
-          onRemoveSuccess={props.onRemoveSuccess}
-          onRemoveFail={props.onRemoveFail}
-          resetFileKey={() => setFileKey(undefined)}
+          onRemove={handleRemove}
         />
       ) : (
         <div>
@@ -376,37 +503,13 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
 const FileDisplayer = (props: {
   fileKey: string
   uploadStatus?: 'pending' | 'success' | 'failed'
+  deleteStatus?: 'pending' | 'success' | 'failed'
   imageBaseUrl?: string
-  resetFileKey: () => void
-  onRemove?: (fileKey: string) => void
-  onRemoveSuccess?: (fileKey: string) => void
-  onRemoveFail?: (reason: string) => void
+  onRemove: (fileKey: string) => void
 }) => {
   const isImage = isImageKey(props.fileKey)
 
-  const handleRemove = () => {
-    // Custom handle on your own
-    if (props.onRemove) {
-      props.onRemove(props.fileKey)
-      return
-    }
-
-    try {
-      // TODO: implement remove by signed-url method
-      // 1. Grab delete object signed url
-      // 2. Fetch the delete object signed url
-      // 3. Delete the object
-      props.resetFileKey()
-      props.onRemoveSuccess?.(props.fileKey)
-    } catch (error) {
-      const message = (error as Error).message
-      props.onRemoveFail?.(message || 'Remove file fail')
-      toast.error('Remove file fail', { description: message })
-      return
-    }
-  }
-
-  const uploadStatusVariant = {
+  const statusVariant = {
     pending: {
       icon: <BaseIcon icon={CloudArrowUpIcon} size="sm" className="text-muted-fg" />,
       text: (
@@ -433,6 +536,8 @@ const FileDisplayer = (props: {
     },
   }
 
+  const isDeleting = props.deleteStatus === 'pending'
+
   return (
     <div className="w-full h-full bg-white dark:bg-transparent rounded-md p-8 items-center gap-x-4 border border-bluegray-300 dark:border-bluegray-700">
       <div className="flex gap-x-4 items-start">
@@ -452,17 +557,26 @@ const FileDisplayer = (props: {
             {props.fileKey.split('/').pop() || ''}
           </Typography>
 
-          {props.uploadStatus && (
+          {(props.uploadStatus || props.deleteStatus) && (
             <div className="flex gap-2 items-center text-muted-fg">
-              {uploadStatusVariant[props.uploadStatus].icon}
-              {uploadStatusVariant[props.uploadStatus].text}
+              {props.deleteStatus ? (
+                <>
+                  {statusVariant[props.deleteStatus].icon}
+                  {statusVariant[props.deleteStatus].text}
+                </>
+              ) : props.uploadStatus ? (
+                <>
+                  {statusVariant[props.uploadStatus].icon}
+                  {statusVariant[props.uploadStatus].text}
+                </>
+              ) : null}
             </div>
           )}
 
           <div className="flex gap-6 items-center">
             <Modal>
-              <Button variant="destruction" size="xs">
-                Remove
+              <Button variant="destruction" size="xs" isDisabled={isDeleting}>
+                {isDeleting ? 'Deleting...' : 'Remove'}
               </Button>
               <ModalContent isBlurred role="alertdialog">
                 <ModalHeader className="">
@@ -475,8 +589,13 @@ const FileDisplayer = (props: {
                   <ModalClose variant="outline" size="sm">
                     Cancel
                   </ModalClose>
-                  <ModalClose variant="destruction" size="sm" onClick={handleRemove}>
-                    Delete
+                  <ModalClose
+                    variant="destruction"
+                    size="sm"
+                    onClick={() => props.onRemove(props.fileKey)}
+                    isDisabled={isDeleting}
+                  >
+                    {isDeleting ? 'Deleting...' : 'Delete'}
                   </ModalClose>
                 </ModalFooter>
               </ModalContent>
