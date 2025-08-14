@@ -1,5 +1,61 @@
 # @genseki/react
 
+## 0.1.0-alpha.34
+
+### Patch Changes
+
+- [#154](https://github.com/softnetics/genseki/pull/154) [`4f04302`](https://github.com/softnetics/genseki/commit/4f04302a46e85a52b2f07156ec77fe55a17a4367) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Add delete object from storage
+
+## 0.1.0-alpha.33
+
+### Patch Changes
+
+- [#142](https://github.com/softnetics/genseki/pull/142) [`b1908d1`](https://github.com/softnetics/genseki/commit/b1908d164c623e2e9e409e7426e5948c75783e40) Thanks [@Desmenez](https://github.com/Desmenez)! - [Fix] Media file uploader not working (https://github.com/softnetics/genseki/pull/142)
+
+## 0.1.0-alpha.32
+
+### Minor Changes
+
+- [#140](https://github.com/softnetics/genseki/pull/140) [`bd93756`](https://github.com/softnetics/genseki/commit/bd93756ef1db834e49e67e6bf62e8b31fcba546d) Thanks [@PondC](https://github.com/PondC)! - [Fix] any password can login due to unawaited Promise leak
+
+### Patch Changes
+
+- [#148](https://github.com/softnetics/genseki/pull/148) [`3a9f911`](https://github.com/softnetics/genseki/commit/3a9f911e96104c9f7d82fc5aef4b0ddd435a0a47) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] use useMutation in CRUD page instead of serverFunction
+
+## 0.1.0-alpha.31
+
+### Patch Changes
+
+- [#146](https://github.com/softnetics/genseki/pull/146) [`650bcad`](https://github.com/softnetics/genseki/commit/650bcad59781c3e32b8a28f91e22e6e23759035b) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] `getFieldsClient` wrong omit field
+
+## 0.1.0-alpha.30
+
+### Minor Changes
+
+- [#141](https://github.com/softnetics/genseki/pull/141) [`72ddbd9`](https://github.com/softnetics/genseki/commit/72ddbd9f6d4cc931f35e71208a53e9f912101c47) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] implement proper way to handle options and conditional disabling
+
+## 0.1.0-alpha.29
+
+### Minor Changes
+
+- [#143](https://github.com/softnetics/genseki/pull/143) [`16e83a3`](https://github.com/softnetics/genseki/commit/16e83a305e9387389856b4d566c79df9742a301a) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Export Tanstack table component
+
+## 0.1.0-alpha.28
+
+## 0.1.0-alpha.27
+
+### Patch Changes
+
+- [#133](https://github.com/softnetics/genseki/pull/133) [`164983e`](https://github.com/softnetics/genseki/commit/164983e46de25b2f016fa6208906f67e4211e3b8) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Use `createEndpoint` for `builder.endpoint`
+
+## 0.1.0-alpha.26
+
+### Patch Changes
+
+- [#128](https://github.com/softnetics/genseki/pull/128) [`983ce71`](https://github.com/softnetics/genseki/commit/983ce71ff2ba07f182ed7edf898bb05bfd785be9) Thanks [@t0ngk](https://github.com/t0ngk)! - export `createGensekiUiRoute`
+
+- [#132](https://github.com/softnetics/genseki/pull/132) [`2006302`](https://github.com/softnetics/genseki/commit/2006302a31dfda6c5d15de0b756340e0a37b30b3) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Allow passing options for setting cookie via response helper
+
 ## 0.1.0-alpha.25
 
 ### Minor Changes

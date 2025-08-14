@@ -1,5 +1,31 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.34
+
+## 0.1.0-alpha.33
+
+## 0.1.0-alpha.32
+
+## 0.1.0-alpha.31
+
+## 0.1.0-alpha.30
+
+## 0.1.0-alpha.29
+
+## 0.1.0-alpha.28
+
+### Patch Changes
+
+- [#138](https://github.com/softnetics/genseki/pull/138) [`1b99806`](https://github.com/softnetics/genseki/commit/1b998067c7745169c9787cdd96257e5e122dfcad) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix `useInvalidateQuery` does not match its type
+
+## 0.1.0-alpha.27
+
+### Minor Changes
+
+- [#135](https://github.com/softnetics/genseki/pull/135) [`e66eaa3`](https://github.com/softnetics/genseki/commit/e66eaa3477b2af61244cac5fea5fb60d7c02c976) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Add `useGetQueryData`, `useSetQueryData`, and `useOptimisticUpdateQuery`
+
+## 0.1.0-alpha.26
+
 ## 0.1.0-alpha.25
 
 ## 0.1.0-alpha.24

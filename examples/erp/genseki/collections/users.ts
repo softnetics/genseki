@@ -13,39 +13,53 @@ export const fields = builder.fields('user', (fb) => ({
   }),
   image: fb.columns('image', {
     type: 'media',
-    mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+    label: 'Image',
+    isRequired: true,
+    uploadOptions: {
+      maxSize: 1024 * 1024 * 2, // 2MB
+      limit: 1,
+      accept: 'image/*',
+      mimeTypes: ['image/jpeg', 'image/png', 'image/webp'],
+      pathName: 'dev-uploads/test', // storage name
+    },
   }),
 }))
 
-export const usersCollection = builder.collection((b) => ({
-  slug: 'users',
-  list: b.list({
-    fields: fields,
-    columns: columns,
-    configuration: {
-      search: ['name'],
-      sortBy: ['name'],
-    },
-  }),
-  api: {
-    example: builder.endpoint(
-      {
-        method: 'GET',
-        path: '/',
-        responses: {
-          200: z.object({
-            data: z.any(),
-          }),
-        },
-      },
-      async () => {
-        return {
-          status: 200,
-          body: {
-            data: 'Hello from users collection',
-          },
-        }
-      }
-    ),
+const list = builder.list(fields, {
+  columns: columns,
+  configuration: {
+    search: ['name'],
+    sortBy: ['name'],
   },
-}))
+})
+
+const update = builder.update(fields, {})
+
+const api = {
+  example: builder.endpoint(
+    {
+      method: 'GET',
+      path: '/',
+      responses: {
+        200: z.object({
+          data: z.any(),
+        }),
+      },
+    },
+    async () => {
+      return {
+        status: 200,
+        body: {
+          data: 'Hello from users collection',
+        },
+      }
+    }
+  ),
+}
+
+export const usersCollection = builder.collection({
+  slug: 'users',
+  list: list,
+  api: api,
+  update: update,
+})

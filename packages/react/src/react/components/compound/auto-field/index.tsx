@@ -1,9 +1,10 @@
 'use client'
 
 import { type ReactNode, startTransition, useMemo } from 'react'
-import { useFieldArray, useFormContext } from 'react-hook-form'
+import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
+import { useQuery } from '@tanstack/react-query'
 
 import {
   BaseIcon,
@@ -14,10 +15,12 @@ import {
   type DatePickerProps,
   FormField,
   FormItemController,
+  Label,
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
   Select,
+  SelectLabel,
   SelectList,
   SelectOption,
   type SelectProps,
@@ -31,9 +34,15 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
-import type { FieldRelationShapeClient, FieldShapeClient } from '../../../../core/field'
+import type {
+  FieldOptionsCallbackReturn,
+  FieldRelationShapeClient,
+  FieldsClient,
+  FieldShapeClient,
+} from '../../../../core/field'
 import { constructEditorProviderProps } from '../../../../core/richtext'
 import type { EditorProviderClientProps } from '../../../../core/richtext/types'
+import { useDebounce } from '../../../hooks/use-debounce'
 import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
@@ -185,23 +194,54 @@ export function AutoTimeField(
   )
 }
 
-interface AutoSelectField extends SelectProps<{}> {
-  items: { value: string | number; label: string }[]
+interface AutoSelectField extends Omit<SelectProps<{}>, 'items'> {
+  optionsName: string
+  optionsFetchPath: string
 }
 
 export function AutoSelectField(props: AutoSelectField) {
   const { field, error } = useFormItemController()
 
+  const form = useFormContext()
+
+  const value = useWatch({
+    control: form.control,
+  })
+
+  const query = useQuery<{ status: 200; body: FieldOptionsCallbackReturn }>({
+    queryKey: ['POST', props.optionsFetchPath, { pathParams: { name: props.optionsName } }],
+    queryFn: async () => {
+      const response = await fetch(`/api${props.optionsFetchPath}?name=${props.optionsName}`, {
+        method: 'POST',
+        body: JSON.stringify(value),
+        headers: { 'Content-Type': 'application/json' },
+      })
+      if (!response.ok) throw new Error('Failed to fetch options')
+      return response.json()
+    },
+    enabled: false,
+  })
+
+  useDebounce(value, () => query.refetch(), 500)
+
+  const items = query.data?.body.options ?? []
+  const isDisabled = query.data?.body.disabled ?? props.isDisabled
+
   return (
     <Select
       {...field}
-      {...props}
+      aria-label={props.label}
+      items={items}
+      isDisabled={isDisabled}
       selectedKey={field.value}
       className={cn('w-full', props.className)}
       errorMessage={error?.message}
+      onOpenChange={(isOpen) => {
+        if (isOpen) query.refetch()
+      }}
       onSelectionChange={(value) => {
         if (value === null) return field.onChange(null)
-        const selectedItem = props.items?.find((item) => item.value === value)
+        const selectedItem = items.find((item) => item.value === value)
         if (selectedItem) {
           field.onChange(selectedItem.value)
         } else {
@@ -209,11 +249,16 @@ export function AutoSelectField(props: AutoSelectField) {
         }
       }}
     >
-      <SelectTrigger className="h-auto" />
-      <SelectList items={props.items}>
+      {props.label && (
+        <Label>
+          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+        </Label>
+      )}
+      <SelectTrigger className="h-auto" isPending={query.isLoading} />
+      <SelectList items={items}>
         {(item) => (
           <SelectOption key={item.value} id={item.value} textValue={item.label}>
-            {item.label}
+            <SelectLabel>{item.label}</SelectLabel>
           </SelectOption>
         )}
       </SelectList>
@@ -280,7 +325,9 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
 
 interface AutoFieldProps {
   fieldShape: FieldShapeClient
-  optionsRecord: Record<string, any[]>
+
+  optionsFetchPath?: string
+
   className?: string
   prefix?: string
   disabled?: boolean
@@ -389,22 +436,29 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'selectNumber':
     case 'selectText': {
-      const options = props.optionsRecord[field.$client.fieldName] ?? []
+      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
+
       return (
         <AutoFormField
           key={commonProps.name}
           name={commonProps.name}
-          component={<AutoSelectField {...commonProps} items={options} isDisabled={disabled} />}
+          component={
+            <AutoSelectField
+              {...commonProps}
+              isDisabled={disabled}
+              optionsName={field.options}
+              optionsFetchPath={props.optionsFetchPath}
+            />
+          }
         />
       )
     }
 
     case 'comboboxNumber':
     case 'comboboxText': {
-      const options = props.optionsRecord[field.$client.fieldName] ?? []
       return (
         <select name={field.$client.fieldName}>
-          {options.map((option) => (
+          {([] as any[]).map((option) => (
             <option key={option.value} value={option.value}>
               {option.label}
             </option>
@@ -429,39 +483,48 @@ export function AutoField(props: AutoFieldProps) {
       )
     }
 
-    case 'create':
+    case 'create': {
+      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
+
       return (
         <AutoRelationshipField
           name={field.$client.fieldName}
           fieldShape={field}
           allowCreate={true}
           allowConnect={false}
-          optionsRecord={props.optionsRecord}
           disabled={disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       )
-    case 'connect':
+    }
+    case 'connect': {
+      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
+
       return (
         <AutoRelationshipField
           name={field.$client.fieldName}
           fieldShape={field}
           allowConnect={true}
           allowCreate={false}
-          optionsRecord={props.optionsRecord}
           disabled={disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       )
-    case 'connectOrCreate':
+    }
+    case 'connectOrCreate': {
+      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
+
       return (
         <AutoRelationshipField
           name={field.$client.fieldName}
           fieldShape={field}
           allowConnect={true}
           allowCreate={true}
-          optionsRecord={props.optionsRecord}
           disabled={disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       )
+    }
 
     default:
       throw new Error(`Unsupported field type: ${JSON.stringify(field)}`)
@@ -470,9 +533,10 @@ export function AutoField(props: AutoFieldProps) {
 
 interface AutoRelationshipFieldProps {
   name: string
-  // NOTE: This should be FieldClient but the type is not correct
   fieldShape: FieldRelationShapeClient
-  optionsRecord: Record<string, any[]>
+
+  optionsFetchPath: string
+
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
@@ -490,11 +554,11 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
         <AutoOneRelationshipField
           name={props.name}
           fieldShape={props.fieldShape}
-          optionsRecord={props.optionsRecord}
           className={props.className}
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
           disabled={props.disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       )
     case true:
@@ -502,11 +566,11 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
         <AutoManyRelationshipField
           name={props.name}
           fieldShape={props.fieldShape}
-          optionsRecord={props.optionsRecord}
           className={props.className}
           allowCreate={props.allowCreate}
           allowConnect={props.allowConnect}
           disabled={props.disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       )
     default:
@@ -517,33 +581,37 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
 export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   const { control } = useFormContext()
 
-  if (props.fieldShape.hidden) return null
-  const disabled = props.fieldShape.disabled || false
+  const fieldShape = props.fieldShape
+
+  if (fieldShape.hidden) return null
+  const disabled = fieldShape.disabled || false
 
   const commonProps = {
-    label: props.fieldShape.label,
+    label: fieldShape.label,
     className: props.className,
-    description: props.fieldShape.description,
-    placeholder: props.fieldShape.placeholder,
+    description: fieldShape.description,
+    placeholder: fieldShape.placeholder,
   }
 
-  const connectComponent = (
+  const connectComponent = (name: string, options: string) => (
     <FormField
-      name={`${props.name}.connect`}
+      key={name}
+      name={name}
       control={control}
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.fieldShape.$client.fieldName] ?? []}
             isDisabled={disabled}
+            optionsFetchPath={props.optionsFetchPath}
+            optionsName={options}
           />
         </FormItemController>
       )}
     />
   )
 
-  const createComponent = Object.entries(props.fieldShape.fields).map(([key, originalField]) => (
+  const createComponent = Object.entries(fieldShape.fields).map(([key, originalField]) => (
     <AutoFormField
       key={`${props.name}.create.${originalField.$client.fieldName}`}
       name={`${props.name}.create.${originalField.$client.fieldName}`}
@@ -552,7 +620,6 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
           key={key}
           fieldShape={originalField as FieldShapeClient}
           className="w-full"
-          optionsRecord={props.optionsRecord}
           prefix={`${props.name}.create`}
           disabled={disabled}
         />
@@ -560,25 +627,25 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
     />
   ))
 
-  switch (props.fieldShape.type) {
+  switch (fieldShape.type) {
     case 'connect':
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          <div>{props.fieldShape.label}</div>
-          {connectComponent}
+          <div>{fieldShape.label}</div>
+          {connectComponent(`${props.name}.connect`, fieldShape.options)}
         </div>
       )
     case 'create':
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          <div>{props.fieldShape.label}</div>
+          <div>{fieldShape.label}</div>
           {createComponent}
         </div>
       )
     case 'connectOrCreate':
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          {connectComponent}
+          {connectComponent(`${props.name}.connect`, fieldShape.options)}
           <div className="flex flex-col gap-y-2 bg-yellow-500 p-4 rounded-lg">
             {createComponent}
           </div>
@@ -590,7 +657,9 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 interface AutoManyRelationshipFieldProps {
   name: string
   fieldShape: FieldRelationShapeClient
-  optionsRecord: Record<string, any[]>
+
+  optionsFetchPath: string
+
   className?: string
   allowCreate?: boolean
   allowConnect?: boolean
@@ -604,15 +673,17 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     name: props.name,
   })
 
-  if (props.fieldShape.hidden) return null
-  const disabled = props.fieldShape.disabled || props.disabled
+  const fieldShape = props.fieldShape
 
-  const connectComponent = (name: string) => {
+  if (fieldShape.hidden) return null
+  const disabled = fieldShape.disabled || props.disabled
+
+  const connectComponent = (name: string, options: string) => {
     const commonProps = {
-      label: props.fieldShape.label,
+      label: fieldShape.label,
       className: props.className,
-      description: props.fieldShape.description,
-      placeholder: props.fieldShape.placeholder,
+      description: fieldShape.description,
+      placeholder: fieldShape.placeholder,
     }
     return (
       <AutoFormField
@@ -620,8 +691,9 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         component={
           <AutoSelectField
             {...commonProps}
-            items={props.optionsRecord[props.fieldShape.$client.fieldName] ?? []}
             isDisabled={disabled}
+            optionsName={options}
+            optionsFetchPath={props.optionsFetchPath}
           />
         }
       />
@@ -629,7 +701,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 
   const createComponent = (name: string) => {
-    return Object.entries(props.fieldShape.fields).map(([key, childField]) => (
+    return Object.entries(fieldShape.fields).map(([key, childField]) => (
       <AutoFormField
         key={key}
         name={name}
@@ -637,7 +709,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           <AutoField
             fieldShape={childField as FieldShapeClient}
             className="w-full"
-            optionsRecord={props.optionsRecord}
             prefix={name}
             disabled={disabled}
           />
@@ -646,16 +717,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     ))
   }
 
-  switch (props.fieldShape.type) {
+  switch (fieldShape.type) {
     case 'connect':
       return (
         <div className="border border-red-500 p-6">
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>
-                {props.fieldShape.label} #{index + 1}
+                {fieldShape.label} #{index + 1}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`)}
+              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
             </div>
           ))}
           <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
@@ -669,7 +740,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>
-                {props.fieldShape.label} #{index + 1}
+                {fieldShape.label} #{index + 1}
               </div>
               {createComponent(`${props.name}.${index}.create`)}
             </div>
@@ -692,9 +763,9 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>
-                {props.fieldShape.label} #{index + 1}
+                {fieldShape.label} #{index + 1}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`)}
+              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
               {createComponent(`${props.name}.${index}.create`)}
             </div>
           ))}
@@ -710,4 +781,25 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         </div>
       )
   }
+}
+
+interface AutoFieldsProps {
+  fields: FieldsClient
+  optionsFetchPath?: string
+  disabled?: boolean
+}
+
+export function AutoFields(props: AutoFieldsProps) {
+  return (
+    <>
+      {Object.values(props.fields.shape).map((fieldShape) => (
+        <AutoField
+          key={fieldShape.$client.fieldName}
+          fieldShape={fieldShape}
+          optionsFetchPath={props.optionsFetchPath}
+          disabled={props.disabled}
+        />
+      ))}
+    </>
+  )
 }

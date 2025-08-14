@@ -1,6 +1,6 @@
 import type { IsNever, Promisable, Simplify, ValueOf } from 'type-fest'
-import type { z } from 'zod/v4'
-import { type ZodType } from 'zod/v4'
+import type { z } from 'zod'
+import { type ZodType } from 'zod'
 import type { JSONSchema } from 'zod/v4/core'
 
 import type { AnyContextable, AnyRequestContextable, ContextToRequestContext } from './context'
@@ -146,6 +146,11 @@ export interface ApiRouteSchemaClient {
   pathParams?: JSONSchema.JSONSchema
   description?: string
   responses: Partial<Record<ApiHttpStatus, JSONSchema.JSONSchema>>
+}
+
+export type ApiRoutePath = {
+  method: 'GET' | 'POST' | 'PUT' | 'PATCH' | 'DELETE'
+  path: string
 }
 
 export interface AnyApiRouteSchema {

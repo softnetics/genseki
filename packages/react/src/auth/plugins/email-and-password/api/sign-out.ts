@@ -1,4 +1,4 @@
-import z from 'zod/v4'
+import z from 'zod'
 
 import { ResponseHelper } from '../../../../core'
 import type { AnyContextable } from '../../../../core/context'

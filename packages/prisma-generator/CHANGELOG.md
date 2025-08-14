@@ -1,5 +1,27 @@
 # @genseki/prisma-generator
 
+## 0.1.0-alpha.34
+
+## 0.1.0-alpha.33
+
+## 0.1.0-alpha.32
+
+## 0.1.0-alpha.31
+
+## 0.1.0-alpha.30
+
+## 0.1.0-alpha.29
+
+## 0.1.0-alpha.28
+
+## 0.1.0-alpha.27
+
+### Patch Changes
+
+- [#135](https://github.com/softnetics/genseki/pull/135) [`b651962`](https://github.com/softnetics/genseki/commit/b651962d991bd956285a80e08ebddd51bf5506f7) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Fix] Prisma generator bin name
+
+## 0.1.0-alpha.26
+
 ## 0.1.0-alpha.25
 
 ## 0.1.0-alpha.24

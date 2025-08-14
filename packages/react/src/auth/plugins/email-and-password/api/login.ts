@@ -1,4 +1,4 @@
-import z from 'zod/v4'
+import z from 'zod'
 
 import type { AnyContextable } from '../../../../core/context'
 import { createEndpoint } from '../../../../core/endpoint'
@@ -29,7 +29,7 @@ export function loginEmail<
 
       // Create session
       const { sessionToken, expiredAt } = await service.createSession({ userId: userId })
-      ResponseHelper.setSessionCookie(response, sessionToken, { expiredAt })
+      ResponseHelper.setSessionCookie(response, sessionToken, { expires: expiredAt })
 
       return {
         status: 200 as const,

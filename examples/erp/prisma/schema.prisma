@@ -10,9 +10,7 @@ generator client {
 }
 
 generator genseki {
-  // TODO: Recheck this 
-  // provider = "@genseki/prisma-generator"
-  provider = "node ./node_modules/@genseki/prisma-generator"
+  provider = "prisma-genseki-generator"
   output   = "../generated/genseki"
 }
 

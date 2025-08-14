@@ -1,4 +1,4 @@
-import z from 'zod/v4'
+import z from 'zod'
 
 import type { AnyContextable } from '../../context'
 import { createEndpoint } from '../../endpoint'
@@ -12,7 +12,7 @@ export function grabPutObjUrl<const TContext extends AnyContextable>(
     context,
     {
       method: 'GET',
-      path: '/api/storage/put-obj-signed-url',
+      path: '/storage/put-obj-signed-url',
       query: z.object({
         key: z.string(),
       }),

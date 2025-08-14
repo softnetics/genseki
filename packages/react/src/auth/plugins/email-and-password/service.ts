@@ -43,7 +43,7 @@ export class EmailAndPasswordService<TContext extends AnyContextable> {
     if (!account.password)
       throw new HttpInternalServerError('This account does not support password login')
 
-    const status = Password.verifyPassword(password, account.password)
+    const status = await Password.verifyPassword(password, account.password)
     if (!status) throw new HttpInternalServerError('Invalid email or password')
 
     return user.id

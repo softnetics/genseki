@@ -14,12 +14,14 @@ import { FullModelSchemas } from '../generated/genseki/unsanitized'
 const app = new GensekiApp({
   title: 'Genseki ERP Example',
   version: '0.0.0',
-  storageAdapter: StorageAdapterS3.initialize({
+  storageAdapter: StorageAdapterS3.initialize(context, {
     bucket: process.env.AWS_BUCKET_NAME!,
+    imageBaseUrl: process.env.NEXT_PUBLIC_AWS_IMAGE_URL!,
     clientConfig: {
+      region: process.env.AWS_REGION!,
       credentials: {
         accessKeyId: process.env.AWS_ACCESS_KEY_ID!,
-        secretAccessKey: process.env.AWS_SECRET_KEY!,
+        secretAccessKey: process.env.AWS_SECRET_ACCESS_KEY!,
       },
     },
   }),

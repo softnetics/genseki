@@ -4,7 +4,6 @@ import { UpdateClientView } from './update.client'
 
 import { type Fields, getFieldsClient } from '../../../core'
 import type { CollectionUpdateDefaultApiRoute } from '../../../core/builder.utils'
-import { createOptionsRecord } from '../../components/compound/auto-field'
 import { Typography } from '../../components/primitives/typography'
 import { getHeadersObject } from '../../utils/headers'
 
@@ -27,14 +26,11 @@ export async function UpdateView(props: UpdateViewProps) {
     headers: { 'Content-Type': 'application/json' },
   })
 
-  const context = props.context.toRequestContext(request)
-
   const result = await props.updateDefault.handler(
     { pathParams: { id: props.identifier } },
     { request, response }
   )
 
-  const optionsRecord = await createOptionsRecord(context, props.fields)
   const fieldsClient = getFieldsClient(props.fields)
 
   return (
@@ -47,7 +43,6 @@ export async function UpdateView(props: UpdateViewProps) {
         identifier={props.identifier}
         slug={props.slug}
         defaultValues={result.body}
-        optionsRecord={optionsRecord}
       />
     </CollectionFormLayout>
   )

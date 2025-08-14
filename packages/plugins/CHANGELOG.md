@@ -1,5 +1,27 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.34
+
+## 0.1.0-alpha.33
+
+## 0.1.0-alpha.32
+
+## 0.1.0-alpha.31
+
+## 0.1.0-alpha.30
+
+### Patch Changes
+
+- [#141](https://github.com/softnetics/genseki/pull/141) [`72ddbd9`](https://github.com/softnetics/genseki/commit/72ddbd9f6d4cc931f35e71208a53e9f912101c47) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] implement proper way to handle options and conditional disabling
+
+## 0.1.0-alpha.29
+
+## 0.1.0-alpha.28
+
+## 0.1.0-alpha.27
+
+## 0.1.0-alpha.26
+
 ## 0.1.0-alpha.25
 
 ## 0.1.0-alpha.24

@@ -1,6 +1,6 @@
 import { deepmerge } from 'deepmerge-ts'
 import type { SimplifyDeep, ValueOf } from 'type-fest'
-import { z } from 'zod/v4'
+import { z } from 'zod'
 
 import type {
   AnyContextable,
