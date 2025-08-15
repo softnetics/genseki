@@ -519,17 +519,29 @@ export class FieldBuilder<
       fieldColumnName as string
     ] as TModelSchemas[TModelName]['shape']['columns'][TFieldColumnName]
 
+    type Column = TOptions['required'] extends boolean
+      ? Omit<TModelSchemas[TModelName]['shape']['columns'][TFieldColumnName], 'isRequired'> & {
+          isRequired: TOptions['required']
+        }
+      : TModelSchemas[TModelName]['shape']['columns'][TFieldColumnName]
+
     const fieldMetadata = {
       $client: {
         source: 'column',
         // This field will be mutated by the builder to include the field name
         fieldName: '',
-        column: column,
+        column: {
+          ...column,
+          isRequired: options.required ?? column.isRequired,
+        } as Column,
       },
       $server: {
         source: 'column',
         fieldName: '',
-        column: column,
+        column: {
+          ...column,
+          isRequired: options.required ?? column.isRequired,
+        } as Column,
       },
     } satisfies FieldColumnShapeBase
 
