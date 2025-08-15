@@ -280,7 +280,7 @@ export function transformPrismaResultToFieldsPayload(
       }
 
       let value = result[schemaKey]
-      if (value === undefined) return acc
+      if (value === undefined || value === null) return acc
 
       if (
         fieldShape.$server.source === 'column' &&

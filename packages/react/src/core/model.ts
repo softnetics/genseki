@@ -34,10 +34,6 @@ export type InferDataType<T extends DataType> = T extends typeof DataType.STRING
                   ? string
                   : never
 
-export type InferDataTypes<T extends DataType[]> = {
-  [K in T[number]]: InferDataType<K>
-}
-
 export const SchemaType = {
   COLUMN: 'COLUMN',
   RELATION: 'RELATION',
