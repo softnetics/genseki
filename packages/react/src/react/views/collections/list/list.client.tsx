@@ -28,10 +28,8 @@ import {
 import { parseAsInteger, parseAsString, useQueryStates } from 'nuqs'
 import { toast } from 'sonner'
 
-import type { ListFeatures } from './types'
-
-import type { Fields, FieldsClient } from '../../../core'
-import type { ListConfiguration } from '../../../core/collection'
+import type { Fields, FieldsClient } from '../../../../core'
+import type { ListConfiguration } from '../../../../core/collection'
 import {
   Button,
   ButtonLink,
@@ -44,11 +42,12 @@ import {
   PageSizeSelect,
   Pagination,
   TextField,
-} from '../../components'
-import { BaseIcon } from '../../components/primitives/base-icon'
-import { TanstackTable } from '../../components/primitives/tanstack-table'
-import { useDebounce } from '../../hooks/use-debounce'
-import { useNavigation } from '../../providers'
+} from '../../../components'
+import { BaseIcon } from '../../../components/primitives/base-icon'
+import { TanstackTable } from '../../../components/primitives/tanstack-table'
+import { useDebounce } from '../../../hooks/use-debounce'
+import { useNavigation } from '../../../providers'
+import type { ListFeatures } from '../types'
 
 interface ToolbarProps {
   slug: string
@@ -132,7 +131,6 @@ type BaseData = {
   __id: string
   __pk: string
 } & {}
-
 interface ListTableProps {
   slug: string
   identifierColumn: string

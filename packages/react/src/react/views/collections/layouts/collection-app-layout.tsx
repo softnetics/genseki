@@ -1,7 +1,6 @@
 import {
   AppSidebar,
   type AppSideBarBuilderProps,
-  AppSidebarNav,
   SidebarInset,
   SidebarProvider,
 } from '../../../components'
@@ -19,17 +18,16 @@ export interface CollectionAppLayoutProps {
  */
 export function CollectionAppLayout(props: CollectionAppLayoutProps) {
   return (
-    <SidebarProvider>
-      <AppSidebar
-        title={props.title}
-        version={props.version}
-        sidebar={props.sidebar}
-        pathname={props.pathname}
-      />
-      <SidebarInset>
-        <AppSidebarNav />
-        {props.children}
-      </SidebarInset>
-    </SidebarProvider>
+    <>
+      <SidebarProvider>
+        <AppSidebar
+          title={props.title}
+          version={props.version}
+          sidebar={props.sidebar}
+          pathname={props.pathname}
+        />
+        <SidebarInset>{props.children}</SidebarInset>
+      </SidebarProvider>
+    </>
   )
 }

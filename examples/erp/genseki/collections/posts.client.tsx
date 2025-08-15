@@ -24,6 +24,10 @@ export const columns = [
       }),
     ],
   }),
+  columnHelper.accessor('author.name', {
+    header: 'Author Name',
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor('author.email', {
     header: 'Author Email',
     cell: (info) => info.getValue(),
