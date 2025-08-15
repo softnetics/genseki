@@ -76,6 +76,7 @@ export const fields = builder.fields('post', (fb) => ({
   author: fb.relations('author', (fb) => ({
     type: 'connect',
     label: 'Author',
+    required: true,
     fields: fb.fields('user', (fb) => ({
       name: fb.columns('name', {
         type: 'text',
@@ -95,6 +96,12 @@ export const fields = builder.fields('post', (fb) => ({
     }),
     options: 'author',
   })),
+  createdAt: fb.columns('createdAt', {
+    type: 'date',
+    label: 'Created At',
+    hidden: true,
+    description: 'The date the post was created',
+  }),
   updatedAt: fb.columns('updatedAt', {
     type: 'date',
     label: 'Updated At',
@@ -140,6 +147,43 @@ const list = builder.list(fields, {
     sortBy: ['updatedAt', 'title'],
   },
   options: options,
+  uis: {
+    layout: {
+      collection(args) {
+        const AppLayout = args.AppLayout
+        const SidebarProvider = args.SidebarProvider
+        const AppSidebar = args.AppSidebar
+        const SidebarInset = args.SidebarInset
+        const TopbarBreadcrumb = args.TopbarNav
+
+        return (
+          <>
+            <SidebarProvider>
+              <AppSidebar />
+              <SidebarInset>
+                <TopbarBreadcrumb />
+                <div>{args.children}</div>
+              </SidebarInset>
+            </SidebarProvider>
+          </>
+        )
+      },
+    },
+    pages: {
+      collection(args) {
+        const listViewProps = args.listViewProps
+        const ListView = args.ListView
+        const Banner = args.Banner
+
+        return (
+          <div>
+            <Banner />
+            <ListView />
+          </div>
+        )
+      },
+    },
+  },
 })
 
 const create = builder.create(fields, {

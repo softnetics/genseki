@@ -1,8 +1,12 @@
-import type { ColumnDef } from '@tanstack/react-table'
+import type React from 'react'
+
+import type { UseQueryResult } from '@tanstack/react-query'
+import type { ColumnDef, Table } from '@tanstack/react-table'
 import type { ConditionalExcept, IsEmptyObject, Promisable, Simplify } from 'type-fest'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
+import type { CollectionFindManyApiRoute } from './builder.utils'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
 import {
@@ -19,6 +23,9 @@ import {
   type FieldsOptions,
 } from './field'
 import type { DataType, InferDataType } from './model'
+
+import type { SidebarProviderProps } from '../react'
+import type { BaseViewProps, ListFeatures } from '../react/views/collections/types'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
@@ -316,6 +323,67 @@ export interface ListConfiguration<TFields extends Fields> {
   sortBy?: ExtractSortableColumns<TFields>[]
 }
 
+interface BaseData {
+  __id: string
+  __pk: string
+}
+
+// TODO: TypeSafe by TFieldsData
+type CustomCollectionDataQuery<TFieldsData> = UseQueryResult<{
+  data: BaseData[]
+  total: number
+  totalPage: number
+  currentPage: number
+}>
+
+interface CustomCollectionTable<TFieldsData> {
+  GensekiTable: React.FC
+  table: Table<TFieldsData>
+  columns: ColumnDef<TFieldsData>
+}
+interface CustomCollectionPagination {
+  GensekiPagination: React.FC
+}
+interface CustomCollectionToolbar {
+  GensekiToolbar: React.FC
+}
+
+interface CustomCollection_CollectionLayout {
+  (args: {
+    AppLayout: React.FC<{ children: React.ReactNode }>
+    AppSidebar: React.FC
+    SidebarProvider: React.FC<SidebarProviderProps>
+    SidebarInset: React.FC<React.ComponentProps<'main'>>
+    TopbarNav: React.FC
+    listViewProps: ListViewProps
+    children: React.ReactNode
+  }): React.ReactElement
+}
+
+interface CustomCollection_CollectionPage<TFieldsData> {
+  (args: {
+    listViewProps: ListViewProps
+    dataQuery?: CustomCollectionDataQuery<TFieldsData>
+    table?: CustomCollectionTable<TFieldsData>
+    pagination?: CustomCollectionPagination
+    toolbar?: CustomCollectionToolbar
+    ListView: React.FC
+    Banner: React.FC
+  }): React.ReactElement
+}
+interface CustomCollectionUI<
+  TContext extends AnyContextable = AnyContextable,
+  TFields extends Fields = Fields,
+  TFieldsData = any,
+> {
+  layout?: {
+    collection?: CustomCollection_CollectionLayout
+  }
+  pages?: {
+    collection?: CustomCollection_CollectionPage<TFieldsData>
+  }
+}
+
 export type CollectionListConfig<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
@@ -324,6 +392,7 @@ export type CollectionListConfig<
   fields: TFields
   columns: ColumnDef<TFieldsData, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
+  uis?: CustomCollectionUI<TContext, TFields, TFieldsData>
   configuration?: ListConfiguration<TFields>
   features?: {
     create?: boolean
@@ -382,4 +451,13 @@ export interface CollectionConfigClient {
   one?: {
     fields: FieldsClient
   }
+}
+
+export interface ListViewProps extends BaseViewProps {
+  headers: Headers
+  searchParams: Record<string, string | string[]>
+  columns: ColumnDef<any>[]
+  findMany: CollectionFindManyApiRoute<string, Fields>
+  listConfiguration?: ListConfiguration<Fields>
+  features?: ListFeatures
 }
