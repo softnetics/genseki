@@ -7,6 +7,7 @@ import { SetupPage } from './auth/setup/setup'
 import { setupApi } from './auth/setup/setup-api'
 import { postsCollection } from './collections/posts'
 import { usersCollection } from './collections/users'
+import { tagsCollection } from './collections/tags'
 import { context } from './helper'
 
 import { FullModelSchemas } from '../generated/genseki/unsanitized'
@@ -38,6 +39,11 @@ const app = new GensekiApp({
         type: 'item',
         label: 'Posts',
         path: '/admin/collections/posts',
+      },
+      {
+        type: 'item',
+        label: 'Tags',
+        path: '/admin/collections/tags',
       },
     ],
   },
@@ -79,6 +85,7 @@ const app = new GensekiApp({
   )
   .apply(usersCollection)
   .apply(postsCollection)
+  .apply(tagsCollection)
   .apply({
     api: {
       auth: {

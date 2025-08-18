@@ -309,6 +309,7 @@ const AutoRichTextField = (props: {
 
 export function AutoFormField(props: { name: string; component: ReactNode }) {
   const { control } = useFormContext()
+
   return (
     <FormField
       key={props.name}
@@ -341,7 +342,7 @@ export function AutoField(props: AutoFieldProps) {
   const disabled = props.fieldShape.disabled || props.disabled
 
   const commonProps = {
-    name: props.prefix ? `${props.prefix}.${field.$client}` : field.$client.fieldName,
+    name: props.prefix ? `${props.prefix}.${props.fieldShape.$client.fieldName}` : props.fieldShape.$client.fieldName,
     label: field.label,
     className: className,
     description: field.description,
@@ -483,43 +484,18 @@ export function AutoField(props: AutoFieldProps) {
       )
     }
 
-    case 'create': {
-      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
-
-      return (
-        <AutoRelationshipField
-          name={field.$client.fieldName}
-          fieldShape={field}
-          allowCreate={true}
-          allowConnect={false}
-          disabled={disabled}
-          optionsFetchPath={props.optionsFetchPath}
-        />
-      )
-    }
-    case 'connect': {
-      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
-
-      return (
-        <AutoRelationshipField
-          name={field.$client.fieldName}
-          fieldShape={field}
-          allowConnect={true}
-          allowCreate={false}
-          disabled={disabled}
-          optionsFetchPath={props.optionsFetchPath}
-        />
-      )
-    }
+    case 'create':
+    case 'connect':
     case 'connectOrCreate': {
       if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
 
       return (
         <AutoRelationshipField
+          prefix={props.prefix || ''}
           name={field.$client.fieldName}
           fieldShape={field}
-          allowConnect={true}
           allowCreate={true}
+          allowConnect={false}
           disabled={disabled}
           optionsFetchPath={props.optionsFetchPath}
         />
@@ -534,6 +510,7 @@ export function AutoField(props: AutoFieldProps) {
 interface AutoRelationshipFieldProps {
   name: string
   fieldShape: FieldRelationShapeClient
+  prefix: string
 
   optionsFetchPath: string
 
@@ -548,10 +525,13 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
     return null
   }
 
+  const appendedPrefix = props.prefix ? `${props.prefix}.${props.fieldShape.$client.fieldName}` : props.fieldShape.$client.fieldName
+
   switch (props.fieldShape.$client.relation.isList) {
     case false:
       return (
         <AutoOneRelationshipField
+          prefix={appendedPrefix}
           name={props.name}
           fieldShape={props.fieldShape}
           className={props.className}
@@ -564,6 +544,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
     case true:
       return (
         <AutoManyRelationshipField
+          prefix={appendedPrefix}
           name={props.name}
           fieldShape={props.fieldShape}
           className={props.className}
@@ -613,15 +594,16 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 
   const createComponent = Object.entries(fieldShape.fields).map(([key, originalField]) => (
     <AutoFormField
-      key={`${props.name}.create.${originalField.$client.fieldName}`}
-      name={`${props.name}.create.${originalField.$client.fieldName}`}
+      key={`${props.prefix}.create.${originalField.$client.fieldName}`}
+      name={`${props.prefix}.create.${originalField.$client.fieldName}`}
       component={
         <AutoField
           key={key}
           fieldShape={originalField as FieldShapeClient}
           className="w-full"
-          prefix={`${props.name}.create`}
+          prefix={`${props.prefix}.create`}
           disabled={disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       }
     />
@@ -632,7 +614,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
           <div>{fieldShape.label}</div>
-          {connectComponent(`${props.name}.connect`, fieldShape.options)}
+          {connectComponent(`${props.prefix}.connect`, fieldShape.options)}
         </div>
       )
     case 'create':
@@ -645,7 +627,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
     case 'connectOrCreate':
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          {connectComponent(`${props.name}.connect`, fieldShape.options)}
+          {connectComponent(`${props.prefix}.connect`, fieldShape.options)}
           <div className="flex flex-col gap-y-2 bg-yellow-500 p-4 rounded-lg">
             {createComponent}
           </div>
@@ -657,6 +639,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
 interface AutoManyRelationshipFieldProps {
   name: string
   fieldShape: FieldRelationShapeClient
+  prefix: string
 
   optionsFetchPath: string
 
@@ -711,6 +694,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             className="w-full"
             prefix={name}
             disabled={disabled}
+            optionsFetchPath={props.optionsFetchPath}
           />
         }
       />
@@ -726,7 +710,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               <div>
                 {fieldShape.label} #{index + 1}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+              {connectComponent(`${props.prefix}.${index}.connect`, fieldShape.options)}
             </div>
           ))}
           <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
@@ -742,7 +726,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               <div>
                 {fieldShape.label} #{index + 1}
               </div>
-              {createComponent(`${props.name}.${index}.create`)}
+              {createComponent(`${props.prefix}.${index}.create`)}
             </div>
           ))}
           <Button
@@ -765,8 +749,8 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               <div>
                 {fieldShape.label} #{index + 1}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
-              {createComponent(`${props.name}.${index}.create`)}
+              {connectComponent(`${props.prefix}.${index}.connect`, fieldShape.options)}
+              {createComponent(`${props.prefix}.${index}.create`)}
             </div>
           ))}
           <Button
