@@ -77,7 +77,7 @@ export const PostClientToolbar = (props: {
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/api/posts`],
+        queryKey: ['GET', `/posts`],
       })
       toast.success('Deletion successfully')
     },
@@ -131,7 +131,7 @@ export const PostClientTable = (props: {
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/api/${props.slug}`],
+        queryKey: ['GET', `/${props.slug}`],
       })
       toast.success('Deletion successfully')
     },

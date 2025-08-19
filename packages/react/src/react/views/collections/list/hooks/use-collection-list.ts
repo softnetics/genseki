@@ -16,7 +16,7 @@ export function useCollectionList<TFieldsData = any>(
   const queryKey = { ...(args.pagination || pagination), search: args.search ?? search }
 
   const query: UseQueryResult<CollectionListResponse<TFieldsData>> = useQuery({
-    queryKey: ['GET', `/api/${args.slug}`, { query: queryKey }] as const,
+    queryKey: ['GET', `/${args.slug}`, { query: queryKey }] as const,
     queryFn: async (context) => {
       const [, , payload] = context.queryKey
       const params = new URLSearchParams([

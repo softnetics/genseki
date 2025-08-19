@@ -7,7 +7,7 @@ interface UseDelete {
 }
 export function useCollectionDelete(args: UseDelete) {
   const deleteMutation = useMutation({
-    mutationKey: ['DELETE', `/api/${args.slug}`],
+    mutationKey: ['DELETE', `/${args.slug}`],
     mutationFn: async (selectedRowIds: string[]) => {
       const res = await fetch(`/api/${args.slug}`, {
         method: 'DELETE',

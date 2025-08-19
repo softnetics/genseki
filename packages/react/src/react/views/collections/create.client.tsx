@@ -30,7 +30,7 @@ export function CreateClientView(props: CreateClientViewProps) {
     status: number
     body: { __pk: string; __id: string }
   }>({
-    mutationKey: ['POST', `/api/${props.slug}`],
+    mutationKey: ['POST', `/${props.slug}`],
     mutationFn: async (data: any) => {
       // TODO: This should be provided from App Config
       const response = await fetch(`/api/${props.slug}`, {

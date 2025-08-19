@@ -31,7 +31,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
     status: number
     body: { __pk: string; __id: string }
   }>({
-    mutationKey: ['PATCH', `/api/${props.slug}`],
+    mutationKey: ['PATCH', `/${props.slug}`],
     mutationFn: async (data: any) => {
       // TODO: This should be provided from App Config
       const response = await fetch(`/api/${props.slug}/${props.identifier}`, {
@@ -49,7 +49,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         throw new Error(`Failed to update (status: ${response.status}): ${errorBody}`)
       }
       queryCleint.invalidateQueries({
-        queryKey: ['GET', `/api/${props.slug}`],
+        queryKey: ['GET', `/${props.slug}`],
       })
       return response.json()
     },

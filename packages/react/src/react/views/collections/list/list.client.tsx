@@ -61,7 +61,7 @@ export function ListViewClient<TFieldsClient extends FieldsClient, TFieldsData e
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/api/${props.slug}`],
+        queryKey: ['GET', `/${props.slug}`],
       })
       toast.success('Deletion successfully')
     },
