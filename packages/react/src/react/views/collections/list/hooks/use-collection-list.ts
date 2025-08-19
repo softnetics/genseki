@@ -30,9 +30,11 @@ export const useCollectionList = <TFieldsData = any>(
       }
 
       // Add sorting parameters if they exist
-      if (payload.query.sortBy && payload.query.sortOrder) {
-        params.append('sortBy', payload.query.sortBy)
-        params.append('sortOrder', payload.query.sortOrder)
+      if (payload.query.sort.length > 0) {
+        payload.query.sort.forEach((sort) => {
+          params.append('sortBy', sort.id)
+          params.append('sortOrder', sort.desc ? 'desc' : 'asc')
+        })
       }
 
       return fetch(`/api/${args.slug}?${params.toString()}`)

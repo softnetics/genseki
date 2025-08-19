@@ -1,11 +1,15 @@
 'use client'
-import { parseAsInteger, parseAsString, parseAsStringLiteral, useQueryStates } from 'nuqs'
+import { parseAsArrayOf, parseAsInteger, parseAsJson, useQueryStates } from 'nuqs'
+import z from 'zod'
 
+const sortSchema = z.object({
+  id: z.string(),
+  desc: z.boolean(),
+})
 export interface UsePaginationProps {
   page: number
   pageSize: number
-  sortBy: string | null
-  sortOrder: 'asc' | 'desc' | null
+  sort: z.infer<typeof sortSchema>[]
 }
 
 export interface UsePagination {
@@ -20,9 +24,8 @@ export const usePagination = () => {
   const [pagination, setPagination] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     pageSize: parseAsInteger.withDefault(10),
-    sortBy: parseAsString,
-    sortOrder: parseAsStringLiteral(['asc', 'desc'])
-      .withDefault('asc')
+    sort: parseAsArrayOf(parseAsJson(sortSchema.parse))
+      .withDefault([])
       .withOptions({ clearOnDefault: true }),
   })
 

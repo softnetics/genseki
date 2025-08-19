@@ -123,6 +123,14 @@ export const options = builder.options(fields, {
           label: 'example2',
           value: 'example2',
         },
+        {
+          label: 'example3',
+          value: 'example3',
+        },
+        {
+          label: 'example4',
+          value: 'example4',
+        },
       ],
     }
   },

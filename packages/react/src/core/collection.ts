@@ -436,9 +436,7 @@ export interface CollectionConfigClient {
   }
 }
 
-export interface ListViewProps<TFields extends Fields = Fields>
-  extends BaseViewProps<TFields>,
-    RenderArgs {
+export interface ListViewProps<TFields extends Fields = Fields> extends BaseViewProps, RenderArgs {
   headers: Headers
   searchParams: Record<string, string | string[]>
   columns: ColumnDef<any>[]

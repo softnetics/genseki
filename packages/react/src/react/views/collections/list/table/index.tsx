@@ -63,7 +63,6 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
     getCoreRowModel: getCoreRowModel(),
     // Sorting settings
     getSortedRowModel: getSortedRowModel(),
-    manualSorting: true,
     initialState: {
       sorting: [{ id: getDefaultSortField(), desc: true }],
     },
@@ -71,20 +70,10 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
       const currentSorting = table?.getState().sorting
       const newSorting = typeof updater === 'function' ? updater(currentSorting) : updater
 
-      if (newSorting.length > 0) {
-        const sortConfig = newSorting[0]
-        setPagination((prevPagination) => ({
-          ...prevPagination,
-          sortBy: sortConfig.id,
-          sortOrder: sortConfig.desc ? 'desc' : 'asc',
-        }))
-      } else {
-        setPagination((prevPagination) => ({
-          ...prevPagination,
-          sortBy: getDefaultSortField(),
-          sortOrder: 'asc',
-        }))
-      }
+      setPagination((prevPagination) => ({
+        ...prevPagination,
+        sort: newSorting,
+      }))
     },
     // Pagination settings
     manualPagination: true,
@@ -102,9 +91,7 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
     },
     state: {
       rowSelection,
-      sorting: [
-        { id: pagination.sortBy ?? getDefaultSortField(), desc: pagination.sortOrder === 'desc' },
-      ],
+      sorting: pagination.sort,
       pagination: {
         pageIndex: pagination.page - 1,
         pageSize: pagination.pageSize,
@@ -157,7 +144,6 @@ export const generateEnhancedColumns = <TFieldsData extends BaseData>(
     columnHelper.display({
       id: 'actions',
       cell: (cellContext) => {
-        console.log(args.features)
         if (!args.features?.one && !args.features?.update && !args.features?.delete) {
           return null
         }
