@@ -7,8 +7,8 @@ export interface CollectionListPaginationProps {
   totalPage?: number
 }
 
-export const CollectionListPagination = (props: CollectionListPaginationProps) => {
-  const [pagination, setPagination] = usePagination()
+export function CollectionListPagination(props: CollectionListPaginationProps) {
+  const { pagination, setPagination } = usePagination()
 
   const totalPage = props.totalPage ?? 1
 

@@ -17,7 +17,7 @@ export interface CollectionListSearchProps {
  * @param props.onSearchChange An event handler for search value change
  * @param props.isLoading A loading state
  */
-export const CollectionListSearch = (props: CollectionListSearchProps) => {
+export function CollectionListSearch(props: CollectionListSearchProps) {
   const { undebouncedSearch, setSearch } = useSearch({
     debounce: 500,
   })

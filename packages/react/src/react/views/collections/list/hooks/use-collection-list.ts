@@ -4,13 +4,13 @@ import type { CollectionListResponse } from '../../../../../core/collection'
 import { type UsePagination, usePagination } from '../../../../hooks/use-pagination'
 import { type UseSearch, useSearch } from '../../../../hooks/use-search'
 
-export const useCollectionList = <TFieldsData = any>(
+export function useCollectionList<TFieldsData = any>(
   args: { slug: string } & {
     pagination?: UsePagination['Pagination']
     search?: UseSearch['Search']
   }
-) => {
-  const [pagination] = usePagination()
+) {
+  const { pagination } = usePagination()
   const { search } = useSearch()
 
   const queryKey = { ...(args.pagination || pagination), search: args.search ?? search }

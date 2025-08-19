@@ -10,7 +10,7 @@ export interface CollectionListFilterProps
   extends MinimalCollectionListFilterProps,
     Partial<ButtonProps> {}
 
-export const CollectionListFilter = (props: CollectionListFilterProps) => {
+export function CollectionListFilter(props: CollectionListFilterProps) {
   return (
     <Button
       aria-label="Filter"

@@ -9,7 +9,7 @@ export interface CollectionListCreateProps
   extends MinimalCollectionListCreateProps,
     Partial<ButtonLinkProps> {}
 
-export const CollectionListCreate = (props: CollectionListCreateProps) => {
+export function CollectionListCreate(props: CollectionListCreateProps) {
   return (
     <ButtonLink
       aria-label="Create"

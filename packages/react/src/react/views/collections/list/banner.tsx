@@ -9,7 +9,7 @@ interface BannerProps {
   slug: string
 }
 
-export const Banner = (props: BannerProps) => {
+export function Banner(props: BannerProps) {
   return (
     <div className="w-full px-12 py-24 [background-image:radial-gradient(100%_100%_at_10%_-30%,--alpha(var(--color-primary)/15%),var(--color-secondary))]">
       <div className="mx-auto grid w-full max-w-[1200px] grid-cols-[auto_1fr] gap-x-12">

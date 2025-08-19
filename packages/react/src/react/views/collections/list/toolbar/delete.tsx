@@ -13,7 +13,7 @@ export interface CollectionListDeleteProps
   extends MinimalCollectionListDeleteProps,
     Partial<ButtonProps> {}
 
-export const CollectionListDelete = (props: CollectionListDeleteProps) => {
+export function CollectionListDelete(props: CollectionListDeleteProps) {
   return (
     <Button
       aria-label="Delete"

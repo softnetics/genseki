@@ -5,7 +5,7 @@ interface UseDelete {
   onSuccess: () => Promise<void> | void
   onError: () => Promise<void> | void
 }
-export const useCollectionDelete = (args: UseDelete) => {
+export function useCollectionDelete(args: UseDelete) {
   const deleteMutation = useMutation({
     mutationKey: ['DELETE', `/api/${args.slug}`],
     mutationFn: async (selectedRowIds: string[]) => {

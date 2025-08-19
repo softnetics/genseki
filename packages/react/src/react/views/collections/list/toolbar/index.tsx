@@ -26,7 +26,7 @@ export interface CollectionListToolbarProps
  * @param props.onDelete A callback function when delete button is clicked
  * @param props.features Features configuration for the list view
  */
-export const CollectionListToolbar = (props: CollectionListToolbarProps) => {
+export function CollectionListToolbar(props: CollectionListToolbarProps) {
   const { isShowDeleteButton = false, features } = props
 
   return (
