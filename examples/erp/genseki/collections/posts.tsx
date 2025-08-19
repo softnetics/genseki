@@ -157,7 +157,7 @@ export const options = builder.options(fields, {
       disabled: false,
       options: tags.map((tag) => ({ label: tag.name, value: tag.id })),
     }
-  }
+  },
 })
 
 const list = builder.list(fields, {

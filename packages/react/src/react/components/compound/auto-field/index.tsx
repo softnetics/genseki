@@ -342,7 +342,9 @@ export function AutoField(props: AutoFieldProps) {
   const disabled = props.fieldShape.disabled || props.disabled
 
   const commonProps = {
-    name: props.prefix ? `${props.prefix}.${props.fieldShape.$client.fieldName}` : props.fieldShape.$client.fieldName,
+    name: props.prefix
+      ? `${props.prefix}.${props.fieldShape.$client.fieldName}`
+      : props.fieldShape.$client.fieldName,
     label: field.label,
     className: className,
     description: field.description,
@@ -493,8 +495,8 @@ export function AutoField(props: AutoFieldProps) {
         <AutoRelationshipField
           name={commonProps.name}
           fieldShape={field}
-          allowConnect={field.type === "connect" || field.type === "connectOrCreate"}
-          allowCreate={field.type === "create" || field.type === "connectOrCreate"}
+          allowConnect={field.type === 'connect' || field.type === 'connectOrCreate'}
+          allowCreate={field.type === 'create' || field.type === 'connectOrCreate'}
           disabled={disabled}
           optionsFetchPath={props.optionsFetchPath}
         />
