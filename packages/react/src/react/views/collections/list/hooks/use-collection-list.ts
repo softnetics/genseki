@@ -11,7 +11,7 @@ export const useCollectionList = <TFieldsData = any>(
   }
 ) => {
   const [pagination] = usePagination()
-  const [search] = useSearch()
+  const { search } = useSearch()
 
   const queryKey = { ...(args.pagination || pagination), search: args.search ?? search }
 

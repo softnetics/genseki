@@ -6,11 +6,12 @@ import { type Options, parseAsString, useQueryState } from 'nuqs'
 import { useDebounce } from './use-debounce'
 
 export interface UseSearch {
-  Search: ReturnType<typeof useSearch>['0']
-  SetSearch: ReturnType<typeof useSearch>['2']
+  Search: ReturnType<typeof useSearch>['search']
+  SetSearch: ReturnType<typeof useSearch>['setSearch']
+  UndebouncedSearch: ReturnType<typeof useSearch>['undebouncedSearch']
 }
 
-export const useSearch = (options?: { debounce?: number } & Options) => {
+export function useSearch(options?: { debounce?: number } & Options) {
   const { debounce, ...nuqsOptions } = options || {}
 
   const [undebouncedSearch, undebouncedSetSearch] = useState('')
@@ -25,5 +26,5 @@ export const useSearch = (options?: { debounce?: number } & Options) => {
 
   useDebounce(undebouncedSearch, onSearchChange, debounce || 500)
 
-  return [search, undebouncedSearch, undebouncedSetSearch] as const
+  return { search, undebouncedSearch, setSearch: undebouncedSetSearch } as const
 }
