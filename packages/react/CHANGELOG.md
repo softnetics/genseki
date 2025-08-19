@@ -1,5 +1,17 @@
 # @genseki/react
 
+## 0.1.0-alpha.34
+
+### Patch Changes
+
+- [#154](https://github.com/softnetics/genseki/pull/154) [`4f04302`](https://github.com/softnetics/genseki/commit/4f04302a46e85a52b2f07156ec77fe55a17a4367) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Add delete object from storage
+
+## 0.1.0-alpha.33
+
+### Patch Changes
+
+- [#142](https://github.com/softnetics/genseki/pull/142) [`b1908d1`](https://github.com/softnetics/genseki/commit/b1908d164c623e2e9e409e7426e5948c75783e40) Thanks [@Desmenez](https://github.com/Desmenez)! - [Fix] Media file uploader not working (https://github.com/softnetics/genseki/pull/142)
+
 ## 0.1.0-alpha.32
 
 ### Minor Changes
