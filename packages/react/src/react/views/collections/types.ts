@@ -1,11 +1,11 @@
 import type { Fields } from '../../../core'
 import type { AnyContextable } from '../../../core/context'
 
-export interface BaseViewProps {
+export interface BaseViewProps<TFields extends Fields = Fields> {
   slug: string
   context: AnyContextable
   identifierColumn: string
-  fields: Fields
+  fields: TFields
 }
 
 export interface ListFeatures {

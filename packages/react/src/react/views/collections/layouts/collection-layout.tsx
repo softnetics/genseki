@@ -5,7 +5,7 @@ import {
   SidebarProvider,
 } from '../../../components'
 
-export interface CollectionAppLayoutProps {
+export interface CollectionLayoutProps {
   title: string
   version: string
   children: React.ReactNode
@@ -13,10 +13,7 @@ export interface CollectionAppLayoutProps {
   sidebar?: AppSideBarBuilderProps
 }
 
-/**
- * @description RootCollection Layout is included with `sidebar`
- */
-export function CollectionAppLayout(props: CollectionAppLayoutProps) {
+export function CollectionLayout(props: CollectionLayoutProps) {
   return (
     <>
       <SidebarProvider>

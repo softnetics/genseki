@@ -9,9 +9,10 @@ import {
   CustomImageExtension,
   ImageUploadNodeExtension,
   SelectionExtension,
+  TanstackTableProvider,
 } from '@genseki/react'
 
-import { columns } from './posts.client'
+import { columns, PostClientTable, PostClientToolbar } from './posts.client'
 
 import { EditorSlotBefore } from '../editor/slot-before'
 import { builder, prisma } from '../helper'
@@ -147,21 +148,32 @@ const list = builder.list(fields, {
     sortBy: ['updatedAt', 'title'],
   },
   options: options,
+  actions: { create: true, delete: true, one: true, update: true },
   uis: {
     layout: {
       collection(args) {
-        const AppLayout = args.AppLayout
+        const CollectionLayout = args.CollectionLayout
+        const CollectionSidebar = args.CollectionSidebar
         const SidebarProvider = args.SidebarProvider
-        const AppSidebar = args.AppSidebar
         const SidebarInset = args.SidebarInset
-        const TopbarBreadcrumb = args.TopbarNav
+        const TopbarNav = args.TopbarNav
+
+        /**
+         * @description You can use following template for simple scaffolding
+         *  return (
+         *   <CollectionLayout>
+         *     <TopbarNav />
+         *     {args.children}
+         *   </CollectionLayout>
+         *  )
+         */
 
         return (
           <>
             <SidebarProvider>
-              <AppSidebar />
+              <CollectionSidebar />
               <SidebarInset>
-                <TopbarBreadcrumb />
+                <TopbarNav />
                 <div>{args.children}</div>
               </SidebarInset>
             </SidebarProvider>
@@ -172,13 +184,40 @@ const list = builder.list(fields, {
     pages: {
       collection(args) {
         const listViewProps = args.listViewProps
+        const ListViewWrapper = args.ListViewWrapper
         const ListView = args.ListView
         const Banner = args.Banner
+
+        /**
+         * @description You can use following template for simple scaffolding
+         *
+         * ```return (
+         * <div>
+         *   <Banner />
+         *   <ListViewWrapper>
+         *     <ListView />
+         *   </ListViewWrapper>
+         * </div>
+         * )```
+         */
 
         return (
           <div>
             <Banner />
-            <ListView />
+            <ListViewWrapper>
+              <TanstackTableProvider>
+                <PostClientToolbar
+                  features={listViewProps.features ?? {}}
+                  slug={listViewProps.slug}
+                />
+                <PostClientTable
+                  slug={listViewProps.slug}
+                  columns={listViewProps.columns}
+                  listConfiguration={listViewProps.listConfiguration}
+                  features={listViewProps.features}
+                />
+              </TanstackTableProvider>
+            </ListViewWrapper>
           </div>
         )
       },

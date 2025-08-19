@@ -17,7 +17,7 @@ import { isMediaFieldShape, isRelationFieldShape, isRichTextFieldShape } from '.
 
 import { type AppSideBarBuilderProps, NotAuthorizedPage } from '../react'
 
-interface RenderArgs {
+export interface RenderArgs {
   pathname: string
   params: Record<string, string>
   headers: Headers

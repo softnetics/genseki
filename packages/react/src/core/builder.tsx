@@ -32,7 +32,7 @@ import { FieldBuilder, type Fields, type FieldsOptions, type FieldsShape } from 
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
 
-import { CollectionAppLayout, HomeView } from '../react'
+import { AppTopbarNav, CollectionLayout, HomeView } from '../react'
 import { CreateView } from '../react/views/collections/create'
 import { OneView } from '../react/views/collections/one'
 import type { BaseViewProps } from '../react/views/collections/types'
@@ -117,9 +117,10 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               path: `/collections`,
               requiredAuthenticated: true,
               render: (args) => (
-                <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                  <AppTopbarNav />
                   <HomeView {...args.props} />
-                </CollectionAppLayout>
+                </CollectionLayout>
               ),
               props: {
                 cards: [{ name: slug, path: `/admin/collections/${slug}` }],
@@ -135,13 +136,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         }
 
         if (config.list) {
-          const defaultArgs = {
-            slug: slug,
-            context: this.config.context,
-            identifierColumn: config.list.fields.config.identifierColumn,
-            fields: config.list.fields,
-          } satisfies BaseViewProps
-
           const { route } = getCollectionDefaultFindManyApiRoute({
             slug: slug,
             context: this.config.context,
@@ -158,7 +152,8 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
             context: this.config.context,
             listConfig: config.list,
             gensekiOptions: gensekiOptions,
-            defaultArgs: defaultArgs,
+            identifierColumn: config.list.fields.config.identifierColumn,
+            fields: config.list.fields,
             route: route,
             features: {
               create: !!config.create,
@@ -205,9 +200,10 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               context: this.config.context,
               render: (args) => {
                 return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                    <AppTopbarNav />
                     <CreateView {...args} {...args.params} {...defaultArgs} />
-                  </CollectionAppLayout>
+                  </CollectionLayout>
                 )
               },
             })
@@ -258,7 +254,8 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               context: this.config.context,
               render: (args) => {
                 return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                    <AppTopbarNav />
                     <UpdateView
                       {...args}
                       {...args.params}
@@ -266,7 +263,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                       identifier={args.params.identifier}
                       updateDefault={updateDefaultRoute}
                     />
-                  </CollectionAppLayout>
+                  </CollectionLayout>
                 )
               },
             })
@@ -297,7 +294,8 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               context: this.config.context,
               render: (args) => {
                 return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                    <AppTopbarNav />
                     <OneView
                       {...args}
                       {...args.params}
@@ -305,7 +303,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                       identifier={args.params.identifier}
                       findOne={route}
                     />
-                  </CollectionAppLayout>
+                  </CollectionLayout>
                 )
               },
             })

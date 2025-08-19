@@ -4,35 +4,29 @@ import {
   AppSidebar,
   AppTopbarNav,
   Banner,
-  CollectionAppLayout,
+  CollectionLayout,
   ListView,
+  ListViewWrapper,
+  type ListViewWrapperProps,
   SidebarInset,
   SidebarProvider,
 } from '../../react'
-import type { BaseViewProps } from '../../react/views/collections/types'
+import type { BaseViewProps, ListFeatures } from '../../react/views/collections/types'
 import type { CollectionFindManyApiRoute } from '../builder.utils'
 import type { CollectionListConfig, ListViewProps } from '../collection'
 import { createGensekiUiRoute, type GensekiPluginOptions } from '../config'
-import type { AnyContextable } from '../context'
 import { GensekiUiCommonId } from '../ui'
 
-export const generateCustomCollectionListUI = <
-  TContext extends AnyContextable,
+export function generateCustomCollectionListUI<
   TCollectionListConfig extends CollectionListConfig<any, any>,
->(customCollectionArgs: {
-  slug: string
-  context: TContext
-  listConfig: TCollectionListConfig
-  gensekiOptions: GensekiPluginOptions
-  defaultArgs: BaseViewProps
-  route: CollectionFindManyApiRoute<string, any>
-  features: {
-    create: boolean
-    update: boolean
-    delete: boolean
-    one: boolean
-  }
-}) => {
+>(
+  customCollectionArgs: {
+    listConfig: TCollectionListConfig
+    gensekiOptions: GensekiPluginOptions
+    route: CollectionFindManyApiRoute<string, any>
+    features: ListFeatures
+  } & BaseViewProps
+) {
   return createGensekiUiRoute({
     id: GensekiUiCommonId.COLLECTION_LIST,
     path: `/collections/${customCollectionArgs.slug}`,
@@ -40,40 +34,50 @@ export const generateCustomCollectionListUI = <
     context: customCollectionArgs.context,
     render: (args) => {
       const listViewProps = {
-        ...args,
-        ...args.params,
-        ...customCollectionArgs.defaultArgs,
+        slug: customCollectionArgs.slug,
+        identifierColumn: customCollectionArgs.identifierColumn,
+        fields: customCollectionArgs.fields,
+        context: customCollectionArgs.context,
+        pathname: args.pathname,
+        headers: args.headers,
+        params: args.params,
+        searchParams: args.searchParams,
         findMany: customCollectionArgs.route,
         columns: customCollectionArgs.listConfig.columns ?? [],
         listConfiguration: customCollectionArgs.listConfig.configuration,
-        features: customCollectionArgs.features,
+        features: customCollectionArgs.listConfig.actions,
       } satisfies ListViewProps
 
-      let GensekiAppLayout = (props: { children: React.ReactNode }) => (
-        <CollectionAppLayout
+      let _CollectionLayout = (props: { children: React.ReactNode }) => (
+        <CollectionLayout
           pathname={args.pathname}
           {...customCollectionArgs.gensekiOptions}
           children={props.children}
         />
       )
-      const GensekiCollectionLayout = (props: { children: React.ReactNode }) => props.children
-      const GensekiAppTopbarNav = () => <AppTopbarNav />
-      const GensekiBanner = () => <Banner slug={customCollectionArgs.slug} />
-      let GensekiListView = () => <ListView {...listViewProps} />
+      const _AppTopbarNav = () => <AppTopbarNav />
+      const _Banner = () => <Banner slug={customCollectionArgs.slug} />
+      let _ListView = () => <ListView {...listViewProps} />
+      const _ListViewWrapper = (props: ListViewWrapperProps) => <ListViewWrapper {...props} />
 
-      if (!customCollectionArgs.listConfig.uis)
+      if (
+        !customCollectionArgs.listConfig.uis?.layout &&
+        !customCollectionArgs.listConfig.uis?.pages
+      )
         return (
-          <GensekiAppLayout>
-            <GensekiAppTopbarNav />
-            <GensekiBanner />
-            <GensekiListView />
-          </GensekiAppLayout>
+          <_CollectionLayout>
+            <_AppTopbarNav />
+            <_Banner />
+            <_ListViewWrapper>
+              <_ListView />
+            </_ListViewWrapper>
+          </_CollectionLayout>
         )
 
       if (customCollectionArgs.listConfig.uis.layout?.collection) {
         const newCustomCollectionLayout = customCollectionArgs.listConfig.uis.layout.collection
 
-        GensekiAppLayout = (props: { children: React.ReactNode }) => {
+        _CollectionLayout = (props: { children: React.ReactNode }) => {
           /**
            * @description
            * 1. At the end of `generateCustomCollectionListUI` we call `GensekiAppLayout` with `children`
@@ -86,14 +90,14 @@ export const generateCustomCollectionListUI = <
           return newCustomCollectionLayout({
             children: props.children,
             SidebarProvider: (props) => <SidebarProvider {...props} />,
-            AppSidebar: () => (
+            CollectionSidebar: () => (
               <AppSidebar pathname={args.pathname} {...customCollectionArgs.gensekiOptions} />
             ),
             SidebarInset: (props) => <SidebarInset {...props} />,
-            TopbarNav: () => <GensekiAppTopbarNav />,
-            AppLayout(_props) {
+            TopbarNav: () => <_AppTopbarNav />,
+            CollectionLayout(_props) {
               return (
-                <CollectionAppLayout
+                <CollectionLayout
                   pathname={args.pathname}
                   {...customCollectionArgs.gensekiOptions}
                   children={_props.children}
@@ -107,21 +111,21 @@ export const generateCustomCollectionListUI = <
 
       if (customCollectionArgs.listConfig.uis.pages?.collection) {
         const newListView = customCollectionArgs.listConfig.uis.pages?.collection
-        GensekiListView = () => {
+
+        _ListView = () => {
           return newListView({
-            Banner: GensekiBanner,
+            Banner: _Banner,
             ListView: () => <ListView {...listViewProps} />,
+            ListViewWrapper: _ListViewWrapper,
             listViewProps: listViewProps,
           })
         }
       }
 
       return (
-        <GensekiAppLayout>
-          <GensekiCollectionLayout>
-            <GensekiListView />
-          </GensekiCollectionLayout>
-        </GensekiAppLayout>
+        <_CollectionLayout>
+          <_ListView />
+        </_CollectionLayout>
       )
     },
   })

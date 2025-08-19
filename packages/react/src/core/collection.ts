@@ -1,12 +1,12 @@
 import type React from 'react'
 
-import type { UseQueryResult } from '@tanstack/react-query'
-import type { ColumnDef, Table } from '@tanstack/react-table'
+import type { ColumnDef } from '@tanstack/react-table'
 import type { ConditionalExcept, IsEmptyObject, Promisable, Simplify } from 'type-fest'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
 import type { CollectionFindManyApiRoute } from './builder.utils'
+import type { RenderArgs } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
 import { type AnyApiRouter } from './endpoint'
 import {
@@ -24,7 +24,7 @@ import {
 } from './field'
 import type { DataType, InferDataType } from './model'
 
-import type { SidebarProviderProps } from '../react'
+import type { ListViewWrapperProps, SidebarProviderProps } from '../react'
 import type { BaseViewProps, ListFeatures } from '../react/views/collections/types'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
@@ -181,10 +181,7 @@ export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
     -readonly [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeBase
       ? InferField<TFields['shape'][TKey]>
       : never
-  } & {
-    __pk: string | number
-    __id: string | number
-  },
+  } & BaseData,
   never
 >
 
@@ -323,35 +320,22 @@ export interface ListConfiguration<TFields extends Fields> {
   sortBy?: ExtractSortableColumns<TFields>[]
 }
 
-interface BaseData {
-  __id: string
-  __pk: string
+export interface BaseData {
+  __id: string | number
+  __pk: string | number
 }
 
-// TODO: TypeSafe by TFieldsData
-type CustomCollectionDataQuery<TFieldsData> = UseQueryResult<{
-  data: BaseData[]
+export type CollectionListResponse<TFieldsData = any> = {
+  data: (TFieldsData & BaseData)[]
   total: number
   totalPage: number
   currentPage: number
-}>
-
-interface CustomCollectionTable<TFieldsData> {
-  GensekiTable: React.FC
-  table: Table<TFieldsData>
-  columns: ColumnDef<TFieldsData>
-}
-interface CustomCollectionPagination {
-  GensekiPagination: React.FC
-}
-interface CustomCollectionToolbar {
-  GensekiToolbar: React.FC
 }
 
-interface CustomCollection_CollectionLayout {
+interface CustomCollectionLayout {
   (args: {
-    AppLayout: React.FC<{ children: React.ReactNode }>
-    AppSidebar: React.FC
+    CollectionLayout: React.FC<{ children: React.ReactNode }>
+    CollectionSidebar: React.FC
     SidebarProvider: React.FC<SidebarProviderProps>
     SidebarInset: React.FC<React.ComponentProps<'main'>>
     TopbarNav: React.FC
@@ -360,13 +344,10 @@ interface CustomCollection_CollectionLayout {
   }): React.ReactElement
 }
 
-interface CustomCollection_CollectionPage<TFieldsData> {
+interface CustomCollectionPage<TFields extends Fields> {
   (args: {
-    listViewProps: ListViewProps
-    dataQuery?: CustomCollectionDataQuery<TFieldsData>
-    table?: CustomCollectionTable<TFieldsData>
-    pagination?: CustomCollectionPagination
-    toolbar?: CustomCollectionToolbar
+    listViewProps: ListViewProps<TFields>
+    ListViewWrapper: React.FC<ListViewWrapperProps>
     ListView: React.FC
     Banner: React.FC
   }): React.ReactElement
@@ -374,13 +355,12 @@ interface CustomCollection_CollectionPage<TFieldsData> {
 interface CustomCollectionUI<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
-  TFieldsData = any,
 > {
   layout?: {
-    collection?: CustomCollection_CollectionLayout
+    collection?: CustomCollectionLayout
   }
   pages?: {
-    collection?: CustomCollection_CollectionPage<TFieldsData>
+    collection?: CustomCollectionPage<TFields>
   }
 }
 
@@ -392,9 +372,12 @@ export type CollectionListConfig<
   fields: TFields
   columns: ColumnDef<TFieldsData, any>[]
   api?: ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY>
-  uis?: CustomCollectionUI<TContext, TFields, TFieldsData>
+  uis?: CustomCollectionUI<TContext, TFields>
   configuration?: ListConfiguration<TFields>
-  features?: {
+  /**
+   * @param actions will decide whether or not to show actios in `list` view screen, This is not related to available features of collection, but rather only visible UI part of the `list` page
+   */
+  actions?: {
     create?: boolean
     update?: boolean
     delete?: boolean
@@ -453,11 +436,13 @@ export interface CollectionConfigClient {
   }
 }
 
-export interface ListViewProps extends BaseViewProps {
+export interface ListViewProps<TFields extends Fields = Fields>
+  extends BaseViewProps<TFields>,
+    RenderArgs {
   headers: Headers
   searchParams: Record<string, string | string[]>
   columns: ColumnDef<any>[]
-  findMany: CollectionFindManyApiRoute<string, Fields>
-  listConfiguration?: ListConfiguration<Fields>
+  findMany: CollectionFindManyApiRoute<string, TFields>
+  listConfiguration?: ListConfiguration<TFields>
   features?: ListFeatures
 }

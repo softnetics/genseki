@@ -2,7 +2,7 @@
 
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
-import { useMutation } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { FieldsClient } from '../../../core'
@@ -22,6 +22,8 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   const form = useForm({
     defaultValues: props.defaultValues,
   })
+
+  const queryCleint = useQueryClient()
 
   const { navigate } = useNavigation()
 
@@ -46,6 +48,9 @@ export function UpdateClientView(props: UpdateClientViewProps) {
         }
         throw new Error(`Failed to update (status: ${response.status}): ${errorBody}`)
       }
+      queryCleint.invalidateQueries({
+        queryKey: ['GET', `/api/${props.slug}`],
+      })
       return response.json()
     },
   })
