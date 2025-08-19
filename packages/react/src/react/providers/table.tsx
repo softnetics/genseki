@@ -24,7 +24,7 @@ export interface TanstackTableProviderProps {
   children?: React.ReactNode
 }
 
-const _TanstackTableProvider = createContext<TanstackTableContextValue | null>(null)
+const TanstackTableContext = createContext<TanstackTableContextValue>(null!)
 
 export const TanstackTableProvider = (props: TanstackTableProviderProps) => {
   const [pagination, setPagination] = usePagination()
@@ -33,7 +33,7 @@ export const TanstackTableProvider = (props: TanstackTableProviderProps) => {
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
   return (
-    <_TanstackTableProvider
+    <TanstackTableContext
       value={{
         pagination,
         setPagination,
@@ -44,7 +44,7 @@ export const TanstackTableProvider = (props: TanstackTableProviderProps) => {
       }}
     >
       {props.children}
-    </_TanstackTableProvider>
+    </TanstackTableContext>
   )
 }
 
@@ -52,9 +52,9 @@ export const TanstackTableProvider = (props: TanstackTableProviderProps) => {
  * @description Hook to access the Tanstack table context which provides pagination, search, and row selection state
  */
 export const useTanstackTableContext = () => {
-  const ctx = use(_TanstackTableProvider)
+  const ctx = use(TanstackTableContext)
 
-  if (!ctx) throw new Error('Tanstack table context must be used within Tanstack table provider')
+  if (!ctx) throw new Error('"useTanstackTableContext" must be used within "TanstackTableProvider"')
 
   return ctx
 }
