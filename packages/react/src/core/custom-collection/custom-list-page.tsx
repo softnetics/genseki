@@ -15,7 +15,6 @@ import type { BaseViewProps, ListFeatures } from '../../react/views/collections/
 import type { CollectionFindManyApiRoute } from '../builder.utils'
 import type { CollectionListConfig, ListViewProps } from '../collection'
 import { createGensekiUiRoute, type GensekiPluginOptions } from '../config'
-import { GensekiUiCommonId } from '../ui'
 
 export function generateCustomCollectionListUI<
   TCollectionListConfig extends CollectionListConfig<any, any>,
@@ -28,7 +27,6 @@ export function generateCustomCollectionListUI<
   } & BaseViewProps
 ) {
   return createGensekiUiRoute({
-    id: GensekiUiCommonId.COLLECTION_LIST,
     path: `/collections/${customCollectionArgs.slug}`,
     requiredAuthenticated: true,
     context: customCollectionArgs.context,
