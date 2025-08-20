@@ -327,8 +327,8 @@ export interface BaseData {
   __pk: string | number
 }
 
-export type CollectionListResponse<TFieldsData = any> = {
-  data: (TFieldsData & BaseData)[]
+export type CollectionListResponse = {
+  data: ({} & BaseData)[]
   total: number
   totalPage: number
   currentPage: number
@@ -358,12 +358,8 @@ interface CustomCollectionUI<
   TContext extends AnyContextable = AnyContextable,
   TFields extends Fields = Fields,
 > {
-  layout?: {
-    collection?: CustomCollectionLayout
-  }
-  pages?: {
-    collection?: CustomCollectionPage<TFields>
-  }
+  layout?: CustomCollectionLayout
+  pages?: CustomCollectionPage<TFields>
 }
 
 export type CollectionListConfig<

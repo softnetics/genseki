@@ -18,7 +18,7 @@ interface CollectionListTableArgs<TFieldsData extends BaseData> {
   }
   total?: number
   data: TFieldsData[]
-  columns: ColumnDef<TFieldsData>[]
+  columns: ColumnDef<any>[]
 }
 
 /**

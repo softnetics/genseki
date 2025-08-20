@@ -2,10 +2,10 @@ import React from 'react'
 
 import {
   AppSidebar,
-  AppTopbarNav,
+  AppTopbarNav as _AppTopbarNav,
   Banner,
-  CollectionLayout,
-  ListView,
+  CollectionLayout as _CollectionLayout,
+  ListView as _ListView,
   ListViewWrapper,
   type ListViewWrapperProps,
   SidebarInset,
@@ -45,76 +45,79 @@ export function generateCustomCollectionListUI<
         listConfiguration: customCollectionArgs.listConfig.configuration,
         actions: customCollectionArgs.listConfig.actions,
       } satisfies ListViewProps
-
-      let _CollectionLayout = (props: { children: React.ReactNode }) => (
-        <CollectionLayout
-          pathname={args.pathname}
-          {...customCollectionArgs.gensekiOptions}
-          children={props.children}
-        />
-      )
-      const _AppTopbarNav = () => <AppTopbarNav />
+      const AppTopbarNav = () => <_AppTopbarNav />
       const _Banner = () => <Banner slug={customCollectionArgs.slug} />
-      let _ListView = () => <ListView {...listViewProps} />
       const _ListViewWrapper = (props: ListViewWrapperProps) => <ListViewWrapper {...props} />
+      const CollectionLayout = (props: { children?: React.ReactNode }) => {
+        const NewCollectionLayout = customCollectionArgs.listConfig.uis?.layout
 
-      if (
-        !customCollectionArgs.listConfig.uis?.layout &&
-        !customCollectionArgs.listConfig.uis?.pages
-      )
-        return (
-          <_CollectionLayout>
-            <_AppTopbarNav />
-            <_Banner />
-            <_ListViewWrapper>
-              <_ListView />
-            </_ListViewWrapper>
-          </_CollectionLayout>
-        )
-
-      if (customCollectionArgs.listConfig.uis.layout?.collection) {
-        const newCustomCollectionLayout = customCollectionArgs.listConfig.uis.layout.collection
-
-        _CollectionLayout = (props: { children: React.ReactNode }) => {
-          return newCustomCollectionLayout({
-            children: props.children,
-            SidebarProvider: (props) => <SidebarProvider {...props} />,
-            CollectionSidebar: () => (
-              <AppSidebar pathname={args.pathname} {...customCollectionArgs.gensekiOptions} />
-            ),
-            SidebarInset: (props) => <SidebarInset {...props} />,
-            TopbarNav: () => <_AppTopbarNav />,
-            CollectionLayout(_props) {
-              return (
-                <CollectionLayout
+        if (NewCollectionLayout) {
+          return (
+            <NewCollectionLayout
+              SidebarProvider={(props) => <SidebarProvider {...props} />}
+              CollectionSidebar={() => (
+                <AppSidebar pathname={args.pathname} {...customCollectionArgs.gensekiOptions} />
+              )}
+              SidebarInset={(props) => <SidebarInset {...props} />}
+              TopbarNav={() => <AppTopbarNav />}
+              CollectionLayout={(_props) => (
+                <_CollectionLayout
                   pathname={args.pathname}
                   {...customCollectionArgs.gensekiOptions}
                   children={_props.children}
                 />
-              )
-            },
-            listViewProps: listViewProps,
-          })
+              )}
+              listViewProps={listViewProps}
+            >
+              {props.children}
+            </NewCollectionLayout>
+          )
         }
+
+        return (
+          <_CollectionLayout
+            pathname={args.pathname}
+            {...customCollectionArgs.gensekiOptions}
+            children={props.children}
+          />
+        )
+      }
+      const ListView = () => {
+        const NewListView = customCollectionArgs.listConfig.uis?.pages
+
+        if (NewListView) {
+          return (
+            <NewListView
+              Banner={_Banner}
+              ListView={() => <_ListView {...listViewProps} />}
+              ListViewWrapper={_ListViewWrapper}
+              listViewProps={listViewProps}
+            />
+          )
+        }
+
+        return <_ListView {...listViewProps} />
       }
 
-      if (customCollectionArgs.listConfig.uis.pages?.collection) {
-        const newListView = customCollectionArgs.listConfig.uis.pages?.collection
-
-        _ListView = () => {
-          return newListView({
-            Banner: _Banner,
-            ListView: () => <ListView {...listViewProps} />,
-            ListViewWrapper: _ListViewWrapper,
-            listViewProps: listViewProps,
-          })
-        }
+      if (
+        !customCollectionArgs.listConfig.uis?.layout &&
+        !customCollectionArgs.listConfig.uis?.pages
+      ) {
+        return (
+          <CollectionLayout>
+            <AppTopbarNav />
+            <_Banner />
+            <_ListViewWrapper>
+              <ListView />
+            </_ListViewWrapper>
+          </CollectionLayout>
+        )
       }
 
       return (
-        <_CollectionLayout>
-          <_ListView />
-        </_CollectionLayout>
+        <CollectionLayout>
+          <ListView />
+        </CollectionLayout>
       )
     },
   })

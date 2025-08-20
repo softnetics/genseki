@@ -160,71 +160,68 @@ const list = builder.list(fields, {
   options: options,
   actions: { create: true, delete: true, one: true, update: true },
   uis: {
-    layout: {
-      collection(args) {
-        const CollectionLayout = args.CollectionLayout
-        const CollectionSidebar = args.CollectionSidebar
-        const SidebarProvider = args.SidebarProvider
-        const SidebarInset = args.SidebarInset
-        const TopbarNav = args.TopbarNav
+    layout(args) {
+      const CollectionLayout = args.CollectionLayout
+      const CollectionSidebar = args.CollectionSidebar
+      const SidebarProvider = args.SidebarProvider
+      const SidebarInset = args.SidebarInset
+      const TopbarNav = args.TopbarNav
 
-        /**
-         * @description You can use following template for simple scaffolding
-         *  return (
-         *   <CollectionLayout>
-         *     <TopbarNav />
-         *     {args.children}
-         *   </CollectionLayout>
-         *  )
-         */
+      /**
+       * @description You can use following template for simple scaffolding
+       *  return (
+       *   <CollectionLayout>
+       *     <TopbarNav />
+       *     {args.children}
+       *   </CollectionLayout>
+       *  )
+       */
 
-        return (
-          <>
-            <SidebarProvider>
-              <CollectionSidebar />
-              <SidebarInset>
-                <TopbarNav />
-                <div>{args.children}</div>
-              </SidebarInset>
-            </SidebarProvider>
-          </>
-        )
-      },
+      return (
+        <>
+          <SidebarProvider>
+            <CollectionSidebar />
+            <SidebarInset>
+              <TopbarNav />
+
+              <div>{args.children}</div>
+            </SidebarInset>
+          </SidebarProvider>
+        </>
+      )
     },
-    pages: {
-      collection(args) {
-        const clientListViewProps = getClientListViewProps(args.listViewProps)
-        const ListViewWrapper = args.ListViewWrapper
-        const ListView = args.ListView
-        const Banner = args.Banner
+    pages(args) {
+      const clientListViewProps = getClientListViewProps(args.listViewProps)
+      const ListViewWrapper = args.ListViewWrapper
+      const ListView = args.ListView
+      const Banner = args.Banner
 
-        /**
-         * @description You can use following template for simple scaffolding
-         *
-         * ```return (
-         * <div>
-         *   <Banner />
-         *   <ListViewWrapper>
-         *     <ListView />
-         *   </ListViewWrapper>
-         * </div>
-         * )```
-         */
+      /**
+       * @description You can use following template for simple scaffolding
+       *
+       * ```return (
+       * <div>
+       *   <Banner />
+       *   <ListViewWrapper>
+       *     <ListView />
+       *   </ListViewWrapper>
+       * </div>
+       * )```
+       */
 
-        return (
-          <div>
-            <Banner />
-            <ListViewWrapper>
-              <TableStatesProvider>
-                <ClientListViewPropsProvider clientListViewProps={clientListViewProps}>
-                  <PostClientToolbar />
-                  <PostClientTable />
-                </ClientListViewPropsProvider>
-              </TableStatesProvider>
-            </ListViewWrapper>
-          </div>
-        )
-      },
+      return (
+        <div>
+          <Banner />
+          <ListViewWrapper>
+            <TableStatesProvider>
+              <ClientListViewPropsProvider clientListViewProps={clientListViewProps}>
+                <PostClientToolbar />
+                <PostClientTable />
+              </ClientListViewPropsProvider>
+            </TableStatesProvider>
+          </ListViewWrapper>
+        </div>
+      )
     },
   },
 })

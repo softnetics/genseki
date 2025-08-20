@@ -5,7 +5,7 @@ import { type UsePagination, usePagination } from '../../../../hooks/use-paginat
 import { type UseSearch, useSearch } from '../../../../hooks/use-search'
 import { useSort } from '../../../../hooks/use-sort'
 
-export function useCollectionListQuery<TFieldsData = any>(
+export function useCollectionListQuery(
   args: { slug: string } & {
     pagination?: UsePagination['Pagination']
     search?: UseSearch['Search']
@@ -17,7 +17,7 @@ export function useCollectionListQuery<TFieldsData = any>(
 
   const queryKey = { ...(args.pagination || pagination), search: args.search ?? search, sort: sort }
 
-  const query: UseQueryResult<CollectionListResponse<TFieldsData>> = useQuery({
+  const query: UseQueryResult<CollectionListResponse> = useQuery({
     queryKey: ['GET', `/${args.slug}`, { query: queryKey }] as const,
     queryFn: async (context) => {
       const [, , payload] = context.queryKey

@@ -4,7 +4,7 @@ import type React from 'react'
 
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
+import { createColumnHelper } from '@tanstack/react-table'
 
 import type { BaseData } from '@genseki/react'
 import {
@@ -237,7 +237,7 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
         )
       },
     }),
-  ] as ColumnDef<{ __pk: string; __id: string }>[]
+  ]
 
   const table = useCollectionListTable({
     total: query.data?.total,
