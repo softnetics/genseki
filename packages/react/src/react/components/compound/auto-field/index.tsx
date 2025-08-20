@@ -309,6 +309,7 @@ const AutoRichTextField = (props: {
 
 export function AutoFormField(props: { name: string; component: ReactNode }) {
   const { control } = useFormContext()
+
   return (
     <FormField
       key={props.name}
@@ -341,7 +342,9 @@ export function AutoField(props: AutoFieldProps) {
   const disabled = props.fieldShape.disabled || props.disabled
 
   const commonProps = {
-    name: props.prefix ? `${props.prefix}.${field.$client}` : field.$client.fieldName,
+    name: props.prefix
+      ? `${props.prefix}.${props.fieldShape.$client.fieldName}`
+      : props.fieldShape.$client.fieldName,
     label: field.label,
     className: className,
     description: field.description,
@@ -483,43 +486,17 @@ export function AutoField(props: AutoFieldProps) {
       )
     }
 
-    case 'create': {
-      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
-
-      return (
-        <AutoRelationshipField
-          name={field.$client.fieldName}
-          fieldShape={field}
-          allowCreate={true}
-          allowConnect={false}
-          disabled={disabled}
-          optionsFetchPath={props.optionsFetchPath}
-        />
-      )
-    }
-    case 'connect': {
-      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
-
-      return (
-        <AutoRelationshipField
-          name={field.$client.fieldName}
-          fieldShape={field}
-          allowConnect={true}
-          allowCreate={false}
-          disabled={disabled}
-          optionsFetchPath={props.optionsFetchPath}
-        />
-      )
-    }
+    case 'create':
+    case 'connect':
     case 'connectOrCreate': {
       if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
 
       return (
         <AutoRelationshipField
-          name={field.$client.fieldName}
+          name={commonProps.name}
           fieldShape={field}
-          allowConnect={true}
-          allowCreate={true}
+          allowConnect={field.type === 'connect' || field.type === 'connectOrCreate'}
+          allowCreate={field.type === 'create' || field.type === 'connectOrCreate'}
           disabled={disabled}
           optionsFetchPath={props.optionsFetchPath}
         />
@@ -622,6 +599,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
           className="w-full"
           prefix={`${props.name}.create`}
           disabled={disabled}
+          optionsFetchPath={props.optionsFetchPath}
         />
       }
     />
@@ -711,6 +689,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             className="w-full"
             prefix={name}
             disabled={disabled}
+            optionsFetchPath={props.optionsFetchPath}
           />
         }
       />

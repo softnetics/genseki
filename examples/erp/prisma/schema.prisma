@@ -121,6 +121,33 @@ model Post {
   author   User   @relation(fields: [authorId], references: [id])
 
   comments Comment[]
+  postTags PostTag[]
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model PostTag {
+  id String @id @default(uuid())
+
+  remark String?
+
+  tagId String
+  tag   Tag    @relation(fields: [tagId], references: [id], onDelete: Cascade)
+
+  postId String
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model Tag {
+  id String @id @default(uuid())
+
+  name String
+
+  postTags PostTag[]
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
