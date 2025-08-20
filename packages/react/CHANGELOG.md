@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.35
+
+### Patch Changes
+
+- [#157](https://github.com/softnetics/genseki/pull/157) [`8651a68`](https://github.com/softnetics/genseki/commit/8651a686aa8c96f5e97ca0f9d67a062d499b1485) Thanks [@plohan](https://github.com/plohan)! - Fix create nested relation
+
 ## 0.1.0-alpha.34
 
 ### Patch Changes
