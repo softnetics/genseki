@@ -2,31 +2,30 @@
 
 import React, { useMemo } from 'react'
 
+import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
-import { type ColumnDef } from '@tanstack/react-table'
+import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { toast } from 'sonner'
 
-import { useCollectionDelete } from './hooks/use-collection-delete'
-import { useCollectionList } from './hooks/use-collection-list'
-import { generateEnhancedColumns, useCollectionListTable } from './table'
+import { useCollectionDeleteMutation, useCollectionListQuery } from './hooks'
+import { useClientListViewPropsContext } from './providers'
+import { useCollectionListTable } from './table'
 import { CollectionListPagination } from './table/pagination'
 import { CollectionListToolbar } from './toolbar'
 
-import type { BaseData, FieldsClient } from '../../../../core'
-import type { ListConfiguration } from '../../../../core/collection'
-import { TanstackTable } from '../../../components'
-import { useNavigation, useTanstackTableContext } from '../../../providers'
+import type { BaseData } from '../../../../core'
+import {
+  BaseIcon,
+  Checkbox,
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
+  TanstackTable,
+} from '../../../components'
+import { useNavigation, useTableStatesContext } from '../../../providers'
 import { cn } from '../../../utils/cn'
-import type { ListFeatures } from '../types'
-
-interface ListTableProps<TFieldsClient extends FieldsClient, TFieldsData> {
-  slug: string
-  identifierColumn: string
-  fieldsClient: TFieldsClient
-  columns: ColumnDef<TFieldsData>[]
-  listConfiguration?: ListConfiguration<any>
-  features?: ListFeatures
-}
 
 export interface ListViewWrapperProps {
   children?: React.ReactNode
@@ -43,25 +42,20 @@ export const ListViewWrapper = (props: ListViewWrapperProps) => {
   )
 }
 
-export function ListViewClient<TFieldsClient extends FieldsClient, TFieldsData extends BaseData>(
-  props: ListTableProps<TFieldsClient, TFieldsData>
-) {
+export function ListViewClient() {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const { pagination, rowSelection, setRowSelection } = useTanstackTableContext()
+  const listViewProps = useClientListViewPropsContext()
+  const { pagination, isRowsSelected, rowSelectionIds, setRowSelection } = useTableStatesContext()
 
-  const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key])
+  const query = useCollectionListQuery({ slug: listViewProps.slug })
 
-  const isShowDeleteButton = selectedRowIds.length > 0
-
-  const query = useCollectionList({ slug: props.slug })
-
-  const deleteMutation = useCollectionDelete({
-    slug: props.slug,
+  const deleteMutation = useCollectionDeleteMutation({
+    slug: listViewProps.slug,
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/${props.slug}`],
+        queryKey: ['GET', `/${listViewProps.slug}`],
       })
       toast.success('Deletion successfully')
     },
@@ -71,50 +65,113 @@ export function ListViewClient<TFieldsClient extends FieldsClient, TFieldsData e
   })
 
   const columns = useMemo(() => {
-    if (query.isLoading) return props.columns
+    if (query.isLoading) return listViewProps.columns
 
-    return generateEnhancedColumns({
-      columns: props.columns,
-      features: props.features,
-      onDelete({ row }) {
-        deleteMutation.mutate([row.original.__id.toString()])
-      },
-      onEdit({ row }) {
-        navigation.navigate(`./${props.slug}/update/${row.original.__id}`)
-      },
-      onView({ row }) {
-        navigation.navigate(`./${props.slug}/${row.original.__id}`)
-      },
-    })
-  }, [props.columns, props.features, query.isLoading])
+    const columnHelper = createColumnHelper<BaseData>()
+    return [
+      ...(listViewProps.actions?.delete
+        ? [
+            columnHelper.display({
+              id: 'select',
+              header: ({ table }) => (
+                <Checkbox
+                  isSelected={table.getIsAllRowsSelected()}
+                  isIndeterminate={table.getIsSomeRowsSelected()}
+                  onChange={(checked) =>
+                    table.getToggleAllRowsSelectedHandler()({ target: { checked } })
+                  }
+                />
+              ),
+              cell: ({ row }) => (
+                <Checkbox
+                  isSelected={row.getIsSelected()}
+                  isDisabled={!row.getCanSelect()}
+                  onChange={(checked) => row.getToggleSelectedHandler()({ target: { checked } })}
+                />
+              ),
+            }),
+          ]
+        : []),
+      ...listViewProps.columns,
+      columnHelper.display({
+        id: 'actions',
+        cell: ({ row }) => {
+          if (
+            !listViewProps.actions?.one &&
+            !listViewProps.actions?.update &&
+            !listViewProps.actions?.delete
+          ) {
+            return null
+          }
+
+          return (
+            <div className="grid place-items-center">
+              <Menu>
+                <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
+                  <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
+                </MenuTrigger>
+                <MenuContent aria-label="Actions" placement="left top">
+                  {listViewProps.actions.one && (
+                    <MenuItem
+                      aria-label="View"
+                      onAction={() => {
+                        navigation.navigate(`./${listViewProps.slug}/${row.original.__id}`)
+                      }}
+                    >
+                      View
+                    </MenuItem>
+                  )}
+                  {listViewProps.actions.update && (
+                    <MenuItem
+                      aria-label="Edit"
+                      onAction={() => {
+                        navigation.navigate(`./${listViewProps.slug}/update/${row.original.__id}`)
+                      }}
+                    >
+                      Edit
+                    </MenuItem>
+                  )}
+                  {listViewProps.actions?.delete && (
+                    <>
+                      {listViewProps.actions.one ||
+                        (listViewProps.actions.update && <MenuSeparator />)}
+                      <MenuItem
+                        aria-label="Delete"
+                        isDanger
+                        onAction={() => {
+                          deleteMutation.mutate([row.original.__id.toString()])
+                        }}
+                      >
+                        Delete
+                      </MenuItem>
+                    </>
+                  )}
+                </MenuContent>
+              </Menu>
+            </div>
+          )
+        },
+      }),
+    ] as ColumnDef<{ __pk: string; __id: string }>[]
+  }, [listViewProps.columns, listViewProps.actions, query.isLoading])
 
   const table = useCollectionListTable({
     total: query.data?.total,
     data: query.data?.data || [],
     columns: columns,
-    listConfiguration: props.listConfiguration,
+    listConfiguration: listViewProps.listConfiguration,
   })
 
-  const handleBulkDelete = async () => {
-    // Return immediately if delete is not enabled
-    if (!props.features?.delete) return
-
-    if (selectedRowIds.length === 0) return
-
-    deleteMutation.mutate(selectedRowIds)
-  }
-
-  // Loading state
-  const isLoading = deleteMutation.isPending || query.isLoading || query.isFetching
   const isError = deleteMutation.isError || query.isError
+  const isLoading = deleteMutation.isPending || query.isPending || query.isFetching
 
   return (
     <>
       <CollectionListToolbar
-        features={props.features}
-        slug={props.slug}
-        onDelete={handleBulkDelete}
-        isShowDeleteButton={isShowDeleteButton}
+        actions={listViewProps.actions}
+        slug={listViewProps.slug}
+        onDelete={() => deleteMutation.mutate(rowSelectionIds)}
+        isShowDeleteButton={isRowsSelected}
         isLoading={isLoading}
       />
       <TanstackTable
@@ -124,7 +181,7 @@ export function ListViewClient<TFieldsClient extends FieldsClient, TFieldsData e
         onRowClick="toggleSelect"
         isLoading={isLoading}
         isError={isError}
-        configuration={props.listConfiguration}
+        configuration={listViewProps.listConfiguration}
       />
       <CollectionListPagination totalPage={query.data?.totalPage} />
     </>

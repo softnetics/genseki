@@ -8,7 +8,7 @@ import { CollectionListFilter, type MinimalCollectionListFilterProps } from './f
 import { CollectionListSearch, type CollectionListSearchProps } from './search'
 
 import { BaseIcon, ButtonLink } from '../../../../components'
-import type { ListFeatures } from '../../types'
+import type { ListActions } from '../../types'
 
 export interface CollectionListToolbarProps
   extends CollectionListSearchProps,
@@ -16,7 +16,7 @@ export interface CollectionListToolbarProps
     MinimalCollectionListFilterProps,
     MinimalCollectionListCreateProps {
   isShowDeleteButton?: boolean
-  features?: ListFeatures
+  actions?: ListActions
 }
 
 /**
@@ -27,7 +27,7 @@ export interface CollectionListToolbarProps
  * @param props.features Features configuration for the list view
  */
 export function CollectionListToolbar(props: CollectionListToolbarProps) {
-  const { isShowDeleteButton = false, features } = props
+  const { isShowDeleteButton = false, actions } = props
 
   return (
     <div className="flex items-center justify-between gap-x-3">
@@ -41,7 +41,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
-        {features?.delete && isShowDeleteButton && (
+        {actions?.delete && isShowDeleteButton && (
           <CollectionListDelete onDelete={props.onDelete} isLoading={props.isLoading} />
         )}
         <CollectionListSearch
@@ -50,7 +50,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
           search={props.search}
         />
         <CollectionListFilter isLoading={props.isLoading} /> {/* TODO: Filter */}
-        {features?.create && <CollectionListCreate isLoading={props.isLoading} slug={props.slug} />}
+        {actions?.create && <CollectionListCreate isLoading={props.isLoading} slug={props.slug} />}
       </div>
     </div>
   )

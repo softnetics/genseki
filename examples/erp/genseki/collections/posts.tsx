@@ -6,14 +6,16 @@ import StarterKit from '@tiptap/starter-kit'
 
 import {
   BackColorExtension,
+  ClientListViewPropsProvider,
   CustomImageExtension,
   ImageUploadNodeExtension,
   SelectionExtension,
-  TanstackTableProvider,
+  TableStatesProvider,
 } from '@genseki/react'
 
 import { columns, PostClientTable, PostClientToolbar } from './posts.client'
 
+import { getClientListViewProps } from '../../../../packages/react/src/core/config'
 import { EditorSlotBefore } from '../editor/slot-before'
 import { builder, prisma } from '../helper'
 
@@ -191,7 +193,7 @@ const list = builder.list(fields, {
     },
     pages: {
       collection(args) {
-        const listViewProps = args.listViewProps
+        const clientListViewProps = getClientListViewProps(args.listViewProps)
         const ListViewWrapper = args.ListViewWrapper
         const ListView = args.ListView
         const Banner = args.Banner
@@ -213,18 +215,12 @@ const list = builder.list(fields, {
           <div>
             <Banner />
             <ListViewWrapper>
-              <TanstackTableProvider>
-                <PostClientToolbar
-                  features={listViewProps.features ?? {}}
-                  slug={listViewProps.slug}
-                />
-                <PostClientTable
-                  slug={listViewProps.slug}
-                  columns={listViewProps.columns}
-                  listConfiguration={listViewProps.listConfiguration}
-                  features={listViewProps.features}
-                />
-              </TanstackTableProvider>
+              <TableStatesProvider>
+                <ClientListViewPropsProvider clientListViewProps={clientListViewProps}>
+                  <PostClientToolbar />
+                  <PostClientTable />
+                </ClientListViewPropsProvider>
+              </TableStatesProvider>
             </ListViewWrapper>
           </div>
         )

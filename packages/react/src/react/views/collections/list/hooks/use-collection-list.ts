@@ -3,17 +3,19 @@ import { keepPreviousData, useQuery, type UseQueryResult } from '@tanstack/react
 import type { CollectionListResponse } from '../../../../../core/collection'
 import { type UsePagination, usePagination } from '../../../../hooks/use-pagination'
 import { type UseSearch, useSearch } from '../../../../hooks/use-search'
+import { useSort } from '../../../../hooks/use-sort'
 
-export function useCollectionList<TFieldsData = any>(
+export function useCollectionListQuery<TFieldsData = any>(
   args: { slug: string } & {
     pagination?: UsePagination['Pagination']
     search?: UseSearch['Search']
   }
 ) {
+  const { sort } = useSort()
   const { pagination } = usePagination()
   const { search } = useSearch()
 
-  const queryKey = { ...(args.pagination || pagination), search: args.search ?? search }
+  const queryKey = { ...(args.pagination || pagination), search: args.search ?? search, sort: sort }
 
   const query: UseQueryResult<CollectionListResponse<TFieldsData>> = useQuery({
     queryKey: ['GET', `/${args.slug}`, { query: queryKey }] as const,

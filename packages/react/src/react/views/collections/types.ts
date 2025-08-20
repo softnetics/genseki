@@ -1,4 +1,4 @@
-import type { Fields } from '../../../core'
+import type { Fields, FieldsClient } from '../../../core'
 import type { AnyContextable } from '../../../core/context'
 
 export interface BaseViewProps {
@@ -8,7 +8,13 @@ export interface BaseViewProps {
   fields: Fields
 }
 
-export interface ListFeatures {
+export interface ClientBaseViewProps {
+  slug: string
+  identifierColumn: string
+  fieldsClient: FieldsClient
+}
+
+export interface ListActions {
   create?: boolean
   update?: boolean
   delete?: boolean

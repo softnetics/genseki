@@ -1,29 +1,15 @@
 'use client'
 
-import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import {
-  type CellContext,
   type ColumnDef,
-  createColumnHelper,
   getCoreRowModel,
   getPaginationRowModel,
   getSortedRowModel,
   useReactTable,
 } from '@tanstack/react-table'
-import type { Promisable } from 'type-fest'
 
 import type { BaseData } from '../../../../../core/collection'
-import {
-  BaseIcon,
-  Checkbox,
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuSeparator,
-  MenuTrigger,
-} from '../../../../components'
-import { useTanstackTableContext } from '../../../../providers/table'
-import type { ListFeatures } from '../../types'
+import { useTableStatesContext } from '../../../../providers/table'
 
 interface CollectionListTableArgs<TFieldsData extends BaseData> {
   listConfiguration?: {
@@ -42,7 +28,8 @@ interface CollectionListTableArgs<TFieldsData extends BaseData> {
 export const useCollectionListTable = <TFieldsData extends BaseData>(
   args: CollectionListTableArgs<TFieldsData>
 ) => {
-  const { pagination, setPagination, rowSelection, setRowSelection } = useTanstackTableContext()
+  const { pagination, setPagination, rowSelection, setRowSelection, sort, setSort } =
+    useTableStatesContext()
   // Get default sort field from configuration
   const getDefaultSortField = () => {
     if (args.listConfiguration?.sortBy && args.listConfiguration.sortBy.length > 0) {
@@ -66,15 +53,7 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
     initialState: {
       sorting: [{ id: getDefaultSortField(), desc: true }],
     },
-    onSortingChange: (updater) => {
-      const currentSorting = table?.getState().sorting
-      const newSorting = typeof updater === 'function' ? updater(currentSorting) : updater
-
-      setPagination((prevPagination) => ({
-        ...prevPagination,
-        sort: newSorting,
-      }))
-    },
+    onSortingChange: setSort,
     // Pagination settings
     manualPagination: true,
     getPaginationRowModel: getPaginationRowModel(),
@@ -85,13 +64,13 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
           ? updater({ pageIndex: pagination.page - 1, pageSize: pagination.pageSize })
           : updater
       setPagination((prevPagination) => ({
-        ...prevPagination,
+        pageSize: prevPagination.pageSize,
         page: newPagination.pageIndex + 1,
       }))
     },
     state: {
       rowSelection,
-      sorting: pagination.sort,
+      sorting: sort,
       pagination: {
         pageIndex: pagination.page - 1,
         pageSize: pagination.pageSize,
@@ -100,101 +79,4 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
   })
 
   return table
-}
-
-export interface EnhancedColumnsActions<TFieldsData extends BaseData> {
-  columns: ColumnDef<TFieldsData>[]
-  features?: ListFeatures
-  onEdit?: (cellContext: CellContext<TFieldsData, unknown>) => Promisable<void>
-  onDelete?: (cellContext: CellContext<TFieldsData, unknown>) => Promisable<void>
-  onView?: (cellContext: CellContext<TFieldsData, unknown>) => Promisable<void>
-}
-
-/**
- * @description Generates enhanced table columns with selection checkboxes and action menu items based on provided features
- */
-export const generateEnhancedColumns = <TFieldsData extends BaseData>(
-  args: EnhancedColumnsActions<TFieldsData>
-) => {
-  const columnHelper = createColumnHelper<TFieldsData>()
-
-  const selectionColumns = [
-    columnHelper.display({
-      id: 'select',
-      header: ({ table }) => (
-        <Checkbox
-          isSelected={table.getIsAllRowsSelected()}
-          isIndeterminate={table.getIsSomeRowsSelected()}
-          onChange={(checked) => table.getToggleAllRowsSelectedHandler()({ target: { checked } })}
-        />
-      ),
-      cell: ({ row }) => (
-        <Checkbox
-          isSelected={row.getIsSelected()}
-          isDisabled={!row.getCanSelect()}
-          onChange={(checked) => row.getToggleSelectedHandler()({ target: { checked } })}
-        />
-      ),
-    }),
-  ]
-
-  const columns = [
-    ...(args.features?.delete ? selectionColumns : []),
-    ...args.columns,
-    columnHelper.display({
-      id: 'actions',
-      cell: (cellContext) => {
-        if (!args.features?.one && !args.features?.update && !args.features?.delete) {
-          return null
-        }
-        return (
-          <div className="grid place-items-center">
-            <Menu>
-              <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
-                <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
-              </MenuTrigger>
-              <MenuContent aria-label="Actions" placement="left top">
-                {args.features?.one && (
-                  <MenuItem
-                    aria-label="View"
-                    onAction={async () => {
-                      await args.onView?.(cellContext)
-                    }}
-                  >
-                    View
-                  </MenuItem>
-                )}
-                {args.features?.update && (
-                  <MenuItem
-                    aria-label="Edit"
-                    onAction={async () => {
-                      await args.onEdit?.(cellContext)
-                    }}
-                  >
-                    Edit
-                  </MenuItem>
-                )}
-                {args.features?.delete && (
-                  <>
-                    {args.features?.one || (args.features?.update && <MenuSeparator />)}
-                    <MenuItem
-                      aria-label="Delete"
-                      isDanger
-                      onAction={async () => {
-                        await args.onDelete?.(cellContext)
-                      }}
-                    >
-                      Delete
-                    </MenuItem>
-                  </>
-                )}
-              </MenuContent>
-            </Menu>
-          </div>
-        )
-      },
-    }),
-  ]
-
-  return columns
 }

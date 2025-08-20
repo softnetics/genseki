@@ -386,7 +386,7 @@ export interface FieldRelationCreateOptions extends FieldOptionsShapeBase {
 }
 export interface FieldRelationCreateShapeClient
   extends Omit<FieldRelationCreateOptions, 'fields'>,
-    FieldRelationShapeBase {
+    FieldRelationShapeClientBase {
   fields: FieldsClient
 }
 export interface FieldRelationCreateShape

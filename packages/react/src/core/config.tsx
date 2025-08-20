@@ -9,7 +9,9 @@ import {
   type AnyRequestContextable,
   type ApiRouter,
   createFileUploadHandlers,
+  type ListViewProps,
 } from '.'
+import type { ClientListViewProps } from './collection'
 import { type AnyApiRouter, type ApiRoutePath, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
@@ -331,6 +333,25 @@ export function getFieldsClient(fields: Fields): FieldsClient {
     shape: R.mapValues(fields.shape, (value, key) => getFieldShapeClient(key, value)),
     config: fields.config,
   }
+}
+export function getClientListViewProps<TFields extends Fields>(
+  args: ListViewProps<TFields>
+): ClientListViewProps<TFields> {
+  const fieldsClient = getFieldsClient(args.fields)
+
+  const clientListViewProps = R.pick(args, [
+    'actions',
+    'columns',
+    'headers',
+    'identifierColumn',
+    'listConfiguration',
+    'params',
+    'pathname',
+    'searchParams',
+    'slug',
+  ])
+
+  return { ...clientListViewProps, fieldsClient }
 }
 
 function isGensekiPlugin<TPlugin extends AnyGensekiPlugin>(plugin: any): plugin is TPlugin {

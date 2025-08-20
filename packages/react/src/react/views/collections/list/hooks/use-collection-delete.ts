@@ -1,11 +1,11 @@
-import { useMutation } from '@tanstack/react-query'
+import { type DefaultError, useMutation } from '@tanstack/react-query'
 
-interface UseDelete {
+export interface UseDelete {
   slug: string
-  onSuccess: () => Promise<void> | void
-  onError: () => Promise<void> | void
+  onSuccess: (data: any) => Promise<void> | void
+  onError: (error: DefaultError) => Promise<void> | void
 }
-export function useCollectionDelete(args: UseDelete) {
+export function useCollectionDeleteMutation(args: UseDelete) {
   const deleteMutation = useMutation({
     mutationKey: ['DELETE', `/${args.slug}`],
     mutationFn: async (selectedRowIds: string[]) => {
@@ -20,11 +20,11 @@ export function useCollectionDelete(args: UseDelete) {
       }
       return data
     },
-    onSuccess: async () => {
-      await args.onSuccess()
+    onSuccess: async (data) => {
+      await args.onSuccess(data)
     },
-    onError: async () => {
-      await args.onError()
+    onError: async (error) => {
+      await args.onError(error)
     },
   })
 

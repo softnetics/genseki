@@ -1,22 +1,18 @@
 import { ListViewClient } from './list.client'
+import { ClientListViewPropsProvider } from './providers/list-view-props'
 
-import { type Fields, getFieldsClient } from '../../../../core'
 import type { ListViewProps } from '../../../../core/collection'
-import { TanstackTableProvider } from '../../../providers/table'
+import { getClientListViewProps } from '../../../../core/config'
+import { TableStatesProvider } from '../../../providers/table'
 
-export async function ListView<TFields extends Fields>(props: ListViewProps<TFields>) {
-  const fieldsClient = getFieldsClient(props.fields)
+export async function ListView(props: ListViewProps) {
+  const clientListViewProps = getClientListViewProps(props)
 
   return (
-    <TanstackTableProvider>
-      <ListViewClient
-        slug={props.slug}
-        identifierColumn={props.identifierColumn}
-        fieldsClient={fieldsClient}
-        columns={props.columns as any}
-        listConfiguration={props.listConfiguration}
-        features={props.features}
-      />
-    </TanstackTableProvider>
+    <TableStatesProvider>
+      <ClientListViewPropsProvider clientListViewProps={clientListViewProps}>
+        <ListViewClient />
+      </ClientListViewPropsProvider>
+    </TableStatesProvider>
   )
 }

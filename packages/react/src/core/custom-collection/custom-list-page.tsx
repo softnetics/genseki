@@ -11,7 +11,7 @@ import {
   SidebarInset,
   SidebarProvider,
 } from '../../react'
-import type { BaseViewProps, ListFeatures } from '../../react/views/collections/types'
+import type { BaseViewProps, ListActions } from '../../react/views/collections/types'
 import type { CollectionFindManyApiRoute } from '../builder.utils'
 import type { CollectionListConfig, ListViewProps } from '../collection'
 import { createGensekiUiRoute, type GensekiPluginOptions } from '../config'
@@ -23,7 +23,7 @@ export function generateCustomCollectionListUI<
     listConfig: TCollectionListConfig
     gensekiOptions: GensekiPluginOptions
     route: CollectionFindManyApiRoute<string, any>
-    features: ListFeatures
+    features: ListActions
   } & BaseViewProps
 ) {
   return createGensekiUiRoute({
@@ -43,7 +43,7 @@ export function generateCustomCollectionListUI<
         findMany: customCollectionArgs.route,
         columns: customCollectionArgs.listConfig.columns ?? [],
         listConfiguration: customCollectionArgs.listConfig.configuration,
-        features: customCollectionArgs.listConfig.actions,
+        actions: customCollectionArgs.listConfig.actions,
       } satisfies ListViewProps
 
       let _CollectionLayout = (props: { children: React.ReactNode }) => (
@@ -76,15 +76,6 @@ export function generateCustomCollectionListUI<
         const newCustomCollectionLayout = customCollectionArgs.listConfig.uis.layout.collection
 
         _CollectionLayout = (props: { children: React.ReactNode }) => {
-          /**
-           * @description
-           * 1. At the end of `generateCustomCollectionListUI` we call `GensekiAppLayout` with `children`
-           * 2. The `children` is passed down to `newCustomAppLayout` function as a prop
-           * 3. The `prop.children` then passed to `newCustomAppLayout` as a children
-           * 4. User user `props.children` at the `builder.list` custom config, the it return React.ReactElement from `newCustomAppLayout`
-           * 5. the returned React.ReactElement will replace the `GensekiAppLayout`
-           * (6.) If user use `VanillaGensekiAppLayout` the children under calling of `VanillaGensekiAppLayout` will be passed to `CollectionAppLayout`
-           */
           return newCustomCollectionLayout({
             children: props.children,
             SidebarProvider: (props) => <SidebarProvider {...props} />,

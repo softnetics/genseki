@@ -17,7 +17,6 @@ import {
   type FieldRelationShape,
   type FieldRelationShapeBase,
   type Fields,
-  type FieldsClient,
   type FieldShape,
   type FieldShapeBase,
   type FieldsOptions,
@@ -25,7 +24,11 @@ import {
 import type { DataType, InferDataType } from './model'
 
 import type { ListViewWrapperProps, SidebarProviderProps } from '../react'
-import type { BaseViewProps, ListFeatures } from '../react/views/collections/types'
+import type {
+  BaseViewProps,
+  ClientBaseViewProps,
+  ListActions,
+} from '../react/views/collections/types'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
@@ -293,7 +296,7 @@ export type CollectionUpdateConfig<
 // Extract searchable columns from fields
 export type ExtractSearchableColumns<TFields extends Fields> = {
   [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-    ? TFields['shape'][K]['$server']['column']['dataType'] extends typeof DataType.STRING
+    ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
       ? K
       : never
     : never
@@ -302,7 +305,7 @@ export type ExtractSearchableColumns<TFields extends Fields> = {
 // Extract sortable columns from fields
 export type ExtractSortableColumns<TFields extends Fields> = {
   [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-    ? TFields['shape'][K]['$server']['column']['dataType'] extends
+    ? TFields['shape'][K]['$client']['column']['dataType'] extends
         | typeof DataType.STRING
         | typeof DataType.INT
         | typeof DataType.FLOAT
@@ -314,7 +317,6 @@ export type ExtractSortableColumns<TFields extends Fields> = {
     : never
 }[keyof TFields['shape']]
 
-// ListConfiguration
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
   sortBy?: ExtractSortableColumns<TFields>[]
@@ -423,16 +425,16 @@ export interface CollectionConfig<
 export interface CollectionConfigClient {
   slug: string
   create?: {
-    fields: FieldsClient
+    fields: Fields
   }
   update?: {
-    fields: FieldsClient
+    fields: Fields
   }
   list?: {
-    fields: FieldsClient
+    fields: Fields
   }
   one?: {
-    fields: FieldsClient
+    fields: Fields
   }
 }
 
@@ -442,5 +444,15 @@ export interface ListViewProps<TFields extends Fields = Fields> extends BaseView
   columns: ColumnDef<any>[]
   findMany: CollectionFindManyApiRoute<string, TFields>
   listConfiguration?: ListConfiguration<TFields>
-  features?: ListFeatures
+  actions?: ListActions
+}
+
+export interface ClientListViewProps<TFields extends Fields>
+  extends ClientBaseViewProps,
+    RenderArgs {
+  headers: Headers
+  searchParams: Record<string, string | string[]>
+  columns: ColumnDef<any>[]
+  listConfiguration?: ListConfiguration<TFields>
+  actions?: ListActions
 }

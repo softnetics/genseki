@@ -2,23 +2,30 @@
 
 import type React from 'react'
 
+import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
 
-import type { ListConfiguration } from '@genseki/react'
+import type { BaseData } from '@genseki/react'
 import {
+  BaseIcon,
+  Checkbox,
   CollectionListPagination,
   CollectionListToolbar,
-  generateEnhancedColumns,
   type InferFields,
-  type ListFeatures,
+  Menu,
+  MenuContent,
+  MenuItem,
+  MenuSeparator,
+  MenuTrigger,
   TanstackTable,
   toast,
-  useCollectionDelete,
-  useCollectionList,
+  useClientListViewPropsContext,
+  useCollectionDeleteMutation,
+  useCollectionListQuery,
   useCollectionListTable,
   useNavigation,
-  useTanstackTableContext,
+  useTableStatesContext,
 } from '@genseki/react'
 
 import type { fields } from './posts'
@@ -59,12 +66,9 @@ export const columns = [
  * @description This is an example how you can use the given `CollectionListToolbar` from Genseki,
  * you may use custom toolbar here whehter you want.
  */
-export const PostClientToolbar = (props: {
-  children?: React.ReactNode
-  slug: string
-  features: ListFeatures
-}) => {
-  const { rowSelection, setRowSelection } = useTanstackTableContext()
+export const PostClientToolbar = (props: { children?: React.ReactNode }) => {
+  const listViewProps = useClientListViewPropsContext()
+  const { rowSelection, setRowSelection } = useTableStatesContext()
 
   const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key])
 
@@ -72,8 +76,8 @@ export const PostClientToolbar = (props: {
 
   const queryClient = useQueryClient()
 
-  const deleteMutation = useCollectionDelete({
-    slug: props.slug,
+  const deleteMutation = useCollectionDeleteMutation({
+    slug: listViewProps.slug,
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
@@ -88,7 +92,7 @@ export const PostClientToolbar = (props: {
 
   const handleBulkDelete = async () => {
     // Return immediately if delete is not enabled
-    if (!props.features?.delete) return
+    if (!listViewProps.actions?.delete) return
 
     if (selectedRowIds.length === 0) return
 
@@ -98,8 +102,8 @@ export const PostClientToolbar = (props: {
   return (
     <div>
       <CollectionListToolbar
-        features={props.features}
-        slug={props.slug}
+        actions={listViewProps.actions}
+        slug={listViewProps.slug}
         isShowDeleteButton={isShowDeleteButton}
         onDelete={handleBulkDelete}
       />
@@ -110,28 +114,23 @@ export const PostClientToolbar = (props: {
 /**
  * @description This is an example how you can use the given `TanstackTable` and `CollectionListPagination` from Genseki to compose your view.
  */
-export const PostClientTable = (props: {
-  slug: string
-  children?: React.ReactNode
-  columns: ColumnDef<any>[]
-  listConfiguration?: ListConfiguration<any>
-  features?: ListFeatures
-}) => {
-  const { setRowSelection } = useTanstackTableContext()
+export const PostClientTable = (props: { children?: React.ReactNode }) => {
+  const listViewProps = useClientListViewPropsContext()
+  const { setRowSelection } = useTableStatesContext()
 
   const queryClient = useQueryClient()
 
   const navigation = useNavigation()
 
   // Example of fethcing list data
-  const query = useCollectionList({ slug: props.slug })
+  const query = useCollectionListQuery({ slug: listViewProps.slug })
 
-  const deleteMutation = useCollectionDelete({
-    slug: props.slug,
+  const deleteMutation = useCollectionDeleteMutation({
+    slug: listViewProps.slug,
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/${props.slug}`],
+        queryKey: ['GET', `/${listViewProps.slug}`],
       })
       toast.success('Deletion successfully')
     },
@@ -140,29 +139,111 @@ export const PostClientTable = (props: {
     },
   })
 
-  // generateEnhancedColumns will give you more additional columns
-  // 1.row selection column
-  // 2.update / delete / view actions column
-  const enhancedColumns = generateEnhancedColumns({
-    columns: props.columns,
-    features: props.features,
-    onDelete({ row }) {
-      // You can attach more actions here
-      deleteMutation.mutate([row.original.__id.toString()])
-    },
-    onEdit({ row }) {
-      navigation.navigate(`./${props.slug}/update/${row.original.__id}`)
-    },
-    onView({ row }) {
-      navigation.navigate(`./${props.slug}/${row.original.__id}`)
-    },
-  })
+  const columnHelper = createColumnHelper<BaseData>()
+  // You can setup your own custom columns
+  const enhancedColumns = [
+    ...(listViewProps.actions?.delete
+      ? [
+          columnHelper.display({
+            id: 'select',
+            header: ({ table }) => (
+              <Checkbox
+                isSelected={table.getIsAllRowsSelected()}
+                isIndeterminate={table.getIsSomeRowsSelected()}
+                onChange={(checked) =>
+                  table.getToggleAllRowsSelectedHandler()({ target: { checked } })
+                }
+              />
+            ),
+            cell: ({ row }) => (
+              <input
+                type="checkbox"
+                checked={row.getIsSelected()}
+                onChange={(event) => {
+                  const handler = row.getToggleSelectedHandler()
+                  handler(event)
+                }}
+              />
+            ),
+          }),
+        ]
+      : []),
+    ...listViewProps.columns,
+    columnHelper.display({
+      id: 'actions',
+      cell: ({ row }) => {
+        if (
+          !listViewProps.actions?.one &&
+          !listViewProps.actions?.update &&
+          !listViewProps.actions?.delete
+        ) {
+          return null
+        }
+
+        return (
+          <div className="grid place-items-center">
+            <Menu>
+              <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
+                <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
+              </MenuTrigger>
+              <MenuContent aria-label="Actions" placement="left top">
+                {listViewProps.actions?.one && (
+                  <MenuItem
+                    aria-label="View"
+                    onAction={() => {
+                      navigation.navigate(`./${listViewProps.slug}/${row.original.__id}`)
+                    }}
+                  >
+                    View
+                  </MenuItem>
+                )}
+                {listViewProps.actions?.update && (
+                  <MenuItem
+                    aria-label="Edit"
+                    onAction={() => {
+                      navigation.navigate(`./${listViewProps.slug}/update/${row.original.__id}`)
+                    }}
+                  >
+                    Edit
+                  </MenuItem>
+                )}
+                {listViewProps.actions?.delete && (
+                  <>
+                    {listViewProps.actions?.one ||
+                      (listViewProps.actions?.update && <MenuSeparator />)}
+                    <MenuItem
+                      aria-label="Delete"
+                      isDanger
+                      onAction={() => {
+                        deleteMutation.mutate([row.original.__id.toString()])
+                      }}
+                    >
+                      Delete
+                    </MenuItem>
+                  </>
+                )}
+                <MenuSeparator />
+                <MenuItem
+                  aria-label="Revert"
+                  onAction={() => {
+                    confirm('Confirm to revert the action?')
+                  }}
+                >
+                  Revert
+                </MenuItem>
+              </MenuContent>
+            </Menu>
+          </div>
+        )
+      },
+    }),
+  ] as ColumnDef<{ __pk: string; __id: string }>[]
 
   const table = useCollectionListTable({
     total: query.data?.total,
     data: query.data?.data || [],
     columns: enhancedColumns,
-    listConfiguration: props.listConfiguration,
+    listConfiguration: listViewProps.listConfiguration,
   })
 
   return (
@@ -173,7 +254,7 @@ export const PostClientTable = (props: {
         onRowClick="toggleSelect"
         isLoading={query.isLoading}
         isError={query.isError}
-        configuration={props.listConfiguration}
+        configuration={listViewProps.listConfiguration}
       />
       <CollectionListPagination totalPage={query.data?.totalPage} />
     </>
