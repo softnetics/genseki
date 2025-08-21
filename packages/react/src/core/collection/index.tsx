@@ -296,6 +296,7 @@ export type CollectionListApiArgs<
   search?: string
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
+  filter?: string
 }
 
 export type CollectionListApiReturn<TFields extends Fields> = {

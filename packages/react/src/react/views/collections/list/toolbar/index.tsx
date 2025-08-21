@@ -63,6 +63,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
         {/* TODO: Filter */}
         <CollectionListFilter />
         {actions?.create && <CollectionListCreate slug={context.slug} />}
+        {/* <CollectionListFilter isLoading={props.isLoading} onFilterChange={props.onFilterChange} />{' '} */}
       </div>
     </div>
   )
