@@ -120,7 +120,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 )
 
-interface ButtonLinkProps
+export interface ButtonLinkProps
   extends LinkPrimitiveProps,
     Required<Omit<ButtonVariants, 'isDisabled'>>,
     Pick<ButtonVariants, 'isDisabled'> {

@@ -20,7 +20,7 @@ const greeting = () => {
   return 'Good evening 👋'
 }
 
-type Props = GensekiUiCommonProps['COLLECTION_HOME']
+type Props = GensekiUiCommonProps['COLLECTIONS_HOME']
 interface HomeViewProps extends Props {}
 
 export function HomeView(props: HomeViewProps) {

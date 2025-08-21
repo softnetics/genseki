@@ -10,9 +10,12 @@ export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
 export type {
   ApiReturnType,
+  BaseData,
   CollectionConfig as CollectionOptions,
   InferField,
   InferFields,
+  ListConfiguration,
+  CollectionListViewProps as ListViewProps,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export {

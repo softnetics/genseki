@@ -11,7 +11,7 @@ import {
   SelectionExtension,
 } from '@genseki/react'
 
-import { columns } from './posts.client'
+import { columns, PostClientPagination, PostClientTable, PostClientToolbar } from './posts.client'
 
 import { EditorSlotBefore } from '../editor/slot-before'
 import { builder, prisma } from '../helper'
@@ -76,6 +76,7 @@ export const fields = builder.fields('post', (fb) => ({
   author: fb.relations('author', (fb) => ({
     type: 'connect',
     label: 'Author',
+    required: true,
     fields: fb.fields('user', (fb) => ({
       name: fb.columns('name', {
         type: 'text',
@@ -95,6 +96,12 @@ export const fields = builder.fields('post', (fb) => ({
     }),
     options: 'author',
   })),
+  createdAt: fb.columns('createdAt', {
+    type: 'date',
+    label: 'Created At',
+    hidden: true,
+    description: 'The date the post was created',
+  }),
   postTags: fb.relations('postTags', (fb) => ({
     type: 'create' as const,
     label: 'Tags',
@@ -135,6 +142,14 @@ export const options = builder.options(fields, {
           label: 'example2',
           value: 'example2',
         },
+        {
+          label: 'example3',
+          value: 'example3',
+        },
+        {
+          label: 'example4',
+          value: 'example4',
+        },
       ],
     }
   },
@@ -167,6 +182,68 @@ const list = builder.list(fields, {
     sortBy: ['updatedAt', 'title'],
   },
   options: options,
+  actions: { create: true, delete: true, one: true, update: true },
+  uis: {
+    layout(args) {
+      const CollectionLayout = args.CollectionLayout
+      const CollectionSidebar = args.CollectionSidebar
+      const SidebarProvider = args.SidebarProvider
+      const SidebarInset = args.SidebarInset
+      const TopbarNav = args.TopbarNav
+
+      /**
+       * @description You can use following template for simple scaffolding
+       *  return (
+       *   <CollectionLayout>
+       *     <TopbarNav />
+       *     {args.children}
+       *   </CollectionLayout>
+       *  )
+       */
+
+      return (
+        <>
+          <SidebarProvider>
+            <CollectionSidebar />
+            <SidebarInset>
+              <TopbarNav />
+
+              <div>{args.children}</div>
+            </SidebarInset>
+          </SidebarProvider>
+        </>
+      )
+    },
+    pages(args) {
+      const ListViewContainer = args.ListViewContainer
+      const ListView = args.ListView
+      const Banner = args.Banner
+
+      /**
+       * @description You can also use the following template for simple scaffolding
+       *
+       * ```return (
+       * <div>
+       *   <Banner />
+       *   <ListViewContainer>
+       *     <ListView />
+       *   </ListViewContainer>
+       * </div>
+       * )```
+       */
+
+      return (
+        <div>
+          <Banner />
+          <ListViewContainer>
+            <PostClientToolbar />
+            <PostClientTable />
+            <PostClientPagination />
+          </ListViewContainer>
+        </div>
+      )
+    },
+  },
 })
 
 const create = builder.create(fields, {

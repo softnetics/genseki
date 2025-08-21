@@ -19,6 +19,7 @@ import type {
 } from './collection'
 import { createGensekiUiRoute, type GensekiPlugin, type GensekiUiRouter } from './config'
 import type { AnyContextable, ContextToRequestContext } from './context'
+import { generateCustomCollectionListUI } from './custom-collection/custom-list-page'
 import {
   type ApiRoute,
   type ApiRouteHandlerInitial,
@@ -31,9 +32,8 @@ import { FieldBuilder, type Fields, type FieldsOptions, type FieldsShape } from 
 import type { ModelSchemas } from './model'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from './ui'
 
-import { CollectionAppLayout, HomeView } from '../react'
+import { AppTopbarNav, CollectionLayout, HomeView } from '../react'
 import { CreateView } from '../react/views/collections/create'
-import { ListView } from '../react/views/collections/list'
 import { OneView } from '../react/views/collections/one'
 import type { BaseViewProps } from '../react/views/collections/types'
 import { UpdateView } from '../react/views/collections/update'
@@ -90,15 +90,17 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
       name: slug,
       plugin: (gensekiOptions) => {
         const previousCollectionHomeRouteIndex = gensekiOptions.uis.findIndex(
-          (ui) => ui.id === GensekiUiCommonId.COLLECTION_HOME
+          (ui) => ui.id === GensekiUiCommonId.COLLECTIONS_HOME
         )
         const previousCollectionHomeRoute =
           previousCollectionHomeRouteIndex >= 0
             ? (gensekiOptions.uis[previousCollectionHomeRouteIndex] as GensekiUiRouter<
-                GensekiUiCommonProps['COLLECTION_HOME']
+                GensekiUiCommonProps['COLLECTIONS_HOME']
               >)
             : undefined
 
+        // `collectionHomeRoute` is a page which group every collections
+        // If this is the first plugged collection, It will create the `collection home` page case (else)
         const collectionHomeRoute = previousCollectionHomeRoute
           ? {
               ...previousCollectionHomeRoute,
@@ -110,18 +112,19 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               },
             }
           : createGensekiUiRoute({
-              id: GensekiUiCommonId.COLLECTION_HOME,
+              id: GensekiUiCommonId.COLLECTIONS_HOME,
               context: this.config.context,
               path: `/collections`,
               requiredAuthenticated: true,
               render: (args) => (
-                <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                  <AppTopbarNav />
                   <HomeView {...args.props} />
-                </CollectionAppLayout>
+                </CollectionLayout>
               ),
               props: {
                 cards: [{ name: slug, path: `/admin/collections/${slug}` }],
-              } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTION_HOME],
+              } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTIONS_HOME],
             })
 
         const uis = []
@@ -133,13 +136,6 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
         }
 
         if (config.list) {
-          const defaultArgs = {
-            slug: slug,
-            context: this.config.context,
-            identifierColumn: config.list.fields.config.identifierColumn,
-            fields: config.list.fields,
-          } satisfies BaseViewProps
-
           const { route } = getCollectionDefaultFindManyApiRoute({
             slug: slug,
             context: this.config.context,
@@ -151,33 +147,23 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
 
           Object.assign(api, { findMany: route })
 
-          uis.push(
-            createGensekiUiRoute({
-              path: `/collections/${slug}`,
-              requiredAuthenticated: true,
-              context: this.config.context,
-              render: (args) => {
-                return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
-                    <ListView
-                      {...args}
-                      {...args.params}
-                      {...defaultArgs}
-                      findMany={route}
-                      columns={config.list?.columns ?? []}
-                      listConfiguration={config.list?.configuration}
-                      features={{
-                        create: !!config.create,
-                        update: !!config.update,
-                        delete: !!config.delete,
-                        one: !!config.one,
-                      }}
-                    />
-                  </CollectionAppLayout>
-                )
-              },
-            })
-          )
+          const listUI = generateCustomCollectionListUI({
+            slug: slug,
+            context: this.config.context,
+            listConfig: config.list,
+            gensekiOptions: gensekiOptions,
+            identifierColumn: config.list.fields.config.identifierColumn,
+            fields: config.list.fields,
+            route: route,
+            features: {
+              create: !!config.create,
+              update: !!config.update,
+              delete: !!config.delete,
+              one: !!config.one,
+            },
+          })
+
+          uis.push(listUI)
         }
 
         if (config.create) {
@@ -214,9 +200,10 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               context: this.config.context,
               render: (args) => {
                 return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                    <AppTopbarNav />
                     <CreateView {...args} {...args.params} {...defaultArgs} />
-                  </CollectionAppLayout>
+                  </CollectionLayout>
                 )
               },
             })
@@ -267,7 +254,8 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               context: this.config.context,
               render: (args) => {
                 return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                    <AppTopbarNav />
                     <UpdateView
                       {...args}
                       {...args.params}
@@ -275,7 +263,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                       identifier={args.params.identifier}
                       updateDefault={updateDefaultRoute}
                     />
-                  </CollectionAppLayout>
+                  </CollectionLayout>
                 )
               },
             })
@@ -306,7 +294,8 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
               context: this.config.context,
               render: (args) => {
                 return (
-                  <CollectionAppLayout pathname={args.pathname} {...gensekiOptions}>
+                  <CollectionLayout pathname={args.pathname} {...gensekiOptions}>
+                    <AppTopbarNav />
                     <OneView
                       {...args}
                       {...args.params}
@@ -314,7 +303,7 @@ export class Builder<TModelSchemas extends ModelSchemas, in out TContext extends
                       identifier={args.params.identifier}
                       findOne={route}
                     />
-                  </CollectionAppLayout>
+                  </CollectionLayout>
                 )
               },
             })

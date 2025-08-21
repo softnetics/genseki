@@ -6,7 +6,7 @@ interface GensekiUiCollectionHomeProps {
 }
 
 export interface GensekiUiCommonProps {
-  COLLECTION_HOME: GensekiUiCollectionHomeProps
+  COLLECTIONS_HOME: GensekiUiCollectionHomeProps
   AUTH_LOGIN: {}
   AUTH_SIGNUP: {}
   AUTH_FORGOT_PASSWORD: {}
@@ -14,7 +14,7 @@ export interface GensekiUiCommonProps {
 }
 
 export const GensekiUiCommonId = {
-  COLLECTION_HOME: 'COLLECTION_HOME',
+  COLLECTIONS_HOME: 'COLLECTIONS_HOME',
   AUTH_LOGIN: 'AUTH_LOGIN',
   AUTH_SIGNUP: 'AUTH_SIGNUP',
   AUTH_FORGOT_PASSWORD: 'AUTH_FORGOT_PASSWORD',
