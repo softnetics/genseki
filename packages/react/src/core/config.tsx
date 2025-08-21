@@ -97,6 +97,7 @@ export interface GensekiAppClient {
   title: string
   version: string
   apiPrefix?: string
+  sidebar?: AppSideBarBuilderProps
   pagePathPrefix?: string
   storageAdapter?: StorageAdapterClient
 }
@@ -218,6 +219,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       version: this.options.version,
       apiPrefix: this.options.apiPrefix,
       pagePathPrefix: this.options.pagePathPrefix,
+      sidebar: this.options.sidebar,
       storageAdapter: this.storageRoutesForClient
         ? getStorageAdapterClient({
             storageAdapter: this.options.storageAdapter,

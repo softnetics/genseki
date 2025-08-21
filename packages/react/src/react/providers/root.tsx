@@ -5,7 +5,9 @@ import React, { createContext, type PropsWithChildren, type ReactNode, useContex
 import { UiProviders } from './ui'
 
 import type { GensekiAppClient, GensekiAppCompiled } from '../../core/config'
-import { SidebarProvider } from '../components/primitives/sidebar'
+import { AppSidebar } from '../components/compound/collection-sidebar'
+import { AppTopbarNav } from '../components/compound/collection-sidebar/nav/app-topbar-nav'
+import { SidebarInset, SidebarProvider } from '../components/primitives/sidebar'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
@@ -43,20 +45,27 @@ export function useServerFunction<TApp extends GensekiAppCompiled = GensekiAppCo
   return context.serverFunction as unknown as ServerFunction<TApp>
 }
 
-export const GensekiProvider = (props: {
+export function GensekiProvider(props: {
   app: GensekiAppClient
   serverFunction: ServerFunction
   children: ReactNode
-}) => {
+}) {
   return (
     <GensekiContext.Provider
       value={{
         app: props.app,
         serverFunction: props.serverFunction,
         components: {
-          AppTopbar: () => null,
-          AppSidebar: () => null,
-          AppSidebarInset: () => null,
+          AppTopbar: () => <AppTopbarNav />,
+          AppSidebar: () => (
+            <AppSidebar
+              pathname={''} // TODO: Fix pathname
+              title={props.app.title}
+              version={props.app.version}
+              sidebar={props.app.sidebar}
+            />
+          ),
+          AppSidebarInset: () => <SidebarInset />,
         },
       }}
     >
