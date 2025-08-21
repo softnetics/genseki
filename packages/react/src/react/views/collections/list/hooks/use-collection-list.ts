@@ -1,14 +1,14 @@
 import { keepPreviousData, useQuery, type UseQueryResult } from '@tanstack/react-query'
 
 import type { CollectionListResponse } from '../../../../../core/collection'
-import { type UsePagination, usePagination } from '../../../../hooks/use-pagination'
-import { type UseSearch, useSearch } from '../../../../hooks/use-search'
+import { usePagination, type UsePaginationReturn } from '../../../../hooks/use-pagination'
+import { useSearch, type UseSearchReturn } from '../../../../hooks/use-search'
 import { useSort } from '../../../../hooks/use-sort'
 
 export function useCollectionListQuery(
   args: { slug: string } & {
-    pagination?: UsePagination['Pagination']
-    search?: UseSearch['Search']
+    pagination?: UsePaginationReturn['pagination']
+    search?: UseSearchReturn['search']
   }
 ) {
   const { sort } = useSort()

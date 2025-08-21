@@ -1,18 +1,15 @@
-import { ListViewClient } from './list.client'
-import { ClientListViewPropsProvider } from './providers/list-view-props'
+import { ClientCollectionListView } from './list.client'
+import { CollectionListViewProvider } from './providers'
 
-import type { ListViewProps } from '../../../../core/collection'
+import type { CollectionListViewProps } from '../../../../core/collection'
 import { getClientListViewProps } from '../../../../core/config'
-import { TableStatesProvider } from '../../../providers/table'
 
-export async function ListView(props: ListViewProps) {
+export async function CollectionListView(props: CollectionListViewProps) {
   const clientListViewProps = getClientListViewProps(props)
 
   return (
-    <TableStatesProvider>
-      <ClientListViewPropsProvider clientListViewProps={clientListViewProps}>
-        <ListViewClient />
-      </ClientListViewPropsProvider>
-    </TableStatesProvider>
+    <CollectionListViewProvider clientListViewProps={clientListViewProps}>
+      <ClientCollectionListView />
+    </CollectionListViewProvider>
   )
 }

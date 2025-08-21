@@ -31,12 +31,12 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
   const { pagination, setPagination, rowSelection, setRowSelection, sort, setSort } =
     useTableStatesContext()
   // Get default sort field from configuration
-  const getDefaultSortField = () => {
+  const defaultSortField = (() => {
     if (args.listConfiguration?.sortBy && args.listConfiguration.sortBy.length > 0) {
       return args.listConfiguration.sortBy[0].toString()
     }
-    return ''
-  }
+    return undefined
+  })()
 
   const table = useReactTable({
     data: args.data,
@@ -51,7 +51,7 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
     // Sorting settings
     getSortedRowModel: getSortedRowModel(),
     initialState: {
-      sorting: [{ id: getDefaultSortField(), desc: true }],
+      ...(defaultSortField ? { sorting: [{ id: defaultSortField, desc: true }] } : {}),
     },
     onSortingChange: setSort,
     // Pagination settings

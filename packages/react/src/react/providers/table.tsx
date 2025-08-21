@@ -10,8 +10,8 @@ import React, {
 
 import type { RowSelectionState } from '@tanstack/react-table'
 
-import { type UsePagination, usePagination } from '../hooks/use-pagination'
-import { type UseSearch, useSearch } from '../hooks/use-search'
+import { usePagination, type UsePaginationReturn } from '../hooks/use-pagination'
+import { useSearch, type UseSearchReturn } from '../hooks/use-search'
 import { type UseSort, useSort } from '../hooks/use-sort'
 
 interface UseRowSelection {
@@ -20,25 +20,24 @@ interface UseRowSelection {
 }
 
 export interface TanstackTableContextValue {
-  pagination: UsePagination['Pagination']
-  setPagination: UsePagination['SetPagination']
+  pagination: UsePaginationReturn['pagination']
+  setPagination: UsePaginationReturn['setPagination']
   sort: UseSort['Sort']
   setSort: UseSort['SetSort']
-  search: UseSearch['Search']
-  setSearch: UseSearch['SetSearch']
+  search: UseSearchReturn['search']
+  setSearch: UseSearchReturn['setSearch']
   rowSelection: UseRowSelection['RowSelection']
   rowSelectionIds: string[]
   isRowsSelected: boolean
   setRowSelection: UseRowSelection['SetRowSelection']
 }
-
-export interface TanstackTableProviderProps {
+interface TableStatesProviderProps {
   children?: React.ReactNode
 }
 
 const TableStatesContext = createContext<TanstackTableContextValue>(null!)
 
-export const TableStatesProvider = (props: TanstackTableProviderProps) => {
+export const TableStatesProvider = (props: TableStatesProviderProps) => {
   const { pagination, setPagination } = usePagination()
   const { sort, setSort } = useSort()
   const { search, setSearch } = useSearch()

@@ -2,28 +2,29 @@
 import React, { createContext, use } from 'react'
 
 import type { Fields } from '../../../../../core'
-import type { ClientListViewProps } from '../../../../../core/collection'
+import type { ClientCollectionListViewProps } from '../../../../../core/collection'
 
-type ClientListViewPropsContextValue<TFields extends Fields> = ClientListViewProps<TFields>
+export type ListViewPropsContextValue<TFields extends Fields> =
+  ClientCollectionListViewProps<TFields>
 
-const ClientListViewPropsContext = createContext<ClientListViewPropsContextValue<any>>(null!)
+const ListViewPropsContext = createContext<ListViewPropsContextValue<any>>(null!)
+
+export interface ListViewPropsProviderProps {
+  children?: React.ReactNode
+  clientListViewProps: ClientCollectionListViewProps<any>
+}
 
 /**
  * @description A provider to provide `listViewProps` for client
  */
-export function ClientListViewPropsProvider<TFields extends Fields>(props: {
-  children?: React.ReactNode
-  clientListViewProps: ClientListViewProps<TFields>
-}) {
+export function ListViewPropsProvider(props: ListViewPropsProviderProps) {
   return (
-    <ClientListViewPropsContext value={props.clientListViewProps}>
-      {props.children}
-    </ClientListViewPropsContext>
+    <ListViewPropsContext value={props.clientListViewProps}>{props.children}</ListViewPropsContext>
   )
 }
 
-export function useClientListViewPropsContext() {
-  const value = use(ClientListViewPropsContext)
+export function useListViewPropsContext<TFields extends Fields>() {
+  const value = use(ListViewPropsContext) as ListViewPropsContextValue<TFields>
   if (!value) throw new Error('useListActions must be used within a ListActionsProvider')
   return value
 }

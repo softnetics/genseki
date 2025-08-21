@@ -18,7 +18,7 @@ export interface CollectionListSearchProps {
  * @param props.isLoading A loading state
  */
 export function CollectionListSearch(props: CollectionListSearchProps) {
-  const { undebouncedSearch, setSearch } = useSearch({
+  const { search, setSearch } = useSearch({
     debounce: 500,
   })
 
@@ -43,7 +43,7 @@ export function CollectionListSearch(props: CollectionListSearchProps) {
       prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
       className="w-full"
       isPending={props.isLoading}
-      value={undebouncedSearch}
+      value={search}
       onChange={setSearch}
     />
   )

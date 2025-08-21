@@ -8,19 +8,19 @@ export interface PaginationValue {
   pageSize: number
 }
 
-export interface UsePagination {
-  Pagination: PaginationValue
-  SetPagination: Dispatch<SetStateAction<PaginationValue>>
+export interface UsePaginationReturn {
+  pagination: PaginationValue
+  setPagination: Dispatch<SetStateAction<PaginationValue>>
 }
 
 /**
  * @description Handle standard pagination data
  */
-export function usePagination() {
+export function usePagination(): UsePaginationReturn {
   const [pagination, setPagination] = useQueryStates({
     page: parseAsInteger.withDefault(1),
     pageSize: parseAsInteger.withDefault(10),
   })
 
-  return { pagination, setPagination } as const
+  return { pagination, setPagination }
 }

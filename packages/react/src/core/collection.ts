@@ -23,7 +23,7 @@ import {
 } from './field'
 import type { DataType, InferDataType } from './model'
 
-import type { ListViewWrapperProps, SidebarProviderProps } from '../react'
+import type { ListViewContainerProps, SidebarProviderProps } from '../react'
 import type {
   BaseViewProps,
   ClientBaseViewProps,
@@ -341,15 +341,15 @@ interface CustomCollectionLayout {
     SidebarProvider: React.FC<SidebarProviderProps>
     SidebarInset: React.FC<React.ComponentProps<'main'>>
     TopbarNav: React.FC
-    listViewProps: ListViewProps
+    listViewProps: CollectionListViewProps
     children: React.ReactNode
   }): React.ReactElement
 }
 
 interface CustomCollectionPage<TFields extends Fields> {
   (args: {
-    listViewProps: ListViewProps<TFields>
-    ListViewWrapper: React.FC<ListViewWrapperProps>
+    listViewProps: CollectionListViewProps<TFields>
+    ListViewContainer: React.FC<ListViewContainerProps>
     ListView: React.FC
     Banner: React.FC
   }): React.ReactElement
@@ -434,7 +434,9 @@ export interface CollectionConfigClient {
   }
 }
 
-export interface ListViewProps<TFields extends Fields = Fields> extends BaseViewProps, RenderArgs {
+export interface CollectionListViewProps<TFields extends Fields = Fields>
+  extends BaseViewProps,
+    RenderArgs {
   headers: Headers
   searchParams: Record<string, string | string[]>
   columns: ColumnDef<any>[]
@@ -443,7 +445,7 @@ export interface ListViewProps<TFields extends Fields = Fields> extends BaseView
   actions?: ListActions
 }
 
-export interface ClientListViewProps<TFields extends Fields>
+export interface ClientCollectionListViewProps<TFields extends Fields>
   extends ClientBaseViewProps,
     RenderArgs {
   headers: Headers

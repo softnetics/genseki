@@ -5,16 +5,17 @@ import {
   AppTopbarNav as _AppTopbarNav,
   Banner,
   CollectionLayout as _CollectionLayout,
-  ListView as _ListView,
-  ListViewWrapper,
-  type ListViewWrapperProps,
+  CollectionListView as _ListView,
+  CollectionListViewProvider,
+  ListViewContainer,
+  type ListViewContainerProps,
   SidebarInset,
   SidebarProvider,
 } from '../../react'
 import type { BaseViewProps, ListActions } from '../../react/views/collections/types'
 import type { CollectionFindManyApiRoute } from '../builder.utils'
-import type { CollectionListConfig, ListViewProps } from '../collection'
-import { createGensekiUiRoute, type GensekiPluginOptions } from '../config'
+import type { CollectionListConfig, CollectionListViewProps } from '../collection'
+import { createGensekiUiRoute, type GensekiPluginOptions, getClientListViewProps } from '../config'
 
 export function generateCustomCollectionListUI<
   TCollectionListConfig extends CollectionListConfig<any, any>,
@@ -44,10 +45,10 @@ export function generateCustomCollectionListUI<
         columns: customCollectionArgs.listConfig.columns ?? [],
         listConfiguration: customCollectionArgs.listConfig.configuration,
         actions: customCollectionArgs.listConfig.actions,
-      } satisfies ListViewProps
+      } satisfies CollectionListViewProps
       const AppTopbarNav = () => <_AppTopbarNav />
       const _Banner = () => <Banner slug={customCollectionArgs.slug} />
-      const _ListViewWrapper = (props: ListViewWrapperProps) => <ListViewWrapper {...props} />
+      const _ListViewContainer = (props: ListViewContainerProps) => <ListViewContainer {...props} />
       const CollectionLayout = (props: { children?: React.ReactNode }) => {
         const NewCollectionLayout = customCollectionArgs.listConfig.uis?.layout
 
@@ -84,15 +85,18 @@ export function generateCustomCollectionListUI<
       }
       const ListView = () => {
         const NewListView = customCollectionArgs.listConfig.uis?.pages
+        const clientListViewProps = getClientListViewProps(listViewProps)
 
         if (NewListView) {
           return (
-            <NewListView
-              Banner={_Banner}
-              ListView={() => <_ListView {...listViewProps} />}
-              ListViewWrapper={_ListViewWrapper}
-              listViewProps={listViewProps}
-            />
+            <CollectionListViewProvider clientListViewProps={clientListViewProps}>
+              <NewListView
+                Banner={_Banner}
+                ListView={() => <_ListView {...listViewProps} />}
+                ListViewContainer={_ListViewContainer}
+                listViewProps={listViewProps}
+              />
+            </CollectionListViewProvider>
           )
         }
 
@@ -107,9 +111,9 @@ export function generateCustomCollectionListUI<
           <CollectionLayout>
             <AppTopbarNav />
             <_Banner />
-            <_ListViewWrapper>
+            <_ListViewContainer>
               <ListView />
-            </_ListViewWrapper>
+            </_ListViewContainer>
           </CollectionLayout>
         )
       }

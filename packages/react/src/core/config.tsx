@@ -11,7 +11,7 @@ import {
   createFileUploadHandlers,
   type ListViewProps,
 } from '.'
-import type { ClientListViewProps } from './collection'
+import type { ClientCollectionListViewProps } from './collection'
 import { type AnyApiRouter, type ApiRoutePath, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
@@ -336,7 +336,7 @@ export function getFieldsClient(fields: Fields): FieldsClient {
 }
 export function getClientListViewProps<TFields extends Fields>(
   args: ListViewProps<TFields>
-): ClientListViewProps<TFields> {
+): ClientCollectionListViewProps<TFields> {
   const fieldsClient = getFieldsClient(args.fields)
 
   const clientListViewProps = R.pick(args, [

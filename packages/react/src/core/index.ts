@@ -15,7 +15,7 @@ export type {
   InferField,
   InferFields,
   ListConfiguration,
-  ListViewProps,
+  CollectionListViewProps as ListViewProps,
 } from './collection'
 export { ApiDefaultMethod } from './collection'
 export {

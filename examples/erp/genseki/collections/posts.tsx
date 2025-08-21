@@ -6,16 +6,13 @@ import StarterKit from '@tiptap/starter-kit'
 
 import {
   BackColorExtension,
-  ClientListViewPropsProvider,
   CustomImageExtension,
   ImageUploadNodeExtension,
   SelectionExtension,
-  TableStatesProvider,
 } from '@genseki/react'
 
-import { columns, PostClientTable, PostClientToolbar } from './posts.client'
+import { columns, PostClientPagination, PostClientTable, PostClientToolbar } from './posts.client'
 
-import { getClientListViewProps } from '../../../../packages/react/src/core/config'
 import { EditorSlotBefore } from '../editor/slot-before'
 import { builder, prisma } from '../helper'
 
@@ -218,20 +215,19 @@ const list = builder.list(fields, {
       )
     },
     pages(args) {
-      const clientListViewProps = getClientListViewProps(args.listViewProps)
-      const ListViewWrapper = args.ListViewWrapper
+      const ListViewContainer = args.ListViewContainer
       const ListView = args.ListView
       const Banner = args.Banner
 
       /**
-       * @description You can use following template for simple scaffolding
+       * @description You can also use the following template for simple scaffolding
        *
        * ```return (
        * <div>
        *   <Banner />
-       *   <ListViewWrapper>
+       *   <ListViewContainer>
        *     <ListView />
-       *   </ListViewWrapper>
+       *   </ListViewContainer>
        * </div>
        * )```
        */
@@ -239,14 +235,11 @@ const list = builder.list(fields, {
       return (
         <div>
           <Banner />
-          <ListViewWrapper>
-            <TableStatesProvider>
-              <ClientListViewPropsProvider clientListViewProps={clientListViewProps}>
-                <PostClientToolbar />
-                <PostClientTable />
-              </ClientListViewPropsProvider>
-            </TableStatesProvider>
-          </ListViewWrapper>
+          <ListViewContainer>
+            <PostClientToolbar />
+            <PostClientTable />
+            <PostClientPagination />
+          </ListViewContainer>
         </div>
       )
     },

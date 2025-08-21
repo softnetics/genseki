@@ -20,10 +20,10 @@ import {
   MenuTrigger,
   TanstackTable,
   toast,
-  useClientListViewPropsContext,
   useCollectionDeleteMutation,
   useCollectionListQuery,
   useCollectionListTable,
+  useListViewPropsContext,
   useNavigation,
   useTableStatesContext,
 } from '@genseki/react'
@@ -67,7 +67,7 @@ export const columns = [
  * you may use custom toolbar here whehter you want.
  */
 export const PostClientToolbar = (props: { children?: React.ReactNode }) => {
-  const listViewProps = useClientListViewPropsContext()
+  const listViewProps = useListViewPropsContext()
   const { rowSelection, setRowSelection } = useTableStatesContext()
 
   const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key])
@@ -115,7 +115,7 @@ export const PostClientToolbar = (props: { children?: React.ReactNode }) => {
  * @description This is an example how you can use the given `TanstackTable` and `CollectionListPagination` from Genseki to compose your view.
  */
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
-  const listViewProps = useClientListViewPropsContext()
+  const listViewProps = useListViewPropsContext()
   const { setRowSelection } = useTableStatesContext()
 
   const queryClient = useQueryClient()
@@ -256,7 +256,14 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
         isError={query.isError}
         configuration={listViewProps.listConfiguration}
       />
-      <CollectionListPagination totalPage={query.data?.totalPage} />
     </>
   )
+}
+
+export function PostClientPagination() {
+  const { slug } = useListViewPropsContext()
+
+  const query = useCollectionListQuery({ slug })
+
+  return <CollectionListPagination totalPage={query.data?.totalPage} />
 }

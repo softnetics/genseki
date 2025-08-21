@@ -8,7 +8,7 @@ import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { toast } from 'sonner'
 
 import { useCollectionDeleteMutation, useCollectionListQuery } from './hooks'
-import { useClientListViewPropsContext } from './providers'
+import { useListViewPropsContext } from './providers'
 import { useCollectionListTable } from './table'
 import { CollectionListPagination } from './table/pagination'
 import { CollectionListToolbar } from './toolbar'
@@ -27,12 +27,12 @@ import {
 import { useNavigation, useTableStatesContext } from '../../../providers'
 import { cn } from '../../../utils/cn'
 
-export interface ListViewWrapperProps {
+export interface ListViewContainerProps {
   children?: React.ReactNode
   className?: string
 }
 
-export const ListViewWrapper = (props: ListViewWrapperProps) => {
+export const ListViewContainer = (props: ListViewContainerProps) => {
   return (
     <div
       className={cn('p-12 max-w-[1200px] mx-auto flex w-full flex-col gap-y-12', props.className)}
@@ -42,10 +42,10 @@ export const ListViewWrapper = (props: ListViewWrapperProps) => {
   )
 }
 
-export function ListViewClient() {
+export function ClientCollectionListView() {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const listViewProps = useClientListViewPropsContext()
+  const listViewProps = useListViewPropsContext()
   const { pagination, isRowsSelected, rowSelectionIds, setRowSelection } = useTableStatesContext()
 
   const query = useCollectionListQuery({ slug: listViewProps.slug })
