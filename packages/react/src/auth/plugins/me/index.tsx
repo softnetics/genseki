@@ -1,5 +1,4 @@
-import { createEndpoint } from '../../../core'
-import { createPlugin } from '../../../core/config'
+import { createEndpoint, createPlugin } from '../../../core'
 import type { Contextable } from '../../../core/context'
 
 export function mePlugin<TContext extends Contextable<any>>(context: TContext) {
@@ -21,15 +20,11 @@ export function mePlugin<TContext extends Contextable<any>>(context: TContext) {
     }
   )
 
-  return createPlugin({
-    name: 'auth',
-    plugin: () => {
-      return {
-        api: {
-          me: meApi,
-        },
-        uis: [],
-      }
-    },
+  return createPlugin('auth', (app) => {
+    return app.addApiRouter({
+      api: {
+        me: meApi,
+      },
+    })
   })
 }

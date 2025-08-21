@@ -18,9 +18,7 @@ export interface CollectionListSearchProps {
  * @param props.isLoading A loading state
  */
 export function CollectionListSearch(props: CollectionListSearchProps) {
-  const { search, setSearch } = useSearch({
-    debounce: 500,
-  })
+  const { search, setSearch } = useSearch({ debounce: 500 })
 
   const isIncorrectControlledInput = useMemo(
     () =>

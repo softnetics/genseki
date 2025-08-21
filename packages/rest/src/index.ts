@@ -5,7 +5,7 @@ import type {
   ApiRouteResponse,
   FilterByMethod,
   FlattenApiRouter,
-  GensekiCore,
+  GensekiAppCompiled,
 } from '@genseki/react'
 
 import { withPathParams, withQueryParams } from './utils'
@@ -48,9 +48,9 @@ async function makeFetch(
   return response.json()
 }
 
-export function createRestClient<TCore extends GensekiCore>(
+export function createRestClient<TApp extends GensekiAppCompiled>(
   config: CreateRestClientConfig
-): RestClient<TCore['api']> {
+): RestClient<TApp['api']> {
   return {
     GET: async (path: string, payload: AnyPayload) => {
       return makeFetch('GET', path, payload, config)
@@ -67,7 +67,7 @@ export function createRestClient<TCore extends GensekiCore>(
     PATCH: async (path: string, payload: AnyPayload) => {
       return makeFetch('PATCH', path, payload, config)
     },
-  } as RestClient<TCore['api']>
+  } as RestClient<TApp['api']>
 }
 
 export type ExtractApiRouterPath<TApiRoute extends ApiRoute> = TApiRoute['schema']['path']

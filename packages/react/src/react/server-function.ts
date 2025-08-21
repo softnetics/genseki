@@ -1,24 +1,25 @@
 import type { ValueOf } from 'type-fest'
 
 import {
+  type AnyApiRouter,
   type ApiRoute,
   type ApiRouteHandlerPayload,
   type ApiRouter,
   type ApiRouteResponse,
   type ApiRouteSchema,
+  type GensekiAppCompiled,
 } from '../core'
-import type { GensekiCore } from '../core/config'
 
-export type ServerFunction<TCore extends GensekiCore = GensekiCore> = <
-  TMethod extends GetGensekiApiRouterMethod<TCore['api']>,
-  TArgs extends GetServerFunctionApiArgs<GetApiRouterFromGensekiCore<TCore>, TMethod>,
+export type ServerFunction<TApp extends GensekiAppCompiled = GensekiAppCompiled> = <
+  TMethod extends GetGensekiApiRouterMethod<TApp['api']>,
+  TArgs extends GetServerFunctionApiArgs<GetApiRouterFromGensekiCore<TApp['api']>, TMethod>,
 >(
   method: TMethod,
   args: TArgs
-) => Promise<GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>>
+) => Promise<GetServerFunctionResponse<GetApiRouterFromGensekiCore<TApp['api']>, TMethod>>
 
-export type GetApiRouterFromGensekiCore<TCore extends GensekiCore = GensekiCore> =
-  TCore['api'] extends ApiRouter ? TCore['api'] : never
+export type GetApiRouterFromGensekiCore<TApiRouter extends AnyApiRouter> =
+  TApiRouter extends ApiRouter ? TApiRouter : never
 
 export type GetGensekiApiRouterMethod<TApiRouter extends ApiRouter = ApiRouter> = ValueOf<{
   [TKey in keyof TApiRouter]: TKey extends string

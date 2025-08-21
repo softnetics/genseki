@@ -63,12 +63,12 @@ function createResponse() {
 export async function handleServerFunction<
   TCore extends GensekiCore,
   TMethod extends GetGensekiApiRouterMethod<TCore['api']>,
-  TApiArgs extends GetServerFunctionApiArgs<GetApiRouterFromGensekiCore<TCore>, TMethod>,
+  TApiArgs extends GetServerFunctionApiArgs<GetApiRouterFromGensekiCore<TCore['api']>, TMethod>,
 >(
   core: TCore,
   methodName: TMethod,
   args: TApiArgs
-): Promise<GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>> {
+): Promise<GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore['api']>, TMethod>> {
   try {
     // TODO: Recusively find the method in the core.api object
     const apiRoute = findApiRoute(core.api, methodName)
@@ -87,7 +87,7 @@ export async function handleServerFunction<
       c.set(setCookieData.name, setCookieData.value, setCookieData)
     }
 
-    return result as GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore>, TMethod>
+    return result as GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore['api']>, TMethod>
   } catch (error) {
     console.error('Error handling server function:', error)
     return {

@@ -1,29 +1,35 @@
 'use client'
 
-import { createContext, type ReactNode, useContext } from 'react'
+import React, { createContext, type PropsWithChildren, type ReactNode, useContext } from 'react'
 
 import { UiProviders } from './ui'
 
-import type { GensekiAppCompiled, GensekiAppCompiledClient, GensekiCore } from '../../core/config'
+import type { GensekiAppClient, GensekiAppCompiled } from '../../core/config'
+import { SidebarProvider } from '../components/primitives/sidebar'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
-type RootContextValue<TGensekiApp extends GensekiAppCompiled = GensekiAppCompiled> = {
-  app: GensekiAppCompiledClient
-  serverFunction: ServerFunction<TGensekiApp>
+type RootContextValue<TApp extends GensekiAppCompiled = GensekiAppCompiled> = {
+  app: GensekiAppClient
+  components: {
+    AppSidebar: React.FC
+    AppSidebarInset: React.FC<PropsWithChildren>
+    AppTopbar: React.FC
+  }
+  serverFunction: ServerFunction<TApp>
 }
 
-const RootContext = createContext<RootContextValue>(null!)
+const GensekiContext = createContext<RootContextValue>(null!)
 
-export const useRootContext = <TGensekiCore extends GensekiCore>() => {
-  const context = useContext(RootContext)
-  if (!context) throw new Error('useRootContext must be used within a RootProvider')
-  return context as unknown as RootContextValue<TGensekiCore>
+export function useGenseki() {
+  const context = useContext(GensekiContext)
+  if (!context) throw new Error('"useGenseki" must be used within a "GensekiProvider"')
+  return context as unknown as RootContextValue
 }
 
-export const useStorageAdapter = () => {
-  const context = useContext(RootContext)
-  if (!context) throw new Error('useStorageAdapter must be used within a RootProvider')
+export function useStorageAdapter() {
+  const context = useContext(GensekiContext)
+  if (!context) throw new Error('"useStorageAdapter" must be used within a "GensekiProvider"')
   const storageAdapter = context.app?.storageAdapter
   if (!storageAdapter) {
     throw new Error('Storage adapter is not configured in the GensekiCore')
@@ -31,21 +37,33 @@ export const useStorageAdapter = () => {
   return storageAdapter
 }
 
-export const useServerFunction = <TGensekiCore extends GensekiCore>() => {
-  const context = useContext(RootContext)
-  if (!context) throw new Error('useCollectionServerFunctions must be used within a RootProvider')
-  return context.serverFunction as unknown as ServerFunction<TGensekiCore>
+export function useServerFunction<TApp extends GensekiAppCompiled = GensekiAppCompiled>() {
+  const context = useContext(GensekiContext)
+  if (!context) throw new Error('"useServerFunction" must be used within a "GensekiProvider"')
+  return context.serverFunction as unknown as ServerFunction<TApp>
 }
 
-export const RootProvider = (props: {
-  app: GensekiAppCompiledClient
+export const GensekiProvider = (props: {
+  app: GensekiAppClient
   serverFunction: ServerFunction
   children: ReactNode
 }) => {
   return (
-    <RootContext.Provider value={{ app: props.app, serverFunction: props.serverFunction }}>
-      <Toast />
-      <UiProviders>{props.children}</UiProviders>
-    </RootContext.Provider>
+    <GensekiContext.Provider
+      value={{
+        app: props.app,
+        serverFunction: props.serverFunction,
+        components: {
+          AppTopbar: () => null,
+          AppSidebar: () => null,
+          AppSidebarInset: () => null,
+        },
+      }}
+    >
+      <SidebarProvider>
+        <Toast />
+        <UiProviders>{props.children}</UiProviders>
+      </SidebarProvider>
+    </GensekiContext.Provider>
   )
 }

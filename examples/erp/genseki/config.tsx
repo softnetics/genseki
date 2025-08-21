@@ -1,6 +1,12 @@
 import { withNextJs } from '@genseki/next'
 import { admin } from '@genseki/plugins'
-import { emailAndPasswordPlugin, GensekiApp, mePlugin, StorageAdapterS3 } from '@genseki/react'
+import {
+  createPlugin,
+  emailAndPasswordPlugin,
+  GensekiApp,
+  mePlugin,
+  StorageAdapterS3,
+} from '@genseki/react'
 
 import { accessControl } from './access-control'
 import { SetupPage } from './auth/setup/setup'
@@ -86,14 +92,15 @@ const app = new GensekiApp({
   .apply(usersCollection)
   .apply(postsCollection)
   .apply(tagsCollection)
-  .apply({
-    api: {
-      auth: {
-        setup: setupApi,
-      },
-    },
-  })
-  .build()
+  .apply(
+    createPlugin('common', (app) => {
+      return app.addApiRouter({
+        auth: {
+          setup: setupApi,
+        },
+      })
+    })
+  )
 
 const nextjsApp = withNextJs(app)
 

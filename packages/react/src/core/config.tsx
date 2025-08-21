@@ -1,6 +1,5 @@
 import { type ReactNode } from 'react'
 
-import { deepmerge } from 'deepmerge-ts'
 import * as R from 'remeda'
 import type { Promisable } from 'type-fest'
 
@@ -9,9 +8,7 @@ import {
   type AnyRequestContextable,
   type ApiRouter,
   createFileUploadHandlers,
-  type ListViewProps,
 } from '.'
-import type { ClientCollectionListViewProps } from './collection'
 import { type AnyApiRouter, type ApiRoutePath, isApiRoute } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
@@ -19,6 +16,11 @@ import {
   type StorageAdapter,
   type StorageAdapterClient,
 } from './file-storage-adapters/generic-adapter'
+import {
+  type AnyGensekiPlugin,
+  GensekiAppBuilder,
+  type InferApiRouterFromGensekiPlugin,
+} from './plugin'
 import { getEditorProviderClientProps } from './richtext'
 import { isMediaFieldShape, isRelationFieldShape, isRichTextFieldShape } from './utils'
 
@@ -77,7 +79,7 @@ export interface GensekiAppOptions {
   title: string
   version: string
   apiPrefix?: string
-  uiPathPrefix?: string
+  pagePathPrefix?: string
   components?: {
     NotFound?: () => ReactNode
   }
@@ -86,39 +88,29 @@ export interface GensekiAppOptions {
   middlewares?: GensekiMiddleware[]
 }
 
-export interface GensekiPluginOptions extends GensekiAppOptions, GensekiCore<AnyApiRouter> {}
-
 export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
   api: TApiRouter
   uis: GensekiUiRouter[]
 }
 
-export interface GensekiAppCompiled<TApiRouter extends AnyApiRouter = AnyApiRouter>
-  extends GensekiCore<TApiRouter> {
+export interface GensekiAppClient {
+  title: string
+  version: string
+  apiPrefix?: string
+  pagePathPrefix?: string
+  storageAdapter?: StorageAdapterClient
+}
+export interface GensekiAppCompiled<TApiRouter extends AnyApiRouter = AnyApiRouter> {
+  title: string
+  version: string
+  apiPrefix?: string
+  pagePathPrefix?: string
+  api: TApiRouter
+  uis: GensekiUiRouter[]
   middlewares?: GensekiMiddleware[]
   storageAdapter?: StorageAdapterClient
+  toClient: () => GensekiAppClient
 }
-
-export interface GensekiAppCompiledClient {
-  storageAdapter?: StorageAdapterClient
-}
-
-export interface GensekiPlugin<TName extends string, TApiRouter extends AnyApiRouter> {
-  name: TName
-  plugin: (options: GensekiPluginOptions) => GensekiCore<TApiRouter>
-}
-
-export function createPlugin<TName extends string, TApiRouter extends AnyApiRouter>(args: {
-  name: TName
-  plugin: (options: GensekiPluginOptions) => GensekiCore<TApiRouter>
-}): GensekiPlugin<TName, TApiRouter> {
-  return args
-}
-
-export type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
-export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
-  TPlugin['plugin']
->['api']
 
 const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddlewareArgs) => {
   if (args.ui.requiredAuthenticated) {
@@ -131,9 +123,7 @@ const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddleware
 }
 
 export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
-  // private readonly apiPathPrefix: string
-  private readonly plugins: AnyGensekiPlugin[] = []
-  private core: GensekiCore<TMainApiRouter> = {} as GensekiCore<TMainApiRouter>
+  private readonly pluginBuilder = new GensekiAppBuilder(this.options)
 
   private storageRoutesForClient?: {
     putObjSignedUrl: ApiRoutePath
@@ -142,8 +132,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 
   constructor(private readonly options: GensekiAppOptions) {
-    this.options.middlewares = this.options.middlewares ?? []
-    this.options.middlewares.push(unauthorizedMiddleware)
+    this.pluginBuilder.addMiddleware(unauthorizedMiddleware)
 
     if (this.options.storageAdapter) {
       const { handlers } = createFileUploadHandlers(
@@ -175,22 +164,12 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
   apply<const TPlugin extends AnyGensekiPlugin>(
     plugin: TPlugin
-  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
-
-  apply<const TApiRouter extends AnyApiRouter = AnyApiRouter>(
-    core: Partial<GensekiCore<TApiRouter>>
-  ): GensekiApp<TApiPrefix, TMainApiRouter & TApiRouter>
-
-  apply(input: any) {
-    if (isGensekiPlugin(input)) {
-      this.plugins.push(input)
-    } else {
-      this.core = {
-        api: { ...(this.core.api ?? {}), ...(input.api ?? {}) },
-        uis: [...(this.core.uis ?? []), ...(input.uis ?? [])],
-      }
-    }
-    return this
+  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
+    plugin.plugin(this.pluginBuilder)
+    return this as unknown as GensekiApp<
+      TApiPrefix,
+      TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>
+    >
   }
 
   private _logApiRouter(router: ApiRouter): string[] {
@@ -215,44 +194,30 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 
   build(): GensekiAppCompiled<TMainApiRouter> {
-    const core = this.plugins.reduce(
-      (acc, plugin) => {
-        const pluginCore = plugin.plugin({
-          ...this.options,
-          ...acc,
-        })
-        return {
-          api: deepmerge(acc.api, pluginCore.api) as TMainApiRouter,
-          uis: [...acc.uis, ...(pluginCore.uis ?? [])],
-        }
-      },
-      {
-        uis: this.core.uis ?? [],
-        api: this.core.api ?? {},
-      } as unknown as GensekiCore<TMainApiRouter>
-    )
-
     if (this.options.storageAdapter) {
       const { handlers } = createFileUploadHandlers(
         this.options.storageAdapter.context,
         this.options.storageAdapter
       )
-      core.api = deepmerge(core.api, {
+      this.pluginBuilder.addApiRouter({
         storage: {
           putObjSignedUrl: handlers['file.generatePutObjSignedUrl'],
           getObjSignedUrl: handlers['file.generateGetObjSignedUrl'],
           deleteObjSignedUrl: handlers['file.generateDeleteObjSignedUrl'],
         },
-      }) as TMainApiRouter
+      })
     }
 
-    const logs = this._logApiRouter(core.api).sort((a, b) => a.localeCompare(b))
-    const uiLogs = this._logUis(core.uis).sort((a, b) => a.localeCompare(b))
+    const logs = this._logApiRouter(this.pluginBuilder.core.api).sort((a, b) => a.localeCompare(b))
+    const uiLogs = this._logUis(this.pluginBuilder.core.uis).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
     uiLogs.forEach((log) => console.log(`${log}`))
 
-    return {
-      middlewares: this.options.middlewares,
+    const appClient = {
+      title: this.options.title,
+      version: this.options.version,
+      apiPrefix: this.options.apiPrefix,
+      pagePathPrefix: this.options.pagePathPrefix,
       storageAdapter: this.storageRoutesForClient
         ? getStorageAdapterClient({
             storageAdapter: this.options.storageAdapter,
@@ -261,8 +226,14 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
             grabDeleteObjectSignedUrlApiRoute: this.storageRoutesForClient.deleteObjSignedUrl,
           })
         : undefined,
-      api: core.api,
-      uis: core.uis,
+    } satisfies GensekiAppClient
+
+    return {
+      ...appClient,
+      uis: this.pluginBuilder.core.uis,
+      api: this.pluginBuilder.core.api as TMainApiRouter,
+      middlewares: this.pluginBuilder.middlewares,
+      toClient: () => appClient,
     }
   }
 }
@@ -333,27 +304,4 @@ export function getFieldsClient(fields: Fields): FieldsClient {
     shape: R.mapValues(fields.shape, (value, key) => getFieldShapeClient(key, value)),
     config: fields.config,
   }
-}
-export function getClientListViewProps<TFields extends Fields>(
-  args: ListViewProps<TFields>
-): ClientCollectionListViewProps<TFields> {
-  const fieldsClient = getFieldsClient(args.fields)
-
-  const clientListViewProps = R.pick(args, [
-    'actions',
-    'columns',
-    'headers',
-    'identifierColumn',
-    'listConfiguration',
-    'params',
-    'pathname',
-    'searchParams',
-    'slug',
-  ])
-
-  return { ...clientListViewProps, fieldsClient }
-}
-
-function isGensekiPlugin<TPlugin extends AnyGensekiPlugin>(plugin: any): plugin is TPlugin {
-  return 'name' in plugin && 'plugin' in plugin
 }

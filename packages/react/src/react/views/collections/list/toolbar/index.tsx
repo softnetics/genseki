@@ -1,33 +1,49 @@
 'use client'
 
 import { CaretLeftIcon } from '@phosphor-icons/react/dist/ssr'
+import { useQueryClient } from '@tanstack/react-query'
 
-import { CollectionListCreate, type MinimalCollectionListCreateProps } from './create'
-import { CollectionListDelete, type MinimalCollectionListDeleteProps } from './delete'
-import { CollectionListFilter, type MinimalCollectionListFilterProps } from './filter'
-import { CollectionListSearch, type CollectionListSearchProps } from './search'
+import { CollectionListCreate } from './create'
+import { CollectionListDelete } from './delete'
+import { CollectionListFilter } from './filter'
+import { CollectionListSearch } from './search'
 
+import type { CollectionListActions } from '../../../../../core/collection'
+import { useCollectionListContext } from '../../../../../core/collection/list/context'
+import { toast } from '../../../..'
 import { BaseIcon, ButtonLink } from '../../../../components'
-import type { ListActions } from '../../types'
+import { useTableStatesContext } from '../../../../providers/table'
+import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'
 
-export interface CollectionListToolbarProps
-  extends CollectionListSearchProps,
-    MinimalCollectionListDeleteProps,
-    MinimalCollectionListFilterProps,
-    MinimalCollectionListCreateProps {
-  isShowDeleteButton?: boolean
-  actions?: ListActions
+export interface CollectionListToolbarProps {
+  actions?: Partial<CollectionListActions>
 }
 
-/**
- * @param props.slug A slug for page
- * @param props.isLoading A loading state for the toolbar
- * @param props.isShowDeleteButton A boolean to show/hide delete button
- * @param props.onDelete A callback function when delete button is clicked
- * @param props.features Features configuration for the list view
- */
 export function CollectionListToolbar(props: CollectionListToolbarProps) {
-  const { isShowDeleteButton = false, actions } = props
+  const context = useCollectionListContext()
+  const queryClient = useQueryClient()
+  const { rowSelectionIds, setRowSelection } = useTableStatesContext()
+
+  const actions: CollectionListActions = {
+    create: props.actions?.create ?? context.actions?.create,
+    update: props.actions?.update ?? context.actions?.update,
+    delete: props.actions?.delete ?? context.actions?.delete,
+    one: props.actions?.one ?? context.actions?.one,
+  }
+
+  const deleteMutation = useCollectionDeleteMutation({
+    slug: context.slug,
+    onSuccess: async () => {
+      setRowSelection({})
+      await queryClient.invalidateQueries({
+        queryKey: ['GET', `/${context.slug}`],
+      })
+      toast.success('Deletion successfully')
+    },
+    onError: () => {
+      toast.error('Failed to delete items')
+    },
+  })
 
   return (
     <div className="flex items-center justify-between gap-x-3">
@@ -41,16 +57,13 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
-        {actions?.delete && isShowDeleteButton && (
-          <CollectionListDelete onDelete={props.onDelete} isLoading={props.isLoading} />
+        {actions?.delete && (
+          <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />
         )}
-        <CollectionListSearch
-          isLoading={props.isLoading}
-          onSearchChange={props.onSearchChange}
-          search={props.search}
-        />
-        <CollectionListFilter isLoading={props.isLoading} /> {/* TODO: Filter */}
-        {actions?.create && <CollectionListCreate isLoading={props.isLoading} slug={props.slug} />}
+        <CollectionListSearch />
+        {/* TODO: Filter */}
+        <CollectionListFilter />
+        {actions?.create && <CollectionListCreate slug={context.slug} />}
       </div>
     </div>
   )

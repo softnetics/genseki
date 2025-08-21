@@ -8,12 +8,12 @@ import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
 import { toast } from 'sonner'
 
 import { useCollectionDeleteMutation, useCollectionListQuery } from './hooks'
-import { useListViewPropsContext } from './providers'
 import { useCollectionListTable } from './table'
 import { CollectionListPagination } from './table/pagination'
 import { CollectionListToolbar } from './toolbar'
 
 import type { BaseData } from '../../../../core'
+import { useCollectionListContext } from '../../../../core/collection/list/context'
 import {
   BaseIcon,
   Checkbox,
@@ -27,12 +27,12 @@ import {
 import { useNavigation, useTableStatesContext } from '../../../providers'
 import { cn } from '../../../utils/cn'
 
-export interface ListViewContainerProps {
+export interface CollectionListTableContainerProps {
   children?: React.ReactNode
   className?: string
 }
 
-export const ListViewContainer = (props: ListViewContainerProps) => {
+export function CollectionListTableContainer(props: CollectionListTableContainerProps) {
   return (
     <div
       className={cn('p-12 max-w-[1200px] mx-auto flex w-full flex-col gap-y-12', props.className)}
@@ -42,20 +42,20 @@ export const ListViewContainer = (props: ListViewContainerProps) => {
   )
 }
 
-export function ClientCollectionListView() {
+export function DefaultCollectionListPage() {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
-  const listViewProps = useListViewPropsContext()
+  const context = useCollectionListContext()
   const { pagination, isRowsSelected, rowSelectionIds, setRowSelection } = useTableStatesContext()
 
-  const query = useCollectionListQuery({ slug: listViewProps.slug })
+  const query = useCollectionListQuery({ slug: context.slug })
 
   const deleteMutation = useCollectionDeleteMutation({
-    slug: listViewProps.slug,
+    slug: context.slug,
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/${listViewProps.slug}`],
+        queryKey: ['GET', `/${context.slug}`],
       })
       toast.success('Deletion successfully')
     },
@@ -65,11 +65,11 @@ export function ClientCollectionListView() {
   })
 
   const columns = useMemo(() => {
-    if (query.isLoading) return listViewProps.columns
+    if (query.isLoading) return context.columns
 
     const columnHelper = createColumnHelper<BaseData>()
     return [
-      ...(listViewProps.actions?.delete
+      ...(context.actions?.delete
         ? [
             columnHelper.display({
               id: 'select',
@@ -92,15 +92,11 @@ export function ClientCollectionListView() {
             }),
           ]
         : []),
-      ...listViewProps.columns,
+      ...context.columns,
       columnHelper.display({
         id: 'actions',
         cell: ({ row }) => {
-          if (
-            !listViewProps.actions?.one &&
-            !listViewProps.actions?.update &&
-            !listViewProps.actions?.delete
-          ) {
+          if (!context.actions?.one && !context.actions?.update && !context.actions?.delete) {
             return null
           }
 
@@ -111,30 +107,29 @@ export function ClientCollectionListView() {
                   <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
                 </MenuTrigger>
                 <MenuContent aria-label="Actions" placement="left top">
-                  {listViewProps.actions.one && (
+                  {context.actions.one && (
                     <MenuItem
                       aria-label="View"
                       onAction={() => {
-                        navigation.navigate(`./${listViewProps.slug}/${row.original.__id}`)
+                        navigation.navigate(`./${context.slug}/${row.original.__id}`)
                       }}
                     >
                       View
                     </MenuItem>
                   )}
-                  {listViewProps.actions.update && (
+                  {context.actions.update && (
                     <MenuItem
                       aria-label="Edit"
                       onAction={() => {
-                        navigation.navigate(`./${listViewProps.slug}/update/${row.original.__id}`)
+                        navigation.navigate(`./${context.slug}/update/${row.original.__id}`)
                       }}
                     >
                       Edit
                     </MenuItem>
                   )}
-                  {listViewProps.actions?.delete && (
+                  {context.actions?.delete && (
                     <>
-                      {listViewProps.actions.one ||
-                        (listViewProps.actions.update && <MenuSeparator />)}
+                      {context.actions.one || (context.actions.update && <MenuSeparator />)}
                       <MenuItem
                         aria-label="Delete"
                         isDanger
@@ -153,13 +148,14 @@ export function ClientCollectionListView() {
         },
       }),
     ] as ColumnDef<{ __pk: string; __id: string }>[]
-  }, [listViewProps.columns, listViewProps.actions, query.isLoading])
+  }, [context.columns, context.actions, query.isLoading])
 
   const table = useCollectionListTable({
     total: query.data?.total,
     data: query.data?.data || [],
     columns: columns,
-    listConfiguration: listViewProps.listConfiguration,
+    search: context.search,
+    sortBy: context.sortBy,
   })
 
   const isError = deleteMutation.isError || query.isError
@@ -167,13 +163,7 @@ export function ClientCollectionListView() {
 
   return (
     <>
-      <CollectionListToolbar
-        actions={listViewProps.actions}
-        slug={listViewProps.slug}
-        onDelete={() => deleteMutation.mutate(rowSelectionIds)}
-        isShowDeleteButton={isRowsSelected}
-        isLoading={isLoading}
-      />
+      <CollectionListToolbar />
       <TanstackTable
         table={table}
         loadingItems={pagination.pageSize}
@@ -181,9 +171,12 @@ export function ClientCollectionListView() {
         onRowClick="toggleSelect"
         isLoading={isLoading}
         isError={isError}
-        configuration={listViewProps.listConfiguration}
+        configuration={{
+          search: context.search,
+          sortBy: context.sortBy,
+        }}
       />
-      <CollectionListPagination totalPage={query.data?.totalPage} />
+      <CollectionListPagination />
     </>
   )
 }

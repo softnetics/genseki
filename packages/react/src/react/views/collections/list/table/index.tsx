@@ -12,10 +12,8 @@ import type { BaseData } from '../../../../../core/collection'
 import { useTableStatesContext } from '../../../../providers/table'
 
 interface CollectionListTableArgs<TFieldsData extends BaseData> {
-  listConfiguration?: {
-    search?: (string | number | symbol)[]
-    sortBy?: (string | number | symbol)[]
-  }
+  search?: (string | number | symbol)[]
+  sortBy?: (string | number | symbol)[]
   total?: number
   data: TFieldsData[]
   columns: ColumnDef<any>[]
@@ -32,8 +30,8 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
     useTableStatesContext()
   // Get default sort field from configuration
   const defaultSortField = (() => {
-    if (args.listConfiguration?.sortBy && args.listConfiguration.sortBy.length > 0) {
-      return args.listConfiguration.sortBy[0].toString()
+    if (args.sortBy && args.sortBy.length > 0) {
+      return args.sortBy[0].toString()
     }
     return undefined
   })()

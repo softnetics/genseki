@@ -1,8 +1,11 @@
 import z from 'zod'
 
+import { CollectionBuilder, createPlugin } from '@genseki/react'
+
 import { columns } from './users.client'
 
-import { builder } from '../helper'
+import { FullModelSchemas } from '../../generated/genseki/unsanitized'
+import { builder, context } from '../helper'
 
 export const fields = builder.fields('user', (fb) => ({
   name: fb.columns('name', {
@@ -25,41 +28,40 @@ export const fields = builder.fields('user', (fb) => ({
   }),
 }))
 
-const list = builder.list(fields, {
-  columns: columns,
-  configuration: {
-    search: ['name'],
-    sortBy: ['name'],
-  },
-})
+export const usersCollection = createPlugin('users', (app) => {
+  const collection = new CollectionBuilder('users', context, FullModelSchemas)
 
-const update = builder.update(fields, {})
-
-const api = {
-  example: builder.endpoint(
-    {
-      method: 'GET',
-      path: '/',
-      responses: {
-        200: z.object({
-          data: z.any(),
-        }),
-      },
-    },
-    async () => {
-      return {
-        status: 200,
-        body: {
-          data: 'Hello from users collection',
+  return app
+    .addApiRouter(collection.listApiRouter(fields))
+    .addApiRouter(collection.updateApiRouter(fields))
+    .addPageAndApiRouter(
+      collection.list(fields, {
+        columns: columns,
+        configuration: {
+          search: ['name'],
+          sortBy: ['name'],
         },
-      }
-    }
-  ),
-}
-
-export const usersCollection = builder.collection({
-  slug: 'users',
-  list: list,
-  api: api,
-  update: update,
+      })
+    )
+    .addApiRouter({
+      example: builder.endpoint(
+        {
+          method: 'GET',
+          path: '/',
+          responses: {
+            200: z.object({
+              data: z.any(),
+            }),
+          },
+        },
+        async () => {
+          return {
+            status: 200,
+            body: {
+              data: 'Hello from users collection',
+            },
+          }
+        }
+      ),
+    })
 })

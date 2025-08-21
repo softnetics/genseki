@@ -1,6 +1,9 @@
+import { CollectionBuilder, createPlugin } from '@genseki/react'
+
 import { columns } from './tags.client'
 
-import { builder } from '../helper'
+import { FullModelSchemas } from '../../generated/genseki/unsanitized'
+import { builder, context } from '../helper'
 
 export const fields = builder.fields('tag', (fb) => ({
   name: fb.columns('name', {
@@ -8,20 +11,19 @@ export const fields = builder.fields('tag', (fb) => ({
   }),
 }))
 
-const list = builder.list(fields, {
-  columns: columns,
-  configuration: {
-    search: ['name'],
-    sortBy: ['name'],
-  },
-})
+export const tagsCollection = createPlugin('tags', (app) => {
+  const collection = new CollectionBuilder('tags', context, FullModelSchemas)
 
-const update = builder.update(fields, {})
-const create = builder.create(fields, {})
-
-export const tagsCollection = builder.collection({
-  slug: 'tags',
-  list: list,
-  create: create,
-  update: update,
+  return app
+    .addPageAndApiRouter(
+      collection.list(fields, {
+        columns: columns,
+        configuration: {
+          search: ['name'],
+          sortBy: ['name'],
+        },
+      })
+    )
+    .addPageAndApiRouter(collection.create(fields, {}))
+    .addPageAndApiRouter(collection.update(fields, {}))
 })

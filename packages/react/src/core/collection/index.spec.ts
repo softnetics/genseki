@@ -1,10 +1,11 @@
 import type { JsonValue } from 'type-fest'
 import { describe, expectTypeOf, it } from 'vitest'
 
-import { mockContext } from './__mocks__/context'
-import { FullModelSchemas } from './__mocks__/unsanitized'
-import { Builder } from './builder'
-import type { InferCreateFields, InferFields, InferUpdateFields } from './collection'
+import type { InferCreateFields, InferFields, InferUpdateFields } from '.'
+
+import { mockContext } from '../__mocks__/context'
+import { FullModelSchemas } from '../__mocks__/unsanitized'
+import { Builder } from '../builder'
 
 type Expect<A, B> = A extends B ? (B extends A ? true : never) : never
 

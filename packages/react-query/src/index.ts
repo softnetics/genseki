@@ -21,7 +21,7 @@ import type {
   ApiRouteResponse,
   FilterByMethod,
   FlattenApiRouter,
-  GensekiCore,
+  GensekiAppCompiled,
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
 
@@ -217,9 +217,9 @@ export function queryKey(method: string, path: string | number | symbol, payload
   return [method, path, payloadKey] as const
 }
 
-export function createQueryClient<TCore extends GensekiCore>(
+export function createQueryClient<TApp extends GensekiAppCompiled>(
   config: CreateRestClientConfig
-): QueryClient<TCore['api']> {
+): QueryClient<TApp['api']> {
   const restClient = createRestClient(config)
 
   const useQuery = function (method: string, path: string, payload: any, options?: any) {
@@ -337,5 +337,5 @@ export function createQueryClient<TCore extends GensekiCore>(
     useGetQueryData,
     useSetQueryData,
     useOptimisticUpdateQuery,
-  } as QueryClient<TCore['api']>
+  } as QueryClient<TApp['api']>
 }

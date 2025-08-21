@@ -13,7 +13,7 @@ export interface CollectionLayoutProps {
   sidebar?: AppSideBarBuilderProps
 }
 
-export function CollectionLayout(props: CollectionLayoutProps) {
+export function DefaultCollectionLayout(props: CollectionLayoutProps) {
   return (
     <>
       <SidebarProvider>

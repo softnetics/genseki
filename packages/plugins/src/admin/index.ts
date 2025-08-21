@@ -151,110 +151,104 @@ export function admin<TContext extends AnyContextable, TSchema extends AnyPlugin
     throw new Error('Invalid options provided to admin plugin')
   }
 
-  return createPlugin({
-    name: 'admin',
-    plugin: (input) => {
-      const prisma = context.getPrismaClient()
-      const builder = new Builder({ schema: schema, context })
+  return createPlugin('admin', (app) => {
+    const prisma = context.getPrismaClient()
+    const builder = new Builder({ schema: schema, context })
 
-      const hasPermissionEndpoint = builder.endpoint(
-        {
-          method: 'POST',
-          path: '/auth/admin/has-permission',
-          body: z.object({
-            role: z.string(),
-            permission: z.string(),
+    const hasPermissionEndpoint = builder.endpoint(
+      {
+        method: 'POST',
+        path: '/auth/admin/has-permission',
+        body: z.object({
+          role: z.string(),
+          permission: z.string(),
+        }),
+        responses: {
+          200: z.object({
+            ok: z.boolean(),
           }),
-          responses: {
-            200: z.object({
-              ok: z.boolean(),
-            }),
-          },
         },
-        ({ body }) => {
-          const { role, permission } = body
-          const ok = options.accessControl.hasPermission(role, permission as never)
-          return {
-            status: 200 as const,
-            body: { ok: ok },
-          }
+      },
+      ({ body }) => {
+        const { role, permission } = body
+        const ok = options.accessControl.hasPermission(role, permission as never)
+        return {
+          status: 200 as const,
+          body: { ok: ok },
         }
-      )
-
-      const hasPermissionsEndpoint = builder.endpoint(
-        {
-          method: 'POST',
-          path: '/auth/admin/has-permissions',
-          body: z.object({
-            role: z.string(),
-            permissions: z.string().array(),
-          }),
-          responses: {
-            200: z.object({
-              ok: z.boolean(),
-            }),
-          },
-        },
-        ({ body }) => {
-          const { role, permissions } = body
-          const ok = options.accessControl.hasPermissions(role, permissions as never[])
-          return {
-            status: 200 as const,
-            body: { ok: ok },
-          }
-        }
-      )
-
-      const banUserEndpoint = builder.endpoint(
-        {
-          method: 'POST',
-          path: '/auth/admin/ban-user',
-          body: z.object({
-            userId: z.string(),
-            reason: z.string().optional(),
-            expiresAt: z.date().optional(),
-          }),
-          responses: {
-            200: z.object({
-              ok: z.boolean(),
-            }),
-          },
-        },
-        async ({ body }) => {
-          const { userId } = body
-
-          const banField = schema.user.shape.columns.banned
-          const bannedReasonField = schema.user.shape.columns.bannedReason
-          const bannedExpiredAtField = schema.user.shape.columns.bannedExpiredAt
-
-          await prisma[schema.user.config.prismaModelName].update({
-            where: { id: userId },
-            data: {
-              [banField.name]: true,
-              [bannedReasonField.name]: body.reason ?? 'No reason provided',
-              [bannedExpiredAtField.name]: body.expiresAt ?? null, // null means no expiration
-            },
-          })
-
-          return {
-            status: 200 as const,
-            body: { ok: true },
-          }
-        }
-      )
-
-      const api = {
-        hasPermission: hasPermissionEndpoint,
-        hasPermissions: hasPermissionsEndpoint,
-        banUser: banUserEndpoint,
-      } as const
-
-      return {
-        api: {
-          admin: api,
-        },
-        uis: [],
       }
-    },
+    )
+
+    const hasPermissionsEndpoint = builder.endpoint(
+      {
+        method: 'POST',
+        path: '/auth/admin/has-permissions',
+        body: z.object({
+          role: z.string(),
+          permissions: z.string().array(),
+        }),
+        responses: {
+          200: z.object({
+            ok: z.boolean(),
+          }),
+        },
+      },
+      ({ body }) => {
+        const { role, permissions } = body
+        const ok = options.accessControl.hasPermissions(role, permissions as never[])
+        return {
+          status: 200 as const,
+          body: { ok: ok },
+        }
+      }
+    )
+
+    const banUserEndpoint = builder.endpoint(
+      {
+        method: 'POST',
+        path: '/auth/admin/ban-user',
+        body: z.object({
+          userId: z.string(),
+          reason: z.string().optional(),
+          expiresAt: z.date().optional(),
+        }),
+        responses: {
+          200: z.object({
+            ok: z.boolean(),
+          }),
+        },
+      },
+      async ({ body }) => {
+        const { userId } = body
+
+        const banField = schema.user.shape.columns.banned
+        const bannedReasonField = schema.user.shape.columns.bannedReason
+        const bannedExpiredAtField = schema.user.shape.columns.bannedExpiredAt
+
+        await prisma[schema.user.config.prismaModelName].update({
+          where: { id: userId },
+          data: {
+            [banField.name]: true,
+            [bannedReasonField.name]: body.reason ?? 'No reason provided',
+            [bannedExpiredAtField.name]: body.expiresAt ?? null, // null means no expiration
+          },
+        })
+
+        return {
+          status: 200 as const,
+          body: { ok: true },
+        }
+      }
+    )
+
+    const api = {
+      hasPermission: hasPermissionEndpoint,
+      hasPermissions: hasPermissionsEndpoint,
+      banUser: banUserEndpoint,
+    } as const
+
+    return app.addApiRouter({
+      admin: api,
+    })
   })
 }
