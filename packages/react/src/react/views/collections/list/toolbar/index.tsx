@@ -9,10 +9,10 @@ import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
 import type { CollectionListActions } from '../../../../../core/collection'
-import { useCollectionList } from '../../../../../core/collection/list/context'
 import { toast } from '../../../..'
 import { BaseIcon, ButtonLink } from '../../../../components'
 import { useTableStatesContext } from '../../../../providers/table'
+import { useCollectionList } from '../context'
 import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'
 
 export interface CollectionListToolbarProps {

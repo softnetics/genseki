@@ -1,7 +1,7 @@
 'use client'
 
-import { useCollection } from '../../../../../core/collection/context'
 import { PageSizeSelect, Pagination } from '../../../../components'
+import { useCollection } from '../../context'
 import { usePagination } from '../../../../hooks/use-pagination'
 import { useCollectionListQuery } from '../hooks/use-collection-list'
 

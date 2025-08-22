@@ -6,19 +6,18 @@ import type { ConditionalExcept, Promisable, Simplify } from 'type-fest'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
 import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
-import { CollectionProvider } from './context'
-import { CollectionListProvider } from './list/context'
-
 import {
   AppTopbarNav,
   type CollectionLayoutProps,
   CreateView,
   DefaultCollectionLayout,
-  DefaultCollectionListPage,
   OneView,
   UpdateView,
 } from '../../react'
 import { getHeadersObject } from '../../react/utils/headers'
+import { CollectionProvider } from '../../react/views/collections/context'
+import { CollectionListProvider } from '../../react/views/collections/list/context'
+import { DefaultCollectionListPage } from '../../react/views/collections/list/default'
 import type { BaseViewProps } from '../../react/views/collections/types'
 import {
   type CollectionCreateApiRoute,
@@ -50,11 +49,6 @@ import {
   type FieldsOptions,
 } from '../field'
 import type { DataType, InferDataType, ModelSchemas } from '../model'
-
-export interface BaseData {
-  __id: string | number
-  __pk: string | number
-}
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
@@ -210,7 +204,10 @@ export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
     -readonly [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeBase
       ? InferField<TFields['shape'][TKey]>
       : never
-  } & BaseData,
+  } & {
+    __pk: string | number
+    __id: string | number
+  },
   never
 >
 
@@ -403,13 +400,8 @@ export interface ListConfiguration<TFields extends Fields> {
   sortBy?: ExtractSortableColumns<TFields>[]
 }
 
-export interface BaseData {
-  __id: string | number
-  __pk: string | number
-}
-
 export type CollectionListResponse = {
-  data: (BaseData & {})[]
+  data: ({ __id: string | number; __pk: string | number } & {})[]
   total: number
   totalPage: number
   currentPage: number

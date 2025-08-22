@@ -1,7 +1,7 @@
 'use client'
 import React, { createContext, useContext } from 'react'
 
-import type { FieldsClient } from '../field'
+import type { FieldsClient } from '../../../core/field'
 
 export interface CollectionContextValue {
   slug: string

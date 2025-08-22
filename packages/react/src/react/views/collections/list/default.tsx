@@ -6,12 +6,12 @@ import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
 
 import { Banner } from './banner'
-import { useListTable } from './table'
+import { CollectionListTableContainer } from './container'
+import { useCollectionList } from './context'
+import { CollectionListTable } from './table'
 import { CollectionListPagination } from './table/pagination'
 import { CollectionListToolbar } from './toolbar'
 
-import type { BaseData } from '../../../../core'
-import { useCollectionList } from '../../../../core/collection/list/context'
 import {
   BaseIcon,
   Checkbox,
@@ -20,66 +20,9 @@ import {
   MenuItem,
   MenuSeparator,
   MenuTrigger,
-  TanstackTable,
-  type TanstackTableProps,
 } from '../../../components'
 import { useNavigation } from '../../../providers'
-import { cn } from '../../../utils/cn'
-
-export interface CollectionListTableContainerProps {
-  children?: React.ReactNode
-  className?: string
-}
-
-export function CollectionListTableContainer(props: CollectionListTableContainerProps) {
-  return (
-    <div
-      className={cn('p-12 max-w-[1200px] mx-auto flex w-full flex-col gap-y-12', props.className)}
-    >
-      {props.children}
-    </div>
-  )
-}
-
-export interface CollectionListTableProps<T extends BaseData>
-  extends Omit<TanstackTableProps<T>, 'table' | 'configuration'> {
-  total?: number
-  data?: T[]
-  columns?: ColumnDef<T, any>[]
-  search?: string[]
-  sortBy?: string[]
-
-  isLoading?: boolean
-  isError?: boolean
-}
-
-export function CollectionListTable<T extends BaseData>(props: CollectionListTableProps<T>) {
-  const context = useCollectionList()
-
-  const table = useListTable({
-    total: props.total ?? context.total,
-    data: props.data ?? context.data ?? [],
-    columns: props.columns ?? context.columns,
-    search: props.search ?? context.search,
-    sortBy: props.sortBy ?? context.sortBy,
-  })
-
-  return (
-    <TanstackTable
-      table={table}
-      loadingItems={table.getTotalSize()}
-      className="static"
-      onRowClick="toggleSelect"
-      isLoading={props.isLoading ?? context.isQuerying ?? context.isMutating}
-      isError={props.isError ?? context.isError}
-      configuration={{
-        search: props.search ?? context.search,
-        sortBy: props.sortBy ?? context.sortBy,
-      }}
-      {...props}
-    />
-  )
-}
+import type { BaseData } from '../types'
 
 export function DefaultCollectionListPage() {
   const navigation = useNavigation()

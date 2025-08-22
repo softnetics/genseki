@@ -8,8 +8,13 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import type { BaseData } from '../../../../../core/collection'
+import {
+  TanstackTable,
+  type TanstackTableProps,
+} from '../../../../components/primitives/tanstack-table'
 import { useTableStatesContext } from '../../../../providers/table'
+import type { BaseData } from '../../types'
+import { useCollectionList } from '../context'
 
 interface UseListTableArgs<TFieldsData extends BaseData> {
   search?: (string | number | symbol)[]
@@ -75,4 +80,44 @@ export function useListTable<TFieldsData extends BaseData>(args: UseListTableArg
   })
 
   return table
+}
+
+export interface CollectionListTableProps<T extends BaseData>
+  extends Omit<TanstackTableProps<T>, 'table' | 'configuration'> {
+  total?: number
+  data?: T[]
+  columns?: ColumnDef<T, any>[]
+  search?: string[]
+  sortBy?: string[]
+
+  isLoading?: boolean
+  isError?: boolean
+}
+
+export function CollectionListTable<T extends BaseData>(props: CollectionListTableProps<T>) {
+  const context = useCollectionList()
+
+  const table = useListTable({
+    total: props.total ?? context.total,
+    data: props.data ?? context.data ?? [],
+    columns: props.columns ?? context.columns,
+    search: props.search ?? context.search,
+    sortBy: props.sortBy ?? context.sortBy,
+  })
+
+  return (
+    <TanstackTable
+      table={table}
+      loadingItems={table.getTotalSize()}
+      className="static"
+      onRowClick="toggleSelect"
+      isLoading={props.isLoading ?? context.isQuerying ?? context.isMutating}
+      isError={props.isError ?? context.isError}
+      configuration={{
+        search: props.search ?? context.search,
+        sortBy: props.sortBy ?? context.sortBy,
+      }}
+      {...props}
+    />
+  )
 }

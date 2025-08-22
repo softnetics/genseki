@@ -11,3 +11,8 @@ export interface ClientBaseViewProps {
   slug: string
   fieldsClient: FieldsClient
 }
+
+export interface BaseData {
+  __pk: string | number
+  __id: string | number
+}

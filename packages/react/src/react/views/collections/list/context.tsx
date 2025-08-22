@@ -4,24 +4,20 @@ import React, { createContext, type ReactNode, useContext } from 'react'
 import { useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
 
-import {
-  Banner,
-  CollectionListPagination,
-  CollectionListTable,
-  CollectionListTableContainer,
-  type CollectionListTableContainerProps,
-  type CollectionListTableProps,
-  CollectionListToolbar,
-  type CollectionListToolbarProps,
-  TableStatesProvider,
-  toast,
-  useCollectionDeleteMutation,
-  useCollectionListQuery,
-  useTableStatesContext,
-} from '../../../react'
-import type { FieldsClient } from '../../field'
-import type { BaseData, CollectionListActions } from '..'
+import { Banner } from './banner'
+import { CollectionListTableContainer, type CollectionListTableContainerProps } from './container'
+import { useCollectionDeleteMutation } from './hooks/use-collection-delete'
+import { useCollectionListQuery } from './hooks/use-collection-list'
+import { CollectionListTable, type CollectionListTableProps } from './table'
+import { CollectionListPagination } from './table/pagination'
+import { CollectionListToolbar, type CollectionListToolbarProps } from './toolbar'
+
+import { toast } from '../../../..'
+import type { CollectionListActions } from '../../../../core/collection'
+import type { FieldsClient } from '../../../../core/field'
+import { TableStatesProvider, useTableStatesContext } from '../../../providers/table'
 import { useCollection } from '../context'
+import type { BaseData } from '../types'
 
 export interface CollectionListContextValue<T extends BaseData = BaseData> {
   // Should split into another context
@@ -74,7 +70,7 @@ export interface CollectionListProviderProps<T extends BaseData = BaseData> {
 /**
  * @description A provider to provide `listViewProps` for client
  */
-function _CollectionListProvider(props: CollectionListProviderProps) {
+function _CollectionListProvider<T extends BaseData>(props: CollectionListProviderProps<T>) {
   const context = useCollection()
 
   const { children, ...rest } = props
@@ -120,6 +116,7 @@ function _CollectionListProvider(props: CollectionListProviderProps) {
       value={{
         ...rest,
         ...context,
+        columns: rest.columns as any,
         isError,
         isQuerying,
         isMutating,
@@ -141,10 +138,10 @@ function _CollectionListProvider(props: CollectionListProviderProps) {
   )
 }
 
-export function CollectionListProvider(props: CollectionListProviderProps) {
+export function CollectionListProvider<T extends BaseData>(props: CollectionListProviderProps<T>) {
   return (
     <TableStatesProvider>
-      <_CollectionListProvider {...props} />
+      <_CollectionListProvider<T> {...props} />
     </TableStatesProvider>
   )
 }
