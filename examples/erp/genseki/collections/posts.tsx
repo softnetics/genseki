@@ -11,11 +11,9 @@ import {
   CustomImageExtension,
   ImageUploadNodeExtension,
   SelectionExtension,
-  useCollectionListContext,
-  useGenseki,
 } from '@genseki/react'
 
-import { columns, PostClientTable, PostClientToolbar } from './posts.client'
+import { columns, Layout, Page } from './posts.client'
 
 import { FullModelSchemas } from '../../generated/genseki/unsanitized'
 import { EditorSlotBefore } from '../editor/slot-before'
@@ -192,37 +190,8 @@ export const postsCollection = createPlugin('posts', (app) => {
           sortBy: ['updatedAt', 'title'],
         },
         actions: { create: true, delete: true, one: true, update: true },
-        layout: function Layout(args) {
-          const {
-            components: { AppTopbar, AppSidebar, AppSidebarInset },
-          } = useGenseki()
-
-          return (
-            <>
-              <AppSidebar />
-              <AppSidebarInset>
-                <AppTopbar />
-                {args.children}
-              </AppSidebarInset>
-            </>
-          )
-        },
-        page: function Page(args) {
-          const {
-            components: { ListBanner, ListTableContainer, ListTablePagination },
-          } = useCollectionListContext()
-
-          return (
-            <>
-              <ListBanner />
-              <ListTableContainer>
-                <PostClientToolbar />
-                <PostClientTable />
-                <ListTablePagination />
-              </ListTableContainer>
-            </>
-          )
-        },
+        layout: Layout,
+        page: Page,
       })
     )
     .addApiRouter(collection.createApiRouter(fields, { options: options }))

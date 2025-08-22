@@ -9,7 +9,7 @@ import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
 import type { CollectionListActions } from '../../../../../core/collection'
-import { useCollectionListContext } from '../../../../../core/collection/list/context'
+import { useCollectionList } from '../../../../../core/collection/list/context'
 import { toast } from '../../../..'
 import { BaseIcon, ButtonLink } from '../../../../components'
 import { useTableStatesContext } from '../../../../providers/table'
@@ -20,7 +20,7 @@ export interface CollectionListToolbarProps {
 }
 
 export function CollectionListToolbar(props: CollectionListToolbarProps) {
-  const context = useCollectionListContext()
+  const context = useCollectionList()
   const queryClient = useQueryClient()
   const { rowSelectionIds, setRowSelection } = useTableStatesContext()
 

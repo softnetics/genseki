@@ -6,7 +6,7 @@ import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import type { BaseData } from '@genseki/react'
+import type { BaseData, CollectionLayoutProps } from '@genseki/react'
 import {
   BaseIcon,
   Checkbox,
@@ -20,9 +20,10 @@ import {
   TanstackTable,
   toast,
   useCollectionDeleteMutation,
-  useCollectionListContext,
+  useCollectionList,
   useCollectionListQuery,
-  useCollectionListTable,
+  useGenseki,
+  useListTable,
   useNavigation,
   useTableStatesContext,
 } from '@genseki/react'
@@ -66,7 +67,7 @@ export const columns = [
  * you may use custom toolbar here whehter you want.
  */
 export function PostClientToolbar() {
-  const context = useCollectionListContext()
+  const context = useCollectionList()
 
   return (
     <div>
@@ -79,7 +80,7 @@ export function PostClientToolbar() {
  * @description This is an example how you can use the given `TanstackTable` and `CollectionListPagination` from Genseki to compose your view.
  */
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
-  const context = useCollectionListContext()
+  const context = useCollectionList()
   const { setRowSelection } = useTableStatesContext()
 
   const queryClient = useQueryClient()
@@ -198,11 +199,10 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
     }),
   ]
 
-  const table = useCollectionListTable({
+  const table = useListTable({
     total: query.data?.total,
     data: query.data?.data || [],
     columns: enhancedColumns,
-    // TODO
   })
 
   return (
@@ -218,6 +218,45 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
           sortBy: context.sortBy,
         }}
       />
+    </>
+  )
+}
+
+export function Layout(props: CollectionLayoutProps) {
+  const {
+    components: { AppTopbar, AppSidebar, AppSidebarInset, AppSidebarProvider },
+  } = useGenseki()
+
+  return (
+    <AppSidebarProvider>
+      <AppSidebar />
+      <AppSidebarInset>
+        <AppTopbar />
+        {props.children}
+      </AppSidebarInset>
+    </AppSidebarProvider>
+  )
+}
+
+export function Page() {
+  const {
+    components: {
+      ListBanner,
+      ListTableContainer,
+      ListTablePagination,
+      ListTable,
+      ListTableToolbar,
+    },
+  } = useCollectionList<Post>()
+
+  return (
+    <>
+      <ListBanner />
+      <ListTableContainer>
+        <PostClientToolbar />
+        <PostClientTable />
+        <ListTablePagination />
+      </ListTableContainer>
     </>
   )
 }

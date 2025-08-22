@@ -3,17 +3,15 @@
 import React, { useMemo } from 'react'
 
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
-import { useQueryClient } from '@tanstack/react-query'
 import { type ColumnDef, createColumnHelper } from '@tanstack/react-table'
-import { toast } from 'sonner'
 
-import { useCollectionDeleteMutation, useCollectionListQuery } from './hooks'
-import { useCollectionListTable } from './table'
+import { Banner } from './banner'
+import { useListTable } from './table'
 import { CollectionListPagination } from './table/pagination'
 import { CollectionListToolbar } from './toolbar'
 
 import type { BaseData } from '../../../../core'
-import { useCollectionListContext } from '../../../../core/collection/list/context'
+import { useCollectionList } from '../../../../core/collection/list/context'
 import {
   BaseIcon,
   Checkbox,
@@ -23,8 +21,9 @@ import {
   MenuSeparator,
   MenuTrigger,
   TanstackTable,
+  type TanstackTableProps,
 } from '../../../components'
-import { useNavigation, useTableStatesContext } from '../../../providers'
+import { useNavigation } from '../../../providers'
 import { cn } from '../../../utils/cn'
 
 export interface CollectionListTableContainerProps {
@@ -42,30 +41,53 @@ export function CollectionListTableContainer(props: CollectionListTableContainer
   )
 }
 
-export function DefaultCollectionListPage() {
-  const navigation = useNavigation()
-  const queryClient = useQueryClient()
-  const context = useCollectionListContext()
-  const { pagination, isRowsSelected, rowSelectionIds, setRowSelection } = useTableStatesContext()
+export interface CollectionListTableProps<T extends BaseData>
+  extends Omit<TanstackTableProps<T>, 'table' | 'configuration'> {
+  total?: number
+  data?: T[]
+  columns?: ColumnDef<T, any>[]
+  search?: string[]
+  sortBy?: string[]
 
-  const query = useCollectionListQuery({ slug: context.slug })
+  isLoading?: boolean
+  isError?: boolean
+}
 
-  const deleteMutation = useCollectionDeleteMutation({
-    slug: context.slug,
-    onSuccess: async () => {
-      setRowSelection({})
-      await queryClient.invalidateQueries({
-        queryKey: ['GET', `/${context.slug}`],
-      })
-      toast.success('Deletion successfully')
-    },
-    onError: () => {
-      toast.error('Failed to delete items')
-    },
+export function CollectionListTable<T extends BaseData>(props: CollectionListTableProps<T>) {
+  const context = useCollectionList()
+
+  const table = useListTable({
+    total: props.total ?? context.total,
+    data: props.data ?? context.data ?? [],
+    columns: props.columns ?? context.columns,
+    search: props.search ?? context.search,
+    sortBy: props.sortBy ?? context.sortBy,
   })
 
+  return (
+    <TanstackTable
+      table={table}
+      loadingItems={table.getTotalSize()}
+      className="static"
+      onRowClick="toggleSelect"
+      isLoading={props.isLoading ?? context.isQuerying ?? context.isMutating}
+      isError={props.isError ?? context.isError}
+      configuration={{
+        search: props.search ?? context.search,
+        sortBy: props.sortBy ?? context.sortBy,
+      }}
+      {...props}
+    />
+  )
+}
+
+export function DefaultCollectionListPage() {
+  const navigation = useNavigation()
+
+  const context = useCollectionList()
+
   const columns = useMemo(() => {
-    if (query.isLoading) return context.columns
+    if (context.isQuerying) return context.columns
 
     const columnHelper = createColumnHelper<BaseData>()
     return [
@@ -130,13 +152,7 @@ export function DefaultCollectionListPage() {
                   {context.actions?.delete && (
                     <>
                       {context.actions.one || (context.actions.update && <MenuSeparator />)}
-                      <MenuItem
-                        aria-label="Delete"
-                        isDanger
-                        onAction={() => {
-                          deleteMutation.mutate([row.original.__id.toString()])
-                        }}
-                      >
+                      <MenuItem aria-label="Delete" isDanger onAction={context.deleteRows}>
                         Delete
                       </MenuItem>
                     </>
@@ -148,35 +164,16 @@ export function DefaultCollectionListPage() {
         },
       }),
     ] as ColumnDef<{ __pk: string; __id: string }>[]
-  }, [context.columns, context.actions, query.isLoading])
-
-  const table = useCollectionListTable({
-    total: query.data?.total,
-    data: query.data?.data || [],
-    columns: columns,
-    search: context.search,
-    sortBy: context.sortBy,
-  })
-
-  const isError = deleteMutation.isError || query.isError
-  const isLoading = deleteMutation.isPending || query.isPending || query.isFetching
+  }, [context.columns, context.actions, context.isQuerying])
 
   return (
     <>
-      <CollectionListToolbar />
-      <TanstackTable
-        table={table}
-        loadingItems={pagination.pageSize}
-        className="static"
-        onRowClick="toggleSelect"
-        isLoading={isLoading}
-        isError={isError}
-        configuration={{
-          search: context.search,
-          sortBy: context.sortBy,
-        }}
-      />
-      <CollectionListPagination />
+      <Banner slug={context.slug} />
+      <CollectionListTableContainer>
+        <CollectionListToolbar />
+        <CollectionListTable<any> columns={columns} />
+        <CollectionListPagination />
+      </CollectionListTableContainer>
     </>
   )
 }

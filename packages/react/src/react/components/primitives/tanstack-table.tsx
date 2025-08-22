@@ -16,7 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement>) => void
 
-interface TanstackTableProps<T> {
+export interface TanstackTableProps<T> {
   className?: string
   classNames?: {
     tableContainer?: string

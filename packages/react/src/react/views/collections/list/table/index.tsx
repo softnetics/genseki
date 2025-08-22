@@ -11,7 +11,7 @@ import {
 import type { BaseData } from '../../../../../core/collection'
 import { useTableStatesContext } from '../../../../providers/table'
 
-interface CollectionListTableArgs<TFieldsData extends BaseData> {
+interface UseListTableArgs<TFieldsData extends BaseData> {
   search?: (string | number | symbol)[]
   sortBy?: (string | number | symbol)[]
   total?: number
@@ -23,9 +23,7 @@ interface CollectionListTableArgs<TFieldsData extends BaseData> {
  * @description A flexible hook for creating collection tables with sorting, pagination and row selection.
  * Provides unopinionated table functionality that can be customized for different collection data structures.
  */
-export const useCollectionListTable = <TFieldsData extends BaseData>(
-  args: CollectionListTableArgs<TFieldsData>
-) => {
+export function useListTable<TFieldsData extends BaseData>(args: UseListTableArgs<TFieldsData>) {
   const { pagination, setPagination, rowSelection, setRowSelection, sort, setSort } =
     useTableStatesContext()
   // Get default sort field from configuration

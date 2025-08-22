@@ -41,7 +41,7 @@ export interface AppSidebarProps {
 }
 
 // TODO: Revise this component
-export async function AppSidebar(props: AppSidebarProps) {
+export function AppSidebar(props: AppSidebarProps) {
   return (
     <Sidebar
       collapsible="dock"

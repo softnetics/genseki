@@ -26,7 +26,7 @@ export function CollectionProvider(props: CollectionProviderProps) {
   return <ColectionContext.Provider value={rest}>{children}</ColectionContext.Provider>
 }
 
-export function useCollectionContext() {
+export function useCollection() {
   const value = useContext(ColectionContext)
   if (!value) {
     throw new Error('"useCollectionContext" must be used within a "CollectionProvider"')

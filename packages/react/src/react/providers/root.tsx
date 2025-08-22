@@ -15,6 +15,7 @@ type RootContextValue<TApp extends GensekiAppCompiled = GensekiAppCompiled> = {
   app: GensekiAppClient
   components: {
     AppSidebar: React.FC
+    AppSidebarProvider: React.FC<PropsWithChildren>
     AppSidebarInset: React.FC<PropsWithChildren>
     AppTopbar: React.FC
   }
@@ -65,14 +66,13 @@ export function GensekiProvider(props: {
               sidebar={props.app.sidebar}
             />
           ),
-          AppSidebarInset: () => <SidebarInset />,
+          AppSidebarInset: (props) => <SidebarInset {...props} />,
+          AppSidebarProvider: (props) => <SidebarProvider {...props} />,
         },
       }}
     >
-      <SidebarProvider>
-        <Toast />
-        <UiProviders>{props.children}</UiProviders>
-      </SidebarProvider>
+      <Toast />
+      <UiProviders>{props.children}</UiProviders>
     </GensekiContext.Provider>
   )
 }

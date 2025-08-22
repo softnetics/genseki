@@ -10,8 +10,8 @@ export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
 export type { BaseData, InferField, InferFields, ListConfiguration } from './collection'
 export { ApiDefaultMethod, CollectionBuilder } from './collection'
-export { useCollectionContext } from './collection/context'
-export { useCollectionListContext } from './collection/list/context'
+export { useCollection } from './collection/context'
+export { useCollectionList } from './collection/list/context'
 export {
   createGensekiUiRoute,
   GensekiApp,

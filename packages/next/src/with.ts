@@ -23,6 +23,8 @@ export function withNextJs<TApiRouter extends AnyApiRouter>(
   const compliedApp = app.build()
   const appClient = compliedApp.toClient()
 
+  compliedApp.uis.forEach((ui) => radixRouter.insert(ui.path, ui))
+
   return {
     ...compliedApp,
     radixRouter,

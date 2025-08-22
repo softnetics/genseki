@@ -4,23 +4,47 @@ import type { GensekiAppOptions, GensekiCore, GensekiMiddleware, GensekiUiRouter
 import type { AnyApiRouter } from './endpoint'
 
 export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
-  public readonly core: GensekiCore<TMainApiRouter> = {} as GensekiCore<TMainApiRouter>
-  public readonly middlewares: GensekiMiddleware[] = []
+  private api: TMainApiRouter = {} as TMainApiRouter
+  private uis: GensekiUiRouter[] = []
+  private readonly middlewares: GensekiMiddleware[] = []
 
-  constructor(public readonly options: GensekiAppOptions) {}
+  constructor(private readonly options: GensekiAppOptions) {}
+
+  getApi(): TMainApiRouter {
+    return this.api
+  }
+
+  getUis(): GensekiUiRouter[] {
+    return this.uis
+  }
+
+  getMiddlewares(): GensekiMiddleware[] {
+    return this.middlewares
+  }
 
   addMiddleware(middleware: GensekiMiddleware) {
     this.middlewares.push(middleware)
     return this
   }
 
+  addMiddlewares(middlewares: GensekiMiddleware[]) {
+    this.middlewares.push(...middlewares)
+    return this
+  }
+
   addPage<TProps = any>(page: GensekiUiRouter<TProps>) {
-    this.core.uis.push(page)
+    this.uis.push(page)
     return this
   }
 
   addPages<TProps = any>(pages: GensekiUiRouter<TProps>[]) {
-    this.core.uis.push(...pages)
+    this.uis.push(...pages)
+    return this
+  }
+
+  overridePage(cb: (pages: GensekiUiRouter[]) => GensekiUiRouter[]) {
+    const newPages = cb(this.uis)
+    this.uis = newPages
     return this
   }
 
@@ -28,9 +52,9 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
     page: (options: GensekiAppOptions) => GensekiUiRouter<TProps> | GensekiUiRouter<TProps>
   ): GensekiAppBuilder<TMainApiRouter> {
     if (typeof page === 'function') {
-      this.core.uis.push(page(this.options))
+      this.uis.push(page(this.options))
     } else {
-      this.core.uis.push(page)
+      this.uis.push(page)
     }
     return this
   }
@@ -47,15 +71,15 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
         }
   ): GensekiAppBuilder<TMainApiRouter & TApiRouter> {
     if (typeof args === 'function') return this.addPageAndApiRouter(args(this.options))
-    this.core.uis.push(args.ui)
-    this.core.api = deepmerge(this.core.api ?? {}, args.api ?? {}) as TMainApiRouter
+    this.uis.push(args.ui)
+    this.api = deepmerge(this.api ?? {}, args.api ?? {}) as TMainApiRouter
     return this as unknown as GensekiAppBuilder<TMainApiRouter & TApiRouter>
   }
 
   addApiRouter<TApiRouter extends AnyApiRouter>(
     router: TApiRouter
   ): GensekiAppBuilder<TMainApiRouter & TApiRouter> {
-    this.core.api = deepmerge(this.core.api ?? {}, router ?? {}) as TMainApiRouter
+    this.api = deepmerge(this.api ?? {}, router ?? {}) as TMainApiRouter
     return this as unknown as GensekiAppBuilder<TMainApiRouter & TApiRouter>
   }
 }

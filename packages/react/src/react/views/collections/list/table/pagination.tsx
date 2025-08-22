@@ -1,6 +1,6 @@
 'use client'
 
-import { useCollectionContext } from '../../../../../core/collection/context'
+import { useCollection } from '../../../../../core/collection/context'
 import { PageSizeSelect, Pagination } from '../../../../components'
 import { usePagination } from '../../../../hooks/use-pagination'
 import { useCollectionListQuery } from '../hooks/use-collection-list'
@@ -10,7 +10,7 @@ export interface CollectionListPaginationProps {
 }
 
 export function CollectionListPagination(props: CollectionListPaginationProps) {
-  const context = useCollectionContext()
+  const context = useCollection()
 
   const { pagination, setPagination } = usePagination()
 

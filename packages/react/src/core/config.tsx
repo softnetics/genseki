@@ -124,7 +124,7 @@ const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddleware
 }
 
 export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
-  private readonly pluginBuilder = new GensekiAppBuilder(this.options)
+  private readonly appBuilder = new GensekiAppBuilder(this.options)
 
   private storageRoutesForClient?: {
     putObjSignedUrl: ApiRoutePath
@@ -133,7 +133,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 
   constructor(private readonly options: GensekiAppOptions) {
-    this.pluginBuilder.addMiddleware(unauthorizedMiddleware)
+    this.appBuilder.addMiddleware(unauthorizedMiddleware)
 
     if (this.options.storageAdapter) {
       const { handlers } = createFileUploadHandlers(
@@ -166,7 +166,11 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   apply<const TPlugin extends AnyGensekiPlugin>(
     plugin: TPlugin
   ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
-    plugin.plugin(this.pluginBuilder)
+    const builder = new GensekiAppBuilder(this.options)
+    plugin.plugin(builder)
+    this.appBuilder.addApiRouter({ [plugin.name]: builder.getApi() })
+    this.appBuilder.addPages(builder.getUis())
+    this.appBuilder.addMiddlewares(builder.getMiddlewares())
     return this as unknown as GensekiApp<
       TApiPrefix,
       TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>
@@ -200,7 +204,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
         this.options.storageAdapter.context,
         this.options.storageAdapter
       )
-      this.pluginBuilder.addApiRouter({
+      this.appBuilder.addApiRouter({
         storage: {
           putObjSignedUrl: handlers['file.generatePutObjSignedUrl'],
           getObjSignedUrl: handlers['file.generateGetObjSignedUrl'],
@@ -209,8 +213,8 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       })
     }
 
-    const logs = this._logApiRouter(this.pluginBuilder.core.api).sort((a, b) => a.localeCompare(b))
-    const uiLogs = this._logUis(this.pluginBuilder.core.uis).sort((a, b) => a.localeCompare(b))
+    const logs = this._logApiRouter(this.appBuilder.getApi()).sort((a, b) => a.localeCompare(b))
+    const uiLogs = this._logUis(this.appBuilder.getUis()).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
     uiLogs.forEach((log) => console.log(`${log}`))
 
@@ -232,9 +236,9 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
     return {
       ...appClient,
-      uis: this.pluginBuilder.core.uis,
-      api: this.pluginBuilder.core.api as TMainApiRouter,
-      middlewares: this.pluginBuilder.middlewares,
+      uis: this.appBuilder.getUis(),
+      api: this.appBuilder.getApi() as TMainApiRouter,
+      middlewares: this.appBuilder.getMiddlewares(),
       toClient: () => appClient,
     }
   }
