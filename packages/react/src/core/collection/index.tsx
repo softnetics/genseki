@@ -421,10 +421,15 @@ export type ExtractSortableColumns<TFields extends Fields> = {
     : never
 }[keyof TFields['shape']]
 
+export type ExtractFilterableColumns<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape ? K : never
+}[keyof TFields['shape']]
+
 // ListConfiguration
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
   sortBy?: ExtractSortableColumns<TFields>[]
+  filterBy?: ExtractFilterableColumns<TFields>[]
 }
 
 export interface CollectionListResponse {

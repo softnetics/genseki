@@ -22,12 +22,15 @@ export function CollectionListFilter(props: CollectionListFilterProps) {
   const createRandomText = () => {
     const random0to5 = (): number => Math.floor(Math.random() * 6)
     const arr = [
-      'AAAAAAAAAAAAAAAAAAAA',
-      'BBBBBBBBBBBBBBBBBB',
-      'CCCCCCCCCCCCCCCCCC',
-      'DDDDDDDDDDDDDDDDDD',
-      'EEEEEEEEEEEEEEEEEE',
-      'FFFFFFFFFFFFFFFFFF',
+      '{"title":"o","isActive":"true"}',
+      '{"title":"o","isActive":"true"}',
+      '{"title":"o","isActive":"true"}',
+      '{"author":{"email":{"contains":"gmail"}}}',
+      '{"author":{"email":{"contains":"gmail"}}}',
+      '{"author":{"email":{"contains":"gmail"}}}',
+      // '{"author":{"email":{"contains":"gmail"}},"title":"rr"}',
+      // '{"author":{"email":{"contains":"gmail"}},"title":"rr"}',
+      // '{"author":{"email":{"contains":"gmail"}},"title":"rr"}',
     ]
     return arr[random0to5()]
   }

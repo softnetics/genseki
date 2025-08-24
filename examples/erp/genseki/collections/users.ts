@@ -41,6 +41,7 @@ export const usersCollection = createPlugin('users', (app) => {
         configuration: {
           search: ['name'],
           sortBy: ['name'],
+          filterBy: ['name', 'email'],
         },
       })
     )

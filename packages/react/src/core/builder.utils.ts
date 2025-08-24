@@ -40,6 +40,82 @@ const zStringPositiveNumberOptional = z
   })
   .transform((val) => (val ? Number(val) : undefined))
 
+// ------------ Some helper for filtering WHERE
+
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === 'object' && !Array.isArray(v)
+}
+
+function getValueFromPath(obj: Record<string, unknown>, path: string): unknown {
+  let cur: unknown = obj
+  for (const key of path.split('.')) {
+    if (!isPlainObject(cur)) return undefined
+    cur = cur[key]
+  }
+  return cur
+}
+
+function coercePrimitive(input: any): {
+  kind: 'boolean' | 'number' | 'date' | 'string'
+  value: any
+} {
+  if (typeof input === 'boolean') return { kind: 'boolean', value: input }
+  if (typeof input === 'number' && Number.isFinite(input)) return { kind: 'number', value: input }
+  if (typeof input !== 'string') return { kind: 'string', value: String(input ?? '') }
+
+  const s = input.trim()
+  if (s === 'true' || s === 'false') return { kind: 'boolean', value: s === 'true' }
+  const n = Number(s)
+  if (!Number.isNaN(n) && s !== '') return { kind: 'number', value: n }
+
+  // loose ISO-ish date detection
+  if (/^\d{4}-\d{2}-\d{2}(?:[T ]\d{2}:\d{2}(:\d{2})?(?:\.\d+)?Z?)?$/.test(s)) {
+    const d = new Date(s)
+    if (!Number.isNaN(d.getTime())) return { kind: 'date', value: d }
+  }
+  return { kind: 'string', value: s }
+}
+
+// Helper: turn a filter string into a key/value map.
+// - Accepts JSON:    '{"name":"sam","isActive":"true"}'
+//   (also supports nested objects like {"author":{"email":{"contains":"eieio"}}})
+// - Or pairs list:   'name=sam,isActive=true,createdAtFrom=2025-01-01'
+//   (comma/semicolon/ampersand separators; preserves dot keys like "author.email")
+export function parseFilterStringToKeyValueMap(filterString: string): Record<string, any> {
+  // Try JSON first (preserves nested relation objects)
+  try {
+    const parsed = JSON.parse(filterString)
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as Record<string, any>
+    }
+  } catch {
+    // ignore JSON errors and fall through to pair parsing
+  }
+
+  // Fallback to "key=value" (or "key:value") pairs
+  const result: Record<string, any> = {}
+
+  const pairs = filterString
+    .split(/[,&;]+/) // support ',', '&', ';' as separators
+    .map((segment) => segment.trim())
+    .filter(Boolean)
+
+  for (const pair of pairs) {
+    const [rawKey, ...rawValueParts] = pair.split(/[:=]/) // allow ':' or '='
+    if (!rawKey || rawValueParts.length === 0) continue
+
+    const key = rawKey.trim() // keep dot-keys like "author.email"
+    const value = rawValueParts.join('=').trim() // rejoin to keep '=' inside values
+
+    // Do NOT coerce here (keep strings) — your where-builder handles booleans/numbers/dates.
+    result[key] = value
+  }
+
+  return result
+}
+
+// ------------ Some helper for filtering WHERE
+
 function createCollectionDefaultCreateHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields
@@ -136,14 +212,19 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
     const search = args.search
     const sortBy = args.sortBy
     const sortOrder = args.sortOrder
+    const filter = args.filter
 
     const where: any = {}
 
-    // console.log('model >> ', model) // type ?
-    // console.log('listConfiguration >>> ', listConfiguration) // ?? whats this
-    console.log('+++++ What am I getting at api side >> ', args)
-
-    // Filter === Where
+    console.log('listConfiguration >>> ', listConfiguration) // ?? whats this
+    console.log('+++++ What am I getting at api side >> ', {
+      page,
+      pageSize,
+      search,
+      sortBy,
+      sortOrder,
+      filter,
+    })
 
     // Configured searchable columns.
     if (search && search.trim()) {
@@ -162,6 +243,175 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
             mode: 'insensitive',
           },
         }))
+      }
+    }
+
+    // Configured filterable columns.
+    // Compose AND conditions using listConfiguration.filterBy and DataType rules
+    if (filter && filter.trim()) {
+      // ---- before doing any filters:
+      const configuredRaw = Array.isArray(listConfiguration?.filterBy)
+        ? listConfiguration!.filterBy!
+        : []
+      // normalize keys to strings for safe .includes() and object indexing
+      const configured = configuredRaw.map((k) => String(k))
+
+      // split into scalar keys and relation dot-paths
+      const scalarFieldNames = configured.filter((fieldNameStr) => {
+        if (fieldNameStr.includes('.')) return false
+        const dataType = model.shape.columns[fieldNameStr]?.dataType
+        return (
+          dataType === DataType.STRING ||
+          dataType === DataType.BOOLEAN ||
+          dataType === DataType.DATETIME ||
+          dataType === DataType.BIGINT ||
+          dataType === DataType.INT ||
+          dataType === DataType.FLOAT ||
+          dataType === DataType.DECIMAL
+        )
+      })
+
+      const relationPathFieldNames = configured.filter((fieldNameStr) => fieldNameStr.includes('.'))
+
+      console.log('this is what I can take (scalars) >> ', scalarFieldNames)
+      console.log('this is what I can take (relations) >> ', relationPathFieldNames)
+
+      // parsedFilterMap stays the same as you have
+      const parsedFilterMap = parseFilterStringToKeyValueMap(filter)
+      const andConditions: any[] = []
+
+      // fast-path for direct relation objects (unchanged)
+      for (const [topKey, maybeObj] of Object.entries(parsedFilterMap)) {
+        if (!model.shape.columns[String(topKey)] && isPlainObject(maybeObj)) {
+          andConditions.push({ [topKey]: maybeObj })
+        }
+      }
+
+      // --- Scalars loop (note: use the *string* key)
+      for (const fieldNameStr of scalarFieldNames) {
+        const columnDefinition = model.shape.columns[fieldNameStr]
+        const dataType = columnDefinition?.dataType
+        const value = parsedFilterMap[fieldNameStr]
+
+        switch (dataType) {
+          case DataType.STRING: {
+            if (typeof value === 'string' && value.trim()) {
+              andConditions.push({
+                [fieldNameStr]: { contains: value.trim(), mode: 'insensitive' },
+              })
+            }
+            break
+          }
+          case DataType.BOOLEAN: {
+            if (value === 'true' || value === 'false' || typeof value === 'boolean') {
+              andConditions.push({ [fieldNameStr]: value === true || value === 'true' })
+            }
+            break
+          }
+          case DataType.DATETIME: {
+            const fromValue = parsedFilterMap[`${fieldNameStr}From`]
+            const toValue = parsedFilterMap[`${fieldNameStr}To`]
+            if (fromValue || toValue) {
+              andConditions.push({
+                [fieldNameStr]: {
+                  ...(fromValue ? { gte: new Date(fromValue) } : {}),
+                  ...(toValue ? { lte: new Date(toValue) } : {}),
+                },
+              })
+            } else if (typeof value === 'string' && value) {
+              andConditions.push({ [fieldNameStr]: new Date(value) })
+            }
+            break
+          }
+          case DataType.BIGINT: {
+            const minValue = parsedFilterMap[`${fieldNameStr}Min`]
+            const maxValue = parsedFilterMap[`${fieldNameStr}Max`]
+            const range: any = {}
+            if (typeof minValue === 'string' && minValue !== '') {
+              try {
+                range.gte = BigInt(minValue)
+              } catch {
+                //
+              }
+            }
+            if (typeof maxValue === 'string' && maxValue !== '') {
+              try {
+                range.lte = BigInt(maxValue)
+              } catch {
+                //
+              }
+            }
+            if (range.gte !== undefined || range.lte !== undefined) {
+              andConditions.push({ [fieldNameStr]: range })
+            } else if (typeof value === 'string' && value !== '') {
+              try {
+                andConditions.push({ [fieldNameStr]: BigInt(value) })
+              } catch {
+                //
+              }
+            }
+            break
+          }
+          case DataType.INT:
+          case DataType.FLOAT: {
+            const minValue = parsedFilterMap[`${fieldNameStr}Min`]
+            const maxValue = parsedFilterMap[`${fieldNameStr}Max`]
+            const range: any = {}
+            if (typeof minValue === 'string' && minValue !== '') range.gte = Number(minValue)
+            if (typeof maxValue === 'string' && maxValue !== '') range.lte = Number(maxValue)
+            if (range.gte !== undefined || range.lte !== undefined) {
+              andConditions.push({ [fieldNameStr]: range })
+            } else if (typeof value === 'string' && value !== '' && !Number.isNaN(Number(value))) {
+              andConditions.push({ [fieldNameStr]: Number(value) })
+            }
+            break
+          }
+          case DataType.DECIMAL: {
+            const minValue = parsedFilterMap[`${fieldNameStr}Min`]
+            const maxValue = parsedFilterMap[`${fieldNameStr}Max`]
+            const range: any = {}
+            if (typeof minValue === 'string' && minValue !== '') range.gte = minValue
+            if (typeof maxValue === 'string' && maxValue !== '') range.lte = maxValue
+            if (range.gte !== undefined || range.lte !== undefined) {
+              andConditions.push({ [fieldNameStr]: range })
+            } else if (typeof value === 'string' && value !== '') {
+              andConditions.push({ [fieldNameStr]: value })
+            }
+            break
+          }
+          default:
+            break
+        }
+      }
+
+      // --- Relation dot-paths
+      for (const path of relationPathFieldNames) {
+        const raw =
+          parsedFilterMap[path] !== undefined
+            ? parsedFilterMap[path]
+            : getValueFromPath(parsedFilterMap as any, path)
+        if (raw === undefined) continue
+
+        const [relation, leaf] = path.split('.')
+        if (!relation || !leaf) continue
+
+        if (isPlainObject(raw)) {
+          andConditions.push({ [relation]: { [leaf]: raw } })
+        } else {
+          const coerced = coercePrimitive(raw)
+          if (coerced.kind === 'string') {
+            andConditions.push({
+              [relation]: { [leaf]: { contains: coerced.value, mode: 'insensitive' } },
+            })
+          } else {
+            andConditions.push({ [relation]: { [leaf]: coerced.value } })
+          }
+        }
+      }
+
+      if (andConditions.length > 0) {
+        if (Array.isArray(where.AND)) where.AND.push(...andConditions)
+        else where.AND = andConditions
       }
     }
 

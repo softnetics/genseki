@@ -81,14 +81,18 @@ export function PostClientToolbar() {
  */
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
   const context = useCollectionList()
-  const { setRowSelection } = useTableStatesContext()
+  const { setRowSelection, debouncedSearch, debouncedFilter } = useTableStatesContext()
 
   const queryClient = useQueryClient()
 
   const navigation = useNavigation()
 
   // Example of fethcing list data
-  const query = useCollectionListQuery({ slug: context.slug })
+  const query = useCollectionListQuery({
+    slug: context.slug,
+    search: debouncedSearch,
+    filter: debouncedFilter,
+  })
 
   const deleteMutation = useCollectionDeleteMutation({
     slug: context.slug,
@@ -204,6 +208,8 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
     data: query.data?.data || [],
     columns: enhancedColumns,
   })
+
+  console.log('Inside query >>> ', query.data)
 
   return (
     <>
