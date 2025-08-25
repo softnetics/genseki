@@ -10,6 +10,7 @@ import {
   type CollectionLayoutProps,
   CreateView,
   DefaultCollectionLayout,
+  HomeView,
   OneView,
   UpdateView,
 } from '../../react'
@@ -53,6 +54,7 @@ import {
   type FieldsOptions,
 } from '../field'
 import type { DataType, InferDataType, ModelSchemas } from '../model'
+import type { GensekiPluginBuilderOptions } from '../plugin'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
@@ -432,13 +434,31 @@ export class CollectionBuilder<
   ) {}
 
   overrideHomePage() {
-    return (pages: GensekiUiRouter[]) => {
+    return (pages: GensekiUiRouter[], options: GensekiPluginBuilderOptions) => {
       const homePageIndex = pages.findIndex(
         (page) => page.id === GensekiUiCommonId.COLLECTIONS_HOME
       )
 
       if (homePageIndex === -1) {
-        return pages
+        return [
+          ...pages,
+          createGensekiUiRoute({
+            id: GensekiUiCommonId.COLLECTIONS_HOME,
+            requiredAuthenticated: true,
+            path: `${this.config.uiPathPrefix}`,
+            context: this.context,
+            render: (args) => {
+              return (
+                <DefaultCollectionLayout pathname={args.pathname} {...options}>
+                  <HomeView {...args.props} />
+                </DefaultCollectionLayout>
+              )
+            },
+            props: {
+              cards: [{ name: this.slug, path: `${this.config.uiPathPrefix}/${this.slug}` }],
+            } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTIONS_HOME],
+          }),
+        ]
       }
 
       const homePage: GensekiUiRouter<

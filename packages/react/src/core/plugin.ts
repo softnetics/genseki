@@ -32,7 +32,7 @@ export class GensekiPluginBuilder<TMainApiRouter extends FlatApiRouter = {}> {
     return this.uis
   }
 
-  getOptions(): GensekiAppOptions {
+  getOptions(): GensekiPluginBuilderOptions {
     return this.options
   }
 
@@ -60,8 +60,10 @@ export class GensekiPluginBuilder<TMainApiRouter extends FlatApiRouter = {}> {
     return this
   }
 
-  overridePages(cb: (pages: GensekiUiRouter[]) => GensekiUiRouter[]) {
-    const newPages = cb(this.uis)
+  overridePages(
+    cb: (pages: GensekiUiRouter[], options: GensekiPluginBuilderOptions) => GensekiUiRouter[]
+  ) {
+    const newPages = cb(this.uis, this.options)
     this.uis = newPages
     return this
   }

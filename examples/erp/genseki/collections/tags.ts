@@ -15,6 +15,7 @@ export const tagsCollection = createPlugin('tags', (app) => {
   const collection = new CollectionBuilder('tags', context, FullModelSchemas)
 
   return app
+    .overridePages(collection.overrideHomePage())
     .addPageAndApiRouter(
       collection.list(fields, {
         columns: columns,

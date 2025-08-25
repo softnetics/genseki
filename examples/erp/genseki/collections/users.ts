@@ -32,6 +32,7 @@ export const usersCollection = createPlugin('users', (app) => {
   const collection = new CollectionBuilder('users', context, FullModelSchemas)
 
   return app
+    .overridePages(collection.overrideHomePage())
     .addApiRouter(collection.listApiRouter(fields))
     .addApiRouter(collection.updateApiRouter(fields))
     .addPageAndApiRouter(
