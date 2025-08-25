@@ -1,8 +1,8 @@
 'use client'
 
 import { PageSizeSelect, Pagination } from '../../../../components'
-import { useCollection } from '../../context'
 import { usePagination } from '../../../../hooks/use-pagination'
+import { useCollection } from '../../context'
 import { useCollectionListQuery } from '../hooks/use-collection-list'
 
 export interface CollectionListPaginationProps {
