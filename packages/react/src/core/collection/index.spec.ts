@@ -59,7 +59,7 @@ describe('Collection', () => {
     type Expected = {
       __pk: string | number
       __id: string | number
-      nameField: string
+      nameField?: string | null
       postsField: {
         __pk: string | number
         __id: string | number
@@ -71,11 +71,11 @@ describe('Collection', () => {
           nameField: string
         }[]
       }[]
-      profileField: {
+      profileField?: {
         __id: string | number
         __pk: string | number
         userIdField: string
-      }
+      } | null
     }
 
     expectTypeOf<Expect<Input, Expected>>().toEqualTypeOf<true>()
@@ -85,7 +85,7 @@ describe('Collection', () => {
     type Input = InferCreateFields<typeof userFields>
 
     type Expected = {
-      nameField: string
+      nameField?: string | null
       postsField: {
         create?: {
           titleField: string
@@ -110,7 +110,7 @@ describe('Collection', () => {
     type Input = InferUpdateFields<typeof userFields>
 
     type Expected = {
-      nameField: string
+      nameField?: string | null
       postsField: {
         create?: {
           titleField: string

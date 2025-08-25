@@ -125,7 +125,13 @@ export type InferUpdateFieldShape<TFieldShape extends FieldShape> = ApplyFieldPr
           ? Simplify<InferUpdateRelationField<TFieldShape, 'create' | 'connect' | 'disconnect'>>
           : never
     : TFieldShape extends FieldColumnShape
-      ? InferDataType<TFieldShape['$server']['column']['dataType']>
+      ? TFieldShape['$server']['column']['isList'] extends true
+        ? TFieldShape['$server']['column']['isRequired'] extends true
+          ? InferDataType<TFieldShape['$server']['column']['dataType']>[]
+          : InferDataType<TFieldShape['$server']['column']['dataType']>[] | undefined | null
+        : TFieldShape['$server']['column']['isRequired'] extends true
+          ? InferDataType<TFieldShape['$server']['column']['dataType']>
+          : InferDataType<TFieldShape['$server']['column']['dataType']> | undefined | null
       : never,
   TFieldShape
 >
@@ -179,7 +185,13 @@ export type InferCreateFieldShape<TFieldShape extends FieldShape> = ApplyFieldPr
           ? Simplify<InferCreateRelationField<TFieldShape, 'create' | 'connect'>>
           : never
     : TFieldShape extends FieldColumnShape
-      ? InferDataType<TFieldShape['$server']['column']['dataType']>
+      ? TFieldShape['$server']['column']['isList'] extends true
+        ? TFieldShape['$server']['column']['isRequired'] extends true
+          ? InferDataType<TFieldShape['$server']['column']['dataType']>[]
+          : InferDataType<TFieldShape['$server']['column']['dataType']>[] | undefined | null
+        : TFieldShape['$server']['column']['isRequired'] extends true
+          ? InferDataType<TFieldShape['$server']['column']['dataType']>
+          : InferDataType<TFieldShape['$server']['column']['dataType']> | undefined | null
       : never,
   TFieldShape
 >
@@ -200,23 +212,32 @@ export type InferRelationField<
 export type InferField<TField extends FieldShapeBase> = TField extends FieldRelationShape
   ? TField['$server']['relation']['isList'] extends true
     ? // TODO: Order field
-      InferFields<TField['fields']>[]
-    : InferFields<TField['fields']>
+      TField['$server']['relation']['isRequired'] extends true
+      ? _InferFields<TField['fields']>[]
+      : _InferFields<TField['fields']>[] | undefined | null
+    : TField['$server']['relation']['isRequired'] extends true
+      ? _InferFields<TField['fields']>
+      : _InferFields<TField['fields']> | undefined | null
   : TField extends FieldColumnShape
-    ? InferDataType<TField['$server']['column']['dataType']>
+    ? TField['$server']['column']['isList'] extends true
+      ? TField['$server']['column']['isRequired'] extends true
+        ? InferDataType<TField['$server']['column']['dataType']>[]
+        : InferDataType<TField['$server']['column']['dataType']>[] | undefined | null
+      : TField['$server']['column']['isRequired'] extends true
+        ? InferDataType<TField['$server']['column']['dataType']>
+        : InferDataType<TField['$server']['column']['dataType']> | undefined | null
     : never
 
-export type InferFields<TFields extends Fields> = SimplifyConditionalExcept<
+type _InferFields<TFields extends Fields> = SimplifyConditionalExcept<
   {
     -readonly [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeBase
       ? InferField<TFields['shape'][TKey]>
       : never
-  } & {
-    __pk: string | number
-    __id: string | number
-  },
+  } & { __id: string | number; __pk: string | number },
   never
 >
+
+export type InferFields<TFields extends Fields> = UndefinedToOptional<_InferFields<TFields>>
 
 export interface ServerApiHandlerArgs<TContext extends AnyContextable, TFields extends Fields> {
   slug: string
