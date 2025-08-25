@@ -192,13 +192,13 @@ export const postsCollection = createPlugin('posts', (app) => {
           search: ['title'],
           sortBy: ['updatedAt', 'title'],
         },
-        actions: { delete: true, update: true },
+        actions: { delete: true, update: true, create: true },
         layout: Layout,
         page: Page,
       })
     )
     .addPageAndApiRouter(collection.create(fields, { options: options }))
-    .addApiRouter(collection.updateApiRouter(fields, { options: options }))
+    .addPageAndApiRouter(collection.update(fields, { options: options }))
     .addApiRouter(collection.deleteApiRouter(fields))
 })
 

@@ -699,7 +699,7 @@ export class CollectionBuilder<
                   {...args.params}
                   {...defaultArgs}
                   identifier={args.params.identifier}
-                  updateDefault={{} as any} // TODO
+                  updateDefault={route.updateDefault}
                 />
               </DefaultCollectionLayout>
             </CollectionProvider>
