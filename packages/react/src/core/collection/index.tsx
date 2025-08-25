@@ -455,7 +455,7 @@ export class CollectionBuilder<
               )
             },
             props: {
-              cards: [{ name: this.slug, path: `${this.config.uiPathPrefix}/${this.slug}` }],
+              cards: [{ name: this.slug, path: `/admin${this.config.uiPathPrefix}/${this.slug}` }],
             } satisfies GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTIONS_HOME],
           }),
         ]
@@ -469,7 +469,7 @@ export class CollectionBuilder<
         ...homePage.props,
         cards: [
           ...(homePage.props?.cards ?? []),
-          { name: this.slug, path: `${this.config.uiPathPrefix}/${this.slug}` },
+          { name: this.slug, path: `/admin${this.config.uiPathPrefix}/${this.slug}` },
         ],
       }
 
