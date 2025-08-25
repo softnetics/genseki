@@ -1,6 +1,6 @@
 {
   "name": "@example/ui-playground",
-  "version": "0.1.0-alpha.34",
+  "version": "0.1.0-alpha.35",
   "private": true,
   "scripts": {
     "dev": "NODE_OPTIONS='--inspect' next dev --port 3003 --turbopack",

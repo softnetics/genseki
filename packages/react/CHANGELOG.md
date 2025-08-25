@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.36
+
+### Minor Changes
+
+- [#156](https://github.com/softnetics/genseki/pull/156) [`dfad76d`](https://github.com/softnetics/genseki/commit/dfad76d328581be2a322609628a920771ad0013a) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Custimizable list page UI and components, developer can compose the entirely page from scratch
+
+### Patch Changes
+
+- [#127](https://github.com/softnetics/genseki/pull/127) [`82f9f33`](https://github.com/softnetics/genseki/commit/82f9f331f8441baeb4ecece932dbc5f16c27852d) Thanks [@t0ngk](https://github.com/t0ngk)! - fix optional relation fields
+
 ## 0.1.0-alpha.35
 
 ### Patch Changes
