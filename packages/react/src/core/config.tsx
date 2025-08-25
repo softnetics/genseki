@@ -1,24 +1,20 @@
 import { type ReactNode } from 'react'
 
 import * as R from 'remeda'
-import type { Promisable } from 'type-fest'
+import type { Promisable, Simplify } from 'type-fest'
 
-import {
-  type AnyContextable,
-  type AnyRequestContextable,
-  type ApiRouter,
-  createFileUploadHandlers,
-} from '.'
-import { type AnyApiRouter, type ApiRoutePath, isApiRoute } from './endpoint'
+import type { AnyContextable, AnyRequestContextable } from './context'
+import { type ApiRoutePath, type FlatApiRouter } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
   type StorageAdapter,
   type StorageAdapterClient,
 } from './file-storage-adapters/generic-adapter'
+import { createFileUploadHandlers } from './file-storage-adapters/handlers'
 import {
   type AnyGensekiPlugin,
-  GensekiAppBuilder,
+  GensekiPluginBuilder,
   type InferApiRouterFromGensekiPlugin,
 } from './plugin'
 import { getEditorProviderClientProps } from './richtext'
@@ -78,17 +74,22 @@ export type GensekiMiddleware = (
 export interface GensekiAppOptions {
   title: string
   version: string
-  apiPrefix?: string
-  pagePathPrefix?: string
-  components?: {
-    NotFound?: () => ReactNode
-  }
+  appBaseUrl: string
+  appPathPrefix?: string // default to /admin
+  apiBaseUrl?: string // default to "appBaseUrl"
+  apiPathPrefix?: string // default to /admin/api
   sidebar?: AppSideBarBuilderProps
   storageAdapter?: StorageAdapter
   middlewares?: GensekiMiddleware[]
 }
 
-export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
+export interface GensekiAppOptionsWithDefaults extends GensekiAppOptions {
+  appPathPrefix: string // default to /admin
+  apiBaseUrl: string // default to "appBaseUrl"
+  apiPathPrefix: string // default to /admin/api
+}
+
+export interface GensekiCore<TApiRouter extends FlatApiRouter = {}> {
   api: TApiRouter
   uis: GensekiUiRouter[]
 }
@@ -96,20 +97,18 @@ export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
 export interface GensekiAppClient {
   title: string
   version: string
-  apiPrefix?: string
+  appBaseUrl: string
+  appPathPrefix?: string // default to /admin
+  apiBaseUrl: string // default to "appBaseUrl"
+  apiPathPrefix?: string // default to /admin/api
   sidebar?: AppSideBarBuilderProps
-  pagePathPrefix?: string
   storageAdapter?: StorageAdapterClient
 }
-export interface GensekiAppCompiled<TApiRouter extends AnyApiRouter = AnyApiRouter> {
-  title: string
-  version: string
-  apiPrefix?: string
-  pagePathPrefix?: string
+export interface GensekiAppCompiled<TApiRouter extends FlatApiRouter = {}>
+  extends GensekiAppClient {
   api: TApiRouter
   uis: GensekiUiRouter[]
   middlewares?: GensekiMiddleware[]
-  storageAdapter?: StorageAdapterClient
   toClient: () => GensekiAppClient
 }
 
@@ -123,8 +122,10 @@ const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddleware
   }
 }
 
-export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
-  private readonly appBuilder = new GensekiAppBuilder(this.options)
+export class GensekiApp<TMainApiRouter extends FlatApiRouter = {}> {
+  private readonly pluginBuilder: GensekiPluginBuilder
+
+  private readonly options: GensekiAppOptionsWithDefaults
 
   private storageRoutesForClient?: {
     putObjSignedUrl: ApiRoutePath
@@ -132,15 +133,23 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     deleteObjSignedUrl: ApiRoutePath
   }
 
-  constructor(private readonly options: GensekiAppOptions) {
-    this.appBuilder.addMiddleware(unauthorizedMiddleware)
+  constructor(options: GensekiAppOptions) {
+    this.options = {
+      ...options,
+      appPathPrefix: options.appPathPrefix ?? '/admin',
+      apiPathPrefix: options.apiPathPrefix ?? '/admin/api',
+      apiBaseUrl: options.apiBaseUrl ?? options.appBaseUrl,
+    }
+
+    this.pluginBuilder = new GensekiPluginBuilder(this.options)
+
+    this.pluginBuilder.addMiddleware(unauthorizedMiddleware)
 
     if (this.options.storageAdapter) {
       const { handlers } = createFileUploadHandlers(
         this.options.storageAdapter.context,
         this.options.storageAdapter
       )
-      const apiPrefix = this.options.apiPrefix ?? '/api'
 
       const putHandler = handlers['file.generatePutObjSignedUrl']
       const getHandler = handlers['file.generateGetObjSignedUrl']
@@ -149,15 +158,15 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       this.storageRoutesForClient = {
         putObjSignedUrl: {
           method: putHandler.schema.method,
-          path: `${apiPrefix}${putHandler.schema.path}`,
+          path: `${this.options.apiPathPrefix}${putHandler.schema.path}`,
         },
         getObjSignedUrl: {
           method: getHandler.schema.method,
-          path: `${apiPrefix}${getHandler.schema.path}`,
+          path: `${this.options.apiPathPrefix}${getHandler.schema.path}`,
         },
         deleteObjSignedUrl: {
           method: deleteHandler.schema.method,
-          path: `${apiPrefix}${deleteHandler.schema.path}`,
+          path: `${this.options.apiPathPrefix}${deleteHandler.schema.path}`,
         },
       }
     }
@@ -165,28 +174,15 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
   apply<const TPlugin extends AnyGensekiPlugin>(
     plugin: TPlugin
-  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>> {
-    const builder = new GensekiAppBuilder(this.options)
-    plugin.plugin(builder)
-    this.appBuilder.addApiRouter({ [plugin.name]: builder.getApi() })
-    this.appBuilder.addPages(builder.getUis())
-    this.appBuilder.addMiddlewares(builder.getMiddlewares())
-    return this as unknown as GensekiApp<
-      TApiPrefix,
-      TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>
-    >
+  ): GensekiApp<Simplify<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>> {
+    plugin.plugin(this.pluginBuilder)
+    return this as unknown as GensekiApp<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
   }
 
-  private _logApiRouter(router: ApiRouter): string[] {
+  private _logApiRouter(router: FlatApiRouter): string[] {
     const logs: string[] = []
-    if (isApiRoute(router)) {
-      logs.push(`API Route: ${router.schema.method} ${router.schema.path}`)
-      return logs
-    }
-    Object.entries(router).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        logs.push(...this._logApiRouter(value as ApiRouter))
-      }
+    Object.values(router).forEach((route) => {
+      logs.push(`API Route: ${route.schema.method} ${route.schema.path}`)
     })
     return logs
   }
@@ -204,7 +200,7 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
         this.options.storageAdapter.context,
         this.options.storageAdapter
       )
-      this.appBuilder.addApiRouter({
+      this.pluginBuilder.addApiRouter({
         storage: {
           putObjSignedUrl: handlers['file.generatePutObjSignedUrl'],
           getObjSignedUrl: handlers['file.generateGetObjSignedUrl'],
@@ -213,16 +209,18 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       })
     }
 
-    const logs = this._logApiRouter(this.appBuilder.getApi()).sort((a, b) => a.localeCompare(b))
-    const uiLogs = this._logUis(this.appBuilder.getUis()).sort((a, b) => a.localeCompare(b))
+    const logs = this._logApiRouter(this.pluginBuilder.getApi()).sort((a, b) => a.localeCompare(b))
+    const uiLogs = this._logUis(this.pluginBuilder.getUis()).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
     uiLogs.forEach((log) => console.log(`${log}`))
 
     const appClient = {
       title: this.options.title,
       version: this.options.version,
-      apiPrefix: this.options.apiPrefix,
-      pagePathPrefix: this.options.pagePathPrefix,
+      appBaseUrl: this.options.appBaseUrl,
+      appPathPrefix: this.options.appPathPrefix,
+      apiBaseUrl: this.options.apiBaseUrl ?? this.options.appBaseUrl,
+      apiPathPrefix: this.options.apiPathPrefix,
       sidebar: this.options.sidebar,
       storageAdapter: this.storageRoutesForClient
         ? getStorageAdapterClient({
@@ -236,9 +234,9 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
     return {
       ...appClient,
-      uis: this.appBuilder.getUis(),
-      api: this.appBuilder.getApi() as TMainApiRouter,
-      middlewares: this.appBuilder.getMiddlewares(),
+      uis: this.pluginBuilder.getUis(),
+      api: this.pluginBuilder.getApi() as TMainApiRouter,
+      middlewares: this.pluginBuilder.getMiddlewares(),
       toClient: () => appClient,
     }
   }

@@ -1,3 +1,5 @@
+import type React from 'react'
+
 import Color from '@tiptap/extension-color'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
@@ -182,6 +184,7 @@ export const postsCollection = createPlugin('posts', (app) => {
   const collection = new CollectionBuilder('posts', context, FullModelSchemas)
 
   return app
+    .overridePages(collection.overrideHomePage())
     .addPageAndApiRouter(
       collection.list(fields, {
         columns: columns,
@@ -189,12 +192,81 @@ export const postsCollection = createPlugin('posts', (app) => {
           search: ['title'],
           sortBy: ['updatedAt', 'title'],
         },
-        actions: { create: true, delete: true, one: true, update: true },
+        actions: { delete: true, update: true },
         layout: Layout,
         page: Page,
       })
     )
-    .addApiRouter(collection.createApiRouter(fields, { options: options }))
+    .addPageAndApiRouter(collection.create(fields, { options: options }))
     .addApiRouter(collection.updateApiRouter(fields, { options: options }))
     .addApiRouter(collection.deleteApiRouter(fields))
 })
+
+// TODO: THE NEXT SPECIFICATION, INCLUDE RESUABLE LAYOUT
+// const x = [
+//   app.route('/collections', {
+//     middlewares: [],
+//     Component: (serverProps: { children }) => <div>Collections</div>,
+//     routes: [
+//       app.route('', {
+//         Component: (serverProps) => <div>List Posts</div>,
+//       }),
+//       app.route('/posts/create', {
+//         Component: (serverProps) => <div>Create Post</div>,
+//       }),
+//     ],
+//   }),
+
+//   app.route('/api', {
+//     middlewares: [],
+//     routes: [
+//       app.GET(
+//         '/gay',
+//         {
+//           query: Z.object(),
+//           middlewares: [],
+//         },
+//         ({ query }) => {}
+//       ),
+
+//       builder.endpoint(),
+
+//       app.POST('', {
+//         middlewares: [],
+//       }),
+//     ],
+//   }),
+
+//   app.group('A', [
+//     app.route('/api', {
+//       middlewares: [A],
+//       routes: [
+//         app.GET('', {
+//           middlewares: [],
+//         }),
+//       ],
+//     }),
+//   ]),
+
+//   app.group('B', [
+//     app.route('/api', {
+//       middlewares: [B],
+//       routes: [
+//         app.POST('', {
+//           middlewares: [],
+//         }),
+//       ],
+//     }),
+//   ]),
+
+//   collection.list(fields, {}),
+// ]
+
+// type RouteSpec =
+//   | {
+//       Componenet: React.FC
+//     }
+//   | {
+//       GET: () => void
+//       POST: () => void
+//     }

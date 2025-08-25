@@ -1,10 +1,9 @@
 import type {
   ApiRoute,
   ApiRouteHandlerPayload,
-  ApiRouter,
   ApiRouteResponse,
   FilterByMethod,
-  FlattenApiRouter,
+  FlatApiRouter,
   GensekiAppCompiled,
 } from '@genseki/react'
 
@@ -87,8 +86,10 @@ export type RestMethod<TApiRoute extends ApiRoute> = <
   payload: RestPayload<TApiRoute, TPath>
 ) => Promise<RestResponse<TApiRoute, TPath>>
 
-export type RestClient<TApiRouter extends ApiRouter> =
-  FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
+type ValueOf<T> = T[keyof T]
+
+export type RestClient<TApiRouter extends FlatApiRouter> =
+  ValueOf<TApiRouter> extends infer TApiRoute extends ApiRoute
     ? {
         GET: RestMethod<FilterByMethod<TApiRoute, 'GET'>>
         POST: RestMethod<FilterByMethod<TApiRoute, 'POST'>>

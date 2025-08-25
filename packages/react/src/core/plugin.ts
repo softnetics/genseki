@@ -1,14 +1,28 @@
 import { deepmerge } from 'deepmerge-ts'
+import type { Simplify } from 'type-fest'
 
-import type { GensekiAppOptions, GensekiCore, GensekiMiddleware, GensekiUiRouter } from './config'
-import type { AnyApiRouter } from './endpoint'
+import type {
+  GensekiAppOptions,
+  GensekiAppOptionsWithDefaults,
+  GensekiMiddleware,
+  GensekiUiRouter,
+} from './config'
+import {
+  type AnyApiRouter,
+  type ApiRoute,
+  type FlatApiRouter,
+  recordifyApiRouter,
+  type RecordifyApiRoutes,
+} from './endpoint'
 
-export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
+export interface GensekiPluginBuilderOptions extends GensekiAppOptionsWithDefaults {}
+
+export class GensekiPluginBuilder<TMainApiRouter extends FlatApiRouter = {}> {
   private api: TMainApiRouter = {} as TMainApiRouter
   private uis: GensekiUiRouter[] = []
   private readonly middlewares: GensekiMiddleware[] = []
 
-  constructor(private readonly options: GensekiAppOptions) {}
+  constructor(private readonly options: GensekiPluginBuilderOptions) {}
 
   getApi(): TMainApiRouter {
     return this.api
@@ -16,6 +30,10 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
 
   getUis(): GensekiUiRouter[] {
     return this.uis
+  }
+
+  getOptions(): GensekiAppOptions {
+    return this.options
   }
 
   getMiddlewares(): GensekiMiddleware[] {
@@ -28,7 +46,7 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
   }
 
   addMiddlewares(middlewares: GensekiMiddleware[]) {
-    this.middlewares.push(...middlewares)
+    for (const m of middlewares) this.addMiddleware(m)
     return this
   }
 
@@ -38,11 +56,11 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
   }
 
   addPages<TProps = any>(pages: GensekiUiRouter<TProps>[]) {
-    this.uis.push(...pages)
+    for (const page of pages) this.addPage(page)
     return this
   }
 
-  overridePage(cb: (pages: GensekiUiRouter[]) => GensekiUiRouter[]) {
+  overridePages(cb: (pages: GensekiUiRouter[]) => GensekiUiRouter[]) {
     const newPages = cb(this.uis)
     this.uis = newPages
     return this
@@ -50,12 +68,9 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
 
   addPageFn<TProps = any>(
     page: (options: GensekiAppOptions) => GensekiUiRouter<TProps> | GensekiUiRouter<TProps>
-  ): GensekiAppBuilder<TMainApiRouter> {
-    if (typeof page === 'function') {
-      this.uis.push(page(this.options))
-    } else {
-      this.uis.push(page)
-    }
+  ): GensekiPluginBuilder<TMainApiRouter> {
+    if (typeof page === 'function') this.addPage(page(this.options))
+    else this.addPage(page)
     return this
   }
 
@@ -69,39 +84,42 @@ export class GensekiAppBuilder<TMainApiRouter extends AnyApiRouter = {}> {
           ui: GensekiUiRouter<TProps>
           api: TApiRouter
         }
-  ): GensekiAppBuilder<TMainApiRouter & TApiRouter> {
+  ): GensekiPluginBuilder<Simplify<TMainApiRouter & RecordifyApiRoutes<TApiRouter>>> {
     if (typeof args === 'function') return this.addPageAndApiRouter(args(this.options))
-    this.uis.push(args.ui)
-    this.api = deepmerge(this.api ?? {}, args.api ?? {}) as TMainApiRouter
-    return this as unknown as GensekiAppBuilder<TMainApiRouter & TApiRouter>
+    this.addPage(args.ui)
+    this.addApiRouter(args.api)
+    return this as unknown as GensekiPluginBuilder<TMainApiRouter & RecordifyApiRoutes<TApiRouter>>
   }
 
   addApiRouter<TApiRouter extends AnyApiRouter>(
     router: TApiRouter
-  ): GensekiAppBuilder<TMainApiRouter & TApiRouter> {
-    this.api = deepmerge(this.api ?? {}, router ?? {}) as TMainApiRouter
-    return this as unknown as GensekiAppBuilder<TMainApiRouter & TApiRouter>
+  ): GensekiPluginBuilder<Simplify<TMainApiRouter & RecordifyApiRoutes<TApiRouter>>> {
+    const flatApiRouter = recordifyApiRouter(router)
+    this.api = deepmerge(this.api ?? {}, flatApiRouter ?? {}) as TMainApiRouter &
+      RecordifyApiRoutes<TApiRouter>
+    return this as unknown as GensekiPluginBuilder<TMainApiRouter & RecordifyApiRoutes<TApiRouter>>
   }
 }
 
-export interface GensekiPluginOptions extends GensekiAppOptions, GensekiCore<AnyApiRouter> {}
-
-export interface GensekiPlugin<TName extends string, TApiRouter extends AnyApiRouter = {}> {
+export interface GensekiPlugin<
+  TName extends string,
+  TMainApiRouter extends Record<string, ApiRoute> = {},
+> {
   name: TName
-  plugin: (options: GensekiAppBuilder) => GensekiAppBuilder<TApiRouter>
+  plugin: (options: GensekiPluginBuilder) => GensekiPluginBuilder<TMainApiRouter>
 }
 
-export function createPlugin<TName extends string, TApiRouter extends AnyApiRouter = {}>(
+export function createPlugin<
+  TName extends string,
+  TMainApiRouter extends Record<string, ApiRoute> = {},
+>(
   name: TName,
-  plugin: (options: GensekiAppBuilder) => GensekiAppBuilder<TApiRouter>
-): GensekiPlugin<TName, TApiRouter> {
-  return {
-    name: name,
-    plugin: plugin,
-  }
+  plugin: (options: GensekiPluginBuilder) => GensekiPluginBuilder<TMainApiRouter>
+): GensekiPlugin<TName, TMainApiRouter> {
+  return { name: name, plugin: plugin }
 }
 
-export type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
+export type AnyGensekiPlugin = GensekiPlugin<string, Record<string, ApiRoute>>
 
 export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> =
   TPlugin extends GensekiPlugin<string, infer TApiRouter> ? TApiRouter : never

@@ -5,6 +5,7 @@ import React, { createContext, type PropsWithChildren, type ReactNode, useContex
 import { UiProviders } from './ui'
 
 import type { GensekiAppClient, GensekiAppCompiled } from '../../core/config'
+import type { FlatApiRouter } from '../../core/endpoint'
 import { AppSidebar } from '../components/compound/collection-sidebar'
 import { AppTopbarNav } from '../components/compound/collection-sidebar/nav/app-topbar-nav'
 import { SidebarInset, SidebarProvider } from '../components/primitives/sidebar'
@@ -40,7 +41,9 @@ export function useStorageAdapter() {
   return storageAdapter
 }
 
-export function useServerFunction<TApp extends GensekiAppCompiled = GensekiAppCompiled>() {
+export function useServerFunction<
+  TApp extends GensekiAppCompiled = GensekiAppCompiled<FlatApiRouter>,
+>() {
   const context = useContext(GensekiContext)
   if (!context) throw new Error('"useServerFunction" must be used within a "GensekiProvider"')
   return context.serverFunction as unknown as ServerFunction<TApp>

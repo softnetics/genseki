@@ -4,9 +4,9 @@ import { createRouter } from 'radix3'
 import {
   type ApiRoute,
   type ApiRouter,
-  flattenApiRouter,
   type GensekiCore,
   isApiRoute,
+  recordifyApiRouter,
 } from '@genseki/react'
 
 interface RouteData {
@@ -108,7 +108,7 @@ interface ApiResourceRouterOptions {
 export function createApiResourceRouter(core: GensekiCore, options: ApiResourceRouterOptions = {}) {
   const pathPrefix = options.pathPrefix ?? ''
 
-  const flatApiRouter = flattenApiRouter(core.api)
+  const flatApiRouter = recordifyApiRouter(core.api)
 
   const radixGetRouter = createRouter<RouteData>({
     routes: createRadixRoutesFromApiRouter(flatApiRouter, 'GET', { ...options, pathPrefix }),

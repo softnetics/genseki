@@ -32,10 +32,17 @@ export type {
   ApiRouteSchema,
   ApiRouteSchemaClient,
   FilterByMethod,
-  FlattenApiRouter,
+  FlatApiRouter,
+  FlattenApiRoutes,
   InferApiRouteResponses,
 } from './endpoint'
-export { createEndpoint, flattenApiRouter, isApiRoute } from './endpoint'
+export {
+  createEndpoint,
+  flattenApiRoutes,
+  isApiRoute,
+  recordifyApiRouter,
+  recordifyFlattenApiRoutes,
+} from './endpoint'
 export * from './error'
 export type {
   FieldClientBase,
@@ -76,8 +83,7 @@ export {
 export type {
   AnyGensekiPlugin,
   GensekiPlugin,
-  GensekiAppBuilder as GensekiPluginBuilder,
-  GensekiPluginOptions,
+  GensekiPluginBuilder,
   InferApiRouterFromGensekiPlugin,
 } from './plugin'
 export { createPlugin } from './plugin'

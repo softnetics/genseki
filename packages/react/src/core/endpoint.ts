@@ -34,28 +34,58 @@ export type InferPathParams<TPath extends string> = Simplify<
     : never
 >
 
-export type FlattenApiRouter<TApiRouter extends AnyApiRouter> = ValueOf<{
+type _FlattenApiRouter<TApiRouter extends AnyApiRouter> = ValueOf<{
   [TKey in keyof TApiRouter]: TApiRouter[TKey] extends infer TApiRoute extends ApiRoute
-    ? Simplify<TApiRoute>
+    ? TApiRoute
     : TApiRouter[TKey] extends infer TApiRouter extends AnyApiRouter
-      ? Simplify<FlattenApiRouter<TApiRouter>>
+      ? _FlattenApiRouter<TApiRouter>
       : never
 }>
 
-export function flattenApiRouter<TApiRouter extends AnyApiRouter>(
-  apiRouter: TApiRouter,
-  prefix: string = ''
-): Record<string, ApiRoute> {
-  const flattened: Record<string, ApiRoute> = {}
+export type FlattenApiRoutes<TApiRouter extends AnyApiRouter> = _FlattenApiRouter<TApiRouter>[]
+
+export function flattenApiRoutes<TApiRouter extends AnyApiRouter>(
+  apiRouter: TApiRouter
+): FlattenApiRoutes<TApiRouter> {
+  const flattened: ApiRoute[] = []
   for (const key in apiRouter) {
     const route = apiRouter[key]
     if (isApiRoute(route)) {
-      flattened[`${prefix}${key}`] = route
+      flattened.push(route)
       continue
     }
-    Object.assign(flattened, flattenApiRouter(route, `${prefix}${key}.`))
+    flattened.push(...flattenApiRoutes(route))
   }
-  return flattened
+  return flattened as FlattenApiRoutes<TApiRouter>
+}
+
+export type RecordifyFlattenApiRouter<TApiRoutes extends ApiRoute[]> =
+  TApiRoutes[number] extends infer TApiRoute extends ApiRoute
+    ? {
+        [K in `${TApiRoute['schema']['method']} ${TApiRoute['schema']['path']}`]: TApiRoute
+      }
+    : never
+
+export function recordifyFlattenApiRoutes<TApiRoutes extends ApiRoute[]>(
+  routes: TApiRoutes
+): RecordifyFlattenApiRouter<TApiRoutes> {
+  return routes.reduce(
+    (acc, route) => {
+      acc[`${route.schema.method} ${route.schema.path}`] = route
+      return acc
+    },
+    {} as Record<string, ApiRoute>
+  ) as RecordifyFlattenApiRouter<TApiRoutes>
+}
+
+export type RecordifyApiRoutes<TApiRouter extends AnyApiRouter> = RecordifyFlattenApiRouter<
+  FlattenApiRoutes<TApiRouter>
+>
+
+export function recordifyApiRouter<TApiRouter extends AnyApiRouter>(
+  apiRouter: TApiRouter
+): RecordifyApiRoutes<TApiRouter> {
+  return recordifyFlattenApiRoutes(flattenApiRoutes(apiRouter))
 }
 
 export type FilterByMethod<TApiRoute extends ApiRoute, TMethod extends string> = Extract<
@@ -175,6 +205,10 @@ export interface ApiRouter {
 
 export interface AnyApiRouter {
   [key: string]: AnyApiRouter | ApiRoute<AnyApiRouteSchema>
+}
+
+export interface FlatApiRouter {
+  [key: string]: ApiRoute<AnyApiRouteSchema>
 }
 
 export function isApiRoute<TApiRoute extends ApiRoute>(

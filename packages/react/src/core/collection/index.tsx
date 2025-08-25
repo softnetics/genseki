@@ -7,7 +7,6 @@ import type { UndefinedToOptional } from 'type-fest/source/internal'
 import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
 import {
-  AppTopbarNav,
   type CollectionLayoutProps,
   CreateView,
   DefaultCollectionLayout,
@@ -34,7 +33,12 @@ import {
   getCollectionDefaultUpdateDefaultApiRoute,
   getOptionsRoute,
 } from '../builder.utils'
-import { createGensekiUiRoute, type GensekiAppOptions, getFieldsClient } from '../config'
+import {
+  createGensekiUiRoute,
+  type GensekiAppOptions,
+  type GensekiUiRouter,
+  getFieldsClient,
+} from '../config'
 import type { AnyContextable, ContextToRequestContext } from '../context'
 import {
   type FieldColumnShape,
@@ -49,6 +53,7 @@ import {
   type FieldsOptions,
 } from '../field'
 import type { DataType, InferDataType, ModelSchemas } from '../model'
+import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
 
 export type ToZodObject<T extends Record<string, any>> = ZodObject<{
   [Key in keyof T]-?: T[Key] extends undefined
@@ -353,10 +358,8 @@ export type CollectionUpdateConfig<
   options?: Simplify<FieldsOptions<TContext, TFields>>
 }
 
-export type CollectionDeleteApiArgs<
-  TContext extends AnyContextable,
-  TFields extends Fields,
-> = ServerApiHandlerArgs<TContext, TFields> & {
+export interface CollectionDeleteApiArgs<TContext extends AnyContextable, TFields extends Fields>
+  extends ServerApiHandlerArgs<TContext, TFields> {
   ids: string[] | number[]
 }
 
@@ -400,23 +403,60 @@ export interface ListConfiguration<TFields extends Fields> {
   sortBy?: ExtractSortableColumns<TFields>[]
 }
 
-export type CollectionListResponse = {
+export interface CollectionListResponse {
   data: ({ __id: string | number; __pk: string | number } & {})[]
   total: number
   totalPage: number
   currentPage: number
 }
 
+export interface CollectionConfig {
+  apiPathPrefix: string
+  uiPathPrefix: string
+}
+
 export class CollectionBuilder<
   TSlug extends string,
   TContext extends AnyContextable,
   TModelSchemas extends ModelSchemas,
+  TConfig extends CollectionConfig = { apiPathPrefix: ''; uiPathPrefix: '/collections' },
 > {
   constructor(
     private readonly slug: TSlug,
     private readonly context: TContext,
-    private readonly schema: TModelSchemas
+    private readonly schema: TModelSchemas,
+    private readonly config: TConfig = {
+      uiPathPrefix: '/collections',
+      apiPathPrefix: '',
+    } as TConfig
   ) {}
+
+  overrideHomePage() {
+    return (pages: GensekiUiRouter[]) => {
+      const homePageIndex = pages.findIndex(
+        (page) => page.id === GensekiUiCommonId.COLLECTIONS_HOME
+      )
+
+      if (homePageIndex === -1) {
+        return pages
+      }
+
+      const homePage: GensekiUiRouter<
+        GensekiUiCommonProps[typeof GensekiUiCommonId.COLLECTIONS_HOME]
+      > = pages[homePageIndex]
+
+      homePage.props = {
+        ...homePage.props,
+        cards: [
+          ...(homePage.props?.cards ?? []),
+          { name: this.slug, path: `${this.config.uiPathPrefix}/${this.slug}` },
+        ],
+      }
+
+      pages[homePageIndex] = homePage
+      return pages
+    }
+  }
 
   // TODO: Config
   list<TFields extends Fields>(
@@ -427,7 +467,7 @@ export class CollectionBuilder<
       const route = this.listApiRouter(fields)
 
       const ui = createGensekiUiRoute({
-        path: `/collections/${this.slug}`,
+        path: `${this.config.uiPathPrefix}/${this.slug}`,
         context: this.context,
         requiredAuthenticated: true,
         render: (args) => {
@@ -499,7 +539,7 @@ export class CollectionBuilder<
       } satisfies BaseViewProps
 
       const ui = createGensekiUiRoute({
-        path: `/collections/${this.slug}/:identifier`,
+        path: `${this.config.uiPathPrefix}/${this.slug}/:identifier`,
         requiredAuthenticated: true,
         context: this.context,
         render: (args) => {
@@ -513,7 +553,6 @@ export class CollectionBuilder<
               pathname={args.pathname}
             >
               <DefaultCollectionLayout pathname={args.pathname} {...appOptions}>
-                <AppTopbarNav />
                 <OneView
                   {...args}
                   {...args.params}
@@ -558,7 +597,7 @@ export class CollectionBuilder<
       } satisfies BaseViewProps
 
       const ui = createGensekiUiRoute({
-        path: `/collections/${this.slug}/create`,
+        path: `${this.config.uiPathPrefix}/${this.slug}/create`,
         requiredAuthenticated: true,
         context: this.context,
         render: (args) => {
@@ -572,7 +611,6 @@ export class CollectionBuilder<
               pathname={args.pathname}
             >
               <DefaultCollectionLayout pathname={args.pathname} {...appOptions}>
-                <AppTopbarNav />
                 <CreateView {...args} {...args.params} {...defaultArgs} />
               </DefaultCollectionLayout>
             </CollectionProvider>
@@ -622,7 +660,7 @@ export class CollectionBuilder<
       } satisfies BaseViewProps
 
       const ui = createGensekiUiRoute({
-        path: `/collections/${this.slug}/update/:identifier`,
+        path: `${this.config.uiPathPrefix}/${this.slug}/update/:identifier`,
         requiredAuthenticated: true,
         context: this.context,
         render: (args) => {
@@ -636,7 +674,6 @@ export class CollectionBuilder<
               pathname={args.pathname}
             >
               <DefaultCollectionLayout pathname={args.pathname} {...appOptions}>
-                <AppTopbarNav />
                 <UpdateView
                   {...args}
                   {...args.params}

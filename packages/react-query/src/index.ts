@@ -17,10 +17,9 @@ import type { PartialDeep } from 'type-fest'
 import type {
   ApiRoute,
   ApiRouteHandlerPayload,
-  ApiRouter,
   ApiRouteResponse,
   FilterByMethod,
-  FlattenApiRouter,
+  FlatApiRouter,
   GensekiAppCompiled,
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
@@ -194,8 +193,10 @@ type UseOptimisticUpdateQuery<TApiRoute extends ApiRoute> = {
     | undefined
 }
 
-export type QueryClient<TApiRouter extends ApiRouter> =
-  FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
+type ValueOf<T> = T[keyof T]
+
+export type QueryClient<TApiRouter extends FlatApiRouter> =
+  ValueOf<TApiRouter> extends infer TApiRoute extends ApiRoute
     ? {
         useQuery: UseQuery<TApiRoute>
         queryOptions: QueryOptions<TApiRoute>

@@ -21,14 +21,17 @@ export function ForgotPasswordClientForm() {
       return (
         <InputEmailSection
           onNext={async (email) => {
-            const response = await serverFunction('emailAndPassword.sendEmailResetPassword', {
-              body: {
-                email,
-              },
-              headers: {},
-              query: {},
-              pathParams: {},
-            })
+            const response = await serverFunction(
+              'POST /auth/email-and-password/request-reset-password',
+              {
+                body: {
+                  email,
+                },
+                headers: {},
+                query: {},
+                pathParams: {},
+              }
+            )
 
             if (response.status !== 200) {
               toast.error('Failed to send OTP', {

@@ -5,31 +5,12 @@ import {
   type AnyApiRouteSchema,
   type ApiRoute,
   type ApiRouteHandlerBasePayload,
-  type ApiRouter,
   type ApiRouteSchema,
   type GensekiCore,
-  type GetApiRouterFromGensekiCore,
   type GetGensekiApiRouterMethod,
   type GetServerFunctionApiArgs,
   type GetServerFunctionResponse,
-  isApiRoute,
 } from '@genseki/react'
-
-function findApiRoute(apiRouter: ApiRouter, methodName: string): ApiRoute | undefined {
-  const [head, ...tails] = methodName.split('.')
-  const router = apiRouter[head]
-  if (!router) return undefined
-  if (isApiRoute(router) && tails.length === 0) {
-    return router
-  }
-
-  // TODO: Improve split and join logic performance
-  if (!isApiRoute(router)) {
-    return findApiRoute(router, tails.join('.'))
-  }
-
-  return undefined
-}
 
 function createRequest(
   schema: ApiRouteSchema,
@@ -63,15 +44,14 @@ function createResponse() {
 export async function handleServerFunction<
   TCore extends GensekiCore,
   TMethod extends GetGensekiApiRouterMethod<TCore['api']>,
-  TApiArgs extends GetServerFunctionApiArgs<GetApiRouterFromGensekiCore<TCore['api']>, TMethod>,
+  TApiArgs extends GetServerFunctionApiArgs<TCore['api'], TMethod>,
 >(
   core: TCore,
   methodName: TMethod,
   args: TApiArgs
-): Promise<GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore['api']>, TMethod>> {
+): Promise<GetServerFunctionResponse<TCore['api'], TMethod>> {
   try {
-    // TODO: Recusively find the method in the core.api object
-    const apiRoute = findApiRoute(core.api, methodName)
+    const apiRoute = core.api[methodName as keyof typeof core.api] as ApiRoute | undefined
     if (!apiRoute) {
       throw new Error(`No API route found for method: ${methodName as string}`)
     }
@@ -87,7 +67,7 @@ export async function handleServerFunction<
       c.set(setCookieData.name, setCookieData.value, setCookieData)
     }
 
-    return result as GetServerFunctionResponse<GetApiRouterFromGensekiCore<TCore['api']>, TMethod>
+    return result as GetServerFunctionResponse<TCore['api'], TMethod>
   } catch (error) {
     console.error('Error handling server function:', error)
     return {
