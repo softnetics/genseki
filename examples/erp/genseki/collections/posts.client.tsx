@@ -72,6 +72,19 @@ export function PostClientToolbar() {
   return (
     <div>
       <CollectionListToolbar actions={context.actions} />
+      {/* <CollectionListToolbar
+        filterOptions={Object.values(listViewProps.fieldsClient.shape).map((field) => {
+          return {
+            fieldShape: field,
+            optionsName: optionsFetchPathName(field),
+          }
+        })}
+        allowedFilters={listViewProps.listConfiguration?.filterBy || []}
+        actions={listViewProps.actions}
+        slug={listViewProps.slug}
+        isShowDeleteButton={isShowDeleteButton}
+        onDelete={handleBulkDelete}
+      /> */}
     </div>
   )
 }
@@ -81,6 +94,7 @@ export function PostClientToolbar() {
  */
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
   const context = useCollectionList()
+
   const { setRowSelection, debouncedSearch, debouncedFilter } = useTableStatesContext()
 
   const queryClient = useQueryClient()
@@ -208,8 +222,6 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
     data: query.data?.data || [],
     columns: enhancedColumns,
   })
-
-  console.log('Inside query >>> ', query.data)
 
   return (
     <>
