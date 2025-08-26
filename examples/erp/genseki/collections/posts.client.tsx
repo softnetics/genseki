@@ -214,7 +214,6 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
         isLoading={query.isLoading}
         isError={query.isError}
         configuration={{
-          search: context.search,
           sortBy: context.sortBy,
         }}
       />

@@ -17,7 +17,6 @@ import type { BaseData } from '../../types'
 import { useCollectionList } from '../context'
 
 interface UseListTableArgs<TFieldsData extends BaseData> {
-  search?: (string | number | symbol)[]
   sortBy?: (string | number | symbol)[]
   total?: number
   data: TFieldsData[]
@@ -87,7 +86,6 @@ export interface CollectionListTableProps<T extends BaseData>
   total?: number
   data?: T[]
   columns?: ColumnDef<T, any>[]
-  search?: string[]
   sortBy?: string[]
 
   isLoading?: boolean
@@ -101,7 +99,6 @@ export function CollectionListTable<T extends BaseData>(props: CollectionListTab
     total: props.total ?? context.total,
     data: props.data ?? context.data ?? [],
     columns: props.columns ?? context.columns,
-    search: props.search ?? context.search,
     sortBy: props.sortBy ?? context.sortBy,
   })
 
@@ -114,7 +111,6 @@ export function CollectionListTable<T extends BaseData>(props: CollectionListTab
       isLoading={props.isLoading ?? context.isQuerying ?? context.isMutating}
       isError={props.isError ?? context.isError}
       configuration={{
-        search: props.search ?? context.search,
         sortBy: props.sortBy ?? context.sortBy,
       }}
       {...props}

@@ -1,5 +1,5 @@
 'use client'
-import React, { createContext, type ReactNode, useContext } from 'react'
+import React, { createContext, type ReactNode, useContext, useMemo } from 'react'
 
 import { useQueryClient } from '@tanstack/react-query'
 import type { ColumnDef } from '@tanstack/react-table'
@@ -19,6 +19,14 @@ import { TableStatesProvider, useTableStatesContext } from '../../../providers/t
 import { useCollection } from '../context'
 import type { BaseData } from '../types'
 
+interface CollectionListComponents<T extends BaseData = BaseData> {
+  ListBanner: React.FC
+  ListTableContainer: React.FC<CollectionListTableContainerProps>
+  ListTableToolbar: React.FC<CollectionListToolbarProps>
+  ListTable: (props: CollectionListTableProps<T>) => ReactNode
+  ListTablePagination: React.FC
+}
+
 export interface CollectionListContextValue<T extends BaseData = BaseData> {
   // Should split into another context
   slug: string
@@ -31,13 +39,7 @@ export interface CollectionListContextValue<T extends BaseData = BaseData> {
 
   // Only for list
 
-  components: {
-    ListBanner: React.FC
-    ListTableContainer: React.FC<CollectionListTableContainerProps>
-    ListTableToolbar: React.FC<CollectionListToolbarProps>
-    ListTable: (props: CollectionListTableProps<T>) => ReactNode
-    ListTablePagination: React.FC
-  }
+  components: CollectionListComponents<T>
 
   isError?: boolean
   isMutating?: boolean
@@ -111,6 +113,17 @@ function _CollectionListProvider<T extends BaseData>(props: CollectionListProvid
   const data = query.data?.data ?? []
   const total = query.data?.total ?? 0
 
+  const components: CollectionListComponents = useMemo(
+    () => ({
+      ListBanner: () => <Banner slug={context.slug} />,
+      ListTable: (props) => <CollectionListTable {...props} />,
+      ListTableToolbar: (props) => <CollectionListToolbar {...props} />,
+      ListTableContainer: (props) => <CollectionListTableContainer {...props} />,
+      ListTablePagination: (props) => <CollectionListPagination {...props} />,
+    }),
+    [context.slug]
+  )
+
   return (
     <ColectionListContext.Provider
       value={{
@@ -122,13 +135,7 @@ function _CollectionListProvider<T extends BaseData>(props: CollectionListProvid
         isMutating,
         data,
         total,
-        components: {
-          ListBanner: () => <Banner slug={context.slug} />,
-          ListTable: (props) => <CollectionListTable {...props} />,
-          ListTableToolbar: (props) => <CollectionListToolbar {...props} />,
-          ListTableContainer: (props) => <CollectionListTableContainer {...props} />,
-          ListTablePagination: (props) => <CollectionListPagination {...props} />,
-        },
+        components,
         invalidateList,
         deleteRows,
       }}

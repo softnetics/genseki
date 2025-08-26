@@ -1,7 +1,14 @@
 'use client'
 
-import React, { createContext, type PropsWithChildren, type ReactNode, useContext } from 'react'
+import React, {
+  createContext,
+  type PropsWithChildren,
+  type ReactNode,
+  useContext,
+  useMemo,
+} from 'react'
 
+import { useNavigation } from './navigation'
 import { UiProviders } from './ui'
 
 import type { GensekiAppClient, GensekiAppCompiled } from '../../core/config'
@@ -12,14 +19,16 @@ import { SidebarInset, SidebarProvider } from '../components/primitives/sidebar'
 import { Toast } from '../components/primitives/toast'
 import type { ServerFunction } from '../server-function'
 
+interface RootGensekiComponents {
+  AppSidebar: React.FC
+  AppSidebarProvider: React.FC<PropsWithChildren>
+  AppSidebarInset: React.FC<PropsWithChildren>
+  AppTopbar: React.FC
+}
+
 type RootContextValue<TApp extends GensekiAppCompiled = GensekiAppCompiled> = {
   app: GensekiAppClient
-  components: {
-    AppSidebar: React.FC
-    AppSidebarProvider: React.FC<PropsWithChildren>
-    AppSidebarInset: React.FC<PropsWithChildren>
-    AppTopbar: React.FC
-  }
+  components: RootGensekiComponents
   serverFunction: ServerFunction<TApp>
 }
 
@@ -54,24 +63,33 @@ export function GensekiProvider(props: {
   serverFunction: ServerFunction
   children: ReactNode
 }) {
+  const navigation = useNavigation()
+
+  const pathname = navigation.getPathname()
+
+  const components: RootGensekiComponents = useMemo(
+    () => ({
+      AppTopbar: () => <AppTopbarNav />,
+      AppSidebar: () => (
+        <AppSidebar
+          pathname={pathname}
+          title={props.app.title}
+          version={props.app.version}
+          sidebar={props.app.sidebar}
+        />
+      ),
+      AppSidebarInset: (props) => <SidebarInset {...props} />,
+      AppSidebarProvider: (props) => <SidebarProvider {...props} />,
+    }),
+    [props.app, pathname]
+  )
+
   return (
     <GensekiContext.Provider
       value={{
         app: props.app,
         serverFunction: props.serverFunction,
-        components: {
-          AppTopbar: () => <AppTopbarNav />,
-          AppSidebar: () => (
-            <AppSidebar
-              pathname={''} // TODO: Fix pathname
-              title={props.app.title}
-              version={props.app.version}
-              sidebar={props.app.sidebar}
-            />
-          ),
-          AppSidebarInset: (props) => <SidebarInset {...props} />,
-          AppSidebarProvider: (props) => <SidebarProvider {...props} />,
-        },
+        components,
       }}
     >
       <Toast />

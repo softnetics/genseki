@@ -22,7 +22,7 @@ export interface CollectionListToolbarProps {
 export function CollectionListToolbar(props: CollectionListToolbarProps) {
   const context = useCollectionList()
   const queryClient = useQueryClient()
-  const { rowSelectionIds, setRowSelection } = useTableStatesContext()
+  const { rowSelectionIds, setRowSelection, isRowsSelected } = useTableStatesContext()
 
   const actions: CollectionListActions = {
     create: props.actions?.create ?? context.actions?.create,
@@ -30,7 +30,6 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
     delete: props.actions?.delete ?? context.actions?.delete,
     one: props.actions?.one ?? context.actions?.one,
   }
-
   const deleteMutation = useCollectionDeleteMutation({
     slug: context.slug,
     onSuccess: async () => {
@@ -57,7 +56,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
-        {actions?.delete && (
+        {actions?.delete && isRowsSelected && (
           <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />
         )}
         <CollectionListSearch />
