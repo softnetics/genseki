@@ -95,7 +95,7 @@ export function PostClientToolbar() {
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
   const context = useCollectionList()
 
-  const { setRowSelection, debouncedSearch, debouncedFilter } = useTableStatesContext()
+  const { setRowSelection, debouncedFilter } = useTableStatesContext()
 
   const queryClient = useQueryClient()
 
@@ -104,7 +104,6 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
   // Example of fethcing list data
   const query = useCollectionListQuery({
     slug: context.slug,
-    search: debouncedSearch,
     filter: debouncedFilter,
   })
 

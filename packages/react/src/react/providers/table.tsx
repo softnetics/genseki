@@ -25,8 +25,6 @@ export interface TanstackTableContextValue {
   setPagination: UsePaginationReturn['setPagination']
   sort: UseSort['Sort']
   setSort: UseSort['SetSort']
-  // search: UseSearchReturn['search']
-  debouncedSearch: UseSearchReturn['debouncedSearch']
   setSearch: UseSearchReturn['setSearch']
   // filter: UseFilterReturn['filter']
   debouncedFilter: UseFilterReturn['debouncedFilter']
@@ -46,7 +44,6 @@ export const TableStatesProvider = (props: TableStatesProviderProps) => {
   const { pagination, setPagination } = usePagination()
   const { sort, setSort } = useSort()
   const {
-    debouncedSearch,
     // search,
     setSearch,
   } = useSearch()
@@ -74,7 +71,6 @@ export const TableStatesProvider = (props: TableStatesProviderProps) => {
         sort,
         setSort,
         // search,
-        debouncedSearch,
         setSearch,
         // filter,
         debouncedFilter,

@@ -22,6 +22,7 @@ export const tagsCollection = createPlugin('tags', (app) => {
         configuration: {
           search: ['name'],
           sortBy: ['name'],
+          filterBy: ['name'],
         },
       })
     )

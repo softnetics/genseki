@@ -422,7 +422,17 @@ export type ExtractSortableColumns<TFields extends Fields> = {
 }[keyof TFields['shape']]
 
 export type ExtractFilterableColumns<TFields extends Fields> = {
-  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape ? K : never
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+    ? TFields['shape'][K]['$client']['column']['dataType'] extends
+        | typeof DataType.STRING
+        | typeof DataType.INT
+        | typeof DataType.FLOAT
+        | typeof DataType.DATETIME
+        | typeof DataType.BIGINT
+        | typeof DataType.DECIMAL
+      ? Extract<K, string>
+      : never
+    : never
 }[keyof TFields['shape']]
 
 // ListConfiguration
@@ -549,6 +559,7 @@ export class CollectionBuilder<
                 columns={config.columns}
                 search={config.configuration?.search}
                 sortBy={config.configuration?.sortBy}
+                filter={config.configuration?.filterBy}
                 actions={config.actions}
               >
                 <Layout>{page}</Layout>

@@ -9,7 +9,7 @@ import { useSort } from '../../../../hooks/use-sort'
 export function useCollectionListQuery(
   args: { slug: string } & {
     pagination?: UsePaginationReturn['pagination']
-    search?: UseSearchReturn['debouncedSearch']
+    search?: UseSearchReturn['search']
     filter?: UseFilterReturn['debouncedFilter']
   }
 ) {
