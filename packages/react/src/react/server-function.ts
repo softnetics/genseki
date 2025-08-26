@@ -24,12 +24,8 @@ export type GetGensekiApiRouterMethod<TApiRouter extends FlatApiRouter = FlatApi
 export type GetServerFunctionResponse<
   TApiRouter extends FlatApiRouter,
   TMethod extends string,
-> = TMethod extends `${infer TPrefix}.${infer TMethodName}`
-  ? TApiRouter[TPrefix] extends FlatApiRouter
-    ? GetServerFunctionResponse<TApiRouter[TPrefix], TMethodName>
-    : TApiRouter[TMethodName] extends ApiRoute
-      ? ApiRouteResponse<TApiRouter[TMethodName]['schema']['responses']>
-      : ApiRouteResponse<ApiRouteSchema['responses']>
+> = TApiRouter[TMethod] extends ApiRoute
+  ? ApiRouteResponse<TApiRouter[TMethod]['schema']['responses']>
   : ApiRouteResponse<ApiRouteSchema['responses']>
 
 export type GetServerFunctionApiArgs<

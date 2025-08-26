@@ -69,7 +69,7 @@ export class GensekiPluginBuilder<TMainApiRouter extends FlatApiRouter = {}> {
   }
 
   addPageFn<TProps = any>(
-    page: (options: GensekiAppOptions) => GensekiUiRouter<TProps> | GensekiUiRouter<TProps>
+    page: GensekiUiRouter<TProps> | ((options: GensekiAppOptions) => GensekiUiRouter<TProps>)
   ): GensekiPluginBuilder<TMainApiRouter> {
     if (typeof page === 'function') this.addPage(page(this.options))
     else this.addPage(page)
@@ -78,14 +78,14 @@ export class GensekiPluginBuilder<TMainApiRouter extends FlatApiRouter = {}> {
 
   addPageAndApiRouter<TProps = {}, TApiRouter extends AnyApiRouter = {}>(
     args:
-      | ((options: GensekiAppOptions) => {
-          ui: GensekiUiRouter<TProps>
-          api: TApiRouter
-        })
       | {
           ui: GensekiUiRouter<TProps>
           api: TApiRouter
         }
+      | ((options: GensekiAppOptions) => {
+          ui: GensekiUiRouter<TProps>
+          api: TApiRouter
+        })
   ): GensekiPluginBuilder<Simplify<TMainApiRouter & RecordifyApiRoutes<TApiRouter>>> {
     if (typeof args === 'function') return this.addPageAndApiRouter(args(this.options))
     this.addPage(args.ui)
