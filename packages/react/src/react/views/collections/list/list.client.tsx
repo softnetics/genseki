@@ -178,7 +178,7 @@ export function ClientCollectionListView() {
         table={table}
         loadingItems={pagination.pageSize}
         className="static"
-        onRowClick="toggleSelect"
+        onRowClick={listViewProps.actions?.select ? 'toggleSelect' : undefined}
         isLoading={isLoading}
         isError={isError}
         configuration={listViewProps.listConfiguration}
