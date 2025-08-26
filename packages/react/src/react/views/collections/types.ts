@@ -19,4 +19,5 @@ export interface ListActions {
   update?: boolean
   delete?: boolean
   one?: boolean
+  select?: boolean
 }

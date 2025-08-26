@@ -404,6 +404,7 @@ export type CollectionListConfig<
     update?: boolean
     delete?: boolean
     one?: boolean
+    select?: boolean
   }
 } & CollectionFieldsOptions<TContext, TFields>
 

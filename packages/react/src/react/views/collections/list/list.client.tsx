@@ -69,7 +69,7 @@ export function ClientCollectionListView() {
 
     const columnHelper = createColumnHelper<BaseData>()
     return [
-      ...(listViewProps.actions?.delete
+      ...(listViewProps.actions?.select
         ? [
             columnHelper.display({
               id: 'select',
