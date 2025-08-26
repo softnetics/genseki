@@ -207,14 +207,13 @@ const list = builder.list(fields, {
             <CollectionSidebar />
             <SidebarInset>
               <TopbarNav />
-
               <div>{args.children}</div>
             </SidebarInset>
           </SidebarProvider>
         </>
       )
     },
-    pages(args) {
+    page(args) {
       const ListViewContainer = args.ListViewContainer
       const ListView = args.ListView
       const Banner = args.Banner

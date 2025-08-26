@@ -46,7 +46,7 @@ export function ClientCollectionListView() {
   const navigation = useNavigation()
   const queryClient = useQueryClient()
   const listViewProps = useListViewPropsContext()
-  const { pagination, isRowsSelected, rowSelectionIds, setRowSelection } = useTableStatesContext()
+  const { pagination, isRowsSelected, setRowSelection, rowSelectionIds } = useTableStatesContext()
 
   const query = useCollectionListQuery({ slug: listViewProps.slug })
 
@@ -77,9 +77,9 @@ export function ClientCollectionListView() {
                 <Checkbox
                   isSelected={table.getIsAllRowsSelected()}
                   isIndeterminate={table.getIsSomeRowsSelected()}
-                  onChange={(checked) =>
+                  onChange={(checked) => {
                     table.getToggleAllRowsSelectedHandler()({ target: { checked } })
-                  }
+                  }}
                 />
               ),
               cell: ({ row }) => (

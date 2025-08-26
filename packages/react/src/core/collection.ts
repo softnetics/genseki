@@ -383,7 +383,7 @@ interface CustomCollectionUI<
   TFields extends Fields = Fields,
 > {
   layout?: CustomCollectionLayout
-  pages?: CustomCollectionPage<TFields>
+  page?: CustomCollectionPage<TFields>
 }
 
 export type CollectionListConfig<

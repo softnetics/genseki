@@ -40,7 +40,7 @@ const TableStatesContext = createContext<TanstackTableContextValue>(null!)
 export const TableStatesProvider = (props: TableStatesProviderProps) => {
   const { pagination, setPagination } = usePagination()
   const { sort, setSort } = useSort()
-  const { search, setSearch } = useSearch()
+  const { debouncedSearch, setSearch } = useSearch()
   // row selection does not maintain a state wih URL search parameter like pagination and search
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -58,7 +58,7 @@ export const TableStatesProvider = (props: TableStatesProviderProps) => {
         setPagination,
         sort,
         setSort,
-        search,
+        search: debouncedSearch,
         setSearch,
         rowSelection,
         rowSelectionIds,

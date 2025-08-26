@@ -5,7 +5,7 @@ import {
   AppTopbarNav as _AppTopbarNav,
   Banner,
   CollectionLayout as _CollectionLayout,
-  CollectionListView as _ListView,
+  CollectionListView as _CollectionListView,
   CollectionListViewProvider,
   ListViewContainer,
   type ListViewContainerProps,
@@ -84,7 +84,7 @@ export function generateCustomCollectionListUI<
         )
       }
       const ListView = () => {
-        const NewListView = customCollectionArgs.listConfig.uis?.pages
+        const NewListView = customCollectionArgs.listConfig.uis?.page
         const clientListViewProps = getClientListViewProps(listViewProps)
 
         if (NewListView) {
@@ -92,7 +92,7 @@ export function generateCustomCollectionListUI<
             <CollectionListViewProvider clientListViewProps={clientListViewProps}>
               <NewListView
                 Banner={_Banner}
-                ListView={() => <_ListView {...listViewProps} />}
+                ListView={() => <_CollectionListView />}
                 ListViewContainer={_ListViewContainer}
                 listViewProps={listViewProps}
               />
@@ -100,12 +100,16 @@ export function generateCustomCollectionListUI<
           )
         }
 
-        return <_ListView {...listViewProps} />
+        return (
+          <CollectionListViewProvider clientListViewProps={clientListViewProps}>
+            <_CollectionListView />
+          </CollectionListViewProvider>
+        )
       }
 
       if (
         !customCollectionArgs.listConfig.uis?.layout &&
-        !customCollectionArgs.listConfig.uis?.pages
+        !customCollectionArgs.listConfig.uis?.page
       ) {
         return (
           <CollectionLayout>
