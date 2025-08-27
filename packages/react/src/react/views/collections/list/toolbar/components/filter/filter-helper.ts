@@ -8,7 +8,7 @@ export interface MinimalFilter {
   fieldShape: FieldShapeClient
   options: string
   value: {
-    filterValue: string
+    filterValue?: string
     endFilterValue?: string
   }
 }

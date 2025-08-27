@@ -164,6 +164,7 @@ export function CollectionListFilterPanel(props: CollectionListFilterPanelProps)
             variant="primary"
             isDisabled={chosenFilter.length === 0}
             onClick={() => {
+              // TODO: validate all filter before applying it
               props.onApplyFilter(transformFilterToPrismaString(chosenFilter))
             }}
           >
@@ -305,7 +306,7 @@ export function CollectionListFilterPanel(props: CollectionListFilterPanelProps)
                   fieldShape: addFilterData.fieldShape,
                   options: addFilterData.options,
                   value: {
-                    filterValue: '',
+                    filterValue: undefined,
                   },
                 }
                 setChosenFilter((p) => {

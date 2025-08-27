@@ -1,85 +1,96 @@
-import { useEffect, useState } from 'react'
+import { useForm } from 'react-hook-form'
+
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
+import z from 'zod'
+
+import { DatePicker, Form, FormField, FormMessage, Label } from '@genseki/react'
 
 import { BaseFilterBox, type BaseFilterBoxInterface } from './base'
 
-import { DatePicker, Label, Typography } from '../../../../../../../components'
-
 interface FilterDateInterface extends BaseFilterBoxInterface {
-  updateThisFilter: (startDate: string, endDate: string) => void
+  updateThisFilter: (startDate?: string, endDate?: string) => void
 }
 
-export function FilterDate(props: FilterDateInterface) {
-  const [select, setSelect] = useState<{ startDate?: Date; endDate?: Date }>({
-    startDate: undefined,
-    endDate: undefined,
+const FormSchema = z
+  .object({
+    startDate: z.date(),
+    endDate: z.date(),
   })
-  const isValidDate = (d?: Date) => !!d && !isNaN(d.getTime())
+  .refine((data) => data.endDate >= data.startDate, {
+    message: 'End Date must be AFTER Start date',
+    path: ['endDate'],
+  })
 
-  const isDateRangeValid = (start: Date, end: Date): boolean => {
-    if (!isValidDate(start) || !isValidDate(end)) return false
-    return end.getTime() >= start.getTime()
+type FormSchema = z.infer<typeof FormSchema>
+
+export function FilterDate(props: FilterDateInterface) {
+  const form = useForm<FormSchema>({
+    resolver: standardSchemaResolver(FormSchema),
+    mode: 'all',
+  })
+
+  const handleFormUpdate = async () => {
+    const values = form.getValues()
+    if (!(values.startDate && values.endDate)) return // form is not ready yet
+
+    const isValid = await form.trigger()
+
+    if (isValid) {
+      props.updateThisFilter(values.startDate.toISOString(), values.endDate.toISOString())
+    } else {
+      // invalid data, clear any previous filter
+      props.updateThisFilter(undefined, undefined)
+    }
   }
 
-  const toIsoStartOfDayUTC = (d: Date) =>
-    new Date(
-      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0, 0)
-    ).toISOString()
-
-  const toIsoEndOfDayUTC = (d: Date) =>
-    new Date(
-      Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 23, 59, 59, 999)
-    ).toISOString()
-
-  useEffect(() => {
-    const { startDate, endDate } = select
-    if (!startDate || !endDate) return
-    if (!isDateRangeValid(startDate, endDate)) return
-
-    props.updateThisFilter(toIsoStartOfDayUTC(startDate), toIsoEndOfDayUTC(endDate))
-  }, [select.startDate, select.endDate])
-
   return (
-    <BaseFilterBox {...props}>
-      <div>
-        <Label>Filter by "{props.label}"</Label>
-        <div className="flex items-end gap-2 my-2">
-          <div className="flex flex-col gap-2 grow">
-            <p>Start Date</p>
-            <DatePicker
-              onChange={(sd) => {
-                const dateToDate = new Date(sd?.toString() || '')
-                setSelect((prev) => ({
-                  ...prev,
-                  startDate: dateToDate,
-                }))
-              }}
-            />
+    <Form {...form}>
+      <form>
+        <BaseFilterBox {...props}>
+          <div>
+            <Label>Filter by "{props.label}"</Label>
+            <div className="flex items-end gap-2 my-2">
+              <FormField
+                name="startDate"
+                control={form.control}
+                render={({ field }) => (
+                  <div className="flex flex-col gap-2 grow">
+                    <Label>Start Date</Label>
+                    <DatePicker
+                      aria-label="Start Date"
+                      granularity="day"
+                      onChange={(sd) => {
+                        const dateToDate = new Date(sd?.toString() || '')
+                        field.onChange(dateToDate)
+                        handleFormUpdate()
+                      }}
+                    />
+                  </div>
+                )}
+              />
+              <FormField
+                name="endDate"
+                control={form.control}
+                render={({ field }) => (
+                  <div className="flex flex-col gap-2 grow">
+                    <Label>End Date</Label>
+                    <DatePicker
+                      aria-label="End Date"
+                      granularity="day"
+                      onChange={(sd) => {
+                        const dateToDate = new Date(sd?.toString() || '')
+                        field.onChange(dateToDate)
+                        handleFormUpdate()
+                      }}
+                    />
+                    <FormMessage />
+                  </div>
+                )}
+              />
+            </div>
           </div>
-          <div className="flex flex-col gap-2 grow">
-            <p>End Date</p>
-            <DatePicker
-              onChange={(ed) => {
-                const dateToDate = new Date(ed?.toString() || '')
-                setSelect((prev) => ({
-                  ...prev,
-                  endDate: dateToDate,
-                }))
-              }}
-            />
-          </div>
-        </div>
-        {select.endDate &&
-          select.startDate &&
-          !isDateRangeValid(select.startDate, select.endDate) && (
-            <Typography
-              type="body"
-              weight="bold"
-              className="bg-primary/50 rounded-sm px-4 py-1 text-white"
-            >
-              End Date must be AFTER Start date
-            </Typography>
-          )}
-      </div>
-    </BaseFilterBox>
+        </BaseFilterBox>
+      </form>
+    </Form>
   )
 }
