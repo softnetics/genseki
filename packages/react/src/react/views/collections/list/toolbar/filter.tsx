@@ -1,6 +1,6 @@
 'use client'
 
-import { isThisFilterAllowed, isThisTypeFilterable } from './components/filter/filter-helper'
+import { isThisFieldShapeFilterable, isThisFilterAllowed } from './components/filter/filter-helper'
 import {
   CollectionListFilterPanel,
   type FilterFieldOptions,
@@ -30,7 +30,7 @@ export interface CollectionListFilterProps
 export function CollectionListFilter(props: CollectionListFilterProps) {
   const { setFilter } = useFilter({ debounce: 500 })
 
-  const filterable = props.filterOptions.filter((e) => isThisTypeFilterable(e.fieldShape))
+  const filterable = props.filterOptions.filter((e) => isThisFieldShapeFilterable(e.fieldShape))
 
   const whatFilterCanIFetch = [] // use this to fetch for optionsName
   const whatFilterCanIFormulate = [] // these you will have to create a component to handle the filter value(s) yourself

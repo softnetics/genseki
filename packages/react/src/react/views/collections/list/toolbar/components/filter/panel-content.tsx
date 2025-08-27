@@ -3,13 +3,13 @@ import { useState } from 'react'
 import { FilterDate } from './components/filter-date'
 import { FilterOptions } from './components/filter-options'
 import {
+  getLabelFromFieldShape,
   type MinimalFilter,
+  selectFilterChoiceWithFieldShape,
   transformFilterToPrismaString,
-  whatFilterChoiceToChoose,
 } from './filter-helper'
 
 import type { FieldShapeClient } from '../../../../../../../core'
-import { isRelationFieldShapeClient } from '../../../../../../../core/utils'
 import {
   Button,
   Select,
@@ -35,35 +35,18 @@ interface CollectionListFilterPanelProps {
 }
 
 export function CollectionListFilterPanel(props: CollectionListFilterPanelProps) {
-  const generateLabel = (target: FieldShapeClient, userFriendlyText: boolean) => {
-    const isRelational = isRelationFieldShapeClient(target)
-
-    let columnOrRelationName = ''
-
-    if (isRelational) {
-      columnOrRelationName = target.$client.relation.name
-    } else {
-      columnOrRelationName = target.$client.column.name
-    }
-
-    if (userFriendlyText) {
-      return `${target.label || target.$client.fieldName} (${columnOrRelationName})`
-    }
-    return `${columnOrRelationName}`
-  }
-
   const availableFields = [
     ...props.fetchList.map((e) => {
       return {
         field: e.fieldShape,
-        label: generateLabel(e.fieldShape, true),
+        label: getLabelFromFieldShape(e.fieldShape, true),
         options: e.optionsName,
       }
     }),
     ...props.formulateList.map((e) => {
       return {
         field: e.fieldShape,
-        label: generateLabel(e.fieldShape, true),
+        label: getLabelFromFieldShape(e.fieldShape, true),
         options: e.optionsName,
       }
     }),
@@ -180,8 +163,8 @@ export function CollectionListFilterPanel(props: CollectionListFilterPanelProps)
         {chosenFilter.length > 0 && (
           <div className="space-y-2">
             {chosenFilter.map((filterField) => {
-              const fieldLabel = generateLabel(filterField.fieldShape, true)
-              const choiceType = whatFilterChoiceToChoose(filterField.fieldShape)
+              const fieldLabel = getLabelFromFieldShape(filterField.fieldShape, true)
+              const choiceType = selectFilterChoiceWithFieldShape(filterField.fieldShape)
               switch (choiceType) {
                 case 'datetime':
                   return (

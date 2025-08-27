@@ -21,126 +21,97 @@ export const isThisFilterAllowed = (target: string, allowedList: string[]) => {
   return allowedList.includes(target)
 }
 
-export const whatFilterChoiceToChoose = (item: FieldShapeClient): FilterChoiceComponent => {
-  switch (item.type) {
-    case 'richText':
-    case 'text':
-    case 'password':
-    case 'email':
-    case 'number':
-    case 'comboboxNumber':
-    case 'comboboxText':
-    case 'media':
-    case 'create':
-      return null
+export function getLabelFromFieldShape(fieldShape: FieldShapeClient, userFriendlyText: boolean) {
+  const isRelational = isRelationFieldShapeClient(fieldShape)
+  let columnOrRelationName = ''
+  if (isRelational) {
+    columnOrRelationName = fieldShape.$client.relation.name
+  } else {
+    columnOrRelationName = fieldShape.$client.column.name
+  }
+  if (userFriendlyText) {
+    return `${fieldShape.label || fieldShape.$client.fieldName} (${columnOrRelationName})`
+  }
+  return `${columnOrRelationName}`
+}
+
+export function mapFieldShapeClient(fieldShape: FieldShapeClient): {
+  filterChoice: FilterChoiceComponent
+  optionsFetchPathName: string
+} {
+  switch (fieldShape.type) {
+    // case 'richText':
+    // case 'text':
+    // case 'password':
+    // case 'email':
+    // case 'number':
+    // case 'comboboxNumber':
+    // case 'comboboxText':
+    // case 'media':
+    // case 'create':
 
     case 'time':
     case 'date':
-      return 'datetime' // as range
-
-    case 'checkbox':
-    case 'switch':
-      return 'toggle' // as toggle ?
-
-    case 'selectNumber':
-    case 'selectText':
-    case 'connect':
-    case 'connectOrCreate': {
-      if (!item.options || (Array.isArray(item.options) && item.options.length === 0)) {
-        throw new Error('Missing options for select/connect field')
+      return {
+        filterChoice: 'datetime',
+        optionsFetchPathName: '',
       }
-      return 'singleselect'
-    }
-
-    default:
-      return null
-  }
-}
-
-export const isThisTypeFilterable = (item: FieldShapeClient) => {
-  switch (item.type) {
-    case 'richText':
-    case 'text':
-    case 'password':
-    case 'email':
-    case 'number':
-    case 'comboboxNumber':
-    case 'comboboxText':
-    case 'media':
-    case 'create':
-      return false
-
-    case 'time':
-    case 'date':
-      return true
 
     case 'checkbox':
     case 'switch':
-      return false // not ready
+      // this component is not ready yet
+      return {
+        filterChoice: 'toggle',
+        optionsFetchPathName: '',
+      }
 
     case 'selectNumber':
     case 'selectText':
     case 'connect':
     case 'connectOrCreate': {
-      if (!item.options) throw new Error('Missing optionsFetchPath')
-      return true
+      if (
+        !fieldShape.options ||
+        (Array.isArray(fieldShape.options) && fieldShape.options.length === 0)
+      ) {
+        // `optionsFetchPathName` will not be completed without `options`, won't be able to fetch for choices
+        // Act as if it is non-filterable
+        return {
+          filterChoice: null,
+          optionsFetchPathName: '',
+        }
+      }
+      return {
+        filterChoice: 'singleselect',
+        optionsFetchPathName: fieldShape.options,
+      }
     }
 
     default:
-      throw new Error(`Unsupported field type: ${JSON.stringify(item)}`)
+      return {
+        filterChoice: null,
+        optionsFetchPathName: '',
+      }
   }
 }
 
-export const optionsFetchPathName = (item: FieldShapeClient) => {
-  switch (item.type) {
-    case 'richText':
-      return undefined
-    case 'text':
-      return undefined
-    case 'password':
-      return undefined
-    case 'email':
-      return undefined
-    case 'number':
-      return undefined
-    case 'time':
-      return undefined
-    case 'date':
-      return undefined
-    case 'checkbox':
-      return undefined
-    case 'switch':
-      return undefined
+export function selectFilterChoiceWithFieldShape(
+  fieldShape: FieldShapeClient
+): FilterChoiceComponent {
+  return mapFieldShapeClient(fieldShape).filterChoice
+}
 
-    case 'selectNumber':
-    case 'selectText': {
-      if (!item.options) throw new Error('Missing optionsFetchPath')
-      return item.options
-    }
-    case 'comboboxNumber':
-    case 'comboboxText': {
-      return undefined
-    }
-    case 'media': {
-      return undefined
-    }
-    case 'create': {
-      return undefined
-    }
-    case 'connect':
-    case 'connectOrCreate': {
-      if (!item.options) throw new Error('Missing optionsFetchPath')
-      return item.options
-    }
-    default:
-      throw new Error(`Unsupported field type: ${JSON.stringify(item)}`)
-  }
+export function isThisFieldShapeFilterable(fieldShape: FieldShapeClient): boolean {
+  return !!mapFieldShapeClient(fieldShape).filterChoice
+}
+
+export function getOptionsFetchPathNameWithFieldShape(fieldShape: FieldShapeClient): string {
+  return mapFieldShapeClient(fieldShape).optionsFetchPathName
 }
 
 export const transformFilterToPrismaString = (filters: MinimalFilter[]) => {
   // In case false data gets in, filter it out
   const filteredFilters = filters.filter((f) => {
-    const targetType = whatFilterChoiceToChoose(f.fieldShape)
+    const targetType = selectFilterChoiceWithFieldShape(f.fieldShape)
     switch (targetType) {
       case 'datetime':
         return !!f.value.filterValue && !!f.value.endFilterValue
@@ -173,7 +144,7 @@ export const transformFilterToPrismaString = (filters: MinimalFilter[]) => {
   }
 
   const selfPrismaObjectGenerator = (sItem: MinimalFilter) => {
-    const targetType = whatFilterChoiceToChoose(sItem.fieldShape)
+    const targetType = selectFilterChoiceWithFieldShape(sItem.fieldShape)
     switch (targetType) {
       case 'datetime':
         return { gte: sItem.value.filterValue, lte: sItem.value.endFilterValue }

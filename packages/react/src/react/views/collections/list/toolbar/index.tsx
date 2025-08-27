@@ -5,17 +5,13 @@ import { useState } from 'react'
 import { CaretLeftIcon } from '@phosphor-icons/react/dist/ssr'
 import { useQueryClient } from '@tanstack/react-query'
 
-import { optionsFetchPathName } from './components/filter/filter-helper'
+import { getOptionsFetchPathNameWithFieldShape } from './components/filter/filter-helper'
 import { FilterToggle } from './components/filter/filter-toggle'
 import { CollectionListCreate } from './create'
 import { CollectionListDelete } from './delete'
 import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
-// import { CollectionListCreate, type MinimalCollectionListCreateProps } from './create'
-// import { CollectionListDelete, type MinimalCollectionListDeleteProps } from './delete'
-// import { CollectionListFilter } from './filter'
-// import { CollectionListSearch, type CollectionListSearchProps } from './search'
 import type { CollectionListActions } from '../../../../../core/collection'
 import { toast } from '../../../..'
 import { BaseIcon, ButtonLink } from '../../../../components'
@@ -27,20 +23,6 @@ import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'
 export interface CollectionListToolbarProps {
   actions?: Partial<CollectionListActions>
 }
-// import { cn } from '../../../../utils/cn'
-// import type { ListActions } from '../../types'
-
-// export interface CollectionListToolbarProps
-//   extends CollectionListSearchProps,
-//     MinimalCollectionListDeleteProps,
-//     MinimalCollectionListFilterProps,
-//     MinimalCollectionListCreateProps {
-//   isShowDeleteButton?: boolean
-//   actions?: ListActions
-//   filterOptions: FilterFieldOptions[]
-//   allowedFilters: string[]
-//   onFilterChange?: (value: string) => void
-// }
 
 export function CollectionListToolbar(props: CollectionListToolbarProps) {
   const context = useCollectionList()
@@ -108,7 +90,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
             filterOptions={Object.values(context.fields.shape).map((fieldShape) => {
               return {
                 fieldShape,
-                optionsName: optionsFetchPathName(fieldShape),
+                optionsName: getOptionsFetchPathNameWithFieldShape(fieldShape),
               }
             })}
             allowedFilters={context.filter || []}
