@@ -8,29 +8,17 @@ export type {
 } from '../core/context'
 export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
-export type {
-  ApiReturnType,
-  BaseData,
-  CollectionConfig as CollectionOptions,
-  InferField,
-  InferFields,
-  ListConfiguration,
-  CollectionListViewProps as ListViewProps,
-} from './collection'
-export { ApiDefaultMethod } from './collection'
+export type { InferField, InferFields, ListConfiguration } from './collection'
+export { ApiDefaultMethod, CollectionBuilder } from './collection'
 export {
-  type AnyGensekiPlugin,
   createGensekiUiRoute,
-  createPlugin,
   GensekiApp,
+  type GensekiAppClient,
   type GensekiAppCompiled,
-  type GensekiAppCompiledClient,
   type GensekiAppOptions,
   type GensekiCore,
-  type GensekiPlugin,
   type GensekiUiRouter,
   getFieldsClient,
-  type InferApiRouterFromGensekiPlugin,
 } from './config'
 export type {
   AnyApiRouter,
@@ -44,10 +32,17 @@ export type {
   ApiRouteSchema,
   ApiRouteSchemaClient,
   FilterByMethod,
-  FlattenApiRouter,
+  FlatApiRouter,
+  FlattenApiRoutes,
   InferApiRouteResponses,
 } from './endpoint'
-export { createEndpoint, flattenApiRouter, isApiRoute } from './endpoint'
+export {
+  createEndpoint,
+  flattenApiRoutes,
+  isApiRoute,
+  recordifyApiRouter,
+  recordifyFlattenApiRoutes,
+} from './endpoint'
 export * from './error'
 export type {
   FieldClientBase,
@@ -85,6 +80,13 @@ export {
   SchemaType,
   unsanitizedModelSchemas,
 } from './model'
+export type {
+  AnyGensekiPlugin,
+  GensekiPlugin,
+  GensekiPluginBuilder,
+  InferApiRouterFromGensekiPlugin,
+} from './plugin'
+export { createPlugin } from './plugin'
 export type {
   AnyTable,
   AnyTypedFieldColumn,

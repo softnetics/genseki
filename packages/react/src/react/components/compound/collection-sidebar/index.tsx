@@ -41,7 +41,7 @@ export interface AppSidebarProps {
 }
 
 // TODO: Revise this component
-export async function AppSidebar(props: AppSidebarProps) {
+export function AppSidebar(props: AppSidebarProps) {
   return (
     <Sidebar
       collapsible="dock"
@@ -102,7 +102,9 @@ function CurveLine({ className }: { className?: string }) {
 }
 
 export function SidebarBuilder(props: AppSideBarBuilderProps & { pathname: string }) {
-  const isCurrentPage = (path: string) => props.pathname.includes(path)
+  const isCurrentPage = (path: string) => {
+    return props.pathname.includes(path)
+  }
 
   return props.items.map((item, index) =>
     item.type === 'section' ? (

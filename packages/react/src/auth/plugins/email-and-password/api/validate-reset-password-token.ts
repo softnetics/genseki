@@ -13,7 +13,7 @@ export function validateResetPasswordToken<
     service.context,
     {
       method: 'POST',
-      path: '/api/email-and-password/validate-reset-password-token',
+      path: '/auth/email-and-password/validate-reset-password-token',
       body: z.object({
         token: z.string(),
       }),

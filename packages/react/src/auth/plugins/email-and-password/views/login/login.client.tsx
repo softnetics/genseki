@@ -48,7 +48,7 @@ export function LoginClientForm() {
     form.clearErrors('password')
     setIsLoading(true)
 
-    const response = await serverFunction('emailAndPassword.loginEmail', {
+    const response = await serverFunction('POST /auth/email-and-password/login', {
       body: {
         email: data.email,
         password: data.password,

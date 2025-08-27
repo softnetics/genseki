@@ -1,3 +1,5 @@
+import type React from 'react'
+
 import Color from '@tiptap/extension-color'
 import TextAlign from '@tiptap/extension-text-align'
 import TextStyle from '@tiptap/extension-text-style'
@@ -6,15 +8,18 @@ import StarterKit from '@tiptap/starter-kit'
 
 import {
   BackColorExtension,
+  CollectionBuilder,
+  createPlugin,
   CustomImageExtension,
   ImageUploadNodeExtension,
   SelectionExtension,
 } from '@genseki/react'
 
-import { columns, PostClientPagination, PostClientTable, PostClientToolbar } from './posts.client'
+import { columns, Layout, Page } from './posts.client'
 
+import { FullModelSchemas } from '../../generated/genseki/unsanitized'
 import { EditorSlotBefore } from '../editor/slot-before'
-import { builder, prisma } from '../helper'
+import { builder, context, prisma } from '../helper'
 
 export const postEditorProviderProps = {
   immediatelyRender: false,
@@ -175,98 +180,93 @@ export const options = builder.options(fields, {
   },
 })
 
-const list = builder.list(fields, {
-  columns: columns,
-  configuration: {
-    search: ['title'],
-    sortBy: ['updatedAt', 'title'],
-  },
-  options: options,
-  actions: { create: true, delete: true, one: true, update: true },
-  uis: {
-    layout(args) {
-      const CollectionLayout = args.CollectionLayout
-      const CollectionSidebar = args.CollectionSidebar
-      const SidebarProvider = args.SidebarProvider
-      const SidebarInset = args.SidebarInset
-      const TopbarNav = args.TopbarNav
+export const postsCollection = createPlugin('posts', (app) => {
+  const collection = new CollectionBuilder('posts', context, FullModelSchemas)
 
-      /**
-       * @description You can use following template for simple scaffolding
-       *  return (
-       *   <CollectionLayout>
-       *     <TopbarNav />
-       *     {args.children}
-       *   </CollectionLayout>
-       *  )
-       */
-
-      return (
-        <>
-          <SidebarProvider>
-            <CollectionSidebar />
-            <SidebarInset>
-              <TopbarNav />
-
-              <div>{args.children}</div>
-            </SidebarInset>
-          </SidebarProvider>
-        </>
-      )
-    },
-    pages(args) {
-      const ListViewContainer = args.ListViewContainer
-      const ListView = args.ListView
-      const Banner = args.Banner
-
-      /**
-       * @description You can also use the following template for simple scaffolding
-       *
-       * ```return (
-       * <div>
-       *   <Banner />
-       *   <ListViewContainer>
-       *     <ListView />
-       *   </ListViewContainer>
-       * </div>
-       * )```
-       */
-
-      return (
-        <div>
-          <Banner />
-          <ListViewContainer>
-            <PostClientToolbar />
-            <PostClientTable />
-            <PostClientPagination />
-          </ListViewContainer>
-        </div>
-      )
-    },
-  },
+  return app
+    .overridePages(collection.overrideHomePage())
+    .addPageAndApiRouter(
+      collection.list(fields, {
+        columns: columns,
+        configuration: {
+          search: ['title'],
+          sortBy: ['updatedAt', 'title'],
+        },
+        actions: { delete: true, update: true, create: true },
+        layout: Layout,
+        page: Page,
+      })
+    )
+    .addPageAndApiRouter(collection.create(fields, { options: options }))
+    .addPageAndApiRouter(collection.update(fields, { options: options }))
+    .addApiRouter(collection.deleteApiRouter(fields))
 })
 
-const create = builder.create(fields, {
-  options: options,
-})
+// TODO: THE NEXT SPECIFICATION, INCLUDE RESUABLE LAYOUT
+// const x = [
+//   app.route('/collections', {
+//     middlewares: [],
+//     Component: (serverProps: { children }) => <div>Collections</div>,
+//     routes: [
+//       app.route('', {
+//         Component: (serverProps) => <div>List Posts</div>,
+//       }),
+//       app.route('/posts/create', {
+//         Component: (serverProps) => <div>Create Post</div>,
+//       }),
+//     ],
+//   }),
 
-const update = builder.update(fields, {
-  options: options,
-})
+//   app.route('/api', {
+//     middlewares: [],
+//     routes: [
+//       app.GET(
+//         '/gay',
+//         {
+//           query: Z.object(),
+//           middlewares: [],
+//         },
+//         ({ query }) => {}
+//       ),
 
-const _delete = builder.delete(fields, {
-  options: options,
-})
+//       builder.endpoint(),
 
-const one = builder.one(fields, {
-  options: options,
-})
+//       app.POST('', {
+//         middlewares: [],
+//       }),
+//     ],
+//   }),
 
-export const postsCollection = builder.collection({
-  slug: 'posts',
-  list: list,
-  create: create,
-  update: update,
-  delete: _delete,
-  one: one,
-})
+//   app.group('A', [
+//     app.route('/api', {
+//       middlewares: [A],
+//       routes: [
+//         app.GET('', {
+//           middlewares: [],
+//         }),
+//       ],
+//     }),
+//   ]),
+
+//   app.group('B', [
+//     app.route('/api', {
+//       middlewares: [B],
+//       routes: [
+//         app.POST('', {
+//           middlewares: [],
+//         }),
+//       ],
+//     }),
+//   ]),
+
+//   collection.list(fields, {}),
+// ]
+
+// type RouteSpec =
+//   | {
+//       Componenet: React.FC
+//     }
+//   | {
+//       GET: () => void
+//       POST: () => void
+//     }

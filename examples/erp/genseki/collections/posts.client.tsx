@@ -6,11 +6,10 @@ import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 
-import type { BaseData } from '@genseki/react'
+import type { BaseData, CollectionLayoutProps } from '@genseki/react'
 import {
   BaseIcon,
   Checkbox,
-  CollectionListPagination,
   CollectionListToolbar,
   type InferFields,
   Menu,
@@ -21,9 +20,10 @@ import {
   TanstackTable,
   toast,
   useCollectionDeleteMutation,
+  useCollectionList,
   useCollectionListQuery,
-  useCollectionListTable,
-  useListViewPropsContext,
+  useGenseki,
+  useListTable,
   useNavigation,
   useTableStatesContext,
 } from '@genseki/react'
@@ -66,47 +66,12 @@ export const columns = [
  * @description This is an example how you can use the given `CollectionListToolbar` from Genseki,
  * you may use custom toolbar here whehter you want.
  */
-export const PostClientToolbar = (props: { children?: React.ReactNode }) => {
-  const listViewProps = useListViewPropsContext()
-  const { rowSelection, setRowSelection } = useTableStatesContext()
-
-  const selectedRowIds = Object.keys(rowSelection).filter((key) => rowSelection[key])
-
-  const isShowDeleteButton = selectedRowIds.length > 0
-
-  const queryClient = useQueryClient()
-
-  const deleteMutation = useCollectionDeleteMutation({
-    slug: listViewProps.slug,
-    onSuccess: async () => {
-      setRowSelection({})
-      await queryClient.invalidateQueries({
-        queryKey: ['GET', `/posts`],
-      })
-      toast.success('Deletion successfully')
-    },
-    onError: () => {
-      toast.error('Failed to delete items')
-    },
-  })
-
-  const handleBulkDelete = async () => {
-    // Return immediately if delete is not enabled
-    if (!listViewProps.actions?.delete) return
-
-    if (selectedRowIds.length === 0) return
-
-    deleteMutation.mutate(selectedRowIds)
-  }
+export function PostClientToolbar() {
+  const context = useCollectionList()
 
   return (
     <div>
-      <CollectionListToolbar
-        actions={listViewProps.actions}
-        slug={listViewProps.slug}
-        isShowDeleteButton={isShowDeleteButton}
-        onDelete={handleBulkDelete}
-      />
+      <CollectionListToolbar actions={context.actions} />
     </div>
   )
 }
@@ -115,7 +80,7 @@ export const PostClientToolbar = (props: { children?: React.ReactNode }) => {
  * @description This is an example how you can use the given `TanstackTable` and `CollectionListPagination` from Genseki to compose your view.
  */
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
-  const listViewProps = useListViewPropsContext()
+  const context = useCollectionList()
   const { setRowSelection } = useTableStatesContext()
 
   const queryClient = useQueryClient()
@@ -123,14 +88,14 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
   const navigation = useNavigation()
 
   // Example of fethcing list data
-  const query = useCollectionListQuery({ slug: listViewProps.slug })
+  const query = useCollectionListQuery({ slug: context.slug })
 
   const deleteMutation = useCollectionDeleteMutation({
-    slug: listViewProps.slug,
+    slug: context.slug,
     onSuccess: async () => {
       setRowSelection({})
       await queryClient.invalidateQueries({
-        queryKey: ['GET', `/${listViewProps.slug}`],
+        queryKey: ['GET', `/${context.slug}`],
       })
       toast.success('Deletion successfully')
     },
@@ -142,7 +107,7 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
   const columnHelper = createColumnHelper<BaseData>()
   // You can setup your own custom columns
   const enhancedColumns = [
-    ...(listViewProps.actions?.delete
+    ...(context.actions?.delete
       ? [
           columnHelper.display({
             id: 'select',
@@ -168,15 +133,11 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
           }),
         ]
       : []),
-    ...listViewProps.columns,
+    ...context.columns,
     columnHelper.display({
       id: 'actions',
       cell: ({ row }) => {
-        if (
-          !listViewProps.actions?.one &&
-          !listViewProps.actions?.update &&
-          !listViewProps.actions?.delete
-        ) {
+        if (!context.actions?.one && !context.actions?.update && !context.actions?.delete) {
           return null
         }
 
@@ -187,30 +148,29 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
                 <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
               </MenuTrigger>
               <MenuContent aria-label="Actions" placement="left top">
-                {listViewProps.actions?.one && (
+                {context.actions?.one && (
                   <MenuItem
                     aria-label="View"
                     onAction={() => {
-                      navigation.navigate(`./${listViewProps.slug}/${row.original.__id}`)
+                      navigation.navigate(`./${context.slug}/${row.original.__id}`)
                     }}
                   >
                     View
                   </MenuItem>
                 )}
-                {listViewProps.actions?.update && (
+                {context.actions?.update && (
                   <MenuItem
                     aria-label="Edit"
                     onAction={() => {
-                      navigation.navigate(`./${listViewProps.slug}/update/${row.original.__id}`)
+                      navigation.navigate(`./${context.slug}/update/${row.original.__id}`)
                     }}
                   >
                     Edit
                   </MenuItem>
                 )}
-                {listViewProps.actions?.delete && (
+                {context.actions?.delete && (
                   <>
-                    {listViewProps.actions?.one ||
-                      (listViewProps.actions?.update && <MenuSeparator />)}
+                    {context.actions?.one || (context.actions?.update && <MenuSeparator />)}
                     <MenuItem
                       aria-label="Delete"
                       isDanger
@@ -239,11 +199,10 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
     }),
   ]
 
-  const table = useCollectionListTable({
+  const table = useListTable({
     total: query.data?.total,
     data: query.data?.data || [],
     columns: enhancedColumns,
-    listConfiguration: listViewProps.listConfiguration,
   })
 
   return (
@@ -254,16 +213,49 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
         onRowClick="toggleSelect"
         isLoading={query.isLoading}
         isError={query.isError}
-        configuration={listViewProps.listConfiguration}
+        configuration={{
+          sortBy: context.sortBy,
+        }}
       />
     </>
   )
 }
 
-export function PostClientPagination() {
-  const { slug } = useListViewPropsContext()
+export function Layout(props: CollectionLayoutProps) {
+  const {
+    components: { AppTopbar, AppSidebar, AppSidebarInset, AppSidebarProvider },
+  } = useGenseki()
 
-  const query = useCollectionListQuery({ slug })
+  return (
+    <AppSidebarProvider>
+      <AppSidebar />
+      <AppSidebarInset>
+        <AppTopbar />
+        {props.children}
+      </AppSidebarInset>
+    </AppSidebarProvider>
+  )
+}
 
-  return <CollectionListPagination totalPage={query.data?.totalPage} />
+export function Page() {
+  const {
+    components: {
+      ListBanner,
+      ListTableContainer,
+      ListTablePagination,
+      ListTable,
+      ListTableToolbar,
+    },
+  } = useCollectionList<Post>()
+
+  return (
+    <>
+      <ListBanner />
+      <ListTableContainer>
+        <PostClientToolbar />
+        <PostClientTable />
+        <ListTablePagination />
+      </ListTableContainer>
+    </>
+  )
 }

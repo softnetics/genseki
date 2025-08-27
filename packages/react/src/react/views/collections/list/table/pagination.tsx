@@ -2,15 +2,21 @@
 
 import { PageSizeSelect, Pagination } from '../../../../components'
 import { usePagination } from '../../../../hooks/use-pagination'
+import { useCollection } from '../../context'
+import { useCollectionListQuery } from '../hooks/use-collection-list'
 
 export interface CollectionListPaginationProps {
   totalPage?: number
 }
 
 export function CollectionListPagination(props: CollectionListPaginationProps) {
+  const context = useCollection()
+
   const { pagination, setPagination } = usePagination()
 
-  const totalPage = props.totalPage ?? 1
+  const query = useCollectionListQuery({ slug: context.slug })
+
+  const totalPage = props.totalPage ?? query.data?.totalPage ?? 1
 
   const onPageChange = (page: number) =>
     setPagination((pagination) => ({ page: page, pageSize: pagination.pageSize }))

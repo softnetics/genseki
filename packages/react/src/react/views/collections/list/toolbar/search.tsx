@@ -1,9 +1,11 @@
 'use client'
-import React, { useMemo } from 'react'
+import React from 'react'
 
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
+import { useControllableState } from '@radix-ui/react-use-controllable-state'
 
 import { BaseIcon, TextField } from '../../../../components'
+import { useDebounce } from '../../../../hooks/use-debounce'
 import { useSearch } from '../../../../hooks/use-search'
 
 export interface CollectionListSearchProps {
@@ -18,23 +20,20 @@ export interface CollectionListSearchProps {
  * @param props.isLoading A loading state
  */
 export function CollectionListSearch(props: CollectionListSearchProps) {
-  const { search, setSearch } = useSearch({
-    debounce: 500,
+  const { search: paramSearch, setSearch: setParamSearch } = useSearch()
+  const [search, onSearch] = useControllableState({
+    prop: props.search,
+    onChange: props.onSearchChange,
+    defaultProp: paramSearch,
   })
 
-  const isIncorrectControlledInput = useMemo(
-    () =>
-      [typeof props.onSearchChange === 'undefined', typeof props.search === 'undefined'].filter(
-        (option) => !!option
-      ).length === 1,
-    []
+  useDebounce(
+    search,
+    (value: string) => {
+      setParamSearch(value)
+    },
+    500
   )
-
-  if (isIncorrectControlledInput) {
-    throw new Error(
-      'The controlled input is not properly configured. You need to provide either `onSearchChange` and `search` for controlled input'
-    )
-  }
 
   return (
     <TextField
@@ -44,7 +43,7 @@ export function CollectionListSearch(props: CollectionListSearchProps) {
       className="w-full"
       isPending={props.isLoading}
       value={search}
-      onChange={setSearch}
+      onChange={onSearch}
     />
   )
 }

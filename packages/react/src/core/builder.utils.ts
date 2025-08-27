@@ -1,9 +1,21 @@
 import z from 'zod'
 
-import type { ApiDefaultMethod } from './collection'
+import type {
+  CollectionCreateApiHandler,
+  CollectionCreateApiReturn,
+  CollectionDeleteApiHandler,
+  CollectionDeleteApiReturn,
+  CollectionFindOneApiHandler,
+  CollectionFindOneApiReturn,
+  CollectionListApiHandler,
+  CollectionListApiReturn,
+  CollectionUpdateApiHandler,
+  CollectionUpdateApiReturn,
+  CollectionUpdateDefaultApiHandler,
+  CollectionUpdateDefaultApiReturn,
+} from './collection'
 import type { ListConfiguration } from './collection'
-import { type ApiReturnType, type InferCreateFields, type InferUpdateFields } from './collection'
-import { type ApiConfigHandlerFn } from './collection'
+import { type InferCreateFields, type InferUpdateFields } from './collection'
 import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
 import { HttpInternalServerError } from './error'
@@ -31,7 +43,7 @@ const zStringPositiveNumberOptional = z
 function createCollectionDefaultCreateHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields
-): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.CREATE> {
+): CollectionCreateApiHandler<TContext, TFields> {
   const prisma = config.context.getPrismaClient()
 
   const model = config.schema[fields.config.prismaModelName]
@@ -52,7 +64,7 @@ function createCollectionDefaultCreateHandler<TContext extends Contextable, TFie
 function createCollectionDefaultUpdateHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields
-): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.UPDATE> {
+): CollectionUpdateApiHandler<TContext, TFields> {
   const prisma = config.context.getPrismaClient()
 
   const model = config.schema[fields.config.prismaModelName]
@@ -74,7 +86,7 @@ function createCollectionDefaultUpdateHandler<TContext extends Contextable, TFie
 function createCollectionDefaultDeleteHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields
-): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.DELETE> {
+): CollectionDeleteApiHandler<TContext, TFields> {
   const prisma = config.context.getPrismaClient()
 
   const model = config.schema[fields.config.prismaModelName]
@@ -97,7 +109,7 @@ function createCollectionDefaultFindOneHandler<
 >(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields
-): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_ONE> {
+): CollectionFindOneApiHandler<TContext, TFields> {
   const prisma = config.context.getPrismaClient()
 
   return async (args) => {
@@ -110,14 +122,11 @@ function createCollectionDefaultFindOneHandler<
   }
 }
 
-function createCollectionDefaultFindManyHandler<
-  TContext extends Contextable,
-  TFields extends Fields,
->(
+function createCollectionDefaultListHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields,
   listConfiguration?: ListConfiguration<TFields>
-): ApiConfigHandlerFn<TContext, TFields, typeof ApiDefaultMethod.FIND_MANY> {
+): CollectionListApiHandler<TContext, TFields> {
   const prisma = config.context.getPrismaClient()
   const model = config.schema[fields.config.prismaModelName]
 
@@ -204,7 +213,7 @@ export type CollectionCreateApiRoute<TSlug extends string, TFields extends Field
   method: 'POST'
   body: ToZodObject<InferCreateFields<TFields>>
   responses: {
-    200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.CREATE, TFields>>
+    200: ToZodObject<CollectionCreateApiReturn>
   }
 }>
 
@@ -213,7 +222,7 @@ export function getCollectionDefaultCreateApiRoute(args: {
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
-  customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.CREATE>
+  customHandler?: CollectionCreateApiHandler<AnyContextable, Fields>
 }) {
   const defaultHandler = createCollectionDefaultCreateHandler(
     { schema: args.schema, context: args.context },
@@ -268,7 +277,7 @@ export type CollectionUpdateApiRoute<TSlug extends string, TFields extends Field
   pathParams: ToZodObject<{ id: string }>
   body: ToZodObject<InferUpdateFields<TFields>>
   responses: {
-    200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.UPDATE, TFields>>
+    200: ToZodObject<CollectionUpdateApiReturn>
   }
 }>
 
@@ -277,7 +286,7 @@ export function getCollectionDefaultUpdateApiRoute(args: {
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
-  customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.UPDATE>
+  customHandler?: CollectionUpdateApiHandler<AnyContextable, Fields>
 }) {
   const defaultHandler = createCollectionDefaultUpdateHandler(
     { schema: args.schema, context: args.context },
@@ -334,7 +343,7 @@ export type CollectionUpdateDefaultApiRoute<
   method: 'GET'
   pathParams: ToZodObject<{ id: string }>
   responses: {
-    200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.FIND_ONE, TFields>>
+    200: ToZodObject<CollectionUpdateDefaultApiReturn<TFields>>
   }
 }>
 
@@ -343,8 +352,7 @@ export function getCollectionDefaultUpdateDefaultApiRoute(args: {
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
-  // TODO: This should return default values for the form, not just findOne response
-  customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_ONE>
+  customHandler?: CollectionUpdateDefaultApiHandler<AnyContextable, Fields>
 }) {
   const defaultHandler = createCollectionDefaultFindOneHandler(
     { schema: args.schema, context: args.context },
@@ -395,7 +403,7 @@ export type CollectionDeleteApiRoute<TSlug extends string> = ApiRoute<{
   method: 'DELETE'
   body: ToZodObject<{ ids: string[] | number[] }>
   responses: {
-    200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.DELETE, Fields>>
+    200: ToZodObject<CollectionDeleteApiReturn>
   }
 }>
 
@@ -404,7 +412,7 @@ export function getCollectionDefaultDeleteApiRoute(args: {
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
-  customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.DELETE>
+  customHandler?: CollectionDeleteApiHandler<AnyContextable, Fields>
 }) {
   const defaultHandler = createCollectionDefaultDeleteHandler(
     { schema: args.schema, context: args.context },
@@ -457,7 +465,7 @@ export type CollectionFindOneApiRoute<TSlug extends string, TFields extends Fiel
   method: 'GET'
   pathParams: ToZodObject<{ id: string }>
   responses: {
-    200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.FIND_ONE, TFields>>
+    200: ToZodObject<CollectionFindOneApiReturn<TFields>>
   }
 }>
 
@@ -466,7 +474,7 @@ export function getCollectionDefaultFindOneApiRoute(args: {
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
-  customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_ONE>
+  customHandler?: CollectionFindOneApiHandler<AnyContextable, Fields>
 }) {
   const defaultHandler = createCollectionDefaultFindOneHandler(
     { schema: args.schema, context: args.context },
@@ -510,7 +518,7 @@ export function getCollectionDefaultFindOneApiRoute(args: {
   }
 }
 
-export type CollectionFindManyApiRoute<TSlug extends string, TFields extends Fields> = ApiRoute<{
+export type CollectionListApiRoute<TSlug extends string, TFields extends Fields> = ApiRoute<{
   path: `/${TSlug}`
   method: 'GET'
   query: ToZodObject<{
@@ -520,19 +528,19 @@ export type CollectionFindManyApiRoute<TSlug extends string, TFields extends Fie
     orderType?: 'asc' | 'desc'
   }>
   responses: {
-    200: ToZodObject<ApiReturnType<typeof ApiDefaultMethod.FIND_MANY, TFields>>
+    200: ToZodObject<CollectionListApiReturn<TFields>>
   }
 }>
 
-export function getCollectionDefaultFindManyApiRoute(args: {
+export function getCollectionDefaultListApiRoute(args: {
   slug: string
   context: AnyContextable
   schema: ModelSchemas
   fields: Fields
-  customHandler?: ApiConfigHandlerFn<AnyContextable, Fields, typeof ApiDefaultMethod.FIND_MANY>
+  customHandler?: CollectionListApiHandler<AnyContextable, Fields>
   listConfiguration?: ListConfiguration<Fields>
 }) {
-  const defaultHandler = createCollectionDefaultFindManyHandler(
+  const defaultHandler = createCollectionDefaultListHandler(
     { schema: args.schema, context: args.context },
     args.fields,
     args.listConfiguration
@@ -586,7 +594,7 @@ export function getCollectionDefaultFindManyApiRoute(args: {
   )
 
   return {
-    route: route as unknown as CollectionFindManyApiRoute<string, Fields>,
+    route: route as unknown as CollectionListApiRoute<string, Fields>,
     handler,
     defaultHandler,
   }
@@ -594,7 +602,7 @@ export function getCollectionDefaultFindManyApiRoute(args: {
 
 export type CollectionFieldsOptionsApiRoute<TPath extends string> = ApiRoute<{
   path: TPath
-  method: 'GET'
+  method: 'POST'
   query: ToZodObject<{ name: string }>
   body: z.ZodOptional<z.ZodAny>
   responses: {
@@ -605,9 +613,9 @@ export type CollectionFieldsOptionsApiRoute<TPath extends string> = ApiRoute<{
   }
 }>
 
-export function getOptionsRoute(
+export function getOptionsRoute<TPath extends string>(
   context: AnyContextable,
-  path: string,
+  path: TPath,
   fieldsOptions: FieldsOptions
 ) {
   const route = createEndpoint(
@@ -632,15 +640,15 @@ export function getOptionsRoute(
       },
     },
     async (payload) => {
-      const optionsFn = fieldsOptions[
-        payload.query.name as keyof FieldsOptions
-      ] as FieldOptionsCallback
+      const name = ((payload as any).query as { name: string }).name
+      const body = (payload as any).body as { [key: string]: any }
+      const optionsFn = fieldsOptions[name as keyof FieldsOptions] as FieldOptionsCallback
 
       if (!optionsFn) {
-        throw new HttpInternalServerError(`Field options "${payload.query.name}" not found`)
+        throw new HttpInternalServerError(`Field options "${name}" not found`)
       }
 
-      const result = await optionsFn({ context: payload.context, body: payload.body })
+      const result = await optionsFn({ context: payload.context, body: body })
 
       return {
         status: 200,
@@ -684,7 +692,7 @@ export type CollectionDefaultAdminApiRouter<
     : {}) &
   (TOptions['list'] extends { fields: Fields }
     ? {
-        findMany: CollectionFindManyApiRoute<TSlug, TOptions['list']['fields']>
+        findMany: CollectionListApiRoute<TSlug, TOptions['list']['fields']>
       }
     : {}) &
   (TOptions['one'] extends { fields: Fields }

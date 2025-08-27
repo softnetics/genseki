@@ -1,24 +1,22 @@
 import { type ReactNode } from 'react'
 
-import { deepmerge } from 'deepmerge-ts'
 import * as R from 'remeda'
-import type { Promisable } from 'type-fest'
+import type { Promisable, Simplify } from 'type-fest'
 
-import {
-  type AnyContextable,
-  type AnyRequestContextable,
-  type ApiRouter,
-  createFileUploadHandlers,
-  type ListViewProps,
-} from '.'
-import type { ClientCollectionListViewProps } from './collection'
-import { type AnyApiRouter, type ApiRoutePath, isApiRoute } from './endpoint'
+import type { AnyContextable, AnyRequestContextable } from './context'
+import { type ApiRoutePath, type FlatApiRouter } from './endpoint'
 import type { Fields, FieldsClient, FieldShape, FieldShapeClient } from './field'
 import {
   getStorageAdapterClient,
   type StorageAdapter,
   type StorageAdapterClient,
 } from './file-storage-adapters/generic-adapter'
+import { createFileUploadHandlers } from './file-storage-adapters/handlers'
+import {
+  type AnyGensekiPlugin,
+  GensekiPluginBuilder,
+  type InferApiRouterFromGensekiPlugin,
+} from './plugin'
 import { getEditorProviderClientProps } from './richtext'
 import { isMediaFieldShape, isRelationFieldShape, isRichTextFieldShape } from './utils'
 
@@ -76,49 +74,43 @@ export type GensekiMiddleware = (
 export interface GensekiAppOptions {
   title: string
   version: string
-  apiPrefix?: string
-  uiPathPrefix?: string
-  components?: {
-    NotFound?: () => ReactNode
-  }
+  appBaseUrl: string
+  appPathPrefix?: string // default to /admin
+  apiBaseUrl?: string // default to "appBaseUrl"
+  apiPathPrefix?: string // default to /admin/api
   sidebar?: AppSideBarBuilderProps
   storageAdapter?: StorageAdapter
   middlewares?: GensekiMiddleware[]
 }
 
-export interface GensekiPluginOptions extends GensekiAppOptions, GensekiCore<AnyApiRouter> {}
+export interface GensekiAppOptionsWithDefaults extends GensekiAppOptions {
+  appPathPrefix: string // default to /admin
+  apiBaseUrl: string // default to "appBaseUrl"
+  apiPathPrefix: string // default to /admin/api
+}
 
-export interface GensekiCore<TApiRouter extends AnyApiRouter = AnyApiRouter> {
+export interface GensekiCore<TApiRouter extends FlatApiRouter = {}> {
   api: TApiRouter
   uis: GensekiUiRouter[]
 }
 
-export interface GensekiAppCompiled<TApiRouter extends AnyApiRouter = AnyApiRouter>
-  extends GensekiCore<TApiRouter> {
+export interface GensekiAppClient {
+  title: string
+  version: string
+  appBaseUrl: string
+  appPathPrefix?: string // default to /admin
+  apiBaseUrl: string // default to "appBaseUrl"
+  apiPathPrefix?: string // default to /admin/api
+  sidebar?: AppSideBarBuilderProps
+  storageAdapter?: StorageAdapterClient
+}
+export interface GensekiAppCompiled<TApiRouter extends FlatApiRouter = {}>
+  extends GensekiAppClient {
+  api: TApiRouter
+  uis: GensekiUiRouter[]
   middlewares?: GensekiMiddleware[]
-  storageAdapter?: StorageAdapterClient
+  toClient: () => GensekiAppClient
 }
-
-export interface GensekiAppCompiledClient {
-  storageAdapter?: StorageAdapterClient
-}
-
-export interface GensekiPlugin<TName extends string, TApiRouter extends AnyApiRouter> {
-  name: TName
-  plugin: (options: GensekiPluginOptions) => GensekiCore<TApiRouter>
-}
-
-export function createPlugin<TName extends string, TApiRouter extends AnyApiRouter>(args: {
-  name: TName
-  plugin: (options: GensekiPluginOptions) => GensekiCore<TApiRouter>
-}): GensekiPlugin<TName, TApiRouter> {
-  return args
-}
-
-export type AnyGensekiPlugin = GensekiPlugin<string, AnyApiRouter>
-export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> = ReturnType<
-  TPlugin['plugin']
->['api']
 
 const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddlewareArgs) => {
   if (args.ui.requiredAuthenticated) {
@@ -130,10 +122,10 @@ const unauthorizedMiddleware: GensekiMiddleware = async (args: GensekiMiddleware
   }
 }
 
-export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApiRouter = {}> {
-  // private readonly apiPathPrefix: string
-  private readonly plugins: AnyGensekiPlugin[] = []
-  private core: GensekiCore<TMainApiRouter> = {} as GensekiCore<TMainApiRouter>
+export class GensekiApp<TMainApiRouter extends FlatApiRouter = {}> {
+  private readonly pluginBuilder: GensekiPluginBuilder
+
+  private readonly options: GensekiAppOptionsWithDefaults
 
   private storageRoutesForClient?: {
     putObjSignedUrl: ApiRoutePath
@@ -141,16 +133,23 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
     deleteObjSignedUrl: ApiRoutePath
   }
 
-  constructor(private readonly options: GensekiAppOptions) {
-    this.options.middlewares = this.options.middlewares ?? []
-    this.options.middlewares.push(unauthorizedMiddleware)
+  constructor(options: GensekiAppOptions) {
+    this.options = {
+      ...options,
+      appPathPrefix: options.appPathPrefix ?? '/admin',
+      apiPathPrefix: options.apiPathPrefix ?? '/admin/api',
+      apiBaseUrl: options.apiBaseUrl ?? options.appBaseUrl,
+    }
+
+    this.pluginBuilder = new GensekiPluginBuilder(this.options)
+
+    this.pluginBuilder.addMiddleware(unauthorizedMiddleware)
 
     if (this.options.storageAdapter) {
       const { handlers } = createFileUploadHandlers(
         this.options.storageAdapter.context,
         this.options.storageAdapter
       )
-      const apiPrefix = this.options.apiPrefix ?? '/api'
 
       const putHandler = handlers['file.generatePutObjSignedUrl']
       const getHandler = handlers['file.generateGetObjSignedUrl']
@@ -159,15 +158,15 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
       this.storageRoutesForClient = {
         putObjSignedUrl: {
           method: putHandler.schema.method,
-          path: `${apiPrefix}${putHandler.schema.path}`,
+          path: `${this.options.apiPathPrefix}${putHandler.schema.path}`,
         },
         getObjSignedUrl: {
           method: getHandler.schema.method,
-          path: `${apiPrefix}${getHandler.schema.path}`,
+          path: `${this.options.apiPathPrefix}${getHandler.schema.path}`,
         },
         deleteObjSignedUrl: {
           method: deleteHandler.schema.method,
-          path: `${apiPrefix}${deleteHandler.schema.path}`,
+          path: `${this.options.apiPathPrefix}${deleteHandler.schema.path}`,
         },
       }
     }
@@ -175,34 +174,15 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
 
   apply<const TPlugin extends AnyGensekiPlugin>(
     plugin: TPlugin
-  ): GensekiApp<TApiPrefix, TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
-
-  apply<const TApiRouter extends AnyApiRouter = AnyApiRouter>(
-    core: Partial<GensekiCore<TApiRouter>>
-  ): GensekiApp<TApiPrefix, TMainApiRouter & TApiRouter>
-
-  apply(input: any) {
-    if (isGensekiPlugin(input)) {
-      this.plugins.push(input)
-    } else {
-      this.core = {
-        api: { ...(this.core.api ?? {}), ...(input.api ?? {}) },
-        uis: [...(this.core.uis ?? []), ...(input.uis ?? [])],
-      }
-    }
-    return this
+  ): GensekiApp<Simplify<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>> {
+    plugin.plugin(this.pluginBuilder)
+    return this as unknown as GensekiApp<TMainApiRouter & InferApiRouterFromGensekiPlugin<TPlugin>>
   }
 
-  private _logApiRouter(router: ApiRouter): string[] {
+  private _logApiRouter(router: FlatApiRouter): string[] {
     const logs: string[] = []
-    if (isApiRoute(router)) {
-      logs.push(`API Route: ${router.schema.method} ${router.schema.path}`)
-      return logs
-    }
-    Object.entries(router).forEach(([key, value]) => {
-      if (typeof value === 'object' && value !== null) {
-        logs.push(...this._logApiRouter(value as ApiRouter))
-      }
+    Object.values(router).forEach((route) => {
+      logs.push(`API Route: ${route.schema.method} ${route.schema.path}`)
     })
     return logs
   }
@@ -215,44 +195,33 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
   }
 
   build(): GensekiAppCompiled<TMainApiRouter> {
-    const core = this.plugins.reduce(
-      (acc, plugin) => {
-        const pluginCore = plugin.plugin({
-          ...this.options,
-          ...acc,
-        })
-        return {
-          api: deepmerge(acc.api, pluginCore.api) as TMainApiRouter,
-          uis: [...acc.uis, ...(pluginCore.uis ?? [])],
-        }
-      },
-      {
-        uis: this.core.uis ?? [],
-        api: this.core.api ?? {},
-      } as unknown as GensekiCore<TMainApiRouter>
-    )
-
     if (this.options.storageAdapter) {
       const { handlers } = createFileUploadHandlers(
         this.options.storageAdapter.context,
         this.options.storageAdapter
       )
-      core.api = deepmerge(core.api, {
+      this.pluginBuilder.addApiRouter({
         storage: {
           putObjSignedUrl: handlers['file.generatePutObjSignedUrl'],
           getObjSignedUrl: handlers['file.generateGetObjSignedUrl'],
           deleteObjSignedUrl: handlers['file.generateDeleteObjSignedUrl'],
         },
-      }) as TMainApiRouter
+      })
     }
 
-    const logs = this._logApiRouter(core.api).sort((a, b) => a.localeCompare(b))
-    const uiLogs = this._logUis(core.uis).sort((a, b) => a.localeCompare(b))
+    const logs = this._logApiRouter(this.pluginBuilder.getApi()).sort((a, b) => a.localeCompare(b))
+    const uiLogs = this._logUis(this.pluginBuilder.getUis()).sort((a, b) => a.localeCompare(b))
     logs.forEach((log) => console.log(`${log}`))
     uiLogs.forEach((log) => console.log(`${log}`))
 
-    return {
-      middlewares: this.options.middlewares,
+    const appClient = {
+      title: this.options.title,
+      version: this.options.version,
+      appBaseUrl: this.options.appBaseUrl,
+      appPathPrefix: this.options.appPathPrefix,
+      apiBaseUrl: this.options.apiBaseUrl ?? this.options.appBaseUrl,
+      apiPathPrefix: this.options.apiPathPrefix,
+      sidebar: this.options.sidebar,
       storageAdapter: this.storageRoutesForClient
         ? getStorageAdapterClient({
             storageAdapter: this.options.storageAdapter,
@@ -261,8 +230,14 @@ export class GensekiApp<TApiPrefix extends string, TMainApiRouter extends AnyApi
             grabDeleteObjectSignedUrlApiRoute: this.storageRoutesForClient.deleteObjSignedUrl,
           })
         : undefined,
-      api: core.api,
-      uis: core.uis,
+    } satisfies GensekiAppClient
+
+    return {
+      ...appClient,
+      uis: this.pluginBuilder.getUis(),
+      api: this.pluginBuilder.getApi() as TMainApiRouter,
+      middlewares: this.pluginBuilder.getMiddlewares(),
+      toClient: () => appClient,
     }
   }
 }
@@ -333,27 +308,4 @@ export function getFieldsClient(fields: Fields): FieldsClient {
     shape: R.mapValues(fields.shape, (value, key) => getFieldShapeClient(key, value)),
     config: fields.config,
   }
-}
-export function getClientListViewProps<TFields extends Fields>(
-  args: ListViewProps<TFields>
-): ClientCollectionListViewProps<TFields> {
-  const fieldsClient = getFieldsClient(args.fields)
-
-  const clientListViewProps = R.pick(args, [
-    'actions',
-    'columns',
-    'headers',
-    'identifierColumn',
-    'listConfiguration',
-    'params',
-    'pathname',
-    'searchParams',
-    'slug',
-  ])
-
-  return { ...clientListViewProps, fieldsClient }
-}
-
-function isGensekiPlugin<TPlugin extends AnyGensekiPlugin>(plugin: any): plugin is TPlugin {
-  return 'name' in plugin && 'plugin' in plugin
 }
