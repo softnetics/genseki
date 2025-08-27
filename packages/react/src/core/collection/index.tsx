@@ -427,7 +427,7 @@ export interface ListConfiguration<TFields extends Fields> {
 }
 
 export interface CollectionListResponse {
-  data: ({ __id: string | number; __pk: string | number } & {})[]
+  data: ({ __id: string | number; __pk: string | number } & Record<string, unknown>)[]
   total: number
   totalPage: number
   currentPage: number
