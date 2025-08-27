@@ -14,7 +14,7 @@ const list = builder.list(fields, {
     search: ['name'],
     sortBy: ['name'],
   },
-  actions: { create: true, update: true },
+  actions: { create: true, update: true, select: true },
 })
 
 const update = builder.update(fields, {})
