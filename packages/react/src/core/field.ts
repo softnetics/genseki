@@ -192,6 +192,7 @@ export interface FieldColumnStringDateShape
 
 export interface FieldColumnStringMediaOptions extends FieldOptionsShapeBase {
   type: 'media'
+  hintText?: string
   uploadOptions?: FileUploadOptionsProps
 }
 export interface FieldColumnStringMediaShapeClient

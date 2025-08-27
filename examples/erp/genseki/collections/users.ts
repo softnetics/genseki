@@ -18,6 +18,7 @@ export const fields = builder.fields('user', (fb) => ({
     type: 'media',
     label: 'Image',
     isRequired: true,
+    hintText: 'Suggested Ratio 1:1',
     uploadOptions: {
       maxSize: 1024 * 1024 * 2, // 2MB
       limit: 1,
