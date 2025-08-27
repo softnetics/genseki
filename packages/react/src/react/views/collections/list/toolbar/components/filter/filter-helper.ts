@@ -1,8 +1,8 @@
 import type { FieldShapeClient } from '../../../../../../../core'
-import type {
-  FieldColumnShapeClient,
-  FieldRelationShapeClient,
-} from '../../../../../../../core/field'
+import {
+  isColumnFieldShapeClient,
+  isRelationFieldShapeClient,
+} from '../../../../../../../core/utils'
 
 export interface MinimalFilter {
   fieldShape: FieldShapeClient
@@ -137,24 +137,6 @@ export const optionsFetchPathName = (item: FieldShapeClient) => {
   }
 }
 
-export const assertTypeFieldRelationShapeClientToTarget = (
-  target: any
-): FieldRelationShapeClient | null => {
-  const tryAssert = target as FieldRelationShapeClient
-  if (tryAssert.$client.relation) {
-    return tryAssert
-  }
-  return null
-}
-
-export const assertTypeFieldColumnShapeClient = (target: any): FieldColumnShapeClient | null => {
-  const tryAssert = target as FieldColumnShapeClient
-  if (tryAssert.$client.column) {
-    return tryAssert
-  }
-  return null
-}
-
 export const transformFilterToPrismaString = (filters: MinimalFilter[]) => {
   // In case false data gets in, filter it out
   const filteredFilters = filters.filter((f) => {
@@ -182,9 +164,8 @@ export const transformFilterToPrismaString = (filters: MinimalFilter[]) => {
   const finalFilterObject: any = {}
 
   for (const rItem of relationalArray) {
-    const typeCasted = assertTypeFieldRelationShapeClientToTarget(rItem.fieldShape)
-    if (typeCasted?.$client.relation.name) {
-      finalFilterObject[typeCasted.$client.relation.name] = {
+    if (isRelationFieldShapeClient(rItem.fieldShape)) {
+      finalFilterObject[rItem.fieldShape.$client.relation.name] = {
         // Relational should only takes ID instead of column
         id: rItem.value.filterValue,
       }
@@ -206,9 +187,8 @@ export const transformFilterToPrismaString = (filters: MinimalFilter[]) => {
   }
 
   for (const sItem of selfArray) {
-    const typeCasted = assertTypeFieldColumnShapeClient(sItem.fieldShape)
-    if (typeCasted?.$client.column.name) {
-      finalFilterObject[typeCasted.$client.column.name] = selfPrismaObjectGenerator(sItem)
+    if (isColumnFieldShapeClient(sItem.fieldShape)) {
+      finalFilterObject[sItem.fieldShape.$client.column.name] = selfPrismaObjectGenerator(sItem)
     }
   }
 

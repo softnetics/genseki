@@ -3,14 +3,13 @@ import { useState } from 'react'
 import { FilterDate } from './components/filter-date'
 import { FilterOptions } from './components/filter-options'
 import {
-  assertTypeFieldColumnShapeClient,
-  assertTypeFieldRelationShapeClientToTarget,
   type MinimalFilter,
   transformFilterToPrismaString,
   whatFilterChoiceToChoose,
 } from './filter-helper'
 
 import type { FieldShapeClient } from '../../../../../../../core'
+import { isRelationFieldShapeClient } from '../../../../../../../core/utils'
 import {
   Button,
   Select,
@@ -37,26 +36,20 @@ interface CollectionListFilterPanelProps {
 
 export function CollectionListFilterPanel(props: CollectionListFilterPanelProps) {
   const generateLabel = (target: FieldShapeClient, userFriendlyText: boolean) => {
-    const tryRelation = assertTypeFieldRelationShapeClientToTarget(target)
-    const trySelf = assertTypeFieldColumnShapeClient(target)
+    const isRelational = isRelationFieldShapeClient(target)
 
     let columnOrRelationName = ''
 
-    if (tryRelation?.$client.relation) {
-      columnOrRelationName = tryRelation.$client.relation.name
+    if (isRelational) {
+      columnOrRelationName = target.$client.relation.name
+    } else {
+      columnOrRelationName = target.$client.column.name
     }
 
-    if (trySelf?.$client.column.name) {
-      columnOrRelationName = trySelf.$client.column.name
+    if (userFriendlyText) {
+      return `${target.label || target.$client.fieldName} (${columnOrRelationName})`
     }
-
-    if (columnOrRelationName !== '') {
-      if (userFriendlyText && columnOrRelationName !== '') {
-        return `${target.label || target.$client.fieldName} (${columnOrRelationName})`
-      }
-      return `${columnOrRelationName}`
-    }
-    return target.label || target.$client.fieldName
+    return `${columnOrRelationName}`
   }
 
   const availableFields = [
