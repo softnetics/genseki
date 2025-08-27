@@ -1,25 +1,33 @@
 import { createRouter } from 'radix3'
 
-import type { GensekiAppCompiled, GensekiUiRouter } from '@genseki/react'
+import type {
+  FlatApiRouter,
+  GensekiApp,
+  GensekiAppClient,
+  GensekiAppCompiled,
+  GensekiUiRouter,
+} from '@genseki/react'
 
-export interface NextJsGensekiApp extends GensekiAppCompiled {
+export interface NextJsGensekiApp<TApiRouter extends FlatApiRouter = {}>
+  extends GensekiAppCompiled<TApiRouter> {
   radixRouter: ReturnType<typeof createRouter<GensekiUiRouter>>
   toClient: () => NextJsGensekiAppClient
 }
 
-export interface NextJsGensekiAppClient extends Pick<GensekiAppCompiled, 'storageAdapter'> {}
+export interface NextJsGensekiAppClient extends GensekiAppClient {}
 
-export function withNextJs<TGensekiApp extends GensekiAppCompiled>(app: TGensekiApp) {
+export function withNextJs<TApiRouter extends FlatApiRouter>(
+  app: GensekiApp<TApiRouter>
+): NextJsGensekiApp<TApiRouter> {
   const radixRouter = createRouter<GensekiUiRouter>()
-  app.uis.forEach((ui) => radixRouter.insert(ui.path, ui))
+  const compliedApp = app.build()
+  const appClient = compliedApp.toClient()
+
+  compliedApp.uis.forEach((ui) => radixRouter.insert(ui.path, ui))
 
   return {
-    ...app,
-    radixRouter: radixRouter,
-    toClient(): NextJsGensekiAppClient {
-      return {
-        storageAdapter: app.storageAdapter,
-      }
-    },
+    ...compliedApp,
+    radixRouter,
+    toClient: () => appClient,
   }
 }

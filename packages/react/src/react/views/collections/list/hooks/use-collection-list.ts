@@ -15,7 +15,11 @@ export function useCollectionListQuery(
   const { pagination } = usePagination()
   const { search } = useSearch()
 
-  const queryKey = { ...(args.pagination || pagination), search: args.search ?? search, sort: sort }
+  const queryKey = {
+    ...(args.pagination || pagination),
+    search: args.search ?? search,
+    sort: sort,
+  }
 
   const query: UseQueryResult<CollectionListResponse> = useQuery({
     queryKey: ['GET', `/${args.slug}`, { query: queryKey }] as const,

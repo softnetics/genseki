@@ -4,19 +4,15 @@ import type { AnyContextable } from '../../../core/context'
 export interface BaseViewProps {
   slug: string
   context: AnyContextable
-  identifierColumn: string
   fields: Fields
 }
 
 export interface ClientBaseViewProps {
   slug: string
-  identifierColumn: string
   fieldsClient: FieldsClient
 }
 
-export interface ListActions {
-  create?: boolean
-  update?: boolean
-  delete?: boolean
-  one?: boolean
+export interface BaseData {
+  __pk: string | number
+  __id: string | number
 }

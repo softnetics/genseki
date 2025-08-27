@@ -16,7 +16,7 @@ import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from '.
 
 type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement>) => void
 
-interface TanstackTableProps<T> {
+export interface TanstackTableProps<T> {
   className?: string
   classNames?: {
     tableContainer?: string
@@ -37,7 +37,6 @@ interface TanstackTableProps<T> {
   emptyFallback?: React.ReactNode
   emptyMessage?: React.ReactNode
   configuration?: {
-    search?: (string | number | symbol)[]
     sortBy?: (string | number | symbol)[]
   }
 }

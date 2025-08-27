@@ -44,6 +44,7 @@
     "@internationalized/date": "^3.8.2",
     "@phosphor-icons/react": "^2.1.8",
     "@radix-ui/react-slot": "^1.2.0",
+    "@radix-ui/react-use-controllable-state": "^1.2.2",
     "@react-aria/i18n": "^3.12.9",
     "@react-aria/visually-hidden": "^3.8.23",
     "@react-stately/calendar": "^3.8.2",

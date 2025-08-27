@@ -8,14 +8,16 @@ import {
   useReactTable,
 } from '@tanstack/react-table'
 
-import type { BaseData } from '../../../../../core/collection'
+import {
+  TanstackTable,
+  type TanstackTableProps,
+} from '../../../../components/primitives/tanstack-table'
 import { useTableStatesContext } from '../../../../providers/table'
+import type { BaseData } from '../../types'
+import { useCollectionList } from '../context'
 
-interface CollectionListTableArgs<TFieldsData extends BaseData> {
-  listConfiguration?: {
-    search?: (string | number | symbol)[]
-    sortBy?: (string | number | symbol)[]
-  }
+interface UseListTableArgs<TFieldsData extends BaseData> {
+  sortBy?: (string | number | symbol)[]
   total?: number
   data: TFieldsData[]
   columns: ColumnDef<any>[]
@@ -25,15 +27,13 @@ interface CollectionListTableArgs<TFieldsData extends BaseData> {
  * @description A flexible hook for creating collection tables with sorting, pagination and row selection.
  * Provides unopinionated table functionality that can be customized for different collection data structures.
  */
-export const useCollectionListTable = <TFieldsData extends BaseData>(
-  args: CollectionListTableArgs<TFieldsData>
-) => {
+export function useListTable<TFieldsData extends BaseData>(args: UseListTableArgs<TFieldsData>) {
   const { pagination, setPagination, rowSelection, setRowSelection, sort, setSort } =
     useTableStatesContext()
   // Get default sort field from configuration
   const defaultSortField = (() => {
-    if (args.listConfiguration?.sortBy && args.listConfiguration.sortBy.length > 0) {
-      return args.listConfiguration.sortBy[0].toString()
+    if (args.sortBy && args.sortBy.length > 0) {
+      return args.sortBy[0].toString()
     }
     return undefined
   })()
@@ -79,4 +79,41 @@ export const useCollectionListTable = <TFieldsData extends BaseData>(
   })
 
   return table
+}
+
+export interface CollectionListTableProps<T extends BaseData>
+  extends Omit<TanstackTableProps<T>, 'table' | 'configuration'> {
+  total?: number
+  data?: T[]
+  columns?: ColumnDef<T, any>[]
+  sortBy?: string[]
+
+  isLoading?: boolean
+  isError?: boolean
+}
+
+export function CollectionListTable<T extends BaseData>(props: CollectionListTableProps<T>) {
+  const context = useCollectionList()
+
+  const table = useListTable({
+    total: props.total ?? context.total,
+    data: props.data ?? context.data ?? [],
+    columns: props.columns ?? context.columns,
+    sortBy: props.sortBy ?? context.sortBy,
+  })
+
+  return (
+    <TanstackTable
+      table={table}
+      loadingItems={table.getTotalSize()}
+      className="static"
+      onRowClick="toggleSelect"
+      isLoading={props.isLoading ?? context.isQuerying ?? context.isMutating}
+      isError={props.isError ?? context.isError}
+      configuration={{
+        sortBy: props.sortBy ?? context.sortBy,
+      }}
+      {...props}
+    />
+  )
 }

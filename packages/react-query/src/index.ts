@@ -17,11 +17,10 @@ import type { PartialDeep } from 'type-fest'
 import type {
   ApiRoute,
   ApiRouteHandlerPayload,
-  ApiRouter,
   ApiRouteResponse,
   FilterByMethod,
-  FlattenApiRouter,
-  GensekiCore,
+  FlatApiRouter,
+  GensekiAppCompiled,
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
 
@@ -46,12 +45,12 @@ type ApiRouteSchemaFromMethodAndPath<
 type UseQuery<TApiRoute extends ApiRoute> = {
   <
     const TMethod extends QueryMethod,
-    const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
     const TPayload extends ApiRouteHandlerPayload<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
     >,
     const TResponse extends ApiRouteResponse<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
     >,
     const TError extends DefaultError = DefaultError,
   >(
@@ -65,12 +64,12 @@ type UseQuery<TApiRoute extends ApiRoute> = {
 type QueryOptions<TApiRoute extends ApiRoute> = {
   <
     const TMethod extends QueryMethod,
-    const TPath extends FilterByMethod<TApiRoute, QueryMethod>['schema']['path'],
+    const TPath extends FilterByMethod<TApiRoute, TMethod>['schema']['path'],
     const TPayload extends ApiRouteHandlerPayload<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>
     >,
     const TResponse extends ApiRouteResponse<
-      ApiRouteSchemaFromMethodAndPath<TApiRoute, QueryMethod, TPath>['responses']
+      ApiRouteSchemaFromMethodAndPath<TApiRoute, TMethod, TPath>['responses']
     >,
     const TError extends DefaultError = DefaultError,
   >(
@@ -194,8 +193,10 @@ type UseOptimisticUpdateQuery<TApiRoute extends ApiRoute> = {
     | undefined
 }
 
-export type QueryClient<TApiRouter extends ApiRouter> =
-  FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
+type ValueOf<T> = T[keyof T]
+
+export type QueryClient<TApiRouter extends FlatApiRouter> =
+  ValueOf<TApiRouter> extends infer TApiRoute extends ApiRoute
     ? {
         useQuery: UseQuery<TApiRoute>
         queryOptions: QueryOptions<TApiRoute>
@@ -217,9 +218,9 @@ export function queryKey(method: string, path: string | number | symbol, payload
   return [method, path, payloadKey] as const
 }
 
-export function createQueryClient<TCore extends GensekiCore>(
+export function createQueryClient<TApp extends GensekiAppCompiled>(
   config: CreateRestClientConfig
-): QueryClient<TCore['api']> {
+): QueryClient<TApp['api']> {
   const restClient = createRestClient(config)
 
   const useQuery = function (method: string, path: string, payload: any, options?: any) {
@@ -337,5 +338,5 @@ export function createQueryClient<TCore extends GensekiCore>(
     useGetQueryData,
     useSetQueryData,
     useOptimisticUpdateQuery,
-  } as QueryClient<TCore['api']>
+  } as QueryClient<TApp['api']>
 }

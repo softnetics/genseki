@@ -1,6 +1,12 @@
 import { withNextJs } from '@genseki/next'
 import { admin } from '@genseki/plugins'
-import { emailAndPasswordPlugin, GensekiApp, mePlugin, StorageAdapterS3 } from '@genseki/react'
+import {
+  createPlugin,
+  emailAndPasswordPlugin,
+  GensekiApp,
+  mePlugin,
+  StorageAdapterS3,
+} from '@genseki/react'
 
 import { accessControl } from './access-control'
 import { SetupPage } from './auth/setup/setup'
@@ -15,6 +21,10 @@ import { FullModelSchemas } from '../generated/genseki/unsanitized'
 const app = new GensekiApp({
   title: 'Genseki ERP Example',
   version: '0.0.0',
+  appBaseUrl: process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000',
+  apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000',
+  appPathPrefix: '/admin',
+  apiPathPrefix: '/admin/api',
   storageAdapter: StorageAdapterS3.initialize(context, {
     bucket: process.env.AWS_BUCKET_NAME!,
     imageBaseUrl: process.env.NEXT_PUBLIC_AWS_IMAGE_URL!,
@@ -74,26 +84,17 @@ const app = new GensekiApp({
       }
     )
   )
-  .apply(
-    admin(
-      context,
-      { user: FullModelSchemas.user },
-      {
-        accessControl: accessControl,
-      }
-    )
-  )
+  .apply(admin(context, { user: FullModelSchemas.user }, { accessControl: accessControl }))
   .apply(usersCollection)
   .apply(postsCollection)
   .apply(tagsCollection)
-  .apply({
-    api: {
-      auth: {
-        setup: setupApi,
-      },
-    },
-  })
-  .build()
+  .apply(
+    createPlugin('common', (app) => {
+      return app.addApiRouter({
+        auth: { setup: setupApi },
+      })
+    })
+  )
 
 const nextjsApp = withNextJs(app)
 

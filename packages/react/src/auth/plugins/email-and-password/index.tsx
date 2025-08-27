@@ -16,8 +16,9 @@ import { AuthLayout } from './views/layout'
 import { LoginView } from './views/login/login'
 import { ResetPasswordView } from './views/reset-password/reset-password'
 
-import { createGensekiUiRoute, createPlugin, type GensekiMiddleware } from '../../../core/config'
+import { createGensekiUiRoute, type GensekiMiddleware } from '../../../core/config'
 import type { AnyContextable } from '../../../core/context'
+import { createPlugin } from '../../../core/plugin'
 import type { IsValidTable } from '../../../core/table'
 import { GensekiUiCommonId } from '../../../core/ui'
 import type {
@@ -142,117 +143,109 @@ export function emailAndPasswordPlugin<
     return { redirect: `/admin/auth/setup` }
   }
 
-  return createPlugin({
-    name: 'auth',
-    plugin: (input) => {
-      if (_options.setup.enabled) {
-        input.middlewares?.push(setupMiddleware)
-      }
+  return createPlugin('emailAndPassword', (app) => {
+    if (_options.setup.enabled) {
+      app.addMiddleware(setupMiddleware)
+    }
 
-      const api = {
-        //  No authentication required
-        loginEmail: loginEmail(service),
-        signOut: signOut(service),
-        resetPasswordEmail: resetPasswordEmail(service),
-        validateResetPasswordToken: validateResetPasswordToken(service),
-        sendEmailResetPassword: requestResetPassword(service),
-      } as const
+    const api = {
+      //  No authentication required
+      loginEmail: loginEmail(service),
+      signOut: signOut(service),
+      resetPasswordEmail: resetPasswordEmail(service),
+      validateResetPasswordToken: validateResetPasswordToken(service),
+      sendEmailResetPassword: requestResetPassword(service),
+    } as const
 
-      const uis = [
-        createGensekiUiRoute({
-          id: GensekiUiCommonId.AUTH_LOGIN,
-          context: context,
-          path: '/auth/login',
-          requiredAuthenticated: false,
-          render: (args) => {
-            return (
-              <AuthLayout>
-                <LoginView {...args} {...args.params} />
-              </AuthLayout>
-            )
-          },
-        }),
-        createGensekiUiRoute({
-          id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
-          context: context,
-          path: '/auth/forgot-password',
-          requiredAuthenticated: false,
-          render: (args) => {
-            if (!options.resetPassword.enabled) {
-              throw new Error('Reset password is not enabled')
-            }
-
-            return (
-              <AuthLayout>
-                <ForgotPasswordView {...args} {...args.params} />
-              </AuthLayout>
-            )
-          },
-        }),
-        createGensekiUiRoute({
-          id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
-          context: context,
-          path: '/auth/reset-password',
-          requiredAuthenticated: false,
-          render: (args) => {
-            if (!options.resetPassword.enabled) {
-              throw new Error('Reset password is not enabled')
-            }
-
-            return (
-              <AuthLayout>
-                <ResetPasswordView
-                  {...args}
-                  validateToken={async (token) => {
-                    try {
-                      const verification = await service.validateResetPasswordToken(token)
-                      return !!verification
-                    } catch (error) {
-                      console.error('Error validating reset password token:', error)
-                      return false
-                    }
-                  }}
-                />
-              </AuthLayout>
-            )
-          },
-        }),
-      ]
-
-      if (options.setup?.enabled ?? true) {
-        const View = options.setup.ui
-        uis.push(
-          createGensekiUiRoute({
-            context: context,
-            path: '/auth/setup',
-            requiredAuthenticated: false,
-            render: async () => {
-              if (!options.setup?.enabled) {
-                throw new Error('Set up is not enabled')
-              }
-
-              const count = await service.userCounts()
-              if (count > 0) {
-                return { redirect: '/admin/auth/login', type: 'replace' }
-              }
-
-              return (
-                <AuthLayout>
-                  <View />
-                </AuthLayout>
-              )
-            },
-          })
-        )
-      }
-
-      return {
-        api: {
-          emailAndPassword: api,
+    const uis = [
+      createGensekiUiRoute({
+        id: GensekiUiCommonId.AUTH_LOGIN,
+        context: context,
+        path: '/auth/login',
+        requiredAuthenticated: false,
+        render: (args) => {
+          return (
+            <AuthLayout>
+              <LoginView {...args} {...args.params} />
+            </AuthLayout>
+          )
         },
-        uis: uis,
-      }
-    },
+      }),
+      createGensekiUiRoute({
+        id: GensekiUiCommonId.AUTH_FORGOT_PASSWORD,
+        context: context,
+        path: '/auth/forgot-password',
+        requiredAuthenticated: false,
+        render: (args) => {
+          if (!options.resetPassword.enabled) {
+            throw new Error('Reset password is not enabled')
+          }
+
+          return (
+            <AuthLayout>
+              <ForgotPasswordView {...args} {...args.params} />
+            </AuthLayout>
+          )
+        },
+      }),
+      createGensekiUiRoute({
+        id: GensekiUiCommonId.AUTH_RESET_PASSWORD,
+        context: context,
+        path: '/auth/reset-password',
+        requiredAuthenticated: false,
+        render: (args) => {
+          if (!options.resetPassword.enabled) {
+            throw new Error('Reset password is not enabled')
+          }
+
+          return (
+            <AuthLayout>
+              <ResetPasswordView
+                {...args}
+                validateToken={async (token) => {
+                  try {
+                    const verification = await service.validateResetPasswordToken(token)
+                    return !!verification
+                  } catch (error) {
+                    console.error('Error validating reset password token:', error)
+                    return false
+                  }
+                }}
+              />
+            </AuthLayout>
+          )
+        },
+      }),
+    ]
+
+    if (options.setup?.enabled ?? true) {
+      const View = options.setup.ui
+      uis.push(
+        createGensekiUiRoute({
+          context: context,
+          path: '/auth/setup',
+          requiredAuthenticated: false,
+          render: async () => {
+            if (!options.setup?.enabled) {
+              throw new Error('Set up is not enabled')
+            }
+
+            const count = await service.userCounts()
+            if (count > 0) {
+              return { redirect: '/admin/auth/login', type: 'replace' }
+            }
+
+            return (
+              <AuthLayout>
+                <View />
+              </AuthLayout>
+            )
+          },
+        })
+      )
+    }
+
+    return app.addApiRouter(api).addPages(uis)
   })
 }
 

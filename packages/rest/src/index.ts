@@ -1,11 +1,10 @@
 import type {
   ApiRoute,
   ApiRouteHandlerPayload,
-  ApiRouter,
   ApiRouteResponse,
   FilterByMethod,
-  FlattenApiRouter,
-  GensekiCore,
+  FlatApiRouter,
+  GensekiAppCompiled,
 } from '@genseki/react'
 
 import { withPathParams, withQueryParams } from './utils'
@@ -48,9 +47,9 @@ async function makeFetch(
   return response.json()
 }
 
-export function createRestClient<TCore extends GensekiCore>(
+export function createRestClient<TApp extends GensekiAppCompiled>(
   config: CreateRestClientConfig
-): RestClient<TCore['api']> {
+): RestClient<TApp['api']> {
   return {
     GET: async (path: string, payload: AnyPayload) => {
       return makeFetch('GET', path, payload, config)
@@ -67,7 +66,7 @@ export function createRestClient<TCore extends GensekiCore>(
     PATCH: async (path: string, payload: AnyPayload) => {
       return makeFetch('PATCH', path, payload, config)
     },
-  } as RestClient<TCore['api']>
+  } as RestClient<TApp['api']>
 }
 
 export type ExtractApiRouterPath<TApiRoute extends ApiRoute> = TApiRoute['schema']['path']
@@ -87,8 +86,10 @@ export type RestMethod<TApiRoute extends ApiRoute> = <
   payload: RestPayload<TApiRoute, TPath>
 ) => Promise<RestResponse<TApiRoute, TPath>>
 
-export type RestClient<TApiRouter extends ApiRouter> =
-  FlattenApiRouter<TApiRouter> extends infer TApiRoute extends ApiRoute
+type ValueOf<T> = T[keyof T]
+
+export type RestClient<TApiRouter extends FlatApiRouter> =
+  ValueOf<TApiRouter> extends infer TApiRoute extends ApiRoute
     ? {
         GET: RestMethod<FilterByMethod<TApiRoute, 'GET'>>
         POST: RestMethod<FilterByMethod<TApiRoute, 'POST'>>
