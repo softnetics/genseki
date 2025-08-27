@@ -13,7 +13,7 @@ export interface MinimalFilter {
   }
 }
 
-export type FilterChoiceComponent = 'datetime' | 'toggle' | 'singleselect' | ''
+export type FilterChoiceComponent = 'datetime' | 'toggle' | 'singleselect' | null
 
 export const isThisFilterAllowed = (target: string, allowedList: string[]) => {
   // Depends on if you want "No filter list given" to allow all filter or allow none
@@ -32,7 +32,7 @@ export const whatFilterChoiceToChoose = (item: FieldShapeClient): FilterChoiceCo
     case 'comboboxText':
     case 'media':
     case 'create':
-      return ''
+      return null
 
     case 'time':
     case 'date':
@@ -53,7 +53,7 @@ export const whatFilterChoiceToChoose = (item: FieldShapeClient): FilterChoiceCo
     }
 
     default:
-      return ''
+      return null
   }
 }
 
