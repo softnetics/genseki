@@ -23,6 +23,14 @@ const FormSchema = z
 
 type FormSchema = z.infer<typeof FormSchema>
 
+const toIsoStartOfDayUTC = (d: Date) =>
+  new Date(Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 0, 0, 0, 0)).toISOString()
+
+const toIsoEndOfDayUTC = (d: Date) =>
+  new Date(
+    Date.UTC(d.getUTCFullYear(), d.getUTCMonth(), d.getUTCDate(), 23, 59, 59, 999)
+  ).toISOString()
+
 export function FilterDate(props: FilterDateInterface) {
   const form = useForm<FormSchema>({
     resolver: standardSchemaResolver(FormSchema),
@@ -62,7 +70,9 @@ export function FilterDate(props: FilterDateInterface) {
                       aria-label="Start Date"
                       granularity="day"
                       onChange={(sd) => {
-                        const dateToDate = new Date(sd?.toString() || '')
+                        const dateToDate = new Date(
+                          toIsoStartOfDayUTC(new Date(sd?.toString() || ''))
+                        )
                         field.onChange(dateToDate)
                         handleFormUpdate()
                       }}
@@ -80,7 +90,9 @@ export function FilterDate(props: FilterDateInterface) {
                       aria-label="End Date"
                       granularity="day"
                       onChange={(sd) => {
-                        const dateToDate = new Date(sd?.toString() || '')
+                        const dateToDate = new Date(
+                          toIsoEndOfDayUTC(new Date(sd?.toString() || ''))
+                        )
                         field.onChange(dateToDate)
                         handleFormUpdate()
                       }}
