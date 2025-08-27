@@ -3,7 +3,7 @@ import { useForm } from 'react-hook-form'
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import z from 'zod'
 
-import { DatePicker, Form, FormField, FormMessage, Label } from '@genseki/react'
+import { DatePicker, Form, FormField, FormMessage, Label, Typography } from '@genseki/react'
 
 import { BaseFilterBox, type BaseFilterBoxInterface } from './base'
 
@@ -48,7 +48,9 @@ export function FilterDate(props: FilterDateInterface) {
       <form>
         <BaseFilterBox {...props}>
           <div>
-            <Label>Filter by "{props.label}"</Label>
+            <Typography type="body" weight="medium">
+              Filter by "{props.label}"
+            </Typography>
             <div className="flex items-end gap-2 my-2">
               <FormField
                 name="startDate"
