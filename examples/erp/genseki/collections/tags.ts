@@ -23,8 +23,14 @@ export const tagsCollection = createPlugin('tags', (app) => {
           search: ['name'],
           sortBy: ['name'],
         },
+        actions: {
+          create: true,
+          update: true,
+          delete: true,
+        },
       })
     )
     .addPageAndApiRouter(collection.create(fields, {}))
     .addPageAndApiRouter(collection.update(fields, {}))
+    .addApiRouter(collection.deleteApiRouter(fields))
 })
