@@ -1,5 +1,7 @@
 'use client'
 
+import { useMemo } from 'react'
+
 import { isThisFieldShapeFilterable, isThisFilterAllowed } from './components/filter/filter-helper'
 import {
   CollectionListFilterPanel,
@@ -32,16 +34,20 @@ export function CollectionListFilter(props: CollectionListFilterProps) {
 
   const filterable = props.filterOptions.filter((e) => isThisFieldShapeFilterable(e.fieldShape))
 
-  const whatFilterCanIFetch = [] // use this to fetch for optionsName
-  const whatFilterCanIFormulate = [] // these you will have to create a component to handle the filter value(s) yourself
+  const { whatFilterCanIFetch, whatFilterCanIFormulate } = useMemo(() => {
+    const fetchList: typeof filterable = [] // this is those "select" options, will have to fetch for choices
+    const formulateList: typeof filterable = [] // this is other types, create a filter component to handle each type separately
 
-  for (const e of filterable) {
-    if (e.optionsName) {
-      whatFilterCanIFetch.push(e)
-    } else if (isThisFilterAllowed(e.fieldShape.$client.fieldName, props.allowedFilters)) {
-      whatFilterCanIFormulate.push(e)
+    for (const e of filterable) {
+      if (e.optionsName) {
+        fetchList.push(e)
+      } else if (isThisFilterAllowed(e.fieldShape.$client.fieldName, props.allowedFilters)) {
+        formulateList.push(e)
+      }
     }
-  }
+
+    return { whatFilterCanIFetch: fetchList, whatFilterCanIFormulate: formulateList }
+  }, [filterable, props.allowedFilters])
 
   return (
     <CollectionListFilterPanel
