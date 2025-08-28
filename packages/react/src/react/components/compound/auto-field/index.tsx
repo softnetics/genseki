@@ -4,7 +4,6 @@ import { type ReactNode, startTransition, useMemo } from 'react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
-import { useQuery } from '@tanstack/react-query'
 
 import {
   BaseIcon,
@@ -34,8 +33,9 @@ import {
   useFormItemController,
 } from '@genseki/react'
 
+import { useOptionsHelperQuery } from './query-options-helper'
+
 import type {
-  FieldOptionsCallbackReturn,
   FieldRelationShapeClient,
   FieldsClient,
   FieldShapeClient,
@@ -208,18 +208,10 @@ export function AutoSelectField(props: AutoSelectField) {
     control: form.control,
   })
 
-  const query = useQuery<{ status: 200; body: FieldOptionsCallbackReturn }>({
-    queryKey: ['POST', props.optionsFetchPath, { pathParams: { name: props.optionsName } }],
-    queryFn: async () => {
-      const response = await fetch(`/api${props.optionsFetchPath}?name=${props.optionsName}`, {
-        method: 'POST',
-        body: JSON.stringify(value),
-        headers: { 'Content-Type': 'application/json' },
-      })
-      if (!response.ok) throw new Error('Failed to fetch options')
-      return response.json()
-    },
-    enabled: false,
+  const { query } = useOptionsHelperQuery({
+    optionsFetchPath: props.optionsFetchPath,
+    optionsName: props.optionsName,
+    queryFnBodyValue: value,
   })
 
   useDebounce(value, () => query.refetch(), 500)

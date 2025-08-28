@@ -215,7 +215,7 @@ export function CollectionListFilterPanel(props: CollectionListFilterPanelProps)
                         handleRemoveChosenFilter(filterField.fieldShape)
                       }}
                       label={fieldLabel}
-                      optionsFetchPath={`${props.slug}/create/options`}
+                      optionsFetchPath={`/${props.slug}/create/options`}
                       optionsName={filterField.options}
                     />
                   )

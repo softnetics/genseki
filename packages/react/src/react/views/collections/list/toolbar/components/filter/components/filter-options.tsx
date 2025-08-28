@@ -1,10 +1,7 @@
 import { useState } from 'react'
 
-import { useQuery } from '@tanstack/react-query'
-
 import { BaseFilterBox, type BaseFilterBoxInterface } from './base'
 
-import type { FieldOptionsCallbackReturn } from '../../../../../../../../core/field'
 import {
   Label,
   Select,
@@ -13,6 +10,7 @@ import {
   SelectOption,
   SelectTrigger,
 } from '../../../../../../../components'
+import { useOptionsHelperQuery } from '../../../../../../../components/compound/auto-field/query-options-helper'
 import { useDebounce } from '../../../../../../../hooks/use-debounce'
 
 interface FilterOptionsInterface extends BaseFilterBoxInterface {
@@ -29,19 +27,10 @@ export function FilterOptions(props: FilterOptionsInterface) {
 
   const optionKey = `${optionsFetchPath} - ${optionsName}`
 
-  const query = useQuery<{ status: 200; body: FieldOptionsCallbackReturn }>({
-    queryKey: ['POST', optionsFetchPath, { pathParams: { name: optionsName } }],
-    queryFn: async () => {
-      const response = await fetch(`/api/${optionsFetchPath}?name=${optionsName}`, {
-        method: 'POST',
-        // body: JSON.stringify(value),
-        headers: { 'Content-Type': 'application/json' },
-      })
-      if (!response.ok) throw new Error('Failed to fetch options')
-      return response.json()
-    },
-    enabled: false,
-    retry: 2,
+  const { query } = useOptionsHelperQuery({
+    optionsFetchPath: optionsFetchPath,
+    optionsName: optionsName,
+    retryCount: 2,
   })
 
   useDebounce(
