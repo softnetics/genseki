@@ -423,11 +423,15 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
       throw new Error('Verification not found')
     }
 
+    const attempt = verification.value.attempt + 1
+
     await this.prisma.verification.update({
       where: { id: verification.id },
       data: {
-        value: JSON.stringify({ ...verification.value, attempt: verification.value.attempt + 1 }),
+        value: JSON.stringify({ ...verification.value, attempt }),
       },
     })
+
+    return attempt
   }
 }

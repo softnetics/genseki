@@ -560,10 +560,23 @@ export class PhoneService<
     }
 
     if (verifyStatus.value === false) {
-      //
+      const attempt = await this.store
+        .increaseForgotPasswordVerificationAttempt(payload.phone, payload.refCode)
+        .then((result) => ok(result))
+        .catch((error) => err(error))
+
+      if (attempt.isErr()) {
+        return err({
+          code: 'FAILED_TO_INCREASE_ATTEMPT' as const,
+          message: 'Failed to increase forgot password verification attempt',
+          cause: attempt.error,
+        })
+      }
+
       return err({
         code: 'INVALID_OTP' as const,
         message: 'Invalid OTP',
+        attempt: attempt.value,
       })
     }
     // TODO: Should we delete the verification
