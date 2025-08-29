@@ -211,6 +211,7 @@ export function phone<
             'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
             'REACHED_MAX_ATTEMPTS',
             'FAILED_TO_VERIFY_OTP',
+            'FAILED_TO_INCREASE_ATTEMPT',
             'INVALID_OTP',
             'ACCOUNT_NOT_FOUND',
           ]),
