@@ -5,42 +5,7 @@ import { createEndpoint, createPlugin } from '@genseki/react'
 
 import type { PhoneService } from './service'
 import type { PhoneStore } from './store'
-import type { AnyPluginSchema, BaseSignUpBodySchema } from './types'
-
-export interface PhonePluginOptions<
-  TSignUpBody extends BaseSignUpBodySchema = BaseSignUpBodySchema,
-> {
-  login?: {
-    sessionExpiredInSeconds?: number // default to 3600 seconds (1 hour)
-    hashPassword?: (password: string) => Promise<string>
-    verifyPassword?: (password: string, hashed: string) => Promise<boolean>
-  }
-  signUp: {
-    body: TSignUpBody
-    onOtpSent: (data: {
-      phone: string
-      name: string
-      refCode: string
-    }) => Promise<{ token: string; refCode: string }>
-    onOtpVerify: (data: { phone: string; token: string; pin: string }) => Promise<boolean>
-  }
-  changePhone?: {
-    onOtpSent: (data: {
-      phone: string
-      name: string | undefined | null
-      refCode: string
-    }) => Promise<{ token: string; refCode: string }>
-    onOtpVerify: (data: { phone: string; token: string; pin: string }) => Promise<boolean>
-  }
-  forgotPassword?: {
-    onOtpSent: (data: {
-      phone: string
-      name: string | undefined | null
-      refCode: string
-    }) => Promise<{ token: string; refCode: string }>
-    onOtpVerify: (data: { phone: string; token: string; pin: string }) => Promise<boolean>
-  }
-}
+import type { AnyPluginSchema } from './types'
 
 export function phone<
   TContext extends AnyContextable,
