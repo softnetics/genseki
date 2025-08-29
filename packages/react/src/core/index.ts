@@ -87,6 +87,7 @@ export type {
   InferApiRouterFromGensekiPlugin,
 } from './plugin'
 export { createPlugin } from './plugin'
+export type { MockPrismaClient } from './prisma.types'
 export type {
   AnyTable,
   AnyTypedFieldColumn,
