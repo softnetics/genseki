@@ -286,7 +286,7 @@ export class PhoneService<
     if (existingUser.phone !== phone.old) {
       return err({
         code: 'CURRENT_PHONE_AND_OLD_PHONE_IS_NOT_THE_SAME' as const,
-        message: 'New phone number is the same as the current one',
+        message: 'Current phone number does not match the provided old phone number',
       })
     }
 
@@ -620,14 +620,14 @@ export class PhoneService<
       })
     }
 
-    if (!(await Password.verifyPassword(password, payload.password.old))) {
+    if (!(await Password.verifyPassword(payload.password.old, password))) {
       return err({
         code: 'OLD_PASSWORD_INCORRECT' as const,
         message: 'Old password is incorrect',
       })
     }
 
-    if (await Password.verifyPassword(password, payload.password.new)) {
+    if (await Password.verifyPassword(payload.password.new, password)) {
       return err({
         code: 'NEW_PASSWORD_SAME_AS_OLD' as const,
         message: 'New password must be different from the old one',

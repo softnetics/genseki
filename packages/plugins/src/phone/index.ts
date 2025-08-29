@@ -103,7 +103,7 @@ export function phone<
       body: z.object({
         token: z.string(),
         refCode: z.string(),
-        pin: z.string().min(1, 'กรุณากรอกรหัส OTP'),
+        pin: z.string().min(1, 'Please enter the OTP'),
         phone: z.string(),
       }),
       responses: {
