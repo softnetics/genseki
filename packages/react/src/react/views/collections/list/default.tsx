@@ -95,7 +95,11 @@ export function DefaultCollectionListPage() {
                   {context.actions?.delete && (
                     <>
                       {context.actions.one || (context.actions.update && <MenuSeparator />)}
-                      <MenuItem aria-label="Delete" isDanger onAction={context.deleteRows}>
+                      <MenuItem
+                        aria-label="Delete"
+                        isDanger
+                        onAction={() => context.deleteRows([row.original.__id as string])}
+                      >
                         Delete
                       </MenuItem>
                     </>
