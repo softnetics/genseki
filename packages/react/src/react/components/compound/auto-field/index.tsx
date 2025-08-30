@@ -479,6 +479,7 @@ export function AutoField(props: AutoFieldProps) {
             <AutoFileUploadField
               {...commonProps}
               uploadOptions={field.uploadOptions}
+              hintText={field.hintText}
               isDisabled={disabled}
             />
           }
