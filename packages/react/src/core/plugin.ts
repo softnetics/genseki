@@ -14,6 +14,7 @@ import {
   recordifyApiRouter,
   type RecordifyApiRoutes,
 } from './endpoint'
+import type { IsValidTable } from './table'
 
 export interface GensekiPluginBuilderOptions extends GensekiAppOptionsWithDefaults {}
 
@@ -125,3 +126,23 @@ export type AnyGensekiPlugin = GensekiPlugin<string, Record<string, ApiRoute>>
 
 export type InferApiRouterFromGensekiPlugin<TPlugin extends AnyGensekiPlugin> =
   TPlugin extends GensekiPlugin<string, infer TApiRouter> ? TApiRouter : never
+
+export type ValidatePluginSchema<
+  TPluginSchema extends Record<string, any>,
+  TSchema extends Record<keyof TPluginSchema, any>,
+> = {
+  [K in keyof TPluginSchema]: IsValidTable<TPluginSchema[K], TSchema[K]>
+}
+
+export type ObjectWithOnlyValue<TObj extends Record<string, any>, TValue> = {
+  [K in keyof TObj]: TValue
+}
+
+export type ValidateSchema<
+  TPluginSchema extends Record<string, any>,
+  TSchema extends Record<keyof TPluginSchema, any>,
+  TOutput,
+> =
+  ValidatePluginSchema<TPluginSchema, TSchema> extends ObjectWithOnlyValue<TSchema, true>
+    ? TOutput
+    : ValidatePluginSchema<TPluginSchema, TSchema>

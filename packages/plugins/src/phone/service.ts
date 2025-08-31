@@ -3,10 +3,16 @@ import { err, ok } from 'neverthrow'
 import type { PartialDeep } from 'type-fest'
 import type z from 'zod'
 
-import { AccountProvider, type AnyContextable, type IsValidTable, Password } from '@genseki/react'
+import {
+  AccountProvider,
+  type AnyContextable,
+  type ObjectWithOnlyValue,
+  Password,
+  type ValidateSchema,
+} from '@genseki/react'
 
 import type { PhoneStore } from './store'
-import type { AnyPluginSchema, BaseSignUpBodySchema, PluginSchema } from './types'
+import type { BaseSignUpBodySchema, PluginSchema } from './types'
 interface PhoneServiceOptions<
   TSignUpBodySchema extends BaseSignUpBodySchema = BaseSignUpBodySchema,
 > {
@@ -54,25 +60,9 @@ export type PhoneServiceOptionsWithDefaults = ReturnType<
   typeof defu<PhoneServiceOptions, [typeof defaultOptions]>
 >
 
-type ValidateSchema<TSchema extends AnyPluginSchema, TOutput> = {
-  user: IsValidTable<PluginSchema['user'], TSchema['user']>
-  session: IsValidTable<PluginSchema['session'], TSchema['session']>
-  account: IsValidTable<PluginSchema['account'], TSchema['account']>
-  verification: IsValidTable<PluginSchema['verification'], TSchema['verification']>
-} extends {
-  user: true
-}
-  ? TOutput
-  : {
-      user: IsValidTable<PluginSchema['user'], TSchema['user']>
-      session: IsValidTable<PluginSchema['session'], TSchema['session']>
-      account: IsValidTable<PluginSchema['account'], TSchema['account']>
-      verification: IsValidTable<PluginSchema['verification'], TSchema['verification']>
-    }
-
 export class PhoneService<
   TContext extends AnyContextable,
-  TSchema extends AnyPluginSchema,
+  TSchema extends ObjectWithOnlyValue<PluginSchema, any>,
   TSignUpBodySchema extends BaseSignUpBodySchema,
   TStore extends PhoneStore<TSignUpBodySchema>,
 > {
@@ -81,7 +71,7 @@ export class PhoneService<
   constructor(
     public readonly context: TContext,
     public readonly schema: TSchema,
-    options: ValidateSchema<TSchema, PhoneServiceOptions<TSignUpBodySchema>>,
+    options: ValidateSchema<PluginSchema, TSchema, PhoneServiceOptions<TSignUpBodySchema>>,
     private readonly store: TStore
   ) {
     this.options = defu(options, defaultOptions) as PhoneServiceOptionsWithDefaults

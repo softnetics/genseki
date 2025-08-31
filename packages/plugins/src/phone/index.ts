@@ -1,16 +1,58 @@
 import z from 'zod'
 
-import type { AnyContextable } from '@genseki/react'
-import { createEndpoint, createPlugin } from '@genseki/react'
+import type { AnyContextable, ObjectWithOnlyValue } from '@genseki/react'
+import { createEndpoint, createPlugin, HttpUnauthorizedError, ResponseHelper } from '@genseki/react'
 
 import type { PhoneService } from './service'
 import type { PhoneStore } from './store'
-import type { AnyPluginSchema } from './types'
+import type { PluginSchema } from './types'
 
 export function phone<
   TContext extends AnyContextable,
-  TPhoneService extends PhoneService<TContext, AnyPluginSchema, any, PhoneStore<any>>,
+  TPhoneService extends PhoneService<
+    TContext,
+    ObjectWithOnlyValue<PluginSchema, any>,
+    any,
+    PhoneStore<any>
+  >,
 >(context: TContext, service: TPhoneService) {
+  const loginEndpoint = createEndpoint(
+    context,
+    {
+      method: 'POST',
+      path: '/auth/phone/sign-up/otp',
+      body: z.object({
+        phone: z.string().min(1),
+        password: z.string().min(1),
+      }),
+      responses: {
+        200: z.object({
+          message: z.string(),
+        }),
+      },
+    },
+    async (payload, { response }) => {
+      const body = payload.body
+
+      const session = await service.login(body)
+
+      if (session.isErr()) {
+        throw new HttpUnauthorizedError(session.error.message)
+      }
+
+      ResponseHelper.setSessionCookie(response, session.value.token, {
+        expires: session.value.expiredAt,
+      })
+
+      return {
+        status: 200,
+        body: {
+          message: 'Login successful',
+        },
+      }
+    }
+  )
+
   const sendSignUpOtpEndpoint = createEndpoint(
     context,
     {
@@ -358,6 +400,7 @@ export function phone<
 
   return createPlugin('phone', (app) => {
     const api = {
+      loginEndpoint,
       sendSignUpOtpEndpoint: sendSignUpOtpEndpoint as {
         schema: typeof sendSignUpOtpEndpoint.schema
         handler: any

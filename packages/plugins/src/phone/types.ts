@@ -1,5 +1,3 @@
-import type { ZodObject, ZodOptional, ZodType } from 'zod'
-
 import type {
   AnyAccountTable,
   AnySessionTable,
@@ -8,15 +6,10 @@ import type {
   AnyUserTable as BaseAnyUserTable,
   AnyVerificationTable,
   DataType,
+  ToZodObject,
 } from '@genseki/react'
 
-export type ToZodObject<T extends Record<string, any>> = ZodObject<{
-  [Key in keyof T]-?: T[Key] extends undefined
-    ? ZodOptional<ZodType<NonNullable<T[Key]>>>
-    : ZodType<T[Key]>
-}>
-
-export type BaseSignUpBody = {
+export interface BaseSignUpBody {
   name: string
   phone: string
   password: string
@@ -35,13 +28,6 @@ type AnyUserTable = AnyTable<{
   primaryFields: any
 }> &
   BaseAnyUserTable
-
-export type AnyPluginSchema = {
-  user: any
-  session: any
-  account: any
-  verification: any
-}
 
 export interface PluginSchema {
   user: AnyUserTable

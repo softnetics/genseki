@@ -27,10 +27,6 @@ class CustomPhoneStore extends PhoneStore<typeof body> {
 
 const phoneStore = new CustomPhoneStore(prisma as any)
 
-const refCode = 'ref9'
-const token = 'token9'
-const pin = '9'
-
 const phoneService = new PhoneService(
   context,
   {
@@ -44,37 +40,34 @@ const phoneService = new PhoneService(
       body: body,
       onOtpSent: async () => {
         return {
-          refCode: refCode,
-          token: token,
+          refCode: crypto.randomUUID().slice(0, 6),
+          token: crypto.randomUUID(),
         }
       },
       onOtpVerify: async (payload) => {
-        if (payload.token === token && payload.pin === pin) return true
-        return false
+        return Math.random() < 0.5
       },
     },
     changePhone: {
       onOtpSent: async () => {
         return {
-          refCode: refCode,
-          token: token,
+          refCode: crypto.randomUUID().slice(0, 6),
+          token: crypto.randomUUID(),
         }
       },
       onOtpVerify: async (payload) => {
-        if (payload.token === token && payload.pin === pin) return true
-        return false
+        return Math.random() < 0.5
       },
     },
     forgotPassword: {
       onOtpSent: async () => {
         return {
-          refCode: refCode,
-          token: token,
+          refCode: crypto.randomUUID().slice(0, 6),
+          token: crypto.randomUUID(),
         }
       },
       onOtpVerify: async (payload) => {
-        if (payload.token === token && payload.pin === pin) return true
-        return false
+        return Math.random() < 0.5
       },
     },
   },

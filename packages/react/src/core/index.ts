@@ -85,6 +85,9 @@ export type {
   GensekiPlugin,
   GensekiPluginBuilder,
   InferApiRouterFromGensekiPlugin,
+  ObjectWithOnlyValue,
+  ValidatePluginSchema,
+  ValidateSchema,
 } from './plugin'
 export { createPlugin } from './plugin'
 export type { MockPrismaClient } from './prisma.types'
@@ -98,4 +101,5 @@ export type {
   WithIsRequired,
   WithIsUnique,
 } from './table'
+export type { ToZodObject } from './utils'
 export { getDefaultValueFromFieldsClient } from './utils'

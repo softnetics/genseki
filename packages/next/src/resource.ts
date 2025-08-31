@@ -57,6 +57,8 @@ async function makeApiRoute(
     // If the request body is not JSON or empty, we will not parse it
     // This is useful for file uploads or plain text requests
 
+    // TODO: Handle plain text and file upload
+
     return new Response(JSON.stringify({ message: 'Invalid request body' }), {
       status: 400,
       headers: { 'Content-Type': 'application/json' },
