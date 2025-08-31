@@ -14,7 +14,7 @@ interface RouteData {
   methodName: string
 }
 
-function isResponse(value: unknown): value is { status: number; body: any } {
+function isGensekiResponse(value: unknown): value is { status: number; body: any } {
   if (typeof value === 'object' && value !== null) {
     return 'status' in value && 'body' in value
   }
@@ -92,7 +92,7 @@ async function makeApiRoute(
     })
   } catch (error: unknown) {
     console.error('Error in API route:', error)
-    if (isResponse(error)) {
+    if (isGensekiResponse(error)) {
       return Response.json(
         {
           status: error?.status ?? 500,
