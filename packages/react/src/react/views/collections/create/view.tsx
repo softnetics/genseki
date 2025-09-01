@@ -3,7 +3,7 @@ import { type SubmitHandler } from 'react-hook-form'
 import { toast } from 'sonner'
 
 import { useCollectionCreate } from './context'
-import { useCollectionCreateMutation } from './hooks/use-collection-create'
+import { useCollectionCreateMutation } from './hooks/use-collection-create-mutation'
 
 import { SubmitButton } from '../../../components'
 import { useNavigation } from '../../../providers'

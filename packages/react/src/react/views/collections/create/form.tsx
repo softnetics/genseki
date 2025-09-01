@@ -1,23 +1,34 @@
-import { type SubmitHandler, type UseFormProps } from 'react-hook-form'
+import {
+  type FieldValues,
+  type SubmitErrorHandler,
+  type SubmitHandler,
+  type UseFormProps,
+} from 'react-hook-form'
 
-import useCreateFormWithDefaultValues from './hooks/use-create-form-with-default-values'
+import { useCreateFormWithDefaultValues } from './hooks/use-create-form-with-default-values'
 
 import { Form } from '../../../components'
 
-export interface CreateFormProps {
-  onSubmit: SubmitHandler<any>
+export interface CreateFormProps<TFieldValues extends FieldValues> {
+  onSubmit: SubmitHandler<TFieldValues>
   children: React.ReactNode
-  formOptions?: Omit<UseFormProps, 'defaultValues'>
+  onError?: SubmitErrorHandler<TFieldValues>
+  formOptions?: Omit<UseFormProps<TFieldValues>, 'defaultValues'>
 }
 
-const CreateForm = ({ children, onSubmit, formOptions }: CreateFormProps) => {
+export const CreateForm = <TFieldValues extends FieldValues>({
+  children,
+  onSubmit,
+  onError,
+  formOptions,
+}: CreateFormProps<TFieldValues>) => {
   const form = useCreateFormWithDefaultValues(formOptions)
 
   return (
     <Form {...form}>
       <form
         noValidate
-        onSubmit={form.handleSubmit(onSubmit)}
+        onSubmit={form.handleSubmit(onSubmit, onError)}
         className="flex flex-col gap-y-8 mt-16"
       >
         {children}
@@ -25,5 +36,3 @@ const CreateForm = ({ children, onSubmit, formOptions }: CreateFormProps) => {
     </Form>
   )
 }
-
-export default CreateForm

@@ -2,11 +2,12 @@
 import { AutoField, type AutoFieldProps } from '../../../components'
 import { useCollection } from '../context'
 
-export interface FieldProps extends Omit<AutoFieldProps, 'fieldShape' | 'optionsFetchPath'> {
-  fieldName: string
+export interface FieldProps<TFieldValues extends {} = {}>
+  extends Omit<AutoFieldProps, 'fieldShape' | 'optionsFetchPath'> {
+  fieldName: keyof TFieldValues
 }
 
-const Field = ({ fieldName, ...rest }: FieldProps) => {
+const Field = <TFieldValues extends {}>({ fieldName, ...rest }: FieldProps<TFieldValues>) => {
   const { fields, slug } = useCollection()
 
   return (

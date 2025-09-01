@@ -7,18 +7,18 @@ import Field from './field'
 import type { FieldsSetProps } from './fieldsSet'
 import FieldsSet from './fieldsSet'
 import type { CreateFormProps } from './form'
-import CreateForm from './form'
+import { CreateForm } from './form'
 import type { CollectionCreateTitleProps } from './title'
 import CollectionCreateTitle from './title'
 import DefaultCollectionCreateView from './view'
 
 import { CollectionFormLayout, type FormLayoutProps } from '../layouts/collection-form-layout'
 
-interface CollectionListContextValue {
+interface CollectionListContextValue<TFieldsValue extends {} = {}> {
   components: {
-    Field: React.FC<FieldProps>
+    Field: React.FC<FieldProps<TFieldsValue>>
     FieldsSet: React.FC<FieldsSetProps>
-    CreateForm: React.FC<CreateFormProps>
+    CreateForm: React.FC<CreateFormProps<TFieldsValue>>
     CollectionCreateTitle: React.FC<CollectionCreateTitleProps>
     DefaultCollectionCreateView: React.FC
     CollectionFormLayout: React.FC<FormLayoutProps>
@@ -54,10 +54,12 @@ export const CollectionCreateProvider = ({ children }: CollectionCreateProviderP
   )
 }
 
-export const useCollectionCreate = () => {
+export const useCollectionCreate = <
+  TFieldsValue extends {},
+>(): CollectionListContextValue<TFieldsValue> => {
   const value = useContext(CollectionCreateContext)
   if (!value)
     throw new Error('"useCollectionCreate" must be used within a "CollectionCreateProvider"')
 
-  return value
+  return value as unknown as CollectionListContextValue<TFieldsValue>
 }

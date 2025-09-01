@@ -1,4 +1,4 @@
-import { useMutation } from '@tanstack/react-query'
+import { type MutationOptions, useMutation } from '@tanstack/react-query'
 
 import { useCollection } from '../../context'
 import type { BaseData } from '../../types'
@@ -12,32 +12,38 @@ export class CollectionCreateError extends Error {
   }
 }
 
-export interface UseCollectionCreateMutationParams {
-  slug?: string
-  onSuccess?: (data: any) => Promise<void> | void
-  onError?: (error: CollectionCreateError) => Promise<void> | void
-  onMutate?: () => void | Promise<void>
+type Response = {
+  status: number
+  body: BaseData
 }
 
-export const useCollectionCreateMutation = ({
+interface UseCollectionCreateMutationParams<
+  T,
+  TMutationOptions extends MutationOptions<Response, CollectionCreateError, T> = MutationOptions<
+    Response,
+    CollectionCreateError,
+    T
+  >,
+> {
+  slug?: string
+  onSuccess?: TMutationOptions['onSuccess']
+  onError?: TMutationOptions['onError']
+  onMutate?: TMutationOptions['onMutate']
+}
+
+export const useCollectionCreateMutation = <T>({
   slug: customSlug,
   onSuccess,
   onError,
   onMutate,
-}: UseCollectionCreateMutationParams) => {
+}: UseCollectionCreateMutationParams<T>) => {
   const context = useCollection()
 
   const slug = customSlug ?? context.slug
 
-  return useMutation<
-    {
-      status: number
-      body: BaseData
-    },
-    CollectionCreateError
-  >({
+  return useMutation<Response, CollectionCreateError, T>({
     mutationKey: ['POST', `/${slug}`],
-    mutationFn: async (data: any) => {
+    mutationFn: async (data) => {
       // TODO: This should be provided from App Config
       const response = await fetch(`/api/${slug}`, {
         method: 'POST',

@@ -1,4 +1,5 @@
 export * from './collections/context'
+export * from './collections/create'
 export * from './collections/home'
 export * from './collections/layouts/collection-form-layout'
 export * from './collections/layouts/collection-layout'

@@ -1,14 +1,16 @@
 'use client'
 
 import type React from 'react'
-import { useState } from 'react'
-import { type SubmitHandler, useFormContext } from 'react-hook-form'
+import { useCallback, useState } from 'react'
+import { type SubmitErrorHandler, type SubmitHandler, useFormContext } from 'react-hook-form'
 
+import { zodResolver } from '@hookform/resolvers/zod'
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
+import z from 'zod'
 
-import type { BaseData, CollectionLayoutProps } from '@genseki/react'
+import type { BaseData, CollectionLayoutProps, InferCreateFields } from '@genseki/react'
 import {
   BaseIcon,
   Button,
@@ -24,6 +26,8 @@ import {
   TanstackTable,
   toast,
   Typography,
+  useCollectionCreate,
+  useCollectionCreateMutation,
   useCollectionDeleteMutation,
   useCollectionList,
   useCollectionListQuery,
@@ -34,9 +38,6 @@ import {
 } from '@genseki/react'
 
 import type { fields } from './posts'
-
-import { useCollectionCreate } from '../../../../packages/react/src/react/views/collections/create/context'
-import { useCollectionCreateMutation } from '../../../../packages/react/src/react/views/collections/create/hooks/use-collection-create'
 
 type Post = InferFields<typeof fields>
 const columnHelper = createColumnHelper<Post>()
@@ -295,28 +296,53 @@ const CancelButton = () => {
   )
 }
 
+type CreatePostFields = InferCreateFields<typeof fields>
+const createPostSchema = z.object({
+  example: z.string().min(1),
+  author: z.object({
+    connect: z.uuid(),
+  }),
+  content: z.any(),
+  postTags: z.any(),
+  title: z.string().min(1),
+})
+
 export const CustomCreatePage = () => {
   const [errorMessage, setErrorMessage] = useState<string | null>(null)
 
   const { navigate } = useNavigation()
   const {
     components: { CollectionFormLayout, CreateForm, Field },
-  } = useCollectionCreate()
+  } = useCollectionCreate<CreatePostFields>()
 
-  const mutation = useCollectionCreateMutation({
+  const mutation = useCollectionCreateMutation<CreatePostFields>({
     onSuccess: () => {
       toast.success('Post published', { position: 'top-center' })
       return navigate(`./`)
     },
-    onError: ({ message }) => {
-      setErrorMessage(`Error: ${message}`)
-    },
-    onMutate: () => {
-      setErrorMessage(null)
-    },
+    onError: ({ message }) => setErrorMessage(`Error: ${message}`),
+    onMutate: () => setErrorMessage(null),
   })
 
-  const onSubmit: SubmitHandler<any> = (data: any) => mutation.mutateAsync(data)
+  const handleValidationError = useCallback<SubmitErrorHandler<CreatePostFields>>(
+    (errors) =>
+      setErrorMessage(
+        [
+          errors.author?.message && `AUTHOR: ${errors.author?.message}`,
+          errors.author?.connect?.message && `AUTHOR.CONNECT: ${errors.author?.connect?.message}`,
+          errors.example?.message && `EXAMPLE: ${errors.example?.message}`,
+          errors.title?.message && `TITLE: ${errors.title.message}`,
+        ]
+          .filter((e) => e !== undefined)
+          .join(',')
+      ),
+    []
+  )
+
+  const handleSubmit = useCallback<SubmitHandler<CreatePostFields>>(
+    (data) => mutation.mutateAsync(data),
+    [mutation]
+  )
 
   return (
     <CollectionFormLayout>
@@ -332,7 +358,13 @@ export const CustomCreatePage = () => {
           {errorMessage}
         </Typography>
       )}
-      <CreateForm onSubmit={onSubmit}>
+      <CreateForm
+        onSubmit={handleSubmit}
+        onError={handleValidationError}
+        formOptions={{
+          resolver: zodResolver(createPostSchema),
+        }}
+      >
         <Field fieldName="example" />
         <SimpleTextInput
           fieldName="title"
