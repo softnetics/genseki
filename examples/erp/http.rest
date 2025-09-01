@@ -1,0 +1,40 @@
+POST http://localhost:3000/api/auth/phone/sign-up/otp
+Content-Type: application/json
+
+{
+  "name": "0812345679",
+  "phone": "0812345679",
+  "password": "password"
+}
+
+###
+
+POST http://localhost:3000/api/auth/phone/sign-up/otp/verify
+Content-Type: application/json
+
+{
+  "token": "token8",
+  "phone": "0812345679",
+  "pin": "8",
+  "refCode": "ref8"
+}
+
+### 
+POST http://localhost:3000/api/auth/phone/forgot-password/otp
+Content-Type: application/json
+
+{
+  "phone": "0812345678"
+}
+
+###
+
+POST http://localhost:3000/api/auth/phone/forgot-password/otp/verify
+Content-Type: application/json
+
+{
+  "token": "token9",
+  "phone": "0812345678",
+  "pin": "9",
+  "refCode": "ref9"
+}

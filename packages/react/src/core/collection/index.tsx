@@ -4,7 +4,6 @@ import type { PropsWithChildren } from 'react'
 import type { ColumnDef } from '@tanstack/react-table'
 import type { ConditionalExcept, Promisable, Simplify } from 'type-fest'
 import type { UndefinedToOptional } from 'type-fest/source/internal'
-import type { ZodObject, ZodOptional, ZodType } from 'zod'
 
 import {
   type CollectionLayoutProps,
@@ -56,12 +55,6 @@ import {
 import type { DataType, InferDataType, ModelSchemas } from '../model'
 import type { GensekiPluginBuilderOptions } from '../plugin'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
-
-export type ToZodObject<T extends Record<string, any>> = ZodObject<{
-  [Key in keyof T]-?: T[Key] extends undefined
-    ? ZodOptional<ZodType<NonNullable<T[Key]>>>
-    : ZodType<T[Key]>
-}>
 
 type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
 

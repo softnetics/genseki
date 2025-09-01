@@ -1,53 +1,55 @@
 interface PrismaUpdateArgs {
-  where: any
-  data: any
+  where: Record<string, any>
+  data: Record<string, any>
 }
 
 interface PrismaUpdateManyArgs {
-  where: any
-  data: any
+  where: Record<string, any>
+  data: Record<string, any>
 }
 
 interface PrismaUpsertArgs {
-  where: any
-  create: any
-  update: any
+  select: Record<string, any>
+  where: Record<string, any>
+  create: Record<string, any>
+  update: Record<string, any>
 }
 
 interface PrismaFindManyArgs {
   select?: Record<string, any>
-  where?: any
-  orderBy?: any
+  where?: Record<string, any>
+  orderBy?: Record<string, any>
   take?: number
   skip?: number
 }
 
 interface PrismaFindFirstArgs {
   select?: Record<string, any>
-  where?: any
-  orderBy?: any
+  where?: Record<string, any>
+  orderBy?: Record<string, any>
 }
 
 interface PrismaFindUniqueArgs {
   select?: Record<string, any>
-  where: any
-  orderBy?: any
+  where: Record<string, any>
+  orderBy?: Record<string, any>
 }
 
 interface PrismaCreateArgs {
-  data: any
+  select?: Record<string, any>
+  data: Record<string, any>
 }
 
 interface PrismaDeleteArgs {
-  where: any
+  where: Record<string, any>
 }
 
 interface PrismaDeleteManyArgs {
-  where?: any
+  where?: Record<string, any>
 }
 
 interface PrismaCountArgs {
-  where?: any
+  where?: Record<string, any>
 }
 
 export type MockPrismaClient = {
