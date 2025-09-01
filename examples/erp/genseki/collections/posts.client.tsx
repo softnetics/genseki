@@ -1,6 +1,8 @@
 'use client'
 
 import type React from 'react'
+import { useState } from 'react'
+import { type SubmitHandler, useFormContext } from 'react-hook-form'
 
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
@@ -9,6 +11,7 @@ import { createColumnHelper } from '@tanstack/react-table'
 import type { BaseData, CollectionLayoutProps } from '@genseki/react'
 import {
   BaseIcon,
+  Button,
   Checkbox,
   CollectionListToolbar,
   type InferFields,
@@ -17,8 +20,10 @@ import {
   MenuItem,
   MenuSeparator,
   MenuTrigger,
+  SubmitButton,
   TanstackTable,
   toast,
+  Typography,
   useCollectionDeleteMutation,
   useCollectionList,
   useCollectionListQuery,
@@ -29,6 +34,9 @@ import {
 } from '@genseki/react'
 
 import type { fields } from './posts'
+
+import { useCollectionCreate } from '../../../../packages/react/src/react/views/collections/create/context'
+import { useCollectionCreateMutation } from '../../../../packages/react/src/react/views/collections/create/hooks/use-collection-create'
 
 type Post = InferFields<typeof fields>
 const columnHelper = createColumnHelper<Post>()
@@ -237,7 +245,7 @@ export function Layout(props: CollectionLayoutProps) {
   )
 }
 
-export function Page() {
+export function CustomListPage() {
   const {
     components: {
       ListBanner,
@@ -257,5 +265,88 @@ export function Page() {
         <ListTablePagination />
       </ListTableContainer>
     </>
+  )
+}
+
+interface SimpleTextInputProps extends React.InputHTMLAttributes<HTMLInputElement> {
+  fieldName: string
+}
+const SimpleTextInput = ({ fieldName, ...rest }: SimpleTextInputProps) => {
+  const { register } = useFormContext()
+
+  return <input {...rest} {...register(fieldName)} />
+}
+
+const CancelButton = () => {
+  const {
+    formState: { isDirty },
+  } = useFormContext()
+  const { navigate } = useNavigation()
+
+  const handleCancel = () => {
+    if ((isDirty && confirm('You have unsaved changes, sure to leave?')) || !isDirty)
+      return navigate('./')
+  }
+
+  return (
+    <Button size="md" variant="destruction" onClick={handleCancel}>
+      Cancel
+    </Button>
+  )
+}
+
+export const CustomCreatePage = () => {
+  const [errorMessage, setErrorMessage] = useState<string | null>(null)
+
+  const { navigate } = useNavigation()
+  const {
+    components: { CollectionFormLayout, CreateForm, Field },
+  } = useCollectionCreate()
+
+  const mutation = useCollectionCreateMutation({
+    onSuccess: () => {
+      toast.success('Post published', { position: 'top-center' })
+      return navigate(`./`)
+    },
+    onError: ({ message }) => {
+      setErrorMessage(`Error: ${message}`)
+    },
+    onMutate: () => {
+      setErrorMessage(null)
+    },
+  })
+
+  const onSubmit: SubmitHandler<any> = (data: any) => mutation.mutateAsync(data)
+
+  return (
+    <CollectionFormLayout>
+      <Typography
+        type="h2"
+        weight="semibold"
+        className={errorMessage === null ? 'text-black' : 'text-red-500'}
+      >
+        Publish a new article
+      </Typography>
+      {errorMessage && (
+        <Typography type="body" weight="bold" className="text-red-500">
+          {errorMessage}
+        </Typography>
+      )}
+      <CreateForm onSubmit={onSubmit}>
+        <Field fieldName="example" />
+        <SimpleTextInput
+          fieldName="title"
+          placeholder="Custom Title Input"
+          className="border-2 rounded-sm border-purple-500 p-4"
+        />
+        <Field fieldName="content" />
+        <Field fieldName="author" />
+        <Field fieldName="postTags" />
+        <div className="grid grid-cols-2 gap-4">
+          <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
+          <CancelButton />
+        </div>
+      </CreateForm>
+    </CollectionFormLayout>
   )
 }

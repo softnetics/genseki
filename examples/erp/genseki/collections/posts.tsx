@@ -15,7 +15,7 @@ import {
   SelectionExtension,
 } from '@genseki/react'
 
-import { columns, Layout, Page } from './posts.client'
+import { columns, CustomCreatePage, CustomListPage, Layout } from './posts.client'
 
 import { FullModelSchemas } from '../../generated/genseki/unsanitized'
 import { EditorSlotBefore } from '../editor/slot-before'
@@ -194,10 +194,10 @@ export const postsCollection = createPlugin('posts', (app) => {
         },
         actions: { delete: true, update: true, create: true },
         layout: Layout,
-        page: Page,
+        page: CustomListPage,
       })
     )
-    .addPageAndApiRouter(collection.create(fields, { options: options }))
+    .addPageAndApiRouter(collection.create(fields, { options: options, page: CustomCreatePage }))
     .addPageAndApiRouter(collection.update(fields, { options: options }))
     .addApiRouter(collection.deleteApiRouter(fields))
 })
