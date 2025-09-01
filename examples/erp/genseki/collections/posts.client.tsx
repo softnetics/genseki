@@ -278,7 +278,10 @@ const SimpleTextInput = ({ fieldName, ...rest }: SimpleTextInputProps) => {
   return <input {...rest} {...register(fieldName)} />
 }
 
-const CancelButton = () => {
+interface CancelButtonProps {
+  pending?: boolean
+}
+const CancelButton = ({ pending }: CancelButtonProps) => {
   const {
     formState: { isDirty },
   } = useFormContext()
@@ -290,8 +293,8 @@ const CancelButton = () => {
   }
 
   return (
-    <Button size="md" variant="destruction" onClick={handleCancel}>
-      Cancel
+    <Button size="md" variant="destruction" onClick={handleCancel} isDisabled={pending}>
+      {pending ? 'Submitting...' : 'Cancel'}
     </Button>
   )
 }
@@ -376,7 +379,7 @@ export const CustomCreatePage = () => {
         <Field fieldName="postTags" />
         <div className="grid grid-cols-2 gap-4">
           <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
-          <CancelButton />
+          <CancelButton pending={mutation.isPending} />
         </div>
       </CreateForm>
     </CollectionFormLayout>

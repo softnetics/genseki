@@ -3,42 +3,42 @@
 import React, { createContext, useContext, useMemo } from 'react'
 
 import type { FieldProps } from './field'
-import Field from './field'
-import type { FieldsSetProps } from './fieldsSet'
-import FieldsSet from './fieldsSet'
+import { Field } from './field'
+import type { FieldsProps } from './fields'
+import { Fields } from './fields'
 import type { CreateFormProps } from './form'
 import { CreateForm } from './form'
 import type { CollectionCreateTitleProps } from './title'
-import CollectionCreateTitle from './title'
-import DefaultCollectionCreateView from './view'
+import { CreateTitle } from './title'
+import { CreateView } from './view'
 
 import { CollectionFormLayout, type FormLayoutProps } from '../layouts/collection-form-layout'
 
-interface CollectionListContextValue<TFieldsValue extends {} = {}> {
+interface CollectionCreateContextValue<TFieldsValue extends {} = {}> {
   components: {
-    Field: React.FC<FieldProps<TFieldsValue>>
-    FieldsSet: React.FC<FieldsSetProps>
+    CreateField: React.FC<FieldProps<TFieldsValue>>
+    CreateFields: React.FC<FieldsProps>
     CreateForm: React.FC<CreateFormProps<TFieldsValue>>
-    CollectionCreateTitle: React.FC<CollectionCreateTitleProps>
-    DefaultCollectionCreateView: React.FC
-    CollectionFormLayout: React.FC<FormLayoutProps>
+    CreateTitle: React.FC<CollectionCreateTitleProps>
+    CreateView: React.FC
+    CreateFormLayout: React.FC<FormLayoutProps>
   }
 }
 
-const CollectionCreateContext = createContext<CollectionListContextValue | null>(null)
+const CollectionCreateContext = createContext<CollectionCreateContextValue | null>(null)
 
 interface CollectionCreateProviderProps {
   children: React.ReactNode
 }
-export const CollectionCreateProvider = ({ children }: CollectionCreateProviderProps) => {
-  const components = useMemo<CollectionListContextValue['components']>(
+export function CollectionCreateProvider({ children }: CollectionCreateProviderProps) {
+  const components = useMemo<CollectionCreateContextValue['components']>(
     () => ({
-      Field,
-      FieldsSet,
+      CreateField: Field,
+      CreateFields: Fields,
       CreateForm,
-      CollectionCreateTitle,
-      DefaultCollectionCreateView,
-      CollectionFormLayout,
+      CreateTitle,
+      CreateView,
+      CreateFormLayout: CollectionFormLayout,
     }),
     []
   )
@@ -56,10 +56,10 @@ export const CollectionCreateProvider = ({ children }: CollectionCreateProviderP
 
 export const useCollectionCreate = <
   TFieldsValue extends {},
->(): CollectionListContextValue<TFieldsValue> => {
+>(): CollectionCreateContextValue<TFieldsValue> => {
   const value = useContext(CollectionCreateContext)
   if (!value)
     throw new Error('"useCollectionCreate" must be used within a "CollectionCreateProvider"')
 
-  return value as unknown as CollectionListContextValue<TFieldsValue>
+  return value as unknown as CollectionCreateContextValue<TFieldsValue>
 }

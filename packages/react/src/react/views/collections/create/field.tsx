@@ -7,7 +7,7 @@ export interface FieldProps<TFieldValues extends {} = {}>
   fieldName: keyof TFieldValues
 }
 
-const Field = <TFieldValues extends {}>({ fieldName, ...rest }: FieldProps<TFieldValues>) => {
+export function Field<TFieldValues extends {}>({ fieldName, ...rest }: FieldProps<TFieldValues>) {
   const { fields, slug } = useCollection()
 
   return (
@@ -18,5 +18,3 @@ const Field = <TFieldValues extends {}>({ fieldName, ...rest }: FieldProps<TFiel
     />
   )
 }
-
-export default Field

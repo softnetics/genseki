@@ -5,7 +5,7 @@ import {
   type UseFormProps,
 } from 'react-hook-form'
 
-import { useCreateFormWithDefaultValues } from './hooks/use-create-form-with-default-values'
+import { useCreateForm } from './hooks/use-create-form-with-default-values'
 
 import { Form } from '../../../components'
 
@@ -22,7 +22,7 @@ export const CreateForm = <TFieldValues extends FieldValues>({
   onError,
   formOptions,
 }: CreateFormProps<TFieldValues>) => {
-  const form = useCreateFormWithDefaultValues(formOptions)
+  const form = useCreateForm(formOptions)
 
   return (
     <Form {...form}>

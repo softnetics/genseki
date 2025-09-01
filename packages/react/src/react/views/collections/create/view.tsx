@@ -8,10 +8,10 @@ import { useCollectionCreateMutation } from './hooks/use-collection-create-mutat
 import { SubmitButton } from '../../../components'
 import { useNavigation } from '../../../providers'
 
-const DefaultCollectionCreateView = () => {
+export function CreateView() {
   const { navigate } = useNavigation()
   const {
-    components: { CreateForm, FieldsSet },
+    components: { CreateForm, CreateFields: FieldsSet },
   } = useCollectionCreate()
 
   const mutation = useCollectionCreateMutation({
@@ -33,5 +33,3 @@ const DefaultCollectionCreateView = () => {
     </CreateForm>
   )
 }
-
-export default DefaultCollectionCreateView

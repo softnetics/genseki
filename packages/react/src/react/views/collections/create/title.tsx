@@ -4,7 +4,7 @@ import { useCollection } from '../context'
 export interface CollectionCreateTitleProps {
   slug?: string
 }
-const CollectionCreateTitle = ({ slug }: CollectionCreateTitleProps) => {
+export function CreateTitle({ slug }: CollectionCreateTitleProps) {
   const context = useCollection()
 
   return (
@@ -13,5 +13,3 @@ const CollectionCreateTitle = ({ slug }: CollectionCreateTitleProps) => {
     </Typography>
   )
 }
-
-export default CollectionCreateTitle

@@ -4,17 +4,16 @@ import { getDefaultValueFromFieldsClient } from '../../../../../core'
 import { useStorageAdapter } from '../../../../providers/root'
 import { useCollection } from '../../context'
 
-export const useCreateFormWithDefaultValues = <TFieldValues extends FieldValues>(
-  props?: Omit<UseFormProps<TFieldValues>, 'defaultValues'>
+export const useCreateForm = <TFieldValues extends FieldValues>(
+  props?: UseFormProps<TFieldValues>
 ) => {
   const storageAdapter = useStorageAdapter()
   const { fields } = useCollection()
 
   return useForm<TFieldValues>({
-    defaultValues: getDefaultValueFromFieldsClient(
-      fields,
-      storageAdapter
-    ) as DefaultValues<TFieldValues>,
+    defaultValues:
+      props?.defaultValues ??
+      (getDefaultValueFromFieldsClient(fields, storageAdapter) as DefaultValues<TFieldValues>),
     ...props,
   })
 }
