@@ -167,7 +167,9 @@ export type InferCreateRelationField<
   TKeys extends 'create' | 'connect' | 'disconnect',
 > = TField['$server']['relation']['isList'] extends true
   ? InferCreateManyRelationFieldShape<TField, TKeys>
-  : Partial<InferCreateOneRelationFieldShape<TField, TKeys>>
+  : TField['$server']['relation']['isRequired'] extends true
+    ? InferCreateOneRelationFieldShape<TField, TKeys>
+    : Partial<InferCreateOneRelationFieldShape<TField, TKeys>>
 
 export type InferCreateFieldShape<TFieldShape extends FieldShape> = ApplyFieldProperty<
   TFieldShape extends FieldRelationShapeBase
