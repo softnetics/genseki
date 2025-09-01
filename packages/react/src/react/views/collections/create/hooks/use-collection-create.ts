@@ -16,12 +16,14 @@ export interface UseCollectionCreateMutationParams {
   slug?: string
   onSuccess?: (data: any) => Promise<void> | void
   onError?: (error: CollectionCreateError) => Promise<void> | void
+  onMutate?: () => void | Promise<void>
 }
 
 export const useCollectionCreateMutation = ({
   slug: customSlug,
   onSuccess,
   onError,
+  onMutate,
 }: UseCollectionCreateMutationParams) => {
   const context = useCollection()
 
@@ -50,8 +52,8 @@ export const useCollectionCreateMutation = ({
           errorBody = await response.text()
         }
         const errorMessage =
-          typeof errorBody === 'object' && errorBody && errorBody.message
-            ? errorBody.message
+          typeof errorBody === 'object' && errorBody && errorBody.body.message
+            ? errorBody.body.message
             : typeof errorBody === 'string' && errorBody
               ? errorBody
               : 'Failed to create'
@@ -61,5 +63,6 @@ export const useCollectionCreateMutation = ({
     },
     onSuccess,
     onError,
+    onMutate,
   })
 }
