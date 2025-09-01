@@ -614,23 +614,51 @@ export class PhoneService<
       })
     }
 
-    const password = account.password
+    const existingPassword = account.password
 
-    if (!password) {
+    if (!existingPassword) {
       return err({
         code: 'ACCOUNT_NOT_SUPPORTED' as const,
         message: 'This account does not need to change password',
       })
     }
 
-    if (!(await Password.verifyPassword(payload.password.old, password))) {
+    const oldPasswordVerification = await Password.verifyPassword(
+      payload.password.old,
+      existingPassword
+    )
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (oldPasswordVerification.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Old Password checking logic throw error. Please check the log for more details',
+      })
+    }
+
+    if (!oldPasswordVerification.value) {
       return err({
         code: 'OLD_PASSWORD_INCORRECT' as const,
         message: 'Old password is incorrect',
       })
     }
 
-    if (await Password.verifyPassword(payload.password.new, password)) {
+    const newPasswordVerification = await Password.verifyPassword(
+      payload.password.new,
+      existingPassword
+    )
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (newPasswordVerification.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'New Password checking logic throw error. Please check the log for more details',
+      })
+    }
+
+    if (newPasswordVerification.value) {
       return err({
         code: 'NEW_PASSWORD_SAME_AS_OLD' as const,
         message: 'New password must be different from the old one',
