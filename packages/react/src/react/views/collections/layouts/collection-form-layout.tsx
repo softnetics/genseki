@@ -26,19 +26,15 @@ const layout = tv({
 
 type LayoutVariants = VariantProps<typeof layout>
 
-interface FormLayoutProps extends LayoutVariants {
+export interface FormLayoutProps extends LayoutVariants {
   children?: React.ReactNode
   className?: string
-  banner?: React.ReactNode
 }
 
 export const CollectionFormLayout = (props: FormLayoutProps) => {
   return (
-    <>
-      {props.banner}
-      <div className={cn(layout({ size: props.size, display: props.display }), props.className)}>
-        {props.children}
-      </div>
-    </>
+    <div className={cn(layout({ size: props.size, display: props.display }), props.className)}>
+      {props.children}
+    </div>
   )
 }
