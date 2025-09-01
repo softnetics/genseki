@@ -315,7 +315,7 @@ export const CustomCreatePage = () => {
 
   const { navigate } = useNavigation()
   const {
-    components: { CollectionFormLayout, CreateForm, Field },
+    components: { CreateFormLayout, CreateForm, CreateField },
   } = useCollectionCreate<CreatePostFields>()
 
   const mutation = useCollectionCreateMutation<CreatePostFields>({
@@ -348,7 +348,7 @@ export const CustomCreatePage = () => {
   )
 
   return (
-    <CollectionFormLayout>
+    <CreateFormLayout>
       <Typography
         type="h2"
         weight="semibold"
@@ -368,20 +368,20 @@ export const CustomCreatePage = () => {
           resolver: zodResolver(createPostSchema),
         }}
       >
-        <Field fieldName="example" />
+        <CreateField fieldName="example" />
         <SimpleTextInput
           fieldName="title"
           placeholder="Custom Title Input"
           className="border-2 rounded-sm border-purple-500 p-4"
         />
-        <Field fieldName="content" />
-        <Field fieldName="author" />
-        <Field fieldName="postTags" />
+        <CreateField fieldName="content" />
+        <CreateField fieldName="author" />
+        <CreateField fieldName="postTags" />
         <div className="grid grid-cols-2 gap-4">
           <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
           <CancelButton pending={mutation.isPending} />
         </div>
       </CreateForm>
-    </CollectionFormLayout>
+    </CreateFormLayout>
   )
 }
