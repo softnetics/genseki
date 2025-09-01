@@ -338,8 +338,6 @@ export class PhoneService<
       token: otpResponse.value.token,
       refCode: otpResponse.value.refCode,
       resendAttempt: count + 1,
-      submitAttempt: 0,
-      // TODO: penalty time
     })
   }
 
@@ -437,7 +435,6 @@ export class PhoneService<
         token: token,
         refCode: refCode,
         resendAttempt: 1,
-        submitAttempt: 0,
       })
     }
 
@@ -495,8 +492,6 @@ export class PhoneService<
       token: token.value,
       refCode: otpResponse.value.refCode,
       resendAttempt: count + 1,
-      submitAttempt: 0,
-      // TODO: Penalty time
     })
   }
 
@@ -634,6 +629,7 @@ export class PhoneService<
       return err({
         code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'Old Password checking logic throw error. Please check the log for more details',
+        cause: oldPasswordVerification.error,
       })
     }
 
@@ -655,6 +651,7 @@ export class PhoneService<
       return err({
         code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'New Password checking logic throw error. Please check the log for more details',
+        cause: newPasswordVerification.error,
       })
     }
 

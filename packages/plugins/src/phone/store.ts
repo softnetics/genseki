@@ -337,12 +337,12 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
 
   async getForgotPasswordVerification(phone: string, refCode: string) {
     const verification = (await this.prisma.verification.findFirst({
-      select: { id: true, value: true },
+      select: { id: true, value: true, createdAt: true },
       where: {
         identifier: `forgot-password:${phone}:${refCode}`,
         expiredAt: { gte: new Date() },
       },
-    })) as { id: string; value: string } | null
+    })) as { id: string; value: string; createdAt: Date } | null
 
     if (!verification) {
       return null
@@ -357,6 +357,7 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return {
       id: verification.id,
       value: value,
+      createdAt: verification.createdAt,
     }
   }
 

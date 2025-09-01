@@ -64,7 +64,6 @@ export function phone<
           token: z.string(),
           refCode: z.string(),
           resendAttempt: z.number(),
-          submitAttempt: z.number(),
         }),
         500: z.looseObject({
           code: z.enum([
@@ -96,7 +95,6 @@ export function phone<
           token: response.value.token,
           refCode: response.value.refCode,
           resendAttempt: response.value.resendAttempt,
-          submitAttempt: response.value.submitAttempt,
         },
       }
     }
@@ -117,17 +115,23 @@ export function phone<
         200: z.object({
           message: z.string(),
         }),
-        500: z.looseObject({
-          code: z.enum([
-            'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
-            'REACHED_MAX_ATTEMPTS',
-            'FAILED_OTP_VERIFICATION',
-            'INVALID_OTP',
-            'ACCOUNT_NOT_FOUND',
-            'INTERNAL_SERVER_ERROR',
-          ]),
-          message: z.string(),
-        }),
+        500: z.union([
+          z.looseObject({
+            code: z.enum([
+              'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
+              'REACHED_MAX_ATTEMPTS',
+              'FAILED_OTP_VERIFICATION',
+              'ACCOUNT_NOT_FOUND',
+              'INTERNAL_SERVER_ERROR',
+            ]),
+            message: z.string(),
+          }),
+          z.looseObject({
+            code: z.enum(['INVALID_OTP']),
+            message: z.string(),
+            attempt: z.number(),
+          }),
+        ]),
       },
     },
     async (payload) => {
@@ -162,7 +166,6 @@ export function phone<
           refCode: z.string(),
           token: z.string(),
           resendAttempt: z.number(),
-          submitAttempt: z.number(),
         }),
         500: z.looseObject({
           code: z.enum([
@@ -191,7 +194,6 @@ export function phone<
           refCode: response.value.refCode,
           token: response.value.token,
           resendAttempt: response.value.resendAttempt,
-          submitAttempt: response.value.submitAttempt,
         },
       }
     }
@@ -212,18 +214,24 @@ export function phone<
         200: z.object({
           token: z.string(),
         }),
-        500: z.looseObject({
-          code: z.enum([
-            'FEATURE_NOT_ENABLED',
-            'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
-            'REACHED_MAX_ATTEMPTS',
-            'FAILED_TO_VERIFY_OTP',
-            'FAILED_TO_INCREASE_ATTEMPT',
-            'INVALID_OTP',
-            'ACCOUNT_NOT_FOUND',
-          ]),
-          message: z.string(),
-        }),
+        500: z.union([
+          z.looseObject({
+            code: z.enum([
+              'FEATURE_NOT_ENABLED',
+              'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
+              'REACHED_MAX_ATTEMPTS',
+              'FAILED_TO_VERIFY_OTP',
+              'FAILED_TO_INCREASE_ATTEMPT',
+              'ACCOUNT_NOT_FOUND',
+            ]),
+            message: z.string(),
+          }),
+          z.looseObject({
+            code: z.enum(['INVALID_OTP']),
+            message: z.string(),
+            attempt: z.number(),
+          }),
+        ]),
       },
     },
     async (payload) => {
@@ -264,6 +272,7 @@ export function phone<
             'ACCOUNT_NOT_SUPPORTED',
             'OLD_PASSWORD_INCORRECT',
             'NEW_PASSWORD_SAME_AS_OLD',
+            'INTERNAL_SERVER_ERROR',
             'FAILED_TO_UPDATE_PASSWORD',
             'FAILED_TO_DELETE_PASSWORD_VERIFICATION',
           ]),
@@ -305,7 +314,6 @@ export function phone<
           refCode: z.string(),
           token: z.string(),
           resendAttempt: z.number(),
-          submitAttempt: z.number(),
         }),
         500: z.looseObject({
           code: z.enum([
@@ -342,7 +350,6 @@ export function phone<
           refCode: response.value.refCode,
           token: response.value.token,
           resendAttempt: response.value.resendAttempt,
-          submitAttempt: response.value.submitAttempt,
         },
       }
     }
@@ -362,17 +369,23 @@ export function phone<
         200: z.object({
           message: z.string(),
         }),
-        500: z.looseObject({
-          code: z.enum([
-            'FEATURE_NOT_ENABLED',
-            'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
-            'REACHED_MAX_ATTEMPTS',
-            'FAILED_OTP_VERIFICATION',
-            'INVALID_OTP',
-            'INTERNAL_SERVER_ERROR',
-          ]),
-          message: z.string(),
-        }),
+        500: z.union([
+          z.looseObject({
+            code: z.enum([
+              'FEATURE_NOT_ENABLED',
+              'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
+              'REACHED_MAX_ATTEMPTS',
+              'FAILED_OTP_VERIFICATION',
+              'INTERNAL_SERVER_ERROR',
+            ]),
+            message: z.string(),
+          }),
+          z.looseObject({
+            code: z.enum(['INVALID_OTP']),
+            message: z.string(),
+            attempt: z.number(),
+          }),
+        ]),
       },
     },
     async ({ context, body }) => {
