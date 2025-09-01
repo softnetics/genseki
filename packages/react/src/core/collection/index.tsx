@@ -631,6 +631,8 @@ export class CollectionBuilder<
         requiredAuthenticated: true,
         context: this.context,
         render: (args) => {
+          const Page = config.page ?? DefaultCollectionCreatePage
+
           return (
             <CollectionProvider
               slug={this.slug}
@@ -642,7 +644,7 @@ export class CollectionBuilder<
             >
               <CollectionCreateProvider>
                 <DefaultCollectionLayout pathname={args.pathname} {...appOptions}>
-                  <DefaultCollectionCreatePage />
+                  <Page />
                 </DefaultCollectionLayout>
               </CollectionCreateProvider>
             </CollectionProvider>
