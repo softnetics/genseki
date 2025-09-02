@@ -4,7 +4,6 @@ import React, { createContext, useContext, useMemo } from 'react'
 
 import { Field, type FieldProps } from './field'
 import { Fields, type FieldsProps } from './fields'
-import { CreateForm, type CreateFormProps } from './form'
 import { CreateTitle, type CreateTitleProps } from './title'
 import { CreateView } from './view'
 
@@ -14,7 +13,6 @@ interface CollectionCreateContextValue<TFieldsValue extends {} = {}> {
   components: {
     CreateField: React.FC<FieldProps<TFieldsValue>>
     CreateFields: React.FC<FieldsProps>
-    CreateForm: React.FC<CreateFormProps<TFieldsValue>>
     CreateTitle: React.FC<CreateTitleProps>
     CreateView: React.FC
     CreateFormLayout: React.FC<FormLayoutProps>
@@ -31,7 +29,6 @@ export function CollectionCreateProvider({ children }: CollectionCreateProviderP
     () => ({
       CreateField: Field,
       CreateFields: Fields,
-      CreateForm,
       CreateTitle,
       CreateView,
       CreateFormLayout: CollectionFormLayout,

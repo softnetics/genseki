@@ -1,7 +1,7 @@
 'use client'
 
 import type React from 'react'
-import { useCallback, useState } from 'react'
+import { useState } from 'react'
 import { type SubmitErrorHandler, type SubmitHandler, useFormContext } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
@@ -16,6 +16,7 @@ import {
   Button,
   Checkbox,
   CollectionListToolbar,
+  Form,
   type InferFields,
   Menu,
   MenuContent,
@@ -29,6 +30,7 @@ import {
   useCollectionCreate,
   useCollectionCreateMutation,
   useCollectionDeleteMutation,
+  useCollectionForm,
   useCollectionList,
   useCollectionListQuery,
   useGenseki,
@@ -303,7 +305,10 @@ type CreatePostFields = InferCreateFields<typeof fields>
 const CreatePostSchema = z.object({
   example: z.string().min(1),
   author: z.object({
-    connect: z.uuid(),
+    connect: z
+      .uuid()
+      .optional()
+      .refine((id) => !!id, { error: 'Please select some author' }),
   }),
   content: z.any(),
   postTags: z.any(),
@@ -315,8 +320,12 @@ export const CustomCreatePage = () => {
 
   const { navigate } = useNavigation()
   const {
-    components: { CreateFormLayout, CreateForm, CreateField },
+    components: { CreateFormLayout, CreateField },
   } = useCollectionCreate<CreatePostFields>()
+
+  const form = useCollectionForm<CreatePostFields>({
+    resolver: zodResolver(CreatePostSchema),
+  })
 
   const mutation = useCollectionCreateMutation<CreatePostFields>({
     onSuccess: () => {
@@ -327,25 +336,19 @@ export const CustomCreatePage = () => {
     onMutate: () => setErrorMessage(null),
   })
 
-  const handleValidationError = useCallback<SubmitErrorHandler<CreatePostFields>>(
-    (errors) =>
-      setErrorMessage(
-        [
-          errors.author?.message && `AUTHOR: ${errors.author?.message}`,
-          errors.author?.connect?.message && `AUTHOR.CONNECT: ${errors.author?.connect?.message}`,
-          errors.example?.message && `EXAMPLE: ${errors.example?.message}`,
-          errors.title?.message && `TITLE: ${errors.title.message}`,
-        ]
-          .filter((e) => e !== undefined)
-          .join(',')
-      ),
-    []
-  )
+  const handleValidationError: SubmitErrorHandler<CreatePostFields> = (errors) =>
+    setErrorMessage(
+      [
+        errors.author?.message && `AUTHOR: ${errors.author?.message}`,
+        errors.author?.connect?.message && `AUTHOR.CONNECT: ${errors.author?.connect?.message}`,
+        errors.example?.message && `EXAMPLE: ${errors.example?.message}`,
+        errors.title?.message && `TITLE: ${errors.title.message}`,
+      ]
+        .filter((e) => e !== undefined)
+        .join(',')
+    )
 
-  const handleSubmit = useCallback<SubmitHandler<CreatePostFields>>(
-    (data) => mutation.mutateAsync(data),
-    [mutation]
-  )
+  const handleSubmit: SubmitHandler<CreatePostFields> = (data) => mutation.mutateAsync(data)
 
   return (
     <CreateFormLayout>
@@ -361,27 +364,27 @@ export const CustomCreatePage = () => {
           {errorMessage}
         </Typography>
       )}
-      <CreateForm
-        onSubmit={handleSubmit}
-        onError={handleValidationError}
-        formOptions={{
-          resolver: zodResolver(CreatePostSchema),
-        }}
-      >
-        <CreateField fieldName="example" />
-        <SimpleTextInput
-          fieldName="title"
-          placeholder="Custom Title Input"
-          className="border-2 rounded-sm border-purple-500 p-4"
-        />
-        <CreateField fieldName="content" />
-        <CreateField fieldName="author" />
-        <CreateField fieldName="postTags" />
-        <div className="grid grid-cols-2 gap-4">
-          <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
-          <CancelButton pending={mutation.isPending} />
-        </div>
-      </CreateForm>
+      <Form {...form}>
+        <form
+          noValidate
+          onSubmit={form.handleSubmit(handleSubmit, handleValidationError)}
+          className="flex flex-col gap-y-8 mt-16"
+        >
+          <CreateField fieldName="example" />
+          <SimpleTextInput
+            fieldName="title"
+            placeholder="Custom Title Input"
+            className="border-2 rounded-sm border-purple-500 p-4"
+          />
+          <CreateField fieldName="content" />
+          <CreateField fieldName="author" />
+          <CreateField fieldName="postTags" />
+          <div className="grid grid-cols-2 gap-4">
+            <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
+            <CancelButton pending={mutation.isPending} />
+          </div>
+        </form>
+      </Form>
     </CreateFormLayout>
   )
 }
