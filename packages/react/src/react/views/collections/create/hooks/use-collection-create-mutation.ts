@@ -3,7 +3,7 @@ import { type MutationOptions, useMutation } from '@tanstack/react-query'
 import { useCollection } from '../../context'
 import type { BaseData } from '../../types'
 
-export class CollectionCreateError extends Error {
+class CollectionCreateError extends Error {
   constructor(
     public readonly status: number,
     message?: string

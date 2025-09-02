@@ -300,7 +300,7 @@ const CancelButton = ({ pending }: CancelButtonProps) => {
 }
 
 type CreatePostFields = InferCreateFields<typeof fields>
-const createPostSchema = z.object({
+const CreatePostSchema = z.object({
   example: z.string().min(1),
   author: z.object({
     connect: z.uuid(),
@@ -365,7 +365,7 @@ export const CustomCreatePage = () => {
         onSubmit={handleSubmit}
         onError={handleValidationError}
         formOptions={{
-          resolver: zodResolver(createPostSchema),
+          resolver: zodResolver(CreatePostSchema),
         }}
       >
         <CreateField fieldName="example" />
