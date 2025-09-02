@@ -11,7 +11,7 @@ import { useNavigation } from '../../../providers'
 export function CreateView() {
   const { navigate } = useNavigation()
   const {
-    components: { CreateForm, CreateFields: FieldsSet },
+    components: { CreateForm, CreateFields },
   } = useCollectionCreate()
 
   const mutation = useCollectionCreateMutation({
@@ -28,7 +28,7 @@ export function CreateView() {
 
   return (
     <CreateForm onSubmit={onSubmit}>
-      <FieldsSet disabled={mutation.isPending} />
+      <CreateFields disabled={mutation.isPending} />
       <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
     </CreateForm>
   )

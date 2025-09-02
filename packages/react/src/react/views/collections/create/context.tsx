@@ -2,14 +2,10 @@
 
 import React, { createContext, useContext, useMemo } from 'react'
 
-import type { FieldProps } from './field'
-import { Field } from './field'
-import type { FieldsProps } from './fields'
-import { Fields } from './fields'
-import type { CreateFormProps } from './form'
-import { CreateForm } from './form'
-import type { CollectionCreateTitleProps } from './title'
-import { CreateTitle } from './title'
+import { Field, type FieldProps } from './field'
+import { Fields, type FieldsProps } from './fields'
+import { CreateForm, type CreateFormProps } from './form'
+import { CreateTitle, type CreateTitleProps } from './title'
 import { CreateView } from './view'
 
 import { CollectionFormLayout, type FormLayoutProps } from '../layouts/collection-form-layout'
@@ -19,7 +15,7 @@ interface CollectionCreateContextValue<TFieldsValue extends {} = {}> {
     CreateField: React.FC<FieldProps<TFieldsValue>>
     CreateFields: React.FC<FieldsProps>
     CreateForm: React.FC<CreateFormProps<TFieldsValue>>
-    CreateTitle: React.FC<CollectionCreateTitleProps>
+    CreateTitle: React.FC<CreateTitleProps>
     CreateView: React.FC
     CreateFormLayout: React.FC<FormLayoutProps>
   }

@@ -4,17 +4,13 @@ import { useCollectionCreate } from './context'
 
 export function DefaultCollectionCreatePage() {
   const {
-    components: {
-      CreateFormLayout: CollectionFormLayout,
-      CreateTitle: CollectionCreateTitle,
-      CreateView: DefaultCollectionCreateView,
-    },
+    components: { CreateFormLayout, CreateTitle, CreateView },
   } = useCollectionCreate()
 
   return (
-    <CollectionFormLayout>
-      <CollectionCreateTitle />
-      <DefaultCollectionCreateView />
-    </CollectionFormLayout>
+    <CreateFormLayout>
+      <CreateTitle />
+      <CreateView />
+    </CreateFormLayout>
   )
 }

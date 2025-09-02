@@ -1,10 +1,10 @@
 import { Typography } from '../../../components/primitives/typography'
 import { useCollection } from '../context'
 
-export interface CollectionCreateTitleProps {
+export interface CreateTitleProps {
   slug?: string
 }
-export function CreateTitle({ slug }: CollectionCreateTitleProps) {
+export function CreateTitle({ slug }: CreateTitleProps) {
   const context = useCollection()
 
   return (
