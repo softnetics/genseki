@@ -289,6 +289,7 @@ export type CollectionListApiArgs<
   search?: string
   sortBy?: string
   sortOrder?: 'asc' | 'desc'
+  filter?: string
 }
 
 export type CollectionListApiReturn<TFields extends Fields> = {
@@ -413,10 +414,25 @@ export type ExtractSortableColumns<TFields extends Fields> = {
     : never
 }[keyof TFields['shape']]
 
+export type ExtractFilterableColumns<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+    ? TFields['shape'][K]['$client']['column']['dataType'] extends
+        | typeof DataType.STRING
+        | typeof DataType.INT
+        | typeof DataType.FLOAT
+        | typeof DataType.DATETIME
+        | typeof DataType.BIGINT
+        | typeof DataType.DECIMAL
+      ? Extract<K, string>
+      : never
+    : never
+}[keyof TFields['shape']]
+
 // ListConfiguration
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
   sortBy?: ExtractSortableColumns<TFields>[]
+  filterBy?: ExtractFilterableColumns<TFields>[]
 }
 
 export interface CollectionListResponse {
@@ -536,6 +552,7 @@ export class CollectionBuilder<
                 columns={config.columns}
                 search={config.configuration?.search}
                 sortBy={config.configuration?.sortBy}
+                filter={config.configuration?.filterBy}
                 actions={config.actions}
               >
                 <Layout>{page}</Layout>

@@ -51,6 +51,7 @@ export interface CollectionListContextValue<T extends BaseData = BaseData> {
   columns: ColumnDef<T, any>[]
   search?: string[]
   sortBy?: string[]
+  filter?: string[]
   actions?: CollectionListActions
 
   // Helper functions
@@ -66,6 +67,7 @@ export interface CollectionListProviderProps<T extends BaseData = BaseData> {
   columns: ColumnDef<T, any>[]
   search?: string[]
   sortBy?: string[]
+  filter?: string[]
   actions?: CollectionListActions
 }
 

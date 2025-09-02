@@ -6,8 +6,10 @@ import type { ZodObject, ZodOptional, ZodType } from 'zod'
 import type {
   FieldColumnJsonRichTextShape,
   FieldColumnJsonRichTextShapeClient,
+  FieldColumnShapeClient,
   FieldColumnStringMediaShape,
   FieldRelationShape,
+  FieldRelationShapeClient,
   Fields,
   FieldsClient,
   FieldShape,
@@ -37,6 +39,18 @@ export function tryParseJSONObject(jsonString: string): Record<string, unknown> 
 // TODO: Move this to ./field.ts
 export function isRelationFieldShape(fieldShape: FieldShape): fieldShape is FieldRelationShape {
   return fieldShape.$client.source === 'relation'
+}
+
+export function isRelationFieldShapeClient(
+  fieldShape: FieldShapeClient
+): fieldShape is FieldRelationShapeClient {
+  return fieldShape.$client.source === 'relation'
+}
+
+export function isColumnFieldShapeClient(
+  fieldShape: FieldShapeClient
+): fieldShape is FieldColumnShapeClient {
+  return fieldShape.$client.source === 'column'
 }
 
 export function isRichTextFieldShape(

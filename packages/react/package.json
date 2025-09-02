@@ -71,6 +71,7 @@
     "input-otp": "^1.4.2",
     "motion": "^12.7.4",
     "nuqs": "^2.4.3",
+    "qs": "^6.14.0",
     "radix3": "^1.1.2",
     "react": "^19.1.0",
     "react-aria-components": "^1.10.1",

@@ -81,14 +81,18 @@ export function PostClientToolbar() {
  */
 export const PostClientTable = (props: { children?: React.ReactNode }) => {
   const context = useCollectionList()
-  const { setRowSelection } = useTableStatesContext()
+
+  const { setRowSelection, debouncedFilter } = useTableStatesContext()
 
   const queryClient = useQueryClient()
 
   const navigation = useNavigation()
 
   // Example of fethcing list data
-  const query = useCollectionListQuery({ slug: context.slug })
+  const query = useCollectionListQuery({
+    slug: context.slug,
+    filter: debouncedFilter,
+  })
 
   const deleteMutation = useCollectionDeleteMutation({
     slug: context.slug,

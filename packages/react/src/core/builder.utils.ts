@@ -40,6 +40,27 @@ const zStringPositiveNumberOptional = z
   })
   .transform((val) => (val ? Number(val) : undefined))
 
+// ------------ Some helper for filtering WHERE
+function isPlainObject(v: unknown): v is Record<string, unknown> {
+  return v !== null && typeof v === 'object' && !Array.isArray(v)
+}
+
+// - Accepts JSON:  '{"name":"sam","isActive":"true"}'
+//   (also supports nested objects like {"author":{"email":{"contains":"eieio"}}})
+export function parseFilterStringToKeyValueMap(filterString: string): Record<string, any> {
+  try {
+    const parsed = JSON.parse(filterString)
+    if (parsed && typeof parsed === 'object' && !Array.isArray(parsed)) {
+      return parsed as Record<string, any>
+    }
+  } catch {
+    // Bad input, not an object. Ignore all
+  }
+  return {}
+}
+
+// ------------ Some helper for filtering WHERE
+
 function createCollectionDefaultCreateHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields
@@ -136,6 +157,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
     const search = args.search
     const sortBy = args.sortBy
     const sortOrder = args.sortOrder
+    const filter = args.filter
 
     const where: any = {}
 
@@ -156,6 +178,24 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
             mode: 'insensitive',
           },
         }))
+      }
+    }
+
+    // Configured filterable columns.
+    if (filter && filter.trim()) {
+      const parsedFilterMap = parseFilterStringToKeyValueMap(filter)
+      const andConditions: any[] = []
+
+      // filters should already be a JSON, but check again just in case
+      for (const [topKey, maybeObj] of Object.entries(parsedFilterMap)) {
+        if (isPlainObject(maybeObj)) {
+          andConditions.push({ [topKey]: maybeObj })
+        }
+      }
+
+      if (andConditions.length > 0) {
+        if (Array.isArray(where.AND)) where.AND.push(...andConditions)
+        else where.AND = andConditions
       }
     }
 
@@ -558,6 +598,7 @@ export function getCollectionDefaultListApiRoute(args: {
         search: z.string().optional(),
         sortBy: z.string().optional(),
         sortOrder: z.enum(['asc', 'desc']).optional(),
+        filter: z.string().optional(),
       }),
       responses: {
         200: z.object({
@@ -579,6 +620,7 @@ export function getCollectionDefaultListApiRoute(args: {
         search: payload.query.search,
         sortBy: payload.query.sortBy,
         sortOrder: payload.query.sortOrder,
+        filter: payload.query.filter,
       })
 
       return {

@@ -10,6 +10,7 @@ import React, {
 
 import type { RowSelectionState } from '@tanstack/react-table'
 
+import { useFilter, type UseFilterReturn } from '../hooks/use-filter'
 import { usePagination, type UsePaginationReturn } from '../hooks/use-pagination'
 import { useSearch, type UseSearchReturn } from '../hooks/use-search'
 import { type UseSort, useSort } from '../hooks/use-sort'
@@ -24,8 +25,10 @@ export interface TanstackTableContextValue {
   setPagination: UsePaginationReturn['setPagination']
   sort: UseSort['Sort']
   setSort: UseSort['SetSort']
-  search: UseSearchReturn['search']
   setSearch: UseSearchReturn['setSearch']
+  // filter: UseFilterReturn['filter']
+  debouncedFilter: UseFilterReturn['debouncedFilter']
+  setFilter: UseFilterReturn['setFilter']
   rowSelection: UseRowSelection['RowSelection']
   rowSelectionIds: string[]
   isRowsSelected: boolean
@@ -40,7 +43,16 @@ const TableStatesContext = createContext<TanstackTableContextValue>(null!)
 export const TableStatesProvider = (props: TableStatesProviderProps) => {
   const { pagination, setPagination } = usePagination()
   const { sort, setSort } = useSort()
-  const { search, setSearch } = useSearch()
+  const {
+    // search,
+    setSearch,
+  } = useSearch()
+  const {
+    debouncedFilter,
+    //  filter,
+    setFilter,
+  } = useFilter()
+
   // row selection does not maintain a state wih URL search parameter like pagination and search
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -58,8 +70,11 @@ export const TableStatesProvider = (props: TableStatesProviderProps) => {
         setPagination,
         sort,
         setSort,
-        search,
+        // search,
         setSearch,
+        // filter,
+        debouncedFilter,
+        setFilter,
         rowSelection,
         rowSelectionIds,
         setRowSelection,

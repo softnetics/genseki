@@ -1,6 +1,7 @@
 import { keepPreviousData, useQuery, type UseQueryResult } from '@tanstack/react-query'
 
 import type { CollectionListResponse } from '../../../../../core/collection'
+import { useFilter, type UseFilterReturn } from '../../../../hooks/use-filter'
 import { usePagination, type UsePaginationReturn } from '../../../../hooks/use-pagination'
 import { useSearch, type UseSearchReturn } from '../../../../hooks/use-search'
 import { useSort } from '../../../../hooks/use-sort'
@@ -9,15 +10,18 @@ export function useCollectionListQuery(
   args: { slug: string } & {
     pagination?: UsePaginationReturn['pagination']
     search?: UseSearchReturn['search']
+    filter?: UseFilterReturn['debouncedFilter']
   }
 ) {
   const { sort } = useSort()
   const { pagination } = usePagination()
   const { search } = useSearch()
+  const { filter } = useFilter()
 
   const queryKey = {
     ...(args.pagination || pagination),
     search: args.search ?? search,
+    filter: args.filter ?? filter,
     sort: sort,
   }
 
@@ -33,6 +37,11 @@ export function useCollectionListQuery(
       // Add search parameter if it exists
       if (payload.query.search && payload.query.search.trim()) {
         params.append('search', payload.query.search.trim())
+      }
+
+      // Add filter parameter if it exists
+      if (payload.query.filter && payload.query.filter.trim()) {
+        params.append('filter', payload.query.filter.trim())
       }
 
       // Add sorting parameters if they exist
