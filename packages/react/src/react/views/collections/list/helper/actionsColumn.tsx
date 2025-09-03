@@ -82,10 +82,8 @@ export function createDeleteActionItem(
   return createDefaultActionItem(
     title,
     icon,
-    (context) => {
-      if (context.deleteRows) {
-        context.deleteRows()
-      }
+    (context, row) => {
+      context.deleteRows([row.original.__id as string])
     },
     true
   )

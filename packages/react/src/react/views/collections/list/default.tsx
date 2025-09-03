@@ -16,17 +16,13 @@ export function DefaultCollectionListPage() {
     if (context.isQuerying) return context.columns
 
     return context.columns
-  }, [context.columns, context.actions, context.isQuerying])
-
+  }, [context.columns, context.isQuerying])
   return (
     <>
       <Banner slug={context.slug} />
       <CollectionListTableContainer>
         <CollectionListToolbar />
-        <CollectionListTable<any>
-          columns={columns}
-          onRowClick={context.actions?.select ? 'toggleSelect' : undefined}
-        />
+        <CollectionListTable<any> columns={columns} onRowClick={undefined} />
         <CollectionListPagination />
       </CollectionListTableContainer>
     </>

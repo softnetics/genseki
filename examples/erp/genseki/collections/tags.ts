@@ -23,10 +23,8 @@ export const tagsCollection = createPlugin('tags', (app) => {
           search: ['name'],
           sortBy: ['name'],
         },
-        actions: {
+        toolbar: {
           create: true,
-          update: true,
-          select: true,
           delete: true,
         },
       })

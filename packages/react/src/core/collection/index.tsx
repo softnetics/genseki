@@ -319,13 +319,7 @@ export type CollectionListConfig<
   /**
    * @param actions will decide whether or not to show actios in `list` view screen, This is not related to available features of collection, but rather only visible UI part of the `list` page
    */
-  actions?: {
-    create?: boolean
-    update?: boolean
-    delete?: boolean
-    one?: boolean
-    select?: boolean
-  }
+  toolbar?: CollectionToolbarActions
 }
 
 export type CollectionUpdateApiArgs<
@@ -539,7 +533,7 @@ export class CollectionBuilder<
                 columns={config.columns}
                 search={config.configuration?.search}
                 sortBy={config.configuration?.sortBy}
-                actions={config.actions}
+                toolbar={config.toolbar}
               >
                 <Layout>{page}</Layout>
               </CollectionListProvider>
@@ -775,10 +769,7 @@ export class CollectionBuilder<
   }
 }
 
-export interface CollectionListActions {
+export interface CollectionToolbarActions {
   create?: boolean
-  update?: boolean
   delete?: boolean
-  one?: boolean
-  select?: boolean
 }
