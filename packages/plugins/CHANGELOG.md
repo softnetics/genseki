@@ -1,5 +1,15 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.37
+
+### Minor Changes
+
+- [#169](https://github.com/softnetics/genseki/pull/169) [`02f4233`](https://github.com/softnetics/genseki/commit/02f4233513a8a042b5844eb8393f94925b8053d1) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Implement a plugin for phone authentication
+
+### Patch Changes
+
+- [#162](https://github.com/softnetics/genseki/pull/162) [`36bb10e`](https://github.com/softnetics/genseki/commit/36bb10e56c271b385e921dbac9ad202cef28d861) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Refactor Collection Model
+
 ## 0.1.0-alpha.36
 
 ## 0.1.0-alpha.35

@@ -1,5 +1,27 @@
 # @genseki/react
 
+## 0.1.0-alpha.37
+
+### Minor Changes
+
+- [#169](https://github.com/softnetics/genseki/pull/169) [`02f4233`](https://github.com/softnetics/genseki/commit/02f4233513a8a042b5844eb8393f94925b8053d1) Thanks [@saenyakorn](https://github.com/saenyakorn)! - [Feature] Implement a plugin for phone authentication
+
+- [#170](https://github.com/softnetics/genseki/pull/170) [`d105b0d`](https://github.com/softnetics/genseki/commit/d105b0d1d42f2c76b200a8feaefec4e3325f2887) Thanks [@intaniger](https://github.com/intaniger)! - Customizable create page, developer can render a customized page via `config.page` when adding create page with `CollectionBuilder.create`.
+
+  ```ts
+  collection.create(fields, { options: options, page: /* Your customized create page */ })
+  ```
+
+  For working example, see https://github.com/softnetics/genseki/blob/8b38a1ab9379330e290eb8633dcbf8106ae435b8/examples/erp/genseki/collections/posts.client.tsx#L318-L390
+
+### Patch Changes
+
+- [#162](https://github.com/softnetics/genseki/pull/162) [`36bb10e`](https://github.com/softnetics/genseki/commit/36bb10e56c271b385e921dbac9ad202cef28d861) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Refactor Collection Model
+
+- [#168](https://github.com/softnetics/genseki/pull/168) [`af6664c`](https://github.com/softnetics/genseki/commit/af6664cd347354d0f9bf8bc3d194d90964c63adc) Thanks [@plohan](https://github.com/plohan)! - Support hint text for media input
+
+- [#167](https://github.com/softnetics/genseki/pull/167) [`cd6fdb4`](https://github.com/softnetics/genseki/commit/cd6fdb40390e585364ed3bfdf9e00d72e8e3b1f0) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: can't delete single
+
 ## 0.1.0-alpha.36
 
 ### Minor Changes
