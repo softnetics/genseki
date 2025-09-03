@@ -8,7 +8,7 @@ export type {
 } from '../core/context'
 export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
-export type { InferField, InferFields, ListConfiguration } from './collection'
+export type { InferCreateFields, InferField, InferFields, ListConfiguration } from './collection'
 export { ApiDefaultMethod, CollectionBuilder } from './collection'
 export {
   createGensekiUiRoute,

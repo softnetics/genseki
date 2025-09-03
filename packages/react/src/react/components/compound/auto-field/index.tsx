@@ -324,7 +324,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
   )
 }
 
-interface AutoFieldProps {
+export interface AutoFieldProps {
   fieldShape: FieldShapeClient
 
   optionsFetchPath?: string
@@ -763,7 +763,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 }
 
-interface AutoFieldsProps {
+export interface AutoFieldsProps {
   fields: FieldsClient
   optionsFetchPath?: string
   disabled?: boolean

@@ -7,7 +7,6 @@ import type { UndefinedToOptional } from 'type-fest/source/internal'
 
 import {
   type CollectionLayoutProps,
-  CreateView,
   DefaultCollectionLayout,
   HomeView,
   OneView,
@@ -15,6 +14,8 @@ import {
 } from '../../react'
 import { getHeadersObject } from '../../react/utils/headers'
 import { CollectionProvider } from '../../react/views/collections/context'
+import { CollectionCreateProvider } from '../../react/views/collections/create/context'
+import { DefaultCollectionCreatePage } from '../../react/views/collections/create/default'
 import { CollectionListProvider } from '../../react/views/collections/list/context'
 import { DefaultCollectionListPage } from '../../react/views/collections/list/default'
 import type { BaseViewProps } from '../../react/views/collections/types'
@@ -262,6 +263,7 @@ export type CollectionCreateConfig<
 > = {
   api?: CollectionCreateApiHandler<TContext, TFields>
   options?: Simplify<FieldsOptions<TContext, TFields>>
+  page?: React.FC
 }
 
 export type CollectionFindOneApiArgs<
@@ -624,17 +626,13 @@ export class CollectionBuilder<
     return (appOptions: GensekiAppOptions) => {
       const route = this.createApiRouter(fields, config)
 
-      const defaultArgs = {
-        slug: this.slug,
-        context: this.context,
-        fields: fields,
-      } satisfies BaseViewProps
-
       const ui = createGensekiUiRoute({
         path: `${this.config.uiPathPrefix}/${this.slug}/create`,
         requiredAuthenticated: true,
         context: this.context,
         render: (args) => {
+          const Page = config.page ?? DefaultCollectionCreatePage
+
           return (
             <CollectionProvider
               slug={this.slug}
@@ -644,9 +642,11 @@ export class CollectionBuilder<
               searchParams={args.searchParams}
               pathname={args.pathname}
             >
-              <DefaultCollectionLayout pathname={args.pathname} {...appOptions}>
-                <CreateView {...args} {...args.params} {...defaultArgs} />
-              </DefaultCollectionLayout>
+              <CollectionCreateProvider>
+                <DefaultCollectionLayout pathname={args.pathname} {...appOptions}>
+                  <Page />
+                </DefaultCollectionLayout>
+              </CollectionCreateProvider>
             </CollectionProvider>
           )
         },

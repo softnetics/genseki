@@ -39,4 +39,3 @@ yarn-error.log*
 *.pem
 
 .data
-packages/drizzlify-next/drizzilify.code-workspace
