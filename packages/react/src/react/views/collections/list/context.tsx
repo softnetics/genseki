@@ -54,7 +54,7 @@ export interface CollectionListContextValue<T extends BaseData = BaseData> {
   actions?: CollectionListActions
 
   // Helper functions
-  deleteRows: () => void
+  deleteRows: (rows?: string[]) => void
   invalidateList: (page?: number) => Promise<void>
 }
 
@@ -101,9 +101,9 @@ function _CollectionListProvider<T extends BaseData>(props: CollectionListProvid
     },
   })
 
-  const deleteRows = () => {
-    if (rowSelectionIds.length === 0) return
-    deleteMutation.mutate(rowSelectionIds)
+  const deleteRows = (rows?: string[]) => {
+    if (rowSelectionIds.length === 0 && !rows) return
+    deleteMutation.mutate(rows ?? rowSelectionIds)
   }
 
   const isError = deleteMutation.isError || query.isError

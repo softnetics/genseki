@@ -324,7 +324,7 @@ export function AutoFormField(props: { name: string; component: ReactNode }) {
   )
 }
 
-interface AutoFieldProps {
+export interface AutoFieldProps {
   fieldShape: FieldShapeClient
 
   optionsFetchPath?: string
@@ -479,6 +479,7 @@ export function AutoField(props: AutoFieldProps) {
             <AutoFileUploadField
               {...commonProps}
               uploadOptions={field.uploadOptions}
+              hintText={field.hintText}
               isDisabled={disabled}
             />
           }
@@ -762,7 +763,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   }
 }
 
-interface AutoFieldsProps {
+export interface AutoFieldsProps {
   fields: FieldsClient
   optionsFetchPath?: string
   disabled?: boolean

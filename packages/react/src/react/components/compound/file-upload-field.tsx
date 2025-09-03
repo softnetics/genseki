@@ -188,6 +188,7 @@ export interface FileUploadFieldProps extends DropZoneProps {
   placeholder?: string
   description?: string
   isRequired?: boolean
+  hintText?: string
   errorMessage?: string
   uploadOptions?: FileUploadOptionsProps
   onUpload?: (files: File[], setFileKey: Dispatch<SetStateAction<string | undefined>>) => void
@@ -216,6 +217,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   const pathName = props.uploadOptions?.pathName
   const readableMimeTypes = mimeTypes.map((mimeType) => mimeType.split('/')[1]).join(', ')
   const imageBaseUrl = storageAdapter.imageBaseUrl
+  const hintText = props.hintText || `${readableMimeTypes} (max. ${readableMaxSize})`
 
   // Upload progress
   const [progress, setProgress] = useState<number | undefined>(undefined)
@@ -469,9 +471,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
                         </>
                       )}
                       <br />
-                      <span>
-                        {readableMimeTypes} (max. {readableMaxSize})
-                      </span>
+                      <span>{hintText}</span>
                     </Typography>
 
                     {/* <Typography type="caption" weight="normal" className="text-text-trivial">

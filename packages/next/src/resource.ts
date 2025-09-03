@@ -14,6 +14,13 @@ interface RouteData {
   methodName: string
 }
 
+function isGensekiResponse(value: unknown): value is { status: number; body: any } {
+  if (typeof value === 'object' && value !== null) {
+    return 'status' in value && 'body' in value
+  }
+  return false
+}
+
 function extractHeaders(headers: Headers) {
   const headersRecord: Record<string, string> = {}
   headers.forEach((value, key) => {
@@ -49,6 +56,13 @@ async function makeApiRoute(
   } catch {
     // If the request body is not JSON or empty, we will not parse it
     // This is useful for file uploads or plain text requests
+
+    // TODO: Handle plain text and file upload
+
+    return new Response(JSON.stringify({ message: 'Invalid request body' }), {
+      status: 400,
+      headers: { 'Content-Type': 'application/json' },
+    })
   }
 
   const response = new Response(null, {
@@ -76,16 +90,26 @@ async function makeApiRoute(
       status: rawResponse.status,
       headers: response.headers,
     })
-  } catch (error: any) {
+  } catch (error: unknown) {
     console.error('Error in API route:', error)
+    if (isGensekiResponse(error)) {
+      return Response.json(
+        {
+          status: error?.status ?? 500,
+          body: {
+            message: error?.body?.message ?? 'Internal Server Error',
+          },
+        },
+        { status: error?.status ?? 500 }
+      )
+    }
+
     return Response.json(
       {
-        status: error.status || 500,
-        body: {
-          message: error.message || 'Internal Server Error',
-        },
+        status: 500,
+        body: error,
       },
-      { status: error.status || 500 }
+      { status: 500 }
     )
   }
 }

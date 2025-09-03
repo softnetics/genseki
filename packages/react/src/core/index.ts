@@ -8,7 +8,7 @@ export type {
 } from '../core/context'
 export { RequestContextable } from '../core/context'
 export { Builder } from './builder'
-export type { InferField, InferFields, ListConfiguration } from './collection'
+export type { InferCreateFields, InferField, InferFields, ListConfiguration } from './collection'
 export { ApiDefaultMethod, CollectionBuilder } from './collection'
 export {
   createGensekiUiRoute,
@@ -85,8 +85,12 @@ export type {
   GensekiPlugin,
   GensekiPluginBuilder,
   InferApiRouterFromGensekiPlugin,
+  ObjectWithOnlyValue,
+  ValidatePluginSchema,
+  ValidateSchema,
 } from './plugin'
 export { createPlugin } from './plugin'
+export type { MockPrismaClient } from './prisma.types'
 export type {
   AnyTable,
   AnyTypedFieldColumn,
@@ -97,4 +101,5 @@ export type {
   WithIsRequired,
   WithIsUnique,
 } from './table'
+export type { ToZodObject } from './utils'
 export { getDefaultValueFromFieldsClient } from './utils'

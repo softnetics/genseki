@@ -1,12 +1,6 @@
 import { withNextJs } from '@genseki/next'
 import { admin } from '@genseki/plugins'
-import {
-  createPlugin,
-  emailAndPasswordPlugin,
-  GensekiApp,
-  mePlugin,
-  StorageAdapterS3,
-} from '@genseki/react'
+import { createPlugin, emailAndPasswordPlugin, GensekiApp, StorageAdapterS3 } from '@genseki/react'
 
 import { accessControl } from './access-control'
 import { SetupPage } from './auth/setup/setup'
@@ -15,6 +9,8 @@ import { postsCollection } from './collections/posts'
 import { tagsCollection } from './collections/tags'
 import { usersCollection } from './collections/users'
 import { context } from './helper'
+import { mePlugin } from './plugins/me'
+import { phonePlugin } from './plugins/phone'
 
 import { FullModelSchemas } from '../generated/genseki/unsanitized'
 
@@ -58,7 +54,8 @@ const app = new GensekiApp({
     ],
   },
 })
-  .apply(mePlugin(context))
+  .apply(mePlugin)
+  .apply(phonePlugin)
   .apply(
     emailAndPasswordPlugin(
       context,
