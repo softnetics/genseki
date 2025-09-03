@@ -25,6 +25,7 @@ export const tagsCollection = createPlugin('tags', (app) => {
         },
         actions: {
           create: true,
+          update: true,
           select: true,
           delete: true,
         },
