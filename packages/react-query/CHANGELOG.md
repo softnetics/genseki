@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.37
+
+### Patch Changes
+
+- [#162](https://github.com/softnetics/genseki/pull/162) [`36bb10e`](https://github.com/softnetics/genseki/commit/36bb10e56c271b385e921dbac9ad202cef28d861) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Refactor Collection Model
+
 ## 0.1.0-alpha.36
 
 ## 0.1.0-alpha.35
