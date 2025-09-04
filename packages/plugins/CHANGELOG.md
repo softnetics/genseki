@@ -1,5 +1,12 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.39
+
+### Patch Changes
+
+- [#174](https://github.com/softnetics/genseki/pull/174) [`6766250`](https://github.com/softnetics/genseki/commit/6766250a284955f49b58120b1266d84a95faedfe) Thanks [@saenyakorn](https://github.com/saenyakorn)! - - fix `RecordifyFlattenApiRouter` wrong implementation
+  - fix wrong phone plguin login path
+
 ## 0.1.0-alpha.38
 
 ## 0.1.0-alpha.37
