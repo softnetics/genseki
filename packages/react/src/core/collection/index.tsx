@@ -56,6 +56,12 @@ import type { DataType, InferDataType, ModelSchemas } from '../model'
 import type { GensekiPluginBuilderOptions } from '../plugin'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
 
+type ExcludeKeysWithTypeOf<T, V> = {
+  [K in keyof T]-?: [Exclude<T[K], undefined>] extends [V] ? never : K
+}[keyof T]
+
+export type Without<T, V> = Pick<T, ExcludeKeysWithTypeOf<T, V>>
+
 type UndefinedToOptional<T extends object> = {
   [Key in keyof T as undefined extends T[Key] ? Key : never]?: T[Key]
 } & {
@@ -137,10 +143,11 @@ type _InferUpdateFields<TFields extends Fields> = {
   -readonly [TKey in keyof TFields['shape']]: InferUpdateFieldShape<TFields['shape'][TKey]>
 }
 
-export type InferUpdateFields<TFields extends Fields> = Simplify<
+export type InferUpdateFields<TFields extends Fields> = Without<
   UndefinedToOptional<{
     -readonly [TKey in keyof TFields['shape']]: InferUpdateFieldShape<TFields['shape'][TKey]>
-  }>
+  }>,
+  never
 >
 
 export type InferCreateOneRelationFieldShape<
@@ -205,12 +212,13 @@ type _InferCreateFields<TFields extends Fields> = {
   >
 }
 
-export type InferCreateFields<TFields extends Fields> = Simplify<
+export type InferCreateFields<TFields extends Fields> = Without<
   UndefinedToOptional<{
     -readonly [TShapeKey in keyof TFields['shape']]: InferCreateFieldShape<
       TFields['shape'][TShapeKey]
     >
-  }>
+  }>,
+  never
 >
 
 export type InferRelationField<
@@ -245,7 +253,10 @@ type _InferFields<TFields extends Fields> = {
     : never
 } & { __id: string | number; __pk: string | number }
 
-export type InferFields<TFields extends Fields> = UndefinedToOptional<_InferFields<TFields>>
+export type InferFields<TFields extends Fields> = Without<
+  UndefinedToOptional<_InferFields<TFields>>,
+  never
+>
 
 export interface ServerApiHandlerArgs<TContext extends AnyContextable, TFields extends Fields> {
   slug: string
