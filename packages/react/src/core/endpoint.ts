@@ -62,7 +62,7 @@ export function flattenApiRoutes<TApiRouter extends AnyApiRouter>(
 export type RecordifyFlattenApiRouter<TApiRoutes extends ApiRoute[]> = {
   [TApiRoute in TApiRoutes[number] as TApiRoute extends ApiRoute
     ? `${TApiRoute['schema']['method']} ${TApiRoute['schema']['path']}`
-    : never]: TApiRoute extends ApiRoute ? TApiRoute : never
+    : never]: TApiRoute
 }
 
 export function recordifyFlattenApiRoutes<TApiRoutes extends ApiRoute[]>(
