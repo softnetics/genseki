@@ -59,12 +59,11 @@ export function flattenApiRoutes<TApiRouter extends AnyApiRouter>(
   return flattened as FlattenApiRoutes<TApiRouter>
 }
 
-export type RecordifyFlattenApiRouter<TApiRoutes extends ApiRoute[]> =
-  TApiRoutes[number] extends infer TApiRoute extends ApiRoute
-    ? {
-        [K in `${TApiRoute['schema']['method']} ${TApiRoute['schema']['path']}`]: TApiRoute
-      }
-    : never
+export type RecordifyFlattenApiRouter<TApiRoutes extends ApiRoute[]> = {
+  [TApiRoute in TApiRoutes[number] as TApiRoute extends ApiRoute
+    ? `${TApiRoute['schema']['method']} ${TApiRoute['schema']['path']}`
+    : never]: TApiRoute extends ApiRoute ? TApiRoute : never
+}
 
 export function recordifyFlattenApiRoutes<TApiRoutes extends ApiRoute[]>(
   routes: TApiRoutes
@@ -93,7 +92,6 @@ export type FilterByMethod<TApiRoute extends ApiRoute, TMethod extends string> =
   { schema: { method: TMethod } }
 >
 
-// TODO: With IsNever, the performance is not good. Need to fix it.
 type GetBody<TApiRouteSchema extends ApiRouteSchema> =
   IsNever<TApiRouteSchema['body']> extends false ? Output<TApiRouteSchema['body']> : never
 
