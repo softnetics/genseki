@@ -20,7 +20,7 @@ export function phone<
     context,
     {
       method: 'POST',
-      path: '/auth/phone/sign-up/otp',
+      path: '/auth/phone/login',
       body: z.object({
         phone: z.string().min(1),
         password: z.string().min(1),
