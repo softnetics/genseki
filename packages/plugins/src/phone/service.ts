@@ -23,6 +23,7 @@ interface PhoneServiceOptions<
   }
   signUp: {
     body: TSignUpBodySchema
+    autoLogin?: boolean // default to true
     onOtpSent: (data: {
       phone: string
       name: string
@@ -56,9 +57,9 @@ const defaultOptions = {
   },
 } satisfies PartialDeep<PhoneServiceOptions>
 
-export type PhoneServiceOptionsWithDefaults = ReturnType<
-  typeof defu<PhoneServiceOptions, [typeof defaultOptions]>
->
+export type PhoneServiceOptionsWithDefaults<
+  TSignUpBodySchema extends BaseSignUpBodySchema = BaseSignUpBodySchema,
+> = ReturnType<typeof defu<PhoneServiceOptions<TSignUpBodySchema>, [typeof defaultOptions]>>
 
 export class PhoneService<
   TContext extends AnyContextable,
@@ -66,7 +67,7 @@ export class PhoneService<
   TSignUpBodySchema extends BaseSignUpBodySchema,
   TStore extends PhoneStore<TSignUpBodySchema>,
 > {
-  private readonly options: PhoneServiceOptionsWithDefaults
+  private readonly options: PhoneServiceOptionsWithDefaults<TSignUpBodySchema>
 
   constructor(
     public readonly context: TContext,
@@ -74,11 +75,21 @@ export class PhoneService<
     options: ValidateSchema<PluginSchema, TSchema, PhoneServiceOptions<TSignUpBodySchema>>,
     private readonly store: TStore
   ) {
-    this.options = defu(options, defaultOptions) as PhoneServiceOptionsWithDefaults
+    this.options = defu(
+      options,
+      defaultOptions
+    ) as PhoneServiceOptionsWithDefaults<TSignUpBodySchema>
   }
 
-  get signUpBody(): TSignUpBodySchema {
-    return this.options.signUp.body as TSignUpBodySchema
+  getOptions(): PhoneServiceOptionsWithDefaults<TSignUpBodySchema> {
+    return this.options
+  }
+
+  async createSession(userId: string) {
+    return this.store
+      .createSession(userId)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
   }
 
   async login(body: { phone: string; password: string }) {
@@ -104,9 +115,13 @@ export class PhoneService<
       return err({ message: 'Invalid password' })
     }
 
-    const session = await this.store.createSession(user.id)
+    const session = await this.createSession(user.id)
 
-    return ok(session)
+    if (session.isErr()) {
+      return err({ message: 'Failed to create session', cause: session.error })
+    }
+
+    return ok(session.value)
   }
 
   async sendSignUpPhoneOtp(data: z.output<TSignUpBodySchema>) {
@@ -249,7 +264,7 @@ export class PhoneService<
     const userId = await this.store.createUser(verification.value.data)
     await this.store.createAccount(userId, verification.value.password)
 
-    return ok(null)
+    return ok({ userId })
   }
 
   async sendChangePhoneNumberOtp(userId: string, phone: { new: string; old: string }) {
