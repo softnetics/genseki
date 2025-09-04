@@ -1,5 +1,12 @@
 # @genseki/react
 
+## 0.1.0-alpha.38
+
+### Patch Changes
+
+- [#172](https://github.com/softnetics/genseki/pull/172) [`1748c70`](https://github.com/softnetics/genseki/commit/1748c704261b93eb3ac8c92dcdb552077c4d0cca) Thanks [@saenyakorn](https://github.com/saenyakorn)! - - Reduce type inference by utilize type caching and unnecessary type utilities
+  - Add "use client" to `useCollectionForm` to ensure that the hook is used only in the client-side
+
 ## 0.1.0-alpha.37
 
 ### Minor Changes
