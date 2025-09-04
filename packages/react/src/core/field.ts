@@ -1,4 +1,4 @@
-import type { PartialDeep, Promisable, Simplify } from 'type-fest'
+import type { PartialDeep, Promisable } from 'type-fest'
 import z from 'zod'
 
 import type { InferFields } from './collection'
@@ -609,14 +609,14 @@ export class FieldBuilder<
     modelName: TModelName,
     optionsFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape,
     config?: { identifierColumn?: string }
-  ): Simplify<{
+  ): {
     shape: TFieldsShape
     config: {
       primaryColumn: string
       identifierColumn: string
       prismaModelName: TModelName
     }
-  }> {
+  } {
     const fb = new FieldBuilder({
       context: this.options.context,
       modelSchemas: this.options.modelSchemas,

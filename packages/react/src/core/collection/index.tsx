@@ -2,8 +2,7 @@ import type React from 'react'
 import type { PropsWithChildren } from 'react'
 
 import type { ColumnDef } from '@tanstack/react-table'
-import type { ConditionalExcept, Promisable, Simplify } from 'type-fest'
-import type { UndefinedToOptional } from 'type-fest/source/internal'
+import type { Promisable, Simplify } from 'type-fest'
 
 import {
   type CollectionLayoutProps,
@@ -57,7 +56,11 @@ import type { DataType, InferDataType, ModelSchemas } from '../model'
 import type { GensekiPluginBuilderOptions } from '../plugin'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
 
-type SimplifyConditionalExcept<Base, Condition> = Simplify<ConditionalExcept<Base, Condition>>
+type UndefinedToOptional<T extends object> = {
+  [Key in keyof T as undefined extends T[Key] ? Key : never]?: T[Key]
+} & {
+  [Key in keyof T as undefined extends T[Key] ? never : Key]: T[Key]
+}
 
 export const ApiDefaultMethod = {
   CREATE: 'create',
@@ -81,7 +84,7 @@ export type InferUpdateOneRelationFieldShape<
   ('create' extends TKeys
     ? {
         create: TFieldShape extends FieldRelationCreateShape | FieldRelationConnectOrCreateShape
-          ? InferUpdateFields<TFieldShape['fields']>
+          ? _InferUpdateFields<TFieldShape['fields']>
           : never
       }
     : {}) &
@@ -112,11 +115,11 @@ export type InferUpdateRelationField<
 export type InferUpdateFieldShape<TFieldShape extends FieldShape> = ApplyFieldProperty<
   TFieldShape extends FieldRelationShapeBase
     ? TFieldShape extends FieldRelationCreateShape
-      ? Simplify<InferUpdateRelationField<TFieldShape, 'create' | 'connect' | 'disconnect'>>
+      ? InferUpdateRelationField<TFieldShape, 'create' | 'connect' | 'disconnect'>
       : TFieldShape extends FieldRelationConnectShape
-        ? Simplify<InferUpdateRelationField<TFieldShape, 'connect' | 'disconnect'>>
+        ? InferUpdateRelationField<TFieldShape, 'connect' | 'disconnect'>
         : TFieldShape extends FieldRelationConnectOrCreateShape
-          ? Simplify<InferUpdateRelationField<TFieldShape, 'create' | 'connect' | 'disconnect'>>
+          ? InferUpdateRelationField<TFieldShape, 'create' | 'connect' | 'disconnect'>
           : never
     : TFieldShape extends FieldColumnShape
       ? TFieldShape['$server']['column']['isList'] extends true
@@ -130,9 +133,15 @@ export type InferUpdateFieldShape<TFieldShape extends FieldShape> = ApplyFieldPr
   TFieldShape
 >
 
-export type InferUpdateFields<TFields extends Fields> = UndefinedToOptional<{
+type _InferUpdateFields<TFields extends Fields> = {
   -readonly [TKey in keyof TFields['shape']]: InferUpdateFieldShape<TFields['shape'][TKey]>
-}>
+}
+
+export type InferUpdateFields<TFields extends Fields> = Simplify<
+  UndefinedToOptional<{
+    -readonly [TKey in keyof TFields['shape']]: InferUpdateFieldShape<TFields['shape'][TKey]>
+  }>
+>
 
 export type InferCreateOneRelationFieldShape<
   TFieldShape extends FieldRelationShapeBase,
@@ -141,7 +150,7 @@ export type InferCreateOneRelationFieldShape<
   ('create' extends TKeys
     ? {
         create: TFieldShape extends FieldRelationCreateShape | FieldRelationConnectOrCreateShape
-          ? InferCreateFields<TFieldShape['fields']>
+          ? _InferCreateFields<TFieldShape['fields']>
           : never
       }
     : {}) &
@@ -172,11 +181,11 @@ export type InferCreateRelationField<
 export type InferCreateFieldShape<TFieldShape extends FieldShape> = ApplyFieldProperty<
   TFieldShape extends FieldRelationShapeBase
     ? TFieldShape extends FieldRelationCreateShape
-      ? Simplify<InferCreateRelationField<TFieldShape, 'create'>>
+      ? InferCreateRelationField<TFieldShape, 'create'>
       : TFieldShape extends FieldRelationConnectShape
-        ? Simplify<InferCreateRelationField<TFieldShape, 'connect'>>
+        ? InferCreateRelationField<TFieldShape, 'connect'>
         : TFieldShape extends FieldRelationConnectOrCreateShape
-          ? Simplify<InferCreateRelationField<TFieldShape, 'create' | 'connect'>>
+          ? InferCreateRelationField<TFieldShape, 'create' | 'connect'>
           : never
     : TFieldShape extends FieldColumnShape
       ? TFieldShape['$server']['column']['isList'] extends true
@@ -190,11 +199,19 @@ export type InferCreateFieldShape<TFieldShape extends FieldShape> = ApplyFieldPr
   TFieldShape
 >
 
-export type InferCreateFields<TFields extends Fields> = UndefinedToOptional<{
+type _InferCreateFields<TFields extends Fields> = {
   -readonly [TShapeKey in keyof TFields['shape']]: InferCreateFieldShape<
     TFields['shape'][TShapeKey]
   >
-}>
+}
+
+export type InferCreateFields<TFields extends Fields> = Simplify<
+  UndefinedToOptional<{
+    -readonly [TShapeKey in keyof TFields['shape']]: InferCreateFieldShape<
+      TFields['shape'][TShapeKey]
+    >
+  }>
+>
 
 export type InferRelationField<
   TFieldShape extends FieldRelationShape,
@@ -222,14 +239,11 @@ export type InferField<TField extends FieldShapeBase> = TField extends FieldRela
         : InferDataType<TField['$server']['column']['dataType']> | undefined | null
     : never
 
-type _InferFields<TFields extends Fields> = SimplifyConditionalExcept<
-  {
-    -readonly [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeBase
-      ? InferField<TFields['shape'][TKey]>
-      : never
-  } & { __id: string | number; __pk: string | number },
-  never
->
+type _InferFields<TFields extends Fields> = {
+  -readonly [TKey in keyof TFields['shape']]: TFields['shape'][TKey] extends FieldShapeBase
+    ? InferField<TFields['shape'][TKey]>
+    : never
+} & { __id: string | number; __pk: string | number }
 
 export type InferFields<TFields extends Fields> = UndefinedToOptional<_InferFields<TFields>>
 
@@ -262,7 +276,7 @@ export type CollectionCreateConfig<
   TFields extends Fields = Fields,
 > = {
   api?: CollectionCreateApiHandler<TContext, TFields>
-  options?: Simplify<FieldsOptions<TContext, TFields>>
+  options?: FieldsOptions<TContext, TFields>
   page?: React.FC
 }
 
@@ -373,7 +387,7 @@ export type CollectionUpdateConfig<
 > = {
   updateApi?: CollectionUpdateApiHandler<TContext, TFields>
   updateDefaultApi?: CollectionUpdateDefaultApiHandler<TContext, TFields>
-  options?: Simplify<FieldsOptions<TContext, TFields>>
+  options?: FieldsOptions<TContext, TFields>
 }
 
 export interface CollectionDeleteApiArgs<TContext extends AnyContextable, TFields extends Fields>
@@ -560,7 +574,7 @@ export class CollectionBuilder<
     })
 
     return {
-      list: route as Simplify<CollectionListApiRoute<TSlug, TFields>>,
+      list: route as unknown as CollectionListApiRoute<TSlug, TFields>,
     }
   }
 
@@ -602,7 +616,10 @@ export class CollectionBuilder<
         },
       })
 
-      return { ui: ui, api: route }
+      return {
+        ui: ui,
+        api: route,
+      }
     }
   }
 
@@ -615,7 +632,7 @@ export class CollectionBuilder<
     })
 
     return {
-      one: route as Simplify<CollectionFindOneApiRoute<TSlug, TFields>>,
+      one: route as unknown as CollectionFindOneApiRoute<TSlug, TFields>,
     }
   }
 
@@ -652,7 +669,10 @@ export class CollectionBuilder<
         },
       })
 
-      return { ui: ui, api: route }
+      return {
+        ui: ui,
+        api: route,
+      }
     }
   }
 
@@ -675,7 +695,7 @@ export class CollectionBuilder<
     )
 
     return {
-      create: route as Simplify<CollectionCreateApiRoute<TSlug, TFields>>,
+      create: route as CollectionCreateApiRoute<TSlug, TFields>,
       createOptions: createOptionsRoute,
     }
   }
@@ -721,7 +741,10 @@ export class CollectionBuilder<
         },
       })
 
-      return { ui: ui, api: route }
+      return {
+        ui: ui,
+        api: route,
+      }
     }
   }
 
@@ -752,10 +775,8 @@ export class CollectionBuilder<
     )
 
     return {
-      update: updateRoute as Simplify<CollectionUpdateApiRoute<TSlug, TFields>>,
-      updateDefault: updateDefaultRoute as Simplify<
-        CollectionUpdateDefaultApiRoute<TSlug, TFields>
-      >,
+      update: updateRoute as CollectionUpdateApiRoute<TSlug, TFields>,
+      updateDefault: updateDefaultRoute as CollectionUpdateDefaultApiRoute<TSlug, TFields>,
       updateOptions: updateOptionsRoute,
     }
   }
@@ -769,7 +790,7 @@ export class CollectionBuilder<
     })
 
     return {
-      delete: route as Simplify<CollectionDeleteApiRoute<TSlug>>,
+      delete: route as CollectionDeleteApiRoute<TSlug>,
     }
   }
 }

@@ -1,3 +1,5 @@
+'use client'
+
 import { type DefaultValues, type FieldValues, useForm, type UseFormProps } from 'react-hook-form'
 
 import { getDefaultValueFromFieldsClient } from '../../../../core'

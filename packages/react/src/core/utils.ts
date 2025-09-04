@@ -74,7 +74,7 @@ export type ToZodObject<T extends Record<string, any>> = ZodObject<{
 
 export function appendFieldNameToFields<TFieldsShape extends FieldsShape>(
   fieldsShape: TFieldsShape
-): Simplify<TFieldsShape> {
+): TFieldsShape {
   return Object.fromEntries(
     Object.entries(fieldsShape).map(([key, field]) => {
       field.$client.fieldName = key
