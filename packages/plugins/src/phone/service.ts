@@ -11,7 +11,12 @@ import {
   type ValidateSchema,
 } from '@genseki/react'
 
-import type { PhoneStore } from './store'
+import type {
+  ChangePhoneNumberVerificationPayload,
+  ForgotPasswordVerificationPayload,
+  PhoneStore,
+  SignUpVerificationPayload,
+} from './store'
 import type { BaseSignUpBodySchema, PluginSchema } from './types'
 interface PhoneServiceOptions<
   TSignUpBodySchema extends BaseSignUpBodySchema = BaseSignUpBodySchema,
@@ -27,38 +32,56 @@ interface PhoneServiceOptions<
       phone: string
       name: string
       refCode: string
-    }) => Promise<{ token: string; refCode: string }>
-    onOtpVerify: (data: { phone: string; token: string; pin: string }) => Promise<boolean>
+    }) => Promise<{ token: string; refCode: string; pin?: string }>
+    onOtpVerify?: (data: {
+      phone: string
+      token: string
+      pin: string
+      verification: {
+        id: string
+        value: SignUpVerificationPayload<z.output<TSignUpBodySchema>>
+        createdAt: Date
+        expiredAt: Date
+      }
+    }) => Promise<boolean>
   }
   changePhone?: {
     onOtpSent: (data: {
       phone: string
       name: string | undefined | null
       refCode: string
-    }) => Promise<{ token: string; refCode: string }>
-    onOtpVerify: (data: { phone: string; token: string; pin: string }) => Promise<boolean>
+    }) => Promise<{ token: string; refCode: string; pin?: string }>
+    onOtpVerify?: (data: {
+      phone: string
+      token: string
+      pin: string
+      verification: {
+        id: string
+        value: ChangePhoneNumberVerificationPayload
+        createdAt: Date
+        expiredAt: Date
+      }
+    }) => Promise<boolean>
   }
   forgotPassword?: {
     onOtpSent: (data: {
       phone: string
       name: string | undefined | null
       refCode: string
-    }) => Promise<{ token: string; refCode: string }>
-    onOtpVerify: (data: { phone: string; token: string; pin: string }) => Promise<boolean>
+    }) => Promise<{ token: string; refCode: string; pin?: string }>
+    onOtpVerify?: (data: {
+      phone: string
+      token: string
+      pin: string
+      verification: {
+        id: string
+        value: ForgotPasswordVerificationPayload
+        createdAt: Date
+        expiredAt: Date
+      }
+    }) => Promise<boolean>
   }
 }
-
-const defaultOptions = {
-  login: {
-    sessionExpiredInSeconds: 3600,
-    hashPassword: Password.hashPassword,
-    verifyPassword: Password.verifyPassword,
-  },
-} satisfies PartialDeep<PhoneServiceOptions>
-
-export type PhoneServiceOptionsWithDefaults = ReturnType<
-  typeof defu<PhoneServiceOptions, [typeof defaultOptions]>
->
 
 export class PhoneService<
   TContext extends AnyContextable,
@@ -66,7 +89,7 @@ export class PhoneService<
   TSignUpBodySchema extends BaseSignUpBodySchema,
   TStore extends PhoneStore<TSignUpBodySchema>,
 > {
-  private readonly options: PhoneServiceOptionsWithDefaults
+  private readonly options: PhoneServiceOptions<TSignUpBodySchema>
 
   constructor(
     public readonly context: TContext,
@@ -74,7 +97,30 @@ export class PhoneService<
     options: ValidateSchema<PluginSchema, TSchema, PhoneServiceOptions<TSignUpBodySchema>>,
     private readonly store: TStore
   ) {
-    this.options = defu(options, defaultOptions) as PhoneServiceOptionsWithDefaults
+    const defaultOptions = {
+      login: {
+        sessionExpiredInSeconds: 3600,
+        hashPassword: Password.hashPassword,
+        verifyPassword: Password.verifyPassword,
+      },
+      signUp: {
+        onOtpVerify: async (data) => {
+          return data.pin === data.verification.value.pin
+        },
+      },
+      changePhone: {
+        onOtpVerify: async (data) => {
+          return data.pin === data.verification.value.pin
+        },
+      },
+      forgotPassword: {
+        onOtpVerify: async (data) => {
+          return data.pin === data.verification.value.pin
+        },
+      },
+    } satisfies PartialDeep<PhoneServiceOptions>
+
+    this.options = defu(options, defaultOptions) as PhoneServiceOptions<TSignUpBodySchema>
   }
 
   get signUpBody(): TSignUpBodySchema {
@@ -95,10 +141,17 @@ export class PhoneService<
       return err({ message: 'Account not found or password not set' })
     }
 
-    const verifyStatus = await Password.verifyPassword(
+    // NOTE: verifyPassword function is default from options, can be customized
+    const verifyStatus = await this.options.login!.verifyPassword!(
       body.password,
       credentialAccount.password as string
     )
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (verifyStatus.isErr()) {
+      return err({ message: 'Internal Server Error', cause: verifyStatus.error })
+    }
 
     if (!verifyStatus) {
       return err({ message: 'Invalid password' })
@@ -155,7 +208,8 @@ export class PhoneService<
       })
     }
 
-    const hashedPassword = await this.options.login.hashPassword(data.password)
+    // NOTE: Hash function is default from options, can be customized
+    const hashedPassword = await this.options.login!.hashPassword!(data.password)
 
     const { password: _, ...rest } = data
 
@@ -168,6 +222,7 @@ export class PhoneService<
           password: hashedPassword,
           data: rest as z.output<TSignUpBodySchema>,
           attempt: 0,
+          pin: otpResponse.value.pin,
         },
         // TODO: Check the expiration time from config
         expiredAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
@@ -209,12 +264,13 @@ export class PhoneService<
       })
     }
 
-    const verifyStatus = await this.options.signUp
-      .onOtpVerify({
-        phone: data.phone,
-        token: verification.id,
-        pin: data.pin,
-      })
+    // NOTE: signUp.onOtpVerify function is default from options, can be customized
+    const verifyStatus = await this.options.signUp!.onOtpVerify!({
+      phone: data.phone,
+      token: verification.id,
+      pin: data.pin,
+      verification,
+    })
       .then((result) => ok(result))
       .catch((error) => err(error))
 
@@ -329,6 +385,7 @@ export class PhoneService<
         oldPhone: phone.old,
         newPhone: phone.new,
         attempt: 0,
+        pin: otpResponse.value.pin,
       },
       // TODO: Customizable
       expiredAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
@@ -381,6 +438,7 @@ export class PhoneService<
         phone: verification.value.newPhone,
         pin: payload.pin,
         token: verification.id,
+        verification,
       })
       .then((result) => ok(result))
       .catch((error) => err(error))
@@ -473,6 +531,7 @@ export class PhoneService<
           phone: phone,
           attempt: 0,
           userId: existingUser.id,
+          pin: otpResponse.value.pin,
         },
         // TODO: Customizable
         expiredAt: new Date(Date.now() + 5 * 60 * 1000), // 5 minutes
@@ -527,12 +586,13 @@ export class PhoneService<
       })
     }
 
-    const verifyStatus = await this.options.forgotPassword
-      .onOtpVerify({
-        phone: payload.phone,
-        pin: payload.pin,
-        token: verification.id,
-      })
+    // NOTE: forgotPassword.onOtpVerify function is default from options, can be customized
+    const verifyStatus = await this.options.forgotPassword!.onOtpVerify!({
+      phone: payload.phone,
+      pin: payload.pin,
+      token: verification.id,
+      verification,
+    })
       .then((result) => ok(result))
       .catch((error) => err(error))
 
@@ -593,7 +653,8 @@ export class PhoneService<
       })
     }
 
-    const hashedPassword = await Password.hashPassword(payload.password)
+    // NOTE: Hash function is default from options, can be customized
+    const hashedPassword = await this.options.login!.hashPassword!(payload.password)
       .then((result) => ok(result))
       .catch((error) => err(error))
 

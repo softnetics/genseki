@@ -13,7 +13,6 @@ export interface BaseSignUpBody {
   name: string
   phone: string
   password: string
-  email?: string
 }
 
 export type BaseSignUpBodySchema = ToZodObject<BaseSignUpBody>
