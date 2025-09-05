@@ -53,13 +53,6 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return user.id
   }
 
-  async generateRefCode(length = 6) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    const array = new Uint8Array(length)
-    crypto.getRandomValues(array)
-    return Array.from(array, (x) => chars[x % chars.length]).join('')
-  }
-
   async checkIfUserExists(data: z.output<TSignUpBodySchema>): Promise<boolean> {
     const user = await this.prisma.user.findUnique({
       where: { phone: data.phone },

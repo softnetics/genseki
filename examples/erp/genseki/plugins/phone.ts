@@ -1,6 +1,6 @@
 import z from 'zod'
 
-import { phone, PhoneService, PhoneStore } from '@genseki/plugins'
+import { generatePinCode, generateRefCode, phone, PhoneService, PhoneStore } from '@genseki/plugins'
 
 import { FullModelSchemas } from '../../generated/genseki/unsanitized'
 import { context, prisma } from '../helper'
@@ -39,35 +39,35 @@ const phoneService = new PhoneService(
     signUp: {
       body: body,
       onOtpSent: async () => {
+        const pin = generatePinCode()
+        console.log('PIN CODE', pin) // In real world, you should send this pin code to user via SMS
         return {
-          refCode: crypto.randomUUID().slice(0, 6),
+          refCode: generateRefCode(),
           token: crypto.randomUUID(),
+          pin,
         }
-      },
-      onOtpVerify: async (payload) => {
-        return Math.random() < 0.5
       },
     },
     changePhone: {
       onOtpSent: async () => {
+        const pin = generatePinCode()
+        console.log('PIN CODE', pin) // In real world, you should send this pin code to user via SMS
         return {
-          refCode: crypto.randomUUID().slice(0, 6),
+          refCode: generateRefCode(),
           token: crypto.randomUUID(),
+          pin,
         }
-      },
-      onOtpVerify: async (payload) => {
-        return Math.random() < 0.5
       },
     },
     forgotPassword: {
       onOtpSent: async () => {
+        const pin = generatePinCode()
+        console.log('PIN CODE', pin) // In real world, you should send this pin code to user via SMS
         return {
-          refCode: crypto.randomUUID().slice(0, 6),
+          refCode: generateRefCode(),
           token: crypto.randomUUID(),
+          pin,
         }
-      },
-      onOtpVerify: async (payload) => {
-        return Math.random() < 0.5
       },
     },
   },

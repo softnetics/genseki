@@ -18,6 +18,25 @@ import type {
   SignUpVerificationPayload,
 } from './store'
 import type { BaseSignUpBodySchema, PluginSchema } from './types'
+
+interface OnOtpSentArgs {
+  phone: string
+  name: string | undefined | null
+}
+
+interface OnOtpSentReturn {
+  token: string
+  refCode: string
+  pin?: string // Provided when using manual OTP handling
+}
+
+interface OnOtpVerification<T> {
+  phone: string
+  token: string
+  pin: string
+  verification: { id: string; value: T; createdAt: Date; expiredAt: Date }
+}
+
 interface PhoneServiceOptions<
   TSignUpBodySchema extends BaseSignUpBodySchema = BaseSignUpBodySchema,
 > {
@@ -28,58 +47,20 @@ interface PhoneServiceOptions<
   }
   signUp: {
     body: TSignUpBodySchema
-    onOtpSent: (data: {
-      phone: string
-      name: string
-      refCode: string
-    }) => Promise<{ token: string; refCode: string; pin?: string }>
-    onOtpVerify?: (data: {
-      phone: string
-      token: string
-      pin: string
-      verification: {
-        id: string
-        value: SignUpVerificationPayload<z.output<TSignUpBodySchema>>
-        createdAt: Date
-        expiredAt: Date
-      }
-    }) => Promise<boolean>
+    onOtpSent: (data: OnOtpSentArgs) => Promise<OnOtpSentReturn>
+    onOtpVerify?: (
+      data: OnOtpVerification<SignUpVerificationPayload<z.output<TSignUpBodySchema>>>
+    ) => Promise<boolean>
   }
   changePhone?: {
-    onOtpSent: (data: {
-      phone: string
-      name: string | undefined | null
-      refCode: string
-    }) => Promise<{ token: string; refCode: string; pin?: string }>
-    onOtpVerify?: (data: {
-      phone: string
-      token: string
-      pin: string
-      verification: {
-        id: string
-        value: ChangePhoneNumberVerificationPayload
-        createdAt: Date
-        expiredAt: Date
-      }
-    }) => Promise<boolean>
+    onOtpSent: (data: OnOtpSentArgs) => Promise<OnOtpSentReturn>
+    onOtpVerify?: (
+      data: OnOtpVerification<ChangePhoneNumberVerificationPayload>
+    ) => Promise<boolean>
   }
   forgotPassword?: {
-    onOtpSent: (data: {
-      phone: string
-      name: string | undefined | null
-      refCode: string
-    }) => Promise<{ token: string; refCode: string; pin?: string }>
-    onOtpVerify?: (data: {
-      phone: string
-      token: string
-      pin: string
-      verification: {
-        id: string
-        value: ForgotPasswordVerificationPayload
-        createdAt: Date
-        expiredAt: Date
-      }
-    }) => Promise<boolean>
+    onOtpSent: (data: OnOtpSentArgs) => Promise<OnOtpSentReturn>
+    onOtpVerify?: (data: OnOtpVerification<ForgotPasswordVerificationPayload>) => Promise<boolean>
   }
 }
 
@@ -192,11 +173,7 @@ export class PhoneService<
 
     // Send phone verification OTP
     const otpResponse = await this.options.signUp
-      .onOtpSent({
-        phone: data.phone,
-        name: data.name,
-        refCode: await this.store.generateRefCode(),
-      })
+      .onOtpSent({ phone: data.phone, name: data.name })
       .then((result) => ok(result))
       .catch((error) => err(error))
 
@@ -358,14 +335,8 @@ export class PhoneService<
       })
     }
 
-    const refCode = await this.store.generateRefCode()
-
     const otpResponse = await this.options.changePhone
-      .onOtpSent({
-        phone: phone.new,
-        name: existingUser.name,
-        refCode: refCode,
-      })
+      .onOtpSent({ phone: phone.new, name: existingUser.name })
       .then((result) => ok(result))
       .catch((error) => err(error))
 
@@ -507,11 +478,7 @@ export class PhoneService<
     }
 
     const otpResponse = await this.options.forgotPassword
-      .onOtpSent({
-        phone: phone,
-        name: existingUser.name,
-        refCode: await this.store.generateRefCode(),
-      })
+      .onOtpSent({ phone: phone, name: existingUser.name })
       .then((result) => ok(result))
       .catch((error) => err(error))
 
