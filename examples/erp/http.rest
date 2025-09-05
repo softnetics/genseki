@@ -33,8 +33,50 @@ POST http://localhost:3000/api/auth/phone/forgot-password/otp/verify
 Content-Type: application/json
 
 {
-  "token": "token9",
+  "token": "2c3d6dc3-05c5-45e1-8a58-a1484010ee36",
   "phone": "0812345678",
   "pin": "9",
-  "refCode": "ref9"
+  "refCode": "a8fc31"
+}
+
+###
+
+POST http://localhost:3000/api/auth/phone/forgot-password/reset
+Content-Type: application/json
+
+{
+  "token": "fbe2e5a8-7d7c-4320-a210-d756091b5c7e",
+  "password": "new-password"
+}
+
+###
+
+POST http://localhost:3000/api/auth/phone/login
+Content-Type: application/json
+
+{
+  "phone": "0812345679",
+  "password": "password"
+}
+
+###
+
+POST http://localhost:3000/api/auth/phone/change/otp
+Content-Type: application/json
+Cookie: GENSEKI_SESSION=b44e3ba0-076e-4f80-9876-38d4d3d61a61
+
+{
+  "oldPhoneNumber": "0812345679",
+  "newPhoneNumber": "0812345677"
+}
+
+###
+
+POST http://localhost:3000/api/auth/phone/change/otp/verify
+Content-Type: application/json
+
+{
+  "refCode": "b05a92",
+  "token": "4c6981ad-6fdf-47b2-b020-2b1b55aa1dc0",
+  "pin": "8"
 }

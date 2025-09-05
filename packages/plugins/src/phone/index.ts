@@ -258,8 +258,7 @@ export function phone<
       path: '/auth/phone/forgot-password/reset',
       body: z.object({
         token: z.string().min(1),
-        oldPassword: z.string().min(1),
-        newPassword: z.string().min(1),
+        password: z.string().min(1),
       }),
       responses: {
         200: z.object({
@@ -268,13 +267,9 @@ export function phone<
         500: z.looseObject({
           code: z.enum([
             'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
-            'ACCOUNT_NOT_FOUND',
-            'ACCOUNT_NOT_SUPPORTED',
-            'OLD_PASSWORD_INCORRECT',
-            'NEW_PASSWORD_SAME_AS_OLD',
-            'INTERNAL_SERVER_ERROR',
+            'FAILED_TO_HASH_PASSWORD',
             'FAILED_TO_UPDATE_PASSWORD',
-            'FAILED_TO_DELETE_PASSWORD_VERIFICATION',
+            'FAILED_TO_DELETE_VERIFICATION',
           ]),
           message: z.string(),
         }),
@@ -283,7 +278,7 @@ export function phone<
     async ({ body }) => {
       const response = await service.resetPassword({
         token: body.token,
-        password: { old: body.oldPassword, new: body.newPassword },
+        password: body.password,
       })
 
       if (response.isErr()) {
@@ -304,7 +299,7 @@ export function phone<
     context,
     {
       method: 'POST',
-      path: '/auth/phone/change',
+      path: '/auth/phone/change/otp',
       body: z.object({
         oldPhoneNumber: z.string().min(1),
         newPhoneNumber: z.string().min(1),
@@ -359,7 +354,7 @@ export function phone<
     context,
     {
       method: 'POST',
-      path: '/auth/phone/change/verify',
+      path: '/auth/phone/change/otp/verify',
       body: z.object({
         refCode: z.string(),
         token: z.string(),

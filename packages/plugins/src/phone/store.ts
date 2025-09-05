@@ -211,7 +211,7 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     await this.prisma.verification.create({
       data: {
         id: data.id,
-        identifier: `change-phone:${data.value.oldPhone}:${data.refCode}`,
+        identifier: `change-phone:${data.value.userId}:${data.refCode}`,
         value: JSON.stringify(data.value),
         expiredAt: data.expiredAt,
       },
@@ -237,10 +237,10 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return attempt
   }
 
-  async countActiveChangePhoneNumberVerification(phone: string) {
+  async countActiveChangePhoneNumberVerification(userId: string) {
     const count = await this.prisma.verification.count({
       where: {
-        identifier: { contains: `change-phone:${phone}` },
+        identifier: { contains: `change-phone:${userId}` },
         expiredAt: { gte: new Date() },
       },
     })
@@ -371,6 +371,7 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
         identifier: `reset-password:${data.value.accountId}`,
       },
       create: {
+        identifier: `reset-password:${data.value.accountId}`,
         value: JSON.stringify(data.value),
         expiredAt: data.expiredAt,
       },
