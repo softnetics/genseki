@@ -13,6 +13,8 @@ import type { PhoneService } from './service'
 import type { PhoneStore } from './store'
 import type { PluginSchema } from './types'
 
+export { generatePinCode, generateRefCode } from './utils'
+
 export function phone<
   TContext extends AnyContextable,
   TPhoneService extends PhoneService<

@@ -10,24 +10,27 @@ import {
 import { safeJsonParse } from './helper'
 import type { BaseSignUpBody, BaseSignUpBodySchema, PluginSchema } from './types'
 
-interface SignUpVerificationPayload<TSignUpBody extends BaseSignUpBody = BaseSignUpBody> {
+export interface SignUpVerificationPayload<TSignUpBody extends BaseSignUpBody = BaseSignUpBody> {
   phone: string
   password: string
   attempt: number
   data: TSignUpBody
+  pin?: string
 }
 
-interface ChangePhoneNumberVerificationPayload {
+export interface ChangePhoneNumberVerificationPayload {
   userId: string
   newPhone: string
   oldPhone: string
   attempt: number
+  pin?: string
 }
 
-interface ForgotPasswordVerificationPayload {
+export interface ForgotPasswordVerificationPayload {
   phone: string
   attempt: number
   userId: string
+  pin?: string
 }
 
 interface ResetPasswordVerificationPayload {
@@ -44,18 +47,10 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
       data: {
         name: data.name,
         phone: data.phone,
-        email: data.email,
       },
     })) as { id: string }
 
     return user.id
-  }
-
-  async generateRefCode(length = 6) {
-    const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789'
-    const array = new Uint8Array(length)
-    crypto.getRandomValues(array)
-    return Array.from(array, (x) => chars[x % chars.length]).join('')
   }
 
   async checkIfUserExists(data: z.output<TSignUpBodySchema>): Promise<boolean> {
@@ -133,7 +128,7 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
 
   async getSignUpVerification(phone: string, refCode: string) {
     const verification = await this.prisma.verification.findFirst({
-      select: { id: true, value: true },
+      select: { id: true, value: true, createdAt: true, expiredAt: true },
       where: {
         identifier: `sign-up-phone:${phone}:${refCode}`,
         expiredAt: { gte: new Date() },
@@ -153,8 +148,10 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     }
 
     return {
-      id: verification.id,
+      id: verification.id as string,
       value: value,
+      createdAt: verification.createdAt as Date,
+      expiredAt: verification.expiredAt as Date,
     }
   }
 
@@ -249,7 +246,7 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
 
   async getChangePhoneNumberVerification(userId: string, refCode: string) {
     const verification = await this.prisma.verification.findFirst({
-      select: { id: true, value: true },
+      select: { id: true, value: true, createdAt: true, expiredAt: true },
       where: {
         identifier: `change-phone:${userId}:${refCode}`,
         expiredAt: { gte: new Date() },
@@ -269,6 +266,8 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return {
       id: verification.id as string,
       value: value,
+      createdAt: verification.createdAt as Date,
+      expiredAt: verification.expiredAt as Date,
     }
   }
 
@@ -337,12 +336,12 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
 
   async getForgotPasswordVerification(phone: string, refCode: string) {
     const verification = (await this.prisma.verification.findFirst({
-      select: { id: true, value: true, createdAt: true },
+      select: { id: true, value: true, createdAt: true, expiredAt: true },
       where: {
         identifier: `forgot-password:${phone}:${refCode}`,
         expiredAt: { gte: new Date() },
       },
-    })) as { id: string; value: string; createdAt: Date } | null
+    })) as { id: string; value: string; createdAt: Date; expiredAt: Date } | null
 
     if (!verification) {
       return null
@@ -358,6 +357,7 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
       id: verification.id,
       value: value,
       createdAt: verification.createdAt,
+      expiredAt: verification.expiredAt,
     }
   }
 
