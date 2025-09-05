@@ -1,5 +1,15 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.40
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @genseki/react@0.1.0-alpha.41
+  - @genseki/next@0.1.0-alpha.41
+  - @genseki/rest@0.1.0-alpha.41
+  - @genseki/react-query@0.1.0-alpha.41
+
 ## 0.1.0-alpha.39
 
 ### Patch Changes
