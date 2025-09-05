@@ -97,6 +97,7 @@ async function makeApiRoute(
         {
           status: error?.status ?? 500,
           body: {
+            ...error?.body,
             message: error?.body?.message ?? 'Internal Server Error',
           },
         },

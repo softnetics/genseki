@@ -92,8 +92,8 @@ export class MyContext implements Contextable<User> {
   getUserSchema() {
     return z.object({
       id: z.string(),
-      name: z.string().optional(),
-      email: z.email().optional(),
+      name: z.string().nullish(),
+      email: z.email().nullish(),
     })
   }
 

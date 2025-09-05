@@ -17,7 +17,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "codegen": "tsx ./scripts/build.ts",
-    "bundle": "rm -rf dist && tsx ./scripts/build.ts"
+    "bundle": "tsx ./scripts/build.ts"
   },
   "keywords": [],
   "author": "",

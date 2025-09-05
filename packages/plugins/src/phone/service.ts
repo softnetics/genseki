@@ -278,7 +278,7 @@ export class PhoneService<
     const [existingUser, userWithPhone, count] = await Promise.all([
       this.store.getUserById(userId),
       this.store.getUserByPhone(phone.new),
-      this.store.countActiveChangePhoneNumberVerification(phone.old),
+      this.store.countActiveChangePhoneNumberVerification(userId),
     ])
 
     if (!existingUser) {
@@ -579,7 +579,7 @@ export class PhoneService<
         attempt: attempt.value,
       })
     }
-    // TODO: Should we delete the verification
+
     const accountId = await this.store.getCredentialAccountIdByUserId(verification.value.userId)
 
     if (!accountId) {
@@ -598,7 +598,7 @@ export class PhoneService<
     return ok({ token: resetPasswordVerification })
   }
 
-  async resetPassword(payload: { token: string; password: { old: string; new: string } }) {
+  async resetPassword(payload: { token: string; password: string }) {
     const verification = await this.store.getResetPasswordVerification(payload.token)
 
     if (!verification) {
@@ -608,80 +608,22 @@ export class PhoneService<
       })
     }
 
-    const account = await this.store.getAccountById(verification.value.accountId)
-
-    if (!account) {
-      return err({
-        code: 'ACCOUNT_NOT_FOUND' as const,
-        message: 'Account not found',
-      })
-    }
-
-    if (account.provider !== AccountProvider.CREDENTIAL) {
-      return err({
-        code: 'ACCOUNT_NOT_SUPPORTED' as const,
-        message: 'This account does not support password login',
-      })
-    }
-
-    const existingPassword = account.password
-
-    if (!existingPassword) {
-      return err({
-        code: 'ACCOUNT_NOT_SUPPORTED' as const,
-        message: 'This account does not need to change password',
-      })
-    }
-
-    const oldPasswordVerification = await Password.verifyPassword(
-      payload.password.old,
-      existingPassword
-    )
+    const hashedPassword = await Password.hashPassword(payload.password)
       .then((result) => ok(result))
       .catch((error) => err(error))
 
-    if (oldPasswordVerification.isErr()) {
+    if (hashedPassword.isErr()) {
       return err({
-        code: 'INTERNAL_SERVER_ERROR' as const,
-        message: 'Old Password checking logic throw error. Please check the log for more details',
-        cause: oldPasswordVerification.error,
-      })
-    }
-
-    if (!oldPasswordVerification.value) {
-      return err({
-        code: 'OLD_PASSWORD_INCORRECT' as const,
-        message: 'Old password is incorrect',
-      })
-    }
-
-    const newPasswordVerification = await Password.verifyPassword(
-      payload.password.new,
-      existingPassword
-    )
-      .then((result) => ok(result))
-      .catch((error) => err(error))
-
-    if (newPasswordVerification.isErr()) {
-      return err({
-        code: 'INTERNAL_SERVER_ERROR' as const,
-        message: 'New Password checking logic throw error. Please check the log for more details',
-        cause: newPasswordVerification.error,
-      })
-    }
-
-    if (newPasswordVerification.value) {
-      return err({
-        code: 'NEW_PASSWORD_SAME_AS_OLD' as const,
-        message: 'New password must be different from the old one',
+        code: 'FAILED_TO_HASH_PASSWORD' as const,
+        message: 'Failed to hash password',
+        cause: hashedPassword.error,
       })
     }
 
     const accountId = verification.value.accountId
-    const hashedPassword = await Password.hashPassword(payload.password.new)
 
     const updateResult = await this.store
-      .updateAccountPassword(accountId, hashedPassword)
+      .updateAccountPassword(verification.value.accountId, hashedPassword.value)
       .then((result) => ok(result))
       .catch((error) => err(error))
 
@@ -700,7 +642,7 @@ export class PhoneService<
 
     if (deleteResult.isErr()) {
       return err({
-        code: 'FAILED_TO_DELETE_PASSWORD_VERIFICATION' as const,
+        code: 'FAILED_TO_DELETE_VERIFICATION' as const,
         message: 'Internal Server Error. Please see logs for more details',
         cause: deleteResult.error,
       })
