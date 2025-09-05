@@ -1,7 +1,13 @@
 import z from 'zod'
 
 import type { AnyContextable, ObjectWithOnlyValue } from '@genseki/react'
-import { createEndpoint, createPlugin, HttpUnauthorizedError, ResponseHelper } from '@genseki/react'
+import {
+  createEndpoint,
+  createPlugin,
+  HttpInternalServerError,
+  HttpUnauthorizedError,
+  ResponseHelper,
+} from '@genseki/react'
 
 import type { PhoneService } from './service'
 import type { PhoneStore } from './store'
@@ -55,12 +61,16 @@ export function phone<
     }
   )
 
+  const signUpBody = service.getOptions().signUp.body as ReturnType<
+    TPhoneService['getOptions']
+  >['signUp']['body']
+
   const sendSignUpOtpEndpoint = createEndpoint(
     context,
     {
       method: 'POST',
       path: '/auth/phone/sign-up/otp',
-      body: service.signUpBody as TPhoneService['signUpBody'],
+      body: signUpBody,
       responses: {
         200: z.object({
           token: z.string(),
@@ -115,6 +125,7 @@ export function phone<
       }),
       responses: {
         200: z.object({
+          userId: z.string(),
           message: z.string(),
         }),
         500: z.union([
@@ -136,21 +147,32 @@ export function phone<
         ]),
       },
     },
-    async (payload) => {
+    async (payload, { response }) => {
       const body = payload.body
 
-      const response = await service.verifySignUpPhoneOtp(body)
+      const result = await service.verifySignUpPhoneOtp(body)
 
-      if (response.isErr()) {
-        return {
-          status: 500,
-          body: response.error,
-        }
+      if (result.isErr()) {
+        return { status: 500, body: result.error }
+      }
+
+      const session = await service.createSession(result.value.userId)
+      if (session.isErr()) {
+        throw new HttpInternalServerError(session.error.message)
+      }
+
+      if (service.getOptions().signUp.autoLogin !== false) {
+        ResponseHelper.setSessionCookie(response, session.value.token, {
+          expires: session.value.expiredAt,
+        })
       }
 
       return {
         status: 200,
-        body: { message: 'Sign up success' },
+        body: {
+          userId: result.value.userId,
+          message: 'Sign up success',
+        },
       }
     }
   )

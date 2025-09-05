@@ -46,6 +46,7 @@ interface PhoneServiceOptions<
     verifyPassword?: (password: string, hashed: string) => Promise<boolean>
   }
   signUp: {
+    autoLogin?: boolean // default to true
     body: TSignUpBodySchema
     onOtpSent: (data: OnOtpSentArgs) => Promise<OnOtpSentReturn>
     onOtpVerify?: (
@@ -104,8 +105,15 @@ export class PhoneService<
     this.options = defu(options, defaultOptions) as PhoneServiceOptions<TSignUpBodySchema>
   }
 
-  get signUpBody(): TSignUpBodySchema {
-    return this.options.signUp.body as TSignUpBodySchema
+  getOptions(): PhoneServiceOptions<TSignUpBodySchema> {
+    return this.options
+  }
+
+  async createSession(userId: string) {
+    return this.store
+      .createSession(userId)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
   }
 
   async login(body: { phone: string; password: string }) {
@@ -138,9 +146,13 @@ export class PhoneService<
       return err({ message: 'Invalid password' })
     }
 
-    const session = await this.store.createSession(user.id)
+    const session = await this.createSession(user.id)
 
-    return ok(session)
+    if (session.isErr()) {
+      return err({ message: 'Failed to create session', cause: session.error })
+    }
+
+    return ok(session.value)
   }
 
   async sendSignUpPhoneOtp(data: z.output<TSignUpBodySchema>) {
@@ -282,7 +294,7 @@ export class PhoneService<
     const userId = await this.store.createUser(verification.value.data)
     await this.store.createAccount(userId, verification.value.password)
 
-    return ok(null)
+    return ok({ userId })
   }
 
   async sendChangePhoneNumberOtp(userId: string, phone: { new: string; old: string }) {
