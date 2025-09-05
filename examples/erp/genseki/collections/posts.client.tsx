@@ -5,24 +5,20 @@ import { useState } from 'react'
 import { type SubmitErrorHandler, type SubmitHandler, useFormContext } from 'react-hook-form'
 
 import { zodResolver } from '@hookform/resolvers/zod'
-import { DotsThreeVerticalIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
 import z from 'zod'
 
-import type { BaseData, CollectionLayoutProps, InferCreateFields } from '@genseki/react'
+import type { CollectionLayoutProps, InferCreateFields } from '@genseki/react'
 import {
-  BaseIcon,
+  actionsColumn,
   Button,
-  Checkbox,
   CollectionListToolbar,
+  createDeleteActionItem,
+  createEditActionItem,
+  createSeparatorItem,
   Form,
   type InferFields,
-  Menu,
-  MenuContent,
-  MenuItem,
-  MenuSeparator,
-  MenuTrigger,
   SubmitButton,
   TanstackTable,
   toast,
@@ -71,6 +67,7 @@ export const columns = [
     header: 'Updated At',
     cell: (info) => <div>{new Date(info.getValue()).toLocaleDateString('en-GB')}</div>,
   }),
+  actionsColumn([createEditActionItem(), createSeparatorItem(), createDeleteActionItem()]),
 ]
 
 /**
@@ -82,7 +79,7 @@ export function PostClientToolbar() {
 
   return (
     <div>
-      <CollectionListToolbar actions={context.actions} />
+      <CollectionListToolbar toolbar={context.toolbar} />
     </div>
   )
 }
@@ -115,105 +112,10 @@ export const PostClientTable = (props: { children?: React.ReactNode }) => {
     },
   })
 
-  const columnHelper = createColumnHelper<BaseData>()
-  // You can setup your own custom columns
-  const enhancedColumns = [
-    ...(context.actions?.delete
-      ? [
-          columnHelper.display({
-            id: 'select',
-            header: ({ table }) => (
-              <Checkbox
-                isSelected={table.getIsAllRowsSelected()}
-                isIndeterminate={table.getIsSomeRowsSelected()}
-                onChange={(checked) =>
-                  table.getToggleAllRowsSelectedHandler()({ target: { checked } })
-                }
-              />
-            ),
-            cell: ({ row }) => (
-              <input
-                type="checkbox"
-                checked={row.getIsSelected()}
-                onChange={(event) => {
-                  const handler = row.getToggleSelectedHandler()
-                  handler(event)
-                }}
-              />
-            ),
-          }),
-        ]
-      : []),
-    ...context.columns,
-    columnHelper.display({
-      id: 'actions',
-      cell: ({ row }) => {
-        if (!context.actions?.one && !context.actions?.update && !context.actions?.delete) {
-          return null
-        }
-
-        return (
-          <div className="grid place-items-center">
-            <Menu>
-              <MenuTrigger aria-label="Actions Icon" className="cursor-pointer">
-                <BaseIcon icon={DotsThreeVerticalIcon} size="md" weight="bold" />
-              </MenuTrigger>
-              <MenuContent aria-label="Actions" placement="left top">
-                {context.actions?.one && (
-                  <MenuItem
-                    aria-label="View"
-                    onAction={() => {
-                      navigation.navigate(`./${context.slug}/${row.original.__id}`)
-                    }}
-                  >
-                    View
-                  </MenuItem>
-                )}
-                {context.actions?.update && (
-                  <MenuItem
-                    aria-label="Edit"
-                    onAction={() => {
-                      navigation.navigate(`./${context.slug}/update/${row.original.__id}`)
-                    }}
-                  >
-                    Edit
-                  </MenuItem>
-                )}
-                {context.actions?.delete && (
-                  <>
-                    {context.actions?.one || (context.actions?.update && <MenuSeparator />)}
-                    <MenuItem
-                      aria-label="Delete"
-                      isDanger
-                      onAction={() => {
-                        deleteMutation.mutate([row.original.__id.toString()])
-                      }}
-                    >
-                      Delete
-                    </MenuItem>
-                  </>
-                )}
-                <MenuSeparator />
-                <MenuItem
-                  aria-label="Revert"
-                  onAction={() => {
-                    confirm('Confirm to revert the action?')
-                  }}
-                >
-                  Revert
-                </MenuItem>
-              </MenuContent>
-            </Menu>
-          </div>
-        )
-      },
-    }),
-  ]
-
   const table = useListTable({
     total: query.data?.total,
     data: query.data?.data || [],
-    columns: enhancedColumns,
+    columns: context.columns,
   })
 
   return (

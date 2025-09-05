@@ -8,7 +8,7 @@ import { CollectionListDelete } from './delete'
 import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
-import type { CollectionListActions } from '../../../../../core/collection'
+import type { CollectionToolbarActions } from '../../../../../core/collection'
 import { toast } from '../../../..'
 import { BaseIcon, ButtonLink } from '../../../../components'
 import { useTableStatesContext } from '../../../../providers/table'
@@ -16,7 +16,7 @@ import { useCollectionList } from '../context'
 import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'
 
 export interface CollectionListToolbarProps {
-  actions?: Partial<CollectionListActions>
+  toolbar?: Partial<CollectionToolbarActions>
 }
 
 export function CollectionListToolbar(props: CollectionListToolbarProps) {
@@ -24,11 +24,9 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
   const queryClient = useQueryClient()
   const { rowSelectionIds, setRowSelection, isRowsSelected } = useTableStatesContext()
 
-  const actions: CollectionListActions = {
-    create: props.actions?.create ?? context.actions?.create,
-    update: props.actions?.update ?? context.actions?.update,
-    delete: props.actions?.delete ?? context.actions?.delete,
-    one: props.actions?.one ?? context.actions?.one,
+  const toolbar: CollectionToolbarActions = {
+    create: props.toolbar?.create ?? context.toolbar?.create,
+    delete: props.toolbar?.delete ?? context.toolbar?.delete,
   }
   const deleteMutation = useCollectionDeleteMutation({
     slug: context.slug,
@@ -56,13 +54,13 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
         Back
       </ButtonLink>
       <div className="flex items-center gap-x-4">
-        {actions?.delete && isRowsSelected && (
+        {toolbar?.delete && isRowsSelected && (
           <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />
         )}
         <CollectionListSearch />
         {/* TODO: Filter */}
         <CollectionListFilter />
-        {actions?.create && <CollectionListCreate slug={context.slug} />}
+        {toolbar?.create && <CollectionListCreate slug={context.slug} />}
       </div>
     </div>
   )

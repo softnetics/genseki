@@ -13,7 +13,7 @@ import { CollectionListPagination } from './table/pagination'
 import { CollectionListToolbar, type CollectionListToolbarProps } from './toolbar'
 
 import { toast } from '../../../..'
-import type { CollectionListActions } from '../../../../core/collection'
+import type { CollectionToolbarActions } from '../../../../core/collection'
 import type { FieldsClient } from '../../../../core/field'
 import { TableStatesProvider, useTableStatesContext } from '../../../providers/table'
 import { useCollection } from '../context'
@@ -51,7 +51,7 @@ export interface CollectionListContextValue<T extends BaseData = BaseData> {
   columns: ColumnDef<T, any>[]
   search?: string[]
   sortBy?: string[]
-  actions?: CollectionListActions
+  toolbar?: CollectionToolbarActions
 
   // Helper functions
   deleteRows: (rows?: string[]) => void
@@ -66,7 +66,7 @@ export interface CollectionListProviderProps<T extends BaseData = BaseData> {
   columns: ColumnDef<T, any>[]
   search?: string[]
   sortBy?: string[]
-  actions?: CollectionListActions
+  toolbar?: CollectionToolbarActions
 }
 
 /**

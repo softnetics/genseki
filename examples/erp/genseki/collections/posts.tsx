@@ -192,7 +192,10 @@ export const postsCollection = createPlugin('posts', (app) => {
           search: ['title'],
           sortBy: ['updatedAt', 'title'],
         },
-        actions: { delete: true, update: true, create: true },
+        toolbar: {
+          create: true,
+          delete: true,
+        },
         layout: Layout,
         page: CustomListPage,
       })
