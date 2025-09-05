@@ -1,5 +1,15 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.40
+
+### Minor Changes
+
+- [#176](https://github.com/softnetics/genseki/pull/176) [`ce64292`](https://github.com/softnetics/genseki/commit/ce64292f015c633cd133981e2882a9ec1366b759) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Implement auto login after sign up for phone plugin
+
+### Patch Changes
+
+- [#177](https://github.com/softnetics/genseki/pull/177) [`8df54c5`](https://github.com/softnetics/genseki/commit/8df54c5d450bb36de3a10a5196054eb7d269238a) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix Forgot password and Change phone bugs in phone plugin
+
 ## 0.1.0-alpha.39
 
 ### Patch Changes

@@ -1,5 +1,14 @@
 # @genseki/next
 
+## 0.1.0-alpha.40
+
+### Patch Changes
+
+- [#177](https://github.com/softnetics/genseki/pull/177) [`8df54c5`](https://github.com/softnetics/genseki/commit/8df54c5d450bb36de3a10a5196054eb7d269238a) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix Forgot password and Change phone bugs in phone plugin
+
+- Updated dependencies []:
+  - @genseki/react@0.1.0-alpha.40
+
 ## 0.1.0-alpha.39
 
 ### Patch Changes
