@@ -80,3 +80,13 @@ Content-Type: application/json
   "token": "4c6981ad-6fdf-47b2-b020-2b1b55aa1dc0",
   "pin": "8"
 }
+
+###
+
+POST http://localhost:3000/api/auth/phone/login
+Content-Type: application/json
+
+{
+  "phone": "0812345679",
+  "password": "password1"
+}
