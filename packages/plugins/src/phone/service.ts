@@ -236,7 +236,19 @@ export class PhoneService<
   }
 
   async verifySignUpPhoneOtp(data: { phone: string; token: string; refCode: string; pin: string }) {
-    const verification = await this.store.getSignUpVerification(data.token)
+    const verificationResult = await this.store
+      .getSignUpVerification(data.token)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (verificationResult.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Failed to get sign up verification',
+      })
+    }
+
+    const verification = verificationResult.value
 
     if (!verification) {
       return err({
@@ -433,7 +445,21 @@ export class PhoneService<
       })
     }
 
-    const verification = await this.store.getChangePhoneNumberVerification(payload.token)
+    const verificationResult = await this.store
+      .getChangePhoneNumberVerification(payload.token)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (verificationResult.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Failed to get change phone number verification',
+        cause: verificationResult.error,
+      })
+    }
+
+    const verification = verificationResult.value
+
     if (!verification) {
       return err({
         code: 'INVALID_OR_EXPIRED_VERIFICATION_TOKEN' as const,
@@ -625,7 +651,20 @@ export class PhoneService<
       })
     }
 
-    const verification = await this.store.getForgotPasswordVerification(payload.token)
+    const verificationResult = await this.store
+      .getForgotPasswordVerification(payload.token)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (verificationResult.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Failed to get forgot password verification',
+        cause: verificationResult.error,
+      })
+    }
+
+    const verification = verificationResult.value
 
     if (!verification) {
       return err({
