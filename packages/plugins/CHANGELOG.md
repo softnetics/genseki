@@ -1,5 +1,11 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.42
+
+### Patch Changes
+
+- [#181](https://github.com/softnetics/genseki/pull/181) [`83a5c51`](https://github.com/softnetics/genseki/commit/83a5c51c744b9cc316d072e3b13ceec592065ef8) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix phone plugin bugs and simplify error code
+
 ## 0.1.0-alpha.41
 
 ### Minor Changes
