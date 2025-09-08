@@ -142,7 +142,7 @@ export class PhoneService<
       return err({ message: 'Internal Server Error', cause: verifyStatus.error })
     }
 
-    if (!verifyStatus) {
+    if (!verifyStatus.value) {
       return err({ message: 'Invalid password' })
     }
 
@@ -178,7 +178,7 @@ export class PhoneService<
     // Check if the given phone number has reached the maximum OTP send limit
     if (count >= 5) {
       return err({
-        code: 'MAX_OTP_SEND_LIMIT_REACHED' as const,
+        code: 'REACHED_MAX_ATTEMPTS' as const,
         message: 'Maximum OTP send limit reached. Please try again later.',
       })
     }
@@ -221,7 +221,7 @@ export class PhoneService<
 
     if (result.isErr()) {
       return err({
-        code: 'FAILED_TO_CREATE_VERIFICATION' as const,
+        code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'Failed to create sign up verification',
         cause: result.error,
       })
@@ -265,7 +265,7 @@ export class PhoneService<
 
     if (verifyStatus.isErr()) {
       return err({
-        code: 'FAILED_OTP_VERIFICATION' as const,
+        code: 'FAILED_TO_VERIFY_OTP' as const,
         message: 'Failed to verify OTP',
         cause: verifyStatus.error,
       })
@@ -291,10 +291,50 @@ export class PhoneService<
       })
     }
 
-    const userId = await this.store.createUser(verification.value.data)
-    await this.store.createAccount(userId, verification.value.password)
+    const userIdResult = await this.store
+      .createUser(verification.value.data)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
 
-    return ok({ userId })
+    if (userIdResult.isErr()) {
+      return err({
+        code: 'FAILED_TO_CREATE_USER' as const,
+        message: 'Failed to create user',
+        cause: userIdResult.error,
+      })
+    }
+
+    {
+      const result = await this.store
+        .createAccount(userIdResult.value, verification.value.password)
+        .then((result) => ok(result))
+        .catch((error) => err(error))
+
+      if (result.isErr()) {
+        return err({
+          code: 'INTERNAL_SERVER_ERROR' as const,
+          message: 'Failed to create account',
+          cause: result.error,
+        })
+      }
+    }
+
+    {
+      const result = await this.store
+        .deleteSignUpVerification(data.phone)
+        .then((result) => ok(result))
+        .catch((error) => err(error))
+
+      if (result.isErr()) {
+        return err({
+          code: 'INTERNAL_SERVER_ERROR' as const,
+          message: 'Failed to delete verification record',
+          cause: result.error,
+        })
+      }
+    }
+
+    return ok({ userId: userIdResult.value })
   }
 
   async sendChangePhoneNumberOtp(userId: string, phone: { new: string; old: string }) {
@@ -334,7 +374,7 @@ export class PhoneService<
 
     if (userWithPhone) {
       return err({
-        code: 'PHONE_EXISTS' as const,
+        code: 'PHONE_ALREADY_EXISTS' as const,
         message: 'Phone number already exists',
       })
     }
@@ -342,7 +382,7 @@ export class PhoneService<
     // TODO: Customizable
     if (count >= 5) {
       return err({
-        code: 'REACHED_MAX_OTP_SEND_LIMIT' as const,
+        code: 'REACHED_MAX_ATTEMPTS' as const,
         message: 'Maximum OTP send limit reached. Please try again later.',
       })
     }
@@ -428,7 +468,7 @@ export class PhoneService<
 
     if (verifyStatus.isErr()) {
       return err({
-        code: 'FAILED_OTP_VERIFICATION' as const,
+        code: 'FAILED_TO_VERIFY_OTP' as const,
         message: 'Failed to verify OTP',
         cause: verifyStatus.error,
       })
@@ -440,17 +480,49 @@ export class PhoneService<
         .then((result) => ok(result))
         .catch((error) => err(error))
 
-      if (attempt.isErr())
+      if (attempt.isErr()) {
         return err({
           code: 'INTERNAL_SERVER_ERROR' as const,
           message: 'Failed to increase verification attempt',
           cause: attempt.error,
         })
+      }
+
       return err({
         code: 'INVALID_OTP' as const,
         message: 'Invalid OTP',
         attempt: attempt.value,
       })
+    }
+
+    {
+      const result = await this.store
+        .updatePhoneNumber(userId, verification.value.newPhone)
+        .then((result) => ok(result))
+        .catch((error) => err(error))
+
+      if (result.isErr()) {
+        return err({
+          code: 'INTERNAL_SERVER_ERROR' as const,
+          message: 'Failed to update phone number',
+          cause: result.error,
+        })
+      }
+    }
+
+    {
+      const result = await this.store
+        .deleteChangePhoneNumberVerification(userId)
+        .then((result) => ok(result))
+        .catch((error) => err(error))
+
+      if (result.isErr()) {
+        return err({
+          code: 'INTERNAL_SERVER_ERROR' as const,
+          message: 'Failed to delete verification record',
+          cause: result.error,
+        })
+      }
     }
 
     return ok({
@@ -520,7 +592,7 @@ export class PhoneService<
 
     if (token.isErr()) {
       return err({
-        code: 'FAILED_TO_CREATE_VERIFICATION' as const,
+        code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'Failed to create forgot password verification',
         cause: token.error,
       })
@@ -591,7 +663,7 @@ export class PhoneService<
 
       if (attempt.isErr()) {
         return err({
-          code: 'FAILED_TO_INCREASE_ATTEMPT' as const,
+          code: 'INTERNAL_SERVER_ERROR' as const,
           message: 'Failed to increase forgot password verification attempt',
           cause: attempt.error,
         })
@@ -604,22 +676,57 @@ export class PhoneService<
       })
     }
 
-    const accountId = await this.store.getCredentialAccountIdByUserId(verification.value.userId)
+    const accountIdResult = await this.store
+      .getCredentialAccountIdByUserId(verification.value.userId)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
 
-    if (!accountId) {
+    if (accountIdResult.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Failed to get account ID',
+        cause: accountIdResult.error,
+      })
+    }
+
+    if (!accountIdResult.value) {
       return err({
         code: 'ACCOUNT_NOT_FOUND' as const,
         message: 'Account not found',
       })
     }
 
-    const resetPasswordVerification = await this.store.createResetPasswordVerification({
-      value: { accountId: accountId },
-      // TODO: Customizable
-      expiredAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
-    })
+    const resetPasswordVerification = await this.store
+      .createResetPasswordVerification({
+        value: { accountId: accountIdResult.value },
+        // TODO: Customizable
+        expiredAt: new Date(Date.now() + 15 * 60 * 1000), // 15 minutes
+      })
+      .then((result) => ok(result))
+      .catch((error) => err(error))
 
-    return ok({ token: resetPasswordVerification })
+    if (resetPasswordVerification.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Failed to create reset password verification',
+        cause: resetPasswordVerification.error,
+      })
+    }
+
+    const deleteResult = await this.store
+      .deleteForgotPasswordVerification(payload.phone)
+      .then((result) => ok(result))
+      .catch((error) => err(error))
+
+    if (deleteResult.isErr()) {
+      return err({
+        code: 'INTERNAL_SERVER_ERROR' as const,
+        message: 'Failed to delete forgot password verification',
+        cause: deleteResult.error,
+      })
+    }
+
+    return ok({ token: resetPasswordVerification.value })
   }
 
   async resetPassword(payload: { token: string; password: string }) {
@@ -639,7 +746,7 @@ export class PhoneService<
 
     if (hashedPassword.isErr()) {
       return err({
-        code: 'FAILED_TO_HASH_PASSWORD' as const,
+        code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'Failed to hash password',
         cause: hashedPassword.error,
       })
@@ -654,7 +761,7 @@ export class PhoneService<
 
     if (updateResult.isErr()) {
       return err({
-        code: 'FAILED_TO_UPDATE_PASSWORD' as const,
+        code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'Failed to update password',
         cause: updateResult.error,
       })
@@ -667,7 +774,7 @@ export class PhoneService<
 
     if (deleteResult.isErr()) {
       return err({
-        code: 'FAILED_TO_DELETE_VERIFICATION' as const,
+        code: 'INTERNAL_SERVER_ERROR' as const,
         message: 'Internal Server Error. Please see logs for more details',
         cause: deleteResult.error,
       })

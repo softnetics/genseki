@@ -197,6 +197,13 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return attempt
   }
 
+  async deleteSignUpVerification(phone: string) {
+    await this.prisma.verification.updateMany({
+      where: { identifier: { contains: `sign-up-phone:${phone}` } },
+      data: { expiredAt: new Date() },
+    })
+  }
+
   // Change phone number
 
   async createChangePhoneNumberVerification(data: {
@@ -271,36 +278,17 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     }
   }
 
-  async getLatestPhoneNumberVerification(userId: string) {
-    const verification = await this.prisma.verification.findFirst({
-      select: { id: true, value: true },
-      where: {
-        identifier: { contains: `change-phone:${userId}` },
-        expiredAt: { gte: new Date() },
-      },
-      orderBy: { createdAt: 'desc' },
-    })
-
-    if (!verification) {
-      return null
-    }
-
-    const value = safeJsonParse<ChangePhoneNumberVerificationPayload>(verification.value)
-
-    if (!value) {
-      return null
-    }
-
-    return {
-      id: verification.id as string,
-      value: value,
-    }
-  }
-
   async updatePhoneNumber(userId: string, newPhone: string) {
     await this.prisma.user.update({
       where: { id: userId },
       data: { phone: newPhone, phoneVerified: true },
+    })
+  }
+
+  async deleteChangePhoneNumberVerification(userId: string) {
+    await this.prisma.verification.updateMany({
+      where: { identifier: { contains: `change-phone:${userId}` } },
+      data: { expiredAt: new Date() },
     })
   }
 
@@ -361,6 +349,13 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     }
   }
 
+  async deleteForgotPasswordVerification(phone: string) {
+    await this.prisma.verification.updateMany({
+      where: { identifier: { contains: `forgot-password:${phone}` } },
+      data: { expiredAt: new Date() },
+    })
+  }
+
   async createResetPasswordVerification(data: {
     value: ResetPasswordVerificationPayload
     expiredAt: Date
@@ -413,8 +408,9 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
   }
 
   async deleteResetPasswordVerification(accountId: string) {
-    await this.prisma.verification.deleteMany({
+    await this.prisma.verification.updateMany({
       where: { identifier: `reset-password:${accountId}` },
+      data: { expiredAt: new Date() },
     })
   }
 
