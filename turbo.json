@@ -9,14 +9,15 @@
     "build": {
       "dependsOn": ["^build", "codegen"],
       "inputs": ["$TURBO_DEFAULT$", ".env*"],
-      "outputs": [".next/**", "!.next/cache/**"]
+      "outputs": [".next/**", "!.next/cache/**", "generated/**", "dist/**"]
     },
     "bundle": {
       "dependsOn": ["^bundle"],
-      "outputs": ["dist"]
+      "outputs": ["generated/**", "dist/**"]
     },
     "codegen": {
-      "dependsOn": ["^codegen"]
+      "dependsOn": ["^codegen"],
+      "outputs": ["generated/**", "dist/**"]
     },
     "lint": {
       "dependsOn": ["^lint"]
