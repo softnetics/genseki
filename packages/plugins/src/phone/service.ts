@@ -236,7 +236,7 @@ export class PhoneService<
   }
 
   async verifySignUpPhoneOtp(data: { phone: string; token: string; refCode: string; pin: string }) {
-    const verification = await this.store.getSignUpVerification(data.phone, data.refCode)
+    const verification = await this.store.getSignUpVerification(data.token)
 
     if (!verification) {
       return err({
@@ -273,7 +273,7 @@ export class PhoneService<
 
     if (verifyStatus.value === false) {
       const attempt = await this.store
-        .increaseSignUpVerificationAttempt(data.phone, data.refCode)
+        .increaseSignUpVerificationAttempt(data.token)
         .then((result) => ok(result))
         .catch((error) => err(error))
 
@@ -433,11 +433,18 @@ export class PhoneService<
       })
     }
 
-    const verification = await this.store.getChangePhoneNumberVerification(userId, payload.refCode)
+    const verification = await this.store.getChangePhoneNumberVerification(payload.token)
     if (!verification) {
       return err({
         code: 'INVALID_OR_EXPIRED_VERIFICATION_TOKEN' as const,
         message: 'Invalid or expired verification token',
+      })
+    }
+
+    if (verification.value.userId !== userId) {
+      return err({
+        code: 'VERIFICATION_DOES_NOT_BELONGS_TO_USER' as const,
+        message: 'This verification does not belong to the user',
       })
     }
 
@@ -476,7 +483,7 @@ export class PhoneService<
 
     if (verifyStatus.value === false) {
       const attempt = await this.store
-        .increaseChangePhoneNumberVerificationAttempt(userId, payload.refCode)
+        .increaseChangePhoneNumberVerificationAttempt(payload.token)
         .then((result) => ok(result))
         .catch((error) => err(error))
 
@@ -618,10 +625,7 @@ export class PhoneService<
       })
     }
 
-    const verification = await this.store.getForgotPasswordVerification(
-      payload.phone,
-      payload.refCode
-    )
+    const verification = await this.store.getForgotPasswordVerification(payload.token)
 
     if (!verification) {
       return err({
@@ -657,7 +661,7 @@ export class PhoneService<
 
     if (verifyStatus.value === false) {
       const attempt = await this.store
-        .increaseForgotPasswordVerificationAttempt(payload.phone, payload.refCode)
+        .increaseForgotPasswordVerificationAttempt(payload.token)
         .then((result) => ok(result))
         .catch((error) => err(error))
 

@@ -126,13 +126,10 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
 
   // Sign up
 
-  async getSignUpVerification(phone: string, refCode: string) {
+  async getSignUpVerification(token: string) {
     const verification = await this.prisma.verification.findFirst({
       select: { id: true, value: true, createdAt: true, expiredAt: true },
-      where: {
-        identifier: `sign-up-phone:${phone}:${refCode}`,
-        expiredAt: { gte: new Date() },
-      },
+      where: { id: token, expiredAt: { gte: new Date() } },
     })
 
     if (!verification) {
@@ -178,8 +175,8 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     })
   }
 
-  async increaseSignUpVerificationAttempt(phone: string, refCode: string) {
-    const verification = await this.getSignUpVerification(phone, refCode)
+  async increaseSignUpVerificationAttempt(token: string) {
+    const verification = await this.getSignUpVerification(token)
 
     if (!verification) {
       throw new Error('Verification not found')
@@ -222,8 +219,8 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     })
   }
 
-  async increaseChangePhoneNumberVerificationAttempt(userId: string, refCode: string) {
-    const verification = await this.getChangePhoneNumberVerification(userId, refCode)
+  async increaseChangePhoneNumberVerificationAttempt(token: string) {
+    const verification = await this.getChangePhoneNumberVerification(token)
 
     if (!verification) {
       throw new Error('Verification not found')
@@ -251,13 +248,10 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return count
   }
 
-  async getChangePhoneNumberVerification(userId: string, refCode: string) {
+  async getChangePhoneNumberVerification(token: string) {
     const verification = await this.prisma.verification.findFirst({
       select: { id: true, value: true, createdAt: true, expiredAt: true },
-      where: {
-        identifier: `change-phone:${userId}:${refCode}`,
-        expiredAt: { gte: new Date() },
-      },
+      where: { id: token, expiredAt: { gte: new Date() } },
     })
 
     if (!verification) {
@@ -322,13 +316,10 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     return id
   }
 
-  async getForgotPasswordVerification(phone: string, refCode: string) {
+  async getForgotPasswordVerification(token: string) {
     const verification = (await this.prisma.verification.findFirst({
       select: { id: true, value: true, createdAt: true, expiredAt: true },
-      where: {
-        identifier: `forgot-password:${phone}:${refCode}`,
-        expiredAt: { gte: new Date() },
-      },
+      where: { id: token, expiredAt: { gte: new Date() } },
     })) as { id: string; value: string; createdAt: Date; expiredAt: Date } | null
 
     if (!verification) {
@@ -414,8 +405,8 @@ export abstract class PhoneStore<TSignUpBodySchema extends BaseSignUpBodySchema>
     })
   }
 
-  async increaseForgotPasswordVerificationAttempt(phone: string, refCode: string) {
-    const verification = await this.getForgotPasswordVerification(phone, refCode)
+  async increaseForgotPasswordVerificationAttempt(token: string) {
+    const verification = await this.getForgotPasswordVerification(token)
 
     if (!verification) {
       throw new Error('Verification not found')

@@ -389,6 +389,7 @@ export function phone<
             code: z.enum([
               'FEATURE_NOT_ENABLED',
               'INVALID_OR_EXPIRED_VERIFICATION_TOKEN',
+              'VERIFICATION_DOES_NOT_BELONGS_TO_USER',
               'REACHED_MAX_ATTEMPTS',
               'FAILED_TO_VERIFY_OTP',
               'INTERNAL_SERVER_ERROR',
