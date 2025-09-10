@@ -59,10 +59,13 @@ async function makeApiRoute(
 
     // TODO: Handle plain text and file upload
 
-    return new Response(JSON.stringify({ message: 'Invalid request body' }), {
-      status: 400,
-      headers: { 'Content-Type': 'application/json' },
-    })
+    return Response.json(
+      { message: 'Invalid request body' },
+      {
+        status: 400,
+        headers: { 'Content-Type': 'application/json' },
+      }
+    )
   }
 
   const response = new Response(null, {
