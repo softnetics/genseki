@@ -1,7 +1,8 @@
+import { useId } from 'react'
+
 import type { Icon } from '@phosphor-icons/react'
 import { DotsThreeVerticalIcon } from '@phosphor-icons/react/dist/ssr'
 import { createColumnHelper, type Row } from '@tanstack/react-table'
-import * as R from 'remeda'
 
 import {
   BaseIcon,
@@ -15,19 +16,9 @@ import { type NavigationContextValue, useNavigation } from '../../../../provider
 import type { BaseData } from '../../types'
 import { useCollectionList } from '../context'
 
-type ActionItem = (
-  context: ReturnType<typeof useCollectionList>,
-  row: Row<BaseData>,
-  key: string
-) => React.ReactNode
+type ActionItem = (row: Row<BaseData>, key: string) => React.ReactNode
 
-export function createActionItem(
-  render: (
-    context: ReturnType<typeof useCollectionList>,
-    row: Row<BaseData>,
-    key: string
-  ) => React.ReactNode
-) {
+export function createActionItem(render: (row: Row<BaseData>, key: string) => React.ReactNode) {
   return render
 }
 
@@ -41,8 +32,10 @@ function createDefaultActionItem(
   ) => string | void,
   isDanger?: boolean
 ) {
-  return createActionItem((context, row, key) => {
+  return createActionItem((row, key) => {
+    const context = useCollectionList()
     const navigation = useNavigation()
+
     return (
       <MenuItem
         aria-label={title}
@@ -90,7 +83,7 @@ export function createDeleteActionItem(
 }
 
 export function createSeparatorItem() {
-  return createActionItem((context, row, key) => <MenuSeparator key={key} />)
+  return createActionItem((row, key) => <MenuSeparator key={key} />)
 }
 
 export function actionsColumn(actionItems: ActionItem[] = []) {
@@ -99,8 +92,6 @@ export function actionsColumn(actionItems: ActionItem[] = []) {
   return columnHelper.display({
     id: 'actions',
     cell: ({ row }) => {
-      const context = useCollectionList()
-
       return (
         <div className="grid place-items-center">
           <Menu>
@@ -109,8 +100,8 @@ export function actionsColumn(actionItems: ActionItem[] = []) {
             </MenuTrigger>
             {actionItems.length !== 0 ? (
               <MenuContent aria-label="Actions" placement="left top">
-                {(actionItems ?? []).map((createActionItem) => {
-                  return createActionItem(context, row, R.randomString(6))
+                {actionItems.map((createActionItem) => {
+                  return createActionItem(row, useId())
                 })}
               </MenuContent>
             ) : null}
