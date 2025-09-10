@@ -1,5 +1,11 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.43
+
+### Patch Changes
+
+- [#184](https://github.com/softnetics/genseki/pull/184) [`92c78d7`](https://github.com/softnetics/genseki/commit/92c78d7bd0e2badfb106a95255bac971c2b87980) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix [Phone Plugin] Avoid User Enumeration by changing login error message
+
 ## 0.1.0-alpha.42
 
 ### Patch Changes
