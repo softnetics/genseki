@@ -1,5 +1,14 @@
 # @genseki/next
 
+## 0.1.0-alpha.43
+
+### Patch Changes
+
+- [#186](https://github.com/softnetics/genseki/pull/186) [`a2050f0`](https://github.com/softnetics/genseki/commit/a2050f0a29a3779514e90c7e94a8e81aa0c87eb7) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix invalid response type
+
+- Updated dependencies []:
+  - @genseki/react@0.1.0-alpha.43
+
 ## 0.1.0-alpha.42
 
 ### Patch Changes
