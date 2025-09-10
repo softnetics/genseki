@@ -120,14 +120,14 @@ export class PhoneService<
     const user = await this.store.getUserByPhone(body.phone)
 
     if (!user) {
-      return err({ message: 'User not found' })
+      return err({ message: 'Invalid password or user not found' })
     }
 
     const accounts = await this.store.getAccountByUserId(user.id)
     const credentialAccount = accounts.find((a) => a.provider === AccountProvider.CREDENTIAL)
 
     if (!credentialAccount || !credentialAccount.password) {
-      return err({ message: 'Account not found or password not set' })
+      return err({ message: 'Invalid password or user not found' })
     }
 
     // NOTE: verifyPassword function is default from options, can be customized
@@ -143,7 +143,7 @@ export class PhoneService<
     }
 
     if (!verifyStatus.value) {
-      return err({ message: 'Invalid password' })
+      return err({ message: 'Invalid password or user not found' })
     }
 
     const session = await this.createSession(user.id)
