@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.42
+
+### Patch Changes
+
+- [#164](https://github.com/softnetics/genseki/pull/164) [`e88f0b7`](https://github.com/softnetics/genseki/commit/e88f0b7a2fd523a5e769579db9e86c9524385187) Thanks [@t0ngk](https://github.com/t0ngk)! - feat: add action select
+
+- Updated dependencies [[`e88f0b7`](https://github.com/softnetics/genseki/commit/e88f0b7a2fd523a5e769579db9e86c9524385187)]:
+  - @genseki/react@0.1.0-alpha.44
+  - @genseki/next@0.1.0-alpha.44
+  - @genseki/plugins@0.1.0-alpha.44
+  - @genseki/prisma-generator@0.1.0-alpha.44
+  - @genseki/react-query@0.1.0-alpha.44
+  - @genseki/rest@0.1.0-alpha.44
+
 ## 0.1.0-alpha.41
 
 ### Patch Changes
