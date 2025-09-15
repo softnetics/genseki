@@ -37,7 +37,11 @@ const TableBody = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tbody ref={ref} className={cn('text-text-body font-medium text-base', className)} {...props} />
+  <tbody
+    ref={ref}
+    className={cn('text-text-primary font-medium text-base', className)}
+    {...props}
+  />
 ))
 TableBody.displayName = 'TableBody'
 
@@ -45,7 +49,11 @@ const TableFooter = React.forwardRef<
   HTMLTableSectionElement,
   React.HTMLAttributes<HTMLTableSectionElement>
 >(({ className, ...props }, ref) => (
-  <tfoot ref={ref} className={cn('font-normal text-base text-text-body', className)} {...props} />
+  <tfoot
+    ref={ref}
+    className={cn('font-normal text-base text-text-primary', className)}
+    {...props}
+  />
 ))
 TableFooter.displayName = 'TableFooter'
 
@@ -89,7 +97,7 @@ const TableCell = React.forwardRef<
   <td
     ref={ref}
     className={cn(
-      'text-foreground px-6 py-7 text-left align-middle whitespace-nowrap text-body-s font-normal',
+      'text-foreground px-6 py-7 text-left align-middle whitespace-nowrap text-primary-s font-normal',
       className
     )}
     {...props}

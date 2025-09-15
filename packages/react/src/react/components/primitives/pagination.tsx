@@ -5,7 +5,7 @@ import { useMemo } from 'react'
 import { IconArrowLeft, IconArrowRight } from '@intentui/icons'
 import clsx from 'clsx'
 
-import { Select, SelectList, SelectOption, SelectTrigger } from '../..'
+import { Select, SelectList, SelectOption, SelectTrigger, Typography } from '../..'
 
 interface PaginationProps {
   variant?: 'default' | 'compact'
@@ -39,7 +39,7 @@ const Pagination = (props: PaginationProps) => {
           'flex gap-2.5 size-20 transition-colors text-lg shrink-0 items-center justify-center bg-white dark:bg-bluegray-800',
           currentPage === 1
             ? 'cursor-not-allowed text-bluegray-300'
-            : 'cursor-pointer text-text-body '
+            : 'cursor-pointer text-text-primary '
         )}
         onClick={() => onPageChange(currentPage - 1)}
         disabled={currentPage === 1}
@@ -55,9 +55,11 @@ const Pagination = (props: PaginationProps) => {
             return (
               <div
                 key={`elipse-${page}-${idx}`}
-                className={`size-20 shrink-0 flex items-center justify-center text-text-body transition-colors cursor-pointer text-lg border-l border-bluegray-300 bg-white dark:bg-bluegray-800`}
+                className={`size-20 shrink-0 flex items-center justify-center text-text-primary transition-colors cursor-pointer text-lg border-l border-bluegray-300 bg-white dark:bg-bluegray-800`}
               >
-                <span className="text-lg">...</span>
+                <Typography type="body" weight="normal">
+                  ...
+                </Typography>
               </div>
             )
           }
@@ -65,7 +67,7 @@ const Pagination = (props: PaginationProps) => {
             <button
               key={`page-${page}-${idx}`}
               className={clsx(
-                'flex size-20 shrink-0 items-center justify-center bg-accent-fg text-text-body transition-colors cursor-pointer text-lg',
+                'flex size-20 shrink-0 items-center justify-center bg-accent-fg text-text-primary transition-colors cursor-pointer text-lg',
                 page === currentPage
                   ? 'bg-bluegray-50 dark:bg-bluegray-700'
                   : 'bg-white dark:bg-bluegray-800',
@@ -74,7 +76,9 @@ const Pagination = (props: PaginationProps) => {
               )}
               onClick={() => onPageChange(page as number)}
             >
-              {page}
+              <Typography type="body" weight="normal">
+                {page}
+              </Typography>
             </button>
           )
         })}
@@ -86,7 +90,7 @@ const Pagination = (props: PaginationProps) => {
           'flex gap-2.5 size-20 transition-colors cursor-pointer text-lg shrink-0 items-center justify-center bg-white dark:bg-bluegray-800',
           currentPage === totalPages
             ? 'cursor-not-allowed text-bluegray-300'
-            : 'cursor-pointer text-text-body'
+            : 'cursor-pointer text-text-primary'
         )}
         onClick={() => onPageChange(currentPage + 1)}
         disabled={currentPage === totalPages}

@@ -5,7 +5,7 @@ import { tv, type VariantProps } from 'tailwind-variants'
 import { cn } from '../../utils/cn'
 
 const iconVariants = tv({
-  base: 'text-text-body',
+  base: 'text-icon-secondary',
   variants: {
     size: {
       xl: 'size-15',

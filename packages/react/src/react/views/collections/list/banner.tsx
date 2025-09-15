@@ -27,11 +27,11 @@ export function Banner(props: BannerProps) {
           />
           <div className="absolute -inset-8 z-0 aspect-square [background-image:radial-gradient(circle,--alpha(var(--color-fg)/25%)_2px,--alpha(var(--color-fg)/25%)_2px,transparent_2px)] [background-repeat:repeat] [background-size:8px_8px] [mask-image:radial-gradient(circle,black,transparent_80%)]" />
         </div>
-        <div className="flex flex-col">
-          <Typography type="h2" weight="bold" className="text-text-nontrivial">
+        <div className="flex flex-col justify-center">
+          <Typography type="h2" weight="bold" className="text-text-primary leading-[100%]">
             {formatSlug(props.slug)}
           </Typography>
-          <Typography type="h4" weight="normal" className="text-text-body">
+          <Typography type="h4" weight="normal" className="text-text-secondary leading-[140%]">
             A collection
           </Typography>
         </div>

@@ -57,10 +57,10 @@ export function AppSidebar(props: AppSidebarProps) {
             <BaseIcon icon={MoonStarsIcon} size="lg" weight="duotone" className="text-primary" />
           </div>
           <div className="flex flex-col group-data-[sidebar-state=collapsed]/sidebar-container:hidden group-data-[sidebar-state=collapsed]/sidebar-container:translate-x-full">
-            <Typography type="body" weight="semibold" className="text-text-nontrivial">
+            <Typography type="body" weight="semibold" className="text-text-primary">
               {props.title}
             </Typography>
-            <Typography type="label" weight="medium" className="text-text-trivial">
+            <Typography type="label" weight="medium" className="text-text-secondary">
               {props.version}
             </Typography>
           </div>
@@ -72,7 +72,7 @@ export function AppSidebar(props: AppSidebarProps) {
             <SidebarDisclosure id={1}>
               <SidebarDisclosureTrigger className="in-data-[sidebar-state=collapsed]:rounded-none rounded-md">
                 <BaseIcon icon={DatabaseIcon} size="sm" weight="duotone" className="size-8!" />
-                <SidebarLabel className="text-text-body text-sm">Collections</SidebarLabel>
+                <SidebarLabel className="text-text-primary text-sm">Collections</SidebarLabel>
               </SidebarDisclosureTrigger>
               <SidebarDisclosurePanel>
                 <SidebarBuilder pathname={props.pathname} {...props.sidebar} />

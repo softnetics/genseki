@@ -141,7 +141,7 @@ const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
       {...props}
       className={composeTailwindRenderProps(
         className,
-        'text-fg placeholder-text-body outline-hidden focus:outline-hidden w-full min-w-0 bg-transparent p-4 text-base [&::-ms-reveal]:hidden [&::-webkit-search-cancel-button]:hidden'
+        'text-text-primary placeholder-text-primary outline-hidden focus:outline-hidden w-full min-w-0 bg-transparent p-4 text-base [&::-ms-reveal]:hidden [&::-webkit-search-cancel-button]:hidden'
       )}
     />
   )

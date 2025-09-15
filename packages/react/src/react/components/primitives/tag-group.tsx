@@ -27,7 +27,7 @@ import { BaseIcon } from '../../components/primitives/base-icon'
 const intents = {
   primary: {
     base: [
-      'bg-pumpkin-100 text-pumpkin-600 **:[[slot=remove]]:hover:bg-primary **:[[slot=remove]]:hover:text-primary-fg',
+      'bg-surface-brand-soft-2 text-primary **:[[slot=remove]]:hover:bg-primary **:[[slot=remove]]:hover:text-primary-fg',
     ],
     selected: [
       'bg-primary dark:hover:bg-primary dark:bg-primary hover:bg-primary text-primary-fg dark:text-primary-fg hover:text-primary-fg',
@@ -36,10 +36,10 @@ const intents = {
   },
   gray: {
     base: [
-      'bg-bluegray-100 text-bluegray-600 **:[[slot=remove]]:hover:bg-fg **:[[slot=remove]]:hover:text-bg',
+      'bg-surface-primary-hover text-text-secondary **:[[slot=remove]]:hover:bg-fg **:[[slot=remove]]:hover:text-bg',
     ],
     selected: [
-      'bg-stroke-body text-white',
+      'bg-surface-secondary text-text-inverse',
       '**:[[slot=remove]]:hover:bg-secondary/30 **:[[slot=remove]]:hover:text-secondary',
     ],
   },
@@ -48,35 +48,35 @@ const intents = {
       'bg-surface-correct text-text-correct **:[[slot=remove]]:hover:bg-success **:[[slot=remove]]:hover:text-success-fg',
     ],
     selected: [
-      'bg-palm-500 text-white',
+      'bg-palm-500 text-text-inverse',
       '**:[[slot=remove]]:hover:bg-success-fg/30 **:[[slot=remove]]:hover:text-success-fg',
     ],
   },
   incorrect: {
     base: [
-      'bg-red-50 text-red-700 **:[[slot=remove]]:hover:bg-danger **:[[slot=remove]]:hover:text-danger-fg',
+      'bg-surface-incorrect text-text-incorrect **:[[slot=remove]]:hover:bg-danger **:[[slot=remove]]:hover:text-danger-fg',
     ],
     selected: [
-      'bg-red-500 text-white',
+      'bg-surface-incorrect-hover text-text-inverse',
       '**:[[slot=remove]]:hover:bg-danger-fg/30 **:[[slot=remove]]:hover:text-danger-fg',
     ],
   },
   accent: {
     base: [
-      'bg-yellow-50 text-yellow-600 **:[[slot=remove]]:hover:bg-warning **:[[slot=remove]]:hover:text-warning-fg',
+      'bg-surface-accent text-text-accent-bold **:[[slot=remove]]:hover:bg-warning **:[[slot=remove]]:hover:text-warning-fg',
     ],
     selected: [
-      'bg-yellow-500 text-white',
+      'bg-surface-accent-hover text-text-inverse',
       '**:[[slot=remove]]:hover:bg-warning-fg/30 **:[[slot=remove]]:hover:text-warning-fg',
     ],
   },
   info: {
     base: [
-      'bg-ocean-50 text-ocean-600',
+      'bg-surface-info text-text-info-bold',
       '**:[[slot=remove]]:hover:bg-danger **:[[slot=remove]]:hover:text-danger-fg',
     ],
     selected: [
-      'bg-ocean-500 text-white',
+      'bg-surface-info-hover text-text-inverse',
       '**:[[slot=remove]]:hover:bg-danger-fg/30 **:[[slot=remove]]:hover:text-danger-fg',
     ],
   },

@@ -18,7 +18,7 @@ const tooltipStyles = tv({
   ],
   variants: {
     intent: {
-      default: 'bg-black text-white [&_.arx]:fill-overlay [&_.arx]:stroke-border',
+      default: 'bg-black text-text-inverse [&_.arx]:fill-overlay [&_.arx]:stroke-border',
       inverse:
         'border-transparent bg-fg text-bg [&_.arx]:fill-fg [&_.arx]:stroke-transparent dark:[&_.arx]:fill-white [&_.text-muted-fg]:text-bg/70 dark:[&_.text-muted-fg]:text-fg/70',
     },

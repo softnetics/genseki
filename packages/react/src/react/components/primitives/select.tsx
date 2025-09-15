@@ -34,13 +34,13 @@ import { cn } from '../../utils/cn'
 const selectTriggerStyles = tv({
   extend: focusStyles,
   base: [
-    'btr flex w-full cursor-default items-center gap-12 gap-x-2 rounded-md border border-input px-6 py-5 text-start shadow-sm transition group-disabled:opacity-50 **:data-[slot=icon]:size-8 h-20 dark:shadow-none',
+    'bg-bg btr flex w-full cursor-default items-center gap-12 gap-x-2 rounded-md border border-input px-6 py-5 text-start shadow-sm transition group-disabled:opacity-50 **:data-[slot=icon]:size-8 h-20 dark:shadow-none',
     'group-data-open:border-ring/70 group-data-open:ring-4 group-data-open:ring-ring/20',
     'text-fg group-invalid:border-danger group-invalid:ring-danger/20 forced-colors:group-invalid:border-[Mark]',
   ],
   variants: {
     isDisabled: {
-      true: 'opacity-80 bg-bluegray-100 forced-colors:border-[GrayText] forced-colors:text-[GrayText]',
+      true: 'opacity-80 bg-surface-primary-hover forced-colors:border-[GrayText] forced-colors:text-[GrayText]',
     },
   },
 })
@@ -69,7 +69,7 @@ const Select = <T extends object>({
         <>
           {label && (
             <Label>
-              {label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+              {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
             </Label>
           )}
           {typeof props.children === 'function' ? props.children(values) : props.children}

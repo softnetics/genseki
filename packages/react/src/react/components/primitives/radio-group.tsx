@@ -97,7 +97,7 @@ const Radio = ({ className, children, description, label, size = 'md', ...props 
                 data-slot="indicator"
                 className={twMerge([
                   `relative inset-bluegray-300 isolate flex ${sizeClasses[size].indicator} shrink-0 items-center justify-center rounded-full bg-secondary text-bg transition before:absolute before:inset-auto before:shrink-0 before:rounded-full before:content-['']`,
-                  `focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none border border-bluegray-400`,
+                  `focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none border border-bluegray-400`,
                   isSelected && [
                     'bg-primary text-primary-fg before:bg-white',
                     'group-invalid:inset-ring-danger/70 group-invalid:bg-danger group-invalid:text-danger-fg',

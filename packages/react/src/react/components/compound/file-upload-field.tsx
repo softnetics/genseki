@@ -420,7 +420,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
     <div className="group flex flex-col gap-y-4">
       {props.label && (
         <Label htmlFor={props.name}>
-          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+          {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
         </Label>
       )}
       {fileKey ? (
@@ -474,7 +474,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
                       <span>{hintText}</span>
                     </Typography>
 
-                    {/* <Typography type="caption" weight="normal" className="text-text-trivial">
+                    {/* <Typography type="caption" weight="normal" className="text-text-secondary">
                   Maximum file size {readableMaxSize}.
                 </Typography> */}
                   </div>

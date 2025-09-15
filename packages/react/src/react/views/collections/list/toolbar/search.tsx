@@ -40,7 +40,6 @@ export function CollectionListSearch(props: CollectionListSearchProps) {
       aria-label="Search"
       placeholder="Search"
       prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
-      className="w-full"
       isPending={props.isLoading}
       value={search}
       onChange={onSearch}
