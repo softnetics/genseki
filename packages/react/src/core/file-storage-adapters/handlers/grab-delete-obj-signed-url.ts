@@ -11,7 +11,7 @@ export function grabDeleteObjUrl<const TContext extends AnyContextable>(
   return createEndpoint(
     context,
     {
-      method: 'DELETE',
+      method: 'GET',
       path: '/storage/delete-obj-signed-url',
       query: z.object({
         key: z.string(),

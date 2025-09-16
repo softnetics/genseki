@@ -36,7 +36,7 @@ import { DropZone } from '../primitives/drop-zone'
 /**
  * @description Generates a signed URL for uploading a file to object storage by making a request to the provided path with the file key
  */
-const generatePutObjSignedUrlData = async (
+export const generatePutObjSignedUrlData = async (
   path: string,
   key: string
 ): Promise<{ ok: true; data: any } | { ok: false; message: string }> => {
@@ -64,7 +64,7 @@ const generatePutObjSignedUrlData = async (
 /**
  * @description Generates a signed URL for deleting a file from object storage
  */
-const generateDeleteObjSignedUrlData = async (
+export const generateDeleteObjSignedUrlData = async (
   path: string,
   key: string
 ): Promise<{ ok: true; data: any } | { ok: false; message: string }> => {
@@ -73,9 +73,7 @@ const generateDeleteObjSignedUrlData = async (
 
     deleteObjUrlEndpoint.searchParams.append('key', key)
 
-    const deleteObjSignedUrl = await fetch(deleteObjUrlEndpoint.toString(), {
-      method: 'DELETE',
-    })
+    const deleteObjSignedUrl = await fetch(deleteObjUrlEndpoint.toString())
 
     return {
       ok: true,
@@ -94,7 +92,7 @@ const generateDeleteObjSignedUrlData = async (
 /**
  * @description Uploads a file using a signed URL
  */
-const uploadObject = async (
+export const uploadObject = async (
   signedUrl: string,
   file: File,
   onProgress?: (percent: number) => void
@@ -143,7 +141,7 @@ const uploadObject = async (
 /**
  * @description Deletes a file using a signed URL
  */
-const deleteObject = async (
+export const deleteObject = async (
   signedUrl: string
 ): Promise<{ ok: true } | { ok: false; message: string }> => {
   try {
@@ -537,7 +535,6 @@ const FileDisplayer = (props: {
   }
 
   const isDeleting = props.deleteStatus === 'pending'
-
   return (
     <div className="w-full h-full bg-white dark:bg-transparent rounded-md p-8 items-center gap-x-4 border border-bluegray-300 dark:border-bluegray-700">
       <div className="flex gap-x-4 items-start">

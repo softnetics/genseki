@@ -45,6 +45,7 @@ export const usersCollection = createPlugin('users', (app) => {
         },
       })
     )
+    .addPageAndApiRouter(collection.update(fields))
     .addApiRouter({
       example: builder.endpoint(
         {
