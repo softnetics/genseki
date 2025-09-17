@@ -243,6 +243,8 @@ export function AutoSelectField(props: AutoSelectField) {
       }}
       onSelectionChange={(value) => {
         if (value === null) return field.onChange(null)
+        if (value === field.value) return field.onChange(null)
+
         const selectedItem = items.find((item) => item.value === value)
         if (selectedItem) {
           field.onChange(selectedItem.value)
