@@ -281,7 +281,7 @@
           }
 
           .tiptap-image-upload-subtext {
-            color: var(--color-text-trivial);
+            color: var(--color-text-secondary);
           }
         }
       }

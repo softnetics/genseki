@@ -7,7 +7,7 @@ import {
   Link,
 } from 'react-aria-components'
 
-import { Spinner } from '@phosphor-icons/react'
+import { Spinner, SpinnerIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 import { BaseIcon } from './base-icon'
@@ -18,35 +18,35 @@ const buttonVariants = tv({
   base: 'cursor-pointer flex items-center justify-center transition-all duration-200',
   variants: {
     variant: {
-      primary: `[&>*]:text-white text-white
-        shadow-[0_0_0_0.8px_var(--color-primary-emphasis),0_1px_3px_0_var(--color-primary),inset_0_1.5px_0_0_--alpha(var(--color-white)/20%)]
-        focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      primary: `[&>*]:text-text-inverse text-text-inverse
+        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
       secondary: `
-        bg-pumpkin-50 hover:bg-pumpkin-100
-        [&>*]:text-accent text-accent
-        focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
-      tertiary: `bg-pumpkin-50 hover:bg-pumpkin-100
-        [&>*]:text-accent text-accent 
-        focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none border border-primary-emphasis`,
-      naked: `bg-white-normal hover:bg-bluegray-100 [&>*]:text-bluegray-600 text-bluegray-600 shadow-xs border-b border-stroke-trivial/10 
-      focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
-      outline: `bg-white-normal dark:bg-bluegray-800 hover:bg-bluegray-50 [&>*]:text-text-body text-text-body border border-bluegray-300 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+        bg-surface-button-secondary hover:bg-surface-button-secondary-hover disabled:bg-surface-button-secondary-disabled
+        [&>*]:text-text-brand text-text-brand
+        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+      tertiary: `bg-surface-button-tertiary hover:bg-surface-button-tertiary-hover disabled:bg-surface-button-tertiary-disabled focus:outline-none
+        [&>*]:text-text-brand text-text-brand 
+        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg border border-border-button-tertiary`,
+      naked: `bg-surface-button-naked hover:bg-surface-button-naked-hover disabled:bg-surface-button-naked-disabled focus:outline-none
+       [&>*]:text-text-secondary text-text-secondary shadow-xs border-b border-stroke-tertiary/10 
+      focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg`,
+      outline: `bg-surface-button-outline  hover:bg-surface-button-outline-hover disabled:bg-surface-button-outline-disabled focus:outline-none
+       [&>*]:text-text-secondary text-text-secondary border border-border-button-outline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg`,
       ghost:
-        'bg-none [&>*]:text-bluegray-600 text-bluegray-600 hover:bg-bluegray-50 focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
+        'bg-none [&>*]:text-text-secondary text-text-secondary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
       vanish:
-        '[&>*]:text-secondary-fg text-secondary-fg focus-visible:ring-2 focus-visible:ring-primary-emphasis focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
-      destruction: `[&>*]:text-white text-white bg-red-600 hover:bg-red-700
-        focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
+        '[&>*]:text-secondary-fg text-secondary-fg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
+      destruction: `[&>*]:text-text-inverse text-text-inverse bg-surface-button-destruction hover:bg-surface-button-destruction-hover disabled:bg-surface-button-destruction-disabled focus:outline-none
+        focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg `,
     },
     size: {
       'square-petite': 'size-14 p-0 rounded-md text-base font-medium',
-      md: 'p-6 gap-x-2 rounded-md text-base font-medium',
-      sm: 'p-4 gap-x-2 rounded-md text-sm font-medium',
-      xs: 'p-2 gap-x-1 rounded-sm text-sm font-medium',
-      xxs: 'p-1 gap-x-1 rounded-xs text-xs font-medium',
+      md: 'py-4 [&:has(>_*[data-slot="icon"]:only-child)]:p-4 px-6 gap-x-2 rounded-md text-base font-medium',
+      sm: 'py-3 [&:has(>_*[data-slot="icon"]:only-child)]:p-3 px-4 gap-x-2 rounded-md text-sm font-medium',
+      xs: 'py-1 [&:has(>_*[data-slot="icon"]:only-child)]:p-1 px-2 gap-x-1 rounded-sm text-sm font-medium',
     },
     isDisabled: {
-      true: 'cursor-not-allowed bg-accent-fg [&>*]:text-bluegray-300 text-bluegray-300 border-secondary shadow-none',
+      true: 'cursor-not-allowed [&>*]:text-bluegray-300 text-bluegray-300 border-secondary shadow-none',
       false: null,
     },
   },
@@ -90,6 +90,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
 
     return (
       <ButtonPrimitive
+        data-xxx="xxx"
         ref={ref}
         {...props}
         isDisabled={isDisabled || isPending}
@@ -109,7 +110,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
             {props.leadingIcon}
             {typeof props.children === 'function' ? props.children(values) : props.children}
             {isPending ? (
-              <BaseIcon icon={Spinner} size="sm" className="animate-spin" />
+              <BaseIcon icon={SpinnerIcon} size="sm" className="animate-spin" />
             ) : (
               props.trailingIcon
             )}

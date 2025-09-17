@@ -39,12 +39,13 @@ interface NonRevealableTextFieldProps extends BaseTextFieldProps {
 }
 
 const fieldgroupVariants = tv({
-  base: 'box-content rounded-md',
+  base: 'bg-bg box-content rounded-md',
   variants: {
     size: {
-      md: `[&>input]:p-6 [&>[data-slot=prefix]]:pl-4 [&>[data-slot=suffix]]:pr-4`,
-      sm: `[&>input]:p-4 [&>[data-slot=prefix]]:pl-2 [&>[data-slot=suffix]]:pr-2`,
-      xs: `[&>input]:p-2 [&>[data-slot=prefix]]:pl-2 [&>[data-slot=suffix]]:pr-2`,
+      lg: `[&>input]:py-6 px-2 [&>[data-slot=prefix]]:pl-4 [&>[data-slot=suffix]]:pr-4`,
+      md: `[&>input]:py-4 px-2 [&>[data-slot=prefix]]:pl-2 [&>[data-slot=suffix]]:pr-2`,
+      sm: `[&>input]:py-3 px-2 [&>[data-slot=prefix]]:pl-1 [&>[data-slot=suffix]]:pr-1`,
+      xs: `[&>input]:py-2 px-1 [&>[data-slot=prefix]]:pl-1 [&>[data-slot=suffix]]:pr-1`,
     },
   },
   defaultVariants: { size: 'md' },
@@ -89,7 +90,7 @@ const TextField = ({
         <>
           {label && (
             <Label>
-              {label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+              {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
             </Label>
           )}
           <FieldGroup
@@ -110,7 +111,7 @@ const TextField = ({
                 data-slot="prefix"
                 type="caption"
                 weight="medium"
-                className="text-text-trivial"
+                className="text-text-secondary"
               >
                 {prefix}
               </Typography>
@@ -133,14 +134,14 @@ const TextField = ({
                 )}
               </Button>
             ) : isPending ? (
-              <Loader variant="spin" className="size-10" />
+              <Loader variant="spin" />
             ) : suffix ? (
               typeof suffix === 'string' ? (
                 <Typography
                   data-slot="suffix"
                   type="caption"
                   weight="medium"
-                  className="text-text-trivial"
+                  className="text-text-secondary"
                 >
                   {suffix}
                 </Typography>

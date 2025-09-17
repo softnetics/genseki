@@ -60,7 +60,7 @@ interface ButtonGroupItemProps extends ToggleButtonProps {}
 
 const ButtonGroupItemStyles = tv({
   base: [
-    'bg-bluegray-100 cursor-pointer dark:bg-bluegray-700',
+    'bg-surface-primary-hover cursor-pointer dark:bg-bluegray-700',
     'text-bluegray-800 px-4 py-2 dark:text-bluegray-200',
     'relative isolate inline-flex flex-row items-center font-medium outline-hidden',
   ],
@@ -76,12 +76,12 @@ const ButtonGroupItemStyles = tv({
     },
     size: {
       sm: [
-        'text-base',
+        'text-sm',
         '*:data-[slot=icon]:size-4.5 sm:*:data-[slot=icon]:size-4',
         '*:data-[slot=loader]:size-4.5 sm:*:data-[slot=loader]:size-4',
       ],
       md: [
-        'text-lg',
+        'text-base',
         '*:data-[slot=icon]:size-5 sm:*:data-[slot=icon]:size-4',
         '*:data-[slot=loader]:size-5 sm:*:data-[slot=loader]:size-4',
       ],

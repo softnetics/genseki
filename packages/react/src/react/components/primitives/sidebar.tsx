@@ -422,7 +422,7 @@ const sidebarItemStyles = tv({
       true: 'flex not-has-data-[slot=icon]:hidden size-9 items-center justify-center gap-x-0 p-0 **:data-[slot=menu-trigger]:hidden',
     },
     isCurrent: {
-      true: 'bg-primary/10 text-text-accent pointer-events-none hover:bg-(--sidebar-accent)/90 hover:text-fg **:data-[slot=menu-trigger]:from-(--sidebar-accent) **:data-[slot=icon]:text-fg [&_.text-muted-fg]:text-fg/80',
+      true: 'bg-primary/10 text-text-brand pointer-events-none hover:bg-(--sidebar-accent)/90 hover:text-fg **:data-[slot=menu-trigger]:from-(--sidebar-accent) **:data-[slot=icon]:text-fg [&_.text-muted-fg]:text-fg/80',
     },
     isActive: {
       true: 'bg-[--alpha(var(--sidebar-accent)/20%)] text-sidebar-fg **:data-[slot=menu-trigger]:flex',
