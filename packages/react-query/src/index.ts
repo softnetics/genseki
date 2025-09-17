@@ -24,6 +24,8 @@ import type {
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
 
+import { isEmptyObject, normalizeObject, sortObjectDeep } from './utils'
+
 type QueryMethod = 'GET'
 type MutationMethod = 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 type Method = QueryMethod | MutationMethod
@@ -209,46 +211,18 @@ export type QueryClient<TApiRouter extends FlatApiRouter> =
       }
     : never
 
-function isEmptyObject(obj: any): boolean {
-  return (
-    obj != null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length === 0
-  )
-}
-
-function sortObjectDeep(obj: any): any {
-  if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) {
-    return obj
-  }
-
-  return Object.keys(obj)
-    .sort()
-    .reduce((result, key) => {
-      result[key] = sortObjectDeep(obj[key])
-      return result
-    }, {} as any)
-}
-
-function normalizePayload(payload?: any): any {
-  if (!payload) return undefined
-
-  const normalized = {
-    pathParams: payload.pathParams,
-    query: payload.query,
-    headers: payload.headers,
-  }
-
-  const filtered = Object.entries(normalized).reduce((acc, [key, value]) => {
-    if (value != null && !isEmptyObject(value)) {
-      acc[key] = sortObjectDeep(value)
-    }
-    return acc
-  }, {} as any)
-
-  return Object.keys(filtered).length > 0 ? filtered : undefined
-}
-
 export function queryKey(method: string, path: string | number | symbol, payload?: any) {
-  const normalizedPayload = normalizePayload(payload)
+  const { header, ...rest } = payload
+  const normalizedPayload = normalizeObject(rest)
+  const normalizedHeaders = header && !isEmptyObject(header) ? sortObjectDeep(header) : undefined
+
+  if (normalizedHeaders && normalizedPayload) {
+    return [method, path, normalizedPayload, normalizedHeaders] as const
+  }
+
+  if (normalizedHeaders) {
+    return [method, path, normalizedHeaders] as const
+  }
 
   if (normalizedPayload) {
     return [method, path, normalizedPayload] as const
