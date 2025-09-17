@@ -218,6 +218,14 @@
   --color-surface-correct-hover: var(--color-palm-500);
   --color-surface-incorrect: var(--color-red-50);
   --color-surface-incorrect-hover: var(--color-red-500);
+  --color-surface-incorrect: var(--color-valencia-50);
+  --color-surface-incorrect-hover: var(--color-red-500);
+  --color-surface-primary: var(--color-white);
+  --color-surface-primary-hover: var(--color-bluegray-100);
+  --color-surface-primary-active: var(--color-bluegray-100);
+  --color-surface-primary-disabled: var(--color-bluegray-50);
+  --color-surface-secondary: var(--color-bluegray-400);
+  --color-surface-tertiary: var(--color-bluegray-50);
   --color-surface-accent: var(--color-yellow-50);
   --color-surface-accent-hover: var(--color-yellow-500);
   --color-surface-info: var(--color-ocean-50);
