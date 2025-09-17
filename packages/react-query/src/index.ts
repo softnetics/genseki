@@ -209,13 +209,52 @@ export type QueryClient<TApiRouter extends FlatApiRouter> =
       }
     : never
 
-export function queryKey(method: string, path: string | number | symbol, payload?: any) {
-  const payloadKey = {
-    pathParams: payload?.pathParams ?? {},
-    query: payload?.query ?? {},
-    headers: payload?.headers ?? {},
+function isEmptyObject(obj: any): boolean {
+  return (
+    obj != null && typeof obj === 'object' && !Array.isArray(obj) && Object.keys(obj).length === 0
+  )
+}
+
+function sortObjectDeep(obj: any): any {
+  if (obj == null || typeof obj !== 'object' || Array.isArray(obj)) {
+    return obj
   }
-  return [method, path, payloadKey] as const
+
+  return Object.keys(obj)
+    .sort()
+    .reduce((result, key) => {
+      result[key] = sortObjectDeep(obj[key])
+      return result
+    }, {} as any)
+}
+
+function normalizePayload(payload?: any): any {
+  if (!payload) return undefined
+
+  const normalized = {
+    pathParams: payload.pathParams,
+    query: payload.query,
+    headers: payload.headers,
+  }
+
+  const filtered = Object.entries(normalized).reduce((acc, [key, value]) => {
+    if (value != null && !isEmptyObject(value)) {
+      acc[key] = sortObjectDeep(value)
+    }
+    return acc
+  }, {} as any)
+
+  return Object.keys(filtered).length > 0 ? filtered : undefined
+}
+
+export function queryKey(method: string, path: string | number | symbol, payload?: any) {
+  const normalizedPayload = normalizePayload(payload)
+
+  if (normalizedPayload) {
+    return [method, path, normalizedPayload] as const
+  }
+
+  return [method, path] as const
 }
 
 export function createQueryClient<TApp extends GensekiAppCompiled>(
