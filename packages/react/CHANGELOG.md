@@ -1,5 +1,17 @@
 # @genseki/react
 
+## 0.1.0-alpha.45
+
+### Minor Changes
+
+- [#191](https://github.com/softnetics/genseki/pull/191) [`831b2cd`](https://github.com/softnetics/genseki/commit/831b2cd5c2e7d46a40df01e0c73b5cc08c5ff928) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - Add surface colors
+
+### Patch Changes
+
+- [#190](https://github.com/softnetics/genseki/pull/190) [`51ce530`](https://github.com/softnetics/genseki/commit/51ce530c0bd64ec0d82b6da8954997f834e1d740) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - [[Fix] Fix component props type not showing.](https://github.com/softnetics/genseki/issues/189)
+
+- [#195](https://github.com/softnetics/genseki/pull/195) [`39e013b`](https://github.com/softnetics/genseki/commit/39e013bc52b3e5ebf4659e48698163e9a4642cdc) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Revamp new design system and design token for Genseki.
+
 ## 0.1.0-alpha.44
 
 ### Patch Changes
