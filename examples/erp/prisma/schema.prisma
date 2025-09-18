@@ -142,6 +142,8 @@ model PostTag {
   postId String
   post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
 
+  order String
+
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt
 }

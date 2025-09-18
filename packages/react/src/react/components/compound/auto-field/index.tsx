@@ -5,6 +5,7 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
+import { LexoRank } from 'lexorank'
 
 import {
   BaseIcon,
@@ -18,6 +19,7 @@ import {
   Label,
   NumberField,
   type NumberFieldProps,
+  ReorderGroup,
   RichTextEditor,
   Select,
   SelectLabel,
@@ -659,7 +661,7 @@ interface AutoManyRelationshipFieldProps {
 }
 
 export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
-  const { control } = useFormContext()
+  const { control, watch } = useFormContext()
   const fieldArray = useFieldArray({
     control: control,
     name: props.name,
@@ -739,49 +741,91 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
       )
     case 'create':
       return (
-        <div className="rounded-md border border-input p-6 grid grid-cols-1 gap-y-6">
-          {!!fieldArray.fields.length && (
-            <div className="flex flex-col space-y-6">
-              {fieldArray.fields.map((fieldValue, index) => (
-                <div
-                  key={fieldValue.id}
-                  className="p-6 bg-surface-tertiary rounded-sm flex flex-col gap-y-4"
-                >
-                  <Typography type="caption" weight="normal">
-                    {fieldShape.label} #{index + 1}
-                  </Typography>
-                  <div className="flex flex-col">
-                    {createComponent(`${props.name}.${index}.create`)}
-                  </div>
-                </div>
-              ))}
-            </div>
-          )}
+        <div className="border border-red-500 p-6 space-y-4">
+          <ReorderGroup
+            title={fieldShape.label}
+            onMove={(oldIndex, newIndex) => {
+              const field = fieldArray.fields[oldIndex] as any
+              const newFields = [...fieldArray.fields]
+              newFields.splice(oldIndex, 1)
+              newFields.splice(newIndex, 0, field)
+
+              const prevField = newIndex > 0 ? (newFields[newIndex - 1] as any) : undefined
+              const nextField =
+                newIndex < newFields.length - 1 ? (newFields[newIndex + 1] as any) : undefined
+
+              let newLexoRank: LexoRank
+              if (!prevField && nextField?.create?.order) {
+                newLexoRank = LexoRank.parse(nextField.create.order).genPrev()
+              } else if (prevField?.create?.order && !nextField) {
+                newLexoRank = LexoRank.parse(prevField.create.order).genNext()
+              } else if (prevField?.create?.order && nextField?.create?.order) {
+                newLexoRank = LexoRank.parse(prevField.create.order).between(
+                  LexoRank.parse(nextField.create.order)
+                )
+              } else {
+                newLexoRank = LexoRank.middle()
+              }
+
+              fieldArray.update(oldIndex, {
+                create: {
+                  ...field.create,
+                  order: newLexoRank.toString(),
+                },
+              })
+              fieldArray.move(oldIndex, newIndex)
+            }}
+            collapsible={false}
+            onDelete={(index) => fieldArray.remove(index)}
+          >
+            {fieldArray.fields.map((fieldValue, index) => (
+              <div
+                key={fieldValue.id}
+                className="p-6 bg-muted rounded-b-lg flex flex-col gap-y-4 border border-t-0 border-bluegray-300"
+              >
+                {/* <div>
+                  {fieldShape.label} #{index + 1}
+                </div> */}
+                {createComponent(`${props.name}.${index}.create`)}
+              </div>
+            ))}
+          </ReorderGroup>
           <Button
             type="button"
             variant="outline"
             size="sm"
             isDisabled={disabled}
-            onClick={() => fieldArray.append({})}
-            className="justify-self-start"
+            onClick={() => {
+              const lastField = fieldArray.fields.at(-1) as
+                | { create?: { order?: string } }
+                | undefined
+              const lastOrder = lastField?.create?.order ?? LexoRank.middle().toString()
+              const nextOrder = LexoRank.parse(lastOrder).genNext().toString()
+              fieldArray.append({
+                create: { order: nextOrder },
+              })
+            }}
           >
             Add
           </Button>
+          <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </div>
       )
 
     case 'connectOrCreate':
       return (
-        <div className="rounded-md border border-input shadow-sm p-6">
-          {fieldArray.fields.map((fieldValue, index) => (
-            <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-              <div>
-                {fieldShape.label} #{index + 1}
+        <div className="border border-red-500 p-6">
+          <ReorderGroup title="DAS">
+            {fieldArray.fields.map((fieldValue, index) => (
+              <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
+                <div>
+                  {fieldShape.label} #{index + 1}
+                </div>
+                {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+                {createComponent(`${props.name}.${index}.create`)}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
-              {createComponent(`${props.name}.${index}.create`)}
-            </div>
-          ))}
+            ))}
+          </ReorderGroup>
           <Button
             type="button"
             variant="primary"

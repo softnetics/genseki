@@ -107,26 +107,32 @@ export const fields = builder.fields('post', (fb) => ({
     hidden: true,
     description: 'The date the post was created',
   }),
-  postTags: fb.relations('postTags', (fb) => ({
-    type: 'create' as const,
-    label: 'Tags',
-    fields: fb.fields('postTag', (fb) => ({
-      remark: fb.columns('remark', {
-        type: 'text',
-        label: 'Remark',
-      }),
-      tag: fb.relations('tag', (fb) => ({
-        type: 'connect' as const,
-        fields: fb.fields('tag', (fb) => ({
-          name: fb.columns('name', {
-            type: 'text',
-            label: 'Name',
-          }),
+  postTags: fb.relations(
+    'postTags',
+    (fb) => ({
+      type: 'create' as const,
+      label: 'Tags',
+      fields: fb.fields('postTag', (fb) => ({
+        remark: fb.columns('remark', {
+          type: 'text',
+          label: 'Remark',
+        }),
+        tag: fb.relations('tag', (fb) => ({
+          type: 'connect' as const,
+          fields: fb.fields('tag', (fb) => ({
+            name: fb.columns('name', {
+              type: 'text',
+              label: 'Name',
+            }),
+          })),
+          options: 'tag',
         })),
-        options: 'tag',
       })),
-    })),
-  })),
+    }),
+    {
+      orderColumn: 'order',
+    }
+  ),
   updatedAt: fb.columns('updatedAt', {
     type: 'date',
     label: 'Updated At',

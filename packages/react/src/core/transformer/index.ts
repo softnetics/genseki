@@ -46,13 +46,22 @@ function transformFieldRelationPayloadToPrismaCreatePayload(
     throw new Error(`Field "${fieldShape.$server.fieldName}" is not a relation field`)
   }
 
+  const orderColumn = fieldShape.$server.config.orderColumn
+
   switch (fieldShape.type) {
     case 'create': {
       return {
         create: fieldShape.$server.relation.isList
-          ? (payload as any[]).map((v) =>
-              transformFieldPayloadToPrismaCreatePayload(fieldShape.fields, v.create)
-            )
+          ? (payload as any[]).map((v) => {
+              const transformData = transformFieldPayloadToPrismaCreatePayload(
+                fieldShape.fields,
+                v.create
+              )
+              if (orderColumn && v.create.order !== undefined) {
+                transformData[orderColumn] = v.create.order
+              }
+              return transformData
+            })
           : transformFieldPayloadToPrismaCreatePayload(fieldShape.fields, payload.create),
       }
     }
