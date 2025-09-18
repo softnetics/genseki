@@ -139,53 +139,23 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
 
     const where: any = {}
 
-    // Configured searchable columns.
     if (search && search.trim()) {
-      const searchFields = listConfiguration?.search
-        ? listConfiguration.search.filter(
-            (field) => model.shape.columns[field as string]?.dataType === DataType.STRING
-          )
-        : Object.keys(model.shape.columns).filter(
-            (key) => model.shape.columns[key].dataType === DataType.STRING
-          )
+      const searchConditions: any[] = []
+      const searchFields = listConfiguration?.search || []
 
-      if (searchFields.length > 0) {
-        where.OR = searchFields.map((field) => ({
-          [field]: {
-            contains: search.trim(),
-            mode: 'insensitive',
-          },
-        }))
-      }
-    }
-
-    // Configured sortable columns.
-    const orderBy: any = {}
-    if (sortBy) {
-      const isValidSortField =
-        !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy as any)
-
-      if (isValidSortField && model.shape.columns[sortBy]) {
-        orderBy[sortBy] = sortOrder ?? 'asc'
-      } else {
-        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = sortOrder ?? 'asc'
-      }
-    } else {
-      // Use default sort configuration.
-      if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
-        const defaultSortField = listConfiguration.sortBy[0]
-        if (model.shape.columns[defaultSortField as string]) {
-          orderBy[defaultSortField] = 'desc'
-        } else {
-          const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-          orderBy[primaryField.name] = 'asc'
+      for (const fieldPath of searchFields) {
+        const searchCondition = buildSearchCondition(fieldPath, search.trim(), fields, model)
+        if (searchCondition) {
+          searchConditions.push(searchCondition)
         }
-      } else {
-        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = 'asc'
+      }
+
+      if (searchConditions.length > 0) {
+        where.OR = searchConditions
       }
     }
+
+    const orderBy = buildOrderBy(sortBy, sortOrder, listConfiguration, model)
 
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
@@ -206,6 +176,158 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       data: response.map((item) => transformPrismaResultToFieldsPayload(fields, item) as any),
     }
   }
+}
+
+function buildSearchCondition(
+  fieldPath: string,
+  searchTerm: string,
+  fields: Fields,
+  model: any
+): any {
+  const pathParts = fieldPath.split('.')
+
+  if (pathParts.length === 1) {
+    // Direct field search
+    const fieldName = pathParts[0]
+    const column = model.shape.columns[fieldName]
+
+    if (column && column.dataType === DataType.STRING) {
+      return {
+        [fieldName]: {
+          contains: searchTerm,
+          mode: 'insensitive',
+        },
+      }
+    }
+  } else if (pathParts.length === 2) {
+    // One level relational field search
+    const [relationFieldName, nestedField] = pathParts
+
+    // Check if this is a valid relation in the fields definition
+    const fieldDef = fields.shape[relationFieldName]
+
+    if (fieldDef && '$server' in fieldDef && 'relation' in fieldDef.$server) {
+      // Get the actual Prisma relation name from the server relation metadata
+      const prismaRelationName = fieldDef.$server.relation.name
+
+      return {
+        [prismaRelationName]: {
+          [nestedField]: {
+            contains: searchTerm,
+            mode: 'insensitive',
+          },
+        },
+      }
+    }
+  } else if (pathParts.length > 2) {
+    // Deep nested relations (e.g., postTags.tag.name)
+    return buildDeepRelationalSearchCondition(pathParts, searchTerm, fields)
+  }
+
+  return null
+}
+
+function buildDeepRelationalSearchCondition(
+  pathParts: string[],
+  searchTerm: string,
+  fields: Fields
+): any {
+  if (pathParts.length === 0) return null
+
+  if (pathParts.length === 1) {
+    return {
+      [pathParts[0]]: {
+        contains: searchTerm,
+        mode: 'insensitive',
+      },
+    }
+  }
+
+  const [currentLevelFieldName, ...restPath] = pathParts
+
+  // Get the field definition to find the actual Prisma relation name
+  const fieldDef = fields.shape[currentLevelFieldName]
+
+  if (fieldDef && '$server' in fieldDef && 'relation' in fieldDef.$server) {
+    const prismaRelationName = fieldDef.$server.relation.name
+
+    // For nested fields, we need to pass the nested field definition
+    let nestedFields = fields
+    if ('fields' in fieldDef) {
+      nestedFields = fieldDef.fields
+    }
+
+    return {
+      [prismaRelationName]: buildDeepRelationalSearchCondition(restPath, searchTerm, nestedFields),
+    }
+  }
+
+  // Fallback to using the field name directly if no relation metadata found
+  return {
+    [currentLevelFieldName]: buildDeepRelationalSearchCondition(restPath, searchTerm, fields),
+  }
+}
+
+function buildOrderBy(
+  sortBy: string | undefined,
+  sortOrder: string | undefined,
+  listConfiguration: any,
+  model: any
+): any {
+  const orderBy: any = {}
+
+  if (sortBy) {
+    const isValidSortField = !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy)
+
+    if (isValidSortField) {
+      if (sortBy.includes('.')) {
+        const pathParts = sortBy.split('.')
+        buildNestedOrderBy(orderBy, pathParts, sortOrder ?? 'asc')
+      } else if (model.shape.columns[sortBy]) {
+        orderBy[sortBy] = sortOrder ?? 'asc'
+      } else {
+        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+        orderBy[primaryField.name] = sortOrder ?? 'asc'
+      }
+    } else {
+      const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+      orderBy[primaryField.name] = sortOrder ?? 'asc'
+    }
+  } else {
+    if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
+      const defaultSortField = listConfiguration.sortBy[0]
+      if (defaultSortField.includes('.')) {
+        const pathParts = defaultSortField.split('.')
+        buildNestedOrderBy(orderBy, pathParts, 'desc')
+      } else if (model.shape.columns[defaultSortField]) {
+        orderBy[defaultSortField] = 'desc'
+      } else {
+        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+        orderBy[primaryField.name] = 'asc'
+      }
+    } else {
+      const primaryField = model.shape.columns[model.shape.primaryFields[0]]
+      orderBy[primaryField.name] = 'asc'
+    }
+  }
+
+  return orderBy
+}
+
+// Helper function to build nested orderBy structure
+function buildNestedOrderBy(orderBy: any, pathParts: string[], sortOrder: string): void {
+  let currentOrderBy = orderBy
+
+  // Build nested structure for all parts except the last
+  for (let i = 0; i < pathParts.length - 1; i++) {
+    if (!currentOrderBy[pathParts[i]]) {
+      currentOrderBy[pathParts[i]] = {}
+    }
+    currentOrderBy = currentOrderBy[pathParts[i]]
+  }
+
+  // Set the sort order for the final field
+  currentOrderBy[pathParts[pathParts.length - 1]] = sortOrder
 }
 
 export type CollectionCreateApiRoute<TSlug extends string, TFields extends Fields> = ApiRoute<{
@@ -532,13 +654,13 @@ export type CollectionListApiRoute<TSlug extends string, TFields extends Fields>
   }
 }>
 
-export function getCollectionDefaultListApiRoute(args: {
+export function getCollectionDefaultListApiRoute<TFields extends Fields>(args: {
   slug: string
   context: AnyContextable
   schema: ModelSchemas
-  fields: Fields
-  customHandler?: CollectionListApiHandler<AnyContextable, Fields>
-  listConfiguration?: ListConfiguration<Fields>
+  fields: TFields
+  customHandler?: CollectionListApiHandler<AnyContextable, TFields>
+  listConfiguration?: ListConfiguration<TFields>
 }) {
   const defaultHandler = createCollectionDefaultListHandler(
     { schema: args.schema, context: args.context },
@@ -594,7 +716,7 @@ export function getCollectionDefaultListApiRoute(args: {
   )
 
   return {
-    route: route as unknown as CollectionListApiRoute<string, Fields>,
+    route: route as unknown as CollectionListApiRoute<string, TFields>,
     handler,
     defaultHandler,
   }

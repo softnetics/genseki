@@ -127,6 +127,16 @@ export const fields = builder.fields('post', (fb) => ({
       })),
     })),
   })),
+  postDetail: fb.relations('detail', (fb) => ({
+    type: 'create' as const,
+    label: 'Detail',
+    fields: fb.fields('postDetail', (fb) => ({
+      description: fb.columns('description', {
+        type: 'text',
+        label: 'Description',
+      }),
+    })),
+  })),
   updatedAt: fb.columns('updatedAt', {
     type: 'date',
     label: 'Updated At',
@@ -189,7 +199,7 @@ export const postsCollection = createPlugin('posts', (app) => {
       collection.list(fields, {
         columns: columns,
         configuration: {
-          search: ['title'],
+          search: ['title', 'postDetail.description', 'author.name'],
           sortBy: ['updatedAt', 'title'],
         },
         toolbar: {

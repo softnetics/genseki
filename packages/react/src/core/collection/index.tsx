@@ -52,7 +52,8 @@ import {
   type FieldShapeBase,
   type FieldsOptions,
 } from '../field'
-import type { DataType, InferDataType, ModelSchemas } from '../model'
+import type { DataType } from '../model'
+import { type InferDataType, type ModelSchemas } from '../model'
 import type { GensekiPluginBuilderOptions } from '../plugin'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
 
@@ -411,8 +412,7 @@ export type CollectionDeleteApiHandler<TContext extends AnyContextable, TFields 
   }
 ) => Promisable<CollectionDeleteApiReturn>
 
-// Extract searchable columns from fields
-export type ExtractSearchableColumns<TFields extends Fields> = {
+type DirectStringColumns<TFields extends Fields> = {
   [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
     ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
       ? Extract<K, string>
@@ -420,22 +420,64 @@ export type ExtractSearchableColumns<TFields extends Fields> = {
     : never
 }[keyof TFields['shape']]
 
-// Extract sortable columns from fields
-export type ExtractSortableColumns<TFields extends Fields> = {
+type RelationFields<TFields extends Fields> = {
+  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldRelationShape
+    ? Extract<K, string>
+    : never
+}[keyof TFields['shape']]
+
+type RelationStringPaths<TFields extends Fields> = {
+  [K in RelationFields<TFields>]: TFields['shape'][K] extends FieldRelationShape
+    ? TFields['shape'][K]['fields'] extends Fields
+      ? {
+          [NK in keyof TFields['shape'][K]['fields']['shape']]: TFields['shape'][K]['fields']['shape'][NK] extends FieldColumnShape
+            ? TFields['shape'][K]['fields']['shape'][NK]['$client']['column']['dataType'] extends typeof DataType.STRING
+              ? `${K}.${Extract<NK, string>}`
+              : never
+            : never
+        }[keyof TFields['shape'][K]['fields']['shape']]
+      : never
+    : never
+}[RelationFields<TFields>]
+
+export type ExtractSearchableColumns<TFields extends Fields> =
+  | DirectStringColumns<TFields>
+  | RelationStringPaths<TFields>
+
+type SortableDataTypes =
+  | typeof DataType.STRING
+  | typeof DataType.INT
+  | typeof DataType.FLOAT
+  | typeof DataType.DATETIME
+  | typeof DataType.BIGINT
+  | typeof DataType.DECIMAL
+
+type DirectSortableColumns<TFields extends Fields> = {
   [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-    ? TFields['shape'][K]['$client']['column']['dataType'] extends
-        | typeof DataType.STRING
-        | typeof DataType.INT
-        | typeof DataType.FLOAT
-        | typeof DataType.DATETIME
-        | typeof DataType.BIGINT
-        | typeof DataType.DECIMAL
+    ? TFields['shape'][K]['$client']['column']['dataType'] extends SortableDataTypes
       ? Extract<K, string>
       : never
     : never
 }[keyof TFields['shape']]
 
-// ListConfiguration
+type RelationSortablePaths<TFields extends Fields> = {
+  [K in RelationFields<TFields>]: TFields['shape'][K] extends FieldRelationShape
+    ? TFields['shape'][K]['fields'] extends Fields
+      ? {
+          [NK in keyof TFields['shape'][K]['fields']['shape']]: TFields['shape'][K]['fields']['shape'][NK] extends FieldColumnShape
+            ? TFields['shape'][K]['fields']['shape'][NK]['$client']['column']['dataType'] extends SortableDataTypes
+              ? `${K}.${Extract<NK, string>}`
+              : never
+            : never
+        }[keyof TFields['shape'][K]['fields']['shape']]
+      : never
+    : never
+}[RelationFields<TFields>]
+
+export type ExtractSortableColumns<TFields extends Fields> =
+  | DirectSortableColumns<TFields>
+  | RelationSortablePaths<TFields>
+
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
   sortBy?: ExtractSortableColumns<TFields>[]
@@ -520,7 +562,7 @@ export class CollectionBuilder<
     config: CollectionListConfig<TContext, TFields> = { columns: [] }
   ) {
     return (appOptions: GensekiAppOptions) => {
-      const route = this.listApiRouter(fields)
+      const route = this.listApiRouter(fields, config.configuration)
 
       const ui = createGensekiUiRoute({
         path: `${this.config.uiPathPrefix}/${this.slug}`,
@@ -571,12 +613,16 @@ export class CollectionBuilder<
     }
   }
 
-  listApiRouter<TFields extends Fields>(fields: TFields) {
+  listApiRouter<TFields extends Fields>(
+    fields: TFields,
+    listConfiguration?: ListConfiguration<TFields>
+  ) {
     const { route } = getCollectionDefaultListApiRoute({
       slug: this.slug,
       context: this.context,
       schema: this.schema,
       fields: fields,
+      listConfiguration: listConfiguration,
     })
 
     return {
