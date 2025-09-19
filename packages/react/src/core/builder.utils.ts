@@ -123,7 +123,7 @@ function createCollectionDefaultFindOneHandler<
   }
 }
 
-function createSearchConditionForPath(
+function createSearchCondition(
   relationPath: string,
   searchValue: string,
   fields: Fields
@@ -172,7 +172,7 @@ function buildSearchCondition(
   }
 }
 
-function createOrderByForPath(
+function createOrderByCondition(
   sortPath: string | undefined,
   sortDirection: string | undefined,
   allowedSortPaths: any,
@@ -184,7 +184,7 @@ function createOrderByForPath(
 
     if (isAllowedSortPath) {
       if (sortPath.includes('.')) {
-        return buildNestedOrderBy(sortPath.split('.'), sortDirection ?? 'asc')
+        return buildOrderByCondition(sortPath.split('.'), sortDirection ?? 'asc')
       } else if (model.shape.columns[sortPath]) {
         return { [sortPath]: sortDirection ?? 'asc' }
       } else {
@@ -199,7 +199,7 @@ function createOrderByForPath(
     if (allowedSortPaths?.sortBy && allowedSortPaths.sortBy.length > 0) {
       const defaultSortPath = allowedSortPaths.sortBy[0]
       if (defaultSortPath.includes('.')) {
-        return buildNestedOrderBy(defaultSortPath.split('.'), 'desc')
+        return buildOrderByCondition(defaultSortPath.split('.'), 'desc')
       } else if (model.shape.columns[defaultSortPath]) {
         return { [defaultSortPath]: 'desc' }
       } else {
@@ -213,7 +213,10 @@ function createOrderByForPath(
   }
 }
 
-function buildNestedOrderBy(pathSegments: string[], sortDirection: string): PrismaOrderByCondition {
+function buildOrderByCondition(
+  pathSegments: string[],
+  sortDirection: string
+): PrismaOrderByCondition {
   if (pathSegments.length === 0) return {}
 
   if (pathSegments.length === 1) {
@@ -222,7 +225,7 @@ function buildNestedOrderBy(pathSegments: string[], sortDirection: string): Pris
 
   const [currentSegment, ...remainingSegments] = pathSegments
   return {
-    [currentSegment]: buildNestedOrderBy(remainingSegments, sortDirection),
+    [currentSegment]: buildOrderByCondition(remainingSegments, sortDirection),
   }
 }
 
@@ -248,7 +251,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       const searchFields = listConfiguration?.search || []
 
       for (const fieldPath of searchFields) {
-        const searchCondition = createSearchConditionForPath(fieldPath, search.trim(), fields)
+        const searchCondition = createSearchCondition(fieldPath, search.trim(), fields)
         if (searchCondition) {
           searchConditions.push(searchCondition)
         }
@@ -259,7 +262,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       }
     }
 
-    const orderBy = createOrderByForPath(sortBy, sortOrder, listConfiguration, model)
+    const orderBy = createOrderByCondition(sortBy, sortOrder, listConfiguration, model)
 
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),

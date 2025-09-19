@@ -291,7 +291,6 @@ export const CustomCreatePage = () => {
           <CreateField fieldName="author" />
           <CreateField fieldName="postTags" />
           <CreateField fieldName="postDetail" />
-          {/* <CreateField fieldName= /> */}
           <div className="grid grid-cols-2 gap-4">
             <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
             <CancelButton pending={mutation.isPending} />
