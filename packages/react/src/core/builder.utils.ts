@@ -20,7 +20,8 @@ import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
 import { HttpInternalServerError } from './error'
 import { type FieldOptionsCallback, type Fields, type FieldsOptions } from './field'
-import { DataType, type ModelSchemas } from './model'
+import { type ModelSchemas } from './model'
+import type { PrismaOrderByCondition, PrismaSearchCondition } from './prisma.types'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
@@ -125,36 +126,19 @@ function createCollectionDefaultFindOneHandler<
 function createSearchConditionForPath(
   relationPath: string,
   searchValue: string,
-  fields: Fields,
-  model: any
-): any {
+  fields: Fields
+): PrismaSearchCondition {
   const pathSegments = relationPath.split('.')
-  return buildRecursiveSearchCondition(pathSegments, searchValue, fields, model)
+  return buildSearchCondition(pathSegments, searchValue, fields)
 }
 
-function buildRecursiveSearchCondition(
+function buildSearchCondition(
   pathSegments: string[],
   searchValue: string,
-  fields: Fields,
-  model?: any
-): any {
-  if (pathSegments.length === 0) return null
-
+  fields: Fields
+): PrismaSearchCondition {
   if (pathSegments.length === 1) {
     const fieldName = pathSegments[0]
-
-    if (model) {
-      const columnDefinition = model.shape.columns[fieldName]
-      if (columnDefinition && columnDefinition.dataType === DataType.STRING) {
-        return {
-          [fieldName]: {
-            contains: searchValue,
-            mode: 'insensitive',
-          },
-        }
-      }
-    }
-
     return {
       [fieldName]: {
         contains: searchValue,
@@ -163,7 +147,6 @@ function buildRecursiveSearchCondition(
     }
   }
 
-  // Multiple segments - handle relation
   const [currentRelationName, ...remainingPathSegments] = pathSegments
   const currentFieldDefinition = fields.shape[currentRelationName]
 
@@ -174,27 +157,18 @@ function buildRecursiveSearchCondition(
   ) {
     const prismaRelationName = (currentFieldDefinition.$server as any).relation.name
 
-    let nestedfields = fields
+    let nestedFields = fields
     if ('fields' in currentFieldDefinition) {
-      nestedfields = currentFieldDefinition.fields
+      nestedFields = currentFieldDefinition.fields
     }
 
     return {
-      [prismaRelationName]: buildRecursiveSearchCondition(
-        remainingPathSegments,
-        searchValue,
-        nestedfields
-      ),
+      [prismaRelationName]: buildSearchCondition(remainingPathSegments, searchValue, nestedFields),
     }
   }
 
-  // Fallback when relation metadata is missing
   return {
-    [currentRelationName]: buildRecursiveSearchCondition(
-      remainingPathSegments,
-      searchValue,
-      fields
-    ),
+    [currentRelationName]: buildSearchCondition(remainingPathSegments, searchValue, fields),
   }
 }
 
@@ -203,68 +177,53 @@ function createOrderByForPath(
   sortDirection: string | undefined,
   allowedSortPaths: any,
   model: any
-): any {
-  const orderByClause: any = {}
-
+): PrismaOrderByCondition {
   if (sortPath) {
     const isAllowedSortPath =
       !allowedSortPaths?.sortBy || allowedSortPaths.sortBy.includes(sortPath)
 
     if (isAllowedSortPath) {
       if (sortPath.includes('.')) {
-        const pathSegments = sortPath.split('.')
-        buildNestedOrderByStructure(orderByClause, pathSegments, sortDirection ?? 'asc')
+        return buildNestedOrderBy(sortPath.split('.'), sortDirection ?? 'asc')
       } else if (model.shape.columns[sortPath]) {
-        orderByClause[sortPath] = sortDirection ?? 'asc'
+        return { [sortPath]: sortDirection ?? 'asc' }
       } else {
         const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-        orderByClause[primaryFieldDefinition.name] = sortDirection ?? 'asc'
+        return { [primaryFieldDefinition.name]: sortDirection ?? 'asc' }
       }
     } else {
       const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-      orderByClause[primaryFieldDefinition.name] = sortDirection ?? 'asc'
+      return { [primaryFieldDefinition.name]: sortDirection ?? 'asc' }
     }
   } else {
     if (allowedSortPaths?.sortBy && allowedSortPaths.sortBy.length > 0) {
       const defaultSortPath = allowedSortPaths.sortBy[0]
       if (defaultSortPath.includes('.')) {
-        const pathSegments = defaultSortPath.split('.')
-        buildNestedOrderByStructure(orderByClause, pathSegments, 'desc')
+        return buildNestedOrderBy(defaultSortPath.split('.'), 'desc')
       } else if (model.shape.columns[defaultSortPath]) {
-        orderByClause[defaultSortPath] = 'desc'
+        return { [defaultSortPath]: 'desc' }
       } else {
         const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-        orderByClause[primaryFieldDefinition.name] = 'asc'
+        return { [primaryFieldDefinition.name]: 'asc' }
       }
     } else {
       const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-      orderByClause[primaryFieldDefinition.name] = 'asc'
+      return { [primaryFieldDefinition.name]: 'asc' }
     }
   }
-
-  return orderByClause
 }
 
-function buildNestedOrderByStructure(
-  orderByClause: any,
-  pathSegments: string[],
-  sortDirection: string
-): void {
-  let currentOrderByLevel = orderByClause
+function buildNestedOrderBy(pathSegments: string[], sortDirection: string): PrismaOrderByCondition {
+  if (pathSegments.length === 0) return {}
 
-  // Build nested structure for all parts except the last
-  for (let segmentIndex = 0; segmentIndex < pathSegments.length - 1; segmentIndex++) {
-    const currentSegment = pathSegments[segmentIndex]
-
-    if (!currentOrderByLevel[currentSegment]) {
-      currentOrderByLevel[currentSegment] = {}
-    }
-    currentOrderByLevel = currentOrderByLevel[currentSegment]
+  if (pathSegments.length === 1) {
+    return { [pathSegments[0]]: sortDirection }
   }
 
-  // Set the sort direction for the final field
-  const finalFieldName = pathSegments[pathSegments.length - 1]
-  currentOrderByLevel[finalFieldName] = sortDirection
+  const [currentSegment, ...remainingSegments] = pathSegments
+  return {
+    [currentSegment]: buildNestedOrderBy(remainingSegments, sortDirection),
+  }
 }
 
 function createCollectionDefaultListHandler<TContext extends Contextable, TFields extends Fields>(
@@ -289,12 +248,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       const searchFields = listConfiguration?.search || []
 
       for (const fieldPath of searchFields) {
-        const searchCondition = createSearchConditionForPath(
-          fieldPath,
-          search.trim(),
-          fields,
-          model
-        )
+        const searchCondition = createSearchConditionForPath(fieldPath, search.trim(), fields)
         if (searchCondition) {
           searchConditions.push(searchCondition)
         }
