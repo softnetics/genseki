@@ -52,6 +52,8 @@ export const getSortIcon = (isSorted: false | SortDirection) => {
   }
 }
 
+const normalizeColumnId = (id: string) => id.replaceAll('_', '.')
+
 export function TanstackTable<T>({
   className,
   classNames,
@@ -87,10 +89,10 @@ export function TanstackTable<T>({
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())
               // const canSort = header.column.getCanSort()
-              const canSort = configuration?.sortBy?.includes(header.column.id)
+              const canSort = configuration?.sortBy?.includes(normalizeColumnId(header.column.id))
               return (
                 <TableHead
-                  key={header.id}
+                  key={normalizeColumnId(header.id)}
                   className={clsx(
                     'focus-visible:ring-focus ring-inset',
                     header.colSpan > 1 && 'border-bluegray-300 border-b',
