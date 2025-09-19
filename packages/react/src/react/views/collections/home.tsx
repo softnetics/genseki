@@ -28,13 +28,13 @@ export function HomeView(props: HomeViewProps) {
     <div>
       <div className="relative min-h-[240px] w-full px-12 pt-24 [background-image:radial-gradient(100%_100%_at_10%_-30%,--alpha(var(--color-primary)/15%),var(--color-secondary))]">
         <div className="mx-auto flex w-full max-w-[800px] flex-col">
-          <Typography type="h2" weight="bold" className="text-text-nontrivial">
+          <Typography type="h2" weight="bold" className="text-text-primary">
             {greeting()}
           </Typography>
-          <Typography type="h4" weight="normal" className="text-text-body">
+          <Typography type="h4" weight="normal" className="text-text-primary">
             Welcome to your collections
           </Typography>
-          <Typography type="body" weight="normal" className="text-text-trivial mt-4">
+          <Typography type="body" weight="normal" className="text-text-secondary mt-4">
             Select a collection below to view and manage your data.
           </Typography>
         </div>

@@ -139,7 +139,7 @@ const DropdownItemDetails = forwardRef(function DropdownItemDetails(
       {description && (
         <Text
           slot={slot ?? 'description'}
-          className={twMerge('text-sm', classNames?.description)}
+          className={twMerge('text-sm text-text-secondary', classNames?.description)}
           {...restProps}
         >
           {description}

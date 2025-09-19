@@ -14,22 +14,22 @@ const loaderStyles = tv({
   variants: {
     intent: {
       current: 'text-current',
-      primary: 'text-primary',
-      secondary: 'text-muted-fg',
-      success: 'text-success',
-      warning: 'text-warning',
-      danger: 'text-danger',
+      primary: 'text-text-brand',
+      secondary: 'text-text-secondary',
+      success: 'text-text-correct',
+      warning: 'text-text-accent',
+      danger: 'text-text-incorrect',
     },
     size: {
-      small: 'size-4',
-      medium: 'size-6',
-      large: 'size-8',
-      'extra-large': 'size-10',
+      small: 'size-6',
+      medium: 'size-8',
+      large: 'size-10',
+      'extra-large': 'size-12',
     },
   },
   defaultVariants: {
     intent: 'current',
-    size: 'small',
+    size: 'medium',
   },
 })
 

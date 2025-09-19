@@ -53,7 +53,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
       >
         Back
       </ButtonLink>
-      <div className="flex items-center gap-x-4">
+      <div className="flex gap-x-4">
         {toolbar?.delete && isRowsSelected && (
           <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />
         )}

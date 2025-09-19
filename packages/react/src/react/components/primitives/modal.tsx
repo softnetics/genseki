@@ -184,7 +184,7 @@ const ModalTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
 
 const ModalDescription = forwardRef<HTMLDivElement, DialogDescriptionProps>(
   function ModalDescription(props, ref) {
-    return <DialogDescription ref={ref} className="text-bluegray-600" {...props} />
+    return <DialogDescription ref={ref} className="text-text-secondary" {...props} />
   }
 )
 

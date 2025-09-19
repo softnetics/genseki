@@ -96,7 +96,7 @@ const FormItem = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTMLDivEl
   ({ className, ...props }, ref) => {
     return (
       <FormItemProvider>
-        <div ref={ref} className={cn('space-y-spacing-4', className)} {...props} />
+        <div ref={ref} className={cn('', className)} {...props} />
       </FormItemProvider>
     )
   }
@@ -148,7 +148,7 @@ const FormDescription = React.forwardRef<
       ref={ref}
       id={formDescriptionId}
       className={cn(
-        'text-body-s font-regular text-input-text-helper peer-disabled:text-input-text-disabled',
+        'text-primary-s font-regular text-input-text-helper peer-disabled:text-input-text-disabled',
         className
       )}
       {...props}
@@ -194,7 +194,7 @@ export const FormRootMessage = React.forwardRef<
     <p
       ref={ref}
       className={cn(
-        'text-body-s font-regular text-input-text-error gap-spacing-8 flex items-center',
+        'text-primary-s font-regular text-input-text-error gap-spacing-8 flex items-center',
         className
       )}
       {...props}

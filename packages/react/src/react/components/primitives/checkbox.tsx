@@ -94,12 +94,12 @@ const Checkbox = forwardRef(function Checkbox(
   const sizeClasses = {
     md: {
       box: 'size-8',
-      label: 'text-base font-medium',
+      label: 'text-base font-medium leading-[100%]',
       description: 'text-base',
     },
     lg: {
-      box: 'size-10',
-      label: 'text-lg font-medium',
+      box: 'size-12',
+      label: 'text-lg font-medium leading-[100%]',
       description: 'text-lg',
     },
   }
@@ -139,7 +139,7 @@ const Checkbox = forwardRef(function Checkbox(
                 {props.label ? (
                   <Label className={cn(props.description, sizeClasses[size].label)}>
                     {props.label}
-                    {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+                    {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
                   </Label>
                 ) : (
                   (props.children as React.ReactNode)

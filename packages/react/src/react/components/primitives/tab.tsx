@@ -86,16 +86,16 @@ const TabList = <T extends object>({ className, ref, ...props }: TabListProps<T>
 
 const tabStyles = tv({
   base: [
-    'relative flex cursor-pointer items-center whitespace-nowrap rounded-full font-semibold outline-hidden transition *:data-[slot=icon]:mr-2 *:data-[slot=icon]:size-4 focus-visible:text-text-accent',
+    'relative flex cursor-pointer items-center whitespace-nowrap rounded-full font-semibold outline-hidden transition *:data-[slot=icon]:mr-2 *:data-[slot=icon]:size-4 focus-visible:text-text-brand',
     'group-data-[orientation=vertical]/tabs:w-full group-data-[orientation=vertical]/tabs:py-0 group-data-[orientation=vertical]/tabs:pr-2 group-data-[orientation=vertical]/tabs:pl-4',
     'group-data-[orientation=horizontal]/tabs:pb-6',
   ],
   variants: {
     isSelected: {
-      false: 'text-text-body',
-      true: 'text-text-accent',
+      false: 'text-text-primary',
+      true: 'text-text-brand',
     },
-    isFocused: { false: 'ring-0', true: 'text-text-accent' },
+    isFocused: { false: 'ring-0', true: 'text-text-brand' },
     isDisabled: {
       true: 'text-muted-fg/50',
     },

@@ -1,11 +1,11 @@
 import { tv, type VariantProps } from 'tailwind-variants'
 
 const badgeIntents = {
-  gray: 'bg-white border-gray-300 text-bluegray-600',
-  brand: 'bg-pumpkin-50 text-text-accent border-pumpkin-300',
-  blue: 'bg-ocean-50 text-ocean-500 border-ocean-300',
-  red: 'bg-red-50 text-red-500 border-red-300',
-  yellow: 'bg-yellow-50 text-yellow-500 border-yellow-300',
+  gray: 'bg-white border-gray-300 text-text-secondary',
+  brand: 'bg-pumpkin-50 text-text-brand border-pumpkin-300',
+  blue: 'bg-surface-info text-ocean-500 border-ocean-300',
+  red: 'bg-surface-incorrect text-red-500 border-red-300',
+  yellow: 'bg-surface-accent text-yellow-500 border-yellow-300',
   green: 'bg-palm-50 text-palm-500 border-palm-300',
   purple: 'bg-purple-50 text-purple-500 border-purple-300',
   cyan: 'bg-cyan-50 text-cyan-500 border-cyan-300',
