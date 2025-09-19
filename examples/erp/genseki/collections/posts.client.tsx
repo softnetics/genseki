@@ -272,7 +272,7 @@ export const CustomCreatePage = () => {
           onSubmit={form.handleSubmit(handleSubmit, handleValidationError)}
           className="flex flex-col gap-y-8 mt-16"
         >
-          <CreateField fieldName="example" />
+          <CreateField fieldName="example" deselectable={true} />
           <SimpleTextInput
             fieldName="title"
             placeholder="Custom Title Input"
