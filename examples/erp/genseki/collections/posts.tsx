@@ -135,6 +135,16 @@ export const fields = builder.fields('post', (fb) => ({
         type: 'text',
         label: 'Description',
       }),
+      extra: fb.relations('extra', (fb) => ({
+        type: 'create' as const,
+        label: 'Extra Note',
+        fields: fb.fields('postExtra', (fb) => ({
+          note: fb.columns('note', {
+            type: 'text',
+            label: 'Note',
+          }),
+        })),
+      })),
     })),
   })),
   updatedAt: fb.columns('updatedAt', {
@@ -199,7 +209,7 @@ export const postsCollection = createPlugin('posts', (app) => {
       collection.list(fields, {
         columns: columns,
         configuration: {
-          search: ['title', 'postDetail.description', 'author.name'],
+          search: ['title', 'postDetail.description', 'postDetail.extra.note'],
           sortBy: ['updatedAt', 'title'],
         },
         toolbar: {

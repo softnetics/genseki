@@ -67,6 +67,10 @@ export const columns = [
     header: 'Description',
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor('postDetail.extra.note', {
+    header: 'Note',
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor('updatedAt', {
     header: 'Updated At',
     cell: (info) => <div>{new Date(info.getValue()).toLocaleDateString('en-GB')}</div>,
@@ -287,6 +291,7 @@ export const CustomCreatePage = () => {
           <CreateField fieldName="author" />
           <CreateField fieldName="postTags" />
           <CreateField fieldName="postDetail" />
+          {/* <CreateField fieldName= /> */}
           <div className="grid grid-cols-2 gap-4">
             <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
             <CancelButton pending={mutation.isPending} />

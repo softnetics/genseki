@@ -122,6 +122,151 @@ function createCollectionDefaultFindOneHandler<
   }
 }
 
+function createSearchConditionForPath(
+  relationPath: string,
+  searchValue: string,
+  fields: Fields,
+  model: any
+): any {
+  const pathSegments = relationPath.split('.')
+  return buildRecursiveSearchCondition(pathSegments, searchValue, fields, model)
+}
+
+function buildRecursiveSearchCondition(
+  pathSegments: string[],
+  searchValue: string,
+  fields: Fields,
+  model?: any
+): any {
+  if (pathSegments.length === 0) return null
+
+  if (pathSegments.length === 1) {
+    const fieldName = pathSegments[0]
+
+    if (model) {
+      const columnDefinition = model.shape.columns[fieldName]
+      if (columnDefinition && columnDefinition.dataType === DataType.STRING) {
+        return {
+          [fieldName]: {
+            contains: searchValue,
+            mode: 'insensitive',
+          },
+        }
+      }
+    }
+
+    return {
+      [fieldName]: {
+        contains: searchValue,
+        mode: 'insensitive',
+      },
+    }
+  }
+
+  // Multiple segments - handle relation
+  const [currentRelationName, ...remainingPathSegments] = pathSegments
+  const currentFieldDefinition = fields.shape[currentRelationName]
+
+  if (
+    currentFieldDefinition &&
+    '$server' in currentFieldDefinition &&
+    'relation' in currentFieldDefinition.$server
+  ) {
+    const prismaRelationName = (currentFieldDefinition.$server as any).relation.name
+
+    let nestedfields = fields
+    if ('fields' in currentFieldDefinition) {
+      nestedfields = currentFieldDefinition.fields
+    }
+
+    return {
+      [prismaRelationName]: buildRecursiveSearchCondition(
+        remainingPathSegments,
+        searchValue,
+        nestedfields
+      ),
+    }
+  }
+
+  // Fallback when relation metadata is missing
+  return {
+    [currentRelationName]: buildRecursiveSearchCondition(
+      remainingPathSegments,
+      searchValue,
+      fields
+    ),
+  }
+}
+
+function createOrderByForPath(
+  sortPath: string | undefined,
+  sortDirection: string | undefined,
+  allowedSortPaths: any,
+  model: any
+): any {
+  const orderByClause: any = {}
+
+  if (sortPath) {
+    const isAllowedSortPath =
+      !allowedSortPaths?.sortBy || allowedSortPaths.sortBy.includes(sortPath)
+
+    if (isAllowedSortPath) {
+      if (sortPath.includes('.')) {
+        const pathSegments = sortPath.split('.')
+        buildNestedOrderByStructure(orderByClause, pathSegments, sortDirection ?? 'asc')
+      } else if (model.shape.columns[sortPath]) {
+        orderByClause[sortPath] = sortDirection ?? 'asc'
+      } else {
+        const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+        orderByClause[primaryFieldDefinition.name] = sortDirection ?? 'asc'
+      }
+    } else {
+      const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+      orderByClause[primaryFieldDefinition.name] = sortDirection ?? 'asc'
+    }
+  } else {
+    if (allowedSortPaths?.sortBy && allowedSortPaths.sortBy.length > 0) {
+      const defaultSortPath = allowedSortPaths.sortBy[0]
+      if (defaultSortPath.includes('.')) {
+        const pathSegments = defaultSortPath.split('.')
+        buildNestedOrderByStructure(orderByClause, pathSegments, 'desc')
+      } else if (model.shape.columns[defaultSortPath]) {
+        orderByClause[defaultSortPath] = 'desc'
+      } else {
+        const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+        orderByClause[primaryFieldDefinition.name] = 'asc'
+      }
+    } else {
+      const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+      orderByClause[primaryFieldDefinition.name] = 'asc'
+    }
+  }
+
+  return orderByClause
+}
+
+function buildNestedOrderByStructure(
+  orderByClause: any,
+  pathSegments: string[],
+  sortDirection: string
+): void {
+  let currentOrderByLevel = orderByClause
+
+  // Build nested structure for all parts except the last
+  for (let segmentIndex = 0; segmentIndex < pathSegments.length - 1; segmentIndex++) {
+    const currentSegment = pathSegments[segmentIndex]
+
+    if (!currentOrderByLevel[currentSegment]) {
+      currentOrderByLevel[currentSegment] = {}
+    }
+    currentOrderByLevel = currentOrderByLevel[currentSegment]
+  }
+
+  // Set the sort direction for the final field
+  const finalFieldName = pathSegments[pathSegments.length - 1]
+  currentOrderByLevel[finalFieldName] = sortDirection
+}
+
 function createCollectionDefaultListHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields,
@@ -144,7 +289,12 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       const searchFields = listConfiguration?.search || []
 
       for (const fieldPath of searchFields) {
-        const searchCondition = buildSearchCondition(fieldPath, search.trim(), fields, model)
+        const searchCondition = createSearchConditionForPath(
+          fieldPath,
+          search.trim(),
+          fields,
+          model
+        )
         if (searchCondition) {
           searchConditions.push(searchCondition)
         }
@@ -155,7 +305,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       }
     }
 
-    const orderBy = buildOrderBy(sortBy, sortOrder, listConfiguration, model)
+    const orderBy = createOrderByForPath(sortBy, sortOrder, listConfiguration, model)
 
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
@@ -176,158 +326,6 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       data: response.map((item) => transformPrismaResultToFieldsPayload(fields, item) as any),
     }
   }
-}
-
-function buildSearchCondition(
-  fieldPath: string,
-  searchTerm: string,
-  fields: Fields,
-  model: any
-): any {
-  const pathParts = fieldPath.split('.')
-
-  if (pathParts.length === 1) {
-    // Direct field search
-    const fieldName = pathParts[0]
-    const column = model.shape.columns[fieldName]
-
-    if (column && column.dataType === DataType.STRING) {
-      return {
-        [fieldName]: {
-          contains: searchTerm,
-          mode: 'insensitive',
-        },
-      }
-    }
-  } else if (pathParts.length === 2) {
-    // One level relational field search
-    const [relationFieldName, nestedField] = pathParts
-
-    // Check if this is a valid relation in the fields definition
-    const fieldDef = fields.shape[relationFieldName]
-
-    if (fieldDef && '$server' in fieldDef && 'relation' in fieldDef.$server) {
-      // Get the actual Prisma relation name from the server relation metadata
-      const prismaRelationName = fieldDef.$server.relation.name
-
-      return {
-        [prismaRelationName]: {
-          [nestedField]: {
-            contains: searchTerm,
-            mode: 'insensitive',
-          },
-        },
-      }
-    }
-  } else if (pathParts.length > 2) {
-    // Deep nested relations (e.g., postTags.tag.name)
-    return buildDeepRelationalSearchCondition(pathParts, searchTerm, fields)
-  }
-
-  return null
-}
-
-function buildDeepRelationalSearchCondition(
-  pathParts: string[],
-  searchTerm: string,
-  fields: Fields
-): any {
-  if (pathParts.length === 0) return null
-
-  if (pathParts.length === 1) {
-    return {
-      [pathParts[0]]: {
-        contains: searchTerm,
-        mode: 'insensitive',
-      },
-    }
-  }
-
-  const [currentLevelFieldName, ...restPath] = pathParts
-
-  // Get the field definition to find the actual Prisma relation name
-  const fieldDef = fields.shape[currentLevelFieldName]
-
-  if (fieldDef && '$server' in fieldDef && 'relation' in fieldDef.$server) {
-    const prismaRelationName = fieldDef.$server.relation.name
-
-    // For nested fields, we need to pass the nested field definition
-    let nestedFields = fields
-    if ('fields' in fieldDef) {
-      nestedFields = fieldDef.fields
-    }
-
-    return {
-      [prismaRelationName]: buildDeepRelationalSearchCondition(restPath, searchTerm, nestedFields),
-    }
-  }
-
-  // Fallback to using the field name directly if no relation metadata found
-  return {
-    [currentLevelFieldName]: buildDeepRelationalSearchCondition(restPath, searchTerm, fields),
-  }
-}
-
-function buildOrderBy(
-  sortBy: string | undefined,
-  sortOrder: string | undefined,
-  listConfiguration: any,
-  model: any
-): any {
-  const orderBy: any = {}
-
-  if (sortBy) {
-    const isValidSortField = !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy)
-
-    if (isValidSortField) {
-      if (sortBy.includes('.')) {
-        const pathParts = sortBy.split('.')
-        buildNestedOrderBy(orderBy, pathParts, sortOrder ?? 'asc')
-      } else if (model.shape.columns[sortBy]) {
-        orderBy[sortBy] = sortOrder ?? 'asc'
-      } else {
-        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = sortOrder ?? 'asc'
-      }
-    } else {
-      const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-      orderBy[primaryField.name] = sortOrder ?? 'asc'
-    }
-  } else {
-    if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
-      const defaultSortField = listConfiguration.sortBy[0]
-      if (defaultSortField.includes('.')) {
-        const pathParts = defaultSortField.split('.')
-        buildNestedOrderBy(orderBy, pathParts, 'desc')
-      } else if (model.shape.columns[defaultSortField]) {
-        orderBy[defaultSortField] = 'desc'
-      } else {
-        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = 'asc'
-      }
-    } else {
-      const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-      orderBy[primaryField.name] = 'asc'
-    }
-  }
-
-  return orderBy
-}
-
-// Helper function to build nested orderBy structure
-function buildNestedOrderBy(orderBy: any, pathParts: string[], sortOrder: string): void {
-  let currentOrderBy = orderBy
-
-  // Build nested structure for all parts except the last
-  for (let i = 0; i < pathParts.length - 1; i++) {
-    if (!currentOrderBy[pathParts[i]]) {
-      currentOrderBy[pathParts[i]] = {}
-    }
-    currentOrderBy = currentOrderBy[pathParts[i]]
-  }
-
-  // Set the sort order for the final field
-  currentOrderBy[pathParts[pathParts.length - 1]] = sortOrder
 }
 
 export type CollectionCreateApiRoute<TSlug extends string, TFields extends Fields> = ApiRoute<{
