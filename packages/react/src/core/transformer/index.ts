@@ -57,8 +57,8 @@ function transformFieldRelationPayloadToPrismaCreatePayload(
                 fieldShape.fields,
                 v.create
               )
-              if (orderColumn && v.create.order !== undefined) {
-                transformData[orderColumn] = v.create.order
+              if (orderColumn && v.__order !== undefined) {
+                transformData[orderColumn] = v.__order
               }
               return transformData
             })

@@ -755,23 +755,21 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                 newIndex < newFields.length - 1 ? (newFields[newIndex + 1] as any) : undefined
 
               let newLexoRank: LexoRank
-              if (!prevField && nextField?.create?.order) {
-                newLexoRank = LexoRank.parse(nextField.create.order).genPrev()
-              } else if (prevField?.create?.order && !nextField) {
-                newLexoRank = LexoRank.parse(prevField.create.order).genNext()
-              } else if (prevField?.create?.order && nextField?.create?.order) {
-                newLexoRank = LexoRank.parse(prevField.create.order).between(
-                  LexoRank.parse(nextField.create.order)
+              if (!prevField && nextField?.__order) {
+                newLexoRank = LexoRank.parse(nextField.__order).genPrev()
+              } else if (prevField?.__order && !nextField) {
+                newLexoRank = LexoRank.parse(prevField.__order).genNext()
+              } else if (prevField?.__order && nextField?.__order) {
+                newLexoRank = LexoRank.parse(prevField.__order).between(
+                  LexoRank.parse(nextField.__order)
                 )
               } else {
                 newLexoRank = LexoRank.middle()
               }
 
               fieldArray.update(oldIndex, {
-                create: {
-                  ...field.create,
-                  order: newLexoRank.toString(),
-                },
+                ...field,
+                __order: newLexoRank.toString(),
               })
               fieldArray.move(oldIndex, newIndex)
             }}
@@ -796,13 +794,12 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             size="sm"
             isDisabled={disabled}
             onClick={() => {
-              const lastField = fieldArray.fields.at(-1) as
-                | { create?: { order?: string } }
-                | undefined
-              const lastOrder = lastField?.create?.order ?? LexoRank.middle().toString()
+              const lastField = fieldArray.fields.at(-1) as { __order?: string } | undefined
+              const lastOrder = lastField?.__order ?? LexoRank.middle().toString()
               const nextOrder = LexoRank.parse(lastOrder).genNext().toString()
               fieldArray.append({
-                create: { order: nextOrder },
+                __order: nextOrder,
+                create: {},
               })
             }}
           >
