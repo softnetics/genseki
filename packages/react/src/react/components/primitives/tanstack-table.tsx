@@ -52,7 +52,7 @@ export const getSortIcon = (isSorted: false | SortDirection) => {
   }
 }
 
-const normalizeColumnId = (id: string) => id.replaceAll('_', '.')
+const normalizeColumnId = (id: string) => id.replace(/_/g, '.')
 
 export function TanstackTable<T>({
   className,
