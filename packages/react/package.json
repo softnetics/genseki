@@ -2,7 +2,7 @@
   "name": "@genseki/react",
   "sideEffects": false,
   "type": "module",
-  "version": "0.1.0-alpha.45",
+  "version": "0.1.0-alpha.46",
   "files": [
     "dist"
   ],

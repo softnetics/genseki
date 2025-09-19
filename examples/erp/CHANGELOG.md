@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.44
+
+### Patch Changes
+
+- [#193](https://github.com/softnetics/genseki/pull/193) [`b0301bc`](https://github.com/softnetics/genseki/commit/b0301bc28d336b96816b5b932ec010b490cc1fbb) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Uploading image to storage in rich text
+
+- Updated dependencies [[`b0301bc`](https://github.com/softnetics/genseki/commit/b0301bc28d336b96816b5b932ec010b490cc1fbb), [`28387bf`](https://github.com/softnetics/genseki/commit/28387bfadbb87537c21f4fbcf3ec9af53693efb3)]:
+  - @genseki/react@0.1.0-alpha.46
+  - @genseki/react-query@0.1.0-alpha.46
+  - @genseki/next@0.1.0-alpha.46
+  - @genseki/plugins@0.1.0-alpha.46
+  - @genseki/prisma-generator@0.1.0-alpha.46
+  - @genseki/rest@0.1.0-alpha.46
+
 ## 0.1.0-alpha.43
 
 ### Patch Changes

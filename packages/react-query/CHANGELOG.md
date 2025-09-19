@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.46
+
+### Patch Changes
+
+- [#194](https://github.com/softnetics/genseki/pull/194) [`28387bf`](https://github.com/softnetics/genseki/commit/28387bfadbb87537c21f4fbcf3ec9af53693efb3) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - Fix query key in useInvalidateQueries
+
 ## 0.1.0-alpha.45
 
 ## 0.1.0-alpha.44

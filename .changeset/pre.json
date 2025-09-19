@@ -13,6 +13,7 @@
     "@genseki/prisma-generator": "0.0.0"
   },
   "changesets": [
+    "bitter-roses-rescue",
     "bitter-tools-rest",
     "blue-ghosts-rush",
     "blue-icons-search",
@@ -38,6 +39,7 @@
     "five-doodles-relate",
     "five-tables-smile",
     "fluffy-lizards-shop",
+    "fluffy-papayas-accept",
     "forty-fans-sniff",
     "four-cameras-walk",
     "four-donkeys-travel",
