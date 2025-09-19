@@ -25,12 +25,14 @@ import {
   SelectOption,
   type SelectProps,
   SelectTrigger,
+  Separator,
   Switch,
   type SwitchProps,
   TextField,
   type TextFieldProps,
   TimeField,
   type TimeFieldProps,
+  Typography,
   useFormItemController,
 } from '@genseki/react'
 
@@ -251,7 +253,7 @@ export function AutoSelectField(props: AutoSelectField) {
     >
       {props.label && (
         <Label>
-          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+          {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
         </Label>
       )}
       <SelectTrigger className="h-auto" isPending={query.isLoading} />
@@ -609,14 +611,25 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   switch (fieldShape.type) {
     case 'connect':
       return (
-        <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
-          <div>{fieldShape.label}</div>
-          {connectComponent(`${props.name}.connect`, fieldShape.options)}
+        <div className="rounded-md border border-border bg-surface-tertiary overflow-hidden">
+          {fieldShape.label && (
+            <>
+              <Typography
+                type="caption"
+                weight="normal"
+                className="px-6 py-2 text-text-brand bg-surface-brand-soft-1 w-full"
+              >
+                {fieldShape.label}
+              </Typography>
+              <Separator className="border-border-brand" />
+            </>
+          )}
+          <div className="p-6">{connectComponent(`${props.name}.connect`, fieldShape.options)}</div>
         </div>
       )
     case 'create':
       return (
-        <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
+        <div className="">
           <div>{fieldShape.label}</div>
           {createComponent}
         </div>
@@ -625,7 +638,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
       return (
         <div className="p-6 bg-muted rounded-lg flex flex-col gap-y-4 border border-red-500">
           {connectComponent(`${props.name}.connect`, fieldShape.options)}
-          <div className="flex flex-col gap-y-2 bg-yellow-500 p-4 rounded-lg">
+          <div className="flex flex-col gap-y-2 bg-surface-accent-hover p-4 rounded-lg">
             {createComponent}
           </div>
         </div>
@@ -700,37 +713,57 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   switch (fieldShape.type) {
     case 'connect':
       return (
-        <div className="border border-red-500 p-6">
-          {fieldArray.fields.map((fieldValue, index) => (
-            <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-              <div>
-                {fieldShape.label} #{index + 1}
-              </div>
-              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+        <div className="rounded-md border border-input p-6 grid grid-cols-1 gap-y-6">
+          {!!fieldArray.fields.length && (
+            <div className="flex flex-col gap-y-6">
+              {fieldArray.fields.map((fieldValue, index) => (
+                <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
+                  <div>
+                    {fieldShape.label} #{index + 1}
+                  </div>
+                  {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+                </div>
+              ))}
             </div>
-          ))}
-          <Button type="button" variant="primary" size="sm" onClick={() => fieldArray.append({})}>
+          )}
+          <Button
+            type="button"
+            variant="primary"
+            size="sm"
+            onClick={() => fieldArray.append({})}
+            className="justify-self-start"
+          >
             Add
           </Button>
         </div>
       )
     case 'create':
       return (
-        <div className="border border-red-500 p-6">
-          {fieldArray.fields.map((fieldValue, index) => (
-            <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-              <div>
-                {fieldShape.label} #{index + 1}
-              </div>
-              {createComponent(`${props.name}.${index}.create`)}
+        <div className="rounded-md border border-input p-6 grid grid-cols-1 gap-y-6">
+          {!!fieldArray.fields.length && (
+            <div className="flex flex-col space-y-6">
+              {fieldArray.fields.map((fieldValue, index) => (
+                <div
+                  key={fieldValue.id}
+                  className="p-6 bg-surface-tertiary rounded-sm flex flex-col gap-y-4"
+                >
+                  <Typography type="caption" weight="normal">
+                    {fieldShape.label} #{index + 1}
+                  </Typography>
+                  <div className="flex flex-col">
+                    {createComponent(`${props.name}.${index}.create`)}
+                  </div>
+                </div>
+              ))}
             </div>
-          ))}
+          )}
           <Button
             type="button"
-            variant="primary"
+            variant="outline"
             size="sm"
             isDisabled={disabled}
             onClick={() => fieldArray.append({})}
+            className="justify-self-start"
           >
             Add
           </Button>
@@ -739,7 +772,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
 
     case 'connectOrCreate':
       return (
-        <div className="border border-red-500 p-6">
+        <div className="rounded-md border border-input shadow-sm p-6">
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
               <div>

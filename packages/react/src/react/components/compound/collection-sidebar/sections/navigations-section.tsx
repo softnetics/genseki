@@ -19,7 +19,7 @@ export const NavigationSection = ({ id }: { id: number }) => {
     <SidebarDisclosure id={id}>
       <SidebarDisclosureTrigger className="rounded-md`!` in-data-[sidebar-state=collapsed]:rounded-none!">
         <BaseIcon icon={CompassIcon} size="sm" weight="duotone" className="size-8!" />
-        <SidebarLabel className="text-text-body text-sm">Navigations</SidebarLabel>
+        <SidebarLabel className="text-text-primary text-sm">Navigations</SidebarLabel>
       </SidebarDisclosureTrigger>
       <SidebarDisclosurePanel>
         <SidebarItem

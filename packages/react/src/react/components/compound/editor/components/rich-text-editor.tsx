@@ -24,7 +24,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     <div className="flex flex-col gap-y-4" data-invalid={true}>
       {props.label && (
         <Label>
-          {props.label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+          {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
         </Label>
       )}
       <FieldGroup

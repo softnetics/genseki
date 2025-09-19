@@ -62,7 +62,7 @@ const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
               data-slot="prefix"
               type="caption"
               weight="medium"
-              className="ml-2 text-text-trivial"
+              className="ml-2 text-text-secondary"
             >
               {prefix}
             </Typography>
@@ -90,7 +90,7 @@ const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
               data-slot="suffix"
               type="caption"
               weight="medium"
-              className="text-text-trivial mr-2"
+              className="text-text-secondary mr-2"
             >
               {suffix}
             </Typography>

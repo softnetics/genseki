@@ -316,9 +316,10 @@ export default function UIPlayground() {
 
   return (
     <div className="bg-white pb-24 relative dark:bg-black">
+      <div className="bg-warning text-warning-fg">xxxx</div>
       <div className="fixed top-6 right-6 z-50">
         <Button
-          variant={theme === 'dark' ? 'secondary' : 'primary'}
+          variant={'secondary'}
           size="md"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
@@ -332,10 +333,9 @@ export default function UIPlayground() {
               Background: --color-bg | Foreground: --color-fg
             </Typography>
           </div>
-          <div className="bg-primary border-primary-emphasis rounded-sm border px-8 py-4">
+          <div className="bg-primary border-primary rounded-sm border px-8 py-4">
             <Typography type="body" weight="normal" className="text-primary-fg">
-              Background: --color-primary | Foreground: --color-primary-fg | border:
-              --color-primary-emphasis
+              Background: --color-primary | Foreground: --color-primary-fg | border: --color-primary
             </Typography>
           </div>
           <div className="bg-secondary border-border rounded-sm border px-8 py-4">
@@ -1095,11 +1095,20 @@ export default function UIPlayground() {
               />
               <TextField
                 isRequired
+                type="text"
+                label="Something label and small textfield"
+                description="This is a helper text"
+                prefix={<BaseIcon icon={PlusCircleIcon} size="sm" />}
+                suffix={<BaseIcon icon={PlusCircleIcon} size="sm" />}
+                size="xs"
+              />
+              <TextField
+                isRequired
                 type="password"
-                label="Package name"
+                label="Some large textfield"
                 isPending
                 description="This is a helper text"
-                size="md"
+                size="lg"
               />
               <TextField
                 isRequired
@@ -1188,18 +1197,11 @@ export default function UIPlayground() {
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
-                TESTER
-              </Button>
-              <Button
-                variant="primary"
-                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
-                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
-                size="md"
-              >
                 Primary
               </Button>
               <Button
                 variant="secondary"
+                isDisabled
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
@@ -1239,6 +1241,73 @@ export default function UIPlayground() {
                 Ghost
               </Button>
               <Button
+                variant="destruction"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Destruction
+              </Button>
+            </div>
+          </PlaygroundCard>
+          <PlaygroundCard title="Medium size (md) (disabled)" categoryTitle="Button">
+            <div className="flex w-full flex-col items-start gap-y-3">
+              <Button
+                isDisabled
+                variant="primary"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Primary
+              </Button>
+              <Button
+                isDisabled
+                variant="secondary"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Secondary
+              </Button>
+              <Button
+                isDisabled
+                variant="tertiary"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Tertiary
+              </Button>
+              <Button
+                isDisabled
+                variant="naked"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Naked
+              </Button>
+              <Button
+                isDisabled
+                variant="outline"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Outline
+              </Button>
+              <Button
+                isDisabled
+                variant="ghost"
+                leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
+                size="md"
+              >
+                Ghost
+              </Button>
+              <Button
+                isDisabled
                 variant="destruction"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1447,31 +1516,6 @@ export default function UIPlayground() {
               </Button>
             </div>
           </PlaygroundCard>
-          <PlaygroundCard title="Double extra small size (xxs)" categoryTitle="Button">
-            <div className="flex w-full flex-col items-start gap-y-3">
-              <Button variant="primary" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-              <Button variant="secondary" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-              <Button variant="tertiary" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-              <Button variant="naked" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-              <Button variant="outline" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-              <Button variant="ghost" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-              <Button variant="destruction" size="xxs">
-                <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </Button>
-            </div>
-          </PlaygroundCard>
         </div>
       </Wrapper>
       <Wrapper title="Base icon">
@@ -1584,17 +1628,13 @@ export default function UIPlayground() {
           </PlaygroundCard>
           <PlaygroundCard title="Large size (lg)" categoryTitle="Checkbox">
             <CheckboxGroup>
-              <Checkbox value="x" size="lg">
-                X
-              </Checkbox>
               <Checkbox
+                size="lg"
                 value="y"
                 label="Remember me"
                 description="Save my login details for next time"
-              ></Checkbox>
-              <Checkbox isDisabled value="z">
-                Z
-              </Checkbox>
+              />
+              <Checkbox isDisabled value="z" label="Hello world" size="lg" />
             </CheckboxGroup>
           </PlaygroundCard>
         </div>
@@ -1690,7 +1730,7 @@ export default function UIPlayground() {
 
       <Wrapper title="Annotation">
         <Annotation>Annotation</Annotation>
-        <Annotation className="bg-red-50 text-red-700">Annotation</Annotation>
+        <Annotation className="bg-surface-incorrect text-text-incorrect">Annotation</Annotation>
       </Wrapper>
 
       <Wrapper title="Tools Tip group">

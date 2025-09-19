@@ -100,7 +100,7 @@ const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
     <div ref={setNodeRef} style={style}>
       <div className="flex flex-col w-full">
         <div
-          className={`p-6 w-full border border-bluegray-300 bg-bluegray-100 rounded-t-lg overflow-hidden flex items-center gap-12 justify-between ${
+          className={`p-6 w-full border border-bluegray-300 bg-surface-primary-hover rounded-t-lg overflow-hidden flex items-center gap-12 justify-between ${
             isShowContent ? 'rounded-b-none' : 'rounded-b-lg'
           }`}
         >
@@ -111,10 +111,10 @@ const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
               {...attributes}
               {...listeners}
             >
-              <BaseIcon icon={DotsSixIcon} size="sm" className="rotate-90 text-bluegray-600" />
+              <BaseIcon icon={DotsSixIcon} size="sm" className="rotate-90 text-text-secondary" />
             </div>
 
-            <Typography type="body" weight="semibold" className="text-bluegray-600">
+            <Typography type="body" weight="semibold" className="text-text-secondary">
               {order} {title}
             </Typography>
           </div>

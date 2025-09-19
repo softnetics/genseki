@@ -9,7 +9,7 @@ import { CollectionListTableContainer, type CollectionListTableContainerProps } 
 import { useCollectionDeleteMutation } from './hooks/use-collection-delete'
 import { useCollectionListQuery } from './hooks/use-collection-list'
 import { CollectionListTable, type CollectionListTableProps } from './table'
-import { CollectionListPagination } from './table/pagination'
+import { CollectionListPagination, type CollectionListPaginationProps } from './table/pagination'
 import { CollectionListToolbar, type CollectionListToolbarProps } from './toolbar'
 
 import { toast } from '../../../..'
@@ -24,7 +24,7 @@ interface CollectionListComponents<T extends BaseData = BaseData> {
   ListTableContainer: React.FC<CollectionListTableContainerProps>
   ListTableToolbar: React.FC<CollectionListToolbarProps>
   ListTable: (props: CollectionListTableProps<T>) => ReactNode
-  ListTablePagination: React.FC
+  ListTablePagination: React.FC<CollectionListPaginationProps>
 }
 
 export interface CollectionListContextValue<T extends BaseData = BaseData> {

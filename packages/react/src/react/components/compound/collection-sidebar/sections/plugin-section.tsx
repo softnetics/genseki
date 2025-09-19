@@ -17,7 +17,7 @@ export const PluginSection = ({ id }: { id: number }) => {
     <SidebarDisclosure id={id} isDisabled={plugins.length === 0}>
       <SidebarDisclosureTrigger className="rounded-md! in-data-[sidebar-state=collapsed]:rounded-none!">
         <BaseIcon icon={PlugIcon} size="sm" weight="duotone" className="size-8!" />
-        <SidebarLabel className="text-text-body text-sm">Plugins</SidebarLabel>
+        <SidebarLabel className="text-text-primary text-sm">Plugins</SidebarLabel>
       </SidebarDisclosureTrigger>
       <SidebarDisclosurePanel>
         <SidebarItem href="#" tooltip="Tickets">

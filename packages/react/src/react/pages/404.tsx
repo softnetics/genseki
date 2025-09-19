@@ -24,7 +24,7 @@ export const NotfoundPage = ({
       <Typography
         style={{
           backgroundImage:
-            'radial-gradient(circle, var(--color-accent) 2px,var(--color-accent) 2px,transparent 2px)',
+            'radial-gradient(circle, var(--color-primary) 2px,var(--color-primary) 2px,transparent 2px)',
           backgroundRepeat: 'repeat',
           backgroundSize: '4px 4px',
         }}
@@ -35,22 +35,18 @@ export const NotfoundPage = ({
         404
       </Typography>
       {typeof title === 'string' ? (
-        <Typography
-          weight="semibold"
-          type="h4"
-          className="text-text-nontrivial mt-12 min-w-[120px]"
-        >
+        <Typography weight="semibold" type="h4" className="text-text-primary mt-12 min-w-[120px]">
           {title}
         </Typography>
       ) : (
         title
       )}
-      <Typography weight="normal" type="body" className="text-text-body">
+      <Typography weight="normal" type="body" className="text-text-primary">
         {description}
       </Typography>
       <div className="bg-border mt-6 h-px w-full" />
       <Link intent="primary" href={redirectURL} className="mt-12 flex items-end gap-x-2">
-        <BaseIcon size="sm" icon={ArrowLeftIcon} className="text-text-accent" weight="bold" />
+        <BaseIcon size="sm" icon={ArrowLeftIcon} className="text-text-brand" weight="bold" />
         {redirectSentence}
       </Link>
     </div>

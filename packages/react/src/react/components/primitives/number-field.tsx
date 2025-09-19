@@ -70,7 +70,7 @@ const NumberField = ({
     >
       {label && (
         <Label>
-          {label} {props.isRequired && <span className="ml-1 text-pumpkin-500">*</span>}
+          {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
         </Label>
       )}
       <FieldGroup
