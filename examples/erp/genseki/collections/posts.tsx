@@ -56,6 +56,7 @@ export const postEditorProviderProps = {
       accept: 'image/*',
       maxSize: 1024 * 1024 * 10, // 10MB
       limit: 3,
+      pathName: 'posts/rich-text',
     }),
   ],
 }

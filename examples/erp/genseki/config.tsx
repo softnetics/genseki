@@ -20,7 +20,7 @@ const app = new GensekiApp({
   appBaseUrl: process.env.NEXT_PUBLIC_APP_BASE_URL || 'http://localhost:3000',
   apiBaseUrl: process.env.NEXT_PUBLIC_API_BASE_URL || 'http://localhost:3000',
   appPathPrefix: '/admin',
-  apiPathPrefix: '/admin/api',
+  apiPathPrefix: '/api',
   storageAdapter: StorageAdapterS3.initialize(context, {
     bucket: process.env.AWS_BUCKET_NAME!,
     imageBaseUrl: process.env.NEXT_PUBLIC_AWS_IMAGE_URL!,

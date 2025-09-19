@@ -36,6 +36,11 @@ export interface ImageUploadNodeOptions {
    * Whether to show the progress bar or not.
    */
   showProgress?: boolean
+
+  /**
+   * Path to store uploaded image in storage
+   */
+  pathName?: string
 }
 
 declare module '@tiptap/react' {
