@@ -412,105 +412,53 @@ export type CollectionDeleteApiHandler<TContext extends AnyContextable, TFields 
   }
 ) => Promisable<CollectionDeleteApiReturn>
 
-type ExtractStringColumnNames<TFields extends Fields> = {
-  [FieldName in keyof TFields['shape']]: TFields['shape'][FieldName] extends FieldColumnShape
-    ? TFields['shape'][FieldName]['$client']['column']['dataType'] extends typeof DataType.STRING
-      ? Extract<FieldName, string>
-      : never
-    : never
-}[keyof TFields['shape']]
-
-type ExtractRelationFieldNames<TFields extends Fields> = {
-  [FieldName in keyof TFields['shape']]: TFields['shape'][FieldName] extends FieldRelationShape
-    ? Extract<FieldName, string>
-    : never
-}[keyof TFields['shape']]
-
-type BuildRelationStringPaths<
-  TFields extends Fields,
-  TVisitedFields extends ReadonlyArray<any> = [],
-  TCurrentPath extends string = '',
-> = TFields extends TVisitedFields[number]
-  ? never
-  : {
-      [RelationName in ExtractRelationFieldNames<TFields>]: TFields['shape'][RelationName] extends FieldRelationShape
-        ? TFields['shape'][RelationName]['fields'] extends Fields
-          ? // Current level string columns
-            | {
-                  [NestedFieldName in keyof TFields['shape'][RelationName]['fields']['shape']]: TFields['shape'][RelationName]['fields']['shape'][NestedFieldName] extends FieldColumnShape
-                    ? TFields['shape'][RelationName]['fields']['shape'][NestedFieldName]['$client']['column']['dataType'] extends typeof DataType.STRING
-                      ? TCurrentPath extends ''
-                        ? `${Extract<RelationName, string>}.${Extract<NestedFieldName, string>}`
-                        : `${TCurrentPath}.${Extract<RelationName, string>}.${Extract<NestedFieldName, string>}`
-                      : never
-                    : never
-                }[keyof TFields['shape'][RelationName]['fields']['shape']]
-              // Deeper levels with circular reference protection
-              | BuildRelationStringPaths<
-                  TFields['shape'][RelationName]['fields'],
-                  [...TVisitedFields, TFields],
-                  TCurrentPath extends ''
-                    ? Extract<RelationName, string>
-                    : `${TCurrentPath}.${Extract<RelationName, string>}`
-                >
+type ExtractSearchableColumns<TFields extends Fields, TPrefix extends string = '', TAcc = never> =
+  | TAcc
+  | {
+      [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+        ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
+          ? TPrefix extends ''
+            ? Extract<K, string> // Direct column: 'name'
+            : `${TPrefix}.${Extract<K, string>}` // Nested column: 'posts.title'
           : never
-        : never
-    }[ExtractRelationFieldNames<TFields>]
-
-type SortableDataTypes =
-  | typeof DataType.STRING
-  | typeof DataType.INT
-  | typeof DataType.FLOAT
-  | typeof DataType.DATETIME
-  | typeof DataType.BIGINT
-  | typeof DataType.DECIMAL
-
-type ExtractSortableColumnNames<TFields extends Fields> = {
-  [FieldName in keyof TFields['shape']]: TFields['shape'][FieldName] extends FieldColumnShape
-    ? TFields['shape'][FieldName]['$client']['column']['dataType'] extends SortableDataTypes
-      ? Extract<FieldName, string>
-      : never
-    : never
-}[keyof TFields['shape']]
-
-type BuildRelationSortablePaths<
-  TFields extends Fields,
-  TVisitedFields extends ReadonlyArray<any> = [],
-  TCurrentPath extends string = '',
-> = TFields extends TVisitedFields[number]
-  ? never
-  : {
-      [RelationName in ExtractRelationFieldNames<TFields>]: TFields['shape'][RelationName] extends FieldRelationShape
-        ? TFields['shape'][RelationName]['fields'] extends Fields
-          ? // Current level sortable columns
-            | {
-                  [NestedFieldName in keyof TFields['shape'][RelationName]['fields']['shape']]: TFields['shape'][RelationName]['fields']['shape'][NestedFieldName] extends FieldColumnShape
-                    ? TFields['shape'][RelationName]['fields']['shape'][NestedFieldName]['$client']['column']['dataType'] extends SortableDataTypes
-                      ? TCurrentPath extends ''
-                        ? `${Extract<RelationName, string>}.${Extract<NestedFieldName, string>}`
-                        : `${TCurrentPath}.${Extract<RelationName, string>}.${Extract<NestedFieldName, string>}`
-                      : never
-                    : never
-                }[keyof TFields['shape'][RelationName]['fields']['shape']]
-              // Deeper levels with circular reference protection
-              | BuildRelationSortablePaths<
-                  TFields['shape'][RelationName]['fields'],
-                  [...TVisitedFields, TFields],
-                  TCurrentPath extends ''
-                    ? Extract<RelationName, string>
-                    : `${TCurrentPath}.${Extract<RelationName, string>}`
-                >
+        : // Handle relations (recursive case)
+          TFields['shape'][K] extends FieldRelationShape
+          ? TFields['shape'][K]['fields'] extends Fields
+            ? ExtractSearchableColumns<
+                TFields['shape'][K]['fields'],
+                TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
+                TAcc
+              >
+            : never
           : never
-        : never
-    }[ExtractRelationFieldNames<TFields>]
+    }[keyof TFields['shape']]
 
-export type ExtractSearchableColumns<TFields extends Fields> =
-  | ExtractStringColumnNames<TFields>
-  | BuildRelationStringPaths<TFields>
-
-export type ExtractSortableColumns<TFields extends Fields> =
-  | ExtractSortableColumnNames<TFields>
-  | BuildRelationSortablePaths<TFields>
+type ExtractSortableColumns<TFields extends Fields, TPrefix extends string = '', TAcc = never> =
+  | TAcc
+  | {
+      [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+        ? TFields['shape'][K]['$client']['column']['dataType'] extends
+            | typeof DataType.STRING
+            | typeof DataType.INT
+            | typeof DataType.FLOAT
+            | typeof DataType.DATETIME
+            | typeof DataType.BIGINT
+            | typeof DataType.DECIMAL
+          ? TPrefix extends ''
+            ? Extract<K, string> // Direct column: 'id'
+            : `${TPrefix}.${Extract<K, string>}` // Nested column: 'posts.createdAt'
+          : never
+        : // Handle relations (recursive case)
+          TFields['shape'][K] extends FieldRelationShape
+          ? TFields['shape'][K]['fields'] extends Fields
+            ? ExtractSortableColumns<
+                TFields['shape'][K]['fields'],
+                TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
+                TAcc
+              >
+            : never
+          : never
+    }[keyof TFields['shape']]
 
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
