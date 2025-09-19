@@ -24,6 +24,8 @@ import type {
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
 
+import { isEmptyObject, normalizeObject, sortObjectDeep } from './utils'
+
 type QueryMethod = 'GET'
 type MutationMethod = 'POST' | 'PATCH' | 'PUT' | 'DELETE'
 type Method = QueryMethod | MutationMethod
@@ -210,12 +212,23 @@ export type QueryClient<TApiRouter extends FlatApiRouter> =
     : never
 
 export function queryKey(method: string, path: string | number | symbol, payload?: any) {
-  const payloadKey = {
-    pathParams: payload?.pathParams ?? {},
-    query: payload?.query ?? {},
-    headers: payload?.headers ?? {},
+  const { header, ...rest } = payload
+  const normalizedPayload = normalizeObject(rest)
+  const normalizedHeaders = header && !isEmptyObject(header) ? sortObjectDeep(header) : undefined
+
+  if (normalizedHeaders && normalizedPayload) {
+    return [method, path, normalizedPayload, normalizedHeaders] as const
   }
-  return [method, path, payloadKey] as const
+
+  if (normalizedHeaders) {
+    return [method, path, normalizedHeaders] as const
+  }
+
+  if (normalizedPayload) {
+    return [method, path, normalizedPayload] as const
+  }
+
+  return [method, path] as const
 }
 
 export function createQueryClient<TApp extends GensekiAppCompiled>(
