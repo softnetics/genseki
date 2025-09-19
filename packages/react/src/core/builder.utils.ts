@@ -123,20 +123,12 @@ function createCollectionDefaultFindOneHandler<
   }
 }
 
-function createSearchCondition(
-  relationPath: string,
-  searchValue: string,
-  fields: Fields
-): PrismaSearchCondition {
-  const pathSegments = relationPath.split('.')
-  return buildSearchCondition(pathSegments, searchValue, fields)
-}
-
 function buildSearchCondition(
-  pathSegments: string[],
+  path: string | string[],
   searchValue: string,
   fields: Fields
 ): PrismaSearchCondition {
+  const pathSegments = typeof path === 'string' ? path.split('.') : path
   if (pathSegments.length === 1) {
     const fieldName = pathSegments[0]
     return {
@@ -251,7 +243,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       const searchFields = listConfiguration?.search || []
 
       for (const fieldPath of searchFields) {
-        const searchCondition = createSearchCondition(fieldPath, search.trim(), fields)
+        const searchCondition = buildSearchCondition(fieldPath, search.trim(), fields)
         if (searchCondition) {
           searchConditions.push(searchCondition)
         }
