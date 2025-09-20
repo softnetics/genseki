@@ -28,7 +28,7 @@ import {
   transformFieldsToPrismaSelectPayload,
   transformPrismaResultToFieldsPayload,
 } from './transformer'
-import type { ToZodObject } from './utils'
+import { isFieldRelation, type ToZodObject } from './utils'
 
 const zStringPositiveNumberOptional = z
   .string()
@@ -142,11 +142,7 @@ function buildSearchCondition(
   const [currentRelationName, ...remainingPathSegments] = pathSegments
   const currentFieldDefinition = fields.shape[currentRelationName]
 
-  if (
-    currentFieldDefinition &&
-    '$server' in currentFieldDefinition &&
-    'relation' in currentFieldDefinition.$server
-  ) {
+  if (isFieldRelation(currentFieldDefinition)) {
     const prismaRelationName = (currentFieldDefinition.$server as any).relation.name
 
     let nestedFields = fields
