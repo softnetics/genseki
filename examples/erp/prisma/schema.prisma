@@ -126,6 +126,33 @@ model Post {
 
   comments Comment[]
   postTags PostTag[]
+  detail PostDetail?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model PostDetail {
+  id String @id @default(uuid())
+
+  description String?
+
+  postId String @unique
+  post   Post   @relation(fields: [postId], references: [id], onDelete: Cascade)
+
+  extra PostExtra?
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @default(now()) @updatedAt
+}
+
+model PostExtra {
+  id String @id @default(uuid())
+
+  note String?
+
+  postDetailId String @unique
+  postDetail   PostDetail @relation(fields: [postDetailId], references: [id], onDelete: Cascade)
 
   createdAt DateTime @default(now())
   updatedAt DateTime @default(now()) @updatedAt

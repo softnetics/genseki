@@ -37,7 +37,7 @@ export interface TanstackTableProps<T> {
   emptyFallback?: React.ReactNode
   emptyMessage?: React.ReactNode
   configuration?: {
-    sortBy?: (string | number | symbol)[]
+    sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   }
 }
 
@@ -51,6 +51,8 @@ export const getSortIcon = (isSorted: false | SortDirection) => {
       return <CaretDownIcon className="size-8 cursor-pointer" weight="fill" />
   }
 }
+
+const normalizeColumnId = (id: string) => id.replace(/_/g, '.')
 
 export function TanstackTable<T>({
   className,
@@ -87,10 +89,12 @@ export function TanstackTable<T>({
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())
               // const canSort = header.column.getCanSort()
-              const canSort = configuration?.sortBy?.includes(header.column.id)
+              const canSort = configuration?.sortBy?.some(
+                ([columnPath]) => columnPath === normalizeColumnId(header.column.id)
+              )
               return (
                 <TableHead
-                  key={header.id}
+                  key={normalizeColumnId(header.id)}
                   className={clsx(
                     'focus-visible:ring-focus ring-inset',
                     header.colSpan > 1 && 'border-bluegray-300 border-b',
