@@ -37,7 +37,7 @@ export interface TanstackTableProps<T> {
   emptyFallback?: React.ReactNode
   emptyMessage?: React.ReactNode
   configuration?: {
-    sortBy?: (string | number | symbol)[]
+    sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   }
 }
 
@@ -89,7 +89,9 @@ export function TanstackTable<T>({
                 ? null
                 : flexRender(header.column.columnDef.header, header.getContext())
               // const canSort = header.column.getCanSort()
-              const canSort = configuration?.sortBy?.includes(normalizeColumnId(header.column.id))
+              const canSort = configuration?.sortBy?.some(
+                ([columnPath]) => columnPath === normalizeColumnId(header.column.id)
+              )
               return (
                 <TableHead
                   key={normalizeColumnId(header.id)}

@@ -462,7 +462,7 @@ type ExtractSortableColumns<TFields extends Fields, TPrefix extends string = '',
 
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
-  sortBy?: ExtractSortableColumns<TFields>[]
+  sortBy?: ([ExtractSortableColumns<TFields>, 'asc' | 'desc'] | [ExtractSortableColumns<TFields>])[]
 }
 
 export interface CollectionListResponse {

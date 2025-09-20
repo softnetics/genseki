@@ -143,12 +143,9 @@ function buildSearchCondition(
   const currentFieldDefinition = fields.shape[currentRelationName]
 
   if (isFieldRelation(currentFieldDefinition)) {
-    const prismaRelationName = (currentFieldDefinition.$server as any).relation.name
+    const prismaRelationName = currentFieldDefinition.$server.relation.name
 
-    let nestedFields = fields
-    if ('fields' in currentFieldDefinition) {
-      nestedFields = currentFieldDefinition.fields
-    }
+    const nestedFields = 'fields' in currentFieldDefinition ? currentFieldDefinition.fields : fields
 
     return {
       [prismaRelationName]: buildSearchCondition(remainingPathSegments, searchValue, nestedFields),
@@ -160,19 +157,51 @@ function buildSearchCondition(
   }
 }
 
+function buildOrderByCondition(
+  pathSegments: string[],
+  sortDirection: string,
+  fields: Fields
+): PrismaOrderByCondition {
+  if (pathSegments.length === 0) return {}
+
+  if (pathSegments.length === 1) {
+    return { [pathSegments[0]]: sortDirection }
+  }
+
+  const [currentSegment, ...remainingSegments] = pathSegments
+  const currentFieldDefinition = fields.shape[currentSegment]
+
+  if (isFieldRelation(currentFieldDefinition)) {
+    const prismaRelationName = currentFieldDefinition.$server.relation.name
+
+    const nestedFields = 'fields' in currentFieldDefinition ? currentFieldDefinition.fields : fields
+
+    return {
+      [prismaRelationName]: buildOrderByCondition(remainingSegments, sortDirection, nestedFields),
+    }
+  }
+
+  return {
+    [currentSegment]: buildOrderByCondition(remainingSegments, sortDirection, fields),
+  }
+}
 function createOrderByCondition(
   sortPath: string | undefined,
   sortDirection: string | undefined,
   allowedSortPaths: any,
-  model: any
+  model: any,
+  fields: Fields
 ): PrismaOrderByCondition {
   if (sortPath) {
-    const isAllowedSortPath =
-      !allowedSortPaths?.sortBy || allowedSortPaths.sortBy.includes(sortPath)
+    const allowedPaths = allowedSortPaths?.sortBy?.map(
+      (item: ([string, 'asc' | 'desc'] | [string])[]) => item[0]
+    )
+
+    const isAllowedSortPath = !allowedSortPaths?.sortBy || allowedPaths.includes(sortPath)
 
     if (isAllowedSortPath) {
       if (sortPath.includes('.')) {
-        return buildOrderByCondition(sortPath.split('.'), sortDirection ?? 'asc')
+        return buildOrderByCondition(sortPath.split('.'), sortDirection ?? 'asc', fields)
       } else if (model.shape.columns[sortPath]) {
         return { [sortPath]: sortDirection ?? 'asc' }
       } else {
@@ -185,38 +214,25 @@ function createOrderByCondition(
     }
   } else {
     if (allowedSortPaths?.sortBy && allowedSortPaths.sortBy.length > 0) {
-      const defaultSortPath = allowedSortPaths.sortBy[0]
-      if (defaultSortPath.includes('.')) {
-        return buildOrderByCondition(defaultSortPath.split('.'), 'desc')
-      } else if (model.shape.columns[defaultSortPath]) {
-        return { [defaultSortPath]: 'desc' }
-      } else {
-        const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-        return { [primaryFieldDefinition.name]: 'asc' }
-      }
+      const orderByArray = allowedSortPaths.sortBy.map((sortConfig: any) => {
+        const [defaultSortPath, direction = 'asc'] = sortConfig
+        if (defaultSortPath.includes('.')) {
+          return buildOrderByCondition(defaultSortPath.split('.'), direction, fields)
+        } else if (model.shape.columns[defaultSortPath]) {
+          return { [defaultSortPath]: direction }
+        } else {
+          const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+          return { [primaryFieldDefinition.name]: 'asc' }
+        }
+      })
+
+      return orderByArray
     } else {
       const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
       return { [primaryFieldDefinition.name]: 'asc' }
     }
   }
 }
-
-function buildOrderByCondition(
-  pathSegments: string[],
-  sortDirection: string
-): PrismaOrderByCondition {
-  if (pathSegments.length === 0) return {}
-
-  if (pathSegments.length === 1) {
-    return { [pathSegments[0]]: sortDirection }
-  }
-
-  const [currentSegment, ...remainingSegments] = pathSegments
-  return {
-    [currentSegment]: buildOrderByCondition(remainingSegments, sortDirection),
-  }
-}
-
 function createCollectionDefaultListHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields,
@@ -250,8 +266,7 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
       }
     }
 
-    const orderBy = createOrderByCondition(sortBy, sortOrder, listConfiguration, model)
-
+    const orderBy = createOrderByCondition(sortBy, sortOrder, listConfiguration, model, fields)
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
       skip: (page - 1) * pageSize,
