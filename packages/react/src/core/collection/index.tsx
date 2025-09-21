@@ -412,53 +412,69 @@ export type CollectionDeleteApiHandler<TContext extends AnyContextable, TFields 
   }
 ) => Promisable<CollectionDeleteApiReturn>
 
-type ExtractSearchableColumns<TFields extends Fields, TPrefix extends string = '', TAcc = never> =
-  | TAcc
-  | {
-      [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-        ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
-          ? TPrefix extends ''
-            ? Extract<K, string> // Direct column: 'name'
-            : `${TPrefix}.${Extract<K, string>}` // Nested column: 'posts.title'
-          : never
-        : // Handle relations (recursive case)
-          TFields['shape'][K] extends FieldRelationShape
-          ? TFields['shape'][K]['fields'] extends Fields
-            ? ExtractSearchableColumns<
-                TFields['shape'][K]['fields'],
-                TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
-                TAcc
-              >
-            : never
-          : never
-    }[keyof TFields['shape']]
+type IncrementDepth<T extends number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10][T]
 
-type ExtractSortableColumns<TFields extends Fields, TPrefix extends string = '', TAcc = never> =
-  | TAcc
-  | {
-      [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-        ? TFields['shape'][K]['$client']['column']['dataType'] extends
-            | typeof DataType.STRING
-            | typeof DataType.INT
-            | typeof DataType.FLOAT
-            | typeof DataType.DATETIME
-            | typeof DataType.BIGINT
-            | typeof DataType.DECIMAL
-          ? TPrefix extends ''
-            ? Extract<K, string> // Direct column: 'id'
-            : `${TPrefix}.${Extract<K, string>}` // Nested column: 'posts.createdAt'
-          : never
-        : // Handle relations (recursive case)
-          TFields['shape'][K] extends FieldRelationShape
-          ? TFields['shape'][K]['fields'] extends Fields
-            ? ExtractSortableColumns<
-                TFields['shape'][K]['fields'],
-                TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
-                TAcc
-              >
-            : never
-          : never
-    }[keyof TFields['shape']]
+type ExtractSearchableColumns<
+  TFields extends Fields,
+  TPrefix extends string = '',
+  TAcc = never,
+  TDepth extends number = 0,
+> = TDepth extends 10
+  ? TAcc
+  :
+      | TAcc
+      | {
+          [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+            ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
+              ? TPrefix extends ''
+                ? Extract<K, string>
+                : `${TPrefix}.${Extract<K, string>}`
+              : never
+            : TFields['shape'][K] extends FieldRelationShape
+              ? TFields['shape'][K]['fields'] extends Fields
+                ? ExtractSearchableColumns<
+                    TFields['shape'][K]['fields'],
+                    TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
+                    TAcc,
+                    IncrementDepth<TDepth>
+                  >
+                : never
+              : never
+        }[keyof TFields['shape']]
+
+type ExtractSortableColumns<
+  TFields extends Fields,
+  TPrefix extends string = '',
+  TAcc = never,
+  TDepth extends number = 0,
+> = TDepth extends 10
+  ? TAcc
+  :
+      | TAcc
+      | {
+          [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+            ? TFields['shape'][K]['$client']['column']['dataType'] extends
+                | typeof DataType.STRING
+                | typeof DataType.INT
+                | typeof DataType.FLOAT
+                | typeof DataType.DATETIME
+                | typeof DataType.BIGINT
+                | typeof DataType.DECIMAL
+              ? TPrefix extends ''
+                ? Extract<K, string>
+                : `${TPrefix}.${Extract<K, string>}`
+              : never
+            : TFields['shape'][K] extends FieldRelationShape
+              ? TFields['shape'][K]['fields'] extends Fields
+                ? ExtractSortableColumns<
+                    TFields['shape'][K]['fields'],
+                    TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
+                    TAcc,
+                    IncrementDepth<TDepth>
+                  >
+                : never
+              : never
+        }[keyof TFields['shape']]
 
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
