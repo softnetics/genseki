@@ -123,7 +123,7 @@ function createCollectionDefaultFindOneHandler<
   }
 }
 
-function buildSearchCondition(
+export function buildSearchCondition(
   path: string | string[],
   searchValue: string,
   fields: Fields
@@ -157,7 +157,7 @@ function buildSearchCondition(
   }
 }
 
-function buildOrderByCondition(
+export function buildOrderByCondition(
   pathSegments: string[],
   sortDirection: string,
   fields: Fields
@@ -185,7 +185,7 @@ function buildOrderByCondition(
     [currentSegment]: buildOrderByCondition(remainingSegments, sortDirection, fields),
   }
 }
-function createOrderByCondition(
+export function createOrderByCondition(
   sortPath: string | undefined,
   sortDirection: string | undefined,
   allowedSortPaths: any,
