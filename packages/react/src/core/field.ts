@@ -704,6 +704,7 @@ export type FieldsShapeToZodObject<TFieldsShape extends FieldsShape | FieldsShap
 export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShapeClient>(
   fieldShape: TFieldShape
 ): FieldShapeToZodSchema<TFieldShape> {
+  // TODO: More options
   const isRequired = fieldShape.required || false
   const requiredMessage = 'Please fill in the information.'
 
@@ -769,7 +770,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
       return z.iso.date().optional() as FieldShapeToZodSchema<TFieldShape>
     }
 
-    // relation input
+    // TODO: relation input
     case 'connect':
     case 'create':
     case 'connectOrCreate': {
