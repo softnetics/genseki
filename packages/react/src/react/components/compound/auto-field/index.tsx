@@ -5,6 +5,7 @@ import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
 import { useQuery } from '@tanstack/react-query'
+import type { Content } from '@tiptap/react'
 
 import {
   BaseIcon,
@@ -270,6 +271,7 @@ export function AutoSelectField(props: AutoSelectField) {
 
 const AutoRichTextField = (props: {
   name: string
+  onChange?: (content: string | Content | Content[]) => void
   label?: string
   description?: string
   isRequired?: boolean
@@ -295,6 +297,9 @@ const AutoRichTextField = (props: {
       isRequired={props.isRequired}
       isDisabled={props.disabled}
       description={props.description}
+      onChange={(content) => {
+        props.onChange?.(content)
+      }}
       editorProviderProps={{
         ...editorProviderProps,
         onUpdate(updateCb) {
