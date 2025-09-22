@@ -222,7 +222,7 @@ const CreatePostSchema = z.object({
   }),
   content: z.any(),
   postTags: z.any(),
-  title: z.string().min(1),
+  title: z.string().min(1, 'Custom Error Message'),
   postDetail: z.any(),
 })
 
@@ -282,10 +282,10 @@ export const CustomCreatePage = () => {
           className="flex flex-col gap-y-8 mt-16"
         >
           <CreateField fieldName="example" />
-          <SimpleTextInput
+          <CreateField
             fieldName="title"
-            placeholder="Custom Title Input"
-            className="border-2 rounded-sm border-purple-500 p-4"
+            // placeholder="Custom Title Input"
+            // className="border-2 rounded-sm border-purple-500 p-4"
           />
           <CreateField fieldName="content" />
           <CreateField fieldName="author" />

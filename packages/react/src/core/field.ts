@@ -705,8 +705,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
   fieldShape: TFieldShape
 ): FieldShapeToZodSchema<TFieldShape> {
   const isRequired = fieldShape.required || false
-  const fieldLabel = fieldShape.label || 'Field'
-  const requiredMessage = `${fieldLabel} is required`
+  const requiredMessage = 'Please fill in the information.'
 
   switch (fieldShape.type) {
     // Richtext JSON
