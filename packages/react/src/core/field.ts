@@ -1,4 +1,5 @@
 import type { PartialDeep, Promisable } from 'type-fest'
+import z from 'zod'
 
 import type { InferFields } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
@@ -633,7 +634,6 @@ export class FieldBuilder<
     }
   }
 }
-import { z } from 'zod'
 
 type CastOptionalFieldToZodSchema<
   TField extends FieldShapeBase,
@@ -687,11 +687,10 @@ export type FieldsShapeToZodObject<TFieldsShape extends FieldsShape> = z.ZodObje
 export function fieldToZodScheama<TFieldShape extends FieldShapeBase>(
   fieldShape: TFieldShape
 ): FieldShapeToZodSchema<TFieldShape> {
-  const isRequired =
-    fieldShape.$server?.source === 'column' ? fieldShape.$server.column.isRequired : false
+  const isRequired = fieldShape.required
   const fieldLabel = fieldShape.label || 'Field'
   const requiredMessage = `${fieldLabel} is required`
-
+  console.log(fieldShape)
   switch (fieldShape.type) {
     // Richtext JSON
     case 'richText': {

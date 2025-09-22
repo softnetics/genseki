@@ -3,36 +3,28 @@
 import { type DefaultValues, type FieldValues, useForm, type UseFormProps } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
-import type z from 'zod'
 
 import { getDefaultValueFromFieldsClient } from '../../../../core'
-import {
-  type FieldsShape,
-  type FieldsShapeToZodObject,
-  fieldsShapeToZodObject,
-} from '../../../../core/field'
+import { fieldsShapeToZodObject } from '../../../../core/field'
 import { useStorageAdapter } from '../../../providers/root'
 import { useCollection } from '../context'
 
 export const useCollectionForm = <
-  TFieldsShape extends FieldsShape = FieldsShape,
+  TFieldValues extends FieldValues = FieldValues,
   TContext = any,
-  TTransformedValues extends FieldValues = FieldValues,
+  TTransformedValues = TFieldValues,
 >(
-  props?: UseFormProps<z.infer<FieldsShapeToZodObject<TFieldsShape>>, TContext, TTransformedValues>
+  props?: UseFormProps<TFieldValues, TContext, TTransformedValues>
 ) => {
   const storageAdapter = useStorageAdapter()
   const { fields } = useCollection()
 
-  const schema = fieldsShapeToZodObject(fields.shape as TFieldsShape)
-
-  return useForm<z.infer<FieldsShapeToZodObject<TFieldsShape>>, TContext, TTransformedValues>({
+  const schema = fieldsShapeToZodObject(fields.shape)
+  return useForm<TFieldValues, TContext, TTransformedValues>({
+    resolver: standardSchemaResolver(schema),
     defaultValues:
       props?.defaultValues ??
-      (getDefaultValueFromFieldsClient(fields, storageAdapter) as DefaultValues<
-        z.infer<FieldsShapeToZodObject<TFieldsShape>>
-      >),
-    resolver: standardSchemaResolver(schema),
+      (getDefaultValueFromFieldsClient(fields, storageAdapter) as DefaultValues<TFieldValues>),
     ...props,
   })
 }
