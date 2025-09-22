@@ -25,12 +25,8 @@ import {
   createSeparatorItem,
   CustomImageExtension,
   Form,
-  FormControl,
-  FormField,
-  FormItem,
   ImageUploadNodeExtension,
   type InferFields,
-  RichTextEditor,
   SelectionExtension,
   SubmitButton,
   TanstackTable,
@@ -342,30 +338,7 @@ export const CustomCreatePage = () => {
             placeholder="Custom Title Input"
             className="border-2 rounded-sm border-purple-500 p-4"
           />
-          {/* <CreateField fieldName="content" /> */}
-          <FormField
-            name="content"
-            control={form.control}
-            render={({ field, fieldState }) => (
-              <FormItem>
-                <FormControl>
-                  <RichTextEditor
-                    label="Content"
-                    isRequired
-                    errorMessage={fieldState.error?.message}
-                    description="Write the post content here"
-                    editorProviderProps={{
-                      ...postEditorProviderProps,
-                    }}
-                    onChange={(content) => {
-                      field.onChange(content)
-                    }}
-                    isDisabled={form.formState.isSubmitting}
-                  />
-                </FormControl>
-              </FormItem>
-            )}
-          />
+          <CreateField fieldName="content" />
           <CreateField fieldName="author" />
           <CreateField fieldName="postTags" />
           <CreateField fieldName="postDetail" />
