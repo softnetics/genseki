@@ -1,6 +1,6 @@
 'use client'
 
-import { EditorProvider, type EditorProviderProps } from '@tiptap/react'
+import { type Content, EditorProvider, type EditorProviderProps } from '@tiptap/react'
 
 import { cn } from '../../../../utils/cn'
 import { focusStyles } from '../../../primitives'
@@ -9,6 +9,7 @@ import { Description, FieldGroup, Label } from '../../../primitives/field'
 
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
+  onChange?: (content: string | Content | Content[]) => void
   isDisabled?: boolean
   isRequired?: boolean
   isPending?: boolean
@@ -45,6 +46,10 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
             shouldRerenderOnTransaction
             editorContainerProps={{
               className: 'editor-container',
+            }}
+            onUpdate={({ editor }) => {
+              const json = editor.getJSON()
+              props.onChange?.(json)
             }}
             {...props.editorProviderProps}
           />
