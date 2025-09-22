@@ -21,7 +21,7 @@ export const tagsCollection = createPlugin('tags', (app) => {
         columns: columns,
         configuration: {
           search: ['name'],
-          sortBy: ['name'],
+          sortBy: [['name']],
         },
         toolbar: {
           create: true,

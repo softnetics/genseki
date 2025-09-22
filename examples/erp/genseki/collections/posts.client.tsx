@@ -63,6 +63,14 @@ export const columns = [
     header: 'Author Email',
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor('postDetail.description', {
+    header: 'Description',
+    cell: (info) => info.getValue(),
+  }),
+  columnHelper.accessor('postDetail.extra.note', {
+    header: 'Note',
+    cell: (info) => info.getValue(),
+  }),
   columnHelper.accessor('updatedAt', {
     header: 'Updated At',
     cell: (info) => <div>{new Date(info.getValue()).toLocaleDateString('en-GB')}</div>,
@@ -215,6 +223,7 @@ const CreatePostSchema = z.object({
   content: z.any(),
   postTags: z.any(),
   title: z.string().min(1),
+  postDetail: z.any(),
 })
 
 export const CustomCreatePage = () => {
@@ -281,6 +290,7 @@ export const CustomCreatePage = () => {
           <CreateField fieldName="content" />
           <CreateField fieldName="author" />
           <CreateField fieldName="postTags" />
+          <CreateField fieldName="postDetail" />
           <div className="grid grid-cols-2 gap-4">
             <SubmitButton pending={mutation.isPending}>Create</SubmitButton>
             <CancelButton pending={mutation.isPending} />

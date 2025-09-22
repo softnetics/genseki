@@ -154,3 +154,15 @@ export const mimeTypeValidate = (allowedMimes: string[], checkingMime: string) =
 
   return false
 }
+
+export const isFieldRelation = (field: unknown): field is FieldRelationShape => {
+  return (
+    field !== null &&
+    field !== undefined &&
+    typeof field === 'object' &&
+    '$server' in field &&
+    field.$server !== null &&
+    typeof field.$server === 'object' &&
+    'relation' in field.$server
+  )
+}

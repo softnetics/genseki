@@ -20,14 +20,15 @@ import type { AnyContextable, Contextable } from './context'
 import { type ApiRoute, createEndpoint } from './endpoint'
 import { HttpInternalServerError } from './error'
 import { type FieldOptionsCallback, type Fields, type FieldsOptions } from './field'
-import { DataType, type ModelSchemas } from './model'
+import { type ModelSchemas } from './model'
+import type { PrismaOrderByCondition, PrismaSearchCondition } from './prisma.types'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
   transformFieldsToPrismaSelectPayload,
   transformPrismaResultToFieldsPayload,
 } from './transformer'
-import type { ToZodObject } from './utils'
+import { isFieldRelation, type ToZodObject } from './utils'
 
 const zStringPositiveNumberOptional = z
   .string()
@@ -122,6 +123,118 @@ function createCollectionDefaultFindOneHandler<
   }
 }
 
+export function buildSearchCondition(
+  path: string | string[],
+  searchValue: string,
+  fields: Fields
+): PrismaSearchCondition {
+  const pathSegments = typeof path === 'string' ? path.split('.') : path
+  if (pathSegments.length === 1) {
+    const fieldName = pathSegments[0]
+    return {
+      [fieldName]: {
+        contains: searchValue,
+        mode: 'insensitive',
+      },
+    }
+  }
+
+  const [currentRelationName, ...remainingPathSegments] = pathSegments
+  const currentFieldDefinition = fields.shape[currentRelationName]
+
+  if (isFieldRelation(currentFieldDefinition)) {
+    const prismaRelationName = currentFieldDefinition.$server.relation.name
+
+    const nestedFields = 'fields' in currentFieldDefinition ? currentFieldDefinition.fields : fields
+
+    return {
+      [prismaRelationName]: buildSearchCondition(remainingPathSegments, searchValue, nestedFields),
+    }
+  }
+
+  return {
+    [currentRelationName]: buildSearchCondition(remainingPathSegments, searchValue, fields),
+  }
+}
+
+export function buildOrderByCondition(
+  pathSegments: string[],
+  sortDirection: string,
+  fields: Fields
+): PrismaOrderByCondition {
+  if (pathSegments.length === 0) return {}
+
+  if (pathSegments.length === 1) {
+    return { [pathSegments[0]]: sortDirection }
+  }
+
+  const [currentSegment, ...remainingSegments] = pathSegments
+  const currentFieldDefinition = fields.shape[currentSegment]
+
+  if (isFieldRelation(currentFieldDefinition)) {
+    const prismaRelationName = currentFieldDefinition.$server.relation.name
+
+    const nestedFields = 'fields' in currentFieldDefinition ? currentFieldDefinition.fields : fields
+
+    return {
+      [prismaRelationName]: buildOrderByCondition(remainingSegments, sortDirection, nestedFields),
+    }
+  }
+
+  return {
+    [currentSegment]: buildOrderByCondition(remainingSegments, sortDirection, fields),
+  }
+}
+export function createOrderByCondition(
+  sortPath: string | undefined,
+  sortDirection: string | undefined,
+  allowedSortPaths: any,
+  model: any,
+  fields: Fields
+): PrismaOrderByCondition[] {
+  if (sortPath) {
+    const allowedPaths = allowedSortPaths?.sortBy?.map(
+      (item: ([string, 'asc' | 'desc'] | [string])[]) => item[0]
+    )
+
+    const isAllowedSortPath = !allowedSortPaths?.sortBy || allowedPaths.includes(sortPath)
+
+    if (isAllowedSortPath) {
+      const pathSegments = sortPath.split('.')
+      if (pathSegments.length > 1) {
+        return [buildOrderByCondition(pathSegments, sortDirection ?? 'asc', fields)]
+      } else if (model.shape.columns[sortPath]) {
+        return [{ [sortPath]: sortDirection ?? 'asc' }]
+      } else {
+        const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+        return [{ [primaryFieldDefinition.name]: sortDirection ?? 'asc' }]
+      }
+    } else {
+      const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+      return [{ [primaryFieldDefinition.name]: sortDirection ?? 'asc' }]
+    }
+  } else {
+    if (allowedSortPaths?.sortBy && allowedSortPaths.sortBy.length > 0) {
+      const orderByArray = allowedSortPaths.sortBy.map((sortConfig: any) => {
+        const [defaultSortPath, direction = 'asc'] = sortConfig
+        const pathSegments = defaultSortPath.split('.')
+        if (pathSegments.length > 1) {
+          return buildOrderByCondition(pathSegments, direction, fields)
+        } else if (model.shape.columns[defaultSortPath]) {
+          return { [defaultSortPath]: direction }
+        } else {
+          const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+          return { [primaryFieldDefinition.name]: 'asc' }
+        }
+      })
+
+      return orderByArray
+    } else {
+      const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
+      return [{ [primaryFieldDefinition.name]: 'asc' }]
+    }
+  }
+}
 function createCollectionDefaultListHandler<TContext extends Contextable, TFields extends Fields>(
   config: { schema: ModelSchemas; context: TContext },
   fields: Fields,
@@ -139,53 +252,22 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
 
     const where: any = {}
 
-    // Configured searchable columns.
     if (search && search.trim()) {
-      const searchFields = listConfiguration?.search
-        ? listConfiguration.search.filter(
-            (field) => model.shape.columns[field as string]?.dataType === DataType.STRING
-          )
-        : Object.keys(model.shape.columns).filter(
-            (key) => model.shape.columns[key].dataType === DataType.STRING
-          )
+      const searchConditions: any[] = []
+      const searchFields = listConfiguration?.search || []
 
-      if (searchFields.length > 0) {
-        where.OR = searchFields.map((field) => ({
-          [field]: {
-            contains: search.trim(),
-            mode: 'insensitive',
-          },
-        }))
-      }
-    }
-
-    // Configured sortable columns.
-    const orderBy: any = {}
-    if (sortBy) {
-      const isValidSortField =
-        !listConfiguration?.sortBy || listConfiguration.sortBy.includes(sortBy as any)
-
-      if (isValidSortField && model.shape.columns[sortBy]) {
-        orderBy[sortBy] = sortOrder ?? 'asc'
-      } else {
-        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = sortOrder ?? 'asc'
-      }
-    } else {
-      // Use default sort configuration.
-      if (listConfiguration?.sortBy && listConfiguration.sortBy.length > 0) {
-        const defaultSortField = listConfiguration.sortBy[0]
-        if (model.shape.columns[defaultSortField as string]) {
-          orderBy[defaultSortField] = 'desc'
-        } else {
-          const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-          orderBy[primaryField.name] = 'asc'
+      for (const fieldPath of searchFields) {
+        const searchCondition = buildSearchCondition(fieldPath, search.trim(), fields)
+        if (searchCondition) {
+          searchConditions.push(searchCondition)
         }
-      } else {
-        const primaryField = model.shape.columns[model.shape.primaryFields[0]]
-        orderBy[primaryField.name] = 'asc'
+      }
+
+      if (searchConditions.length > 0) {
+        where.OR = searchConditions
       }
     }
+    const orderBy = createOrderByCondition(sortBy, sortOrder, listConfiguration, model, fields)
 
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
@@ -532,13 +614,13 @@ export type CollectionListApiRoute<TSlug extends string, TFields extends Fields>
   }
 }>
 
-export function getCollectionDefaultListApiRoute(args: {
+export function getCollectionDefaultListApiRoute<TFields extends Fields>(args: {
   slug: string
   context: AnyContextable
   schema: ModelSchemas
-  fields: Fields
-  customHandler?: CollectionListApiHandler<AnyContextable, Fields>
-  listConfiguration?: ListConfiguration<Fields>
+  fields: TFields
+  customHandler?: CollectionListApiHandler<AnyContextable, TFields>
+  listConfiguration?: ListConfiguration<TFields>
 }) {
   const defaultHandler = createCollectionDefaultListHandler(
     { schema: args.schema, context: args.context },
@@ -594,7 +676,7 @@ export function getCollectionDefaultListApiRoute(args: {
   )
 
   return {
-    route: route as unknown as CollectionListApiRoute<string, Fields>,
+    route: route as unknown as CollectionListApiRoute<string, TFields>,
     handler,
     defaultHandler,
   }
