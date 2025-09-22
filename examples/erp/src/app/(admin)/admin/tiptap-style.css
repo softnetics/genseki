@@ -148,7 +148,7 @@
 
   /* Selecting an image */
   img.ProseMirror-selectednode,
-  
+
   /* Selecting custom image */
   .ProseMirror-selectednode img {
     outline: 4px solid var(--color-primary);
@@ -410,6 +410,11 @@
       }
     }
   }
+}
+
+.tiptap.ProseMirror {
+  height: 100%;
+  min-height: 240px;
 }
 
 @keyframes image-loaded-fade-in {
