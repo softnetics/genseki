@@ -675,7 +675,7 @@ type FieldRelationToZodSchemaServer<TField extends FieldRelationShape> =
 
 export type FieldShapeToZodSchema<TField extends FieldShapeBase | FieldShapeClient> =
   TField extends FieldColumnJsonShape | FieldColumnJsonShapeClient
-    ? CastOptionalFieldToZodSchema<TField, z.ZodAny>
+    ? CastOptionalFieldToZodSchema<TField, z.ZodJSONSchema>
     : TField extends FieldColumnStringShape | FieldColumnStringShapeClient
       ? CastOptionalFieldToZodSchema<TField, z.ZodString>
       : TField extends FieldColumnStringArrayShape | FieldColumnStringArrayShapeClient
@@ -687,7 +687,7 @@ export type FieldShapeToZodSchema<TField extends FieldShapeBase | FieldShapeClie
             : TField extends FieldColumnBooleanShape | FieldColumnBooleanShapeClient
               ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>
               : TField extends FieldColumnDateShape | FieldColumnDateShapeClient
-                ? CastOptionalFieldToZodSchema<TField, z.ZodDate>
+                ? CastOptionalFieldToZodSchema<TField, z.ZodISODate>
                 : TField extends FieldRelationShape
                   ? FieldRelationToZodSchemaServer<TField>
                   : TField extends FieldRelationShapeClient
@@ -710,7 +710,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
   switch (fieldShape.type) {
     // Richtext JSON
     case 'richText': {
-      const schema = z.any()
+      const schema = z.json()
       return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
 
@@ -764,9 +764,9 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     // date input
     case 'date': {
       if (isRequired) {
-        return z.coerce.date() as FieldShapeToZodSchema<TFieldShape>
+        return z.iso.date() as FieldShapeToZodSchema<TFieldShape>
       }
-      return z.coerce.date().optional() as FieldShapeToZodSchema<TFieldShape>
+      return z.iso.date().optional() as FieldShapeToZodSchema<TFieldShape>
     }
 
     // relation input
