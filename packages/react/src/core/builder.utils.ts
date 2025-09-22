@@ -191,7 +191,7 @@ export function createOrderByCondition(
   allowedSortPaths: any,
   model: any,
   fields: Fields
-): PrismaOrderByCondition {
+): PrismaOrderByCondition[] {
   if (sortPath) {
     const allowedPaths = allowedSortPaths?.sortBy?.map(
       (item: ([string, 'asc' | 'desc'] | [string])[]) => item[0]
@@ -200,24 +200,26 @@ export function createOrderByCondition(
     const isAllowedSortPath = !allowedSortPaths?.sortBy || allowedPaths.includes(sortPath)
 
     if (isAllowedSortPath) {
-      if (sortPath.includes('.')) {
-        return buildOrderByCondition(sortPath.split('.'), sortDirection ?? 'asc', fields)
+      const pathSegments = sortPath.split('.')
+      if (pathSegments.length > 1) {
+        return [buildOrderByCondition(pathSegments, sortDirection ?? 'asc', fields)]
       } else if (model.shape.columns[sortPath]) {
-        return { [sortPath]: sortDirection ?? 'asc' }
+        return [{ [sortPath]: sortDirection ?? 'asc' }]
       } else {
         const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-        return { [primaryFieldDefinition.name]: sortDirection ?? 'asc' }
+        return [{ [primaryFieldDefinition.name]: sortDirection ?? 'asc' }]
       }
     } else {
       const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-      return { [primaryFieldDefinition.name]: sortDirection ?? 'asc' }
+      return [{ [primaryFieldDefinition.name]: sortDirection ?? 'asc' }]
     }
   } else {
     if (allowedSortPaths?.sortBy && allowedSortPaths.sortBy.length > 0) {
       const orderByArray = allowedSortPaths.sortBy.map((sortConfig: any) => {
         const [defaultSortPath, direction = 'asc'] = sortConfig
-        if (defaultSortPath.includes('.')) {
-          return buildOrderByCondition(defaultSortPath.split('.'), direction, fields)
+        const pathSegments = defaultSortPath.split('.')
+        if (pathSegments.length > 1) {
+          return buildOrderByCondition(pathSegments, direction, fields)
         } else if (model.shape.columns[defaultSortPath]) {
           return { [defaultSortPath]: direction }
         } else {
@@ -229,7 +231,7 @@ export function createOrderByCondition(
       return orderByArray
     } else {
       const primaryFieldDefinition = model.shape.columns[model.shape.primaryFields[0]]
-      return { [primaryFieldDefinition.name]: 'asc' }
+      return [{ [primaryFieldDefinition.name]: 'asc' }]
     }
   }
 }
@@ -265,8 +267,8 @@ function createCollectionDefaultListHandler<TContext extends Contextable, TField
         where.OR = searchConditions
       }
     }
-
     const orderBy = createOrderByCondition(sortBy, sortOrder, listConfiguration, model, fields)
+
     const response = await prisma[model.config.prismaModelName].findMany({
       select: transformFieldsToPrismaSelectPayload(fields),
       skip: (page - 1) * pageSize,

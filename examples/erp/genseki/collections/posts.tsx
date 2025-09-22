@@ -210,7 +210,10 @@ export const postsCollection = createPlugin('posts', (app) => {
         columns: columns,
         configuration: {
           search: ['title', 'postDetail.description', 'postDetail.extra.note'],
-          sortBy: [['postDetail.description', 'asc']],
+          sortBy: [
+            ['postDetail.description', 'asc'],
+            ['title', 'asc'],
+          ],
         },
         toolbar: {
           create: true,
