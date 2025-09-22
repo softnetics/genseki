@@ -712,31 +712,79 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     ))
   }
 
+  // Reusable onMove handler for reordering with LexoRank
+  const handleReorderMove = (oldIndex: number, newIndex: number) => {
+    const field = fieldArray.fields[oldIndex] as any
+    const newFields = [...fieldArray.fields]
+    newFields.splice(oldIndex, 1)
+    newFields.splice(newIndex, 0, field)
+
+    const prevField = newIndex > 0 ? (newFields[newIndex - 1] as any) : undefined
+    const nextField = newIndex < newFields.length - 1 ? (newFields[newIndex + 1] as any) : undefined
+
+    let newLexoRank: LexoRank
+    if (!prevField && nextField?.__order) {
+      newLexoRank = LexoRank.parse(nextField.__order).genPrev()
+    } else if (prevField?.__order && !nextField) {
+      newLexoRank = LexoRank.parse(prevField.__order).genNext()
+    } else if (prevField?.__order && nextField?.__order) {
+      newLexoRank = LexoRank.parse(prevField.__order).between(LexoRank.parse(nextField.__order))
+    } else {
+      newLexoRank = LexoRank.middle()
+    }
+
+    fieldArray.update(oldIndex, {
+      ...field,
+      __order: newLexoRank.toString(),
+    })
+    fieldArray.move(oldIndex, newIndex)
+  }
+
   switch (fieldShape.type) {
     case 'connect':
       return (
         <div className="rounded-md border border-input p-6 grid grid-cols-1 gap-y-6">
           {!!fieldArray.fields.length && (
             <div className="flex flex-col gap-y-6">
-              {fieldArray.fields.map((fieldValue, index) => (
-                <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-                  <div>
-                    {fieldShape.label} #{index + 1}
+              <ReorderGroup
+                title={fieldShape.label}
+                onMove={handleReorderMove}
+                collapsible={false}
+                onDelete={(index) => fieldArray.remove(index)}
+              >
+                {fieldArray.fields.map((fieldValue, index) => (
+                  <div
+                    key={fieldValue.id}
+                    className="p-6 bg-muted rounded-b-lg flex flex-col gap-y-4 border border-t-0 border-bluegray-300"
+                  >
+                    {/* <div>
+                      {fieldShape.label} #{index + 1}
+                    </div> */}
+                    {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
                   </div>
-                  {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
-                </div>
-              ))}
+                ))}
+              </ReorderGroup>
             </div>
           )}
           <Button
             type="button"
             variant="primary"
             size="sm"
-            onClick={() => fieldArray.append({})}
+            isDisabled={disabled}
+            onClick={() => {
+              const lastField = fieldArray.fields.at(-1) as { __order?: string } | undefined
+              const lastOrder = lastField?.__order ?? LexoRank.middle().toString()
+              const nextOrder = LexoRank.parse(lastOrder).genNext().toString()
+              fieldArray.append({
+                __order: nextOrder,
+                connect: undefined,
+              })
+            }}
             className="justify-self-start"
           >
             Add
           </Button>
+          <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </div>
       )
     case 'create':
@@ -744,35 +792,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         <div className="border border-red-500 p-6 space-y-4">
           <ReorderGroup
             title={fieldShape.label}
-            onMove={(oldIndex, newIndex) => {
-              const field = fieldArray.fields[oldIndex] as any
-              const newFields = [...fieldArray.fields]
-              newFields.splice(oldIndex, 1)
-              newFields.splice(newIndex, 0, field)
-
-              const prevField = newIndex > 0 ? (newFields[newIndex - 1] as any) : undefined
-              const nextField =
-                newIndex < newFields.length - 1 ? (newFields[newIndex + 1] as any) : undefined
-
-              let newLexoRank: LexoRank
-              if (!prevField && nextField?.__order) {
-                newLexoRank = LexoRank.parse(nextField.__order).genPrev()
-              } else if (prevField?.__order && !nextField) {
-                newLexoRank = LexoRank.parse(prevField.__order).genNext()
-              } else if (prevField?.__order && nextField?.__order) {
-                newLexoRank = LexoRank.parse(prevField.__order).between(
-                  LexoRank.parse(nextField.__order)
-                )
-              } else {
-                newLexoRank = LexoRank.middle()
-              }
-
-              fieldArray.update(oldIndex, {
-                ...field,
-                __order: newLexoRank.toString(),
-              })
-              fieldArray.move(oldIndex, newIndex)
-            }}
+            onMove={handleReorderMove}
             collapsible={false}
             onDelete={(index) => fieldArray.remove(index)}
           >
