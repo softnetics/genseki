@@ -412,7 +412,7 @@ export type CollectionDeleteApiHandler<TContext extends AnyContextable, TFields 
   }
 ) => Promisable<CollectionDeleteApiReturn>
 
-type IncrementDepth<T extends number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10][T]
+type DepthRelation<T extends number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10][T]
 
 type ExtractSearchableColumns<
   TFields extends Fields,
@@ -436,7 +436,7 @@ type ExtractSearchableColumns<
                     TFields['shape'][K]['fields'],
                     TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
                     TAcc,
-                    IncrementDepth<TDepth>
+                    DepthRelation<TDepth>
                   >
                 : never
               : never
@@ -470,7 +470,7 @@ type ExtractSortableColumns<
                     TFields['shape'][K]['fields'],
                     TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
                     TAcc,
-                    IncrementDepth<TDepth>
+                    DepthRelation<TDepth>
                   >
                 : never
               : never
