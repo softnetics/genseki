@@ -22,11 +22,11 @@ const mockStringColumn: FieldColumnShape = {
   },
 } as any
 
-const mockRelationField = (fields: Fields): FieldRelationShape =>
+const mockRelationField = (fields: Fields, relationName: string = 'posts'): FieldRelationShape =>
   ({
     $server: {
       relation: {
-        name: 'posts',
+        name: relationName,
         isList: true,
         isRequired: false,
         relationDataTypes: [] as any,
@@ -82,7 +82,7 @@ describe('buildSearchCondition', () => {
 
     const postFields: Fields = {
       shape: {
-        author: mockRelationField(userFields),
+        author: mockRelationField(userFields, 'author'),
       },
       config: {} as any,
     }
@@ -90,7 +90,7 @@ describe('buildSearchCondition', () => {
     const result = buildSearchCondition('author.name', 'john', postFields)
 
     expect(result).toEqual({
-      posts: {
+      author: {
         name: {
           contains: 'john',
           mode: 'insensitive',
@@ -109,14 +109,14 @@ describe('buildSearchCondition', () => {
 
     const cityFields: Fields = {
       shape: {
-        country: mockRelationField(countryFields),
+        country: mockRelationField(countryFields, 'country'),
       },
       config: {} as any,
     }
 
     const userFields: Fields = {
       shape: {
-        city: mockRelationField(cityFields),
+        city: mockRelationField(cityFields, 'city'),
       },
       config: {} as any,
     }
@@ -124,8 +124,8 @@ describe('buildSearchCondition', () => {
     const result = buildSearchCondition('city.country.name', 'USA', userFields)
 
     expect(result).toEqual({
-      posts: {
-        posts: {
+      city: {
+        country: {
           name: {
             contains: 'USA',
             mode: 'insensitive',
@@ -248,9 +248,11 @@ describe('createOrderByCondition', () => {
   it('should return default orderBy when no sortPath provided', () => {
     const result = createOrderByCondition(undefined, undefined, undefined, mockModel, mockFields)
 
-    expect(result).toEqual({
-      id: 'asc',
-    })
+    expect(result).toEqual([
+      {
+        id: 'asc',
+      },
+    ])
   })
 
   it('should use configured default sortBy when no sortPath provided', () => {
@@ -272,17 +274,21 @@ describe('createOrderByCondition', () => {
   it('should build orderBy for simple column', () => {
     const result = createOrderByCondition('name', 'desc', undefined, mockModel, mockFields)
 
-    expect(result).toEqual({
-      name: 'desc',
-    })
+    expect(result).toEqual([
+      {
+        name: 'desc',
+      },
+    ])
   })
 
   it('should default to asc when no sortOrder provided', () => {
     const result = createOrderByCondition('name', undefined, undefined, mockModel, mockFields)
 
-    expect(result).toEqual({
-      name: 'asc',
-    })
+    expect(result).toEqual([
+      {
+        name: 'asc',
+      },
+    ])
   })
 
   it('should build orderBy for nested relation path', () => {
@@ -302,11 +308,13 @@ describe('createOrderByCondition', () => {
 
     const result = createOrderByCondition('author.name', 'desc', undefined, mockModel, postFields)
 
-    expect(result).toEqual({
-      posts: {
-        name: 'desc',
+    expect(result).toEqual([
+      {
+        posts: {
+          name: 'desc',
+        },
       },
-    })
+    ])
   })
 
   it('should respect allowed sort paths when provided', () => {
@@ -316,9 +324,11 @@ describe('createOrderByCondition', () => {
 
     const result = createOrderByCondition('name', 'desc', allowedSortPaths, mockModel, mockFields)
 
-    expect(result).toEqual({
-      name: 'desc',
-    })
+    expect(result).toEqual([
+      {
+        name: 'desc',
+      },
+    ])
   })
 
   it('should fallback to primary field when sort path not allowed', () => {
@@ -334,17 +344,21 @@ describe('createOrderByCondition', () => {
       mockFields
     )
 
-    expect(result).toEqual({
-      id: 'desc',
-    })
+    expect(result).toEqual([
+      {
+        id: 'desc',
+      },
+    ])
   })
 
   it('should fallback to primary field when column does not exist', () => {
     const result = createOrderByCondition('nonexistent', 'desc', undefined, mockModel, mockFields)
 
-    expect(result).toEqual({
-      id: 'desc',
-    })
+    expect(result).toEqual([
+      {
+        id: 'desc',
+      },
+    ])
   })
 
   it('should handle nested path in allowed sortBy configuration', () => {
