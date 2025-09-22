@@ -634,17 +634,31 @@ export class FieldBuilder<
     }
   }
 }
-
 type CastOptionalFieldToZodSchema<
-  TField extends FieldShapeBase,
+  TField extends FieldShapeBase | FieldShapeClient,
   TSchema extends z.ZodTypeAny,
-> = TField['$server'] extends { source: 'column' }
-  ? TField['$server']['column']['isRequired'] extends true
+> = TField extends { $server: { source: 'column' } }
+  ? TSchema
+  : TField extends { $client: { source: 'column' } }
     ? TSchema
     : z.ZodOptional<TSchema>
-  : TSchema
 
-type FieldRelationToZodSchema<TField extends FieldRelationShape> =
+type FieldRelationToZodSchemaClient<TField extends FieldRelationShapeClient> =
+  TField extends FieldRelationConnectShapeClient
+    ? TField['$client']['relation']['isList'] extends true
+      ? z.ZodArray<FieldsShapeToZodObject<TField['fields']['shape']>>
+      : FieldsShapeToZodObject<TField['fields']['shape']>
+    : TField extends FieldRelationCreateShapeClient
+      ? TField['$client']['relation']['isList'] extends true
+        ? z.ZodArray<FieldsShapeToZodObject<TField['fields']['shape']>>
+        : FieldsShapeToZodObject<TField['fields']['shape']>
+      : TField extends FieldRelationConnectOrCreateShapeClient
+        ? TField['$client']['relation']['isList'] extends true
+          ? z.ZodArray<FieldsShapeToZodObject<TField['fields']['shape']>>
+          : FieldsShapeToZodObject<TField['fields']['shape']>
+        : never
+
+type FieldRelationToZodSchemaServer<TField extends FieldRelationShape> =
   TField extends FieldRelationConnectShape
     ? TField['$server']['relation']['isList'] extends true
       ? z.ZodArray<FieldsShapeToZodObject<TField['fields']['shape']>>
@@ -659,38 +673,41 @@ type FieldRelationToZodSchema<TField extends FieldRelationShape> =
           : FieldsShapeToZodObject<TField['fields']['shape']>
         : never
 
-export type FieldShapeToZodSchema<TField extends FieldShapeBase> =
-  TField extends FieldColumnJsonShape
+export type FieldShapeToZodSchema<TField extends FieldShapeBase | FieldShapeClient> =
+  TField extends FieldColumnJsonShape | FieldColumnJsonShapeClient
     ? CastOptionalFieldToZodSchema<TField, z.ZodAny>
-    : TField extends FieldColumnStringShape
+    : TField extends FieldColumnStringShape | FieldColumnStringShapeClient
       ? CastOptionalFieldToZodSchema<TField, z.ZodString>
-      : TField extends FieldColumnStringArrayShape
+      : TField extends FieldColumnStringArrayShape | FieldColumnStringArrayShapeClient
         ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodString>>
-        : TField extends FieldColumnNumberShape
+        : TField extends FieldColumnNumberShape | FieldColumnNumberShapeClient
           ? CastOptionalFieldToZodSchema<TField, z.ZodNumber>
-          : TField extends FieldColumnNumberArrayShape
+          : TField extends FieldColumnNumberArrayShape | FieldColumnNumberArrayShapeClient
             ? CastOptionalFieldToZodSchema<TField, z.ZodArray<z.ZodNumber>>
-            : TField extends FieldColumnBooleanShape
+            : TField extends FieldColumnBooleanShape | FieldColumnBooleanShapeClient
               ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>
-              : TField extends FieldColumnDateShape
+              : TField extends FieldColumnDateShape | FieldColumnDateShapeClient
                 ? CastOptionalFieldToZodSchema<TField, z.ZodDate>
                 : TField extends FieldRelationShape
-                  ? FieldRelationToZodSchema<TField>
-                  : never
+                  ? FieldRelationToZodSchemaServer<TField>
+                  : TField extends FieldRelationShapeClient
+                    ? FieldRelationToZodSchemaClient<TField>
+                    : never
 
-export type FieldsShapeToZodObject<TFieldsShape extends FieldsShape> = z.ZodObject<{
-  [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShape
-    ? FieldShapeToZodSchema<TFieldsShape[TKey]>
-    : never
-}>
+export type FieldsShapeToZodObject<TFieldsShape extends FieldsShape | FieldsShapeClient> =
+  z.ZodObject<{
+    [TKey in keyof TFieldsShape]: TFieldsShape[TKey] extends FieldShape | FieldShapeClient
+      ? FieldShapeToZodSchema<TFieldsShape[TKey]>
+      : never
+  }>
 
-export function fieldToZodScheama<TFieldShape extends FieldShapeBase>(
+export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShapeClient>(
   fieldShape: TFieldShape
 ): FieldShapeToZodSchema<TFieldShape> {
-  const isRequired = fieldShape.required
+  const isRequired = fieldShape.required || false
   const fieldLabel = fieldShape.label || 'Field'
   const requiredMessage = `${fieldLabel} is required`
-  console.log(fieldShape)
+
   switch (fieldShape.type) {
     // Richtext JSON
     case 'richText': {
@@ -752,6 +769,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase>(
       }
       return z.coerce.date().optional() as FieldShapeToZodSchema<TFieldShape>
     }
+
     // relation input
     case 'connect':
     case 'create':
@@ -765,7 +783,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase>(
   }
 }
 
-export function fieldsShapeToZodObject<TFieldsShape extends FieldsShape>(
+export function fieldsShapeToZodObject<TFieldsShape extends FieldsShape | FieldsShapeClient>(
   fieldsShape: TFieldsShape
 ): FieldsShapeToZodObject<TFieldsShape> {
   const zodObject = Object.entries(fieldsShape).reduce(
