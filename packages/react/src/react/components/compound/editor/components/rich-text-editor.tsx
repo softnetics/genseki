@@ -9,6 +9,7 @@ import { Description, FieldGroup, Label } from '../../../primitives/field'
 
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
+  value?: string | Content | Content[]
   onChange?: (content: string | Content | Content[]) => void
   isDisabled?: boolean
   isRequired?: boolean
@@ -51,6 +52,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
               const json = editor.getJSON()
               props.onChange?.(json)
             }}
+            content={props.value}
             {...props.editorProviderProps}
           />
         </div>
