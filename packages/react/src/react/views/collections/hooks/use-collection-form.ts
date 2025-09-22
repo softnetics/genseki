@@ -1,5 +1,6 @@
 'use client'
 
+import { useMemo } from 'react'
 import { type DefaultValues, type FieldValues, useForm, type UseFormProps } from 'react-hook-form'
 
 import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
@@ -18,8 +19,9 @@ export const useCollectionForm = <
 ) => {
   const storageAdapter = useStorageAdapter()
   const { fields } = useCollection()
-
-  const schema = fieldsShapeToZodObject(fields.shape)
+  const schema = useMemo(() => {
+    return fieldsShapeToZodObject(fields.shape)
+  }, [])
   return useForm<TFieldValues, TContext, TTransformedValues>({
     resolver: standardSchemaResolver(schema),
     defaultValues:
