@@ -1,5 +1,4 @@
 import type { PartialDeep, Promisable } from 'type-fest'
-import z from 'zod'
 
 import type { InferFields } from './collection'
 import type { AnyContextable, ContextToRequestContext } from './context'
@@ -634,14 +633,15 @@ export class FieldBuilder<
     }
   }
 }
+import { z } from 'zod'
 
 type CastOptionalFieldToZodSchema<
   TField extends FieldShapeBase,
   TSchema extends z.ZodTypeAny,
 > = TField['$server'] extends { source: 'column' }
   ? TField['$server']['column']['isRequired'] extends true
-    ? z.ZodOptional<TSchema>
-    : TSchema
+    ? TSchema
+    : z.ZodOptional<TSchema>
   : TSchema
 
 type FieldRelationToZodSchema<TField extends FieldRelationShape> =
@@ -661,7 +661,7 @@ type FieldRelationToZodSchema<TField extends FieldRelationShape> =
 
 export type FieldShapeToZodSchema<TField extends FieldShapeBase> =
   TField extends FieldColumnJsonShape
-    ? CastOptionalFieldToZodSchema<TField, z.ZodJSONSchema>
+    ? CastOptionalFieldToZodSchema<TField, z.ZodAny>
     : TField extends FieldColumnStringShape
       ? CastOptionalFieldToZodSchema<TField, z.ZodString>
       : TField extends FieldColumnStringArrayShape
@@ -673,7 +673,7 @@ export type FieldShapeToZodSchema<TField extends FieldShapeBase> =
             : TField extends FieldColumnBooleanShape
               ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>
               : TField extends FieldColumnDateShape
-                ? CastOptionalFieldToZodSchema<TField, z.ZodISODate>
+                ? CastOptionalFieldToZodSchema<TField, z.ZodDate>
                 : TField extends FieldRelationShape
                   ? FieldRelationToZodSchema<TField>
                   : never
@@ -687,77 +687,79 @@ export type FieldsShapeToZodObject<TFieldsShape extends FieldsShape> = z.ZodObje
 export function fieldToZodScheama<TFieldShape extends FieldShapeBase>(
   fieldShape: TFieldShape
 ): FieldShapeToZodSchema<TFieldShape> {
-  // TODO: More options
+  const isRequired =
+    fieldShape.$server?.source === 'column' ? fieldShape.$server.column.isRequired : false
+  const fieldLabel = fieldShape.label || 'Field'
+  const requiredMessage = `${fieldLabel} is required`
+
   switch (fieldShape.type) {
     // Richtext JSON
     case 'richText': {
-      return z.json() as FieldShapeToZodSchema<TFieldShape>
+      const schema = z.any()
+      return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
+
     // string input
     case 'text':
     case 'selectText':
     case 'time':
     case 'password':
     case 'media': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.string().optional() as FieldShapeToZodSchema<TFieldShape>
-      }
+      const schema = z.string().min(1, requiredMessage)
+      return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
+    }
 
-      return z.string() as FieldShapeToZodSchema<TFieldShape>
-    }
     case 'email': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.string().email().optional() as FieldShapeToZodSchema<TFieldShape>
-      }
-      return z.string().email() as FieldShapeToZodSchema<TFieldShape>
+      const schema = z.string().min(1, requiredMessage).email('Please enter a valid email address')
+      return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
+
     // string[] input
     case 'comboboxText': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.array(z.string()).optional() as FieldShapeToZodSchema<TFieldShape>
-      }
-      return z.array(z.string()) as FieldShapeToZodSchema<TFieldShape>
+      const schema = z.array(z.string()).min(1, requiredMessage)
+      return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
+
     // number input
     case 'number':
     case 'selectNumber': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.number().optional() as FieldShapeToZodSchema<TFieldShape>
+      if (isRequired) {
+        return z.number() as FieldShapeToZodSchema<TFieldShape>
       }
-      return z.number() as FieldShapeToZodSchema<TFieldShape>
+      return z.number().optional() as FieldShapeToZodSchema<TFieldShape>
     }
+
     // number[] input
     case 'comboboxNumber': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.array(z.number()).optional() as FieldShapeToZodSchema<TFieldShape>
+      if (isRequired) {
+        return z.array(z.number()).min(1, requiredMessage) as FieldShapeToZodSchema<TFieldShape>
       }
-      return z.array(z.number()) as FieldShapeToZodSchema<TFieldShape>
+      return z.array(z.number()).optional() as FieldShapeToZodSchema<TFieldShape>
     }
+
     // boolean input
     case 'checkbox':
     case 'switch': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.boolean().optional() as FieldShapeToZodSchema<TFieldShape>
+      if (isRequired) {
+        return z.boolean() as FieldShapeToZodSchema<TFieldShape>
       }
-      return z.boolean() as FieldShapeToZodSchema<TFieldShape>
+      return z.boolean().optional() as FieldShapeToZodSchema<TFieldShape>
     }
+
     // date input
     case 'date': {
-      if (!fieldShape.$server.column.isRequired) {
-        return z.iso.date().optional() as FieldShapeToZodSchema<TFieldShape>
+      if (isRequired) {
+        return z.coerce.date() as FieldShapeToZodSchema<TFieldShape>
       }
-      return z.iso.date() as FieldShapeToZodSchema<TFieldShape>
+      return z.coerce.date().optional() as FieldShapeToZodSchema<TFieldShape>
     }
-    // TODO: relation input
-    case 'connect': {
-      return z.any() as unknown as FieldShapeToZodSchema<TFieldShape>
-    }
-    case 'create': {
-      return z.any() as unknown as FieldShapeToZodSchema<TFieldShape>
-    }
+    // relation input
+    case 'connect':
+    case 'create':
     case 'connectOrCreate': {
       return z.any() as unknown as FieldShapeToZodSchema<TFieldShape>
     }
+
     default: {
       throw new Error(`Unknown field type: ${(fieldShape as any).type}`)
     }
@@ -774,6 +776,5 @@ export function fieldsShapeToZodObject<TFieldsShape extends FieldsShape>(
     },
     {} as Record<string, z.ZodTypeAny>
   )
-
   return z.object(zodObject) as FieldsShapeToZodObject<TFieldsShape>
 }
