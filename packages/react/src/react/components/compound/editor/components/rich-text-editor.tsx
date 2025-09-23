@@ -3,6 +3,7 @@
 import { useEffect } from 'react'
 
 import { type Content, type EditorProviderProps, useEditor } from '@tiptap/react'
+import { isDeepEqual } from 'remeda'
 
 import { EditorProvider } from './rich-text-provider'
 
@@ -10,7 +11,6 @@ import { cn } from '../../../../utils/cn'
 import { focusStyles } from '../../../primitives'
 import { CustomFieldError } from '../../../primitives/custom-field-error'
 import { Description, FieldGroup, Label } from '../../../primitives/field'
-
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
   value?: string | Content | Content[]
@@ -36,10 +36,9 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
 
   useEffect(() => {
     if (!editor) return
-    if (props.value !== undefined) {
-      editor.commands.setContent(props.value)
-    }
-  }, [props.value, editor])
+    if (isDeepEqual(editor.getJSON(), props.value) || props.value === undefined) return
+    editor.commands.setContent(props.value)
+  }, [props.value])
 
   return (
     <div className="flex flex-col gap-y-4" data-invalid={true}>
