@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.46
+
+### Patch Changes
+
+- [#193](https://github.com/softnetics/genseki/pull/193) [`b0301bc`](https://github.com/softnetics/genseki/commit/b0301bc28d336b96816b5b932ec010b490cc1fbb) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Uploading image to storage in rich text
+
+- [#198](https://github.com/softnetics/genseki/pull/198) [`cb2221f`](https://github.com/softnetics/genseki/commit/cb2221f49c979a33701598fb81b187b4a057e646) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Upgrade to support relation table for searching and sorting
+
+- [#194](https://github.com/softnetics/genseki/pull/194) [`28387bf`](https://github.com/softnetics/genseki/commit/28387bfadbb87537c21f4fbcf3ec9af53693efb3) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - Fix query key in useInvalidateQueries
+
 ## 0.1.0-alpha.45
 
 ### Minor Changes

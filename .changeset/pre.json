@@ -13,6 +13,7 @@
     "@genseki/prisma-generator": "0.0.0"
   },
   "changesets": [
+    "bitter-roses-rescue",
     "bitter-tools-rest",
     "blue-ghosts-rush",
     "blue-icons-search",
@@ -29,6 +30,7 @@
     "clever-jobs-admire",
     "cool-clocks-decide",
     "cool-knives-appear",
+    "dry-laws-ring",
     "dull-radios-notice",
     "easy-hats-post",
     "empty-schools-yawn",
@@ -38,6 +40,7 @@
     "five-doodles-relate",
     "five-tables-smile",
     "fluffy-lizards-shop",
+    "fluffy-papayas-accept",
     "forty-fans-sniff",
     "four-cameras-walk",
     "four-donkeys-travel",
@@ -86,6 +89,7 @@
     "proud-olives-lie",
     "purple-buttons-bathe",
     "purple-sloths-drop",
+    "quiet-doors-repair",
     "real-snakes-double",
     "rich-radios-sit",
     "rude-carrots-learn",
