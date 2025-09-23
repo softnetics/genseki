@@ -332,7 +332,7 @@ export const CustomCreatePage = () => {
           onSubmit={form.handleSubmit(handleSubmit, handleValidationError)}
           className="flex flex-col gap-y-8 mt-16"
         >
-          <CreateField fieldName="example" deselectable={true} />
+          <CreateField fieldName="example" />
           <CreateField fieldName="title" />
           <CreateField fieldName="content" />
           <CreateField fieldName="author" />
