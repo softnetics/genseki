@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.48
+
+### Patch Changes
+
+- [#211](https://github.com/softnetics/genseki/pull/211) [`eea522d`](https://github.com/softnetics/genseki/commit/eea522dc4d3b1a4d4bcf771f9b943ad1c7c2503d) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Change type date in zod schema
+
+- Updated dependencies [[`eea522d`](https://github.com/softnetics/genseki/commit/eea522dc4d3b1a4d4bcf771f9b943ad1c7c2503d)]:
+  - @genseki/react@0.1.0-alpha.50
+  - @genseki/next@0.1.0-alpha.50
+  - @genseki/plugins@0.1.0-alpha.50
+  - @genseki/prisma-generator@0.1.0-alpha.50
+  - @genseki/react-query@0.1.0-alpha.50
+  - @genseki/rest@0.1.0-alpha.50
+
 ## 0.1.0-alpha.47
 
 ### Patch Changes
