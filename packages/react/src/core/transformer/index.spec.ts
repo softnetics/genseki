@@ -858,7 +858,12 @@ describe('transformer', () => {
         content: true,
         published: true,
         author: { select: { id: true, name: true } },
-        tags: { select: { id: true, name: true, order: true } },
+        tags: {
+          orderBy: {
+            order: 'asc',
+          },
+          select: { id: true, name: true, order: true },
+        },
       }
       const output = transformFieldsToPrismaSelectPayload(postFields)
       expect(output).toEqual(expected)

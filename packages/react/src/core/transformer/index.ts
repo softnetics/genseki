@@ -323,6 +323,7 @@ export function transformFieldsToPrismaSelectPayload(fields: Fields) {
       }
       if (orderColumn) {
         acc[relationName].select[orderColumn] = true
+        acc[relationName].orderBy = { [orderColumn]: 'asc' }
       }
     }
     return acc
