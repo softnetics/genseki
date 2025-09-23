@@ -7,18 +7,27 @@ import { type SubmitErrorHandler, type SubmitHandler, useFormContext } from 'rea
 import { zodResolver } from '@hookform/resolvers/zod'
 import { useQueryClient } from '@tanstack/react-query'
 import { createColumnHelper } from '@tanstack/react-table'
+import Color from '@tiptap/extension-color'
+import TextAlign from '@tiptap/extension-text-align'
+import { TextStyle } from '@tiptap/extension-text-style'
+import { Underline } from '@tiptap/extension-underline'
+import StarterKit from '@tiptap/starter-kit'
 import z from 'zod'
 
 import type { CollectionLayoutProps, InferCreateFields } from '@genseki/react'
 import {
   actionsColumn,
+  BackColorExtension,
   Button,
   CollectionListToolbar,
   createDeleteActionItem,
   createEditActionItem,
   createSeparatorItem,
+  CustomImageExtension,
   Form,
+  ImageUploadNodeExtension,
   type InferFields,
+  SelectionExtension,
   SubmitButton,
   TanstackTable,
   toast,
@@ -35,10 +44,52 @@ import {
   useTableStatesContext,
 } from '@genseki/react'
 
-import type { fields } from './posts'
+import { type fields } from './posts'
+
+import { EditorSlotBefore } from '../editor/slot-before'
 
 type Post = InferFields<typeof fields>
 const columnHelper = createColumnHelper<Post>()
+
+const postEditorProviderProps = {
+  immediatelyRender: false,
+  shouldRerenderOnTransaction: true,
+  content: '<h2>This came from Post content field</h2>',
+  slotBefore: <EditorSlotBefore />,
+  extensions: [
+    Color,
+    BackColorExtension,
+    Underline.configure({ HTMLAttributes: { class: 'earth-underline' } }),
+    SelectionExtension,
+    TextStyle,
+    TextAlign.configure({
+      types: ['heading', 'paragraph'],
+      alignments: ['left', 'center', 'right', 'justify'],
+      defaultAlignment: 'left',
+    }),
+    StarterKit.configure({
+      bold: { HTMLAttributes: { class: 'bold large-black' } },
+      paragraph: { HTMLAttributes: { class: 'paragraph-custom' } },
+      heading: { HTMLAttributes: { class: 'heading-custom' } },
+      bulletList: { HTMLAttributes: { class: 'list-custom' } },
+      orderedList: { HTMLAttributes: { class: 'ordered-list' } },
+      code: { HTMLAttributes: { class: 'code' } },
+      codeBlock: { HTMLAttributes: { class: 'code-block' } },
+      horizontalRule: { HTMLAttributes: { class: 'hr-custom' } },
+      italic: { HTMLAttributes: { class: 'italic-text' } },
+      strike: { HTMLAttributes: { class: 'strikethrough' } },
+      blockquote: { HTMLAttributes: { class: 'blockquote-custom' } },
+    }),
+    CustomImageExtension.configure({ HTMLAttributes: { className: 'image-displayer' } }),
+    ImageUploadNodeExtension.configure({
+      showProgress: false,
+      accept: 'image/*',
+      maxSize: 1024 * 1024 * 10, // 10MB
+      limit: 3,
+      pathName: 'posts/rich-text',
+    }),
+  ],
+}
 
 export const columns = [
   columnHelper.group({
