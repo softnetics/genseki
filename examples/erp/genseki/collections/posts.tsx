@@ -72,6 +72,8 @@ export const fields = builder.fields('post', (fb) => ({
     type: 'text',
     label: 'Title',
     description: "Post's title name",
+    required: true,
+    default: '',
   }),
   content: fb.columns('content', {
     type: 'richText',

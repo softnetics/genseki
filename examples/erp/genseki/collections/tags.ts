@@ -8,6 +8,8 @@ import { builder, context } from '../helper'
 export const fields = builder.fields('tag', (fb) => ({
   name: fb.columns('name', {
     type: 'text',
+    required: true,
+    default: '',
   }),
 }))
 
