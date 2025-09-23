@@ -11,6 +11,9 @@ export const fields = builder.fields('tag', (fb) => ({
     required: true,
     default: '',
   }),
+  updatedAt: fb.columns('updatedAt', {
+    type: 'date',
+  }),
 }))
 
 export const tagsCollection = createPlugin('tags', (app) => {
@@ -23,7 +26,7 @@ export const tagsCollection = createPlugin('tags', (app) => {
         columns: columns,
         configuration: {
           search: ['name'],
-          sortBy: [['name']],
+          sortBy: [['updatedAt']],
         },
         toolbar: {
           create: true,

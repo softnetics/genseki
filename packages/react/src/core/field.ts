@@ -687,7 +687,7 @@ export type FieldShapeToZodSchema<TField extends FieldShapeBase | FieldShapeClie
             : TField extends FieldColumnBooleanShape | FieldColumnBooleanShapeClient
               ? CastOptionalFieldToZodSchema<TField, z.ZodBoolean>
               : TField extends FieldColumnDateShape | FieldColumnDateShapeClient
-                ? CastOptionalFieldToZodSchema<TField, z.ZodISODate>
+                ? CastOptionalFieldToZodSchema<TField, z.ZodCoercedDate>
                 : TField extends FieldRelationShape
                   ? FieldRelationToZodSchemaServer<TField>
                   : TField extends FieldRelationShapeClient
@@ -765,9 +765,9 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     // date input
     case 'date': {
       if (isRequired) {
-        return z.iso.date() as FieldShapeToZodSchema<TFieldShape>
+        return z.coerce.date() as FieldShapeToZodSchema<TFieldShape>
       }
-      return z.iso.date().optional() as FieldShapeToZodSchema<TFieldShape>
+      return z.coerce.date().optional() as FieldShapeToZodSchema<TFieldShape>
     }
 
     // TODO: relation input
