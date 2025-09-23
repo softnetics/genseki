@@ -110,7 +110,7 @@ export const fields = builder.fields('post', (fb) => ({
   postTags: fb.relations(
     'postTags',
     (fb) => ({
-      type: 'connectOrCreate' as const,
+      type: 'create' as const,
       label: 'Tags',
       options: 'postTags',
       fields: fb.fields('postTag', (fb) => ({
