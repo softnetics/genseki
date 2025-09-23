@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.48
+
+### Patch Changes
+
+- [#207](https://github.com/softnetics/genseki/pull/207) [`32757e7`](https://github.com/softnetics/genseki/commit/32757e7757b6f23f79ae7c29044eb380b391c2de) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Check empty payload in queryKey
+
 ## 0.1.0-alpha.47
 
 ## 0.1.0-alpha.46
