@@ -205,7 +205,6 @@ interface AutoSelectField extends Omit<SelectProps<{}>, 'items'> {
 
 export function AutoSelectField(props: AutoSelectField) {
   const { field, error } = useFormItemController()
-  const { deselectable = true } = props
   const form = useFormContext()
 
   const value = useWatch({
@@ -244,7 +243,8 @@ export function AutoSelectField(props: AutoSelectField) {
         if (isOpen) query.refetch()
       }}
       onSelectionChange={(value) => {
-        if (value === null || (deselectable && value === field.value)) return field.onChange(null)
+        if (value === null || (props.deselectable && value === field.value))
+          return field.onChange(null)
 
         const selectedItem = items.find((item) => item.value === value)
         if (selectedItem) {
@@ -341,10 +341,9 @@ export interface AutoFieldProps {
   className?: string
   prefix?: string
   disabled?: boolean
-  deselectable?: boolean
 }
 
-export function AutoField({ deselectable = true, ...props }: AutoFieldProps) {
+export function AutoField(props: AutoFieldProps) {
   const { fieldShape: field, className } = props
 
   if (props.fieldShape.hidden) return null
@@ -461,7 +460,7 @@ export function AutoField({ deselectable = true, ...props }: AutoFieldProps) {
               isDisabled={disabled}
               optionsName={field.options}
               optionsFetchPath={props.optionsFetchPath}
-              deselectable={deselectable}
+              deselectable={field.deselectable}
             />
           }
         />
@@ -502,7 +501,6 @@ export function AutoField({ deselectable = true, ...props }: AutoFieldProps) {
     case 'connect':
     case 'connectOrCreate': {
       if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
-
       return (
         <AutoRelationshipField
           name={commonProps.name}
@@ -511,7 +509,7 @@ export function AutoField({ deselectable = true, ...props }: AutoFieldProps) {
           allowCreate={field.type === 'create' || field.type === 'connectOrCreate'}
           disabled={disabled}
           optionsFetchPath={props.optionsFetchPath}
-          deselectable={deselectable}
+          deselectable={field.deselectable}
         />
       )
     }
@@ -534,14 +532,10 @@ interface AutoRelationshipFieldProps {
   deselectable?: boolean
 }
 
-export function AutoRelationshipField({
-  deselectable = true,
-  ...props
-}: AutoRelationshipFieldProps) {
+export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
   if (props.fieldShape.hidden) {
     return null
   }
-
   switch (props.fieldShape.$client.relation.isList) {
     case false:
       return (
@@ -553,7 +547,7 @@ export function AutoRelationshipField({
           allowConnect={props.allowConnect}
           disabled={props.disabled}
           optionsFetchPath={props.optionsFetchPath}
-          deselectable={deselectable}
+          deselectable={props.deselectable}
         />
       )
     case true:
@@ -566,7 +560,7 @@ export function AutoRelationshipField({
           allowConnect={props.allowConnect}
           disabled={props.disabled}
           optionsFetchPath={props.optionsFetchPath}
-          deselectable={deselectable}
+          deselectable={props.deselectable}
         />
       )
     default:
@@ -574,7 +568,7 @@ export function AutoRelationshipField({
   }
 }
 
-export function AutoOneRelationshipField({ deselectable, ...props }: AutoRelationshipFieldProps) {
+export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   const { control } = useFormContext()
 
   const fieldShape = props.fieldShape
@@ -601,7 +595,7 @@ export function AutoOneRelationshipField({ deselectable, ...props }: AutoRelatio
             isDisabled={disabled}
             optionsFetchPath={props.optionsFetchPath}
             optionsName={options}
-            deselectable={deselectable}
+            deselectable={fieldShape.deselectable}
           />
         </FormItemController>
       )}
