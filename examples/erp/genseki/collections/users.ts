@@ -41,10 +41,11 @@ export const usersCollection = createPlugin('users', (app) => {
         columns: columns,
         configuration: {
           search: ['name'],
-          sortBy: ['name'],
+          sortBy: [['name']],
         },
       })
     )
+    .addPageAndApiRouter(collection.update(fields))
     .addApiRouter({
       example: builder.endpoint(
         {

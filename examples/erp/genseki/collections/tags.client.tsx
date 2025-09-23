@@ -25,6 +25,9 @@ export const columns = [
   columnHelper.accessor('name', {
     cell: (info) => info.getValue(),
   }),
+  columnHelper.accessor('updatedAt', {
+    cell: (info) => info.getValue(),
+  }),
   actionsColumn([
     createViewActionItem(),
     createEditActionItem(),

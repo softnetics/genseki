@@ -68,3 +68,16 @@ export type MockPrismaClient = {
 } & {
   $transaction<T>(cb: (tx: MockPrismaClient) => Promise<T> | T): Promise<T>
 } & {}
+
+export type PrismaSearchCondition = {
+  [fieldName: string]:
+    | {
+        contains: string
+        mode: 'insensitive'
+      }
+    | PrismaSearchCondition
+}
+
+export type PrismaOrderByCondition = {
+  [fieldName: string]: string | PrismaOrderByCondition
+}

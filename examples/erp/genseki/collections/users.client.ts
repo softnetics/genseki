@@ -2,7 +2,7 @@
 
 import { createColumnHelper } from '@tanstack/react-table'
 
-import type { InferFields } from '@genseki/react'
+import { actionsColumn, createEditActionItem, type InferFields } from '@genseki/react'
 
 import type { fields } from './users'
 
@@ -19,4 +19,5 @@ export const columns = [
   columnHelper.accessor('email', {
     cell: (info) => info.getValue(),
   }),
+  actionsColumn([createEditActionItem()]),
 ]

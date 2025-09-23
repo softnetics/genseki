@@ -56,6 +56,7 @@ export const postEditorProviderProps = {
       accept: 'image/*',
       maxSize: 1024 * 1024 * 10, // 10MB
       limit: 3,
+      pathName: 'posts/rich-text',
     }),
   ],
 }
@@ -71,6 +72,8 @@ export const fields = builder.fields('post', (fb) => ({
     type: 'text',
     label: 'Title',
     description: "Post's title name",
+    required: true,
+    default: '',
   }),
   content: fb.columns('content', {
     type: 'richText',
@@ -124,6 +127,26 @@ export const fields = builder.fields('post', (fb) => ({
           }),
         })),
         options: 'tag',
+      })),
+    })),
+  })),
+  postDetail: fb.relations('detail', (fb) => ({
+    type: 'create' as const,
+    label: 'Detail',
+    fields: fb.fields('postDetail', (fb) => ({
+      description: fb.columns('description', {
+        type: 'text',
+        label: 'Description',
+      }),
+      extra: fb.relations('extra', (fb) => ({
+        type: 'create' as const,
+        label: 'Extra Note',
+        fields: fb.fields('postExtra', (fb) => ({
+          note: fb.columns('note', {
+            type: 'text',
+            label: 'Note',
+          }),
+        })),
       })),
     })),
   })),
@@ -189,8 +212,11 @@ export const postsCollection = createPlugin('posts', (app) => {
       collection.list(fields, {
         columns: columns,
         configuration: {
-          search: ['title'],
-          sortBy: ['updatedAt', 'title'],
+          search: ['title', 'postDetail.description', 'postDetail.extra.note'],
+          sortBy: [
+            ['postDetail.description', 'asc'],
+            ['title', 'asc'],
+          ],
         },
         toolbar: {
           create: true,

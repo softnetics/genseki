@@ -1,5 +1,75 @@
 # @example/erp
 
+## 0.1.0-alpha.48
+
+### Patch Changes
+
+- [#211](https://github.com/softnetics/genseki/pull/211) [`eea522d`](https://github.com/softnetics/genseki/commit/eea522dc4d3b1a4d4bcf771f9b943ad1c7c2503d) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Change type date in zod schema
+
+- Updated dependencies [[`eea522d`](https://github.com/softnetics/genseki/commit/eea522dc4d3b1a4d4bcf771f9b943ad1c7c2503d)]:
+  - @genseki/react@0.1.0-alpha.50
+  - @genseki/next@0.1.0-alpha.50
+  - @genseki/plugins@0.1.0-alpha.50
+  - @genseki/prisma-generator@0.1.0-alpha.50
+  - @genseki/react-query@0.1.0-alpha.50
+  - @genseki/rest@0.1.0-alpha.50
+
+## 0.1.0-alpha.47
+
+### Patch Changes
+
+- Updated dependencies [[`80d8389`](https://github.com/softnetics/genseki/commit/80d8389fe70f74867aaf6241559fa0d38d3e87c9)]:
+  - @genseki/react@0.1.0-alpha.49
+  - @genseki/next@0.1.0-alpha.49
+  - @genseki/plugins@0.1.0-alpha.49
+  - @genseki/prisma-generator@0.1.0-alpha.49
+  - @genseki/react-query@0.1.0-alpha.49
+  - @genseki/rest@0.1.0-alpha.49
+
+## 0.1.0-alpha.46
+
+### Patch Changes
+
+- Updated dependencies [[`32757e7`](https://github.com/softnetics/genseki/commit/32757e7757b6f23f79ae7c29044eb380b391c2de)]:
+  - @genseki/react-query@0.1.0-alpha.48
+  - @genseki/react@0.1.0-alpha.48
+  - @genseki/next@0.1.0-alpha.48
+  - @genseki/rest@0.1.0-alpha.48
+  - @genseki/plugins@0.1.0-alpha.48
+  - @genseki/prisma-generator@0.1.0-alpha.48
+
+## 0.1.0-alpha.45
+
+### Patch Changes
+
+- [#204](https://github.com/softnetics/genseki/pull/204) [`abb3578`](https://github.com/softnetics/genseki/commit/abb3578fd869e60007dc4aebbcd344aaddd89903) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Display required error message
+
+- Updated dependencies [[`abb3578`](https://github.com/softnetics/genseki/commit/abb3578fd869e60007dc4aebbcd344aaddd89903)]:
+  - @genseki/react@0.1.0-alpha.47
+  - @genseki/next@0.1.0-alpha.47
+  - @genseki/plugins@0.1.0-alpha.47
+  - @genseki/prisma-generator@0.1.0-alpha.47
+  - @genseki/react-query@0.1.0-alpha.47
+  - @genseki/rest@0.1.0-alpha.47
+
+## 0.1.0-alpha.44
+
+### Patch Changes
+
+- [#193](https://github.com/softnetics/genseki/pull/193) [`b0301bc`](https://github.com/softnetics/genseki/commit/b0301bc28d336b96816b5b932ec010b490cc1fbb) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Uploading image to storage in rich text
+
+- [#198](https://github.com/softnetics/genseki/pull/198) [`cb2221f`](https://github.com/softnetics/genseki/commit/cb2221f49c979a33701598fb81b187b4a057e646) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Upgrade to support relation table for searching and sorting
+
+- [#203](https://github.com/softnetics/genseki/pull/203) [`b590f41`](https://github.com/softnetics/genseki/commit/b590f4110e1f5e488d41e089fd1e5fd06152c170) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: add min-height of richtext
+
+- Updated dependencies [[`b0301bc`](https://github.com/softnetics/genseki/commit/b0301bc28d336b96816b5b932ec010b490cc1fbb), [`cb2221f`](https://github.com/softnetics/genseki/commit/cb2221f49c979a33701598fb81b187b4a057e646), [`28387bf`](https://github.com/softnetics/genseki/commit/28387bfadbb87537c21f4fbcf3ec9af53693efb3)]:
+  - @genseki/react@0.1.0-alpha.46
+  - @genseki/react-query@0.1.0-alpha.46
+  - @genseki/next@0.1.0-alpha.46
+  - @genseki/plugins@0.1.0-alpha.46
+  - @genseki/prisma-generator@0.1.0-alpha.46
+  - @genseki/rest@0.1.0-alpha.46
+
 ## 0.1.0-alpha.43
 
 ### Patch Changes

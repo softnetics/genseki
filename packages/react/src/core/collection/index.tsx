@@ -52,7 +52,8 @@ import {
   type FieldShapeBase,
   type FieldsOptions,
 } from '../field'
-import type { DataType, InferDataType, ModelSchemas } from '../model'
+import type { DataType } from '../model'
+import { type InferDataType, type ModelSchemas } from '../model'
 import type { GensekiPluginBuilderOptions } from '../plugin'
 import { GensekiUiCommonId, type GensekiUiCommonProps } from '../ui'
 
@@ -411,34 +412,73 @@ export type CollectionDeleteApiHandler<TContext extends AnyContextable, TFields 
   }
 ) => Promisable<CollectionDeleteApiReturn>
 
-// Extract searchable columns from fields
-export type ExtractSearchableColumns<TFields extends Fields> = {
-  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-    ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
-      ? Extract<K, string>
-      : never
-    : never
-}[keyof TFields['shape']]
+type DepthRelation<T extends number> = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10][T]
 
-// Extract sortable columns from fields
-export type ExtractSortableColumns<TFields extends Fields> = {
-  [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
-    ? TFields['shape'][K]['$client']['column']['dataType'] extends
-        | typeof DataType.STRING
-        | typeof DataType.INT
-        | typeof DataType.FLOAT
-        | typeof DataType.DATETIME
-        | typeof DataType.BIGINT
-        | typeof DataType.DECIMAL
-      ? Extract<K, string>
-      : never
-    : never
-}[keyof TFields['shape']]
+type ExtractSearchableColumns<
+  TFields extends Fields,
+  TPrefix extends string = '',
+  TAcc = never,
+  TDepth extends number = 0,
+> = TDepth extends 10
+  ? TAcc
+  :
+      | TAcc
+      | {
+          [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+            ? TFields['shape'][K]['$client']['column']['dataType'] extends typeof DataType.STRING
+              ? TPrefix extends ''
+                ? Extract<K, string>
+                : `${TPrefix}.${Extract<K, string>}`
+              : never
+            : TFields['shape'][K] extends FieldRelationShape
+              ? TFields['shape'][K]['fields'] extends Fields
+                ? ExtractSearchableColumns<
+                    TFields['shape'][K]['fields'],
+                    TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
+                    TAcc,
+                    DepthRelation<TDepth>
+                  >
+                : never
+              : never
+        }[keyof TFields['shape']]
 
-// ListConfiguration
+type ExtractSortableColumns<
+  TFields extends Fields,
+  TPrefix extends string = '',
+  TAcc = never,
+  TDepth extends number = 0,
+> = TDepth extends 10
+  ? TAcc
+  :
+      | TAcc
+      | {
+          [K in keyof TFields['shape']]: TFields['shape'][K] extends FieldColumnShape
+            ? TFields['shape'][K]['$client']['column']['dataType'] extends
+                | typeof DataType.STRING
+                | typeof DataType.INT
+                | typeof DataType.FLOAT
+                | typeof DataType.DATETIME
+                | typeof DataType.BIGINT
+                | typeof DataType.DECIMAL
+              ? TPrefix extends ''
+                ? Extract<K, string>
+                : `${TPrefix}.${Extract<K, string>}`
+              : never
+            : TFields['shape'][K] extends FieldRelationShape
+              ? TFields['shape'][K]['fields'] extends Fields
+                ? ExtractSortableColumns<
+                    TFields['shape'][K]['fields'],
+                    TPrefix extends '' ? Extract<K, string> : `${TPrefix}.${Extract<K, string>}`,
+                    TAcc,
+                    DepthRelation<TDepth>
+                  >
+                : never
+              : never
+        }[keyof TFields['shape']]
+
 export interface ListConfiguration<TFields extends Fields> {
   search?: ExtractSearchableColumns<TFields>[]
-  sortBy?: ExtractSortableColumns<TFields>[]
+  sortBy?: ([ExtractSortableColumns<TFields>, 'asc' | 'desc'] | [ExtractSortableColumns<TFields>])[]
 }
 
 export interface CollectionListResponse {
@@ -520,7 +560,7 @@ export class CollectionBuilder<
     config: CollectionListConfig<TContext, TFields> = { columns: [] }
   ) {
     return (appOptions: GensekiAppOptions) => {
-      const route = this.listApiRouter(fields)
+      const route = this.listApiRouter(fields, config.configuration)
 
       const ui = createGensekiUiRoute({
         path: `${this.config.uiPathPrefix}/${this.slug}`,
@@ -571,12 +611,16 @@ export class CollectionBuilder<
     }
   }
 
-  listApiRouter<TFields extends Fields>(fields: TFields) {
+  listApiRouter<TFields extends Fields>(
+    fields: TFields,
+    listConfiguration?: ListConfiguration<TFields>
+  ) {
     const { route } = getCollectionDefaultListApiRoute({
       slug: this.slug,
       context: this.context,
       schema: this.schema,
       fields: fields,
+      listConfiguration: listConfiguration,
     })
 
     return {

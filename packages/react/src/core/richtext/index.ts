@@ -10,7 +10,13 @@ import { toast } from 'sonner'
 
 import type { EditorProviderClientProps, SanitizedExtension } from './types'
 
-import { BackColorExtension, CustomImageExtension, ImageUploadNodeExtension } from '../../react'
+import {
+  BackColorExtension,
+  CustomImageExtension,
+  generatePutObjSignedUrlData,
+  ImageUploadNodeExtension,
+  uploadObject,
+} from '../../react'
 import { SelectionExtension } from '../../react/components/compound/editor/extensions/selection-extension'
 import type { StorageAdapterClient } from '../file-storage-adapters'
 
@@ -83,18 +89,19 @@ export const constructSanitizedExtensions = (
             toast.error(error.message)
           },
           async upload(file) {
-            const key = `${crypto.randomUUID()}-${file.name}`
+            const name = file.name.split('.').slice(0, -1).join('.')
+            const fileType = file.name.split('.').pop()
+            const key = `${extension.options.pathName ? `${extension.options.pathName}/` : ''}${name}-${crypto.randomUUID()}.${fileType}`
+            const signedUrlPath = storageAdapter.grabPutObjectSignedUrlApiRoute.path
+            const putObjSignedUrl = await generatePutObjSignedUrlData(signedUrlPath, key)
 
-            // Upload image
-            const putObjSignedUrlApiRoute = storageAdapter.grabPutObjectSignedUrlApiRoute
-            const putObjUrlEndpoint = new URL(putObjSignedUrlApiRoute.path, window.location.origin)
-            putObjUrlEndpoint.searchParams.append('key', key)
-            const putObjSignedUrl = await fetch(putObjUrlEndpoint.toString())
-            const putObjSignedUrlData = await putObjSignedUrl.json()
-            await fetch(putObjSignedUrlData.signedUrl, {
-              method: 'PUT',
-              body: file,
-            })
+            if (!putObjSignedUrl.ok) {
+              throw new Error('Generating put object signed URL error: ' + putObjSignedUrl.message)
+            }
+            const uploadResult = await uploadObject(putObjSignedUrl.data.body.signedUrl, file)
+            if (!uploadResult.ok) {
+              throw new Error('File upload error: ' + uploadResult.message)
+            }
 
             return { key }
           },
