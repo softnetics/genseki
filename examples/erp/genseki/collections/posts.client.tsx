@@ -333,11 +333,7 @@ export const CustomCreatePage = () => {
           className="flex flex-col gap-y-8 mt-16"
         >
           <CreateField fieldName="example" />
-          <CreateField
-            fieldName="title"
-            // placeholder="Custom Title Input"
-            // className="border-2 rounded-sm border-purple-500 p-4"
-          />
+          <CreateField fieldName="title" />
           <CreateField fieldName="content" />
           <CreateField fieldName="author" />
           <CreateField fieldName="postTags" />

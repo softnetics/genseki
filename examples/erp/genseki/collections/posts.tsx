@@ -67,6 +67,7 @@ export const fields = builder.fields('post', (fb) => ({
     label: 'Example',
     description: 'This is an example of a select text field',
     options: 'example',
+    deselectable: true,
   }),
   title: fb.columns('title', {
     type: 'text',
@@ -85,11 +86,13 @@ export const fields = builder.fields('post', (fb) => ({
     type: 'connect',
     label: 'Author',
     required: true,
+    deselectable: true,
     fields: fb.fields('user', (fb) => ({
       name: fb.columns('name', {
         type: 'text',
         label: 'Name',
         description: 'The name of the author',
+        deselectable: true,
       }),
       email: fb.columns('email', {
         type: 'text',
@@ -120,6 +123,7 @@ export const fields = builder.fields('post', (fb) => ({
       }),
       tag: fb.relations('tag', (fb) => ({
         type: 'connect' as const,
+        deselectable: false,
         fields: fb.fields('tag', (fb) => ({
           name: fb.columns('name', {
             type: 'text',
