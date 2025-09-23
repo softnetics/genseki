@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.47
+
+### Patch Changes
+
+- [#204](https://github.com/softnetics/genseki/pull/204) [`abb3578`](https://github.com/softnetics/genseki/commit/abb3578fd869e60007dc4aebbcd344aaddd89903) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Display required error message
+
 ## 0.1.0-alpha.46
 
 ### Patch Changes

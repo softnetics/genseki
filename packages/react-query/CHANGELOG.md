@@ -1,5 +1,7 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.47
+
 ## 0.1.0-alpha.46
 
 ### Patch Changes

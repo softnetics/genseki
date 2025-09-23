@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.45
+
+### Patch Changes
+
+- [#204](https://github.com/softnetics/genseki/pull/204) [`abb3578`](https://github.com/softnetics/genseki/commit/abb3578fd869e60007dc4aebbcd344aaddd89903) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Display required error message
+
+- Updated dependencies [[`abb3578`](https://github.com/softnetics/genseki/commit/abb3578fd869e60007dc4aebbcd344aaddd89903)]:
+  - @genseki/react@0.1.0-alpha.47
+  - @genseki/next@0.1.0-alpha.47
+  - @genseki/plugins@0.1.0-alpha.47
+  - @genseki/prisma-generator@0.1.0-alpha.47
+  - @genseki/react-query@0.1.0-alpha.47
+  - @genseki/rest@0.1.0-alpha.47
+
 ## 0.1.0-alpha.44
 
 ### Patch Changes
