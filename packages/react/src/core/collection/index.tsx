@@ -159,11 +159,14 @@ export type InferCreateOneRelationFieldShape<
         create: TFieldShape extends FieldRelationCreateShape | FieldRelationConnectOrCreateShape
           ? _InferCreateFields<TFieldShape['fields']>
           : never
+
+        __order?: string
       }
     : {}) &
     ('connect' extends TKeys
       ? {
           connect: InferDataType<TFieldShape['$server']['relation']['relationDataTypes'][0]>
+          __order?: string
         }
       : {}) &
     ('disconnect' extends TKeys

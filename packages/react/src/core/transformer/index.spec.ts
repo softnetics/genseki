@@ -3,6 +3,7 @@ import { describe, expect, it } from 'vitest'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
+  transformFieldPayloadToUpdateOrderPayload,
   transformFieldsToPrismaSelectPayload,
   transformPrismaResultToFieldsPayload,
 } from '.'
@@ -122,6 +123,117 @@ const userFieldsOptional = builder.fields('user', (fb) => ({
     })),
     options: 'staff',
   })),
+}))
+
+const postFields = builder.fields('post', (fb) => ({
+  title: fb.columns('title', {
+    type: 'text',
+  }),
+  content: fb.columns('content', {
+    type: 'richText',
+    editor: {},
+  }),
+  published: fb.columns('published', {
+    type: 'checkbox',
+  }),
+  user: fb.relations('author', (fb) => ({
+    type: 'connect',
+    options: 'user',
+    fields: fb.fields('user', (fb) => ({
+      name: fb.columns('name', {
+        type: 'text',
+      }),
+    })),
+  })),
+  tags: fb.relations(
+    'tags',
+    (fb) => ({
+      type: 'connect',
+      options: 'tag',
+      fields: fb.fields('tag', (fb) => ({
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+      })),
+    }),
+    {
+      orderColumn: 'order',
+    }
+  ),
+}))
+
+const postCreateFields = builder.fields('post', (fb) => ({
+  title: fb.columns('title', {
+    type: 'text',
+  }),
+  content: fb.columns('content', {
+    type: 'richText',
+    editor: {},
+  }),
+  published: fb.columns('published', {
+    type: 'checkbox',
+  }),
+  user: fb.relations('author', (fb) => ({
+    type: 'connect',
+    options: 'user',
+    fields: fb.fields('user', (fb) => ({
+      name: fb.columns('name', {
+        type: 'text',
+      }),
+    })),
+  })),
+  tags: fb.relations(
+    'tags',
+    (fb) => ({
+      type: 'create',
+      options: 'tag',
+      fields: fb.fields('tag', (fb) => ({
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+      })),
+    }),
+    {
+      orderColumn: 'order',
+    }
+  ),
+}))
+
+const postConnectOrCreateFields = builder.fields('post', (fb) => ({
+  title: fb.columns('title', {
+    type: 'text',
+  }),
+  content: fb.columns('content', {
+    type: 'richText',
+    editor: {},
+  }),
+  published: fb.columns('published', {
+    type: 'checkbox',
+  }),
+  user: fb.relations('author', (fb) => ({
+    type: 'connect',
+    options: 'user',
+    fields: fb.fields('user', (fb) => ({
+      name: fb.columns('name', {
+        type: 'text',
+      }),
+    })),
+  })),
+  tags: fb.relations(
+    'tags',
+    (fb) => ({
+      type: 'connectOrCreate',
+      options: 'tag',
+      fields: fb.fields('tag', (fb) => ({
+        name: fb.columns('name', {
+          type: 'text',
+        }),
+      })),
+    }),
+    {
+      orderColumn: 'order',
+    }
+  ),
 }))
 
 describe('transformer', () => {
@@ -332,6 +444,117 @@ describe('transformer', () => {
       }
 
       const output = transformFieldPayloadToPrismaCreatePayload(userFieldsOptional, input)
+      expect(output).toEqual(expected)
+    })
+
+    it('should transform payload to update order payload correctly', () => {
+      const input = {
+        user: {
+          connect: 'user-id-1',
+        },
+        title: 'Post 1',
+        content: {},
+        published: true,
+        tags: [
+          { connect: 'tag-id-1', __order: '12314' },
+          { connect: 'tag-id-1', __order: '12313' },
+          { connect: 'tag-id-1', __order: '12315' },
+        ],
+      } satisfies InferCreateFields<typeof postFields>
+
+      const expected = {
+        tag: [
+          { where: { id: 'tag-id-1' }, data: { order: '12314' } },
+          { where: { id: 'tag-id-1' }, data: { order: '12313' } },
+          { where: { id: 'tag-id-1' }, data: { order: '12315' } },
+        ],
+      }
+
+      const output = transformFieldPayloadToUpdateOrderPayload(postFields, input)
+      expect(output).toEqual(expected)
+    })
+
+    it('should handle empty tags array in update order payload', () => {
+      const input = {
+        user: {
+          connect: 'user-id-1',
+        },
+        title: 'Post 1',
+        content: {},
+        published: true,
+        tags: [],
+      } satisfies InferCreateFields<typeof postFields>
+
+      const expected = {
+        tag: [],
+      }
+
+      const output = transformFieldPayloadToUpdateOrderPayload(postFields, input)
+      expect(output).toEqual(expected)
+    })
+
+    it('should return empty array when tags only contain create in update order payload', () => {
+      const input = {
+        user: {
+          connect: 'user-id-1',
+        },
+        title: 'Post 1',
+        content: {},
+        published: true,
+        tags: [
+          {
+            __order: '12314',
+            create: {
+              name: 'Tag 1',
+            },
+          },
+          {
+            __order: '12313',
+            create: {
+              name: 'Tag 2',
+            },
+          },
+        ],
+      } satisfies InferCreateFields<typeof postCreateFields>
+
+      const expected = {}
+
+      const output = transformFieldPayloadToUpdateOrderPayload(postCreateFields, input)
+      expect(output).toEqual(expected)
+    })
+
+    it('should only include connect items in update order payload when both create and connect are present', () => {
+      const input = {
+        user: {
+          connect: 'user-id-1',
+        },
+        title: 'Post 1',
+        content: {},
+        published: true,
+        tags: [
+          {
+            __order: '12314',
+            create: {
+              name: 'Tag 1',
+            },
+          },
+          {
+            __order: '12313',
+            connect: 'tag-id-1',
+          },
+        ],
+      } satisfies InferCreateFields<typeof postConnectOrCreateFields>
+
+      const expected = {
+        tag: [
+          {
+            where: { id: 'tag-id-1' },
+            data: { order: '12313' },
+          },
+        ],
+      }
+
+      const output = transformFieldPayloadToUpdateOrderPayload(postConnectOrCreateFields, input)
       expect(output).toEqual(expected)
     })
   })
@@ -590,6 +813,7 @@ describe('transformer', () => {
       const output = transformFieldsToPrismaSelectPayload(userFields)
       expect(output).toEqual(expected)
     })
+
     it('should transform fields to Prisma select payload (with optional (roles is optional))', () => {
       const expected = {
         id: true,
@@ -624,6 +848,19 @@ describe('transformer', () => {
       }
 
       const output = transformFieldsToPrismaSelectPayload(userFieldsOptional)
+      expect(output).toEqual(expected)
+    })
+
+    it('should transform post fields to Prisma select payload with order column', () => {
+      const expected = {
+        id: true,
+        title: true,
+        content: true,
+        published: true,
+        author: { select: { id: true, name: true } },
+        tags: { select: { id: true, name: true, order: true } },
+      }
+      const output = transformFieldsToPrismaSelectPayload(postFields)
       expect(output).toEqual(expected)
     })
   })
@@ -853,6 +1090,70 @@ describe('transformer', () => {
       } satisfies InferFields<typeof userFieldsOptional>
 
       const output = transformPrismaResultToFieldsPayload(userFieldsOptional, payload)
+      expect(output).toEqual(expected)
+    })
+    it('should transform post prisma result to fields payload with order column', () => {
+      const payload = {
+        id: 'mock-post-id',
+        title: 'Hello World',
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'heading',
+              attrs: { textAlign: 'left', level: 1 },
+              content: [{ type: 'text', text: 'Hello' }],
+            },
+          ],
+        },
+        published: true,
+        author: {
+          id: 'mock-user-id',
+          name: 'John Doe',
+        },
+        tags: [
+          { id: 'mock-tag-id', name: 'Tag 1', order: '12314' },
+          { id: 'mock-tag-id-2', name: 'Tag 2', order: '12315' },
+        ],
+      }
+
+      const expected = {
+        __pk: 'mock-post-id',
+        __id: 'mock-post-id',
+        title: 'Hello World',
+        content: {
+          type: 'doc',
+          content: [
+            {
+              type: 'heading',
+              attrs: { textAlign: 'left', level: 1 },
+              content: [{ type: 'text', text: 'Hello' }],
+            },
+          ],
+        },
+        published: true,
+        user: {
+          __id: 'mock-user-id',
+          __pk: 'mock-user-id',
+          name: 'John Doe',
+        },
+        tags: [
+          {
+            __id: 'mock-tag-id',
+            __pk: 'mock-tag-id',
+            name: 'Tag 1',
+            __order: '12314',
+          },
+          {
+            __id: 'mock-tag-id-2',
+            __pk: 'mock-tag-id-2',
+            name: 'Tag 2',
+            __order: '12315',
+          },
+        ],
+      }
+
+      const output = transformPrismaResultToFieldsPayload(postFields, payload)
       expect(output).toEqual(expected)
     })
   })

@@ -2,6 +2,61 @@ import type { FieldRelationShape, Fields } from '../field'
 import { DataType } from '../model'
 import { isRelationFieldShape } from '../utils'
 
+export function transformFieldPayloadToUpdateOrderPayload(
+  fields: Fields,
+  payload: any
+): Record<string, any> {
+  return Object.entries(fields.shape).reduce((acc, [fieldKey, fieldShape]) => {
+    const inputValue = payload[fieldKey]
+    if (inputValue === undefined) return acc
+
+    if (isRelationFieldShape(fieldShape) && fieldShape.$server.config.orderColumn) {
+      const prismaModelName = fieldShape.$server.relation.referencedModel.config.prismaModelName
+      const orderColumn = fieldShape.$server.config.orderColumn
+      const isList = fieldShape.$server.relation.isList
+      switch (fieldShape.type) {
+        case 'connect':
+          return {
+            ...acc,
+            [prismaModelName]: isList
+              ? (inputValue as any[]).map((v: any) => ({
+                  where: { id: v.connect },
+                  data: { [orderColumn]: v.__order },
+                }))
+              : [
+                  {
+                    where: { id: inputValue.connect },
+                    data: { [orderColumn]: inputValue.__order },
+                  },
+                ],
+          }
+        case 'connectOrCreate':
+          return {
+            ...acc,
+            [prismaModelName]: isList
+              ? (inputValue as any[]).reduce((acc, v) => {
+                  if (v.connect) {
+                    return [
+                      ...acc,
+                      {
+                        where: { id: v.connect },
+                        data: { [orderColumn]: v.__order },
+                      },
+                    ]
+                  }
+                  return acc
+                }, [])
+              : [],
+          }
+        default:
+          break
+      }
+    }
+
+    return acc
+  }, {})
+}
+
 export function transformFieldPayloadToPrismaCreatePayload(
   fields: Fields,
   payload: any
@@ -260,8 +315,14 @@ export function transformFieldsToPrismaSelectPayload(fields: Fields) {
     if (fieldShape.$server.source === 'column') {
       acc[fieldShape.$server.column.name] = true
     } else if (isRelationFieldShape(fieldShape)) {
-      acc[fieldShape.$server.relation.name] = {
-        select: transformFieldsToPrismaSelectPayload(fieldShape.fields),
+      const orderColumn = fieldShape.$server.config.orderColumn
+      const selectPayload = transformFieldsToPrismaSelectPayload(fieldShape.fields)
+      const relationName = fieldShape.$server.relation.name
+      acc[relationName] = {
+        select: selectPayload,
+      }
+      if (orderColumn) {
+        acc[relationName].select[orderColumn] = true
       }
     }
     return acc
@@ -299,17 +360,27 @@ export function transformPrismaResultToFieldsPayload(
       }
 
       if (isRelationFieldShape(fieldShape)) {
+        const orderColumn = fieldShape.$server.config.orderColumn
         if (fieldShape.$server.relation.isList) {
           if (!Array.isArray(value)) {
             throw new Error(
               `Expected an array for relation field "${fieldShape.$server.fieldName}", but got ${typeof value}`
             )
           }
-          value = (value as any[]).map((v) =>
-            transformPrismaResultToFieldsPayload(fieldShape.fields, v)
-          )
+          value = (value as any[]).map((v) => {
+            const transformed = transformPrismaResultToFieldsPayload(fieldShape.fields, v)
+            if (orderColumn && v[orderColumn] !== undefined) {
+              return { ...transformed, __order: v[orderColumn] }
+            }
+            return transformed
+          })
         } else {
-          value = transformPrismaResultToFieldsPayload(fieldShape.fields, value)
+          const transformed = transformPrismaResultToFieldsPayload(fieldShape.fields, value)
+          if (orderColumn && value[orderColumn] !== undefined) {
+            value = { ...transformed, __order: value[orderColumn] }
+          } else {
+            value = transformed
+          }
         }
       }
 

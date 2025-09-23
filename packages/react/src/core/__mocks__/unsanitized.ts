@@ -65,6 +65,39 @@ export interface UserModelShape {
       hasDefaultValue: true
       dataType: typeof DataType.BOOLEAN
     }
+    phone: {
+      schema: typeof SchemaType.COLUMN
+      name: 'phone'
+      isId: false
+      isList: false
+      isUnique: true
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    phoneVerified: {
+      schema: typeof SchemaType.COLUMN
+      name: 'phoneVerified'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: false
+      isRequired: false
+      hasDefaultValue: true
+      dataType: typeof DataType.BOOLEAN
+    }
+    staffInfoId: {
+      schema: typeof SchemaType.COLUMN
+      name: 'staffInfoId'
+      isId: false
+      isList: false
+      isUnique: false
+      isReadOnly: true
+      isRequired: false
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
     roles: {
       schema: typeof SchemaType.COLUMN
       name: 'roles'
@@ -142,17 +175,6 @@ export interface UserModelShape {
       hasDefaultValue: true
       dataType: typeof DataType.DATETIME
     }
-    staffInfoId: {
-      schema: typeof SchemaType.COLUMN
-      name: 'staffInfoId'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: true
-      isRequired: false
-      hasDefaultValue: false
-      dataType: typeof DataType.STRING
-    }
   }
   relations: {
     posts: {
@@ -181,21 +203,6 @@ export interface UserModelShape {
       hasDefaultValue: false
       relationName: 'ProfileToUser'
       referencedModel: ProfileModel
-      relationToFields: []
-      relationFromFields: []
-      relationDataTypes: [typeof DataType.STRING]
-    }
-    comments: {
-      schema: typeof SchemaType.RELATION
-      name: 'comments'
-      isId: false
-      isList: true
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      relationName: 'CommentToUser'
-      referencedModel: CommentModel
       relationToFields: []
       relationFromFields: []
       relationDataTypes: [typeof DataType.STRING]
@@ -254,15 +261,15 @@ export interface UserModelShape {
       isReadOnly: false
       isRequired: false
       hasDefaultValue: false
-      relationName: 'StaffInfoToUser'
-      referencedModel: StaffInfoModel
+      relationName: 'UserTostaffInfo'
+      referencedModel: staffInfoModel
       relationToFields: ['id']
       relationFromFields: ['id']
       relationDataTypes: [typeof DataType.STRING]
     }
   }
   primaryFields: ['id']
-  uniqueFields: [['id'], ['email']]
+  uniqueFields: [['id'], ['email'], ['phone']]
 }
 
 export interface UserModel {
@@ -875,21 +882,6 @@ export interface PostModelShape {
       relationFromFields: ['id']
       relationDataTypes: [typeof DataType.STRING]
     }
-    comments: {
-      schema: typeof SchemaType.RELATION
-      name: 'comments'
-      isId: false
-      isList: true
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      relationName: 'CommentToPost'
-      referencedModel: CommentModel
-      relationToFields: []
-      relationFromFields: []
-      relationDataTypes: [typeof DataType.STRING]
-    }
     tags: {
       schema: typeof SchemaType.RELATION
       name: 'tags'
@@ -939,7 +931,18 @@ export interface TagModelShape {
       name: 'name'
       isId: false
       isList: false
-      isUnique: true
+      isUnique: false
+      isReadOnly: false
+      isRequired: true
+      hasDefaultValue: false
+      dataType: typeof DataType.STRING
+    }
+    order: {
+      schema: typeof SchemaType.COLUMN
+      name: 'order'
+      isId: false
+      isList: false
+      isUnique: false
       isReadOnly: false
       isRequired: true
       hasDefaultValue: false
@@ -997,7 +1000,7 @@ export interface TagModelShape {
     }
   }
   primaryFields: ['id']
-  uniqueFields: [['id'], ['name']]
+  uniqueFields: [['id']]
 }
 
 export interface TagModel {
@@ -1005,129 +1008,13 @@ export interface TagModel {
   config: TagModelConfig
 }
 
-export interface CommentModelConfig {
-  name: 'CommentModel'
-  dbModelName: 'Comment'
-  prismaModelName: 'comment'
-}
-
-export interface CommentModelShape {
-  columns: {
-    id: {
-      schema: typeof SchemaType.COLUMN
-      name: 'id'
-      isId: true
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: true
-      dataType: typeof DataType.STRING
-    }
-    content: {
-      schema: typeof SchemaType.COLUMN
-      name: 'content'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      dataType: typeof DataType.STRING
-    }
-    postId: {
-      schema: typeof SchemaType.COLUMN
-      name: 'postId'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: true
-      isRequired: true
-      hasDefaultValue: false
-      dataType: typeof DataType.STRING
-    }
-    authorId: {
-      schema: typeof SchemaType.COLUMN
-      name: 'authorId'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: true
-      isRequired: true
-      hasDefaultValue: false
-      dataType: typeof DataType.STRING
-    }
-    createdAt: {
-      schema: typeof SchemaType.COLUMN
-      name: 'createdAt'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: true
-      dataType: typeof DataType.DATETIME
-    }
-    updatedAt: {
-      schema: typeof SchemaType.COLUMN
-      name: 'updatedAt'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: true
-      dataType: typeof DataType.DATETIME
-    }
-  }
-  relations: {
-    post: {
-      schema: typeof SchemaType.RELATION
-      name: 'post'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      relationName: 'CommentToPost'
-      referencedModel: PostModel
-      relationToFields: ['id']
-      relationFromFields: ['id']
-      relationDataTypes: [typeof DataType.STRING]
-    }
-    author: {
-      schema: typeof SchemaType.RELATION
-      name: 'author'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: false
-      relationName: 'CommentToUser'
-      referencedModel: UserModel
-      relationToFields: ['id']
-      relationFromFields: ['id']
-      relationDataTypes: [typeof DataType.STRING]
-    }
-  }
-  primaryFields: ['id']
-  uniqueFields: [['id']]
-}
-
-export interface CommentModel {
-  shape: CommentModelShape
-  config: CommentModelConfig
-}
-
-export interface StaffInfoModelConfig {
-  name: 'StaffInfoModel'
-  dbModelName: 'StaffInfo'
+export interface staffInfoModelConfig {
+  name: 'staffInfoModel'
+  dbModelName: 'staffInfo'
   prismaModelName: 'staffInfo'
 }
 
-export interface StaffInfoModelShape {
+export interface staffInfoModelShape {
   columns: {
     id: {
       schema: typeof SchemaType.COLUMN
@@ -1147,7 +1034,7 @@ export interface StaffInfoModelShape {
       isList: false
       isUnique: false
       isReadOnly: false
-      isRequired: false
+      isRequired: true
       hasDefaultValue: false
       dataType: typeof DataType.STRING
     }
@@ -1158,31 +1045,9 @@ export interface StaffInfoModelShape {
       isList: false
       isUnique: false
       isReadOnly: false
-      isRequired: false
+      isRequired: true
       hasDefaultValue: false
       dataType: typeof DataType.STRING
-    }
-    createdAt: {
-      schema: typeof SchemaType.COLUMN
-      name: 'createdAt'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: true
-      dataType: typeof DataType.DATETIME
-    }
-    updatedAt: {
-      schema: typeof SchemaType.COLUMN
-      name: 'updatedAt'
-      isId: false
-      isList: false
-      isUnique: false
-      isReadOnly: false
-      isRequired: true
-      hasDefaultValue: true
-      dataType: typeof DataType.DATETIME
     }
   }
   relations: {
@@ -1195,7 +1060,7 @@ export interface StaffInfoModelShape {
       isReadOnly: false
       isRequired: true
       hasDefaultValue: false
-      relationName: 'StaffInfoToUser'
+      relationName: 'UserTostaffInfo'
       referencedModel: UserModel
       relationToFields: []
       relationFromFields: []
@@ -1206,9 +1071,9 @@ export interface StaffInfoModelShape {
   uniqueFields: [['id']]
 }
 
-export interface StaffInfoModel {
-  shape: StaffInfoModelShape
-  config: StaffInfoModelConfig
+export interface staffInfoModel {
+  shape: staffInfoModelShape
+  config: staffInfoModelConfig
 }
 
 export type FullModelSchemas = {
@@ -1219,8 +1084,7 @@ export type FullModelSchemas = {
   profile: ProfileModel
   post: PostModel
   tag: TagModel
-  comment: CommentModel
-  staffInfo: StaffInfoModel
+  staffInfo: staffInfoModel
 } & {}
 
 export const FullModelSchemas = unsanitizedModelSchemas<FullModelSchemas>(SanitizedFullModelSchemas)
