@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.50
+
+### Patch Changes
+
+- [#211](https://github.com/softnetics/genseki/pull/211) [`eea522d`](https://github.com/softnetics/genseki/commit/eea522dc4d3b1a4d4bcf771f9b943ad1c7c2503d) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Change type date in zod schema
+
 ## 0.1.0-alpha.49
 
 ### Patch Changes
