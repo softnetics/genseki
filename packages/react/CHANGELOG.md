@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.49
+
+### Patch Changes
+
+- [#209](https://github.com/softnetics/genseki/pull/209) [`80d8389`](https://github.com/softnetics/genseki/commit/80d8389fe70f74867aaf6241559fa0d38d3e87c9) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Add schema validation message on update view
+
 ## 0.1.0-alpha.48
 
 ## 0.1.0-alpha.47
