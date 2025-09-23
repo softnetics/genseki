@@ -2,4 +2,4 @@
 '@genseki/react-query': patch
 ---
 
-[Fix] Check empty payload
+[Fix] Check empty payload in queryKey
