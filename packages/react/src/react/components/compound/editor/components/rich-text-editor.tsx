@@ -1,6 +1,10 @@
 'use client'
 
-import { type Content, EditorProvider, type EditorProviderProps } from '@tiptap/react'
+import { useEffect } from 'react'
+
+import { type Content, type EditorProviderProps, useEditor } from '@tiptap/react'
+
+import { EditorProvider } from './rich-text-provider'
 
 import { cn } from '../../../../utils/cn'
 import { focusStyles } from '../../../primitives'
@@ -22,6 +26,21 @@ export interface RichTextEditorProps {
 export const RichTextEditor = (props: RichTextEditorProps) => {
   const isInvalid = !!props.errorMessage
 
+  const editor = useEditor({
+    ...props.editorProviderProps,
+    content: props.value,
+    onUpdate({ editor }) {
+      props.onChange?.(editor.getJSON())
+    },
+  })
+
+  useEffect(() => {
+    if (!editor) return
+    if (props.value !== undefined) {
+      editor.commands.setContent(props.value)
+    }
+  }, [props.value, editor])
+
   return (
     <div className="flex flex-col gap-y-4" data-invalid={true}>
       {props.label && (
@@ -42,19 +61,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
             props.errorMessage && focusStyles.variants.isInvalid
           )}
         >
-          <EditorProvider
-            immediatelyRender={false}
-            shouldRerenderOnTransaction
-            editorContainerProps={{
-              className: 'editor-container',
-            }}
-            onUpdate={({ editor }) => {
-              const json = editor.getJSON()
-              props.onChange?.(json)
-            }}
-            content={props.value}
-            {...props.editorProviderProps}
-          />
+          <EditorProvider {...props.editorProviderProps} editor={editor} />
         </div>
       </FieldGroup>
       {props.description && <Description>{props.description}</Description>}
