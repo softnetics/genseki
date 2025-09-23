@@ -1,11 +1,14 @@
 'use client'
 
+import { useMemo } from 'react'
 import { type SubmitErrorHandler, type SubmitHandler, useForm } from 'react-hook-form'
 
+import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { toast } from 'sonner'
 
 import type { FieldsClient } from '../../../core'
+import { fieldsShapeToZodObject } from '../../../core/field'
 import { Form } from '../../components'
 import { AutoFields } from '../../components/compound/auto-field'
 import { SubmitButton } from '../../components/compound/submit-button'
@@ -19,7 +22,12 @@ interface UpdateClientViewProps {
 }
 
 export function UpdateClientView(props: UpdateClientViewProps) {
+  const schema = useMemo(() => {
+    return fieldsShapeToZodObject(props.fields.shape)
+  }, [])
+
   const form = useForm({
+    resolver: standardSchemaResolver(schema),
     defaultValues: props.defaultValues,
   })
 
