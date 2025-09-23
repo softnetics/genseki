@@ -212,6 +212,10 @@ export type QueryClient<TApiRouter extends FlatApiRouter> =
     : never
 
 export function queryKey(method: string, path: string | number | symbol, payload?: any) {
+  if (!payload) {
+    return [method, path] as const
+  }
+
   const { header, ...rest } = payload
   const normalizedPayload = normalizeObject(rest)
   const normalizedHeaders = header && !isEmptyObject(header) ? sortObjectDeep(header) : undefined
