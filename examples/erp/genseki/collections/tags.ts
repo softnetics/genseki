@@ -8,6 +8,11 @@ import { builder, context } from '../helper'
 export const fields = builder.fields('tag', (fb) => ({
   name: fb.columns('name', {
     type: 'text',
+    required: true,
+    default: '',
+  }),
+  updatedAt: fb.columns('updatedAt', {
+    type: 'date',
   }),
 }))
 
@@ -21,7 +26,7 @@ export const tagsCollection = createPlugin('tags', (app) => {
         columns: columns,
         configuration: {
           search: ['name'],
-          sortBy: ['name'],
+          sortBy: [['updatedAt']],
         },
         toolbar: {
           create: true,

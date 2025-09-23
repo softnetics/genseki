@@ -20,9 +20,10 @@ export function useCollectionListQuery(
     search: args.search ?? search,
     sort: sort,
   }
+  const fullQueryKey = ['GET', `/${args.slug}`, { query: queryKey }] as const
 
   const query: UseQueryResult<CollectionListResponse> = useQuery({
-    queryKey: ['GET', `/${args.slug}`, { query: queryKey }] as const,
+    queryKey: fullQueryKey,
     queryFn: async (context) => {
       const [, , payload] = context.queryKey
       const params = new URLSearchParams([
@@ -50,5 +51,5 @@ export function useCollectionListQuery(
     placeholderData: keepPreviousData,
   })
 
-  return query
+  return { ...query, queryKey: fullQueryKey }
 }

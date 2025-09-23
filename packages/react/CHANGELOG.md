@@ -1,5 +1,35 @@
 # @genseki/react
 
+## 0.1.0-alpha.50
+
+### Patch Changes
+
+- [#211](https://github.com/softnetics/genseki/pull/211) [`eea522d`](https://github.com/softnetics/genseki/commit/eea522dc4d3b1a4d4bcf771f9b943ad1c7c2503d) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Change type date in zod schema
+
+## 0.1.0-alpha.49
+
+### Patch Changes
+
+- [#209](https://github.com/softnetics/genseki/pull/209) [`80d8389`](https://github.com/softnetics/genseki/commit/80d8389fe70f74867aaf6241559fa0d38d3e87c9) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Add schema validation message on update view
+
+## 0.1.0-alpha.48
+
+## 0.1.0-alpha.47
+
+### Patch Changes
+
+- [#204](https://github.com/softnetics/genseki/pull/204) [`abb3578`](https://github.com/softnetics/genseki/commit/abb3578fd869e60007dc4aebbcd344aaddd89903) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Fix] Display required error message
+
+## 0.1.0-alpha.46
+
+### Patch Changes
+
+- [#193](https://github.com/softnetics/genseki/pull/193) [`b0301bc`](https://github.com/softnetics/genseki/commit/b0301bc28d336b96816b5b932ec010b490cc1fbb) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Uploading image to storage in rich text
+
+- [#198](https://github.com/softnetics/genseki/pull/198) [`cb2221f`](https://github.com/softnetics/genseki/commit/cb2221f49c979a33701598fb81b187b4a057e646) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [Feature] Upgrade to support relation table for searching and sorting
+
+- [#194](https://github.com/softnetics/genseki/pull/194) [`28387bf`](https://github.com/softnetics/genseki/commit/28387bfadbb87537c21f4fbcf3ec9af53693efb3) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - Fix query key in useInvalidateQueries
+
 ## 0.1.0-alpha.45
 
 ### Minor Changes

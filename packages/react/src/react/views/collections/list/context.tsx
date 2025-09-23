@@ -50,7 +50,7 @@ export interface CollectionListContextValue<T extends BaseData = BaseData> {
 
   columns: ColumnDef<T, any>[]
   search?: string[]
-  sortBy?: string[]
+  sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   toolbar?: CollectionToolbarActions
 
   // Helper functions
@@ -65,7 +65,7 @@ export interface CollectionListProviderProps<T extends BaseData = BaseData> {
 
   columns: ColumnDef<T, any>[]
   search?: string[]
-  sortBy?: string[]
+  sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   toolbar?: CollectionToolbarActions
 }
 
@@ -81,10 +81,9 @@ function _CollectionListProvider<T extends BaseData>(props: CollectionListProvid
   const queryClient = useQueryClient()
   const query = useCollectionListQuery({ slug: context.slug })
 
-  const invalidateList = async (page?: number) => {
-    const additionalKeys = page ? [{ query: { page } }] : []
+  const invalidateList = async () => {
     await queryClient.invalidateQueries({
-      queryKey: ['GET', `/${context.slug}`, ...additionalKeys],
+      queryKey: query.queryKey,
       exact: false,
     })
   }

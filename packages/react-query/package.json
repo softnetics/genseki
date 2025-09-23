@@ -2,7 +2,7 @@
   "name": "@genseki/react-query",
   "description": "",
   "sideEffects": false,
-  "version": "0.1.0-alpha.45",
+  "version": "0.1.0-alpha.50",
   "type": "module",
   "files": [
     "dist"
@@ -27,7 +27,8 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc",
-    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json",
+    "test": "vitest run"
   },
   "keywords": [],
   "author": "",
