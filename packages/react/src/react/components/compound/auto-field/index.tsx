@@ -812,7 +812,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           </ReorderGroup>
           <Button
             type="button"
-            variant="outline"
+            variant="primary"
             size="sm"
             isDisabled={disabled}
             onClick={() => {
