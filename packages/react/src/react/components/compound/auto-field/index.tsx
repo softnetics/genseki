@@ -740,6 +740,13 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     fieldArray.move(oldIndex, newIndex)
   }
 
+  const nextOrder = () => {
+    const lastField = fieldArray.fields.at(-1) as { __order?: string } | undefined
+    const lastOrder = lastField?.__order ?? LexoRank.middle().toString()
+    const nextOrder = LexoRank.parse(lastOrder).genNext().toString()
+    return nextOrder
+  }
+
   switch (fieldShape.type) {
     case 'connect':
       return (
@@ -757,9 +764,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                     key={fieldValue.id}
                     className="p-6 bg-muted rounded-b-lg flex flex-col gap-y-4 border border-t-0 border-bluegray-300"
                   >
-                    {/* <div>
-                      {fieldShape.label} #{index + 1}
-                    </div> */}
                     {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
                   </div>
                 ))}
@@ -772,11 +776,8 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             size="sm"
             isDisabled={disabled}
             onClick={() => {
-              const lastField = fieldArray.fields.at(-1) as { __order?: string } | undefined
-              const lastOrder = lastField?.__order ?? LexoRank.middle().toString()
-              const nextOrder = LexoRank.parse(lastOrder).genNext().toString()
               fieldArray.append({
-                __order: nextOrder,
+                __order: nextOrder(),
                 connect: undefined,
               })
             }}
@@ -784,7 +785,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
           >
             Add
           </Button>
-          <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </div>
       )
     case 'create':
@@ -801,9 +801,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                 key={fieldValue.id}
                 className="p-6 bg-muted rounded-b-lg flex flex-col gap-y-4 border border-t-0 border-bluegray-300"
               >
-                {/* <div>
-                  {fieldShape.label} #{index + 1}
-                </div> */}
                 {createComponent(`${props.name}.${index}.create`)}
               </div>
             ))}
@@ -814,30 +811,31 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             size="sm"
             isDisabled={disabled}
             onClick={() => {
-              const lastField = fieldArray.fields.at(-1) as { __order?: string } | undefined
-              const lastOrder = lastField?.__order ?? LexoRank.middle().toString()
-              const nextOrder = LexoRank.parse(lastOrder).genNext().toString()
               fieldArray.append({
-                __order: nextOrder,
+                __order: nextOrder(),
                 create: {},
               })
             }}
           >
             Add
           </Button>
-          <pre>{JSON.stringify(watch(), null, 2)}</pre>
         </div>
       )
 
     case 'connectOrCreate':
       return (
-        <div className="border border-red-500 p-6">
-          <ReorderGroup title="DAS">
+        <div className="border border-red-500 p-6 space-y-4">
+          <ReorderGroup
+            title={fieldShape.label}
+            onMove={handleReorderMove}
+            collapsible={false}
+            onDelete={(index) => fieldArray.remove(index)}
+          >
             {fieldArray.fields.map((fieldValue, index) => (
-              <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-                <div>
-                  {fieldShape.label} #{index + 1}
-                </div>
+              <div
+                key={fieldValue.id}
+                className="p-6 bg-muted rounded-b-lg flex flex-col gap-y-4 border border-t-0 border-bluegray-300"
+              >
                 {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
                 {createComponent(`${props.name}.${index}.create`)}
               </div>
@@ -848,7 +846,11 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             variant="primary"
             size="sm"
             isDisabled={disabled}
-            onClick={() => fieldArray.append({})}
+            onClick={() =>
+              fieldArray.append({
+                __order: nextOrder(),
+              })
+            }
           >
             Add
           </Button>

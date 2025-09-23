@@ -110,8 +110,9 @@ export const fields = builder.fields('post', (fb) => ({
   postTags: fb.relations(
     'postTags',
     (fb) => ({
-      type: 'create' as const,
+      type: 'connectOrCreate' as const,
       label: 'Tags',
+      options: 'postTags',
       fields: fb.fields('postTag', (fb) => ({
         remark: fb.columns('remark', {
           type: 'text',
@@ -182,6 +183,13 @@ export const options = builder.options(fields, {
     return {
       disabled: false,
       options: tags.map((tag) => ({ label: tag.name, value: tag.id })),
+    }
+  },
+  postTags: async () => {
+    const postTags = await prisma.postTag.findMany()
+    return {
+      disabled: false,
+      options: postTags.map((pt) => ({ label: pt.id, value: pt.id })),
     }
   },
 })

@@ -24,6 +24,7 @@ import { DataType, type ModelSchemas } from './model'
 import {
   transformFieldPayloadToPrismaCreatePayload,
   transformFieldPayloadToPrismaUpdatePayload,
+  transformFieldPayloadToUpdateOrderPayload,
   transformFieldsToPrismaSelectPayload,
   transformPrismaResultToFieldsPayload,
 } from './transformer'
@@ -51,8 +52,24 @@ function createCollectionDefaultCreateHandler<TContext extends Contextable, TFie
 
   return async (args) => {
     const transformedData = transformFieldPayloadToPrismaCreatePayload(args.fields, args.data)
-    const result = await prisma[model.config.prismaModelName].create({
-      data: transformedData,
+    const updateTransformedData = transformFieldPayloadToUpdateOrderPayload(args.fields, args.data)
+    const result = await prisma.$transaction(async (tx) => {
+      const result = tx[model.config.prismaModelName].create({
+        data: transformedData,
+      })
+      Object.entries(updateTransformedData).map(async ([key, value]) => {
+        if (Array.isArray(value)) {
+          await Promise.all(
+            value.map(async (item) => {
+              await tx[key].update(item)
+            })
+          )
+        } else {
+          await tx[key].update(value)
+        }
+      })
+
+      return result
     })
 
     const __id = result[fields.config.identifierColumn]
