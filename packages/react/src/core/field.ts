@@ -49,6 +49,7 @@ export interface FieldOptionsShapeBase {
   required?: boolean
   disabled?: boolean
   hidden?: boolean
+  deselectable?: boolean
 }
 
 export interface FieldColumnShapeClientBase extends Omit<FieldOptionsShapeBase, 'type'> {
@@ -163,6 +164,7 @@ export interface FieldColumnStringSelectTextOptions extends FieldOptionsShapeBas
   type: 'selectText'
   default?: string
   options: string
+  deselectable?: boolean
 }
 export interface FieldColumnStringSelectTextShapeClient
   extends FieldColumnStringSelectTextOptions,
@@ -261,6 +263,7 @@ export interface FieldColumnNumberSelectNumberOptions extends FieldOptionsShapeB
   type: 'selectNumber'
   default?: number
   options: string
+  deselectable?: boolean
 }
 export interface FieldColumnNumberSelectNumberShapeClient
   extends FieldColumnNumberSelectNumberOptions,
