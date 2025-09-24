@@ -1,26 +1,26 @@
 {
-  "name": "@genseki/react",
+  "name": "@genseki/theme",
   "sideEffects": false,
   "type": "module",
-  "version": "0.1.0-alpha.50",
+  "version": "0.1.0-alpha.42",
   "files": [
     "dist"
   ],
   "exports": {
-    ".": {
-      "import": "./src/index.ts",
-      "require": "./src/index.ts",
-      "types": "./src/index.ts"
+    "./cosmic": {
+      "import": "./src/cosmic/index.ts",
+      "require": "./src/cosmic/index.ts",
+      "types": "./src/cosmic/index.ts"
     },
-    "./tailwind.css": "./src/react/styles/tailwind.css"
+    "./cosmic/globals.css": "./src/cosmic/globals.css"
   },
   "publishConfig": {
     "exports": {
-      ".": {
-        "import": "./dist/src/index.js",
-        "types": "./dist/src/index.d.ts"
+      "./cosmic": {
+        "import": "./dist/src/cosmic/index.js",
+        "types": "./dist/src/cosmic/index.d.ts"
       },
-      "./tailwind.css": "./dist/src/react/styles/tailwind.css"
+      "./cosmic/globals.css": "./dist/src/cosmic/globals.css"
     }
   },
   "scripts": {
@@ -30,8 +30,7 @@
     "typecheck": "tsc",
     "test": "vitest run",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
-    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json && pnpm copy-tailwind",
-    "copy-tailwind": "mkdir -p dist/src/react/styles && cp src/react/styles/tailwind.css dist/src/react/styles"
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.826.0",
@@ -73,6 +72,7 @@
     "deepmerge-ts": "^7.1.5",
     "defu": "^6.1.4",
     "input-otp": "^1.4.2",
+    "lucide-react": "^0.544.0",
     "motion": "^12.7.4",
     "nuqs": "^2.4.3",
     "radix3": "^1.1.2",
@@ -82,7 +82,7 @@
     "react-hook-form": "^7.61.1",
     "remeda": "^2.21.2",
     "sonner": "^2.0.3",
-    "tailwind-merge": "^3.0.2",
+    "tailwind-merge": "^3.3.0",
     "tailwind-variants": "^1.0.0",
     "tailwindcss": "^4.1.7",
     "tailwindcss-react-aria-components": "^2.0.0",
