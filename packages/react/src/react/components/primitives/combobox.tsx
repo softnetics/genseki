@@ -30,6 +30,7 @@ export interface ComboboxProps {
   className?: string
   isDisabled?: boolean
   isRequired?: boolean
+  deselectable?: boolean
 }
 
 const triggerStyles = tv({
@@ -58,6 +59,7 @@ export function Combobox({
   errorMessage,
   isDisabled,
   isRequired,
+  deselectable = false,
 }: ComboboxProps) {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
@@ -98,6 +100,13 @@ export function Combobox({
   const submitSelection = (index: number) => {
     const item = items[index]
     if (!item) return
+    if (deselectable && value === item.value) {
+      onChange(null)
+      setSelectedText('')
+      setSearch('')
+      handleOpen(false)
+      return
+    }
     onChange(item.value)
     setSelectedText(item.label)
     setSearch(item.label)

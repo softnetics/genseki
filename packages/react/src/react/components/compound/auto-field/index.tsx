@@ -297,7 +297,7 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
     isRequired,
     errorMessage,
     onOpenChange,
-
+    deselectable,
     optionsName,
     optionsFetchPath,
     take = 10,
@@ -351,6 +351,7 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
       isDisabled={mergedDisabled}
       isRequired={isRequired}
       errorMessage={errorMessage}
+      deselectable={deselectable}
       onSearch={setSearch}
       onOpenChange={(isOpen) => {
         if (isOpen && !active) setActive(true)
@@ -683,6 +684,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
             errorMessage={fieldState.error?.message}
             optionsFetchPath={props.optionsFetchPath}
             optionsName={options}
+            deselectable={props.deselectable}
             take={10}
           />
         </FormItemController>
@@ -787,6 +789,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             isRequired={fieldShape.required}
             errorMessage={fieldState.error?.message}
             optionsFetchPath={props.optionsFetchPath}
+            deselectable={props.deselectable}
             optionsName={options}
             take={10}
           />
