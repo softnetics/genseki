@@ -185,21 +185,48 @@ export const options = builder.options(fields, {
       ],
     }
   },
+
   author: async ({ body }) => {
+    const opt = (body as any).__options ?? {}
+    const search: string = opt.search ?? ''
+    const take = Math.max(1, Math.min(Number(opt.take ?? 10) || 10, 50))
+
     if (body.title === 'DISABLED') {
       return {
         disabled: true,
         options: [],
       }
     }
-    const authors = await prisma.user.findMany({ select: { id: true, name: true } })
+
+    const where = search ? { name: { contains: search, mode: 'insensitive' as const } } : {}
+
+    const authors = await prisma.user.findMany({
+      where,
+      select: { id: true, name: true },
+      orderBy: { id: 'asc' },
+      take,
+    })
+
     return {
       disabled: false,
       options: authors.map((author) => ({ label: author.name ?? '(No Name)', value: author.id })),
     }
   },
-  tag: async () => {
-    const tags = await prisma.tag.findMany({ select: { id: true, name: true } })
+
+  tag: async ({ body }: { body: any }) => {
+    const opt = body.__options ?? {}
+    const search: string = opt.search ?? ''
+    const take = Math.max(1, Math.min(Number(opt.take ?? 10) || 10, 50))
+
+    const where = search ? { name: { contains: search, mode: 'insensitive' as const } } : {}
+
+    const tags = await prisma.tag.findMany({
+      where,
+      select: { id: true, name: true },
+      orderBy: { id: 'asc' },
+      take,
+    })
+
     return {
       disabled: false,
       options: tags.map((tag) => ({ label: tag.name, value: tag.id })),

@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, startTransition, useMemo } from 'react'
+import { type ReactNode, startTransition, useMemo, useState } from 'react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
@@ -12,6 +12,9 @@ import {
   Button,
   Checkbox,
   type CheckboxProps,
+  Combobox,
+  type ComboboxItem,
+  type ComboboxProps,
   DatePicker,
   type DatePickerProps,
   FormField,
@@ -268,6 +271,92 @@ export function AutoSelectField(props: AutoSelectField) {
         )}
       </SelectList>
     </Select>
+  )
+}
+
+export interface AutoComboboxFieldProps
+  extends Omit<ComboboxProps, 'items' | 'onSearch' | 'isLoading'> {
+  name?: string
+
+  optionsName: string
+  optionsFetchPath: string
+
+  take?: number
+  searchDelay?: number
+}
+
+export function AutoComboboxField(props: AutoComboboxFieldProps) {
+  const {
+    value,
+    onChange,
+    label,
+    description,
+    placeholder = 'Search…',
+    className,
+    isDisabled,
+    isRequired,
+    errorMessage,
+    onOpenChange,
+
+    optionsName,
+    optionsFetchPath,
+    take = 10,
+    searchDelay = 300,
+  } = props
+
+  const form = useFormContext()
+  const formValues = useWatch({ control: form.control })
+
+  const [search, setSearch] = useState('')
+  const [debouncedSearch, setDebouncedSearch] = useState('')
+
+  const [active, setActive] = useState(false)
+
+  useDebounce(search, () => setDebouncedSearch(search), searchDelay)
+
+  const query = useQuery<{ status: 200; body: FieldOptionsCallbackReturn }>({
+    queryKey: ['POST', optionsFetchPath, optionsName, debouncedSearch, take],
+    enabled: active,
+    queryFn: async () => {
+      const res = await fetch(`/api${optionsFetchPath}?name=${encodeURIComponent(optionsName)}`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          ...formValues,
+          __options: { search: debouncedSearch, take },
+        }),
+      })
+      if (!res.ok) throw new Error('Failed to fetch options')
+      return res.json()
+    },
+  })
+
+  const items: ComboboxItem[] = useMemo(
+    () => (query.data?.body.options ?? []).map((o) => ({ label: o.label, value: String(o.value) })),
+    [query.data]
+  )
+
+  const mergedDisabled = (query.data?.body.disabled ?? false) || isDisabled
+
+  return (
+    <Combobox
+      className={cn('w-full', className)}
+      label={label}
+      description={description}
+      placeholder={placeholder}
+      value={value ?? null}
+      onChange={onChange}
+      items={items}
+      isLoading={query.isFetching}
+      isDisabled={mergedDisabled}
+      isRequired={isRequired}
+      errorMessage={errorMessage}
+      onSearch={setSearch}
+      onOpenChange={(isOpen) => {
+        if (isOpen && !active) setActive(true)
+        onOpenChange?.(isOpen)
+      }}
+    />
   )
 }
 
@@ -576,13 +665,6 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   if (fieldShape.hidden) return null
   const disabled = fieldShape.disabled || false
 
-  const commonProps = {
-    label: fieldShape.label,
-    className: props.className,
-    description: fieldShape.description,
-    placeholder: fieldShape.placeholder,
-  }
-
   const connectComponent = (name: string, options: string) => (
     <FormField
       key={name}
@@ -590,12 +672,18 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
       control={control}
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
-          <AutoSelectField
-            {...commonProps}
+          <AutoComboboxField
+            value={(field.value as string | null) ?? null}
+            onChange={field.onChange}
+            label={fieldShape.label}
+            description={fieldShape.description}
+            placeholder={fieldShape.placeholder}
             isDisabled={disabled}
+            isRequired={fieldShape.required}
+            errorMessage={fieldState.error?.message}
             optionsFetchPath={props.optionsFetchPath}
             optionsName={options}
-            deselectable={fieldShape.deselectable}
+            take={10}
           />
         </FormItemController>
       )}
@@ -622,7 +710,7 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   switch (fieldShape.type) {
     case 'connect':
       return (
-        <div className="rounded-md border border-border bg-surface-tertiary overflow-hidden">
+        <div className="rounded-md border border-border bg-surface-tertiary">
           {fieldShape.label && (
             <>
               <Typography
@@ -682,28 +770,30 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
   if (fieldShape.hidden) return null
   const disabled = fieldShape.disabled || props.disabled
 
-  const connectComponent = (name: string, options: string) => {
-    const commonProps = {
-      label: fieldShape.label,
-      className: props.className,
-      description: fieldShape.description,
-      placeholder: fieldShape.placeholder,
-    }
-    return (
-      <AutoFormField
-        name={name}
-        component={
-          <AutoSelectField
-            {...commonProps}
+  const connectComponent = (name: string, options: string) => (
+    <FormField
+      key={name}
+      name={name}
+      control={control}
+      render={({ field, fieldState, formState }) => (
+        <FormItemController field={field} fieldState={fieldState} formState={formState}>
+          <AutoComboboxField
+            value={(field.value as string | null) ?? null}
+            onChange={field.onChange}
+            label={fieldShape.label}
+            description={fieldShape.description}
+            placeholder={fieldShape.placeholder}
             isDisabled={disabled}
-            optionsName={options}
+            isRequired={fieldShape.required}
+            errorMessage={fieldState.error?.message}
             optionsFetchPath={props.optionsFetchPath}
-            deselectable={props.deselectable}
+            optionsName={options}
+            take={10}
           />
-        }
-      />
-    )
-  }
+        </FormItemController>
+      )}
+    />
+  )
 
   const createComponent = (name: string) => {
     return Object.entries(fieldShape.fields).map(([key, childField]) => (
