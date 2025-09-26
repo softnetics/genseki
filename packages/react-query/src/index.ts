@@ -24,7 +24,7 @@ import type {
 } from '@genseki/react'
 import { createRestClient, type CreateRestClientConfig } from '@genseki/rest'
 
-import { isEmptyObject, normalizeObject, sortObjectDeep } from './utils'
+import { normalizeObject } from './utils'
 
 type QueryMethod = 'GET'
 type MutationMethod = 'POST' | 'PATCH' | 'PUT' | 'DELETE'
@@ -216,17 +216,8 @@ export function queryKey(method: string, path: string | number | symbol, payload
     return [method, path] as const
   }
 
-  const { header, ...rest } = payload
+  const { header: _header, ...rest } = payload
   const normalizedPayload = normalizeObject(rest)
-  const normalizedHeaders = header && !isEmptyObject(header) ? sortObjectDeep(header) : undefined
-
-  if (normalizedHeaders && normalizedPayload) {
-    return [method, path, normalizedPayload, normalizedHeaders] as const
-  }
-
-  if (normalizedHeaders) {
-    return [method, path, normalizedHeaders] as const
-  }
 
   if (normalizedPayload) {
     return [method, path, normalizedPayload] as const
