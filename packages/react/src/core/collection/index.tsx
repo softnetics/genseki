@@ -848,4 +848,7 @@ export class CollectionBuilder<
 export interface CollectionToolbarActions {
   create?: boolean
   delete?: boolean
+  search?: {
+    placeholder?: string
+  }
 }

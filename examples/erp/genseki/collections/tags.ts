@@ -31,6 +31,9 @@ export const tagsCollection = createPlugin('tags', (app) => {
         toolbar: {
           create: true,
           delete: true,
+          search: {
+            placeholder: 'Search by name',
+          },
         },
       })
     )

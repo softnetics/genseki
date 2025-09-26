@@ -9,6 +9,7 @@ import { useDebounce } from '../../../../hooks/use-debounce'
 import { useSearch } from '../../../../hooks/use-search'
 
 export interface CollectionListSearchProps {
+  placeholder?: string
   search?: string // Optional — Controlled input
   onSearchChange?: (value: string) => void // Optional — Controlled input
   isLoading?: boolean
@@ -38,7 +39,7 @@ export function CollectionListSearch(props: CollectionListSearchProps) {
   return (
     <TextField
       aria-label="Search"
-      placeholder="Search"
+      placeholder={props.placeholder ?? 'Search'}
       prefix={<BaseIcon icon={MagnifyingGlassIcon} size="md" />}
       isPending={props.isLoading}
       value={search}

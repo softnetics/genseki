@@ -27,6 +27,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
   const toolbar: CollectionToolbarActions = {
     create: props.toolbar?.create ?? context.toolbar?.create,
     delete: props.toolbar?.delete ?? context.toolbar?.delete,
+    search: props.toolbar?.search ?? context.toolbar?.search,
   }
   const deleteMutation = useCollectionDeleteMutation({
     slug: context.slug,
@@ -57,7 +58,7 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
         {toolbar?.delete && isRowsSelected && (
           <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />
         )}
-        <CollectionListSearch />
+        <CollectionListSearch placeholder={toolbar?.search?.placeholder} />
         {/* TODO: Filter */}
         <CollectionListFilter />
         {toolbar?.create && <CollectionListCreate slug={context.slug} />}
