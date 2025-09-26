@@ -564,7 +564,7 @@ export class CollectionBuilder<
     config: CollectionListConfig<TContext, TFields> = { columns: [] }
   ) {
     return (appOptions: GensekiAppOptions) => {
-      const route = this.listApiRouter(fields, config.configuration)
+      const route = this.listApiRouter(fields, config)
 
       const ui = createGensekiUiRoute({
         path: `${this.config.uiPathPrefix}/${this.slug}`,
@@ -618,14 +618,15 @@ export class CollectionBuilder<
 
   listApiRouter<TFields extends Fields>(
     fields: TFields,
-    listConfiguration?: ListConfiguration<TFields>
+    config?: CollectionListConfig<TContext, TFields>
   ) {
     const { route } = getCollectionDefaultListApiRoute({
       slug: this.slug,
       context: this.context,
       schema: this.schema,
       fields: fields,
-      listConfiguration: listConfiguration,
+      listConfiguration: config?.configuration,
+      customHandler: config?.api,
     })
 
     return {
