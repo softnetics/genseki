@@ -613,7 +613,7 @@ export class CollectionBuilder<
 
   listApiRouter<TFields extends Fields>(
     fields: TFields,
-    config: CollectionListConfig<TContext, TFields>
+    config?: CollectionListConfig<TContext, TFields>
   ) {
     const { route } = getCollectionDefaultListApiRoute({
       slug: this.slug,
