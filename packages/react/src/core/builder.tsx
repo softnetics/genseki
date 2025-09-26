@@ -19,7 +19,7 @@ export class Builder<in out TContext extends AnyContextable, TModelSchemas exten
   fields<const TModelName extends keyof TModelSchemas, const TFieldsShape extends FieldsShape>(
     modelName: TModelName,
     configFn: (fb: FieldBuilder<TContext, TModelSchemas, TModelName>) => TFieldsShape,
-    info?: { identifierColumn?: string }
+    info?: { identifierColumn?: string; orderColumn?: string }
   ) {
     const fb = new FieldBuilder({
       context: this.config.context,

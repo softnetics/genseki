@@ -14,13 +14,17 @@ import {
 import { CSS } from '@dnd-kit/utilities'
 import { IconChevronLgDown } from '@intentui/icons'
 import { DotsSixIcon } from '@phosphor-icons/react'
+import { TrashIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { BaseIcon, Button, Typography } from '../../primitives'
 
 interface ReorderGroupProps {
   title?: string
   children: ReactNode
+  collapsible?: boolean
   onReorder?: (newOrder: string[]) => void
+  onMove?: (oldIndex: number, newIndex: number) => void
+  onDelete?: (index: number) => void
 }
 
 interface SortableItemProps {
@@ -28,9 +32,18 @@ interface SortableItemProps {
   children: ReactElement
   title?: string
   order?: number
+  collapsible?: boolean
+  onDelete?: (index: number) => void
 }
 
-const ReorderGroup = ({ children, onReorder, title }: ReorderGroupProps) => {
+const ReorderGroup = ({
+  children,
+  onReorder,
+  onMove,
+  title,
+  collapsible = true,
+  onDelete,
+}: ReorderGroupProps) => {
   // convert children to array of ReactElement
   const elements = Children.toArray(children) as ReactElement[]
 
@@ -67,6 +80,7 @@ const ReorderGroup = ({ children, onReorder, title }: ReorderGroupProps) => {
     // update state
     setOrder(newOrder)
     onReorder?.(newOrder)
+    onMove?.(oldIndex, newIndex)
   }
 
   return (
@@ -76,7 +90,14 @@ const ReorderGroup = ({ children, onReorder, title }: ReorderGroupProps) => {
           const element = elementMap.get(id)
           if (!element) return null
           return (
-            <SortableItem key={id} id={id} title={title} order={index + 1}>
+            <SortableItem
+              key={id}
+              id={id}
+              title={title}
+              order={index + 1}
+              collapsible={collapsible}
+              onDelete={onDelete}
+            >
               {element}
             </SortableItem>
           )
@@ -86,7 +107,7 @@ const ReorderGroup = ({ children, onReorder, title }: ReorderGroupProps) => {
   )
 }
 
-const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
+const SortableItem = ({ id, children, title, order, collapsible, onDelete }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
 
   const style = {
@@ -119,14 +140,27 @@ const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
             </Typography>
           </div>
 
-          <Button variant="ghost" size="sm" onClick={() => setIsShowContent((prev) => !prev)}>
-            <IconChevronLgDown
-              className={`size-6 transition-transform duration-300 ${
-                isShowContent ? '-rotate-180' : ''
-              }`}
-              fontSize={16}
-            />
-          </Button>
+          {collapsible && (
+            <Button variant="ghost" size="sm" onClick={() => setIsShowContent((prev) => !prev)}>
+              <IconChevronLgDown
+                className={`size-6 transition-transform duration-300 ${
+                  isShowContent ? '-rotate-180' : ''
+                }`}
+                fontSize={16}
+              />
+            </Button>
+          )}
+          {onDelete && (
+            <Button
+              variant="destruction"
+              size="sm"
+              onClick={() => {
+                onDelete(order! - 1)
+              }}
+            >
+              <BaseIcon icon={TrashIcon} />
+            </Button>
+          )}
         </div>
 
         {isShowContent && children}
