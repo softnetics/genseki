@@ -1,5 +1,21 @@
 # @genseki/react
 
+## 0.1.0-alpha.51
+
+### Patch Changes
+
+- [#220](https://github.com/softnetics/genseki/pull/220) [`4357c07`](https://github.com/softnetics/genseki/commit/4357c07ebeb4cc9f07e4106f614746853977d562) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: custom list api
+
+- [#205](https://github.com/softnetics/genseki/pull/205) [`cb9d38e`](https://github.com/softnetics/genseki/commit/cb9d38e8ddc62496b9be4a1879dda39cfbc20cb3) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: Implement Controlled RichTextEditor
+
+- [#219](https://github.com/softnetics/genseki/pull/219) [`d8c4ace`](https://github.com/softnetics/genseki/commit/d8c4ace402196685afef033f184172af626af7a8) Thanks [@Desmenez](https://github.com/Desmenez)! - Support custom banner
+
+- [#197](https://github.com/softnetics/genseki/pull/197) [`1877fa0`](https://github.com/softnetics/genseki/commit/1877fa05cbd71bdd3ad917654931bbe5b0089717) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: cancel select single dropdown
+
+- [#214](https://github.com/softnetics/genseki/pull/214) [`3f1cfc5`](https://github.com/softnetics/genseki/commit/3f1cfc5b2618d90b2c90a4edf6ca652ea59c1f41) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - remove `--color-surface-muted`
+
+- [#218](https://github.com/softnetics/genseki/pull/218) [`5e85599`](https://github.com/softnetics/genseki/commit/5e855993c0b51defad43476675fa46cdc9284605) Thanks [@Desmenez](https://github.com/Desmenez)! - [Feat] Add custom search placeholder
+
 ## 0.1.0-alpha.50
 
 ### Patch Changes
