@@ -32,6 +32,10 @@ export const tagsCollection = createPlugin('tags', (app) => {
           create: true,
           delete: true,
         },
+        banner: {
+          title: 'Tags Banner',
+          description: 'A collection of tags',
+        },
       })
     )
     .addPageAndApiRouter(collection.create(fields, {}))

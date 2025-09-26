@@ -226,6 +226,10 @@ export const postsCollection = createPlugin('posts', (app) => {
           create: true,
           delete: true,
         },
+        banner: {
+          title: 'Posts Banner',
+          description: 'A collection of posts',
+        },
         layout: Layout,
         page: CustomListPage,
       })

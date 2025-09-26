@@ -52,6 +52,10 @@ export interface CollectionListContextValue<T extends BaseData = BaseData> {
   search?: string[]
   sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   toolbar?: CollectionToolbarActions
+  banner?: {
+    title?: string
+    description?: string
+  }
 
   // Helper functions
   deleteRows: (rows?: string[]) => void
@@ -67,6 +71,10 @@ export interface CollectionListProviderProps<T extends BaseData = BaseData> {
   search?: string[]
   sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   toolbar?: CollectionToolbarActions
+  banner?: {
+    title?: string
+    description?: string
+  }
 }
 
 /**
@@ -114,13 +122,19 @@ function _CollectionListProvider<T extends BaseData>(props: CollectionListProvid
 
   const components: CollectionListComponents = useMemo(
     () => ({
-      ListBanner: () => <Banner slug={context.slug} />,
+      ListBanner: () => (
+        <Banner
+          slug={context.slug}
+          title={rest.banner?.title}
+          description={rest.banner?.description}
+        />
+      ),
       ListTable: (props) => <CollectionListTable {...props} />,
       ListTableToolbar: (props) => <CollectionListToolbar {...props} />,
       ListTableContainer: (props) => <CollectionListTableContainer {...props} />,
       ListTablePagination: (props) => <CollectionListPagination {...props} />,
     }),
-    [context.slug]
+    [context.slug, rest.banner?.title, rest.banner?.description]
   )
 
   return (
@@ -137,6 +151,7 @@ function _CollectionListProvider<T extends BaseData>(props: CollectionListProvid
         components,
         invalidateList,
         deleteRows,
+        banner: rest.banner,
       }}
     >
       {children}
