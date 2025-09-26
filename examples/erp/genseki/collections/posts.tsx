@@ -228,6 +228,10 @@ export const postsCollection = createPlugin('posts', (app) => {
         },
         layout: Layout,
         page: CustomListPage,
+        api: async (args) => {
+          console.log('This is from custom list api')
+          return args.defaultApi(args)
+        },
       })
     )
     .addPageAndApiRouter(collection.create(fields, { options: options, page: CustomCreatePage }))
