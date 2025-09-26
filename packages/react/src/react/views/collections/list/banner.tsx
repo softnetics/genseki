@@ -7,6 +7,8 @@ import { formatSlug } from '../../../utils/format-slug'
 
 interface BannerProps {
   slug: string
+  title?: string
+  description?: string
 }
 
 export function Banner(props: BannerProps) {
@@ -29,10 +31,10 @@ export function Banner(props: BannerProps) {
         </div>
         <div className="flex flex-col justify-center">
           <Typography type="h2" weight="bold" className="text-text-primary leading-[100%]">
-            {formatSlug(props.slug)}
+            {props.title ?? formatSlug(props.slug)}
           </Typography>
           <Typography type="h4" weight="normal" className="text-text-secondary leading-[140%]">
-            A collection
+            {props.description ?? 'A collection'}
           </Typography>
         </div>
       </div>

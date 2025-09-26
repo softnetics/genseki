@@ -12,7 +12,11 @@ export function DefaultCollectionListPage() {
 
   return (
     <>
-      <Banner slug={context.slug} />
+      <Banner
+        slug={context.slug}
+        title={context.banner?.title}
+        description={context.banner?.description}
+      />
       <CollectionListTableContainer>
         <CollectionListToolbar />
         <CollectionListTable<any> columns={context.columns} onRowClick={undefined} />

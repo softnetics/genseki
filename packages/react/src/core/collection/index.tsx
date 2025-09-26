@@ -346,6 +346,10 @@ export type CollectionListConfig<
    * @param actions will decide whether or not to show actios in `list` view screen, This is not related to available features of collection, but rather only visible UI part of the `list` page
    */
   toolbar?: CollectionToolbarActions
+  banner?: {
+    title?: string
+    description?: string
+  }
 }
 
 export type CollectionUpdateApiArgs<
@@ -599,6 +603,7 @@ export class CollectionBuilder<
                 search={config.configuration?.search}
                 sortBy={config.configuration?.sortBy}
                 toolbar={config.toolbar}
+                banner={config.banner}
               >
                 <Layout>{page}</Layout>
               </CollectionListProvider>
