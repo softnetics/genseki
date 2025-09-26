@@ -232,7 +232,6 @@
   --color-surface-info-hover: var(--color-ocean-500);
   --color-surface-chowder: var(--color-purple-50);
   --color-surface-chowder-hover: var(--color-purple-500);
-  --color-surface-muted: var();
 
   --font-sans:
     'Inter', ui-sans-serif, system-ui, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji',
