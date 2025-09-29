@@ -14,7 +14,12 @@ import {
   type CheckboxProps,
   Combobox,
   type ComboboxItem,
+  ComboboxLabel,
+  ComboboxList,
+  ComboboxOption,
   type ComboboxProps,
+  ComboboxSearchInput,
+  ComboboxTrigger,
   DatePicker,
   type DatePickerProps,
   FormField,
@@ -275,7 +280,7 @@ export function AutoSelectField(props: AutoSelectField) {
 }
 
 export interface AutoComboboxFieldProps
-  extends Omit<ComboboxProps, 'items' | 'onSearch' | 'isLoading'> {
+  extends Omit<ComboboxProps, 'items' | 'onSearch' | 'isLoading' | 'value' | 'onChange'> {
   name?: string
 
   optionsName: string
@@ -286,16 +291,14 @@ export interface AutoComboboxFieldProps
 }
 
 export function AutoComboboxField(props: AutoComboboxFieldProps) {
+  const { field, error } = useFormItemController()
   const {
-    value,
-    onChange,
     label,
     description,
     placeholder = 'Search…',
     className,
     isDisabled,
     isRequired,
-    errorMessage,
     onOpenChange,
     deselectable,
     optionsName,
@@ -338,26 +341,62 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
 
   const mergedDisabled = (query.data?.body.disabled ?? false) || isDisabled
 
+  const submitSelection = (index: number) => {
+    const item = items[index]
+    if (!item) return
+    if (deselectable && field.value === item.value) {
+      field.onChange(null)
+      setSearch('')
+      return
+    }
+    field.onChange(item.value)
+    setSearch(item.label)
+  }
+
   return (
     <Combobox
-      className={cn('w-full', className)}
       label={label}
+      className={cn('w-full', className)}
       description={description}
       placeholder={placeholder}
-      value={value ?? null}
-      onChange={onChange}
+      value={field.value ?? null}
+      onChange={field.onChange}
       items={items}
-      isLoading={query.isFetching}
+      isPending={query.isFetching}
       isDisabled={mergedDisabled}
       isRequired={isRequired}
-      errorMessage={errorMessage}
+      errorMessage={error?.message}
       deselectable={deselectable}
       onSearch={setSearch}
       onOpenChange={(isOpen) => {
         if (isOpen && !active) setActive(true)
         onOpenChange?.(isOpen)
       }}
-    />
+    >
+      <ComboboxTrigger>
+        <ComboboxSearchInput placeholder={placeholder} />
+      </ComboboxTrigger>
+
+      <ComboboxList>
+        {!query.isFetching && items.length === 0 && (
+          <li className="px-4 py-6 text-sm text-muted-fg">No results</li>
+        )}
+        {!query.isFetching &&
+          items.map((item, idx) => {
+            const isSelected = item.value === field.value
+            return (
+              <ComboboxOption
+                key={item.value}
+                value={item.value}
+                isSelected={isSelected}
+                onSelect={() => submitSelection(idx)}
+              >
+                <ComboboxLabel>{item.label}</ComboboxLabel>
+              </ComboboxOption>
+            )
+          })}
+      </ComboboxList>
+    </Combobox>
   )
 }
 
@@ -559,14 +598,22 @@ export function AutoField(props: AutoFieldProps) {
 
     case 'comboboxNumber':
     case 'comboboxText': {
+      if (!props.optionsFetchPath) throw new Error('Missing optionsFetchPath')
+
       return (
-        <select name={field.$client.fieldName}>
-          {([] as any[]).map((option) => (
-            <option key={option.value} value={option.value}>
-              {option.label}
-            </option>
-          ))}
-        </select>
+        <AutoFormField
+          key={commonProps.name}
+          name={commonProps.name}
+          component={
+            <AutoComboboxField
+              {...commonProps}
+              isDisabled={disabled}
+              optionsName={(field as any).options || 'default'}
+              optionsFetchPath={props.optionsFetchPath}
+              deselectable={(field as any).deselectable}
+            />
+          }
+        />
       )
     }
 
@@ -674,8 +721,6 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
           <AutoComboboxField
-            value={(field.value as string | null) ?? null}
-            onChange={field.onChange}
             label={fieldShape.label}
             description={fieldShape.description}
             placeholder={fieldShape.placeholder}
@@ -780,8 +825,6 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
       render={({ field, fieldState, formState }) => (
         <FormItemController field={field} fieldState={fieldState} formState={formState}>
           <AutoComboboxField
-            value={(field.value as string | null) ?? null}
-            onChange={field.onChange}
             label={fieldShape.label}
             description={fieldShape.description}
             placeholder={fieldShape.placeholder}
