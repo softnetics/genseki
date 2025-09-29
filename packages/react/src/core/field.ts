@@ -493,7 +493,16 @@ export type FieldsOptions<
     options: infer TOptionsName extends string
   }
     ? TOptionsName
-    : never]: FieldOptionsCallback<TContext, string | number, PartialDeep<InferFields<TFields>>>
+    : never]: FieldOptionsCallback<
+    TContext,
+    string | number,
+    PartialDeep<InferFields<TFields>> & {
+      __options?: {
+        search?: string
+        take?: number
+      }
+    }
+  >
 }
 
 export class FieldBuilder<
