@@ -1,5 +1,7 @@
 # @genseki/prisma-generator
 
+## 0.1.0-alpha.52
+
 ## 0.1.0-alpha.51
 
 ## 0.1.0-alpha.50

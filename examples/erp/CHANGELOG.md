@@ -1,5 +1,21 @@
 # @example/erp
 
+## 0.1.0-alpha.50
+
+### Minor Changes
+
+- [#217](https://github.com/softnetics/genseki/pull/217) [`fa5325a`](https://github.com/softnetics/genseki/commit/fa5325a0a8a6bf58b513ae944c386cb827f05b59) Thanks [@Desmenez](https://github.com/Desmenez)! - [Feat] Add combobox as a default connect autoField
+
+### Patch Changes
+
+- Updated dependencies [[`fa5325a`](https://github.com/softnetics/genseki/commit/fa5325a0a8a6bf58b513ae944c386cb827f05b59)]:
+  - @genseki/react@0.1.0-alpha.52
+  - @genseki/next@0.1.0-alpha.52
+  - @genseki/plugins@0.1.0-alpha.52
+  - @genseki/prisma-generator@0.1.0-alpha.52
+  - @genseki/react-query@0.1.0-alpha.52
+  - @genseki/rest@0.1.0-alpha.52
+
 ## 0.1.0-alpha.49
 
 ### Patch Changes
