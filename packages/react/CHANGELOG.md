@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.52
+
+### Minor Changes
+
+- [#217](https://github.com/softnetics/genseki/pull/217) [`fa5325a`](https://github.com/softnetics/genseki/commit/fa5325a0a8a6bf58b513ae944c386cb827f05b59) Thanks [@Desmenez](https://github.com/Desmenez)! - [Feat] Add combobox as a default connect autoField
+
 ## 0.1.0-alpha.51
 
 ### Patch Changes

@@ -1,5 +1,12 @@
 # @genseki/next
 
+## 0.1.0-alpha.52
+
+### Patch Changes
+
+- Updated dependencies [[`fa5325a`](https://github.com/softnetics/genseki/commit/fa5325a0a8a6bf58b513ae944c386cb827f05b59)]:
+  - @genseki/react@0.1.0-alpha.52
+
 ## 0.1.0-alpha.51
 
 ### Patch Changes
