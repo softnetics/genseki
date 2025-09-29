@@ -296,7 +296,7 @@ const ComboboxOption = ({ isSelected, onSelect, children, value }: ComboboxOptio
   )
 }
 
-function Combobox({
+const Combobox = ({
   className,
   value,
   onChange,
@@ -312,7 +312,7 @@ function Combobox({
   isRequired,
   deselectable: _deselectable = false,
   children,
-}: ComboboxProps) {
+}: ComboboxProps) => {
   const [open, setOpen] = useState(false)
   const [search, setSearch] = useState('')
   const rootRef = useRef<HTMLDivElement>(null)

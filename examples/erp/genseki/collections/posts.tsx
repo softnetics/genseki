@@ -187,9 +187,9 @@ export const options = builder.options(fields, {
   },
 
   author: async ({ body }) => {
-    const opt = (body as any).__options ?? {}
-    const search: string = opt.search ?? ''
-    const take = Math.max(1, Math.min(Number(opt.take ?? 10) || 10, 50))
+    const opt = body.__options ?? {}
+    const search = opt.search
+    const take = opt.take
 
     if (body.title === 'DISABLED') {
       return {
@@ -215,8 +215,8 @@ export const options = builder.options(fields, {
 
   tag: async ({ body }: { body: any }) => {
     const opt = body.__options ?? {}
-    const search: string = opt.search ?? ''
-    const take = Math.max(1, Math.min(Number(opt.take ?? 10) || 10, 50))
+    const search = opt.search
+    const take = opt.take
 
     const where = search ? { name: { contains: search, mode: 'insensitive' as const } } : {}
 
