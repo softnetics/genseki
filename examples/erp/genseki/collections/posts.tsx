@@ -116,6 +116,7 @@ export const fields = builder.fields('post', (fb) => ({
   postTags: fb.relations('postTags', (fb) => ({
     type: 'create' as const,
     label: 'Tags',
+    limit: 4,
     fields: fb.fields('postTag', (fb) => ({
       remark: fb.columns('remark', {
         type: 'text',

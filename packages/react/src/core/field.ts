@@ -373,6 +373,7 @@ export interface FieldRelationConnectOptions extends FieldOptionsShapeBase {
   type: 'connect'
   fields: Fields
   options: string
+  limit?: number
 }
 export interface FieldRelationConnectShapeClient
   extends Omit<FieldRelationConnectOptions, 'fields'>,
@@ -387,6 +388,7 @@ export interface FieldRelationConnectShape
 export interface FieldRelationCreateOptions extends FieldOptionsShapeBase {
   type: 'create'
   fields: Fields
+  limit?: number
 }
 export interface FieldRelationCreateShapeClient
   extends Omit<FieldRelationCreateOptions, 'fields'>,
@@ -401,6 +403,7 @@ export interface FieldRelationConnectOrCreateOptions extends FieldOptionsShapeBa
   type: 'connectOrCreate'
   fields: Fields
   options: string
+  limit?: number
 }
 export interface FieldRelationConnectOrCreateShapeClient
   extends Omit<FieldRelationConnectOrCreateOptions, 'fields'>,
