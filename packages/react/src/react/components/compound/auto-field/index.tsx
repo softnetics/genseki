@@ -879,6 +879,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                     {fieldShape.label} #{index + 1}
                   </div>
                   {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => fieldArray.remove(index)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -910,6 +920,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                   </Typography>
                   <div className="flex flex-col">
                     {createComponent(`${props.name}.${index}.create`)}
+                  </div>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => fieldArray.remove(index)}
+                    >
+                      Remove
+                    </Button>
                   </div>
                 </div>
               ))}
@@ -945,6 +965,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               </div>
               {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
               {createComponent(`${props.name}.${index}.create`)}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => fieldArray.remove(index)}
+                >
+                  Remove
+                </Button>
+              </div>
             </div>
           ))}
           <Button
