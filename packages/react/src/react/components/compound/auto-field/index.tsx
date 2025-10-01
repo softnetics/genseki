@@ -647,6 +647,7 @@ export function AutoField(props: AutoFieldProps) {
           disabled={disabled}
           optionsFetchPath={props.optionsFetchPath}
           deselectable={field.deselectable}
+          limit={field.limit}
         />
       )
     }
@@ -667,6 +668,8 @@ interface AutoRelationshipFieldProps {
   allowConnect?: boolean
   disabled?: boolean
   deselectable?: boolean
+
+  limit?: number
 }
 
 export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
@@ -685,6 +688,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           disabled={props.disabled}
           optionsFetchPath={props.optionsFetchPath}
           deselectable={props.deselectable}
+          limit={props.limit}
         />
       )
     case true:
@@ -698,6 +702,7 @@ export function AutoRelationshipField(props: AutoRelationshipFieldProps) {
           disabled={props.disabled}
           optionsFetchPath={props.optionsFetchPath}
           deselectable={props.deselectable}
+          limit={props.limit}
         />
       )
     default:
@@ -803,6 +808,8 @@ interface AutoManyRelationshipFieldProps {
   allowConnect?: boolean
   disabled?: boolean
   deselectable?: boolean
+
+  limit?: number
 }
 
 export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps) {
@@ -814,8 +821,9 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
 
   const fieldShape = props.fieldShape
 
+  const isLimitReached = props.limit ? fieldArray.fields.length >= props.limit : false
   if (fieldShape.hidden) return null
-  const disabled = fieldShape.disabled || props.disabled
+  const disabled = fieldShape.disabled || props.disabled || isLimitReached
 
   const connectComponent = (name: string, options: string) => (
     <FormField
@@ -871,6 +879,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                     {fieldShape.label} #{index + 1}
                   </div>
                   {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => fieldArray.remove(index)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>
@@ -889,7 +907,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
     case 'create':
       return (
         <div className="rounded-md border border-input p-6 grid grid-cols-1 gap-y-6">
-          {!!fieldArray.fields.length && (
+          {fieldArray.fields.length ? (
             <div className="flex flex-col space-y-6">
               {fieldArray.fields.map((fieldValue, index) => (
                 <div
@@ -897,13 +915,31 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                   className="p-6 bg-surface-tertiary rounded-sm flex flex-col gap-y-4"
                 >
                   <Typography type="caption" weight="normal">
-                    {fieldShape.label} #{index + 1}
+                    {fieldShape.label} #{index + 1}{' '}
+                    {fieldShape.required && <span className="ml-1 text-text-brand">*</span>}
                   </Typography>
                   <div className="flex flex-col">
                     {createComponent(`${props.name}.${index}.create`)}
                   </div>
+                  <div className="flex justify-end">
+                    <Button
+                      type="button"
+                      variant="primary"
+                      size="sm"
+                      onClick={() => fieldArray.remove(index)}
+                    >
+                      Remove
+                    </Button>
+                  </div>
                 </div>
               ))}
+            </div>
+          ) : (
+            <div>
+              <Typography type="body" weight="bold">
+                {fieldShape.label}
+              </Typography>
+              {fieldShape.required && <span className="ml-1 text-text-brand">*</span>}
             </div>
           )}
           <Button
@@ -929,6 +965,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               </div>
               {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
               {createComponent(`${props.name}.${index}.create`)}
+              <div className="flex justify-end">
+                <Button
+                  type="button"
+                  variant="primary"
+                  size="sm"
+                  onClick={() => fieldArray.remove(index)}
+                >
+                  Remove
+                </Button>
+              </div>
             </div>
           ))}
           <Button
