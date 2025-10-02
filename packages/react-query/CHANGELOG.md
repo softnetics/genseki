@@ -1,5 +1,11 @@
 # @genseki/react-query
 
+## 0.1.0-alpha.54
+
+### Patch Changes
+
+- [#227](https://github.com/softnetics/genseki/pull/227) [`414c31a`](https://github.com/softnetics/genseki/commit/414c31a33983eadd3e998a35a68d006290675295) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Change query key extraction spelling from `header` to `headers`
+
 ## 0.1.0-alpha.53
 
 ### Patch Changes

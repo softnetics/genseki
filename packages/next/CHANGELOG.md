@@ -1,5 +1,12 @@
 # @genseki/next
 
+## 0.1.0-alpha.54
+
+### Patch Changes
+
+- Updated dependencies []:
+  - @genseki/react@0.1.0-alpha.54
+
 ## 0.1.0-alpha.53
 
 ### Patch Changes

@@ -1,5 +1,7 @@
 # @genseki/react
 
+## 0.1.0-alpha.54
+
 ## 0.1.0-alpha.53
 
 ## 0.1.0-alpha.52

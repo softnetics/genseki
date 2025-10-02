@@ -216,7 +216,7 @@ export function queryKey(method: string, path: string | number | symbol, payload
     return [method, path] as const
   }
 
-  const { header: _header, ...rest } = payload
+  const { headers: _headers, ...rest } = payload
   const normalizedPayload = normalizeObject(rest)
 
   if (normalizedPayload) {
