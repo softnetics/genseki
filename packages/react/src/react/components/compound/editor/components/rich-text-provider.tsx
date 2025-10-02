@@ -29,7 +29,13 @@ export function EditorProvider({
     <EditorContext.Provider value={{ editor: editorInstance }}>
       {slotBefore}
       <EditorConsumer>
-        {() => <EditorContent editor={editorInstance} {...editorContainerProps} />}
+        {() => (
+          <EditorContent
+            editor={editorInstance}
+            {...editorContainerProps}
+            className="min-h-[240px]"
+          />
+        )}
       </EditorConsumer>
       {children}
       {slotAfter}
