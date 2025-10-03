@@ -36,6 +36,9 @@ export interface FieldRelationClientMetadata {
 }
 export interface FieldRelationMetadata extends Omit<FieldRelationClientMetadata, 'relation'> {
   relation: FieldRelationSchema
+  config: {
+    orderColumn?: string
+  }
 }
 
 export interface FieldOptionsShapeBase {
@@ -576,7 +579,8 @@ export class FieldBuilder<
         TModelSchemas,
         TModelSchemas[TModelName]['shape']['relations'][TFieldRelationName]['referencedModel']['config']['prismaModelName']
       >
-    ) => TOptions
+    ) => TOptions,
+    config?: { orderColumn?: string }
   ) {
     const relation = this.model.shape.relations[
       fieldRelationName as string
@@ -608,6 +612,7 @@ export class FieldBuilder<
         // This field will be mutated by the builder to include the field name
         fieldName: '',
         relation: relation,
+        config: config || {},
       },
     } satisfies FieldRelationShapeBase
 
