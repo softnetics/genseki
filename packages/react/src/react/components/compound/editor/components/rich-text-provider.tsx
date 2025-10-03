@@ -7,6 +7,8 @@ import {
   useEditor,
 } from '@tiptap/react'
 
+import { cn } from '../../../../utils/cn'
+
 interface EditorProviderPropsWithEditor extends EditorProviderProps {
   editor?: Editor | null
 }
@@ -29,7 +31,13 @@ export function EditorProvider({
     <EditorContext.Provider value={{ editor: editorInstance }}>
       {slotBefore}
       <EditorConsumer>
-        {() => <EditorContent editor={editorInstance} {...editorContainerProps} />}
+        {() => (
+          <EditorContent
+            editor={editorInstance}
+            className={cn('min-h-[240px]', editorContainerProps.className)}
+            {...editorContainerProps}
+          />
+        )}
       </EditorConsumer>
       {children}
       {slotAfter}

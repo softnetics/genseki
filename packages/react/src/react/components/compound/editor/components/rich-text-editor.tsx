@@ -51,7 +51,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
         isDisabled={props.isDisabled}
         isInvalid={isInvalid}
         data-loading={props.isPending ? 'true' : undefined}
-        className="overflow-auto relative resize-x"
+        className="overflow-auto relative resize-none w-full"
       >
         <div
           className={cn(
