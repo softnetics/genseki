@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.55
+
+### Patch Changes
+
+- [#226](https://github.com/softnetics/genseki/pull/226) [`e5eb01c`](https://github.com/softnetics/genseki/commit/e5eb01cf587d733d4da00fb3a08d1887871dac80) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: richText height and resizeable
+
 ## 0.1.0-alpha.54
 
 ## 0.1.0-alpha.53
