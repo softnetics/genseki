@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.56
+
+### Patch Changes
+
+- [#224](https://github.com/softnetics/genseki/pull/224) [`e312530`](https://github.com/softnetics/genseki/commit/e31253024f3d965cb0991988b20655f23feeaa0c) Thanks [@Desmenez](https://github.com/Desmenez)! - [Fix] Error message not show
+
 ## 0.1.0-alpha.55
 
 ### Patch Changes
