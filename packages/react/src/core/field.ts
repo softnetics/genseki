@@ -736,18 +736,21 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     case 'time':
     case 'password':
     case 'media': {
-      const schema = z.string().min(1, requiredMessage)
+      const schema = z.string(requiredMessage).min(1, requiredMessage)
       return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
 
     case 'email': {
-      const schema = z.string().min(1, requiredMessage).email('Please enter a valid email address')
+      const schema = z
+        .string(requiredMessage)
+        .min(1, requiredMessage)
+        .email('Please enter a valid email address')
       return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
 
     // string[] input
     case 'comboboxText': {
-      const schema = z.array(z.string()).min(1, requiredMessage)
+      const schema = z.array(z.string(requiredMessage)).min(1, requiredMessage)
       return (isRequired ? schema : schema.optional()) as FieldShapeToZodSchema<TFieldShape>
     }
 
@@ -755,7 +758,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     case 'number':
     case 'selectNumber': {
       if (isRequired) {
-        return z.number() as FieldShapeToZodSchema<TFieldShape>
+        return z.number(requiredMessage) as FieldShapeToZodSchema<TFieldShape>
       }
       return z.number().optional() as FieldShapeToZodSchema<TFieldShape>
     }
@@ -763,7 +766,9 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     // number[] input
     case 'comboboxNumber': {
       if (isRequired) {
-        return z.array(z.number()).min(1, requiredMessage) as FieldShapeToZodSchema<TFieldShape>
+        return z
+          .array(z.number(requiredMessage))
+          .min(1, requiredMessage) as FieldShapeToZodSchema<TFieldShape>
       }
       return z.array(z.number()).optional() as FieldShapeToZodSchema<TFieldShape>
     }
@@ -772,7 +777,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     case 'checkbox':
     case 'switch': {
       if (isRequired) {
-        return z.boolean() as FieldShapeToZodSchema<TFieldShape>
+        return z.boolean(requiredMessage) as FieldShapeToZodSchema<TFieldShape>
       }
       return z.boolean().optional() as FieldShapeToZodSchema<TFieldShape>
     }
@@ -780,7 +785,7 @@ export function fieldToZodScheama<TFieldShape extends FieldShapeBase | FieldShap
     // date input
     case 'date': {
       if (isRequired) {
-        return z.coerce.date() as FieldShapeToZodSchema<TFieldShape>
+        return z.coerce.date(requiredMessage) as FieldShapeToZodSchema<TFieldShape>
       }
       return z.coerce.date().optional() as FieldShapeToZodSchema<TFieldShape>
     }
