@@ -1,5 +1,13 @@
 # @genseki/react
 
+## 0.1.0-alpha.55
+
+### Patch Changes
+
+- [#226](https://github.com/softnetics/genseki/pull/226) [`e5eb01c`](https://github.com/softnetics/genseki/commit/e5eb01cf587d733d4da00fb3a08d1887871dac80) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: richText height and resizeable
+
+- [#223](https://github.com/softnetics/genseki/pull/223) [`0b0912b`](https://github.com/softnetics/genseki/commit/0b0912b755394e675df1db161a5106c14e30ad03) Thanks [@Desmenez](https://github.com/Desmenez)! - [Feat]: add limit to type 'create' and remove button
+
 ## 0.1.0-alpha.54
 
 ## 0.1.0-alpha.53

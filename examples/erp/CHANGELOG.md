@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.53
+
+### Patch Changes
+
+- [#223](https://github.com/softnetics/genseki/pull/223) [`0b0912b`](https://github.com/softnetics/genseki/commit/0b0912b755394e675df1db161a5106c14e30ad03) Thanks [@Desmenez](https://github.com/Desmenez)! - [Feat]: add limit to type 'create' and remove button
+
+- Updated dependencies [[`e5eb01c`](https://github.com/softnetics/genseki/commit/e5eb01cf587d733d4da00fb3a08d1887871dac80), [`0b0912b`](https://github.com/softnetics/genseki/commit/0b0912b755394e675df1db161a5106c14e30ad03)]:
+  - @genseki/react@0.1.0-alpha.55
+  - @genseki/next@0.1.0-alpha.55
+  - @genseki/plugins@0.1.0-alpha.55
+  - @genseki/prisma-generator@0.1.0-alpha.55
+  - @genseki/react-query@0.1.0-alpha.55
+  - @genseki/rest@0.1.0-alpha.55
+
 ## 0.1.0-alpha.52
 
 ### Patch Changes
