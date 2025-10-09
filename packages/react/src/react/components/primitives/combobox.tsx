@@ -1,371 +1,221 @@
 'use client'
 
-import React, { createContext, useContext, useEffect, useRef, useState } from 'react'
+import * as React from 'react'
 
+import { CheckIcon } from '@phosphor-icons/react'
+import { CaretUpDownIcon } from '@phosphor-icons/react'
+import { useControllableState } from '@radix-ui/react-use-controllable-state'
+
+import { Button } from './button'
 import {
-  CaretDownIcon,
-  CheckIcon,
-  MagnifyingGlassIcon,
-  SpinnerIcon,
-  XCircleIcon,
-} from '@phosphor-icons/react'
-import { tv } from 'tailwind-variants'
+  Command,
+  CommandEmpty,
+  CommandGroup,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from './command'
+import { Popover, PopoverContent, PopoverTrigger } from './popover'
 
-import { BaseIcon } from './base-icon'
-import { Description, FieldError, Label } from './field'
-import { focusStyles } from './primitive'
-
+import { createRequireContext } from '../../hooks/create-required-context'
 import { cn } from '../../utils/cn'
 
-type ComboboxItem = { label: string; value: string }
-
-interface ComboboxContextValue {
-  open: boolean
-  setOpen: (open: boolean) => void
-  search: string
-  setSearch: (search: string) => void
-  value: string | null
-  onChange: (value: string | null) => void
-  items: ComboboxItem[]
-  isPending?: boolean
-  isDisabled?: boolean
-  isRequired?: boolean
-  errorMessage?: string
-  deselectable?: boolean
-  placeholder?: string
-  onSearch?: (q: string) => void
-}
-
-const ComboboxContext = createContext<ComboboxContextValue | null>(null)
-
-const useComboboxContext = () => {
-  const context = useContext(ComboboxContext)
-  if (!context) {
-    throw new Error('Combobox components must be used within Combobox')
-  }
-  return context
-}
-
-interface ComboboxProps {
-  value: string | null
-  onChange: (value: string | null) => void
-
-  items: ComboboxItem[]
-  isPending?: boolean
-
-  onSearch?: (q: string) => void
-  onOpenChange?: (open: boolean) => void
-
-  label?: string
-  placeholder?: string
-  description?: string
-  errorMessage?: string
-  className?: string
-  isDisabled?: boolean
-  isRequired?: boolean
-  deselectable?: boolean
-  children?: React.ReactNode
-}
-
-const triggerStyles = tv({
-  extend: focusStyles,
-  base: [
-    'flex items-center w-full rounded-md border border-input bg-bg h-20 px-6 py-5 shadow-sm',
-    'text-base text-fg transition data-[open]:ring-4 data-[open]:ring-ring/20',
-  ],
-  variants: {
-    isDisabled: { true: 'opacity-80 bg-surface-primary-hover cursor-not-allowed' },
-    isInvalid: { true: 'border-danger ring-danger/20' },
+const frameworks = [
+  {
+    value: 'next.js',
+    label: 'Next.js',
   },
-})
+  {
+    value: 'sveltekit',
+    label: 'SvelteKit',
+  },
+  {
+    value: 'nuxt.js',
+    label: 'Nuxt.js',
+  },
+  {
+    value: 'remix',
+    label: 'Remix',
+  },
+  {
+    value: 'astro',
+    label: 'Astro',
+  },
+]
 
-interface ComboboxTriggerProps {
-  children: React.ReactNode
-  className?: string
-  isPending?: boolean
+interface Item {
+  value: string
+  label: string
 }
 
-const ComboboxTrigger = ({ children, className }: ComboboxTriggerProps) => {
-  const { open, setOpen, isDisabled, errorMessage } = useComboboxContext()
+const [_ComboboxProvider, useCombobox] = createRequireContext<{
+  open: boolean
+  onOpenChange: React.Dispatch<React.SetStateAction<boolean>>
+  value: string
+  onValueChange: (value: string) => void
+  items: Item[]
+  setItems: React.Dispatch<React.SetStateAction<Item[]>>
+}>('Combobox provider')
 
-  return (
-    <div
-      className={cn(
-        triggerStyles({
-          isDisabled: isDisabled,
-          isInvalid: Boolean(errorMessage),
-          isFocused: open,
-        }),
-        className
-      )}
-      data-open={open ? '' : undefined}
-      onClick={() => {
-        if (isDisabled) return
-        if (!open) setOpen(true)
-      }}
-      role="combobox"
-      aria-expanded={open}
-      aria-haspopup="listbox"
-    >
-      {children}
-    </div>
-  )
-}
-
-interface ComboboxSearchInputProps {
-  placeholder?: string
-  className?: string
-}
-
-const ComboboxSearchInput = ({ placeholder, className }: ComboboxSearchInputProps) => {
-  const { open, search, setSearch, value, items, isDisabled, setOpen, onChange, isPending } =
-    useComboboxContext()
-  const inputRef = useRef<HTMLInputElement>(null)
-  const [selectedText, setSelectedText] = useState('')
-
-  // Sync selected label
-  useEffect(() => {
-    if (!value) return setSelectedText('')
-    const matchedItem = items.find((i) => i.value === value)
-    if (matchedItem) {
-      setSelectedText(matchedItem.label)
-    }
-  }, [value, items])
-
-  const displayText = open ? search : selectedText
-  const showPlaceholder = displayText.length === 0
-  const actualPlaceholder = placeholder || 'Search…'
-
-  const clearSelection = (e: React.MouseEvent) => {
-    e.preventDefault()
-    e.stopPropagation()
-    if (isDisabled) return
-    onChange(null)
-    setSearch('')
-    setOpen(false)
-  }
-
-  return (
-    <>
-      <BaseIcon icon={MagnifyingGlassIcon} className="mr-2 shrink-0 text-muted-fg" />
-      <input
-        ref={inputRef}
-        className={cn(
-          'flex-1 bg-transparent outline-none',
-          'placeholder:text-muted-fg',
-          'text-ellipsis',
-          className
-        )}
-        placeholder={showPlaceholder ? actualPlaceholder : undefined}
-        value={displayText}
-        onChange={(e) => {
-          if (!open) return
-          setSearch(e.target.value)
-        }}
-        onFocus={() => {
-          if (isDisabled) return
-          if (!open) setOpen(true)
-        }}
-        disabled={isDisabled}
-      />
-
-      {value && (
-        <button
-          type="button"
-          className="mr-2 rounded p-1 text-muted-fg hover:text-fg"
-          title="Clear selection"
-          onClick={clearSelection}
-          tabIndex={-1}
-          aria-label="Clear selection"
-        >
-          <BaseIcon icon={XCircleIcon} />
-        </button>
-      )}
-
-      {isPending ? (
-        <BaseIcon icon={SpinnerIcon} className="animate-spin size-6 mr-2" />
-      ) : (
-        <BaseIcon
-          icon={CaretDownIcon}
-          className={cn(
-            'shrink-0 transition-transform text-muted-fg',
-            open && 'rotate-180 text-fg'
-          )}
-        />
-      )}
-    </>
-  )
-}
-
-interface ComboboxListProps {
-  children: React.ReactNode
-  className?: string
-}
-
-const ComboboxList = ({ children, className }: ComboboxListProps) => {
-  const { open, setOpen } = useComboboxContext()
-  const listRef = useRef<HTMLDivElement>(null)
-
-  // Click outside
-  useEffect(() => {
-    if (!open) return
-    const onDocMouseDown = (e: MouseEvent) => {
-      const el = listRef.current
-      if (el && !el.contains(e.target as Node)) setOpen(false)
-    }
-    document.addEventListener('mousedown', onDocMouseDown)
-    return () => document.removeEventListener('mousedown', onDocMouseDown)
-  }, [open, setOpen])
-
-  if (!open) return null
-
-  return (
-    <div ref={listRef} className={cn('relative', className)}>
-      <div className="absolute z-50 mt-5 w-full rounded-md border bg-white shadow">
-        <ul role="listbox" className="max-h-64 overflow-auto py-3">
-          {children}
-        </ul>
-      </div>
-    </div>
-  )
-}
-
-interface ComboboxLabelProps {
-  children: React.ReactNode
-}
-
-const ComboboxLabel = ({ children }: ComboboxLabelProps) => {
-  return <span>{children}</span>
-}
-
-interface ComboboxOptionProps {
-  isSelected?: boolean
-  onSelect?: () => void
-  children: React.ReactNode
+function ComboboxProvider(props: {
+  children?: React.ReactNode
+  open?: boolean
+  onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>
   value?: string
-}
+  onValueChange?: (value: string) => void
+  items: Item[]
+}) {
+  const [items, setItems] = React.useState<Item[]>(props.items ?? [])
 
-const ComboboxOption = ({ isSelected, onSelect, children, value }: ComboboxOptionProps) => {
-  const {
-    items,
-    onChange,
-    setOpen,
-    setSearch,
-    value: currentValue,
-    deselectable,
-  } = useComboboxContext()
+  // typing value
+  const [value, setValue] = useControllableState<string>({
+    defaultProp: '',
+    onChange: props.onValueChange,
+    prop: props.value,
+  })
 
-  const handleSelect = () => {
-    if (value) {
-      const item = items.find((i) => i.value === value)
-      if (item) {
-        if (deselectable && currentValue === item.value) {
-          onChange(null)
-          setSearch('')
-          setOpen(false)
-          return
-        }
-        onChange(item.value)
-        setSearch(item.label)
-        setOpen(false)
-      }
-    }
-    onSelect?.()
-  }
+  // popover state
+  const [open, setOpen] = useControllableState({
+    defaultProp: false,
+    onChange: props.onOpenChange,
+    prop: props.open,
+  })
 
   return (
-    <li
-      role="option"
-      aria-selected={isSelected}
-      className="px-3"
-      onMouseDown={(e) => {
-        e.preventDefault()
-        handleSelect()
-      }}
+    <_ComboboxProvider
+      value={{ open: open, onOpenChange: setOpen, value, onValueChange: setValue, items, setItems }}
     >
-      <div
-        className={cn(
-          'px-4 py-6 cursor-pointer text-sm hover:bg-muted text-text-primary rounded-md flex items-center justify-between transition-colors duration-100',
-          isSelected && 'font-semibold bg-muted'
-        )}
-      >
-        {children}
-        {isSelected && <BaseIcon icon={CheckIcon} className="size-8 text-icon-brand" />}
-      </div>
-    </li>
+      <_ComboboxPopoverProvider>{props.children}</_ComboboxPopoverProvider>
+    </_ComboboxProvider>
   )
 }
 
-const Combobox = ({
-  className,
-  value,
-  onChange,
-  items,
-  isPending: _isPending,
-  onSearch,
-  onOpenChange,
-  label,
-  placeholder = 'Search…',
-  description,
-  errorMessage,
-  isDisabled,
-  isRequired,
-  deselectable: _deselectable = false,
-  children,
-}: ComboboxProps) => {
-  const [open, setOpen] = useState(false)
-  const [search, setSearch] = useState('')
-  const rootRef = useRef<HTMLDivElement>(null)
+function _ComboboxPopoverProvider(props: { children?: React.ReactNode }) {
+  const ctx = useCombobox()
+  return (
+    <Command value={ctx.value || ''} loop className="w-fit">
+      <Popover open={ctx.open} onOpenChange={ctx.onOpenChange}>
+        {props.children}
+      </Popover>
+    </Command>
+  )
+}
 
-  const handleOpen = (next: boolean) => {
-    setOpen(next)
-    onOpenChange?.(next)
-  }
+function ComboboxTrigger(props: {
+  children?: ((selectedItem: Item | undefined) => React.ReactElement) | React.ReactNode
+  className?: string
+}) {
+  const ctx = useCombobox()
 
-  const contextValue: ComboboxContextValue = {
-    open,
-    setOpen: handleOpen,
-    search,
-    setSearch: (text) => {
-      setSearch(text)
-      onSearch?.(text)
-    },
-    value,
-    onChange,
-    items,
-    isPending: _isPending,
-    isDisabled,
-    isRequired,
-    errorMessage,
-    deselectable: _deselectable,
-    placeholder,
-    onSearch,
-  }
+  const selectedItem = ctx.items.find((item) => item.value === ctx.value)
 
   return (
-    <ComboboxContext.Provider value={contextValue}>
-      <div ref={rootRef} className={cn('group flex flex-col', className)}>
-        {label && (
-          <Label>
-            {label} {isRequired && <span className="ml-1 text-text-brand">*</span>}
-          </Label>
-        )}
+    <PopoverTrigger asChild>
+      {typeof props.children === 'function' ? (
+        props.children(selectedItem)
+      ) : props.children ? (
+        props.children
+      ) : (
+        <Button
+          variant="outline"
+          role="combobox"
+          aria-expanded={ctx.open}
+          className={cn('w-[200px] justify-between', props.className)}
+        >
+          {selectedItem?.label || 'Please select item'}
+          <CaretUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+        </Button>
+      )}
+    </PopoverTrigger>
+  )
+}
 
-        {children}
+function ComboboxCommandInput() {
+  return <CommandInput placeholder="Search framework..." />
+}
 
-        {description && <Description>{description}</Description>}
-        <FieldError>{errorMessage}</FieldError>
-      </div>
-    </ComboboxContext.Provider>
+function ComboboxContent({
+  children,
+  className,
+  ...props
+}: { children?: React.ReactNode; className?: string } & React.ComponentPropsWithRef<
+  typeof PopoverContent
+>) {
+  return (
+    <PopoverContent className={cn('w-(--radix-popover-trigger-width) p-0', className)} {...props}>
+      {children}
+    </PopoverContent>
+  )
+}
+
+function ComboboxCommandEmpty({
+  children,
+  className,
+  ...props
+}: { children?: React.ReactNode } & React.ComponentPropsWithRef<typeof CommandEmpty>) {
+  return (
+    <CommandEmpty className={cn('text-muted-foreground', className)} {...props}>
+      {children || 'No framework found'}
+    </CommandEmpty>
+  )
+}
+
+function ComboboxCommandList({
+  children,
+  ...props
+}: { children?: React.ReactNode } & React.ComponentPropsWithRef<typeof CommandList>) {
+  return <CommandList {...props}>{children}</CommandList>
+}
+
+function ComboboxCommandGroup({
+  children: Children,
+  ...props
+}: {
+  children: React.FC<{ items: Item[] }>
+} & Omit<React.ComponentPropsWithRef<typeof CommandGroup>, 'children'>) {
+  const ctx = useCombobox()
+  return (
+    <CommandGroup {...props}>
+      <Children items={ctx.items} />
+    </CommandGroup>
+  )
+}
+
+function ComboboxCommandItem({
+  value,
+  label,
+  ...props
+}: { children?: React.ReactNode; value: string; label: string } & React.ComponentPropsWithRef<
+  typeof CommandItem
+>) {
+  const ctx = useCombobox()
+
+  return (
+    <CommandItem
+      id={value}
+      value={value}
+      onSelect={() => {
+        ctx.onValueChange(value === ctx.value ? '' : value)
+        ctx.onOpenChange(false)
+      }}
+      {...props}
+    >
+      <CheckIcon
+        className={cn('mr-2 h-4 w-4', value === ctx.value ? 'opacity-100' : 'opacity-0')}
+      />
+      {label}
+    </CommandItem>
   )
 }
 
 export {
-  Combobox,
-  ComboboxLabel,
-  ComboboxList,
-  ComboboxOption,
-  ComboboxSearchInput,
+  ComboboxCommandEmpty,
+  ComboboxCommandGroup,
+  ComboboxCommandInput,
+  ComboboxCommandItem,
+  ComboboxCommandList,
+  ComboboxContent,
+  ComboboxProvider,
   ComboboxTrigger,
+  useCombobox,
 }
-export type { ComboboxItem, ComboboxProps }

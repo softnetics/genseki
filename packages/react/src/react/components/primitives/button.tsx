@@ -1,169 +1,96 @@
-'use client'
-import React, { forwardRef } from 'react'
-import type { LinkProps as LinkPrimitiveProps } from 'react-aria-components'
-import {
-  Button as ButtonPrimitive,
-  type ButtonProps as ButtonPrimitiveProps,
-  Link,
-} from 'react-aria-components'
+import * as React from 'react'
 
-import { Spinner, SpinnerIcon } from '@phosphor-icons/react'
-import { tv, type VariantProps } from 'tailwind-variants'
-
-import { BaseIcon } from './base-icon'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../utils/cn'
 
-const buttonVariants = tv({
-  base: 'cursor-pointer flex items-center justify-center transition-all duration-200',
-  variants: {
-    variant: {
-      primary: `[&>*]:text-text-inverse text-text-inverse
-        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
-      secondary: `
-        bg-surface-button-secondary hover:bg-surface-button-secondary-hover disabled:bg-surface-button-secondary-disabled
-        [&>*]:text-text-brand text-text-brand
-        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none`,
-      tertiary: `bg-surface-button-tertiary hover:bg-surface-button-tertiary-hover disabled:bg-surface-button-tertiary-disabled focus:outline-none
-        [&>*]:text-text-brand text-text-brand 
-        focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg border border-border-button-tertiary`,
-      naked: `bg-surface-button-naked hover:bg-surface-button-naked-hover disabled:bg-surface-button-naked-disabled focus:outline-none
-       [&>*]:text-text-secondary text-text-secondary shadow-xs border-b border-stroke-tertiary/10 
-      focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg`,
-      outline: `bg-surface-button-outline  hover:bg-surface-button-outline-hover disabled:bg-surface-button-outline-disabled focus:outline-none
-       [&>*]:text-text-secondary text-text-secondary border border-border-button-outline focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg`,
-      ghost:
-        'bg-none [&>*]:text-text-secondary text-text-secondary focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
-      vanish:
-        '[&>*]:text-secondary-fg text-secondary-fg focus-visible:ring-2 focus-visible:ring-primary focus-visible:ring-offset-2 focus-visible:ring-offset-bg focus:outline-none',
-      destruction: `[&>*]:text-text-inverse text-text-inverse bg-surface-button-destruction hover:bg-surface-button-destruction-hover disabled:bg-surface-button-destruction-disabled focus:outline-none
-        focus-visible:ring-2 focus-visible:ring-red-500 focus-visible:ring-offset-2 focus-visible:ring-offset-bg `,
-    },
-    size: {
-      'square-petite': 'size-14 p-0 rounded-md text-base font-medium',
-      md: 'py-4 [&:has(>_*[data-slot="icon"]:only-child)]:p-4 px-6 gap-x-2 rounded-md text-base font-medium',
-      sm: 'py-3 [&:has(>_*[data-slot="icon"]:only-child)]:p-3 px-4 gap-x-2 rounded-md text-sm font-medium',
-      xs: 'py-1 [&:has(>_*[data-slot="icon"]:only-child)]:p-1 px-2 gap-x-1 rounded-sm text-sm font-medium',
-    },
-    isDisabled: {
-      true: 'cursor-not-allowed [&>*]:text-bluegray-300 text-bluegray-300 border-secondary shadow-none',
-      false: null,
-    },
-  },
-  compoundVariants: [
-    {
-      variant: 'primary',
-      isDisabled: false,
-      className: 'brand-primary-gradient-25% hover:brand-primary-gradient-0%',
-    },
-    {
-      variant: 'secondary',
-      isDisabled: false,
-      className: 'brand-secondary-gradient-10% hover:brand-secondary-gradient-0%',
-    },
-    {
-      variant: 'tertiary',
-      isDisabled: false,
-      className: 'brand-secondary-gradient-10% hover:brand-secondary-gradient-0% ',
-    },
+const buttonVariants = cva(
+  [
+    "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-4 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+    'disabled:opacity-80',
   ],
-  defaultVariants: {
-    variant: 'primary',
-    size: 'md',
-    isDisabled: false,
-  },
-})
-
-type ButtonVariants = VariantProps<typeof buttonVariants>
-
-interface ButtonProps
-  extends ButtonPrimitiveProps,
-    Required<Omit<ButtonVariants, 'isDisabled'>>,
-    Pick<ButtonVariants, 'isDisabled'> {
-  leadingIcon?: React.ReactElement
-  trailingIcon?: React.ReactElement
-}
-
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, ...props }, ref) => {
-    const { isDisabled, isPending = false } = props
-
-    return (
-      <ButtonPrimitive
-        data-xxx="xxx"
-        ref={ref}
-        {...props}
-        isDisabled={isDisabled || isPending}
-        className={(value) =>
-          cn(
-            buttonVariants({
-              variant,
-              size,
-              isDisabled,
-              className: typeof className === 'function' ? className(value) : className,
-            })
-          )
-        }
-      >
-        {(values) => (
-          <>
-            {props.leadingIcon}
-            {typeof props.children === 'function' ? props.children(values) : props.children}
-            {isPending ? (
-              <BaseIcon icon={SpinnerIcon} size="sm" className="animate-spin" />
-            ) : (
-              props.trailingIcon
-            )}
-          </>
-        )}
-      </ButtonPrimitive>
-    )
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90',
+        destructive:
+          'bg-destructive text-white hover:bg-destructive/90 focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        outline:
+          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+        link: 'text-primary underline-offset-4 hover:underline',
+      },
+      isPending: {
+        true: '',
+        false: '',
+      },
+      size: {
+        default: 'h-9 px-4 py-2 has-[>svg]:px-3',
+        sm: 'h-8 rounded-md gap-1.5 px-3 has-[>svg]:px-2.5',
+        lg: 'h-10 rounded-md px-6 has-[>svg]:px-4',
+        icon: 'size-9',
+        'icon-sm': 'size-8',
+        'icon-lg': 'size-10',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
   }
 )
 
-export interface ButtonLinkProps
-  extends LinkPrimitiveProps,
-    Required<Omit<ButtonVariants, 'isDisabled'>>,
-    Pick<ButtonVariants, 'isDisabled'> {
-  leadingIcon?: React.ReactElement
-  trailingIcon?: React.ReactElement
-  isPending?: boolean
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  isPending = false,
+  ...props
+}: React.ComponentProps<'button'> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot : 'button'
+
+  return (
+    <Comp
+      disabled={isPending || props.disabled}
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className, isPending }))}
+      {...props}
+    />
+  )
 }
 
-const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
-  { className, variant, size, isDisabled = false, isPending = false, children, ...props },
-  ref
-) {
-  return (
-    <Link
-      ref={ref}
-      data-slot="button"
-      isDisabled={isDisabled || isPending}
-      className={(value) =>
-        cn(
-          buttonVariants({
-            variant,
-            size,
-            isDisabled,
-            className: typeof className === 'function' ? className(value) : className,
-          })
-        )
-      }
-      {...props}
-    >
-      {(values) => (
-        <>
-          {props.leadingIcon}
-          {typeof children === 'function' ? children(values) : children}
-          {isPending ? (
-            <BaseIcon icon={Spinner} size="sm" className="animate-spin" />
-          ) : (
-            props.trailingIcon
-          )}
-        </>
-      )}
-    </Link>
-  )
-})
+function ButtonLink({
+  className,
+  variant,
+  size,
+  asChild = false,
+  isPending = false,
+  href,
+  ...props
+}: React.ComponentProps<'button'> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+    href: string
+  }) {
+  const Comp = asChild ? Slot : 'button'
 
-export { Button, ButtonLink, type ButtonProps }
+  return (
+    <Comp
+      disabled={isPending || props.disabled}
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className, isPending }))}
+      {...props}
+      onClick={() => {
+        window.location.href = href
+      }}
+    />
+  )
+}
+
+export { Button, ButtonLink, buttonVariants }

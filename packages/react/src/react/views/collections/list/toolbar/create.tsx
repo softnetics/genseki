@@ -1,4 +1,6 @@
-import { ButtonLink, type ButtonLinkProps } from '../../../../components'
+import type { ComponentPropsWithoutRef } from 'react'
+
+import { ButtonLink } from '../../../../components'
 
 export interface MinimalCollectionListCreateProps {
   isLoading?: boolean
@@ -7,14 +9,12 @@ export interface MinimalCollectionListCreateProps {
 
 export interface CollectionListCreateProps
   extends MinimalCollectionListCreateProps,
-    Partial<ButtonLinkProps> {}
+    Partial<ComponentPropsWithoutRef<typeof ButtonLink>> {}
 
 export function CollectionListCreate(props: CollectionListCreateProps) {
   return (
     <ButtonLink
       aria-label="Create"
-      variant="primary"
-      size="md"
       href={`./${props.slug}/create`}
       isPending={props.isLoading}
       {...props}

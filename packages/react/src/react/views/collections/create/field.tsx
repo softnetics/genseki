@@ -10,6 +10,7 @@ export interface FieldProps<TFieldValues extends {} = {}>
 export function Field<TFieldValues extends {}>({ fieldName, ...rest }: FieldProps<TFieldValues>) {
   const { fields, slug } = useCollection()
 
+  return null
   return (
     <AutoField
       fieldShape={fields.shape[fieldName]}

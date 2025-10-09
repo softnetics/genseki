@@ -1,6 +1,7 @@
 import React from 'react'
 
-import { tv, type VariantProps } from 'tailwind-variants'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 import { cn } from '../../utils/cn'
 
@@ -16,8 +17,7 @@ const nativeElementsMap: Record<TypographyTag, React.ElementType> = {
   label: 'p',
 }
 
-const typographyVariants = tv({
-  base: 'inline-block',
+const typographyVariants = cva('inline-block', {
   variants: {
     weight: {
       normal: 'font-normal',
@@ -37,17 +37,21 @@ const typographyVariants = tv({
   },
 })
 
-type TypographyProps = {
-  type: TypographyTag
-} & React.HTMLAttributes<HTMLElement> &
-  Required<VariantProps<typeof typographyVariants>>
+interface TypographyProps
+  extends React.HTMLAttributes<HTMLElement>,
+    VariantProps<typeof typographyVariants> {
+  type?: TypographyTag
+  asChild?: boolean
+}
 
-export const Typography = ({ children, type, weight, className, ...props }: TypographyProps) => {
-  const Component = nativeElementsMap[type]
+export const Typography = ({
+  type = 'body',
+  weight = 'normal',
+  className,
+  asChild = false,
+  ...props
+}: TypographyProps) => {
+  const Component = asChild ? Slot : nativeElementsMap[type]
 
-  return (
-    <Component className={cn(typographyVariants({ weight, type }), className)} {...props}>
-      {children}
-    </Component>
-  )
+  return <Component {...props} className={cn(typographyVariants({ weight, type }), className)} />
 }
