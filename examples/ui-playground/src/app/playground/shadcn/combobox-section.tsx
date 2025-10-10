@@ -1,16 +1,17 @@
-'use client'
-import * as React from 'react'
+import React from 'react'
 
-import { Button, ComboboxContent, Typography } from '@genseki/react'
 import {
+  Button,
   ComboboxCommandEmpty,
   ComboboxCommandGroup,
   ComboboxCommandInput,
   ComboboxCommandItem,
   ComboboxCommandList,
+  ComboboxContent,
   ComboboxProvider,
   ComboboxTrigger,
 } from '@genseki/react'
+import { Typography } from '@genseki/react'
 
 import { PlaygroundCard } from '~/src/components/card'
 
@@ -157,41 +158,35 @@ function CustomTriggerCombobox() {
   )
 }
 
-export default function ComboboxPage() {
+export function ComboboxSection() {
   return (
-    <div className="container mx-auto p-8 max-w-4xl">
-      <Typography type="h1" weight="bold" className="mb-8">
-        Combobox Examples
-      </Typography>
+    <div className="grid gap-8">
+      <PlaygroundCard title="Basic Combobox" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A simple combobox with default styling and behavior.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <BasicCombobox />
+        </div>
+      </PlaygroundCard>
 
-      <div className="grid gap-8">
-        <PlaygroundCard title="Basic Combobox" categoryTitle="Component">
-          <Typography type="body" className="text-muted-foreground mb-4">
-            A simple combobox with default styling and behavior.
-          </Typography>
-          <div className="p-4 bg-background w-full rounded-lg">
-            <BasicCombobox />
-          </div>
-        </PlaygroundCard>
+      <PlaygroundCard title="Controlled Combobox" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A controlled combobox where you can manage the selected value externally.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ControlledCombobox />
+        </div>
+      </PlaygroundCard>
 
-        <PlaygroundCard title="Controlled Combobox" categoryTitle="Component">
-          <Typography type="body" className="text-muted-foreground mb-4">
-            A controlled combobox where you can manage the selected value externally.
-          </Typography>
-          <div className="p-4 bg-background w-full rounded-lg">
-            <ControlledCombobox />
-          </div>
-        </PlaygroundCard>
-
-        <PlaygroundCard title="Custom Trigger" categoryTitle="Component">
-          <Typography type="body" className="text-muted-foreground mb-4">
-            A combobox with a custom trigger using a render prop.
-          </Typography>
-          <div className="p-4 bg-background w-full rounded-lg">
-            <CustomTriggerCombobox />
-          </div>
-        </PlaygroundCard>
-      </div>
+      <PlaygroundCard title="Custom Trigger" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A combobox with a custom trigger using a render prop.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <CustomTriggerCombobox />
+        </div>
+      </PlaygroundCard>
     </div>
   )
 }

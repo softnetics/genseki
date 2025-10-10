@@ -123,7 +123,7 @@ function ComboboxTrigger(props: {
           className={cn('w-[200px] justify-between', props.className)}
         >
           {selectedItem?.label || 'Please select item'}
-          <CaretUpDownIcon className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+          <CaretUpDownIcon className="ml-4 h-8 w-8 shrink-0 opacity-50" />
         </Button>
       )}
     </PopoverTrigger>
@@ -201,7 +201,7 @@ function ComboboxCommandItem({
       {...props}
     >
       <CheckIcon
-        className={cn('mr-2 h-4 w-4', value === ctx.value ? 'opacity-100' : 'opacity-0')}
+        className={cn('mr-4 h-8 w-8', value === ctx.value ? 'opacity-100' : 'opacity-0')}
       />
       {label}
     </CommandItem>
