@@ -12,7 +12,7 @@ export function withValidator<TApiRouteSchema extends ApiRouteSchema>(
 ): ApiRouteHandler<TApiRouteSchema> {
   const wrappedHandler = async (
     payload: ApiRouteHandlerPayload<TApiRouteSchema>,
-    { request, response }: { request: Request; response: Response }
+    { request, response, rawBody }: { request: Request; response: Response; rawBody?: string }
   ) => {
     const result = await validateRequestBody(schema, payload)
     if (result.success === false) {
@@ -26,7 +26,7 @@ export function withValidator<TApiRouteSchema extends ApiRouteSchema>(
     }
 
     const validatedPayload = result.data
-    const responseBody = await handler(validatedPayload as any, { request, response })
+    const responseBody = await handler(validatedPayload as any, { request, response, rawBody })
 
     const validationError = validateResponseBody(
       schema,
