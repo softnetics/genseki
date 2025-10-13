@@ -1,25 +1,35 @@
 'use client'
 
+import * as React from 'react'
 import { useState } from 'react'
-import type { InputProps, TextFieldProps as TextFieldPrimitiveProps } from 'react-aria-components'
+import type {
+  InputProps as ReactAriaInputPrimitiveProps,
+  TextFieldProps as TextFieldPrimitiveProps,
+} from 'react-aria-components'
 import { TextField as TextFieldPrimitive } from 'react-aria-components'
 import { useFormStatus } from 'react-dom'
 
 import { CopyIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
-import { Button } from './button'
-import type { FieldProps } from './field'
-import { Description, FieldError, FieldGroup, Input, Label } from './field'
+import { AriaButton } from './button'
+import type { AriaFieldProps } from './field'
+import {
+  AriaDescription as AriaDescription,
+  AriaFieldError as AriaFieldError,
+  AriaFieldGroup as AriaFieldGroup,
+  AriaInput,
+  AriaLabel as AriaLabel,
+} from './field'
 import { Loader } from './loader'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { cn } from '../../utils/cn'
 
-type InputType = Exclude<InputProps['type'], 'password'>
+type AriaInputType = Exclude<ReactAriaInputPrimitiveProps['type'], 'password'>
 
-interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
+interface AriaBaseTextFieldProps extends TextFieldPrimitiveProps, AriaFieldProps {
   prefix?: React.ReactNode
   suffix?: React.ReactNode
   isPending?: boolean
@@ -28,14 +38,14 @@ interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
   isShowCopyButton?: boolean
 }
 
-interface RevealableTextFieldProps extends BaseTextFieldProps {
+interface AriaRevealableTextFieldProps extends AriaBaseTextFieldProps {
   isRevealable: true
   type: 'password'
 }
 
-interface NonRevealableTextFieldProps extends BaseTextFieldProps {
+interface AriaNonRevealableTextFieldProps extends AriaBaseTextFieldProps {
   isRevealable?: never
-  type?: InputType
+  type?: AriaInputType
 }
 
 const fieldgroupVariants = tv({
@@ -51,10 +61,16 @@ const fieldgroupVariants = tv({
   defaultVariants: { size: 'md' },
 })
 
-type TextFieldProps = (RevealableTextFieldProps | NonRevealableTextFieldProps) &
+/**
+ * @deprecated use InputProps
+ */
+type AriaTextFieldProps = (AriaRevealableTextFieldProps | AriaNonRevealableTextFieldProps) &
   VariantProps<typeof fieldgroupVariants>
 
-const TextField = ({
+/**
+ * @deprecated use Input
+ */
+const AriaTextField = ({
   placeholder,
   label,
   description,
@@ -66,7 +82,7 @@ const TextField = ({
   isRevealable,
   type,
   ...props
-}: TextFieldProps) => {
+}: AriaTextFieldProps) => {
   const formStatus = useFormStatus()
   const disabled = formStatus.pending || props.isDisabled
 
@@ -89,11 +105,11 @@ const TextField = ({
       {!props.children ? (
         <>
           {label && (
-            <Label>
+            <AriaLabel>
               {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-            </Label>
+            </AriaLabel>
           )}
-          <FieldGroup
+          <AriaFieldGroup
             isDisabled={disabled}
             isInvalid={isInvalid}
             data-loading={isPending ? 'true' : undefined}
@@ -118,9 +134,9 @@ const TextField = ({
             ) : (
               prefix && <div data-slot="prefix">{prefix}</div>
             )}
-            <Input placeholder={placeholder} disabled={disabled} />
+            <AriaInput placeholder={placeholder} disabled={disabled} />
             {isRevealable ? (
-              <Button
+              <AriaButton
                 variant="vanish"
                 size="md"
                 type="button"
@@ -132,7 +148,7 @@ const TextField = ({
                 ) : (
                   <BaseIcon icon={EyeIcon} weight="regular" size="md" />
                 )}
-              </Button>
+              </AriaButton>
             ) : isPending ? (
               <Loader variant="spin" />
             ) : suffix ? (
@@ -151,7 +167,7 @@ const TextField = ({
             ) : null}
             {props.isShowCopyButton && (
               <div className="border-l border-border ml-1 flex items-center gap-2">
-                <Button
+                <AriaButton
                   variant="vanish"
                   size="md"
                   type="button"
@@ -162,12 +178,12 @@ const TextField = ({
                 >
                   <BaseIcon icon={CopyIcon} size="md" weight="regular" />
                   Copy
-                </Button>
+                </AriaButton>
               </div>
             )}
-          </FieldGroup>
-          {description && <Description>{description}</Description>}
-          <FieldError>{errorMessage}</FieldError>
+          </AriaFieldGroup>
+          {description && <AriaDescription>{description}</AriaDescription>}
+          <AriaFieldError>{errorMessage}</AriaFieldError>
         </>
       ) : (
         props.children
@@ -176,5 +192,36 @@ const TextField = ({
   )
 }
 
-export type { TextFieldProps }
-export { TextField }
+export { AriaTextField, type AriaTextFieldProps }
+
+/**
+ *
+ * Shadcn component
+ *
+ */
+
+function Input({
+  className,
+  type,
+  isError,
+  ...props
+}: React.ComponentProps<'input'> & { isError?: boolean }) {
+  return (
+    <input
+      type={type}
+      className={cn(
+        'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-18 w-full min-w-0 rounded-md border bg-transparent px-6 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-14 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
+        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
+        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
+        className
+      )}
+      data-slot="input"
+      aria-invalid={isError}
+      {...props}
+    />
+  )
+}
+
+type InputProps = React.ComponentPropsWithRef<typeof Input>
+
+export { Input, type InputProps }

@@ -11,7 +11,7 @@ import {
 import { CaretDownIcon, CaretUpIcon, MinusIcon, PlusIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
-import { Description, FieldError, FieldGroup, Input, Label } from './field'
+import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaInput, AriaLabel } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -69,11 +69,11 @@ const NumberField = ({
       className={composeTailwindRenderProps(className, 'group flex flex-col gap-y-4')}
     >
       {label && (
-        <Label>
+        <AriaLabel>
           {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </Label>
+        </AriaLabel>
       )}
-      <FieldGroup
+      <AriaFieldGroup
         className={cn(
           fieldgroupVariants({ size: props.size }),
           'overflow-hidden',
@@ -83,7 +83,7 @@ const NumberField = ({
         {(renderProps) => (
           <>
             {isMobile ? <StepperButton className="border-r h-full " slot="decrement" /> : null}
-            <Input className="tabular-nums max-md:text-center" placeholder={placeholder} />
+            <AriaInput className="tabular-nums max-md:text-center" placeholder={placeholder} />
             {!isMobile ? (
               <div
                 className={fieldBorderStyles({
@@ -107,9 +107,9 @@ const NumberField = ({
             )}
           </>
         )}
-      </FieldGroup>
-      {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      </AriaFieldGroup>
+      {description && <AriaDescription>{description}</AriaDescription>}
+      <AriaFieldError>{errorMessage}</AriaFieldError>
     </NumberFieldPrimitive>
   )
 }

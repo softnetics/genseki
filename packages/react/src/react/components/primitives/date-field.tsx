@@ -12,7 +12,7 @@ import {
 
 import { tv, type VariantProps } from 'tailwind-variants'
 
-import { Description, FieldError, FieldGroup, Label } from './field'
+import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaLabel } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 import { cn } from '../../utils/cn'
@@ -56,11 +56,11 @@ const DateField = <T extends DateValue>({
       {...props}
     >
       {label && (
-        <Label>
+        <AriaLabel>
           {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </Label>
+        </AriaLabel>
       )}
-      <FieldGroup>
+      <AriaFieldGroup>
         {prefix && typeof prefix === 'string' ? (
           <span className="ml-2 text-muted-fg">{prefix}</span>
         ) : (
@@ -74,9 +74,9 @@ const DateField = <T extends DateValue>({
             suffix
           )
         ) : null}
-      </FieldGroup>
-      {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      </AriaFieldGroup>
+      {description && <AriaDescription>{description}</AriaDescription>}
+      <AriaFieldError>{errorMessage}</AriaFieldError>
     </DateFieldPrimitive>
   )
 }

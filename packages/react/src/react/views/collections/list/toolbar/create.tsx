@@ -13,12 +13,7 @@ export interface CollectionListCreateProps
 
 export function CollectionListCreate(props: CollectionListCreateProps) {
   return (
-    <ButtonLink
-      aria-label="Create"
-      href={`./${props.slug}/create`}
-      isPending={props.isLoading}
-      {...props}
-    >
+    <ButtonLink href={`./${props.slug}/create`} {...props}>
       Create
     </ButtonLink>
   )

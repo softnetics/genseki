@@ -2,7 +2,7 @@
 import { TrashIcon } from '@phosphor-icons/react'
 import type { Promisable } from 'type-fest'
 
-import { BaseIcon, Button, type ButtonProps } from '../../../../components'
+import { AriaButton, type AriaButtonProps, BaseIcon } from '../../../../components'
 
 export interface MinimalCollectionListDeleteProps {
   isLoading?: boolean
@@ -11,11 +11,11 @@ export interface MinimalCollectionListDeleteProps {
 
 export interface CollectionListDeleteProps
   extends MinimalCollectionListDeleteProps,
-    Partial<ButtonProps> {}
+    Partial<AriaButtonProps> {}
 
 export function CollectionListDelete(props: CollectionListDeleteProps) {
   return (
-    <Button
+    <AriaButton
       aria-label="Delete"
       leadingIcon={<BaseIcon icon={TrashIcon} size="md" />}
       onClick={props.onDelete}
@@ -25,6 +25,6 @@ export function CollectionListDelete(props: CollectionListDeleteProps) {
       {...props}
     >
       Delete
-    </Button>
+    </AriaButton>
   )
 }

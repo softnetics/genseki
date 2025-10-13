@@ -15,7 +15,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconChevronLgDown } from '@intentui/icons'
 import { DotsSixIcon } from '@phosphor-icons/react'
 
-import { BaseIcon, Button, Typography } from '../../primitives'
+import { BaseIcon, AriaButton, Typography } from '../../primitives'
 
 interface ReorderGroupProps {
   title?: string
@@ -119,14 +119,14 @@ const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
             </Typography>
           </div>
 
-          <Button variant="ghost" size="sm" onClick={() => setIsShowContent((prev) => !prev)}>
+          <AriaButton variant="ghost" size="sm" onClick={() => setIsShowContent((prev) => !prev)}>
             <IconChevronLgDown
               className={`size-6 transition-transform duration-300 ${
                 isShowContent ? '-rotate-180' : ''
               }`}
               fontSize={16}
             />
-          </Button>
+          </AriaButton>
         </div>
 
         {isShowContent && children}

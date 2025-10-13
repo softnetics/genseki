@@ -24,9 +24,18 @@ function ButtonVariants() {
 function ButtonSizes() {
   return (
     <div className="flex flex-wrap items-center gap-4">
-      <Button size="sm">Small</Button>
-      <Button size="default">Default</Button>
-      <Button size="lg">Large</Button>
+      <Button size="sm">
+        <MagnifyingGlassIcon />
+        Small
+      </Button>
+      <Button size="default">
+        <MagnifyingGlassIcon />
+        Default
+      </Button>
+      <Button size="lg">
+        <MagnifyingGlassIcon />
+        Large
+      </Button>
     </div>
   )
 }
@@ -78,7 +87,7 @@ function ButtonStates() {
   return (
     <div className="flex flex-wrap gap-4">
       <Button disabled>Disabled</Button>
-      <Button isPending={isPending} onClick={handleClick}>
+      <Button disabled={isPending} onClick={handleClick}>
         {isPending ? 'Loading...' : 'Click Me'}
       </Button>
     </div>
@@ -98,7 +107,7 @@ function LoadingButton() {
   }
 
   return (
-    <Button isPending={isLoading} onClick={handleSubmit}>
+    <Button disabled={isLoading} onClick={handleSubmit}>
       {isLoading ? 'Submitting...' : 'Submit Form'}
     </Button>
   )

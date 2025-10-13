@@ -4,6 +4,9 @@ import { tv, type VariantProps } from 'tailwind-variants'
 
 import { cn } from '../../utils/cn'
 
+/**
+ * @deprecated
+ */
 const iconVariants = tv({
   base: 'text-icon-secondary',
   variants: {
@@ -20,6 +23,9 @@ const iconVariants = tv({
 type BaseIconProps = { icon?: Icon } & VariantProps<typeof iconVariants> &
   React.ComponentPropsWithoutRef<Icon>
 
+/**
+ * @deprecated
+ */
 export const BaseIcon = ({
   icon: Icon = PlusCircleIcon,
   size = 'sm',

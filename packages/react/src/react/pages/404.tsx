@@ -24,7 +24,7 @@ export const NotfoundPage = ({
       <Typography
         style={{
           backgroundImage:
-            'radial-gradient(circle, var(--color-primary) 2px,var(--color-primary) 2px,transparent 2px)',
+            'radial-gradient(circle, var(--color-brand) 2px,var(--color-brand) 2px,transparent 2px)',
           backgroundRepeat: 'repeat',
           backgroundSize: '4px 4px',
         }}

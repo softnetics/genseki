@@ -15,11 +15,11 @@ import { twJoin } from 'tailwind-merge'
 
 import type { DateDuration } from '@internationalized/date'
 
-import { Button } from './button'
+import { AriaButton } from './button'
 import { Calendar } from './calendar'
 import { DateInput } from './date-field'
-import { Description, FieldError, FieldGroup, Label } from './field'
-import { PopoverClose, PopoverContent } from './popover'
+import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaLabel } from './field'
+import { AriaPopoverClose, AriaPopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 import { RangeCalendar } from './range-calendar'
 
@@ -44,7 +44,7 @@ const DatePickerOverlay = ({
   ...props
 }: DatePickerOverlayProps) => {
   return (
-    <PopoverContent
+    <AriaPopoverContent
       isDismissable={false}
       showArrow={false}
       className={twJoin(
@@ -60,23 +60,23 @@ const DatePickerOverlay = ({
       )}
       {closeButton && (
         <div className="mx-auto flex w-full max-w-[inherit] justify-center py-8 sm:hidden">
-          <PopoverClose variant="outline" size="md" className="w-full">
+          <AriaPopoverClose variant="outline" size="md" className="w-full">
             Close
-          </PopoverClose>
+          </AriaPopoverClose>
         </div>
       )}
-    </PopoverContent>
+    </AriaPopoverContent>
   )
 }
 
 const DatePickerIcon = () => (
-  <Button
+  <AriaButton
     size="md"
     variant="vanish"
     className="-translate-x-2 rounded-full outline-offset-0 hover:bg-transparent pressed:bg-transparent **:data-[slot=icon]:text-muted-fg"
   >
     <BaseIcon icon={CalendarDotsIcon} weight="duotone" className="group-open:text-fg" aria-hidden />
-  </Button>
+  </AriaButton>
 )
 
 interface DatePickerProps<T extends DateValue> extends DatePickerPrimitiveProps<T> {
@@ -101,16 +101,16 @@ const DatePicker = <T extends DateValue>({
         className={composeTailwindRenderProps(className, 'group/date-picker flex flex-col gap-y-4')}
       >
         {label && (
-          <Label>
+          <AriaLabel>
             {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-          </Label>
+          </AriaLabel>
         )}
-        <FieldGroup className="min-w-40">
+        <AriaFieldGroup className="min-w-40">
           <DateInput size="md" className="w-full pr-16" />
           <DatePickerIcon />
-        </FieldGroup>
-        {description && <Description>{description}</Description>}
-        <FieldError>{errorMessage}</FieldError>
+        </AriaFieldGroup>
+        {description && <AriaDescription>{description}</AriaDescription>}
+        <AriaFieldError>{errorMessage}</AriaFieldError>
         <DatePickerOverlay />
       </DatePickerPrimitive>
     </I18nProvider>

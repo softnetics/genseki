@@ -6,7 +6,7 @@ import {
   type SwitchProps as SwitchPrimitiveProps,
 } from 'react-aria-components'
 
-import { Description, Label } from './field'
+import { AriaDescription, AriaLabel } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 import { cn } from '../../utils/cn'
@@ -69,17 +69,17 @@ const Switch = forwardRef(function Switch(
       <div className="flex flex-col gap-1">
         <>
           {props.label ? (
-            <Label
+            <AriaLabel
               htmlFor={id}
               className={cn(props.description && 'text-sm/4 font-normal select-none')}
             >
               {props.label}
               {props.isRequired && <span className="ml-1 text-red-pumpkin">*</span>}
-            </Label>
+            </AriaLabel>
           ) : (
             (props.children as React.ReactNode)
           )}
-          {props.description && <Description>{props.description}</Description>}
+          {props.description && <AriaDescription>{props.description}</AriaDescription>}
         </>
       </div>
     </div>
