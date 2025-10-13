@@ -45,27 +45,27 @@ async function makeApiRoute(
   const reqHeaders = extractHeaders(req.headers)
   const reqSearchParams = extractSearchParams(req.nextUrl.searchParams)
 
-  // TODO: This logic might not able to handle form data or x-www-form-urlencoded requests correctly
-  let body: any = {}
-  try {
-    if (req.method === 'GET' || req.method === 'HEAD' || req.method === 'OPTIONS') {
-      body = undefined
-    } else {
-      body = await req.json()
+  let rawBody: string | undefined = undefined
+  if (!['GET', 'HEAD', 'OPTIONS'].includes(req.method)) {
+    try {
+      rawBody = await req.text()
+    } catch {
+      rawBody = undefined
     }
-  } catch {
-    // If the request body is not JSON or empty, we will not parse it
-    // This is useful for file uploads or plain text requests
+  }
 
-    // TODO: Handle plain text and file upload
+  let body: any = {}
+  const ct = (req.headers.get('content-type') || '').toLowerCase()
+  if (rawBody) {
+    if (!ct.includes('application/json')) {
+      return Response.json({ message: 'Content-Type must be application/json' }, { status: 400 })
+    }
 
-    return Response.json(
-      { message: 'Invalid request body' },
-      {
-        status: 400,
-        headers: { 'Content-Type': 'application/json' },
-      }
-    )
+    try {
+      body = JSON.parse(rawBody)
+    } catch {
+      return Response.json({ message: 'Invalid JSON request body' }, { status: 400 })
+    }
   }
 
   const response = new Response(null, {
@@ -80,7 +80,7 @@ async function makeApiRoute(
         query: reqSearchParams,
         body,
       },
-      { request: req, response }
+      { request: req, response, rawBody }
     )
 
     if (response.headers.get('Content-Type') === 'application/json') {

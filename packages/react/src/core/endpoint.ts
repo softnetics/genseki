@@ -132,7 +132,7 @@ export type ApiRouteResponse<TResponses extends Partial<Record<ApiHttpStatus, In
 
 export type ApiRouteHandler<TApiRouteSchema extends ApiRouteSchema = ApiRouteSchema> = (
   payload: ApiRouteHandlerPayload<TApiRouteSchema>,
-  meta: { request: Request; response: Response }
+  meta: { request: Request; response: Response; rawBody?: string }
 ) => Promisable<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type ApiRouteHandlerInitial<
@@ -140,7 +140,7 @@ export type ApiRouteHandlerInitial<
   TApiRouteSchema extends ApiRouteSchema,
 > = (
   payload: ApiRouteHandlerPayload<TApiRouteSchema> & { context: TContext },
-  meta: { request: Request; response: Response }
+  meta: { request: Request; response: Response; rawBody?: string }
 ) => Promisable<ApiRouteResponse<TApiRouteSchema['responses']>>
 
 export type GetApiRouteSchemaFromApiRouteHandler<TApiRouteHandler extends ApiRouteHandler<any>> =
@@ -225,11 +225,11 @@ export function createEndpoint<
 ): ApiRoute<TApiRouteSchema> {
   return {
     schema: schema,
-    handler: withValidator(schema, async (payload, { request, response }) => {
+    handler: withValidator(schema, async (payload, { request, response, rawBody }) => {
       const requestContext = context.toRequestContext(request) as ContextToRequestContext<TContext>
       const responseBody = await handler(
         { ...payload, context: requestContext },
-        { request, response }
+        { request, response, rawBody }
       )
       return responseBody
     }),
