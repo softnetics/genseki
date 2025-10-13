@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.57
+
+### Patch Changes
+
+- [#232](https://github.com/softnetics/genseki/pull/232) [`f6474c1`](https://github.com/softnetics/genseki/commit/f6474c17dc80ffc994e2593068b68311a6b0950c) Thanks [@Desmenez](https://github.com/Desmenez)! - chore: add raw body response
+
 ## 0.1.0-alpha.56
 
 ### Patch Changes
