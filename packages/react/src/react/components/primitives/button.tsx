@@ -254,30 +254,4 @@ function Button({
   )
 }
 
-function ButtonLink({
-  className,
-  variant,
-  size,
-  asChild = false,
-  href,
-  ...props
-}: React.ComponentProps<'button'> &
-  VariantProps<typeof buttonVariants> & {
-    asChild?: boolean
-    href: string
-  }) {
-  const Comp = asChild ? Slot : 'button'
-
-  return (
-    <Comp
-      data-slot="button"
-      className={cn(buttonVariants({ variant, size, className }))}
-      {...props}
-      onClick={() => {
-        window.location.href = href
-      }}
-    />
-  )
-}
-
-export { Button, ButtonLink, buttonVariants }
+export { Button, buttonVariants }

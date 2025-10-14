@@ -1,6 +1,6 @@
-import type { ComponentPropsWithoutRef } from 'react'
+import React from 'react'
 
-import { ButtonLink } from '../../../../components'
+import { Button } from '../../../../components'
 
 export interface MinimalCollectionListCreateProps {
   isLoading?: boolean
@@ -9,12 +9,12 @@ export interface MinimalCollectionListCreateProps {
 
 export interface CollectionListCreateProps
   extends MinimalCollectionListCreateProps,
-    Partial<ComponentPropsWithoutRef<typeof ButtonLink>> {}
+    Partial<React.ComponentPropsWithRef<typeof Button>> {}
 
-export function CollectionListCreate(props: CollectionListCreateProps) {
+export function CollectionListCreate({ slug, ...props }: CollectionListCreateProps) {
   return (
-    <ButtonLink href={`./${props.slug}/create`} {...props}>
-      Create
-    </ButtonLink>
+    <Button asChild {...props}>
+      <a href={`./${slug}/create`}>Create</a>
+    </Button>
   )
 }

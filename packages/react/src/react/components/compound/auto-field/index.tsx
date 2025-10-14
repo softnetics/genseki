@@ -27,6 +27,7 @@ import {
   type DatePickerProps,
   FormField,
   FormItemController,
+  Input,
   InputGroup,
   InputGroupInput,
   NumberField,
@@ -102,12 +103,14 @@ export function AutoTextField(
           )}
           <div className="flex flex-col gap-y-2">
             <InputGroup className={cn(props.className, 'bg-background')}>
-              <InputGroupInput
-                required={props.isRequired}
-                placeholder={props.placeholder}
-                isError={!!fieldState.error}
-                {...field}
-              />
+              <InputGroupInput>
+                <Input
+                  required={props.isRequired}
+                  placeholder={props.placeholder}
+                  isError={!!fieldState.error}
+                  {...field}
+                />
+              </InputGroupInput>
             </InputGroup>
             {error?.message && (
               //  TODO: Wait for shadcn form field

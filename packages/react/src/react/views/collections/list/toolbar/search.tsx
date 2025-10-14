@@ -4,7 +4,7 @@ import React from 'react'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
 
-import { InputGroup, InputGroupAddon, InputGroupInput } from '../../../../components'
+import { Input, InputGroup, InputGroupAddon, InputGroupInput } from '../../../../components'
 import { useDebounce } from '../../../../hooks/use-debounce'
 import { useSearch } from '../../../../hooks/use-search'
 
@@ -41,12 +41,14 @@ export function CollectionListSearch(props: CollectionListSearchProps) {
       <InputGroupAddon align="inline-start">
         <MagnifyingGlassIcon />
       </InputGroupAddon>
-      <InputGroupInput
-        aria-label="Search"
-        placeholder={props.placeholder ?? 'Search'}
-        value={search}
-        onChange={(e) => onSearch(e.target.value)}
-      />
+      <InputGroupInput>
+        <Input
+          aria-label="Search"
+          placeholder={props.placeholder ?? 'Search'}
+          value={search}
+          onChange={(e) => onSearch(e.target.value)}
+        />
+      </InputGroupInput>
     </InputGroup>
   )
 }

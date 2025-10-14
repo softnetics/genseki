@@ -9,8 +9,7 @@ import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
 import type { CollectionToolbarActions } from '../../../../../core/collection'
-import { toast } from '../../../..'
-import { ButtonLink } from '../../../../components'
+import { Button, toast } from '../../../..'
 import { useTableStatesContext } from '../../../../providers/table'
 import { useCollectionList } from '../context'
 import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'
@@ -45,10 +44,12 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
 
   return (
     <div className="flex items-center justify-between gap-x-3">
-      <ButtonLink variant="ghost" href=".">
-        <CaretLeftIcon />
-        Back
-      </ButtonLink>
+      <Button asChild variant="ghost">
+        <a href=".">
+          <CaretLeftIcon />
+          Back
+        </a>
+      </Button>
       <div className="flex gap-x-4">
         {toolbar?.delete && isRowsSelected && (
           <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />

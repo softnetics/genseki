@@ -113,9 +113,14 @@ function ControlledCombobox() {
         <Typography type="caption" className="text-muted-foreground">
           Selected: {value || 'None'}
         </Typography>
-        <Button size="sm" variant="outline" onClick={() => setValue('')}>
-          Clear
-        </Button>
+        <div className="inline-flex gap-x-4">
+          <Button size="sm" variant="outline" onClick={() => setValue('')}>
+            Clear
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setValue('typescript')}>
+            TypeScript
+          </Button>
+        </div>
       </div>
     </div>
   )

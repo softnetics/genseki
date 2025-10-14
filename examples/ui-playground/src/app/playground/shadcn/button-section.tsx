@@ -1,8 +1,27 @@
 import React from 'react'
 
-import { DownloadIcon, MagnifyingGlassIcon, PaperPlaneRightIcon } from '@phosphor-icons/react'
+import {
+  ArrowsInLineVerticalIcon,
+  CaretDownIcon,
+  CaretLeftIcon,
+  CaretRightIcon,
+  CaretUpIcon,
+  DownloadIcon,
+  GridFourIcon,
+  ListIcon,
+  MagnifyingGlassIcon,
+  PaperPlaneRightIcon,
+  SortAscendingIcon,
+  SortDescendingIcon,
+} from '@phosphor-icons/react'
 
-import { Button, Typography } from '@genseki/react'
+import {
+  Button,
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+  Typography,
+} from '@genseki/react'
 
 import { PlaygroundCard } from '~/src/components/card'
 
@@ -113,6 +132,116 @@ function LoadingButton() {
   )
 }
 
+// Button Group - Basic
+function ButtonGroupBasic() {
+  return (
+    <ButtonGroup>
+      <Button variant="outline">One</Button>
+      <Button variant="outline">Two</Button>
+      <Button variant="outline">Three</Button>
+    </ButtonGroup>
+  )
+}
+
+// Button Group - With Separators
+function ButtonGroupWithSeparators() {
+  return (
+    <div className="space-y-4">
+      <ButtonGroup>
+        <Button variant="outline">
+          <CaretLeftIcon />
+          Previous
+        </Button>
+        <ButtonGroupSeparator />
+        <Button variant="outline">
+          Next
+          <CaretRightIcon />
+        </Button>
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <Button variant="outline">Sort</Button>
+        <ButtonGroupSeparator />
+        <Button variant="outline" size="icon">
+          <SortAscendingIcon />
+        </Button>
+        <Button variant="outline" size="icon">
+          <SortDescendingIcon />
+        </Button>
+      </ButtonGroup>
+    </div>
+  )
+}
+
+// Button Group - With Text
+function ButtonGroupWithText() {
+  return (
+    <div className="space-y-4">
+      <ButtonGroup>
+        <ButtonGroupText>
+          <MagnifyingGlassIcon />
+          Search
+        </ButtonGroupText>
+        <ButtonGroupSeparator />
+        <Button variant="outline">Filter</Button>
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <Button variant="outline">View</Button>
+        <ButtonGroupSeparator />
+        <ButtonGroupText>
+          <GridFourIcon />
+          Grid
+        </ButtonGroupText>
+        <ButtonGroupText>
+          <ListIcon />
+          List
+        </ButtonGroupText>
+      </ButtonGroup>
+    </div>
+  )
+}
+
+// Button Group - Vertical
+function ButtonGroupVertical() {
+  return (
+    <ButtonGroup orientation="vertical">
+      <Button variant="outline" className="flex justify-between ">
+        <CaretUpIcon />
+        Up
+      </Button>
+      <ButtonGroupSeparator orientation="horizontal" />
+      <Button variant="outline" className="flex justify-end ">
+        <ArrowsInLineVerticalIcon />
+        Center
+      </Button>
+      <ButtonGroupSeparator orientation="horizontal" />
+      <Button variant="outline" className="flex justify-between ">
+        <CaretDownIcon />
+        Down
+      </Button>
+    </ButtonGroup>
+  )
+}
+
+// Button Group - Different Variants
+function ButtonGroupVariants() {
+  return (
+    <div className="space-y-4">
+      <ButtonGroup>
+        <Button variant="default">Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="outline">Outline</Button>
+      </ButtonGroup>
+
+      <ButtonGroup>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="destructive">Destructive</Button>
+      </ButtonGroup>
+    </div>
+  )
+}
+
 export function ButtonSection() {
   return (
     <div className="grid gap-8">
@@ -167,6 +296,51 @@ export function ButtonSection() {
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
           <LoadingButton />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Button Group - Basic" categoryTitle="Composition">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A simple button group with connected buttons.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ButtonGroupBasic />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Button Group - With Separators" categoryTitle="Composition">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          Button groups with separators between buttons for visual distinction.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ButtonGroupWithSeparators />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Button Group - With Text" categoryTitle="Composition">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          Button groups with text labels and icons for better context.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ButtonGroupWithText />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Button Group - Vertical" categoryTitle="Composition">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          Vertical button groups for stacked layouts.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ButtonGroupVertical />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Button Group - Variants" categoryTitle="Composition">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          Button groups with different button variants mixed together.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ButtonGroupVariants />
         </div>
       </PlaygroundCard>
     </div>

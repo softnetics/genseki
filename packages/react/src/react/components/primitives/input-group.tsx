@@ -2,10 +2,11 @@
 
 import * as React from 'react'
 
+import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { Button } from './button'
-import { Input } from './text-field'
+import type { Input } from './text-field'
 
 import { cn } from '../../utils/cn'
 
@@ -133,7 +134,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 
 function InputGroupInput({ className, ...props }: React.ComponentProps<typeof Input>) {
   return (
-    <Input
+    <Slot
       data-slot="input-group-control"
       className={cn(
         'flex-2 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent',

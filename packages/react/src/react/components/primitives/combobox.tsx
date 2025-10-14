@@ -28,7 +28,7 @@ import { Label } from './label'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
 import { focusStyles } from './primitive'
 
-import { createRequireContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/create-required-context'
 import { cn } from '../../utils/cn'
 
 /**
@@ -452,14 +452,21 @@ interface Item {
   label: string
 }
 
-const [_ComboboxProvider, useCombobox] = createRequireContext<{
+const [_ComboboxProvider, useCombobox] = createRequiredContext<{
   open: boolean
   onOpenChange: React.Dispatch<React.SetStateAction<boolean>>
   value: string
   onValueChange: (value: string) => void
   items: Item[]
   setItems: React.Dispatch<React.SetStateAction<Item[]>>
-}>('Combobox provider')
+}>('Combobox provider', {
+  valueMapper(value) {
+    return value
+  },
+  render(props) {
+    return props.children
+  },
+})
 
 function ComboboxProvider(props: {
   children?: React.ReactNode
@@ -487,7 +494,12 @@ function ComboboxProvider(props: {
 
   return (
     <_ComboboxProvider
-      value={{ open: open, onOpenChange: setOpen, value, onValueChange: setValue, items, setItems }}
+      value={value}
+      onValueChange={setValue}
+      open={open}
+      onOpenChange={setOpen}
+      items={items}
+      setItems={setItems}
     >
       <_ComboboxPopoverProvider>{props.children}</_ComboboxPopoverProvider>
     </_ComboboxProvider>
@@ -497,11 +509,9 @@ function ComboboxProvider(props: {
 function _ComboboxPopoverProvider(props: { children?: React.ReactNode }) {
   const ctx = useCombobox()
   return (
-    <Command value={ctx.value || ''} loop className="w-fit">
-      <Popover open={ctx.open} onOpenChange={ctx.onOpenChange}>
-        {props.children}
-      </Popover>
-    </Command>
+    <Popover open={ctx.open} onOpenChange={ctx.onOpenChange}>
+      {props.children}
+    </Popover>
   )
 }
 
@@ -513,19 +523,23 @@ function ComboboxTrigger(props: {
 
   const selectedItem = ctx.items.find((item) => item.value === ctx.value)
 
+  const onTriggerKeyDown: React.KeyboardEventHandler = (event) => {
+    if (event.key === 'ArrowDown') ctx.onOpenChange(true)
+  }
+
   return (
-    <PopoverTrigger asChild>
+    <PopoverTrigger
+      asChild
+      onKeyDown={onTriggerKeyDown}
+      className={cn('w-[200px] justify-between', props.className)}
+      aria-expanded={ctx.open}
+    >
       {typeof props.children === 'function' ? (
         props.children(selectedItem)
       ) : props.children ? (
         props.children
       ) : (
-        <Button
-          variant="outline"
-          role="combobox"
-          aria-expanded={ctx.open}
-          className={cn('w-[200px] justify-between', props.className)}
-        >
+        <Button variant="outline" role="combobox">
           {selectedItem?.label || 'Please select item'}
           <CaretUpDownIcon className="ml-4 h-8 w-8 shrink-0 opacity-50" />
         </Button>
@@ -546,9 +560,11 @@ function ComboboxContent({
   typeof PopoverContent
 >) {
   return (
-    <PopoverContent className={cn('w-(--radix-popover-trigger-width) p-0', className)} {...props}>
-      {children}
-    </PopoverContent>
+    <Command loop className="w-fit">
+      <PopoverContent className={cn('w-(--radix-popover-trigger-width) p-0', className)} {...props}>
+        {children}
+      </PopoverContent>
+    </Command>
   )
 }
 

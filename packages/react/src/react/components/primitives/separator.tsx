@@ -1,10 +1,28 @@
 'use client'
 
-import { Separator as Divider, type SeparatorProps } from 'react-aria-components'
+import * as React from 'react'
+import {
+  Separator as Divider,
+  type SeparatorProps as AriaSeparatorProps,
+} from 'react-aria-components'
 
+import * as SeparatorPrimitive from '@radix-ui/react-separator'
 import { twMerge } from 'tailwind-merge'
 
-export const Separator = ({ orientation = 'horizontal', className, ...props }: SeparatorProps) => {
+import { cn } from '../../utils/cn'
+
+/**
+ * React Aria component
+ */
+
+/**
+ * @deprecated
+ */
+export const AriaSeparator = ({
+  orientation = 'horizontal',
+  className,
+  ...props
+}: AriaSeparatorProps) => {
   return (
     <Divider
       {...props}
@@ -17,4 +35,30 @@ export const Separator = ({ orientation = 'horizontal', className, ...props }: S
   )
 }
 
-export type { SeparatorProps }
+export type { AriaSeparatorProps }
+
+/**
+ * Shadcn component
+ */
+
+function Separator({
+  className,
+  orientation = 'horizontal',
+  decorative = true,
+  ...props
+}: React.ComponentProps<typeof SeparatorPrimitive.Root>) {
+  return (
+    <SeparatorPrimitive.Root
+      data-slot="separator"
+      decorative={decorative}
+      orientation={orientation}
+      className={cn(
+        'bg-border shrink-0 data-[orientation=horizontal]:h-px data-[orientation=horizontal]:w-full data-[orientation=vertical]:h-full data-[orientation=vertical]:w-px',
+        className
+      )}
+      {...props}
+    />
+  )
+}
+
+export { Separator }

@@ -1,6 +1,6 @@
 import { LoginClientForm } from './login.client'
 
-import { AriaButtonLink } from '../../../../../react/components/primitives/button'
+import { Button } from '../../../../../react/components/primitives/button'
 import { Typography } from '../../../../../react/components/primitives/typography'
 
 interface LoginViewProps {}
@@ -23,9 +23,9 @@ export function LoginView(props: LoginViewProps) {
           </span>
           <div className="flex w-full border-b" />
         </div>
-        <AriaButtonLink variant="outline" size="md">
-          TODO: Google
-        </AriaButtonLink>
+        <Button asChild variant="outline">
+          <a href=".">TODO: Google</a>
+        </Button>
       </div>
     </div>
   )
