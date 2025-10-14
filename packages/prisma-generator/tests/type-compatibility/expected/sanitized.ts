@@ -1,10 +1,10 @@
 import {
-  type Simplify,
-  type SanitizedModelShape,
+  DataType,
   type ModelConfig,
   type SanitizedModelSchema,
-  DataType,
+  type SanitizedModelShape,
   SchemaType,
+  type Simplify,
 } from '@genseki/react'
 
 /**
