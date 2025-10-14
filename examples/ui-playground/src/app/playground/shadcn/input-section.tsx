@@ -38,8 +38,20 @@ function BasicInput() {
 function InputTypes() {
   return (
     <div className="space-y-4">
-      <Input type="text" placeholder="Text input" />
-      <Input type="email" placeholder="Email input" />
+      <div className="space-y-4 align-bottom">
+        <Label htmlFor="text-input">Label</Label>
+        <Input type="text" id="text-input" placeholder="Text input" />
+        <Typography type="caption" weight="normal" className="text-muted-fg">
+          This come from with label
+        </Typography>
+      </div>
+      <div className="space-y-4 align-bottom">
+        <Label htmlFor="email">Email</Label>
+        <Input type="email" id="email" placeholder="Email input" />
+        <Typography type="caption" weight="normal" className="text-muted-fg">
+          Email domain must be softnetics.tech
+        </Typography>
+      </div>
       <Input type="password" placeholder="Password input" />
       <Input type="number" placeholder="Number input" />
       <Input type="tel" placeholder="Phone number" />
