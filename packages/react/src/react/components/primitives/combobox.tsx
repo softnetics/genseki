@@ -463,9 +463,6 @@ const [_ComboboxProvider, useCombobox] = createRequiredContext<{
   valueMapper(value) {
     return value
   },
-  render(props) {
-    return props.children
-  },
 })
 
 function ComboboxProvider(props: {

@@ -3,7 +3,7 @@ import React from 'react'
 export function createRequiredContext<T = {}, R = T>(
   name: string,
   options?: {
-    valueMapper?: (value: T) => React.PropsWithChildren<T>
+    valueMapper?: (value: T) => R
     render?: (props: React.PropsWithChildren<{ value: R }>) => React.ReactNode
   }
 ) {
@@ -19,7 +19,13 @@ export function createRequiredContext<T = {}, R = T>(
 
   function Provider(props: React.PropsWithChildren<T>) {
     const value = options?.valueMapper ? options.valueMapper(props) : props
-    const { children: _children, ...sanitizedValue } = value
+
+    const sanitizedValue = (value as any)?.children
+      ? (() => {
+          const { children: _children, ...sanitizedValue } = value as any
+          return sanitizedValue
+        })()
+      : value
 
     return (
       <Context value={sanitizedValue as R}>

@@ -214,7 +214,7 @@ function ButtonGroupText({
         "bg-muted flex items-center gap-4 rounded-md border px-8 text-sm font-medium shadow-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-8",
         className
       )}
-      {...(props as any)}
+      {...(props as React.HTMLAttributes<HTMLElement>)}
     />
   )
 }
