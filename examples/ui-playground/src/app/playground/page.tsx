@@ -25,6 +25,8 @@ import { useTheme } from 'next-themes'
 import {
   Annotation,
   AriaButton,
+  AriaButtonGroup,
+  AriaButtonGroupItem,
   AriaModal,
   AriaModalBody,
   AriaModalClose,
@@ -47,8 +49,6 @@ import {
   Avatar,
   Breadcrumbs,
   BreadcrumbsItem,
-  ButtonGroup,
-  ButtonGroupItem,
   Card,
   Link,
   PageSizeSelect,
@@ -1557,12 +1557,12 @@ export default function UIPlayground() {
       <Wrapper title="Button group">
         <PlaygroundCard title="Medium size (md)" categoryTitle="Button group">
           <div className="flex items-center gap-x-4">
-            <ButtonGroup>
-              <ButtonGroupItem id="1d">1d</ButtonGroupItem>
-              <ButtonGroupItem id="1w">1w</ButtonGroupItem>
-              <ButtonGroupItem id="1m">1m</ButtonGroupItem>
-              <ButtonGroupItem id="1y">1y</ButtonGroupItem>
-            </ButtonGroup>
+            <AriaButtonGroup>
+              <AriaButtonGroupItem id="1d">1d</AriaButtonGroupItem>
+              <AriaButtonGroupItem id="1w">1w</AriaButtonGroupItem>
+              <AriaButtonGroupItem id="1m">1m</AriaButtonGroupItem>
+              <AriaButtonGroupItem id="1y">1y</AriaButtonGroupItem>
+            </AriaButtonGroup>
           </div>
         </PlaygroundCard>
       </Wrapper>
