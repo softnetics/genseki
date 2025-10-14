@@ -1,5 +1,7 @@
 import React from 'react'
 
+import { CheckIcon } from '@phosphor-icons/react'
+
 import {
   Button,
   ComboboxCommandEmpty,
@@ -10,6 +12,7 @@ import {
   ComboboxContent,
   ComboboxProvider,
   ComboboxTrigger,
+  ComboboxTriggerMultiValue,
 } from '@genseki/react'
 import { Typography } from '@genseki/react'
 
@@ -49,8 +52,32 @@ const languages = [
   { value: 'ruby', label: 'Ruby' },
 ]
 
-// Basic Combobox Example
-function BasicCombobox() {
+function BasicComboboxMultiple() {
+  return (
+    <ComboboxProvider items={frameworks} multipleItems={true}>
+      <ComboboxTriggerMultiValue className="w-[200px]" />
+      <ComboboxContent>
+        <ComboboxCommandInput />
+        <ComboboxCommandEmpty>No framework found.</ComboboxCommandEmpty>
+        <ComboboxCommandList>
+          <ComboboxCommandGroup>
+            {({ items }) => {
+              return items.map((framework) => (
+                <ComboboxCommandItem
+                  key={framework.value}
+                  value={framework.value}
+                  label={framework.label}
+                />
+              ))
+            }}
+          </ComboboxCommandGroup>
+        </ComboboxCommandList>
+      </ComboboxContent>
+    </ComboboxProvider>
+  )
+}
+
+function BasicComboboxSingle() {
   return (
     <ComboboxProvider items={frameworks}>
       <ComboboxTrigger className="w-[200px]" />
@@ -76,8 +103,60 @@ function BasicCombobox() {
 }
 
 // Controlled Combobox Example
-function ControlledCombobox() {
-  const [value, setValue] = React.useState<string | null>(null)
+function ControlledComboboxMultiple() {
+  const [value, setValue] = React.useState<string[]>([])
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <div className="space-y-4">
+      <ComboboxProvider
+        items={languages}
+        open={open}
+        onOpenChange={setOpen}
+        value={value ?? undefined}
+        onValueChange={setValue}
+        multipleItems
+      >
+        <ComboboxTriggerMultiValue className="w-[250px]" />
+        <ComboboxContent>
+          <ComboboxCommandInput />
+          <ComboboxCommandEmpty>No language found.</ComboboxCommandEmpty>
+          <ComboboxCommandList>
+            <ComboboxCommandGroup>
+              {({ items }) => {
+                return items.map((language) => (
+                  <ComboboxCommandItem
+                    key={language.value}
+                    value={language.value}
+                    label={language.label}
+                  />
+                ))
+              }}
+            </ComboboxCommandGroup>
+          </ComboboxCommandList>
+        </ComboboxContent>
+      </ComboboxProvider>
+
+      <div className="flex gap-2 items-center">
+        <Typography type="caption" className="text-muted-foreground">
+          Selected: {value.join(', ') || 'None'}
+        </Typography>
+        <div className="inline-flex gap-x-4">
+          <Button size="sm" variant="outline" onClick={() => setValue([''])}>
+            Clear
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setValue(['typescript'])}>
+            TypeScript
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
+// Controlled Combobox Example
+function ControlledComboboxSingle() {
+  const [value, setValue] = React.useState<string[]>([])
   const [open, setOpen] = React.useState(false)
 
   return (
@@ -111,13 +190,13 @@ function ControlledCombobox() {
 
       <div className="flex gap-2 items-center">
         <Typography type="caption" className="text-muted-foreground">
-          Selected: {value || 'None'}
+          Selected: {value.join(', ') || 'None'}
         </Typography>
         <div className="inline-flex gap-x-4">
-          <Button size="sm" variant="outline" onClick={() => setValue('')}>
+          <Button size="sm" variant="outline" onClick={() => setValue([''])}>
             Clear
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setValue('typescript')}>
+          <Button size="sm" variant="outline" onClick={() => setValue(['typescript'])}>
             TypeScript
           </Button>
         </div>
@@ -127,7 +206,52 @@ function ControlledCombobox() {
 }
 
 // Custom Trigger Combobox Example
-function CustomTriggerCombobox() {
+function CustomTriggerComboboxMultiple() {
+  return (
+    <ComboboxProvider items={frameworks} multipleItems>
+      <ComboboxTriggerMultiValue>
+        {(selectedItems) => (
+          <Button
+            variant="secondary"
+            className="w-[250px] grid [grid-template-columns:1fr_1fr] gap-2 p-2 border-border border"
+          >
+            {selectedItems?.map((selectedItem) => (
+              <span
+                key={selectedItem.value}
+                className="bg-primary text-primary-fg min-h-[2rem] rounded-md inline-flex items-center justify-start gap-2"
+              >
+                <span className="w-20 flex justify-end">
+                  <CheckIcon />
+                </span>
+                {selectedItem.label}
+              </span>
+            )) || 'Empty value'}
+          </Button>
+        )}
+      </ComboboxTriggerMultiValue>
+      <ComboboxContent>
+        <ComboboxCommandInput />
+        <ComboboxCommandEmpty>No framework found.</ComboboxCommandEmpty>
+        <ComboboxCommandList>
+          <ComboboxCommandGroup>
+            {({ items }) => {
+              return items.map((framework) => (
+                <ComboboxCommandItem
+                  key={framework.value}
+                  value={framework.value}
+                  label={framework.label}
+                />
+              ))
+            }}
+          </ComboboxCommandGroup>
+        </ComboboxCommandList>
+      </ComboboxContent>
+    </ComboboxProvider>
+  )
+}
+
+// Custom Trigger Combobox Example
+function CustomTriggerComboboxSingle() {
   return (
     <ComboboxProvider items={frameworks}>
       <ComboboxTrigger>
@@ -166,30 +290,57 @@ function CustomTriggerCombobox() {
 export function ComboboxSection() {
   return (
     <div className="grid gap-8">
-      <PlaygroundCard title="Basic Combobox" categoryTitle="Component">
+      <PlaygroundCard title="Basic Combobox (Multiple selection)" categoryTitle="Component">
         <Typography type="body" className="text-muted-foreground mb-4">
           A simple combobox with default styling and behavior.
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
-          <BasicCombobox />
+          <BasicComboboxMultiple />
         </div>
       </PlaygroundCard>
 
-      <PlaygroundCard title="Controlled Combobox" categoryTitle="Component">
+      <PlaygroundCard title="Basic Combobox (Single selection)" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A simple combobox with default styling and behavior.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <BasicComboboxSingle />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Controlled Combobox (Multiple selection)" categoryTitle="Component">
         <Typography type="body" className="text-muted-foreground mb-4">
           A controlled combobox where you can manage the selected value externally.
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
-          <ControlledCombobox />
+          <ControlledComboboxMultiple />
         </div>
       </PlaygroundCard>
 
-      <PlaygroundCard title="Custom Trigger" categoryTitle="Component">
+      <PlaygroundCard title="Controlled Combobox (Single selection)" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A controlled combobox where you can manage the selected value externally.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ControlledComboboxSingle />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Custom Trigger (Multiple selection)" categoryTitle="Component">
         <Typography type="body" className="text-muted-foreground mb-4">
           A combobox with a custom trigger using a render prop.
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
-          <CustomTriggerCombobox />
+          <CustomTriggerComboboxMultiple />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Custom Trigger (Single selection)" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A combobox with a custom trigger using a render prop.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <CustomTriggerComboboxSingle />
         </div>
       </PlaygroundCard>
     </div>

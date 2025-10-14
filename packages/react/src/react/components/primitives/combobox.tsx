@@ -13,6 +13,7 @@ import {
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
 import { tv } from 'tailwind-variants'
 
+import { Badge } from './badge'
 import { BaseIcon } from './base-icon'
 import { Button } from './button'
 import {
@@ -455,10 +456,11 @@ interface Item {
 const [_ComboboxProvider, useCombobox] = createRequiredContext<{
   open: boolean
   onOpenChange: React.Dispatch<React.SetStateAction<boolean>>
-  value: string
-  onValueChange: (value: string) => void
+  value: string[]
+  onValueChange: React.Dispatch<React.SetStateAction<string[]>>
   items: Item[]
   setItems: React.Dispatch<React.SetStateAction<Item[]>>
+  multipleItems?: boolean
 }>('Combobox provider', {
   valueMapper(value) {
     return value
@@ -469,15 +471,19 @@ function ComboboxProvider(props: {
   children?: React.ReactNode
   open?: boolean
   onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>
-  value?: string
-  onValueChange?: (value: string) => void
+  /**
+   * @description array of `value`
+   */
+  value?: string[]
+  onValueChange?: React.Dispatch<React.SetStateAction<string[]>>
   items: Item[]
+  multipleItems?: boolean
 }) {
   const [items, setItems] = React.useState<Item[]>(props.items ?? [])
 
   // typing value
-  const [value, setValue] = useControllableState<string>({
-    defaultProp: '',
+  const [value, setValue] = useControllableState<string[]>({
+    defaultProp: [''],
     onChange: props.onValueChange,
     prop: props.value,
   })
@@ -497,6 +503,7 @@ function ComboboxProvider(props: {
       onOpenChange={setOpen}
       items={items}
       setItems={setItems}
+      multipleItems={props.multipleItems ?? false}
     >
       <_ComboboxPopoverProvider>{props.children}</_ComboboxPopoverProvider>
     </_ComboboxProvider>
@@ -512,13 +519,64 @@ function _ComboboxPopoverProvider(props: { children?: React.ReactNode }) {
   )
 }
 
+function ComboboxTriggerMultiValue(props: {
+  children?: ((selectedItem: Item[] | undefined) => React.ReactElement) | React.ReactNode
+  className?: string
+}) {
+  const ctx = useCombobox()
+
+  const selectedItems = ctx.items.filter((item) => ctx.value.includes(item.value))
+
+  const onTriggerKeyDown: React.KeyboardEventHandler = (event) => {
+    if (event.key === 'ArrowDown') ctx.onOpenChange(true)
+  }
+
+  const renderItems = React.useMemo(() => {
+    return (
+      <span className="flex flex-wrap flex-1 gap-2">
+        {selectedItems.map((selectedItem) => (
+          <Badge shape="square" intent="gray" key={selectedItem.value}>
+            {selectedItem.label}
+          </Badge>
+        ))}
+      </span>
+    )
+  }, [selectedItems])
+
+  return (
+    <PopoverTrigger
+      asChild
+      onKeyDown={onTriggerKeyDown}
+      className={cn('w-[200px] min-h-18 justify-between flex h-auto relative', props.className)}
+      aria-expanded={ctx.open}
+    >
+      {typeof props.children === 'function' ? (
+        props.children(selectedItems)
+      ) : props.children ? (
+        props.children
+      ) : (
+        <Button variant="outline" role="combobox">
+          {selectedItems.length > 0 ? renderItems : 'Please select item'}
+          <CaretUpDownIcon className="h-8 w-8 shrink-0 opacity-50 absolute right-4 inset-y-0 my-auto" />
+        </Button>
+      )}
+    </PopoverTrigger>
+  )
+}
+
 function ComboboxTrigger(props: {
   children?: ((selectedItem: Item | undefined) => React.ReactElement) | React.ReactNode
   className?: string
 }) {
   const ctx = useCombobox()
 
-  const selectedItem = ctx.items.find((item) => item.value === ctx.value)
+  if (ctx.multipleItems) {
+    throw new Error(
+      'Please use `MultipleValueComboboxTrigger` component for mange multi value selection, this will make component maintenance more easier'
+    )
+  }
+
+  const selectedItem = ctx.items.find((item) => ctx.value.includes(item.value))
 
   const onTriggerKeyDown: React.KeyboardEventHandler = (event) => {
     if (event.key === 'ArrowDown') ctx.onOpenChange(true)
@@ -607,18 +665,26 @@ function ComboboxCommandItem({
 >) {
   const ctx = useCombobox()
 
+  const isValueExistedBefore = ctx.value.some((existedValue) => existedValue === value)
+
+  const onSelect = () => {
+    ctx.onValueChange((prevItems) => {
+      if (ctx.multipleItems) {
+        return isValueExistedBefore
+          ? prevItems.filter((prevItem) => prevItem !== value)
+          : [...prevItems, value]
+      }
+
+      return isValueExistedBefore ? [] : [value]
+    })
+
+    !ctx.multipleItems && ctx.onOpenChange(false)
+  }
+
   return (
-    <CommandItem
-      id={value}
-      value={value}
-      onSelect={() => {
-        ctx.onValueChange(value === ctx.value ? '' : value)
-        ctx.onOpenChange(false)
-      }}
-      {...props}
-    >
+    <CommandItem id={value} value={value} onSelect={onSelect} {...props}>
       <CheckIcon
-        className={cn('mr-4 h-8 w-8', value === ctx.value ? 'opacity-100' : 'opacity-0')}
+        className={cn('mr-4 h-8 w-8', isValueExistedBefore ? 'opacity-100' : 'opacity-0')}
       />
       {label}
     </CommandItem>
@@ -634,5 +700,6 @@ export {
   ComboboxContent,
   ComboboxProvider,
   ComboboxTrigger,
+  ComboboxTriggerMultiValue,
   useCombobox,
 }
