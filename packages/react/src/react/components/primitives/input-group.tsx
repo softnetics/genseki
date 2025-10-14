@@ -132,7 +132,7 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
   )
 }
 
-function InputGroupInput({ className, ...props }: React.ComponentProps<typeof Input>) {
+function InputGroupControl({ className, ...props }: React.ComponentProps<typeof Input>) {
   return (
     <Slot
       data-slot="input-group-control"
@@ -164,7 +164,7 @@ export {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
+  InputGroupControl,
   InputGroupText,
   InputGroupTextarea,
 }

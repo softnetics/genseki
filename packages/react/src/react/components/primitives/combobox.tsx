@@ -453,7 +453,7 @@ interface Item {
   label: string
 }
 
-const [_ComboboxProvider, useCombobox] = createRequiredContext<{
+interface ComboboxContextValue {
   open: boolean
   onOpenChange: React.Dispatch<React.SetStateAction<boolean>>
   value: string[]
@@ -461,24 +461,22 @@ const [_ComboboxProvider, useCombobox] = createRequiredContext<{
   items: Item[]
   setItems: React.Dispatch<React.SetStateAction<Item[]>>
   multipleItems?: boolean
-}>('Combobox provider', {
-  valueMapper(value) {
-    return value
-  },
-})
+}
 
-function ComboboxProvider(props: {
+const [_ComboboxProvider, useCombobox] =
+  createRequiredContext<ComboboxContextValue>('Combobox provider')
+
+interface ComboboxProviderProps {
   children?: React.ReactNode
   open?: boolean
   onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>
-  /**
-   * @description array of `value`
-   */
   value?: string[]
   onValueChange?: React.Dispatch<React.SetStateAction<string[]>>
   items: Item[]
   multipleItems?: boolean
-}) {
+}
+
+function ComboboxProvider(props: ComboboxProviderProps) {
   const [items, setItems] = React.useState<Item[]>(props.items ?? [])
 
   // typing value
@@ -533,7 +531,7 @@ function ComboboxTriggerMultiValue(props: {
 
   const renderItems = React.useMemo(() => {
     return (
-      <span className="flex flex-wrap flex-1 gap-2">
+      <span className="flex flex-wrap flex-1 gap-2 pr-8">
         {selectedItems.map((selectedItem) => (
           <Badge shape="square" intent="gray" key={selectedItem.value}>
             {selectedItem.label}

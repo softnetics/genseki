@@ -17,7 +17,7 @@ import {
   InputGroup,
   InputGroupAddon,
   InputGroupButton,
-  InputGroupInput,
+  InputGroupControl,
   InputGroupText,
   Label,
   Typography,
@@ -146,9 +146,9 @@ function InputGroupInlineStart() {
             <MagnifyingGlassIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Searching..." />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
 
       <InputGroup>
@@ -157,9 +157,9 @@ function InputGroupInlineStart() {
             <EnvelopeIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input type="email" placeholder="you@example.com" />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
 
       <InputGroup>
@@ -168,9 +168,9 @@ function InputGroupInlineStart() {
             <CurrencyDollarIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input type="number" placeholder="0.00" />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
     </div>
   )
@@ -181,9 +181,9 @@ function InputGroupInlineEnd() {
   return (
     <div className="space-y-4">
       <InputGroup>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Enter URL" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupText>
             <LinkIcon />
@@ -192,9 +192,9 @@ function InputGroupInlineEnd() {
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Username" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupText>@example.com</InputGroupText>
         </InputGroupAddon>
@@ -216,13 +216,13 @@ function InputGroupWithButtons() {
             <MagnifyingGlassIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input
             placeholder="Search..."
             value={searchValue}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) => setSearchValue(e.target.value)}
           />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="icon-xs" onClick={() => setSearchValue('')}>
             <XIcon />
@@ -231,9 +231,9 @@ function InputGroupWithButtons() {
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input type={showPassword ? 'text' : 'password'} placeholder="Enter password" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="icon-xs" onClick={() => setShowPassword(!showPassword)}>
             {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
@@ -242,9 +242,9 @@ function InputGroupWithButtons() {
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Enter your message" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="xs" variant="default">
             <PaperPlaneRightIcon />
@@ -264,9 +264,9 @@ function InputGroupBothSides() {
         <InputGroupAddon align="inline-start">
           <InputGroupText>https://</InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="example.com" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupText>.com</InputGroupText>
         </InputGroupAddon>
@@ -278,9 +278,9 @@ function InputGroupBothSides() {
             <AtIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="username" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupButton size="xs">Verify</InputGroupButton>
         </InputGroupAddon>
@@ -292,9 +292,9 @@ function InputGroupBothSides() {
             <CurrencyDollarIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input type="number" placeholder="0.00" />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="inline-end">
           <InputGroupText>USD</InputGroupText>
         </InputGroupAddon>
@@ -311,15 +311,15 @@ function InputGroupBlockAlignment() {
         <InputGroupAddon align="block-start">
           <Label className="text-fg">Description</Label>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Enter description..." />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
 
       <InputGroup>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Enter comment..." />
-        </InputGroupInput>
+        </InputGroupControl>
         <InputGroupAddon align="block-end">
           <InputGroupText>Character count: 0/500</InputGroupText>
         </InputGroupAddon>
@@ -338,9 +338,9 @@ function InputGroupStates() {
             <EnvelopeIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Default state" />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
 
       <InputGroup data-disabled="true">
@@ -349,9 +349,9 @@ function InputGroupStates() {
             <EnvelopeIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Disabled state" disabled />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
 
       <InputGroup>
@@ -360,9 +360,9 @@ function InputGroupStates() {
             <EnvelopeIcon />
           </InputGroupText>
         </InputGroupAddon>
-        <InputGroupInput>
+        <InputGroupControl>
           <Input placeholder="Invalid state" aria-invalid="true" defaultValue="invalid@email" />
-        </InputGroupInput>
+        </InputGroupControl>
       </InputGroup>
     </div>
   )

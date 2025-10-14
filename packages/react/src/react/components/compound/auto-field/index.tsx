@@ -29,7 +29,7 @@ import {
   FormItemController,
   Input,
   InputGroup,
-  InputGroupInput,
+  InputGroupControl,
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
@@ -81,7 +81,7 @@ export function AutoFileUploadField(props: FileUploadFieldProps) {
 }
 
 export function AutoTextField(
-  props: React.ComponentPropsWithoutRef<typeof InputGroupInput> & {
+  props: React.ComponentPropsWithoutRef<typeof InputGroupControl> & {
     name: string
     label?: string
     isRequired?: boolean
@@ -103,14 +103,14 @@ export function AutoTextField(
           )}
           <div className="flex flex-col gap-y-2">
             <InputGroup className={cn(props.className, 'bg-background')}>
-              <InputGroupInput>
+              <InputGroupControl>
                 <Input
                   required={props.isRequired}
                   placeholder={props.placeholder}
                   isError={!!fieldState.error}
                   {...field}
                 />
-              </InputGroupInput>
+              </InputGroupControl>
             </InputGroup>
             {error?.message && (
               //  TODO: Wait for shadcn form field
