@@ -1,6 +1,6 @@
 'use client'
 
-import { CaretLeftIcon } from '@phosphor-icons/react/dist/ssr'
+import { CaretLeftIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 
 import { CollectionListCreate } from './create'
@@ -9,8 +9,7 @@ import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
 import type { CollectionToolbarActions } from '../../../../../core/collection'
-import { toast } from '../../../..'
-import { BaseIcon, ButtonLink } from '../../../../components'
+import { Button, toast } from '../../../..'
 import { useTableStatesContext } from '../../../../providers/table'
 import { useCollectionList } from '../context'
 import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'
@@ -45,15 +44,12 @@ export function CollectionListToolbar(props: CollectionListToolbarProps) {
 
   return (
     <div className="flex items-center justify-between gap-x-3">
-      <ButtonLink
-        aria-label="Back"
-        href="."
-        variant="ghost"
-        size="md"
-        leadingIcon={<BaseIcon icon={CaretLeftIcon} size="md" />}
-      >
-        Back
-      </ButtonLink>
+      <Button asChild variant="ghost">
+        <a href=".">
+          <CaretLeftIcon />
+          Back
+        </a>
+      </Button>
       <div className="flex gap-x-4">
         {toolbar?.delete && isRowsSelected && (
           <CollectionListDelete onDelete={() => deleteMutation.mutate(rowSelectionIds)} />

@@ -23,9 +23,9 @@ import {
   DropdownSection,
   DropdownSeparator,
 } from './dropdown'
-import { Description, FieldError, Label } from './field'
+import { AriaDescription, AriaFieldError, AriaLabel } from './field'
 import { ListBox } from './list-box'
-import { PopoverContent, type PopoverContentProps } from './popover'
+import { AriaPopoverContent, type AriaPopoverContentProps } from './popover'
 import { composeTailwindRenderProps, focusStyles } from './primitive'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -68,13 +68,13 @@ const Select = <T extends object>({
       {(values) => (
         <>
           {label && (
-            <Label>
+            <AriaLabel>
               {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-            </Label>
+            </AriaLabel>
           )}
           {typeof props.children === 'function' ? props.children(values) : props.children}
-          {description && <Description>{description}</Description>}
-          <FieldError>{errorMessage}</FieldError>
+          {description && <AriaDescription>{description}</AriaDescription>}
+          <AriaFieldError>{errorMessage}</AriaFieldError>
         </>
       )}
     </SelectPrimitive>
@@ -85,7 +85,7 @@ interface SelectListProps<T extends object>
   extends Omit<ListBoxProps<T>, 'layout' | 'orientation'>,
     Pick<PopoverProps, 'placement'> {
   items?: Iterable<T>
-  popoverClassName?: PopoverContentProps['className']
+  popoverClassName?: AriaPopoverContentProps['className']
 }
 
 const SelectList = <T extends object>({
@@ -96,7 +96,7 @@ const SelectList = <T extends object>({
   ...props
 }: SelectListProps<T>) => {
   return (
-    <PopoverContent
+    <AriaPopoverContent
       showArrow={false}
       respectScreen={false}
       className={composeTailwindRenderProps(
@@ -117,7 +117,7 @@ const SelectList = <T extends object>({
       >
         {children}
       </ListBox>
-    </PopoverContent>
+    </AriaPopoverContent>
   )
 }
 

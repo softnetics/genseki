@@ -250,13 +250,13 @@ const CancelButton = ({ pending }: CancelButtonProps) => {
   } = useFormContext()
   const { navigate } = useNavigation()
 
-  const handleCancel = () => {
+  const handleCancel: React.MouseEventHandler<HTMLButtonElement> = (e) => {
     if ((isDirty && confirm('You have unsaved changes, sure to leave?')) || !isDirty)
       return navigate('./')
   }
 
   return (
-    <Button size="md" variant="destruction" onClick={handleCancel} isDisabled={pending}>
+    <Button variant="destructive" onClick={handleCancel} disabled={pending}>
       {pending ? 'Submitting...' : 'Cancel'}
     </Button>
   )
@@ -310,7 +310,9 @@ export const CustomCreatePage = () => {
         .join(',')
     )
 
-  const handleSubmit: SubmitHandler<CreatePostFields> = (data) => mutation.mutateAsync(data)
+  const handleSubmit: SubmitHandler<CreatePostFields> = (data) => {
+    mutation.mutateAsync(data)
+  }
 
   return (
     <CreateFormLayout>

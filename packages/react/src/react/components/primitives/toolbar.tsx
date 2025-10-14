@@ -7,7 +7,7 @@ import { composeRenderProps, Group, Toolbar as ToolbarPrimitive } from 'react-ar
 import { twMerge } from 'tailwind-merge'
 
 import { composeTailwindRenderProps } from './primitive'
-import { Separator } from './separator'
+import { AriaSeparator } from './separator'
 import { Toggle, type ToggleProps } from './toggle'
 
 const ToolbarContext = createContext<{ orientation?: ToolbarProps['orientation'] }>({
@@ -67,7 +67,7 @@ const ToolbarSeparator = ({ className, ...props }: ToolbarSeparatorProps) => {
   const { orientation } = useContext(ToolbarContext)
   const effectiveOrientation = orientation === 'vertical' ? 'horizontal' : 'vertical'
   return (
-    <Separator
+    <AriaSeparator
       orientation={effectiveOrientation}
       className={twMerge(effectiveOrientation === 'vertical' ? 'mx-1.5' : 'my-1.5 w-9', className)}
       {...props}

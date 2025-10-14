@@ -23,7 +23,7 @@ import { twMerge } from 'tailwind-merge'
 
 import { type CalendarDate, getLocalTimeZone, today } from '@internationalized/date'
 
-import { Button } from './button'
+import { AriaButton } from './button'
 import { Select, SelectLabel, SelectList, SelectOption, SelectTrigger } from './select'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -98,7 +98,7 @@ const CalendarHeader = ({
         )}
       />
       <div className="flex items-center gap-1">
-        <Button
+        <AriaButton
           size="square-petite"
           className="size-14 **:data-[slot=icon]:text-fg p-0"
           variant="ghost"
@@ -109,8 +109,8 @@ const CalendarHeader = ({
           ) : (
             <BaseIcon weight="regular" size="sm" icon={CaretLeftIcon} />
           )}
-        </Button>
-        <Button
+        </AriaButton>
+        <AriaButton
           size="square-petite"
           className="size-14 **:data-[slot=icon]:text-fg p-0"
           variant="ghost"
@@ -121,7 +121,7 @@ const CalendarHeader = ({
           ) : (
             <BaseIcon weight="regular" size="sm" icon={CaretRightIcon} />
           )}
-        </Button>
+        </AriaButton>
       </div>
     </header>
   )

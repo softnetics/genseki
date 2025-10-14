@@ -47,7 +47,7 @@
   "tailwindCSS.experimental.configFile": {
     "packages/react/src/react/styles/tailwind.css": "packages/react/**",
     "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/src/app/(admin)/admin/**",
-    "examples/ui-playground/src/app/playground/tailwind.css": "examples/ui-playground/**"
+    "examples/ui-playground/src/styles/tailwind.css": "examples/ui-playground/**"
   },
   "tailwindCSS.experimental.classRegex": [
     ["clsx\\(.*?\\)(?!\\])", "(?:'|\"|`)([^\"'`]*)(?:'|\"|`)"],

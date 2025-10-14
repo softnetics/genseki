@@ -1,5 +1,5 @@
 'use client'
-import React, { forwardRef } from 'react'
+import * as React from 'react'
 import type { LinkProps as LinkPrimitiveProps } from 'react-aria-components'
 import {
   Button as ButtonPrimitive,
@@ -8,13 +8,24 @@ import {
 } from 'react-aria-components'
 
 import { Spinner, SpinnerIcon } from '@phosphor-icons/react'
-import { tv, type VariantProps } from 'tailwind-variants'
+import { Slot } from '@radix-ui/react-slot'
+import { cva, type VariantProps } from 'class-variance-authority'
+import { tv, type VariantProps as TwVariantProps } from 'tailwind-variants'
 
 import { BaseIcon } from './base-icon'
 
 import { cn } from '../../utils/cn'
 
-const buttonVariants = tv({
+/**
+ *
+ * React Aria component
+ *
+ */
+
+/**
+ * @deprecated
+ */
+const ariaButtonVariants = tv({
   base: 'cursor-pointer flex items-center justify-center transition-all duration-200',
   variants: {
     variant: {
@@ -74,17 +85,26 @@ const buttonVariants = tv({
   },
 })
 
-type ButtonVariants = VariantProps<typeof buttonVariants>
+/**
+ * @deprecated
+ */
+type AriaButtonVariants = TwVariantProps<typeof ariaButtonVariants>
 
-interface ButtonProps
+/**
+ * @deprecated
+ */
+interface AriaButtonProps
   extends ButtonPrimitiveProps,
-    Required<Omit<ButtonVariants, 'isDisabled'>>,
-    Pick<ButtonVariants, 'isDisabled'> {
+    Required<Omit<AriaButtonVariants, 'isDisabled'>>,
+    Pick<AriaButtonVariants, 'isDisabled'> {
   leadingIcon?: React.ReactElement
   trailingIcon?: React.ReactElement
 }
 
-const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
+/**
+ * @deprecated
+ */
+const AriaButton = React.forwardRef<HTMLButtonElement, AriaButtonProps>(
   ({ className, variant, size, ...props }, ref) => {
     const { isDisabled, isPending = false } = props
 
@@ -96,7 +116,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         isDisabled={isDisabled || isPending}
         className={(value) =>
           cn(
-            buttonVariants({
+            ariaButtonVariants({
               variant,
               size,
               isDisabled,
@@ -121,16 +141,22 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
   }
 )
 
-export interface ButtonLinkProps
+/**
+ * @deprecated
+ */
+interface AriaButtonLinkProps
   extends LinkPrimitiveProps,
-    Required<Omit<ButtonVariants, 'isDisabled'>>,
-    Pick<ButtonVariants, 'isDisabled'> {
+    Required<Omit<AriaButtonVariants, 'isDisabled'>>,
+    Pick<AriaButtonVariants, 'isDisabled'> {
   leadingIcon?: React.ReactElement
   trailingIcon?: React.ReactElement
   isPending?: boolean
 }
 
-const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
+/**
+ * @deprecated
+ */
+const AriaButtonLink = React.forwardRef<HTMLAnchorElement, AriaButtonLinkProps>(function ButtonLink(
   { className, variant, size, isDisabled = false, isPending = false, children, ...props },
   ref
 ) {
@@ -141,7 +167,7 @@ const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function Butto
       isDisabled={isDisabled || isPending}
       className={(value) =>
         cn(
-          buttonVariants({
+          ariaButtonVariants({
             variant,
             size,
             isDisabled,
@@ -166,4 +192,66 @@ const ButtonLink = forwardRef<HTMLAnchorElement, ButtonLinkProps>(function Butto
   )
 })
 
-export { Button, ButtonLink, type ButtonProps }
+export { AriaButton, AriaButtonLink, type AriaButtonLinkProps, type AriaButtonProps }
+
+/**
+ *
+ * Shadcn component
+ *
+ */
+
+const buttonVariants = cva(
+  [
+    "inline-flex items-center justify-center gap-4 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-8 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+    'disabled:opacity-80 cursor-pointer',
+  ],
+  {
+    variants: {
+      variant: {
+        default: 'bg-primary text-primary-foreground hover:bg-primary/90 active:bg-primary',
+        destructive:
+          'bg-destructive text-white hover:bg-destructive/90 active:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+        outline:
+          'border bg-background shadow-xs hover:bg-accent hover:text-accent-foreground dark:bg-input/30 dark:border-input dark:hover:bg-input/50',
+        secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
+        ghost: 'hover:bg-accent hover:text-accent-foreground dark:hover:bg-accent/50',
+        link: 'text-primary underline-offset-4 hover:underline hover:border-0',
+      },
+      size: {
+        default: 'h-18 px-8 py-4 has-[>svg]:px-6',
+        sm: 'h-16 rounded-md gap-3 px-6 has-[>svg]:px-5',
+        lg: 'h-20 rounded-md px-12 has-[>svg]:px-8',
+        icon: 'size-18',
+        'icon-sm': 'size-16',
+        'icon-lg': 'size-20',
+      },
+    },
+    defaultVariants: {
+      variant: 'default',
+      size: 'default',
+    },
+  }
+)
+
+function Button({
+  className,
+  variant,
+  size,
+  asChild = false,
+  ...props
+}: React.ComponentProps<'button'> &
+  VariantProps<typeof buttonVariants> & {
+    asChild?: boolean
+  }) {
+  const Comp = asChild ? Slot : 'button'
+
+  return (
+    <Comp
+      data-slot="button"
+      className={cn(buttonVariants({ variant, size, className }))}
+      {...props}
+    />
+  )
+}
+
+export { Button, buttonVariants }

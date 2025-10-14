@@ -1,6 +1,6 @@
 'use client'
 
-import { type ReactNode, startTransition, useMemo, useState } from 'react'
+import React, { type ReactNode, startTransition, useMemo, useState } from 'react'
 import { useFieldArray, useFormContext, useWatch } from 'react-hook-form'
 
 import { EnvelopeIcon } from '@phosphor-icons/react'
@@ -8,23 +8,28 @@ import { useQuery } from '@tanstack/react-query'
 import type { Content } from '@tiptap/react'
 
 import {
+  AriaButton,
+  AriaCombobox,
+  type AriaComboboxItem,
+  AriaComboboxLabel,
+  AriaComboboxList,
+  AriaComboboxOption,
+  type AriaComboboxProps,
+  AriaComboboxSearchInput,
+  AriaComboboxTrigger,
+  AriaTextField,
+  type AriaTextFieldProps,
   BaseIcon,
   Button,
   Checkbox,
   type CheckboxProps,
-  Combobox,
-  type ComboboxItem,
-  ComboboxLabel,
-  ComboboxList,
-  ComboboxOption,
-  type ComboboxProps,
-  ComboboxSearchInput,
-  ComboboxTrigger,
   DatePicker,
   type DatePickerProps,
   FormField,
   FormItemController,
-  Label,
+  Input,
+  InputGroup,
+  InputGroupControl,
   NumberField,
   type NumberFieldProps,
   RichTextEditor,
@@ -34,11 +39,8 @@ import {
   SelectOption,
   type SelectProps,
   SelectTrigger,
-  Separator,
   Switch,
   type SwitchProps,
-  TextField,
-  type TextFieldProps,
   TimeField,
   type TimeFieldProps,
   Typography,
@@ -57,6 +59,7 @@ import { useDebounce } from '../../../hooks/use-debounce'
 import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
+import { Label } from '../../primitives/label'
 import { FileUploadField, type FileUploadFieldProps } from '../file-upload-field'
 
 export function AutoFileUploadField(props: FileUploadFieldProps) {
@@ -77,25 +80,66 @@ export function AutoFileUploadField(props: FileUploadFieldProps) {
   )
 }
 
-export function AutoTextField(props: TextFieldProps) {
-  const { field, error } = useFormItemController()
+export function AutoTextField(
+  props: React.ComponentPropsWithoutRef<typeof InputGroupControl> & {
+    name: string
+    label?: string
+    isRequired?: boolean
+  }
+) {
+  const { field, error, fieldState } = useFormItemController()
 
   return (
-    <TextField
-      type="text"
-      {...props}
-      {...field}
-      errorMessage={error?.message}
-      className={cn('w-full', props.className)}
+    <AutoFormField
+      key={props.name}
+      name={props.name}
+      component={
+        <div className="flex flex-col gap-y-4 group">
+          {props.label && (
+            <Label htmlFor={props.name}>
+              {props.label}
+              {props.isRequired && <span className="text-primary">*</span>}
+            </Label>
+          )}
+          <div className="flex flex-col gap-y-2">
+            <InputGroup className={cn(props.className, 'bg-background')}>
+              <InputGroupControl>
+                <Input
+                  required={props.isRequired}
+                  placeholder={props.placeholder}
+                  isError={!!fieldState.error}
+                  {...field}
+                />
+              </InputGroupControl>
+            </InputGroup>
+            {error?.message && (
+              //  TODO: Wait for shadcn form field
+              <Typography type="caption" weight="normal" className="text-destructive">
+                {error?.message}
+              </Typography>
+            )}
+          </div>
+        </div>
+      }
     />
   )
+
+  // return (
+  //   <AriaTextField
+  //     type="text"
+  //     {...props}
+  //     {...field}
+  //     errorMessage={error?.message}
+  //     className={cn('w-full', props.className)}
+  //   />
+  // )
 }
 
-export function AutoPasswordField(props: TextFieldProps) {
+export function AutoPasswordField(props: AriaTextFieldProps) {
   const { field, error } = useFormItemController()
 
   return (
-    <TextField
+    <AriaTextField
       {...props}
       {...field}
       type="password"
@@ -106,11 +150,11 @@ export function AutoPasswordField(props: TextFieldProps) {
   )
 }
 
-export function AutoEmailField(props: TextFieldProps) {
+export function AutoEmailField(props: AriaTextFieldProps) {
   const { field, error } = useFormItemController()
 
   return (
-    <TextField
+    <AriaTextField
       type="email"
       prefix={<BaseIcon icon={EnvelopeIcon} size="sm" />}
       {...props}
@@ -209,6 +253,8 @@ interface AutoSelectField extends Omit<SelectProps<{}>, 'items'> {
   optionsName: string
   optionsFetchPath: string
   deselectable?: boolean
+  label?: string
+  isRequired?: boolean
 }
 
 export function AutoSelectField(props: AutoSelectField) {
@@ -241,7 +287,6 @@ export function AutoSelectField(props: AutoSelectField) {
   return (
     <Select
       {...field}
-      aria-label={props.label}
       items={items}
       isDisabled={isDisabled}
       selectedKey={field.value}
@@ -263,8 +308,8 @@ export function AutoSelectField(props: AutoSelectField) {
       }}
     >
       {props.label && (
-        <Label>
-          {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
+        <Label htmlFor={props.name}>
+          {props.label} {props.isRequired && <span className="text-primary">*</span>}
         </Label>
       )}
       <SelectTrigger className="h-auto" isPending={query.isLoading} />
@@ -280,7 +325,7 @@ export function AutoSelectField(props: AutoSelectField) {
 }
 
 export interface AutoComboboxFieldProps
-  extends Omit<ComboboxProps, 'items' | 'onSearch' | 'isLoading' | 'value' | 'onChange'> {
+  extends Omit<AriaComboboxProps, 'items' | 'onSearch' | 'isLoading' | 'value' | 'onChange'> {
   name?: string
 
   optionsName: string
@@ -334,7 +379,7 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
     },
   })
 
-  const items: ComboboxItem[] = useMemo(
+  const items: AriaComboboxItem[] = useMemo(
     () => (query.data?.body.options ?? []).map((o) => ({ label: o.label, value: String(o.value) })),
     [query.data]
   )
@@ -354,7 +399,7 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
   }
 
   return (
-    <Combobox
+    <AriaCombobox
       label={label}
       className={cn('w-full', className)}
       description={description}
@@ -373,11 +418,11 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
         onOpenChange?.(isOpen)
       }}
     >
-      <ComboboxTrigger>
-        <ComboboxSearchInput placeholder={placeholder} />
-      </ComboboxTrigger>
+      <AriaComboboxTrigger>
+        <AriaComboboxSearchInput placeholder={placeholder} />
+      </AriaComboboxTrigger>
 
-      <ComboboxList>
+      <AriaComboboxList>
         {!query.isFetching && items.length === 0 && (
           <li className="px-4 py-6 text-sm text-muted-fg">No results</li>
         )}
@@ -385,18 +430,18 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
           items.map((item, idx) => {
             const isSelected = item.value === field.value
             return (
-              <ComboboxOption
+              <AriaComboboxOption
                 key={item.value}
                 value={item.value}
                 isSelected={isSelected}
                 onSelect={() => submitSelection(idx)}
               >
-                <ComboboxLabel>{item.label}</ComboboxLabel>
-              </ComboboxOption>
+                <AriaComboboxLabel>{item.label}</AriaComboboxLabel>
+              </AriaComboboxOption>
             )
           })}
-      </ComboboxList>
-    </Combobox>
+      </AriaComboboxList>
+    </AriaCombobox>
   )
 }
 
@@ -422,26 +467,33 @@ const AutoRichTextField = (props: {
   )
 
   return (
-    <RichTextEditor
-      label={props.label}
-      errorMessage={error?.message}
-      isRequired={props.isRequired}
-      isDisabled={props.disabled}
-      description={props.description}
-      onChange={(content) => {
-        props.onChange?.(content)
-      }}
-      editorProviderProps={{
-        ...editorProviderProps,
-        onUpdate(updateCb) {
-          startTransition(() => {
-            field.onChange(updateCb.editor.getJSON())
-          })
-          editorProviderProps.onUpdate?.(updateCb)
-        },
-        content: field.value,
-      }}
-    />
+    <div className="flex flex-col gap-y-4 group">
+      {props.label && (
+        <Label htmlFor={props.name}>
+          {props.label} {props.isRequired && <span className="text-primary">*</span>}
+        </Label>
+      )}
+      <RichTextEditor
+        label={props.label}
+        errorMessage={error?.message}
+        isRequired={props.isRequired}
+        isDisabled={props.disabled}
+        description={props.description}
+        onChange={(content) => {
+          props.onChange?.(content)
+        }}
+        editorProviderProps={{
+          ...editorProviderProps,
+          onUpdate(updateCb) {
+            startTransition(() => {
+              field.onChange(updateCb.editor.getJSON())
+            })
+            editorProviderProps.onUpdate?.(updateCb)
+          },
+          content: field.value,
+        }}
+      />
+    </div>
   )
 }
 
@@ -511,7 +563,7 @@ export function AutoField(props: AutoFieldProps) {
         <AutoFormField
           key={commonProps.name}
           name={commonProps.name}
-          component={<AutoTextField {...commonProps} isDisabled={disabled} />}
+          component={<AutoTextField {...commonProps} disabled={disabled} />}
         />
       )
     case 'password':
@@ -762,26 +814,15 @@ export function AutoOneRelationshipField(props: AutoRelationshipFieldProps) {
   switch (fieldShape.type) {
     case 'connect':
       return (
-        <div className="rounded-md border border-border bg-surface-tertiary">
-          {fieldShape.label && (
-            <>
-              <Typography
-                type="caption"
-                weight="normal"
-                className="px-6 py-2 text-text-brand bg-surface-brand-soft-1 w-full"
-              >
-                {fieldShape.label}
-              </Typography>
-              <Separator className="border-border-brand" />
-            </>
-          )}
-          <div className="p-6">{connectComponent(`${props.name}.connect`, fieldShape.options)}</div>
+        <div className="flex flex-col gap-y-4">
+          {fieldShape.label && <Label className=" text-primary ">{fieldShape.label}</Label>}
+          {connectComponent(`${props.name}.connect`, fieldShape.options)}
         </div>
       )
     case 'create':
       return (
-        <div className="">
-          <div>{fieldShape.label}</div>
+        <div className="flex flex-col gap-y-4">
+          {fieldShape.label && <Label className="text-primary">{fieldShape.label}</Label>}
           {createComponent}
         </div>
       )
@@ -880,20 +921,20 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                   </div>
                   {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
                   <div className="flex justify-end">
-                    <Button
+                    <AriaButton
                       type="button"
                       variant="primary"
                       size="sm"
                       onClick={() => fieldArray.remove(index)}
                     >
                       Remove
-                    </Button>
+                    </AriaButton>
                   </div>
                 </div>
               ))}
             </div>
           )}
-          <Button
+          <AriaButton
             type="button"
             variant="primary"
             size="sm"
@@ -901,7 +942,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             className="justify-self-start"
           >
             Add
-          </Button>
+          </AriaButton>
         </div>
       )
     case 'create':
@@ -914,20 +955,17 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
                   key={fieldValue.id}
                   className="p-6 bg-surface-tertiary rounded-sm flex flex-col gap-y-4"
                 >
-                  <Typography type="caption" weight="normal">
-                    {fieldShape.label} #{index + 1}{' '}
-                    {fieldShape.required && <span className="ml-1 text-text-brand">*</span>}
-                  </Typography>
-                  <div className="flex flex-col">
+                  <Label htmlFor={props.name} className="text-primary">
+                    <span>
+                      {fieldShape.label} #{index + 1}
+                    </span>
+                    {fieldShape.required && <span className="text-primary">*</span>}
+                  </Label>
+                  <div className="flex flex-col gap-y-4">
                     {createComponent(`${props.name}.${index}.create`)}
                   </div>
                   <div className="flex justify-end">
-                    <Button
-                      type="button"
-                      variant="primary"
-                      size="sm"
-                      onClick={() => fieldArray.remove(index)}
-                    >
+                    <Button type="button" size="sm" onClick={() => fieldArray.remove(index)}>
                       Remove
                     </Button>
                   </div>
@@ -935,18 +973,16 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
               ))}
             </div>
           ) : (
-            <div>
-              <Typography type="body" weight="bold">
-                {fieldShape.label}
-              </Typography>
-              {fieldShape.required && <span className="ml-1 text-text-brand">*</span>}
-            </div>
+            <Label htmlFor={props.name}>
+              <span>{fieldShape.label}</span>
+              {fieldShape.required && <span className="text-primary">*</span>}
+            </Label>
           )}
           <Button
             type="button"
             variant="outline"
             size="sm"
-            isDisabled={disabled}
+            disabled={disabled}
             onClick={() => fieldArray.append({})}
             className="justify-self-start"
           >
@@ -960,24 +996,21 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
         <div className="rounded-md border border-input shadow-sm p-6">
           {fieldArray.fields.map((fieldValue, index) => (
             <div key={fieldValue.id} className="p-6 bg-muted rounded-lg flex flex-col gap-y-4">
-              <div>
+              <Label htmlFor={props.name} className="text-primary">
                 {fieldShape.label} #{index + 1}
+              </Label>
+              <div className="flex flex-col gap-y-4">
+                {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
+                {createComponent(`${props.name}.${index}.create`)}
               </div>
-              {connectComponent(`${props.name}.${index}.connect`, fieldShape.options)}
-              {createComponent(`${props.name}.${index}.create`)}
               <div className="flex justify-end">
-                <Button
-                  type="button"
-                  variant="primary"
-                  size="sm"
-                  onClick={() => fieldArray.remove(index)}
-                >
+                <Button type="button" size="sm" onClick={() => fieldArray.remove(index)}>
                   Remove
                 </Button>
               </div>
             </div>
           ))}
-          <Button
+          <AriaButton
             type="button"
             variant="primary"
             size="sm"
@@ -985,7 +1018,7 @@ export function AutoManyRelationshipField(props: AutoManyRelationshipFieldProps)
             onClick={() => fieldArray.append({})}
           >
             Add
-          </Button>
+          </AriaButton>
         </div>
       )
   }

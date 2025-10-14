@@ -281,7 +281,7 @@
   --color-surface-button-destruction-hover: var(--color-red-700);
   --color-surface-button-destruction-disabled: var(--color-bluegray-50);
 
-  /* Intent UI | semantics */
+  /* Intent UI | semantics (Deprecated soon) */
   --color-bg: var(--color-base-white);
   --color-fg: var(--color-base-black);
 
@@ -345,117 +345,77 @@
   --color-chart-3: var(--color-pumpkin-300);
   --color-chart-4: var(--color-pumpkin-200);
   --color-chart-5: var(--color-pumpkin-100);
+
+  /* Shadcn | semantics (wired to Intentui variables) */
+  --color-radius: 0.65rem;
+  --color-background: var(--color-bg);
+  --color-foreground: var(--color-fg);
+  --color-card: var(--color-overlay);
+  --color-card-foreground: var(--color-overlay-fg);
+  --color-popover: var(--color-overlay);
+  --color-popover-foreground: var(--color-overlay-fg);
+  /* --color-primary: var(--color-primary); // tempory disable by duplicated variable. */
+  --color-primary-foreground: var(--color-primary-fg);
+  /* --color-secondary: var(--color-secondary); */
+  --color-secondary-foreground: var(--color-secondary-fg);
+  /* --color-muted: var(--color-muted); */
+  --color-muted-foreground: var(--color-muted-fg);
+  /* --color-accent: var(--color-accent);*/
+  --color-accent-foreground: var(--color-accent-fg);
+  --color-destructive: var(--color-danger);
+  /* --color-border: var(--color-border);  */
+  /* --color-input: var(--color-input);  */
+  /* --color-ring: var(--color-ring);  */
+  /* --color-chart-1: var(--color-chart-1);  */
+  /* --color-chart-2: var(--color-chart-2);  */
+  /* --color-chart-3: var(--color-chart-3);  */
+  /* --color-chart-4: var(--color-chart-4);  */
+  /* --color-chart-5: var(--color-chart-5);  */
+  /* --color-sidebar: var(--color-sidebar);  */
+  --color-sidebar-foreground: var(--color-sidebar-fg);
+  /* --color-sidebar-primary: var(--color-sidebar-primary);  */
+  --color-sidebar-primary-foreground: var(--color-sidebar-primary-fg);
+  /* --color-sidebar-accent: var(--color-sidebar-accent);  */
+  --color-sidebar-accent-foreground: var(--color-sidebar-accent-fg);
+  /* --color-sidebar-border: var(--color-sidebar-border);  */
+  /* --color-sidebar-ring: var(--color-sidebar-ring);  */
 }
 
-@layer base {
-  /* .dark {
-    --color-text-correct: var(--color-palm-600);
-    --color-text-incorrect: var(--color-valencia-600);
-    --color-text-brand: var(--color-pumpkin-500);
-
-    --color-text-nontrivial: var(--color-bluegray-50);
-    --color-text-primary: var(--color-bluegray-200);
-    --color-text-secondary: var(--color-bluegray-400);
-    --color-text-text-inverse: var(--color-bluegray-600);
-  } */
-
-  /* IntentUI | Theme for used by @theme */
-  /**
-  User need to redefine these variables
-  */
-  /* :root {
-    --bg: var(--color-white);
-    --fg: var(--color-bluegray-900);
-
-    --primary: var(--color-pumpkin-500);
-    --primary-fg: var(--color-pumpkin-50);
-    --primary-emphasis: var(--color-pumpkin-400);
-
-    --secondary: var(--color-bluegray-200);
-    --secondary-fg: var(--color-bluegray-600);
-
-    --overlay: var(--color-white);
-    --overlay-fg: var(--color-bluegray-900);
-
-    --accent: var(--color-pumpkin-500);
-    --accent-fg: var(--color-bluegray-50);
-
-    --muted: var(--color-bluegray-100);
-    --muted-fg: var(--color-bluegray-600);
-
-    --success: var(--color-palm-600);
-    --success-fg: var(--color-base-white);
-
-    --warning: oklch(0.828 0.189 84.429);
-    --warning-fg: oklch(0.279 0.077 45.635);
-
-    --danger: var(--color-valencia-600);
-    --danger-fg: var(--color-valencia-50);
-
-    --border: var(--color-bluegray-300);
-    --input: var(--color-bluegray-300);
-    --ring: var(--color-pumpkin-500);
-
-    --icon-tertiary: var(--color-bluegray-400);
-
-    --navbar: var(--color-bluegray-100);
-    --navbar-fg: var(--color-bluegray-500);
-
-    --sidebar: var(--color-bluegray-50);
-    --sidebar-fg: var(--color-bluegray-600);
-
-    --chart-1: var(--color-pumpkin-500);
-    --chart-2: oklch(0.707 0.165 254.624);
-    --chart-3: oklch(0.809 0.105 251.813);
-    --chart-4: oklch(0.882 0.059 254.128);
-    --chart-5: oklch(0.932 0.032 255.585);
-  } */
-
-  /* .dark {
-    --bg: var(--color-bluegray-800);
-    --fg: var(--color-bluegray-50);
-
-    --primary: var(--color-pumpkin-500);
-    --primary-fg: var(--color-white);
-    --primary-emphasis: var(--color-pumpkin-400);
-
-    --secondary: var(--color-bluegray-600);
-    --secondary-fg: var(--color-bluegray-200);
-
-    --accent: var(--color-pumpkin-500);
-    --accent-fg: var(--color-bluegray-50);
-
-    --muted: var(--color-bluegray-700);
-    --muted-fg: var(--color-bluegray-400);
-
-    --overlay: var(--color-bluegray-900);
-    --overlay-fg: var(--color-bluegray-50);
-
-    --success: var(--color-palm-600);
-    --success-fg: var(--color-white);
-
-    --warning: var(--color-amber-400);
-    --warning-fg: var(--color-amber-950);
-
-    --danger: var(--color-red-600);
-    --danger-fg: var(--color-red-50);
-
-    --border: var(--color-bluegray-700);
-    --input: var(--color-bluegray-700);
-    --ring: var(--color-pumpkin-500);
-
-    --navbar: var(--color-bluegray-500);
-    --navbar-fg: var(--color-bluegray-100);
-
-    --sidebar: var(--color-bluegray-900);
-    --sidebar-fg: var(--color-bluegray-100);
-
-    --chart-1: var(--color-blue-700);
-    --chart-2: var(--color-blue-500);
-    --chart-3: var(--color-blue-400);
-    --chart-4: var(--color-blue-300);
-    --chart-5: var(--color-blue-200);
-  } */
+:root {
+  .dark {
+    /* Dark mode mappings to Intentui color palette */
+    --color-background: var(--color-bluegray-900);
+    --color-foreground: var(--color-base-white);
+    --color-card: var(--color-bluegray-800);
+    --color-card-foreground: var(--color-base-white);
+    --color-popover: var(--color-bluegray-800);
+    --color-popover-foreground: var(--color-base-white);
+    --color-primary: var(--color-pumpkin-500);
+    --color-primary-foreground: var(--color-pumpkin-50);
+    --color-secondary: var(--color-bluegray-700);
+    --color-secondary-foreground: var(--color-base-white);
+    --color-muted: var(--color-bluegray-700);
+    --color-muted-foreground: var(--color-bluegray-300);
+    --color-accent: var(--color-bluegray-700);
+    --color-accent-foreground: var(--color-base-white);
+    --color-destructive: var(--color-red-500);
+    --color-border: var(--color-bluegray-700);
+    --color-input: var(--color-bluegray-600);
+    --color-ring: var(--color-pumpkin-500);
+    --color-chart-1: var(--color-ocean-500);
+    --color-chart-2: var(--color-palm-500);
+    --color-chart-3: var(--color-yellow-500);
+    --color-chart-4: var(--color-purple-500);
+    --color-chart-5: var(--color-valencia-500);
+    --color-sidebar: var(--color-bluegray-800);
+    --color-sidebar-foreground: var(--color-base-white);
+    --color-sidebar-primary: var(--color-pumpkin-500);
+    --color-sidebar-primary-foreground: var(--color-pumpkin-50);
+    --color-sidebar-accent: var(--color-bluegray-700);
+    --color-sidebar-accent-foreground: var(--color-base-white);
+    --color-sidebar-border: var(--color-bluegray-700);
+    --color-sidebar-ring: var(--color-pumpkin-500);
+  }
 }
 
 @custom-variant dark (&:is(.dark *));

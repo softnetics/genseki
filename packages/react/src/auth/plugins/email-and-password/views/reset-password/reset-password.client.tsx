@@ -7,13 +7,13 @@ import { toast } from 'sonner'
 import { z } from 'zod'
 
 import {
+  AriaTextField,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
   SubmitButton,
-  TextField,
   Typography,
   useNavigation,
   useServerFunction,
@@ -103,7 +103,7 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <TextField
+                    <AriaTextField
                       {...field}
                       type="password"
                       placeholder="password..."
@@ -122,7 +122,7 @@ export function ResetPasswordClientForm({ token }: ResetPasswordClientFormProps)
               render={({ field }) => (
                 <FormItem>
                   <FormControl>
-                    <TextField
+                    <AriaTextField
                       {...field}
                       type="password"
                       placeholder="confirmPassword..."

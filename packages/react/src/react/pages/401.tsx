@@ -24,7 +24,7 @@ export const NotAuthorizedPage = ({
       <Typography
         style={{
           backgroundImage:
-            'radial-gradient(circle, var(--color-accent) 2px,var(--color-accent) 2px,transparent 2px)',
+            'radial-gradient(circle, var(--color-brand) 2px,var(--color-brand) 2px,transparent 2px)',
           backgroundRepeat: 'repeat',
           backgroundSize: '4px 4px',
         }}

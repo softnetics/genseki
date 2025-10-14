@@ -16,9 +16,9 @@ import { CaretDownIcon } from '@phosphor-icons/react'
 import { twMerge } from 'tailwind-merge'
 
 import { DropdownItem, DropdownLabel, DropdownSection } from './dropdown'
-import { Description, FieldGroup, type FieldProps, Input, Label } from './field'
+import { AriaDescription, AriaFieldGroup, type AriaFieldProps, AriaInput, AriaLabel } from './field'
 import { ListBox } from './list-box'
-import { PopoverContent } from './popover'
+import { AriaPopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 import { type RestrictedIntent, Tag, TagGroup, type TagGroupProps, TagList } from './tag-group'
 
@@ -30,7 +30,7 @@ interface MultipleSelectProps<T>
       ComboBoxProps<T & { selectedKeys: Selection }>,
       'isRequired' | 'validate' | 'validationBehavior'
     >,
-    FieldProps,
+    AriaFieldProps,
     Pick<TagGroupProps, 'shape'>,
     Pick<GroupProps, 'isDisabled' | 'isInvalid'> {
   className?: string
@@ -128,11 +128,11 @@ const MultipleSelect = <T extends object>({
       {({ isInvalid, isDisabled }) => (
         <>
           {props.label && (
-            <Label onClick={() => inputRef.current?.focus()}>
+            <AriaLabel onClick={() => inputRef.current?.focus()}>
               {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-            </Label>
+            </AriaLabel>
           )}
-          <FieldGroup
+          <AriaFieldGroup
             ref={triggerRef as RefObject<HTMLDivElement>}
             isDisabled={isDisabled}
             isInvalid={isInvalid}
@@ -176,7 +176,7 @@ const MultipleSelect = <T extends object>({
               onInputChange={isMax ? () => {} : setInputValue}
             >
               <div className="flex w-full flex-row items-center justify-between">
-                <Input
+                <AriaInput
                   onFocus={() => triggerButtonRef.current?.click()}
                   ref={inputRef as RefObject<HTMLInputElement>}
                   className="flex-1 p-6 shadow-none ring-0"
@@ -197,7 +197,7 @@ const MultipleSelect = <T extends object>({
                   />
                 </Button>
               </div>
-              <PopoverContent
+              <AriaPopoverContent
                 showArrow={false}
                 respectScreen={false}
                 triggerRef={triggerRef}
@@ -213,7 +213,7 @@ const MultipleSelect = <T extends object>({
                     renderEmptyState ? (
                       renderEmptyState(inputValue)
                     ) : (
-                      <Description className="block p-3">
+                      <AriaDescription className="block p-3">
                         {inputValue ? (
                           <>
                             No results found for:{' '}
@@ -222,7 +222,7 @@ const MultipleSelect = <T extends object>({
                         ) : (
                           'No options'
                         )}
-                      </Description>
+                      </AriaDescription>
                     )
                   }
                   items={(availableItemsToSelect as T[]) ?? props.items}
@@ -238,12 +238,14 @@ const MultipleSelect = <T extends object>({
                     </MultipleSelectItem>
                   )) ?? children}
                 </ListBox>
-              </PopoverContent>
+              </AriaPopoverContent>
             </ComboBox>
-          </FieldGroup>
-          {props.description && <Description>{props.description}</Description>}
+          </AriaFieldGroup>
+          {props.description && <AriaDescription>{props.description}</AriaDescription>}
           {props.errorMessage && isInvalid && (
-            <Description className="text-danger text-sm/5">{props.errorMessage}</Description>
+            <AriaDescription className="text-danger text-sm/5">
+              {props.errorMessage}
+            </AriaDescription>
           )}
         </>
       )}

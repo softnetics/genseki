@@ -12,10 +12,10 @@ import {
 
 import { twMerge } from 'tailwind-merge'
 
-import { Description, FieldError, type FieldProps, Label } from './field'
+import { AriaDescription, AriaFieldError, type AriaFieldProps, AriaLabel } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
-interface RadioGroupProps extends RadioGroupPrimitiveProps, Omit<FieldProps, 'placeholder'> {}
+interface RadioGroupProps extends RadioGroupPrimitiveProps, Omit<AriaFieldProps, 'placeholder'> {}
 
 const RadioGroup = ({
   className,
@@ -35,17 +35,17 @@ const RadioGroup = ({
     >
       {(values) => (
         <>
-          {label && <Label>{label}</Label>}
-          {description && <Description>{description}</Description>}
+          {label && <AriaLabel>{label}</AriaLabel>}
+          {description && <AriaDescription>{description}</AriaDescription>}
           {typeof children === 'function' ? children(values) : children}
-          <FieldError>{errorMessage}</FieldError>
+          <AriaFieldError>{errorMessage}</AriaFieldError>
         </>
       )}
     </RadioGroupPrimitive>
   )
 }
 
-interface RadioProps extends RadioPrimitiveProps, Pick<FieldProps, 'label' | 'description'> {
+interface RadioProps extends RadioPrimitiveProps, Pick<AriaFieldProps, 'label' | 'description'> {
   size?: 'sm' | 'md'
 }
 
@@ -72,14 +72,14 @@ const Radio = ({ className, children, description, label, size = 'md', ...props 
 
           const content = hasCustomChildren ? (
             isStringChild ? (
-              <Label>{children}</Label>
+              <AriaLabel>{children}</AriaLabel>
             ) : (
               children
             )
           ) : (
             <>
-              {label && <Label>{label}</Label>}
-              {description && <Description>{description}</Description>}
+              {label && <AriaLabel>{label}</AriaLabel>}
+              {description && <AriaDescription>{description}</AriaDescription>}
             </>
           )
 

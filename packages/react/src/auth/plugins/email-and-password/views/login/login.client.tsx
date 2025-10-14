@@ -16,7 +16,7 @@ import {
   FormMessage,
 } from '../../../../../react/components/primitives/form'
 import { Link } from '../../../../../react/components/primitives/link'
-import { TextField } from '../../../../../react/components/primitives/text-field'
+import { AriaTextField } from '../../../../../react/components/primitives/text-field'
 import { useNavigation } from '../../../../../react/providers/navigation'
 import { useServerFunction } from '../../../../../react/providers/root'
 
@@ -92,7 +92,7 @@ export function LoginClientForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <TextField
+                  <AriaTextField
                     {...field}
                     name="email"
                     type="email"
@@ -111,7 +111,7 @@ export function LoginClientForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <TextField
+                  <AriaTextField
                     {...field}
                     name="password"
                     type="password"

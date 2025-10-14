@@ -7,13 +7,13 @@ import { useRouter } from 'next/navigation'
 import z from 'zod'
 
 import {
+  AriaTextField,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
   SubmitButton,
-  TextField,
   toast,
 } from '@genseki/react'
 
@@ -74,7 +74,7 @@ export function SetupClientForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField
+                <AriaTextField
                   {...field}
                   placeholder="full name..."
                   label="Full Name"
@@ -91,7 +91,7 @@ export function SetupClientForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField
+                <AriaTextField
                   {...field}
                   type="email"
                   placeholder="email..."
@@ -109,7 +109,7 @@ export function SetupClientForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField
+                <AriaTextField
                   {...field}
                   type="password"
                   placeholder="password..."
@@ -128,7 +128,7 @@ export function SetupClientForm() {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <TextField
+                <AriaTextField
                   {...field}
                   type="password"
                   placeholder="confirm password..."

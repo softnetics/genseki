@@ -12,24 +12,30 @@ import {
 import { tv, type VariantProps } from 'tailwind-variants'
 
 import {
-  Dialog,
-  DialogBody,
-  DialogClose,
-  DialogCloseIcon,
-  DialogDescription,
-  type DialogDescriptionProps,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-  type DialogTitleProps,
-  DialogTrigger,
+  AriaDialog,
+  AriaDialogBody,
+  AriaDialogClose,
+  AriaDialogCloseIcon,
+  AriaDialogDescription,
+  type AriaDialogDescriptionProps,
+  AriaDialogFooter,
+  AriaDialogHeader,
+  AriaDialogTitle,
+  type AriaDialogTitleProps,
+  AriaDialogTrigger,
 } from './dialog'
 
-const Modal = (props: DialogTriggerProps) => {
+/**
+ * @deprecated
+ */
+const AriaModal = (props: DialogTriggerProps) => {
   return <DialogTriggerPrimitive {...props} />
 }
 
-const modalOverlayStyles = tv({
+/**
+ * @deprecated
+ */
+const ariaModalOverlayStyles = tv({
   base: [
     'fixed top-0 left-0 isolate z-50 h-(--visual-viewport-height) w-full',
     'flex items-end justify-end bg-fg/15 text-center sm:block dark:bg-bg/40',
@@ -47,7 +53,11 @@ const modalOverlayStyles = tv({
     },
   },
 })
-const modalContentStyles = tv({
+
+/**
+ * @deprecated
+ */
+const ariaModalContentStyles = tv({
   base: [
     'max-h-full w-full rounded-t-2xl bg-white text-left align-middle text-overlay-fg shadow-lg ring-1 ring-fg/5 border border-bluegray-300',
     'overflow-hidden sm:rounded-2xl dark:ring-border',
@@ -82,10 +92,13 @@ const modalContentStyles = tv({
   },
 })
 
-interface ModalContentProps
+/**
+ * @deprecated
+ */
+interface AriaModalContentProps
   extends Omit<ModalOverlayProps, 'className' | 'children'>,
     Pick<DialogProps, 'aria-label' | 'aria-labelledby' | 'role' | 'children'>,
-    VariantProps<typeof modalContentStyles> {
+    VariantProps<typeof ariaModalContentStyles> {
   closeButton?: boolean
   isBlurred?: boolean
   classNames?: {
@@ -94,7 +107,10 @@ interface ModalContentProps
   }
 }
 
-const ModalContent = ({
+/**
+ * @deprecated
+ */
+const AriaModalContent = ({
   classNames,
   isDismissable: isDismissableInternal,
   isBlurred = false,
@@ -103,7 +119,7 @@ const ModalContent = ({
   role = 'dialog',
   closeButton = true,
   ...props
-}: ModalContentProps) => {
+}: AriaModalContentProps) => {
   const isDismissable = isDismissableInternal ?? role !== 'alertdialog'
   const modalPrimiveiRef = useRef<HTMLDivElement>(null)
   const [shakeFlag, setShakeFlag] = useState(false)
@@ -140,7 +156,7 @@ const ModalContent = ({
         data-overlay
         isDismissable={isDismissable}
         className={composeRenderProps(classNames?.overlay, (className, renderProps) =>
-          modalOverlayStyles({
+          ariaModalOverlayStyles({
             ...renderProps,
             isBlurred,
             className,
@@ -152,7 +168,7 @@ const ModalContent = ({
           ref={modalPrimiveiRef}
           isDismissable={isDismissable}
           className={composeRenderProps(classNames?.content, (className, renderProps) =>
-            modalContentStyles({
+            ariaModalContentStyles({
               ...renderProps,
               size,
               className,
@@ -160,42 +176,48 @@ const ModalContent = ({
           )}
           {...props}
         >
-          <Dialog role={role}>
+          <AriaDialog role={role}>
             {(values) => (
               <>
                 {typeof children === 'function' ? children(values) : children}
                 {closeButton && (
-                  <DialogCloseIcon size="md" variant="ghost" isDismissable={isDismissable} />
+                  <AriaDialogCloseIcon size="md" variant="ghost" isDismissable={isDismissable} />
                 )}
               </>
             )}
-          </Dialog>
+          </AriaDialog>
         </ModalPrimitive>
       </ModalOverlay>
     </div>
   )
 }
 
-const ModalTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(
+/**
+ * @deprecated
+ */
+const AriaModalTitle = forwardRef<HTMLHeadingElement, AriaDialogTitleProps>(
   function ModalTitle(props, ref) {
-    return <DialogTitle ref={ref} className="text-bluegray-800" {...props} />
+    return <AriaDialogTitle ref={ref} className="text-bluegray-800" {...props} />
   }
 )
 
-const ModalDescription = forwardRef<HTMLDivElement, DialogDescriptionProps>(
+/**
+ * @deprecated
+ */
+const AriaModalDescription = forwardRef<HTMLDivElement, AriaDialogDescriptionProps>(
   function ModalDescription(props, ref) {
-    return <DialogDescription ref={ref} className="text-text-secondary" {...props} />
+    return <AriaDialogDescription ref={ref} className="text-text-secondary" {...props} />
   }
 )
 
 export {
-  Modal,
-  DialogBody as ModalBody,
-  DialogClose as ModalClose,
-  ModalContent,
-  ModalDescription,
-  DialogFooter as ModalFooter,
-  DialogHeader as ModalHeader,
-  ModalTitle,
-  DialogTrigger as ModalTrigger,
+  AriaModal,
+  AriaDialogBody as AriaModalBody,
+  AriaDialogClose as AriaModalClose,
+  AriaModalContent,
+  AriaModalDescription,
+  AriaDialogFooter as AriaModalFooter,
+  AriaDialogHeader as AriaModalHeader,
+  AriaModalTitle,
+  AriaDialogTrigger as AriaModalTrigger,
 }

@@ -16,17 +16,17 @@ import { mimeTypeValidate } from '../../../core/utils'
 import { useStorageAdapter } from '../../providers/root'
 import { isImageKey } from '../../utils/is-image-key'
 import {
+  AriaButton,
+  AriaDescription,
+  AriaLabel,
+  AriaModal,
+  AriaModalClose,
+  AriaModalContent,
+  AriaModalDescription,
+  AriaModalFooter,
+  AriaModalHeader,
+  AriaModalTitle,
   BaseIcon,
-  Button,
-  Description,
-  Label,
-  Modal,
-  ModalClose,
-  ModalContent,
-  ModalDescription,
-  ModalFooter,
-  ModalHeader,
-  ModalTitle,
   ProgressBar,
   Typography,
 } from '../primitives'
@@ -417,9 +417,9 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   return (
     <div className="group flex flex-col gap-y-4">
       {props.label && (
-        <Label htmlFor={props.name}>
+        <AriaLabel htmlFor={props.name}>
           {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </Label>
+        </AriaLabel>
       )}
       {fileKey ? (
         <FileDisplayer
@@ -441,7 +441,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
                 className="border border-bluegray-400 bg-white rounded-lg"
               >
                 <div className="flex flex-col items-center gap-6">
-                  <Button
+                  <AriaButton
                     leadingIcon={<BaseIcon icon={PaperclipIcon} size="md" />}
                     variant="outline"
                     size="sm"
@@ -451,7 +451,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
                     }}
                   >
                     Upload a file
-                  </Button>
+                  </AriaButton>
                   <div className="flex flex-col items-center gap-y-4 mt-4">
                     <Typography type="body" weight="medium" className="text-muted-fg text-center">
                       {props.placeholder || (
@@ -492,7 +492,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
           )}
         </div>
       )}
-      {props.description && <Description>{props.description}</Description>}
+      {props.description && <AriaDescription>{props.description}</AriaDescription>}
       <CustomFieldError errorMessage={props.errorMessage} />
     </div>
   )
@@ -571,32 +571,32 @@ const FileDisplayer = (props: {
           )}
 
           <div className="flex gap-6 items-center">
-            <Modal>
-              <Button variant="destruction" size="xs" isDisabled={isDeleting}>
+            <AriaModal>
+              <AriaButton variant="destruction" size="xs" isDisabled={isDeleting}>
                 {isDeleting ? 'Deleting...' : 'Remove'}
-              </Button>
-              <ModalContent isBlurred role="alertdialog">
-                <ModalHeader className="">
-                  <ModalTitle level={3}>Delete file</ModalTitle>
-                  <ModalDescription>
+              </AriaButton>
+              <AriaModalContent isBlurred role="alertdialog">
+                <AriaModalHeader className="">
+                  <AriaModalTitle level={3}>Delete file</AriaModalTitle>
+                  <AriaModalDescription>
                     This will permanently delete the selected file
-                  </ModalDescription>
-                </ModalHeader>
-                <ModalFooter className="flex justify-between">
-                  <ModalClose variant="outline" size="sm">
+                  </AriaModalDescription>
+                </AriaModalHeader>
+                <AriaModalFooter className="flex justify-between">
+                  <AriaModalClose variant="outline" size="sm">
                     Cancel
-                  </ModalClose>
-                  <ModalClose
+                  </AriaModalClose>
+                  <AriaModalClose
                     variant="destruction"
                     size="sm"
                     onClick={() => props.onRemove(props.fileKey)}
                     isDisabled={isDeleting}
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
-                  </ModalClose>
-                </ModalFooter>
-              </ModalContent>
-            </Modal>
+                  </AriaModalClose>
+                </AriaModalFooter>
+              </AriaModalContent>
+            </AriaModal>
           </div>
         </div>
       </div>

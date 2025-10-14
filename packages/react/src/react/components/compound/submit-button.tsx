@@ -14,7 +14,7 @@ export function SubmitButton(props: SubmitButtonProps) {
   const pending = _pending || props.pending
 
   return (
-    <Button size="md" variant="primary" type="submit" className="w-full" isDisabled={pending}>
+    <Button type="submit" className="w-full" disabled={pending}>
       {pending ? 'Submitting...' : <>{props.children}</>}
     </Button>
   )

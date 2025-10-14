@@ -4,21 +4,33 @@ import { TextArea, TextField, type TextFieldProps } from 'react-aria-components'
 
 import { twJoin } from 'tailwind-merge'
 
-import { Description, FieldError, type FieldProps, Label } from './field'
+import { AriaDescription, AriaFieldError, type AriaFieldProps, AriaLabel } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
-interface TextareaProps extends Omit<TextFieldProps, 'className'>, FieldProps {
+/**
+ *
+ * React Aria component
+ *
+ */
+
+/**
+ * @deprecated
+ */
+interface AriaTextareaProps extends Omit<TextFieldProps, 'className'>, AriaFieldProps {
   className?: string | ((v: TextFieldProps) => string)
 }
 
-const Textarea = ({
+/**
+ * @deprecated
+ */
+const AriaTextarea = ({
   className,
   placeholder,
   label,
   description,
   errorMessage,
   ...props
-}: TextareaProps) => {
+}: AriaTextareaProps) => {
   return (
     <TextField
       {...props}
@@ -28,9 +40,9 @@ const Textarea = ({
       )}
     >
       {label && (
-        <Label>
+        <AriaLabel>
           {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </Label>
+        </AriaLabel>
       )}
       <TextArea
         placeholder={placeholder}
@@ -46,11 +58,11 @@ const Textarea = ({
           ])
         )}
       />
-      {description && <Description>{description}</Description>}
-      <FieldError>{errorMessage}</FieldError>
+      {description && <AriaDescription>{description}</AriaDescription>}
+      <AriaFieldError>{errorMessage}</AriaFieldError>
     </TextField>
   )
 }
 
-export type { TextareaProps }
-export { Textarea }
+export type { AriaTextareaProps }
+export { AriaTextarea }

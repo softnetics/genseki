@@ -3,7 +3,7 @@ import { ImageIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
 import { BaseIcon } from '../../../primitives/base-icon'
-import { Button } from '../../../primitives/button'
+import { AriaButton } from '../../../primitives/button'
 
 export const UploadImageButton = () => {
   const { editor } = useCurrentEditor()
@@ -11,7 +11,7 @@ export const UploadImageButton = () => {
   if (!editor) throw new Error('Editor provider is missing')
 
   return (
-    <Button
+    <AriaButton
       size="sm"
       variant="ghost"
       className="self-center p-6"
@@ -20,6 +20,6 @@ export const UploadImageButton = () => {
       }}
     >
       <BaseIcon icon={ImageIcon} size="sm" weight="regular" />
-    </Button>
+    </AriaButton>
   )
 }
