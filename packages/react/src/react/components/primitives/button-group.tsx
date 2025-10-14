@@ -9,7 +9,6 @@ import {
   type ToggleButtonProps,
 } from 'react-aria-components'
 
-import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
@@ -201,15 +200,17 @@ function ButtonGroup({
 
 function ButtonGroupText({
   className,
-  asChild = false,
+  // asChild = false,
   ...props
 }: React.ComponentProps<'div'> & {
-  asChild?: boolean
+  // asChild?: boolean
 }) {
-  const Comp = asChild ? Slot : 'div'
+  // const Comp = asChild ? Slot : 'div'
+
+  // TODO: fix here, No idea why using asChild here make `compilation error`
 
   return (
-    <Comp
+    <div
       className={cn(
         "bg-muted flex items-center gap-4 rounded-md border px-8 text-sm font-medium shadow-xs [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-8",
         className
