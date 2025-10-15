@@ -1,5 +1,52 @@
 # @example/erp
 
+## 0.1.0-alpha.56
+
+### Patch Changes
+
+- [#234](https://github.com/softnetics/genseki/pull/234) [`0f10dbb`](https://github.com/softnetics/genseki/commit/0f10dbb2b46fbc48c68f65fdd1348025148121aa) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - - Migrate from `tv` to `cva`
+
+  - Introducing `create-required-context`
+  - Incremental adopting Intent UI color system to Shadcn color system from
+  - Rename and deprecated react aria
+    - `textfield`
+    - `label`
+    - `button`
+    - `popover` _(with children composible components too)_
+    - `dialog` _(with children composible components too)_
+    - `modal` _(with children composible components too)_
+    - `sheet` _(with children composible components too)_
+    - `base-icon`
+    - `combobox` _(with children composible components too)_
+    - `field-group`
+  - Migrate `textfield` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Migrate `button` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Create `Shadcn` UI playground for Shadcn particularly
+  - Change UI playground project structure
+  - Introducing to new components by Shadcn
+    - Input
+    - Input group
+    - Button
+    - Label
+    - Dialog
+    - Menu
+    - Popover
+    - Combobox composition
+    - Command **(from cmdk)**
+
+- [#236](https://github.com/softnetics/genseki/pull/236) [`f88f0f2`](https://github.com/softnetics/genseki/commit/f88f0f23d7e58436707021d66b886288bfa019d8) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - - Deprecated `link` component
+  - Remove button `link` variant
+  - Add example for `link` usage
+  - Update button variants
+  - update design tokens
+- Updated dependencies [[`0f10dbb`](https://github.com/softnetics/genseki/commit/0f10dbb2b46fbc48c68f65fdd1348025148121aa), [`f88f0f2`](https://github.com/softnetics/genseki/commit/f88f0f23d7e58436707021d66b886288bfa019d8)]:
+  - @genseki/react@0.1.0-alpha.58
+  - @genseki/next@0.1.0-alpha.58
+  - @genseki/plugins@0.1.0-alpha.58
+  - @genseki/prisma-generator@0.1.0-alpha.58
+  - @genseki/react-query@0.1.0-alpha.58
+  - @genseki/rest@0.1.0-alpha.58
+
 ## 0.1.0-alpha.55
 
 ### Patch Changes
