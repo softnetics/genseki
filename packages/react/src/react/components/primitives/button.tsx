@@ -222,7 +222,6 @@ const buttonVariants = cva(
           ' bg-surface-button-ghost hover:bg-surface-button-ghost-hover active:bg-surface-button-ghost text-text-secondary hover:text-accent-foreground dark:hover:bg-accent/50',
         destructive:
           'bg-destructive text-white hover:bg-destructive/90 active:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
-        link: 'text-primary underline-offset-4 hover:underline hover:border-0',
       },
       size: {
         default: 'h-18 px-8 py-4 has-[>svg]:px-6',

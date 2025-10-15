@@ -37,7 +37,6 @@ function ButtonVariants() {
         <Button variant="outline">Outline</Button>
         <Button variant="ghost">Ghost</Button>
         <Button variant="destructive">Destructive</Button>
-        <Button variant="link">Link</Button>
       </div>
       <div className="flex flex-wrap gap-4">
         <Button disabled variant="primary">
@@ -60,9 +59,6 @@ function ButtonVariants() {
         </Button>
         <Button disabled variant="destructive">
           Destructive
-        </Button>
-        <Button disabled variant="link">
-          Link
         </Button>
       </div>
     </div>
