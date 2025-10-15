@@ -614,7 +614,10 @@ function ComboboxContent({
 >) {
   return (
     <Command loop className="w-fit">
-      <PopoverContent className={cn('w-(--radix-popover-trigger-width) p-0', className)} {...props}>
+      <PopoverContent
+        className={cn('w-(--radix-popover-trigger-width) bg-background p-0', className)}
+        {...props}
+      >
         {children}
       </PopoverContent>
     </Command>

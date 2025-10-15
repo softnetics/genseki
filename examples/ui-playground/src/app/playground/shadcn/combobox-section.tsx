@@ -256,7 +256,7 @@ function CustomTriggerComboboxSingle() {
     <ComboboxProvider items={frameworks}>
       <ComboboxTrigger>
         {(selectedItem) => (
-          <Button variant="secondary" className="w-[250px] justify-between">
+          <Button variant="outline" className="w-[250px] justify-between">
             {selectedItem ? (
               <span>🚀 {selectedItem.label}</span>
             ) : (
