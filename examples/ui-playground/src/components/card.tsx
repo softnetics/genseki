@@ -1,6 +1,5 @@
 import { StarIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { BaseIcon } from '@genseki/react'
 import { Typography } from '@genseki/react'
 
 type PlaygroundCardProps = React.PropsWithChildren<{
@@ -14,11 +13,11 @@ export const PlaygroundCard = ({
   children,
 }: PlaygroundCardProps) => {
   return (
-    <div className="border-border inline-flex min-w-[260px] flex-col rounded-lg border">
+    <div className="border-border inline-flex min-w-[260px] flex-col rounded-lg border bg-background">
       <div className="border-border flex w-full flex-col gap-y-4 border-b px-4 py-6">
         <div className="flex items-center gap-x-2">
           <div className="rounded-md bg-blue-500 p-2">
-            <BaseIcon icon={StarIcon} size="sm" weight="duotone" className="text-text-inverse" />
+            <StarIcon className="text-text-inverse" />
           </div>
           <Typography type="caption" weight="medium" className="text-blue-500">
             {categoryTitle}
