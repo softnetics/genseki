@@ -9,6 +9,7 @@ import {
   MagnifyingGlassIcon,
   SpinnerIcon,
   XCircleIcon,
+  XIcon,
 } from '@phosphor-icons/react'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
 import { tv } from 'tailwind-variants'
@@ -533,8 +534,20 @@ function ComboboxTriggerMultiValue(props: {
     return (
       <span className="flex flex-wrap flex-1 gap-2 pr-8">
         {selectedItems.map((selectedItem) => (
-          <Badge shape="square" intent="gray" key={selectedItem.value}>
+          <Badge
+            onClick={(e) => {
+              e.stopPropagation()
+              ctx.onValueChange((prevItems) =>
+                prevItems.filter((prevItem) => prevItem !== selectedItem.value)
+              )
+            }}
+            shape="square"
+            intent="gray"
+            key={selectedItem.value}
+            className="flex "
+          >
             {selectedItem.label}
+            <XIcon className="size-5 ml-1" />
           </Badge>
         ))}
       </span>

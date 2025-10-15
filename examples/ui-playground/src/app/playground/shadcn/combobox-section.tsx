@@ -292,7 +292,7 @@ export function ComboboxSection() {
     <div className="grid gap-8">
       <PlaygroundCard title="Basic Combobox (Multiple selection)" categoryTitle="Component">
         <Typography type="body" className="text-muted-foreground mb-4">
-          A simple combobox with default styling and behavior.
+          A simple combobox with default styling and mbehavior.
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
           <BasicComboboxMultiple />
