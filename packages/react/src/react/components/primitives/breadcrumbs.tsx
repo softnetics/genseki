@@ -6,7 +6,7 @@ import { Breadcrumb, Breadcrumbs as BreadcrumbsPrimitive } from 'react-aria-comp
 import { IconChevronLgRight } from '@intentui/icons'
 import { twMerge } from 'tailwind-merge'
 
-import { Link } from './link'
+import { AriaLink } from './link'
 import { composeTailwindRenderProps } from './primitive'
 
 interface BreadcrumbsContextProps {
@@ -54,7 +54,7 @@ const BreadcrumbsItem = ({
     >
       {({ isCurrent }) => (
         <>
-          <Link href={href} {...props} />
+          <AriaLink href={href} {...props} />
           {trailing}
           {!isCurrent && separator !== false && <Separator separator={separatorValue} />}
         </>

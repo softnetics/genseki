@@ -6,12 +6,19 @@ import { twJoin } from 'tailwind-merge'
 
 import { composeTailwindRenderProps } from './primitive'
 
-interface LinkProps extends LinkPrimitiveProps {
+/**
+ * @deprecated
+ */
+interface AriaLinkProps extends LinkPrimitiveProps {
   intent?: 'primary' | 'secondary' | 'unstyled'
   ref?: React.RefObject<HTMLAnchorElement>
 }
 
-const Link = ({ className, ref, intent = 'unstyled', ...props }: LinkProps) => {
+/**
+ * @deprecated
+ * Use anchor tag instead
+ */
+const AriaLink = ({ className, ref, intent = 'unstyled', ...props }: AriaLinkProps) => {
   return (
     <LinkPrimitive
       ref={ref}
@@ -34,5 +41,5 @@ const Link = ({ className, ref, intent = 'unstyled', ...props }: LinkProps) => {
   )
 }
 
-export type { LinkProps }
-export { Link }
+export type { AriaLinkProps }
+export { AriaLink }

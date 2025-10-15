@@ -2,7 +2,7 @@ import React from 'react'
 
 import { ArrowLeftIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { Link } from '../components'
+import { AriaLink } from '../components'
 import { BaseIcon } from '../components/primitives/base-icon'
 import { Typography } from '../components/primitives/typography'
 
@@ -45,10 +45,10 @@ export const NotfoundPage = ({
         {description}
       </Typography>
       <div className="bg-border mt-6 h-px w-full" />
-      <Link intent="primary" href={redirectURL} className="mt-12 flex items-end gap-x-2">
+      <AriaLink intent="primary" href={redirectURL} className="mt-12 flex items-end gap-x-2">
         <BaseIcon size="sm" icon={ArrowLeftIcon} className="text-text-brand" weight="bold" />
         {redirectSentence}
-      </Link>
+      </AriaLink>
     </div>
   )
 }

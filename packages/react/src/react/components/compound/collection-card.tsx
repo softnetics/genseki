@@ -2,7 +2,7 @@ import { CaretRightIcon, CubeIcon, FolderIcon } from '@phosphor-icons/react/dist
 
 import { Badge } from '../../icons/badge'
 import { BaseIcon } from '../primitives/base-icon'
-import { Link } from '../primitives/link'
+import { AriaLink } from '../primitives/link'
 import { Typography } from '../primitives/typography'
 
 interface CollectionCardProps {
@@ -51,7 +51,7 @@ export const CollectionCard = ({
           {description}
         </Typography>
       </div>
-      <Link
+      <AriaLink
         href={url}
         className="[&>*]:text-primary group flex w-full justify-end rounded-[calc(var(--spacing)*4)] p-5 text-end transition-all [background-image:linear-gradient(120deg,_--alpha(var(--color-primary)/5%)_35%,--alpha(var(--color-primary)/10%)_40%,--alpha(var(--color-primary)/0%)_80%,--alpha(var(--color-primary)/5%))] hover:[background-position:40px_0]"
       >
@@ -64,7 +64,7 @@ export const CollectionCard = ({
           weight="regular"
           className="transition-transform group-hover:translate-x-2"
         />
-      </Link>
+      </AriaLink>
     </div>
   )
 }
