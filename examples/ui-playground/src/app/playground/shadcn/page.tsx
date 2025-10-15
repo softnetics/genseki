@@ -1,7 +1,9 @@
 'use client'
 import * as React from 'react'
 
-import { Link, Typography } from '@genseki/react'
+import Link from 'next/link'
+
+import { Typography } from '@genseki/react'
 
 import { ButtonSection } from './button-section'
 import { ComboboxSection } from './combobox-section'
