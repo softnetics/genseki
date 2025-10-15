@@ -211,7 +211,7 @@ const buttonVariants = cva(
         primary:
           ' bg-surface-button-primary shadow-[inset_0px_-12px_12px_-6px_var(--color-surface-button-primary-hover)] text-text-inverse hover:bg-surface-button-primary-hover active:bg-surface-button-primary disabled:bg-surface-button-primary-disabled disabled:shadow-none disabled:text-text-disabled disabled:border disabled:border-border-button-primary-disabled',
         secondary:
-          ' bg-surface-button-secondary ring-offset-0 text-text-brand hover:bg-surface-button-secondary-hover active:bg-surface-button-secondary disabled:bg-surface-button-secondary-disabled disabled:shadow-none disabled:text-text-disabled',
+          ' bg-surface-button-secondary text-text-brand hover:bg-surface-button-secondary-hover active:bg-surface-button-secondary disabled:bg-surface-button-secondary-disabled disabled:shadow-none disabled:text-text-disabled',
         tertiary:
           ' bg-surface-button-tertiary border border-border-button-tertiary text-text-brand hover:bg-surface-button-tertiary-hover active:bg-surface-button-tertiary hover:border-border-button-tertiary-hover disabled:bg-surface-button-tertiary-disabled disabled:border-border-button-tertiary-disabled disabled:text-text-disabled',
         naked:
