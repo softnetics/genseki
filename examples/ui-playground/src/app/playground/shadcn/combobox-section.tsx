@@ -256,7 +256,7 @@ function CustomTriggerComboboxSingle() {
     <ComboboxProvider items={frameworks}>
       <ComboboxTrigger>
         {(selectedItem) => (
-          <Button variant="secondary" className="w-[250px] justify-between">
+          <Button variant="outline" className="w-[250px] justify-between">
             {selectedItem ? (
               <span>🚀 {selectedItem.label}</span>
             ) : (
@@ -292,7 +292,7 @@ export function ComboboxSection() {
     <div className="grid gap-8">
       <PlaygroundCard title="Basic Combobox (Multiple selection)" categoryTitle="Component">
         <Typography type="body" className="text-muted-foreground mb-4">
-          A simple combobox with default styling and behavior.
+          A simple combobox with default styling and mbehavior.
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
           <BasicComboboxMultiple />

@@ -28,13 +28,39 @@ import { PlaygroundCard } from '~/src/components/card'
 // Basic Button Variants
 function ButtonVariants() {
   return (
-    <div className="flex flex-wrap gap-4">
-      <Button variant="default">Default</Button>
-      <Button variant="secondary">Secondary</Button>
-      <Button variant="outline">Outline</Button>
-      <Button variant="destructive">Destructive</Button>
-      <Button variant="ghost">Ghost</Button>
-      <Button variant="link">Link</Button>
+    <div className="space-y-4">
+      <div className="flex flex-wrap gap-4">
+        <Button variant="primary">Primary</Button>
+        <Button variant="secondary">Secondary</Button>
+        <Button variant="tertiary">Tertiary</Button>
+        <Button variant="naked">Naked</Button>
+        <Button variant="outline">Outline</Button>
+        <Button variant="ghost">Ghost</Button>
+        <Button variant="destructive">Destructive</Button>
+      </div>
+      <div className="flex flex-wrap gap-4">
+        <Button disabled variant="primary">
+          Primary
+        </Button>
+        <Button disabled variant="secondary">
+          Secondary
+        </Button>
+        <Button disabled variant="tertiary">
+          Tertiary
+        </Button>
+        <Button disabled variant="naked">
+          Naked
+        </Button>
+        <Button disabled variant="outline">
+          Outline
+        </Button>
+        <Button disabled variant="ghost">
+          Ghost
+        </Button>
+        <Button disabled variant="destructive">
+          Destructive
+        </Button>
+      </div>
     </div>
   )
 }
@@ -137,7 +163,9 @@ function ButtonGroupBasic() {
   return (
     <ButtonGroup>
       <Button variant="outline">One</Button>
+      <ButtonGroupSeparator />
       <Button variant="outline">Two</Button>
+      <ButtonGroupSeparator />
       <Button variant="outline">Three</Button>
     </ButtonGroup>
   )
@@ -229,12 +257,10 @@ function ButtonGroupVariants() {
   return (
     <div className="space-y-4">
       <ButtonGroup>
-        <Button variant="default">Primary</Button>
+        <Button variant="primary">Primary</Button>
         <Button variant="secondary">Secondary</Button>
+        <Button variant="naked">Naked</Button>
         <Button variant="outline">Outline</Button>
-      </ButtonGroup>
-
-      <ButtonGroup>
         <Button variant="ghost">Ghost</Button>
         <Button variant="destructive">Destructive</Button>
       </ButtonGroup>

@@ -2,16 +2,24 @@
 
 import { Link as LinkPrimitive, type LinkProps as LinkPrimitiveProps } from 'react-aria-components'
 
+import { cva } from 'class-variance-authority'
 import { twJoin } from 'tailwind-merge'
 
 import { composeTailwindRenderProps } from './primitive'
 
-interface LinkProps extends LinkPrimitiveProps {
+/**
+ * @deprecated
+ */
+interface AriaLinkProps extends LinkPrimitiveProps {
   intent?: 'primary' | 'secondary' | 'unstyled'
   ref?: React.RefObject<HTMLAnchorElement>
 }
 
-const Link = ({ className, ref, intent = 'unstyled', ...props }: LinkProps) => {
+/**
+ * @deprecated
+ * Use anchor tag instead
+ */
+const AriaLink = ({ className, ref, intent = 'unstyled', ...props }: AriaLinkProps) => {
   return (
     <LinkPrimitive
       ref={ref}
@@ -34,5 +42,23 @@ const Link = ({ className, ref, intent = 'unstyled', ...props }: LinkProps) => {
   )
 }
 
-export type { LinkProps }
-export { Link }
+export type { AriaLinkProps }
+export { AriaLink }
+
+export const linkVariants = cva('text-sm font-medium text-primary', {
+  variants: {
+    variant: {
+      plain: null,
+      underline: 'underline-offset-4 hover:underline hover:border-0',
+    },
+    size: {
+      sm: 'text-sm',
+      md: 'text-base',
+      lg: 'text-lg',
+    },
+  },
+  defaultVariants: {
+    variant: 'underline',
+    size: 'sm',
+  },
+})

@@ -246,7 +246,7 @@ function InputGroupWithButtons() {
           <Input placeholder="Enter your message" />
         </InputGroupControl>
         <InputGroupAddon align="inline-end">
-          <InputGroupButton size="xs" variant="default">
+          <InputGroupButton size="xs" variant="primary">
             <PaperPlaneRightIcon />
             Send
           </InputGroupButton>

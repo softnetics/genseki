@@ -27,6 +27,7 @@ import {
   AriaButton,
   AriaButtonGroup,
   AriaButtonGroupItem,
+  AriaLink,
   AriaModal,
   AriaModalBody,
   AriaModalClose,
@@ -50,7 +51,6 @@ import {
   Breadcrumbs,
   BreadcrumbsItem,
   Card,
-  Link,
   PageSizeSelect,
   Pagination,
   ProgressBar,
@@ -772,9 +772,9 @@ export default function UIPlayground() {
                       />
                       <div className="my-4 flex items-center justify-between">
                         <Checkbox name="remember-me">Remember me</Checkbox>
-                        <Link className="text-sm" href="#">
+                        <AriaLink className="text-sm" href="#">
                           Forgot password?
-                        </Link>
+                        </AriaLink>
                       </div>
                       <div>
                         <CheckboxGroup

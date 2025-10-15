@@ -1,11 +1,14 @@
 'use client'
 import * as React from 'react'
 
-import { Link, Typography } from '@genseki/react'
+import Link from 'next/link'
+
+import { Typography } from '@genseki/react'
 
 import { ButtonSection } from './button-section'
 import { ComboboxSection } from './combobox-section'
 import { InputSection } from './input-section'
+import { LinkSection } from './link-section'
 
 export default function ComboboxPage() {
   return (
@@ -29,6 +32,11 @@ export default function ComboboxPage() {
           Input
         </Typography>
         <InputSection />
+
+        <Typography type="h2" weight="bold" id="link">
+          Link
+        </Typography>
+        <LinkSection />
       </div>
       <div className="relative bg-card border-l border-border w-[200px]">
         <div className="sticky inset-0 max-h-screen [overscroll-behavior:none] p-4">
@@ -38,6 +46,8 @@ export default function ComboboxPage() {
             <Link href="#combobox">{'>'} Combobox</Link>
             <hr />
             <Link href="#input">{'>'} Input</Link>
+            <hr />
+            <Link href="#link">{'>'} Link</Link>
           </div>
         </div>
       </div>
