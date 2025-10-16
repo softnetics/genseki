@@ -12,6 +12,9 @@ import {
 import type { VariantProps } from 'tailwind-variants'
 import { tv } from 'tailwind-variants'
 
+/**
+ * @deprecated
+ */
 const tooltipStyles = tv({
   base: [
     'group rounded-lg p-6 text-base will-change-transform dark:shadow-none [&_strong]:font-medium',
@@ -40,9 +43,19 @@ const tooltipStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 type TooltipProps = React.ComponentProps<typeof TooltipTriggerPrimitive>
+
+/**
+ * @deprecated
+ */
 const Tooltip = (props: TooltipProps) => <TooltipTriggerPrimitive {...props} />
 
+/**
+ * @deprecated
+ */
 interface TooltipContentProps
   extends Omit<TooltipPrimitiveProps, 'children'>,
     VariantProps<typeof tooltipStyles> {
@@ -50,6 +63,9 @@ interface TooltipContentProps
   children: React.ReactNode
 }
 
+/**
+ * @deprecated
+ */
 const TooltipContent = ({
   offset = 10,
   showArrow = true,
@@ -86,6 +102,9 @@ const TooltipContent = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const TooltipTrigger: typeof Button = Button
 
 export type { TooltipContentProps, TooltipProps }
