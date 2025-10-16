@@ -27,9 +27,9 @@ import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
 import { Badge } from './badge'
-import { AriaButton } from './button'
+import { Button } from './button'
 import { composeTailwindRenderProps } from './primitive'
-import { AriaSheet, AriaSheetBody, AriaSheetContent } from './sheet'
+import { Sheet, SheetBody, SheetContent } from './sheet'
 import { Tooltip, TooltipContent } from './tooltip'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -231,8 +231,8 @@ const Sidebar = ({
 
   if (isMobile) {
     return (
-      <AriaSheet isOpen={isOpenOnMobile} onOpenChange={setIsOpenOnMobile} {...props}>
-        <AriaSheetContent
+      <Sheet isOpen={isOpenOnMobile} onOpenChange={setIsOpenOnMobile} {...props}>
+        <SheetContent
           closeButton={closeButton}
           aria-label="Sidebar"
           data-sidebar-intent="default"
@@ -242,9 +242,9 @@ const Sidebar = ({
           isFloat={intent === 'float'}
           side={side}
         >
-          <AriaSheetBody className="px-0 sm:px-0">{props.children}</AriaSheetBody>
-        </AriaSheetContent>
-      </AriaSheet>
+          <SheetBody className="px-0 sm:px-0">{props.children}</SheetBody>
+        </SheetContent>
+      </Sheet>
     )
   }
 
@@ -699,10 +699,10 @@ const SidebarTrigger = ({
   variant,
   size,
   ...props
-}: React.ComponentProps<typeof AriaButton>) => {
+}: React.ComponentProps<typeof Button>) => {
   const { toggleSidebar } = useSidebar()
   return (
-    <AriaButton
+    <Button
       aria-label={props['aria-label'] || 'Toggle Sidebar'}
       data-sidebar-trigger="true"
       size={size}
@@ -720,7 +720,7 @@ const SidebarTrigger = ({
           <span className="sr-only">Toggle Sidebar</span>
         </>
       )}
-    </AriaButton>
+    </Button>
   )
 }
 

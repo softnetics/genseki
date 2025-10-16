@@ -16,16 +16,16 @@ import { mimeTypeValidate } from '../../../core/utils'
 import { useStorageAdapter } from '../../providers/root'
 import { isImageKey } from '../../utils/is-image-key'
 import {
-  AriaButton,
+  Button,
   AriaDescription,
   AriaLabel,
-  AriaModal,
-  AriaModalClose,
-  AriaModalContent,
-  AriaModalDescription,
-  AriaModalFooter,
-  AriaModalHeader,
-  AriaModalTitle,
+  Modal,
+  ModalClose,
+  ModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
   BaseIcon,
   ProgressBar,
   Typography,
@@ -441,7 +441,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
                 className="border border-bluegray-400 bg-white rounded-lg"
               >
                 <div className="flex flex-col items-center gap-6">
-                  <AriaButton
+                  <Button
                     leadingIcon={<BaseIcon icon={PaperclipIcon} size="md" />}
                     variant="outline"
                     size="sm"
@@ -451,7 +451,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
                     }}
                   >
                     Upload a file
-                  </AriaButton>
+                  </Button>
                   <div className="flex flex-col items-center gap-y-4 mt-4">
                     <Typography type="body" weight="medium" className="text-muted-fg text-center">
                       {props.placeholder || (
@@ -571,32 +571,32 @@ const FileDisplayer = (props: {
           )}
 
           <div className="flex gap-6 items-center">
-            <AriaModal>
-              <AriaButton variant="destruction" size="xs" isDisabled={isDeleting}>
+            <Modal>
+              <Button variant="destruction" size="xs" isDisabled={isDeleting}>
                 {isDeleting ? 'Deleting...' : 'Remove'}
-              </AriaButton>
-              <AriaModalContent isBlurred role="alertdialog">
-                <AriaModalHeader className="">
-                  <AriaModalTitle level={3}>Delete file</AriaModalTitle>
-                  <AriaModalDescription>
+              </Button>
+              <ModalContent isBlurred role="alertdialog">
+                <ModalHeader className="">
+                  <ModalTitle level={3}>Delete file</ModalTitle>
+                  <ModalDescription>
                     This will permanently delete the selected file
-                  </AriaModalDescription>
-                </AriaModalHeader>
-                <AriaModalFooter className="flex justify-between">
-                  <AriaModalClose variant="outline" size="sm">
+                  </ModalDescription>
+                </ModalHeader>
+                <ModalFooter className="flex justify-between">
+                  <ModalClose variant="outline" size="sm">
                     Cancel
-                  </AriaModalClose>
-                  <AriaModalClose
+                  </ModalClose>
+                  <ModalClose
                     variant="destruction"
                     size="sm"
                     onClick={() => props.onRemove(props.fileKey)}
                     isDisabled={isDeleting}
                   >
                     {isDeleting ? 'Deleting...' : 'Delete'}
-                  </AriaModalClose>
-                </AriaModalFooter>
-              </AriaModalContent>
-            </AriaModal>
+                  </ModalClose>
+                </ModalFooter>
+              </ModalContent>
+            </Modal>
           </div>
         </div>
       </div>

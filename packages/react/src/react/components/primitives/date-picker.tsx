@@ -15,11 +15,11 @@ import { twJoin } from 'tailwind-merge'
 
 import type { DateDuration } from '@internationalized/date'
 
-import { AriaButton } from './button'
+import { Button } from './button'
 import { Calendar } from './calendar'
 import { DateInput } from './date-field'
 import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaLabel } from './field'
-import { AriaPopoverClose, AriaPopoverContent } from './popover'
+import { PopoverClose, PopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 import { RangeCalendar } from './range-calendar'
 
@@ -44,7 +44,7 @@ const DatePickerOverlay = ({
   ...props
 }: DatePickerOverlayProps) => {
   return (
-    <AriaPopoverContent
+    <PopoverContent
       isDismissable={false}
       showArrow={false}
       className={twJoin(
@@ -60,23 +60,23 @@ const DatePickerOverlay = ({
       )}
       {closeButton && (
         <div className="mx-auto flex w-full max-w-[inherit] justify-center py-8 sm:hidden">
-          <AriaPopoverClose variant="outline" size="md" className="w-full">
+          <PopoverClose variant="outline" size="md" className="w-full">
             Close
-          </AriaPopoverClose>
+          </PopoverClose>
         </div>
       )}
-    </AriaPopoverContent>
+    </PopoverContent>
   )
 }
 
 const DatePickerIcon = () => (
-  <AriaButton
+  <Button
     size="md"
     variant="vanish"
     className="-translate-x-2 rounded-full outline-offset-0 hover:bg-transparent pressed:bg-transparent **:data-[slot=icon]:text-muted-fg"
   >
     <BaseIcon icon={CalendarDotsIcon} weight="duotone" className="group-open:text-fg" aria-hidden />
-  </AriaButton>
+  </Button>
 )
 
 interface DatePickerProps<T extends DateValue> extends DatePickerPrimitiveProps<T> {

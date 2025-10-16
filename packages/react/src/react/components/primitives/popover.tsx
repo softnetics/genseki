@@ -9,37 +9,35 @@ import type {
 } from 'react-aria-components'
 import {
   composeRenderProps,
-  DialogTrigger as AriaDialogTrigger,
+  DialogTrigger as DialogTrigger,
   Modal,
   ModalOverlay,
   OverlayArrow,
-  Popover as AriaPopoverPrimitive,
+  Popover as PopoverPrimitive,
   PopoverContext,
   useSlottedContext,
 } from 'react-aria-components'
 
-import * as PopoverPrimitive from '@radix-ui/react-popover'
 import { twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
 import type {
-  AriaDialogBodyProps,
-  AriaDialogFooterProps,
-  AriaDialogHeaderProps,
-  AriaDialogTitleProps,
+  DialogBodyProps,
+  DialogFooterProps,
+  DialogHeaderProps,
+  DialogTitleProps,
 } from './dialog'
 import {
-  AriaDialog,
-  AriaDialogBody,
-  AriaDialogClose,
-  AriaDialogDescription,
-  AriaDialogFooter,
-  AriaDialogHeader,
-  AriaDialogTitle,
+  Dialog,
+  DialogBody,
+  DialogClose,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
 } from './dialog'
 
 import { useMediaQuery } from '../../hooks/use-media-query'
-import { cn } from '../../utils/cn'
 
 /**
  *
@@ -50,45 +48,45 @@ import { cn } from '../../utils/cn'
 /**
  * @deprecated
  */
-interface AriaPopoverProps extends DialogTriggerProps {}
+interface PopoverProps extends DialogTriggerProps {}
 
 /**
  * @deprecated
  */
-const AriaPopover = (props: AriaPopoverProps) => {
-  return <AriaDialogTrigger {...props} />
+const Popover = (props: PopoverProps) => {
+  return <DialogTrigger {...props} />
 }
 
 /**
  * @deprecated
  */
-const AriaPopoverTitle = React.forwardRef<HTMLHeadingElement, AriaDialogTitleProps>(
+const PopoverTitle = React.forwardRef<HTMLHeadingElement, DialogTitleProps>(
   ({ className, ...props }, ref) => (
-    <AriaDialogTitle ref={ref} className={twMerge('sm:leading-none', className)} {...props} />
+    <DialogTitle ref={ref} className={twMerge('sm:leading-none', className)} {...props} />
   )
 )
-AriaPopoverTitle.displayName = 'PopoverTitle'
+PopoverTitle.displayName = 'PopoverTitle'
 
 /**
  * @deprecated
  */
-const AriaPopoverHeader = ({ className, ...props }: AriaDialogHeaderProps) => (
-  <AriaDialogHeader className={twMerge('sm:p-4', className)} {...props} />
+const PopoverHeader = ({ className, ...props }: DialogHeaderProps) => (
+  <DialogHeader className={twMerge('sm:p-4', className)} {...props} />
 )
 
 /**
  * @deprecated
  */
-const AriaPopoverFooter = ({ className, ...props }: AriaDialogFooterProps) => (
-  <AriaDialogFooter className={twMerge('sm:p-4', className)} {...props} />
+const PopoverFooter = ({ className, ...props }: DialogFooterProps) => (
+  <DialogFooter className={twMerge('sm:p-4', className)} {...props} />
 )
 
 /**
  * @deprecated
  */
-const AriaPopoverBody = ({ className, ref, ...props }: AriaDialogBodyProps) => (
+const PopoverBody = ({ className, ref, ...props }: DialogBodyProps) => (
   // TODO: Fix type error with ref
-  <AriaDialogBody ref={ref as any} className={twMerge('sm:px-4 sm:pt-2', className)} {...props} />
+  <DialogBody ref={ref as any} className={twMerge('sm:px-4 sm:pt-2', className)} {...props} />
 )
 
 /**
@@ -150,7 +148,7 @@ const drawer = tv({
 /**
  * @deprecated
  */
-interface AriaPopoverContentProps
+interface PopoverContentProps
   extends Omit<PopoverPrimitiveProps, 'children' | 'className'>,
     Omit<ModalOverlayProps, 'className' | 'children'>,
     Pick<DialogProps, 'aria-label' | 'aria-labelledby'> {
@@ -164,13 +162,13 @@ interface AriaPopoverContentProps
 /**
  * @deprecated
  */
-const AriaPopoverContent = ({
+const PopoverContent = ({
   respectScreen = true,
   children,
   showArrow = true,
   className,
   ...props
-}: AriaPopoverContentProps) => {
+}: PopoverContentProps) => {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const popoverContext = useSlottedContext(PopoverContext)!
   const isMenuTrigger = popoverContext?.trigger === 'MenuTrigger'
@@ -190,13 +188,13 @@ const AriaPopoverContent = ({
           drawer({ ...renderProps, isMenu, className })
         )}
       >
-        <AriaDialog role="dialog" aria-label={props['aria-label'] ?? 'List item'}>
+        <Dialog role="dialog" aria-label={props['aria-label'] ?? 'List item'}>
           <>{children}</>
-        </AriaDialog>
+        </Dialog>
       </Modal>
     </ModalOverlay>
   ) : (
-    <AriaPopoverPrimitive
+    <PopoverPrimitive
       offset={effectiveOffset}
       className={composeRenderProps(className, (className, renderProps) =>
         content({
@@ -219,80 +217,38 @@ const AriaPopoverContent = ({
         </OverlayArrow>
       )}
       {!isComboBoxTrigger ? (
-        <AriaDialog role="dialog" aria-label={props['aria-label'] ?? 'List item'}>
+        <Dialog role="dialog" aria-label={props['aria-label'] ?? 'List item'}>
           <> {children}</>
-        </AriaDialog>
+        </Dialog>
       ) : (
         <> {children}</>
       )}
-    </AriaPopoverPrimitive>
+    </PopoverPrimitive>
   )
 }
 
 /**
  * @deprecated
  */
-const AriaPopoverTrigger = AriaDialogTrigger
+const PopoverTrigger = DialogTrigger
 /**
  * @deprecated
  */
-const AriaPopoverClose = AriaDialogClose
+const PopoverClose = DialogClose
 /**
  * @deprecated
  */
-const AriaPopoverDescription = AriaDialogDescription
+const PopoverDescription = DialogDescription
 
-export type { AriaPopoverContentProps, AriaPopoverProps }
+export type { PopoverContentProps, PopoverProps }
 export {
-  AriaPopover,
-  AriaPopoverBody,
-  AriaPopoverClose,
-  AriaPopoverContent,
-  AriaPopoverDescription,
-  AriaPopoverFooter,
-  AriaPopoverHeader,
-  AriaPopoverTitle,
-  AriaPopoverTrigger,
+  Popover,
+  PopoverBody,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTitle,
+  PopoverTrigger,
 }
-
-/**
- *
- * Shadcn component
- *
- */
-
-function Popover({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Root>) {
-  return <PopoverPrimitive.Root data-slot="popover" {...props} />
-}
-
-function PopoverTrigger({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Trigger>) {
-  return <PopoverPrimitive.Trigger data-slot="popover-trigger" {...props} />
-}
-
-function PopoverContent({
-  className,
-  align = 'center',
-  sideOffset = 4,
-  ...props
-}: React.ComponentProps<typeof PopoverPrimitive.Content>) {
-  return (
-    <PopoverPrimitive.Portal>
-      <PopoverPrimitive.Content
-        data-slot="popover-content"
-        align={align}
-        sideOffset={sideOffset}
-        className={cn(
-          'bg-popover text-popover-foreground data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 data-[side=bottom]:slide-in-from-top-2 data-[side=left]:slide-in-from-right-2 data-[side=right]:slide-in-from-left-2 data-[side=top]:slide-in-from-bottom-2 z-50 w-144 origin-(--radix-popover-content-transform-origin) rounded-md border p-8 shadow-md outline-hidden',
-          className
-        )}
-        {...props}
-      />
-    </PopoverPrimitive.Portal>
-  )
-}
-
-function PopoverAnchor({ ...props }: React.ComponentProps<typeof PopoverPrimitive.Anchor>) {
-  return <PopoverPrimitive.Anchor data-slot="popover-anchor" {...props} />
-}
-
-export { Popover, PopoverAnchor, PopoverContent, PopoverTrigger }

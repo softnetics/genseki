@@ -8,26 +8,22 @@ import { useQuery } from '@tanstack/react-query'
 import type { Content } from '@tiptap/react'
 
 import {
-  AriaButton,
-  AriaCombobox,
-  type AriaComboboxItem,
-  AriaComboboxLabel,
-  AriaComboboxList,
-  AriaComboboxOption,
-  type AriaComboboxProps,
-  AriaComboboxSearchInput,
-  AriaComboboxTrigger,
-  AriaTextField,
-  type AriaTextFieldProps,
+  Combobox,
+  type ComboboxItem,
+  ComboboxLabel,
+  ComboboxList,
+  ComboboxOption,
+  type ComboboxProps,
+  ComboboxSearchInput,
+  ComboboxTrigger,
   BaseIcon,
-  Button,
+  Button as AriaButton,
   Checkbox,
   type CheckboxProps,
   DatePicker,
   type DatePickerProps,
   FormField,
   FormItemController,
-  Input,
   InputGroup,
   InputGroupControl,
   NumberField,
@@ -41,11 +37,14 @@ import {
   SelectTrigger,
   Switch,
   type SwitchProps,
+  TextField,
+  type TextFieldProps,
   TimeField,
   type TimeFieldProps,
   Typography,
   useFormItemController,
 } from '@genseki/react'
+import { Button, Input, Label } from '@genseki/react/v2'
 
 import type {
   FieldOptionsCallbackReturn,
@@ -59,7 +58,6 @@ import { useDebounce } from '../../../hooks/use-debounce'
 import { useStorageAdapter } from '../../../providers/root'
 import { cn } from '../../../utils/cn'
 import { convertDateStringToCalendarDate, convertDateStringToTimeValue } from '../../../utils/date'
-import { Label } from '../../primitives/label'
 import { FileUploadField, type FileUploadFieldProps } from '../file-upload-field'
 
 export function AutoFileUploadField(props: FileUploadFieldProps) {
@@ -123,23 +121,13 @@ export function AutoTextField(
       }
     />
   )
-
-  // return (
-  //   <AriaTextField
-  //     type="text"
-  //     {...props}
-  //     {...field}
-  //     errorMessage={error?.message}
-  //     className={cn('w-full', props.className)}
-  //   />
-  // )
 }
 
-export function AutoPasswordField(props: AriaTextFieldProps) {
+export function AutoPasswordField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
 
   return (
-    <AriaTextField
+    <TextField
       {...props}
       {...field}
       type="password"
@@ -150,11 +138,11 @@ export function AutoPasswordField(props: AriaTextFieldProps) {
   )
 }
 
-export function AutoEmailField(props: AriaTextFieldProps) {
+export function AutoEmailField(props: TextFieldProps) {
   const { field, error } = useFormItemController()
 
   return (
-    <AriaTextField
+    <TextField
       type="email"
       prefix={<BaseIcon icon={EnvelopeIcon} size="sm" />}
       {...props}
@@ -325,7 +313,7 @@ export function AutoSelectField(props: AutoSelectField) {
 }
 
 export interface AutoComboboxFieldProps
-  extends Omit<AriaComboboxProps, 'items' | 'onSearch' | 'isLoading' | 'value' | 'onChange'> {
+  extends Omit<ComboboxProps, 'items' | 'onSearch' | 'isLoading' | 'value' | 'onChange'> {
   name?: string
 
   optionsName: string
@@ -379,7 +367,7 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
     },
   })
 
-  const items: AriaComboboxItem[] = useMemo(
+  const items: ComboboxItem[] = useMemo(
     () => (query.data?.body.options ?? []).map((o) => ({ label: o.label, value: String(o.value) })),
     [query.data]
   )
@@ -399,7 +387,7 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
   }
 
   return (
-    <AriaCombobox
+    <Combobox
       label={label}
       className={cn('w-full', className)}
       description={description}
@@ -418,11 +406,11 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
         onOpenChange?.(isOpen)
       }}
     >
-      <AriaComboboxTrigger>
-        <AriaComboboxSearchInput placeholder={placeholder} />
-      </AriaComboboxTrigger>
+      <ComboboxTrigger>
+        <ComboboxSearchInput placeholder={placeholder} />
+      </ComboboxTrigger>
 
-      <AriaComboboxList>
+      <ComboboxList>
         {!query.isFetching && items.length === 0 && (
           <li className="px-4 py-6 text-sm text-muted-fg">No results</li>
         )}
@@ -430,18 +418,18 @@ export function AutoComboboxField(props: AutoComboboxFieldProps) {
           items.map((item, idx) => {
             const isSelected = item.value === field.value
             return (
-              <AriaComboboxOption
+              <ComboboxOption
                 key={item.value}
                 value={item.value}
                 isSelected={isSelected}
                 onSelect={() => submitSelection(idx)}
               >
-                <AriaComboboxLabel>{item.label}</AriaComboboxLabel>
-              </AriaComboboxOption>
+                <ComboboxLabel>{item.label}</ComboboxLabel>
+              </ComboboxOption>
             )
           })}
-      </AriaComboboxList>
-    </AriaCombobox>
+      </ComboboxList>
+    </Combobox>
   )
 }
 

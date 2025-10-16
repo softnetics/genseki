@@ -6,13 +6,13 @@ import { standardSchemaResolver } from '@hookform/resolvers/standard-schema'
 import { z } from 'zod'
 
 import {
-  AriaButton,
-  AriaTextField,
+  Button,
   Form,
   FormControl,
   FormField,
   FormItem,
   FormMessage,
+  TextField,
 } from '@genseki/react'
 
 const schema = z.object({
@@ -56,13 +56,13 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
           render={({ field }) => (
             <FormItem>
               <FormControl>
-                <AriaTextField {...field} placeholder="email" />
+                <TextField {...field} placeholder="email" />
               </FormControl>
               <FormMessage />
             </FormItem>
           )}
         />
-        <AriaButton
+        <Button
           variant="primary"
           type="submit"
           className="w-full"
@@ -70,7 +70,7 @@ export function InputEmailSection({ onNext }: InputEmailSectionProps) {
           onPress={() => form.clearErrors('email')}
         >
           Send OTP
-        </AriaButton>
+        </Button>
       </form>
     </Form>
   )

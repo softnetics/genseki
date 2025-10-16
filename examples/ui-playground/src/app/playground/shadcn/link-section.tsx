@@ -2,7 +2,8 @@ import React from 'react'
 
 import Link from 'next/link'
 
-import { linkVariants, Typography } from '@genseki/react'
+import { Typography } from '@genseki/react'
+import { linkVariants } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '../../../components/card'
 

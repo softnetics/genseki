@@ -33,7 +33,7 @@ import {
   dropdownSectionStyles,
   DropdownSeparator,
 } from './dropdown'
-import { AriaPopoverContent } from './popover'
+import { PopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 
 interface MenuContextProps {
@@ -109,7 +109,7 @@ const MenuContent = <T extends object>({
   const { respectScreen: respectScreenContext } = use(MenuContext)
   const respectScreenInternal = respectScreen ?? respectScreenContext
   return (
-    <AriaPopoverContent
+    <PopoverContent
       isOpen={props.isOpen}
       onOpenChange={props.onOpenChange}
       shouldFlip={props.shouldFlip}
@@ -122,7 +122,7 @@ const MenuContent = <T extends object>({
       arrowBoundaryOffset={props.arrowBoundaryOffset}
       className={composeTailwindRenderProps(
         popoverClassName,
-        'shadow-xs outline-hidden z-50 min-w-44 rounded-lg p-0 sm:pb-0'
+        'shadow-xs outline-hidden z-50 min-w-44 rounded-lg p-0 sm:pb-0 bg-bg'
       )}
     >
       <MenuPrimitive
@@ -133,7 +133,7 @@ const MenuContent = <T extends object>({
         )}
         {...props}
       />
-    </AriaPopoverContent>
+    </PopoverContent>
   )
 }
 

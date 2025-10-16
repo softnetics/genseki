@@ -12,6 +12,11 @@
       "require": "./src/index.ts",
       "types": "./src/index.ts"
     },
+    "./v2": {
+      "import": "./v2/index.ts",
+      "require": "./v2/index.ts",
+      "types": "./v2/index.ts"
+    },
     "./tailwind.css": "./src/react/styles/tailwind.css"
   },
   "publishConfig": {
@@ -19,6 +24,10 @@
       ".": {
         "import": "./dist/src/index.js",
         "types": "./dist/src/index.d.ts"
+      },
+      "./v2": {
+        "import": "./dist/v2/index.js",
+        "types": "./dist/v2/index.d.ts"
       },
       "./tailwind.css": "./dist/src/react/styles/tailwind.css"
     }

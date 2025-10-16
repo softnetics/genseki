@@ -18,7 +18,7 @@ import { twMerge } from 'tailwind-merge'
 import { DropdownItem, DropdownLabel, DropdownSection } from './dropdown'
 import { AriaDescription, AriaFieldGroup, type AriaFieldProps, AriaInput, AriaLabel } from './field'
 import { ListBox } from './list-box'
-import { AriaPopoverContent } from './popover'
+import { PopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 import { type RestrictedIntent, Tag, TagGroup, type TagGroupProps, TagList } from './tag-group'
 
@@ -197,7 +197,7 @@ const MultipleSelect = <T extends object>({
                   />
                 </Button>
               </div>
-              <AriaPopoverContent
+              <PopoverContent
                 showArrow={false}
                 respectScreen={false}
                 triggerRef={triggerRef}
@@ -238,7 +238,7 @@ const MultipleSelect = <T extends object>({
                     </MultipleSelectItem>
                   )) ?? children}
                 </ListBox>
-              </AriaPopoverContent>
+              </PopoverContent>
             </ComboBox>
           </AriaFieldGroup>
           {props.description && <AriaDescription>{props.description}</AriaDescription>}

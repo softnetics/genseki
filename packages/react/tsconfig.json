@@ -8,6 +8,6 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src"],
+  "include": ["src", "v2"],
   "exclude": ["dist", "node_modules"]
 }

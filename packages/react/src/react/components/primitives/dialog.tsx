@@ -5,21 +5,19 @@ import { forwardRef, useEffect, useRef } from 'react'
 import type { HeadingProps as AriaHeadingProps } from 'react-aria-components'
 import {
   Button as AriaButtonPrimitive,
-  Dialog as AriaDialogPrimitive,
+  Dialog as DialogPrimitive,
   Heading,
   Text,
 } from 'react-aria-components'
 
 import { XIcon } from '@phosphor-icons/react'
-import * as DialogPrimitive from '@radix-ui/react-dialog'
 import { twJoin, twMerge } from 'tailwind-merge'
 
-import { AriaButton, type AriaButtonProps } from './button'
+import { Button, type ButtonProps } from './button'
 import { composeTailwindRenderProps } from './primitive'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { useMediaQuery } from '../../hooks/use-media-query'
-import { cn } from '../../utils/cn'
 
 /**
  *
@@ -30,13 +28,13 @@ import { cn } from '../../utils/cn'
 /**
  * @deprecated
  */
-const AriaDialog = ({
+const Dialog = ({
   role = 'dialog',
   className,
   ...props
-}: React.ComponentProps<typeof AriaDialogPrimitive>) => {
+}: React.ComponentProps<typeof DialogPrimitive>) => {
   return (
-    <AriaDialogPrimitive
+    <DialogPrimitive
       role={role}
       className={twMerge(
         'peer/dialog group/dialog outline-hidden relative flex max-h-[inherit] flex-col overflow-hidden [scrollbar-width:thin] [&::-webkit-scrollbar]:size-0.5',
@@ -49,18 +47,18 @@ const AriaDialog = ({
 /**
  * @deprecated
  */
-const AriaDialogTrigger = (props: AriaButtonProps) => <AriaButton {...props} />
+const DialogTrigger = (props: ButtonProps) => <Button {...props} />
 /**
  * @deprecated
  */
-type AriaDialogHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
+type DialogHeaderProps = React.HTMLAttributes<HTMLDivElement> & {
   title?: string
   description?: string
 }
 /**
  * @deprecated
  */
-const AriaDialogHeader = ({ className, ...props }: AriaDialogHeaderProps) => {
+const DialogHeader = ({ className, ...props }: DialogHeaderProps) => {
   const headerRef = useRef<HTMLHeadingElement>(null)
 
   useEffect(() => {
@@ -91,12 +89,12 @@ const AriaDialogHeader = ({ className, ...props }: AriaDialogHeaderProps) => {
         className
       )}
     >
-      {props.title && <AriaDialogTitle>{props.title}</AriaDialogTitle>}
-      {props.description && <AriaDialogDescription>{props.description}</AriaDialogDescription>}
+      {props.title && <DialogTitle>{props.title}</DialogTitle>}
+      {props.description && <DialogDescription>{props.description}</DialogDescription>}
       {!props.title && typeof props.children === 'string' ? (
-        <AriaDialogTitle {...props}>
+        <DialogTitle {...props}>
           <>{props.children}</>
-        </AriaDialogTitle>
+        </DialogTitle>
       ) : (
         <>{props.children}</>
       )}
@@ -106,14 +104,14 @@ const AriaDialogHeader = ({ className, ...props }: AriaDialogHeaderProps) => {
 /**
  * @deprecated
  */
-interface AriaDialogTitleProps extends Omit<AriaHeadingProps, 'level'> {
+interface DialogTitleProps extends Omit<AriaHeadingProps, 'level'> {
   level?: 1 | 2 | 3 | 4
   ref?: React.Ref<HTMLHeadingElement>
 }
 /**
  * @deprecated
  */
-const AriaDialogTitle = forwardRef<HTMLHeadingElement, AriaDialogTitleProps>(function Title(
+const DialogTitle = forwardRef<HTMLHeadingElement, DialogTitleProps>(function Title(
   { level = 3, className, ...props },
   ref
 ) {
@@ -139,34 +137,35 @@ const AriaDialogTitle = forwardRef<HTMLHeadingElement, AriaDialogTitleProps>(fun
 /**
  * @deprecated
  */
-type AriaDialogDescriptionProps = React.ComponentProps<'div'>
+type DialogDescriptionProps = React.ComponentProps<'div'>
 /**
  * @deprecated
  */
-const AriaDialogDescription = forwardRef<HTMLElement, AriaDialogDescriptionProps>(
-  function Description({ className, ...props }, ref) {
-    return (
-      <Text
-        slot="description"
-        className={twMerge('text-muted-fg text-sm', className)}
-        ref={ref}
-        {...props}
-      >
-        <>{props.children}</>
-      </Text>
-    )
-  }
-)
+const DialogDescription = forwardRef<HTMLElement, DialogDescriptionProps>(function Description(
+  { className, ...props },
+  ref
+) {
+  return (
+    <Text
+      slot="description"
+      className={twMerge('text-muted-fg text-sm', className)}
+      ref={ref}
+      {...props}
+    >
+      <>{props.children}</>
+    </Text>
+  )
+})
 
 /**
  * @deprecated
  */
-type AriaDialogBodyProps = React.ComponentProps<'div'>
+type DialogBodyProps = React.ComponentProps<'div'>
 
 /**
  * @deprecated
  */
-const AriaDialogBody = ({ className, ref, ...props }: AriaDialogBodyProps) => (
+const DialogBody = ({ className, ref, ...props }: DialogBodyProps) => (
   <div
     data-slot="dialog-body"
     ref={ref}
@@ -180,11 +179,11 @@ const AriaDialogBody = ({ className, ref, ...props }: AriaDialogBodyProps) => (
 /**
  * @deprecated
  */
-type AriaDialogFooterProps = React.ComponentProps<'div'>
+type DialogFooterProps = React.ComponentProps<'div'>
 /**
  * @deprecated
  */
-const AriaDialogFooter = ({ className, ...props }: AriaDialogFooterProps) => {
+const DialogFooter = ({ className, ...props }: DialogFooterProps) => {
   const footerRef = useRef<HTMLDivElement>(null)
 
   useEffect(() => {
@@ -224,26 +223,19 @@ const AriaDialogFooter = ({ className, ...props }: AriaDialogFooterProps) => {
 /**
  * @deprecated
  */
-const AriaDialogClose = forwardRef<HTMLButtonElement, AriaButtonProps>(function Close(
+const DialogClose = forwardRef<HTMLButtonElement, ButtonProps>(function Close(
   { className, size = 'md', variant = 'vanish', ...props },
   ref
 ) {
   return (
-    <AriaButton
-      slot="close"
-      className={className}
-      ref={ref}
-      size={size}
-      variant={variant}
-      {...props}
-    />
+    <Button slot="close" className={className} ref={ref} size={size} variant={variant} {...props} />
   )
 })
 
 /**
  * @deprecated
  */
-interface AriaCloseButtonIndicatorProps extends Omit<AriaButtonProps, 'children'> {
+interface CloseButtonIndicatorProps extends Omit<ButtonProps, 'children'> {
   className?: string
   isDismissable?: boolean | undefined
 }
@@ -251,7 +243,7 @@ interface AriaCloseButtonIndicatorProps extends Omit<AriaButtonProps, 'children'
 /**
  * @deprecated
  */
-const AriaDialogCloseIndicator = ({ className, ...props }: AriaCloseButtonIndicatorProps) => {
+const DialogCloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps) => {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -279,7 +271,7 @@ const AriaDialogCloseIndicator = ({ className, ...props }: AriaCloseButtonIndica
 /**
  * @deprecated
  */
-const AriaDialogCloseIcon = ({ className, ...props }: AriaCloseButtonIndicatorProps) => {
+const DialogCloseIcon = ({ className, ...props }: CloseButtonIndicatorProps) => {
   const isMobile = useMediaQuery('(max-width: 600px)')
   const buttonRef = useRef<HTMLButtonElement>(null)
 
@@ -289,7 +281,7 @@ const AriaDialogCloseIcon = ({ className, ...props }: AriaCloseButtonIndicatorPr
     }
   }, [isMobile])
   return props.isDismissable ? (
-    <AriaButton
+    <Button
       ref={buttonRef}
       {...(isMobile ? { autoFocus: true } : {})}
       aria-label="Close"
@@ -301,155 +293,28 @@ const AriaDialogCloseIcon = ({ className, ...props }: AriaCloseButtonIndicatorPr
       {...props}
     >
       <BaseIcon icon={XIcon} size="sm" weight="bold" />
-    </AriaButton>
+    </Button>
   ) : null
 }
 
 export type {
-  AriaCloseButtonIndicatorProps,
-  AriaDialogBodyProps,
-  AriaDialogDescriptionProps,
-  AriaDialogFooterProps,
-  AriaDialogHeaderProps,
-  AriaDialogTitleProps,
-}
-
-export {
-  AriaDialog,
-  AriaDialogBody,
-  AriaDialogClose,
-  AriaDialogCloseIcon,
-  AriaDialogCloseIndicator,
-  AriaDialogDescription,
-  AriaDialogFooter,
-  AriaDialogHeader,
-  AriaDialogTitle,
-  AriaDialogTrigger,
-}
-
-/**
- *
- * Shadcn component
- *
- */
-function Dialog({ ...props }: React.ComponentProps<typeof DialogPrimitive.Root>) {
-  return <DialogPrimitive.Root data-slot="dialog" {...props} />
-}
-
-function DialogTrigger({ ...props }: React.ComponentProps<typeof DialogPrimitive.Trigger>) {
-  return <DialogPrimitive.Trigger data-slot="dialog-trigger" {...props} />
-}
-
-function DialogPortal({ ...props }: React.ComponentProps<typeof DialogPrimitive.Portal>) {
-  return <DialogPrimitive.Portal data-slot="dialog-portal" {...props} />
-}
-
-function DialogClose({ ...props }: React.ComponentProps<typeof DialogPrimitive.Close>) {
-  return <DialogPrimitive.Close data-slot="dialog-close" {...props} />
-}
-
-function DialogOverlay({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Overlay>) {
-  return (
-    <DialogPrimitive.Overlay
-      data-slot="dialog-overlay"
-      className={cn(
-        'data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 fixed inset-0 z-50 bg-black/50',
-        className
-      )}
-      {...props}
-    />
-  )
-}
-
-function DialogContent({
-  className,
-  children,
-  showCloseButton = true,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Content> & {
-  showCloseButton?: boolean
-}) {
-  return (
-    <DialogPortal data-slot="dialog-portal">
-      <DialogOverlay />
-      <DialogPrimitive.Content
-        data-slot="dialog-content"
-        className={cn(
-          'bg-background data-[state=open]:animate-in data-[state=closed]:animate-out data-[state=closed]:fade-out-0 data-[state=open]:fade-in-0 data-[state=closed]:zoom-out-95 data-[state=open]:zoom-in-95 fixed top-[50%] left-[50%] z-50 grid w-full max-w-[calc(100%-2rem)] translate-x-[-50%] translate-y-[-50%] gap-8 rounded-lg border p-12 shadow-lg duration-200 sm:max-w-lg',
-          className
-        )}
-        {...props}
-      >
-        {children}
-        {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="ring-offset-background focus:ring-ring data-[state=open]:bg-accent data-[state=open]:text-muted-foreground absolute top-8 right-8 rounded-xs opacity-70 transition-opacity hover:opacity-100 focus:ring-4 focus:ring-offset-4 focus:outline-hidden disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-8"
-          >
-            <XIcon />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
-        )}
-      </DialogPrimitive.Content>
-    </DialogPortal>
-  )
-}
-
-function DialogHeader({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="dialog-header"
-      className={cn('flex flex-col gap-4 text-center sm:text-left', className)}
-      {...props}
-    />
-  )
-}
-
-function DialogFooter({ className, ...props }: React.ComponentProps<'div'>) {
-  return (
-    <div
-      data-slot="dialog-footer"
-      className={cn('flex flex-col-reverse gap-4 sm:flex-row sm:justify-end', className)}
-      {...props}
-    />
-  )
-}
-
-function DialogTitle({ className, ...props }: React.ComponentProps<typeof DialogPrimitive.Title>) {
-  return (
-    <DialogPrimitive.Title
-      data-slot="dialog-title"
-      className={cn('text-lg leading-none font-semibold', className)}
-      {...props}
-    />
-  )
-}
-
-function DialogDescription({
-  className,
-  ...props
-}: React.ComponentProps<typeof DialogPrimitive.Description>) {
-  return (
-    <DialogPrimitive.Description
-      data-slot="dialog-description"
-      className={cn('text-muted-foreground text-sm', className)}
-      {...props}
-    />
-  )
+  CloseButtonIndicatorProps,
+  DialogBodyProps,
+  DialogDescriptionProps,
+  DialogFooterProps,
+  DialogHeaderProps,
+  DialogTitleProps,
 }
 
 export {
   Dialog,
+  DialogBody,
   DialogClose,
-  DialogContent,
+  DialogCloseIcon,
+  DialogCloseIndicator,
   DialogDescription,
   DialogFooter,
   DialogHeader,
-  DialogOverlay,
-  DialogPortal,
   DialogTitle,
   DialogTrigger,
 }

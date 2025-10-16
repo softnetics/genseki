@@ -31,8 +31,7 @@ import {
 import { Slot } from '@radix-ui/react-slot'
 import { deepmerge } from 'deepmerge-ts'
 
-import type { AriaButtonProps } from './button'
-import { AriaButton } from './button'
+import { Button, type ButtonProps } from './button'
 
 import { cn } from '../../utils/cn'
 
@@ -301,7 +300,7 @@ function FormFieldValue<
   return props.render(value)
 }
 
-export interface FormSubmitButtonProps extends AriaButtonProps {
+export interface FormSubmitButtonProps extends ButtonProps {
   isLoading?: boolean
   isError?: boolean
   // TODO: implement icons
@@ -337,7 +336,7 @@ export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitBu
     //     ? loadingIconElement
     //     : rightIcon && <FontAwesomeIcon icon={rightIcon} />
     return (
-      <AriaButton
+      <Button
         type="submit"
         ref={ref}
         // disabled={isLoading || disabled}
@@ -347,7 +346,7 @@ export const FormSubmitButton = React.forwardRef<HTMLButtonElement, FormSubmitBu
         {/* {leftIconElement} */}
         {children}
         {/* {rightIconElement} */}
-      </AriaButton>
+      </Button>
     )
   }
 )

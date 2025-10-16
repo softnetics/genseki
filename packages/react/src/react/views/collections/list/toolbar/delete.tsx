@@ -1,8 +1,10 @@
 'use client'
+import type { ComponentPropsWithRef } from 'react'
+
 import { TrashIcon } from '@phosphor-icons/react'
 import type { Promisable } from 'type-fest'
 
-import { AriaButton, type AriaButtonProps, BaseIcon } from '../../../../components'
+import { Button } from '@genseki/react/v2'
 
 export interface MinimalCollectionListDeleteProps {
   isLoading?: boolean
@@ -11,20 +13,13 @@ export interface MinimalCollectionListDeleteProps {
 
 export interface CollectionListDeleteProps
   extends MinimalCollectionListDeleteProps,
-    Partial<AriaButtonProps> {}
+    Partial<ComponentPropsWithRef<typeof Button>> {}
 
 export function CollectionListDelete(props: CollectionListDeleteProps) {
   return (
-    <AriaButton
-      aria-label="Delete"
-      leadingIcon={<BaseIcon icon={TrashIcon} size="md" />}
-      onClick={props.onDelete}
-      isPending={props.isLoading}
-      variant="destruction"
-      size="md"
-      {...props}
-    >
+    <Button onClick={props.onDelete} disabled={props.isLoading} variant="destructive" {...props}>
+      <TrashIcon />
       Delete
-    </AriaButton>
+    </Button>
   )
 }

@@ -2,8 +2,8 @@
 
 import { FunnelIcon } from '@phosphor-icons/react'
 
+import { Button } from '@genseki/react/v2'
 import type { InputGroupButton } from '../../../../components'
-import { Button } from '../../../../components'
 
 export interface MinimalCollectionListFilterProps {
   isLoading?: boolean

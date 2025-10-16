@@ -6,9 +6,9 @@ import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
 import { Button } from './button'
-import type { Input } from './text-field'
+import type { Input } from './input'
 
-import { cn } from '../../utils/cn'
+import { cn } from '../../../src/react/utils/cn'
 
 function InputGroup({
   className,

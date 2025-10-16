@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Button } from '../../../../components'
+import { Button } from '@genseki/react/v2'
 
 export interface MinimalCollectionListCreateProps {
   isLoading?: boolean
