@@ -140,7 +140,7 @@ function InputGroupControl({ className, ...props }: React.ComponentProps<typeof 
         'flex-2 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent',
         className
       )}
-      {...props}
+      {...(props as any)}
     />
   )
 }

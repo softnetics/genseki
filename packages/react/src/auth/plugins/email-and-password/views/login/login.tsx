@@ -1,6 +1,7 @@
+import { Button } from '@genseki/react/v2'
+
 import { LoginClientForm } from './login.client'
 
-import { Button } from '../../../../../react/components/primitives/button'
 import { Typography } from '../../../../../react/components/primitives/typography'
 
 interface LoginViewProps {}

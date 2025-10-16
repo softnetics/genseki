@@ -15,7 +15,7 @@ import { CSS } from '@dnd-kit/utilities'
 import { IconChevronLgDown } from '@intentui/icons'
 import { DotsSixIcon } from '@phosphor-icons/react'
 
-import { Button, BaseIcon, Typography } from '../../primitives'
+import { BaseIcon, Button, Typography } from '../../primitives'
 
 interface ReorderGroupProps {
   title?: string

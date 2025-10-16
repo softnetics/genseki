@@ -3,6 +3,7 @@
 import { FunnelIcon } from '@phosphor-icons/react'
 
 import { Button } from '@genseki/react/v2'
+
 import type { InputGroupButton } from '../../../../components'
 
 export interface MinimalCollectionListFilterProps {

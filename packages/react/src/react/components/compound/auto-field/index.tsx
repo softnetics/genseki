@@ -8,6 +8,10 @@ import { useQuery } from '@tanstack/react-query'
 import type { Content } from '@tiptap/react'
 
 import {
+  BaseIcon,
+  Button as AriaButton,
+  Checkbox,
+  type CheckboxProps,
   Combobox,
   type ComboboxItem,
   ComboboxLabel,
@@ -16,10 +20,6 @@ import {
   type ComboboxProps,
   ComboboxSearchInput,
   ComboboxTrigger,
-  BaseIcon,
-  Button as AriaButton,
-  Checkbox,
-  type CheckboxProps,
   DatePicker,
   type DatePickerProps,
   FormField,

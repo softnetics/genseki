@@ -16,9 +16,10 @@ import { mimeTypeValidate } from '../../../core/utils'
 import { useStorageAdapter } from '../../providers/root'
 import { isImageKey } from '../../utils/is-image-key'
 import {
-  Button,
   AriaDescription,
   AriaLabel,
+  BaseIcon,
+  Button,
   Modal,
   ModalClose,
   ModalContent,
@@ -26,7 +27,6 @@ import {
   ModalFooter,
   ModalHeader,
   ModalTitle,
-  BaseIcon,
   ProgressBar,
   Typography,
 } from '../primitives'
