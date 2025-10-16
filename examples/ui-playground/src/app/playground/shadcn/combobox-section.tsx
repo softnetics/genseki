@@ -2,6 +2,7 @@ import React from 'react'
 
 import { CheckIcon } from '@phosphor-icons/react'
 
+import { Typography } from '@genseki/react'
 import {
   Button,
   ComboboxCommandEmpty,
@@ -13,8 +14,7 @@ import {
   ComboboxProvider,
   ComboboxTrigger,
   ComboboxTriggerMultiValue,
-} from '@genseki/react'
-import { Typography } from '@genseki/react'
+} from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 

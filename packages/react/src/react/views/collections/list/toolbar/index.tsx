@@ -3,13 +3,15 @@
 import { CaretLeftIcon } from '@phosphor-icons/react'
 import { useQueryClient } from '@tanstack/react-query'
 
+import { Button } from '@genseki/react/v2'
+
 import { CollectionListCreate } from './create'
 import { CollectionListDelete } from './delete'
 import { CollectionListFilter } from './filter'
 import { CollectionListSearch } from './search'
 
 import type { CollectionToolbarActions } from '../../../../../core/collection'
-import { Button, toast } from '../../../..'
+import { toast } from '../../../..'
 import { useTableStatesContext } from '../../../../providers/table'
 import { useCollectionList } from '../context'
 import { useCollectionDeleteMutation } from '../hooks/use-collection-delete'

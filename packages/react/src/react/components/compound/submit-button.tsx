@@ -2,7 +2,7 @@
 
 import { useFormStatus } from 'react-dom'
 
-import { Button } from '../primitives/button'
+import { Button } from '@genseki/react/v2'
 
 interface SubmitButtonProps {
   children: React.ReactNode

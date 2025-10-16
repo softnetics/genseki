@@ -1,6 +1,6 @@
 import { ArrowRightIcon, LockKeyIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { AriaLink } from '../components'
+import { Link } from '../components'
 import { BaseIcon } from '../components/primitives/base-icon'
 import { Typography } from '../components/primitives/typography'
 
@@ -22,10 +22,10 @@ export const UnauthorizedPage = () => {
         You are not authorized to access this page. Please check your permission and try again.
       </Typography>
       <div className="bg-border mt-6 h-px w-full" />
-      <AriaLink intent="primary" href="/" className="mt-12 flex items-end gap-x-2">
+      <Link intent="primary" href="/" className="mt-12 flex items-end gap-x-2">
         Back to home
         <BaseIcon size="sm" icon={ArrowRightIcon} className="text-text-brand" weight="bold" />
-      </AriaLink>
+      </Link>
     </div>
   )
 }

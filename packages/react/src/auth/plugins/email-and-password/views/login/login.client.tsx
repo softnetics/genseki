@@ -15,8 +15,8 @@ import {
   FormItem,
   FormMessage,
 } from '../../../../../react/components/primitives/form'
-import { AriaLink } from '../../../../../react/components/primitives/link'
-import { AriaTextField } from '../../../../../react/components/primitives/text-field'
+import { Link } from '../../../../../react/components/primitives/link'
+import { TextField } from '../../../../../react/components/primitives/text-field'
 import { useNavigation } from '../../../../../react/providers/navigation'
 import { useServerFunction } from '../../../../../react/providers/root'
 
@@ -92,7 +92,7 @@ export function LoginClientForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <AriaTextField
+                  <TextField
                     {...field}
                     name="email"
                     type="email"
@@ -111,7 +111,7 @@ export function LoginClientForm() {
             render={({ field }) => (
               <FormItem>
                 <FormControl>
-                  <AriaTextField
+                  <TextField
                     {...field}
                     name="password"
                     type="password"
@@ -125,9 +125,9 @@ export function LoginClientForm() {
               </FormItem>
             )}
           />
-          <AriaLink href="./forgot-password" intent="primary" className="text-sm ml-auto">
+          <Link href="./forgot-password" intent="primary" className="text-sm ml-auto">
             Forgot Password?
-          </AriaLink>
+          </Link>
           <SubmitButton pending={isLoading}>Login</SubmitButton>
         </form>
       </Form>

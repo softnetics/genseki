@@ -3,7 +3,7 @@ import { ArrowClockwiseIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/r
 import { useCurrentEditor } from '@tiptap/react'
 
 import { BaseIcon } from '../../../primitives/base-icon'
-import { AriaButton } from '../../../primitives/button'
+import { Button } from '../../../primitives/button'
 
 export const UndoButton = () => {
   const { editor } = useCurrentEditor()
@@ -11,7 +11,7 @@ export const UndoButton = () => {
   if (!editor) throw new Error('Editor provider is missing')
 
   return (
-    <AriaButton
+    <Button
       variant="ghost"
       size="md"
       isDisabled={!editor.can().undo()}
@@ -22,7 +22,7 @@ export const UndoButton = () => {
       aria-label="Undo"
     >
       <BaseIcon icon={ArrowCounterClockwiseIcon} weight="regular" />
-    </AriaButton>
+    </Button>
   )
 }
 
@@ -32,7 +32,7 @@ export const RedoButton = () => {
   if (!editor) throw new Error('Editor provider is missing')
 
   return (
-    <AriaButton
+    <Button
       variant="ghost"
       size="md"
       isDisabled={!editor.can().redo()}
@@ -43,6 +43,6 @@ export const RedoButton = () => {
       aria-label="Redo"
     >
       <BaseIcon icon={ArrowClockwiseIcon} weight="regular" />
-    </AriaButton>
+    </Button>
   )
 }

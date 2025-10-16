@@ -4,7 +4,8 @@ import React from 'react'
 import { MagnifyingGlassIcon } from '@phosphor-icons/react'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
 
-import { Input, InputGroup, InputGroupAddon, InputGroupControl } from '../../../../components'
+import { Input } from '../../../../../../v2'
+import { InputGroup, InputGroupAddon, InputGroupControl } from '../../../../components'
 import { useDebounce } from '../../../../hooks/use-debounce'
 import { useSearch } from '../../../../hooks/use-search'
 

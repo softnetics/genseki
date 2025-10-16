@@ -16,21 +16,21 @@ import { composeTailwindRenderProps } from './primitive'
 /**
  * @deprecated
  */
-interface AriaTextareaProps extends Omit<TextFieldProps, 'className'>, AriaFieldProps {
+interface TextareaProps extends Omit<TextFieldProps, 'className'>, AriaFieldProps {
   className?: string | ((v: TextFieldProps) => string)
 }
 
 /**
  * @deprecated
  */
-const AriaTextarea = ({
+const Textarea = ({
   className,
   placeholder,
   label,
   description,
   errorMessage,
   ...props
-}: AriaTextareaProps) => {
+}: TextareaProps) => {
   return (
     <TextField
       {...props}
@@ -64,5 +64,5 @@ const AriaTextarea = ({
   )
 }
 
-export type { AriaTextareaProps }
-export { AriaTextarea }
+export type { TextareaProps }
+export { Textarea }

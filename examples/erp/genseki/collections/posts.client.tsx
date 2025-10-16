@@ -18,7 +18,6 @@ import type { CollectionLayoutProps, InferCreateFields } from '@genseki/react'
 import {
   actionsColumn,
   BackColorExtension,
-  Button,
   CollectionListToolbar,
   createDeleteActionItem,
   createEditActionItem,
@@ -43,6 +42,7 @@ import {
   useNavigation,
   useTableStatesContext,
 } from '@genseki/react'
+import { Button } from '@genseki/react/v2'
 
 import { type fields } from './posts'
 

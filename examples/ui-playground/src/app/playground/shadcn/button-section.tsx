@@ -15,13 +15,8 @@ import {
   SortDescendingIcon,
 } from '@phosphor-icons/react'
 
-import {
-  Button,
-  ButtonGroup,
-  ButtonGroupSeparator,
-  ButtonGroupText,
-  Typography,
-} from '@genseki/react'
+import { Typography } from '@genseki/react'
+import { Button, ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 

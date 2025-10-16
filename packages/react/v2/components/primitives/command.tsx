@@ -7,7 +7,7 @@ import { Command as CommandPrimitive } from 'cmdk'
 
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle } from './dialog'
 
-import { cn } from '../../utils/cn'
+import { cn } from '../../../src/react/utils/cn'
 
 function Command({ className, ...props }: React.ComponentProps<typeof CommandPrimitive>) {
   return (

@@ -24,35 +24,33 @@ import { useTheme } from 'next-themes'
 
 import {
   Annotation,
-  AriaButton,
-  AriaButtonGroup,
-  AriaButtonGroupItem,
-  AriaLink,
-  AriaModal,
-  AriaModalBody,
-  AriaModalClose,
-  AriaModalContent,
-  AriaModalDescription,
-  AriaModalFooter,
-  AriaModalHeader,
-  AriaModalTitle,
-  AriaModalTrigger,
-  AriaPopover,
-  AriaPopoverBody,
-  AriaPopoverClose,
-  AriaPopoverContent,
-  AriaPopoverDescription,
-  AriaPopoverFooter,
-  AriaPopoverHeader,
-  AriaPopoverTitle,
-  AriaTextarea,
-  AriaTextField,
   Avatar,
   Breadcrumbs,
   BreadcrumbsItem,
+  Button,
+  ButtonGroup,
+  ButtonGroupItem,
   Card,
+  Link,
+  Modal,
+  ModalBody,
+  ModalClose,
+  ModalContent,
+  ModalDescription,
+  ModalFooter,
+  ModalHeader,
+  ModalTitle,
+  ModalTrigger,
   PageSizeSelect,
   Pagination,
+  Popover,
+  PopoverBody,
+  PopoverClose,
+  PopoverContent,
+  PopoverDescription,
+  PopoverFooter,
+  PopoverHeader,
+  PopoverTitle,
   ProgressBar,
   Radio,
   RadioGroup,
@@ -70,6 +68,8 @@ import {
   Tag,
   TagGroup,
   TagList,
+  Textarea,
+  TextField,
   TimeField,
   ToggleGroup,
   Toolbar,
@@ -83,7 +83,6 @@ import { RichTextEditor } from '@genseki/react'
 import { BaseIcon } from '@genseki/react'
 import { Typography } from '@genseki/react'
 import { Badge } from '@genseki/react'
-import { Button } from '@genseki/react'
 import { Calendar } from '@genseki/react'
 import { Checkbox, CheckboxGroup } from '@genseki/react'
 import { ColorField } from '@genseki/react'
@@ -314,13 +313,13 @@ export default function UIPlayground() {
   return (
     <div className="bg-white pb-24 relative dark:bg-black">
       <div className="fixed top-6 right-6 z-50">
-        <AriaButton
+        <Button
           variant={'secondary'}
           size="md"
           onClick={() => setTheme(theme === 'dark' ? 'light' : 'dark')}
         >
           {theme === 'dark' ? 'Light' : 'Dark'}
-        </AriaButton>
+        </Button>
       </div>
       <Wrapper title="Theme playground">
         <PlaygroundCard title="Theme playground" categoryTitle="Theme playground">
@@ -466,10 +465,10 @@ export default function UIPlayground() {
             <Checkbox>Spell Check</Checkbox>
             <ToolbarGroup className="ml-auto">
               <Menu>
-                <AriaButton aria-label="Other options" variant="ghost" size="md">
+                <Button aria-label="Other options" variant="ghost" size="md">
                   Options
                   <BaseIcon icon={CaretDownIcon} size="md" weight="regular" />
-                </AriaButton>
+                </Button>
                 <MenuContent showArrow placement="bottom right">
                   <MenuItem>
                     <IconUndo />
@@ -675,86 +674,84 @@ export default function UIPlayground() {
       </Wrapper>
       <Wrapper title="Modal">
         <PlaygroundCard title="Dialog" categoryTitle="Modal">
-          <AriaModal>
-            <AriaModalTrigger size="md" variant="outline">
+          <Modal>
+            <ModalTrigger size="md" variant="outline">
               Confirm
-            </AriaModalTrigger>
-            <AriaModalContent
+            </ModalTrigger>
+            <ModalContent
               isBlurred
               role="alertdialog"
               classNames={{ content: 'w-fit min-w-[16rem]' }}
             >
-              <AriaModalHeader className="[&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-12">
-                <AriaModalTitle level={3}>Delete file</AriaModalTitle>
-                <AriaModalDescription>
+              <ModalHeader className="[&[data-slot=dialog-header]:has(+[data-slot=dialog-footer])]:pb-12">
+                <ModalTitle level={3}>Delete file</ModalTitle>
+                <ModalDescription>
                   This will permanently delete the selected file. Continue?
-                </AriaModalDescription>
-              </AriaModalHeader>
-              <AriaModalFooter className="flex justify-between">
-                <AriaModalClose variant="outline" size="sm" className="w-1/2">
+                </ModalDescription>
+              </ModalHeader>
+              <ModalFooter className="flex justify-between">
+                <ModalClose variant="outline" size="sm" className="w-1/2">
                   Cancel
-                </AriaModalClose>
-                <AriaModalClose variant="destruction" size="sm" className="w-1/2">
+                </ModalClose>
+                <ModalClose variant="destruction" size="sm" className="w-1/2">
                   Delete
                   <BaseIcon icon={TrashIcon} size="sm" />
-                </AriaModalClose>
-              </AriaModalFooter>
-            </AriaModalContent>
-          </AriaModal>
+                </ModalClose>
+              </ModalFooter>
+            </ModalContent>
+          </Modal>
         </PlaygroundCard>
         <PlaygroundCard title="Modal confirm" categoryTitle="Modal">
-          <AriaModal>
-            <AriaModalTrigger size="md" variant="outline">
+          <Modal>
+            <ModalTrigger size="md" variant="outline">
               Turn on 2FA
-            </AriaModalTrigger>
-            <AriaModalContent>
-              <AriaModalHeader>
-                <AriaModalTitle>Nice! Let&apos;s beef up your account.</AriaModalTitle>
-                <AriaModalDescription>
+            </ModalTrigger>
+            <ModalContent>
+              <ModalHeader>
+                <ModalTitle>Nice! Let&apos;s beef up your account.</ModalTitle>
+                <ModalDescription>
                   2FA beefs up your account&apos;s defense. Pop in your password to keep going.
-                </AriaModalDescription>
-              </AriaModalHeader>
+                </ModalDescription>
+              </ModalHeader>
               <form>
-                <AriaModalBody>
-                  <AriaTextField
+                <ModalBody>
+                  <TextField
                     isRequired
                     autoFocus
                     label="Password"
                     type="password"
                     placeholder="Enter your password"
                   />
-                </AriaModalBody>
-                <AriaModalFooter>
-                  <AriaModalClose variant="naked" size="sm">
+                </ModalBody>
+                <ModalFooter>
+                  <ModalClose variant="naked" size="sm">
                     Cancel
-                  </AriaModalClose>
-                  <AriaButton size="sm" variant="primary" type="submit">
+                  </ModalClose>
+                  <Button size="sm" variant="primary" type="submit">
                     Turn on 2FA
-                  </AriaButton>
-                </AriaModalFooter>
+                  </Button>
+                </ModalFooter>
               </form>
-            </AriaModalContent>
-          </AriaModal>
+            </ModalContent>
+          </Modal>
         </PlaygroundCard>
       </Wrapper>
       <Wrapper title="Popover">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Popover (Form)" categoryTitle="Popover">
-            <AriaPopover>
-              <AriaButton variant="primary" size="md">
+            <Popover>
+              <Button variant="primary" size="md">
                 Login
-              </AriaButton>
-              <AriaPopoverContent className="sm:min-w-96">
-                <AriaPopoverHeader>
-                  <AriaPopoverTitle>Login</AriaPopoverTitle>
-                  <AriaPopoverDescription>
-                    Enter your credentials to sign in.
-                  </AriaPopoverDescription>
-                </AriaPopoverHeader>
+              </Button>
+              <PopoverContent className="sm:min-w-96">
+                <PopoverHeader>
+                  <PopoverTitle>Login</PopoverTitle>
+                  <PopoverDescription>Enter your credentials to sign in.</PopoverDescription>
+                </PopoverHeader>
                 <form onSubmit={() => {}} className="w-[400px]">
-                  <AriaPopoverBody>
+                  <PopoverBody>
                     <div className="space-y-4">
-                      <AriaTextField
+                      <TextField
                         autoFocus
                         isRequired
                         size="sm"
@@ -762,7 +759,7 @@ export default function UIPlayground() {
                         label="Email"
                         placeholder="Enter your email"
                       />
-                      <AriaTextField
+                      <TextField
                         isRequired
                         isRevealable
                         size="sm"
@@ -772,9 +769,9 @@ export default function UIPlayground() {
                       />
                       <div className="my-4 flex items-center justify-between">
                         <Checkbox name="remember-me">Remember me</Checkbox>
-                        <AriaLink className="text-sm" href="#">
+                        <Link className="text-sm" href="#">
                           Forgot password?
-                        </AriaLink>
+                        </Link>
                       </div>
                       <div>
                         <CheckboxGroup
@@ -789,58 +786,56 @@ export default function UIPlayground() {
                         </CheckboxGroup>
                       </div>
                     </div>
-                  </AriaPopoverBody>
-                  <AriaPopoverFooter>
-                    <AriaPopoverClose variant="outline" size="sm">
+                  </PopoverBody>
+                  <PopoverFooter>
+                    <PopoverClose variant="outline" size="sm">
                       Cancel
-                    </AriaPopoverClose>
-                    <AriaButton type="submit" variant="tertiary" size="sm">
+                    </PopoverClose>
+                    <Button type="submit" variant="tertiary" size="sm">
                       Login
-                    </AriaButton>
-                  </AriaPopoverFooter>
+                    </Button>
+                  </PopoverFooter>
                 </form>
-              </AriaPopoverContent>
-            </AriaPopover>
+              </PopoverContent>
+            </Popover>
           </PlaygroundCard>
           <PlaygroundCard title="Popover (normal-1)" categoryTitle="Popover">
-            <AriaPopover>
-              <AriaButton size="sm" variant="outline">
+            <Popover>
+              <Button size="sm" variant="outline">
                 Forgot Password
-              </AriaButton>
-              <AriaPopoverContent className="sm:max-w-72">
-                <AriaPopoverHeader>
-                  <AriaPopoverTitle>Email</AriaPopoverTitle>
-                  <AriaPopoverDescription>
-                    We&apos;ll send you an email to log in.
-                  </AriaPopoverDescription>
-                </AriaPopoverHeader>
-              </AriaPopoverContent>
-            </AriaPopover>
+              </Button>
+              <PopoverContent className="sm:max-w-72">
+                <PopoverHeader>
+                  <PopoverTitle>Email</PopoverTitle>
+                  <PopoverDescription>We&apos;ll send you an email to log in.</PopoverDescription>
+                </PopoverHeader>
+              </PopoverContent>
+            </Popover>
           </PlaygroundCard>
           <PlaygroundCard title="Popover (normal-2)" categoryTitle="Popover">
-            <AriaPopover>
-              <AriaButton size="sm" variant="outline">
+            <Popover>
+              <Button size="sm" variant="outline">
                 Open popover
-              </AriaButton>
-              <AriaPopoverContent className="sm:w-[16rem]">
-                <AriaPopoverHeader>
-                  <AriaPopoverTitle level={4}>Popover Title</AriaPopoverTitle>
-                  <AriaPopoverDescription>Lorem ipsum dolor sit amet</AriaPopoverDescription>
-                </AriaPopoverHeader>
-                <AriaPopoverBody>
+              </Button>
+              <PopoverContent className="sm:w-[16rem]">
+                <PopoverHeader>
+                  <PopoverTitle level={4}>Popover Title</PopoverTitle>
+                  <PopoverDescription>Lorem ipsum dolor sit amet</PopoverDescription>
+                </PopoverHeader>
+                <PopoverBody>
                   Popover Body | Lorem ipsum dolor sit amet. Lorem ipsum dolor sit amet consectetur
                   adipisicing elit. Quos, temporibus.
-                </AriaPopoverBody>
-                <AriaPopoverFooter>
-                  <AriaPopoverClose size="sm" variant="outline">
+                </PopoverBody>
+                <PopoverFooter>
+                  <PopoverClose size="sm" variant="outline">
                     Close
-                  </AriaPopoverClose>
-                  <AriaPopoverClose size="sm" variant="secondary">
+                  </PopoverClose>
+                  <PopoverClose size="sm" variant="secondary">
                     Confirm
-                  </AriaPopoverClose>
-                </AriaPopoverFooter>
-              </AriaPopoverContent>
-            </AriaPopover>
+                  </PopoverClose>
+                </PopoverFooter>
+              </PopoverContent>
+            </Popover>
           </PlaygroundCard>
         </div>
       </Wrapper>
@@ -1085,7 +1080,7 @@ export default function UIPlayground() {
           <PlaygroundCard title="Medium size (md)" categoryTitle="Button">
             <div className="flex flex-col space-y-4">
               <Switch onChange={() => {}} />
-              <AriaTextField
+              <TextField
                 isRequired={false}
                 label="Package owner"
                 description="This is a helper text"
@@ -1093,7 +1088,7 @@ export default function UIPlayground() {
                 isDisabled
                 placeholder="Data"
               />
-              <AriaTextField
+              <TextField
                 isRequired
                 type="text"
                 label="Something label and small textfield"
@@ -1102,7 +1097,7 @@ export default function UIPlayground() {
                 suffix={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 size="xs"
               />
-              <AriaTextField
+              <TextField
                 isRequired
                 type="password"
                 label="Some large textfield"
@@ -1110,7 +1105,7 @@ export default function UIPlayground() {
                 description="This is a helper text"
                 size="lg"
               />
-              <AriaTextField
+              <TextField
                 isRequired
                 type="password"
                 label="Package name"
@@ -1118,7 +1113,7 @@ export default function UIPlayground() {
                 description="This is a helper text"
                 size="md"
               />
-              <AriaTextField
+              <TextField
                 isRequired
                 label="Package name"
                 type="text"
@@ -1126,7 +1121,7 @@ export default function UIPlayground() {
                 size="md"
                 prefix={<BaseIcon icon={PlusCircleIcon} size="md" />}
               />
-              <AriaTextField
+              <TextField
                 isRequired
                 label="Package name"
                 type="text"
@@ -1134,8 +1129,8 @@ export default function UIPlayground() {
                 size="md"
                 suffix={<BaseIcon icon={PlusCircleIcon} size="md" />}
               />
-              <AriaTextField type="text" size="md" />
-              <AriaTextField
+              <TextField type="text" size="md" />
+              <TextField
                 type="text"
                 size="sm"
                 prefix={
@@ -1153,7 +1148,7 @@ export default function UIPlayground() {
                   </div>
                 }
               />
-              <AriaTextField
+              <TextField
                 type="text"
                 description="lorem"
                 size="xs"
@@ -1161,7 +1156,7 @@ export default function UIPlayground() {
                 suffix={'Right?'}
                 isDisabled
               />
-              <AriaTextField type="text" description="copy" size="md" isShowCopyButton isShowHttp />
+              <TextField type="text" description="copy" size="md" isShowCopyButton isShowHttp />
             </div>
           </PlaygroundCard>
         </div>
@@ -1169,14 +1164,14 @@ export default function UIPlayground() {
       <Wrapper title="Textarea">
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Medium size (md)" categoryTitle="Textarea">
-            <AriaTextarea
+            <Textarea
               label="Package name"
               description="This is a helper text"
               placeholder="Data"
               className="w-full"
               isRequired
             />
-            <AriaTextarea
+            <Textarea
               label="Package name"
               description="This is a helper text"
               placeholder="Data"
@@ -1191,15 +1186,15 @@ export default function UIPlayground() {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Medium size (md)" categoryTitle="Button">
             <div className="flex w-full flex-col items-start gap-y-3">
-              <AriaButton
+              <Button
                 variant="primary"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
                 Primary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 variant="secondary"
                 isDisabled
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1207,52 +1202,52 @@ export default function UIPlayground() {
                 size="md"
               >
                 Secondary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 variant="tertiary"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
                 Tertiary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 variant="naked"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
                 Naked
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 variant="outline"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
                 Outline
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 variant="ghost"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
                 Ghost
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 variant="destruction"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
                 size="md"
               >
                 Destruction
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
           <PlaygroundCard title="Medium size (md) (disabled)" categoryTitle="Button">
             <div className="flex w-full flex-col items-start gap-y-3">
-              <AriaButton
+              <Button
                 isDisabled
                 variant="primary"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1260,8 +1255,8 @@ export default function UIPlayground() {
                 size="md"
               >
                 Primary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 isDisabled
                 variant="secondary"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1269,8 +1264,8 @@ export default function UIPlayground() {
                 size="md"
               >
                 Secondary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 isDisabled
                 variant="tertiary"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1278,8 +1273,8 @@ export default function UIPlayground() {
                 size="md"
               >
                 Tertiary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 isDisabled
                 variant="naked"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1287,8 +1282,8 @@ export default function UIPlayground() {
                 size="md"
               >
                 Naked
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 isDisabled
                 variant="outline"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1296,8 +1291,8 @@ export default function UIPlayground() {
                 size="md"
               >
                 Outline
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 isDisabled
                 variant="ghost"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1305,8 +1300,8 @@ export default function UIPlayground() {
                 size="md"
               >
                 Ghost
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 isDisabled
                 variant="destruction"
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="md" />}
@@ -1314,127 +1309,127 @@ export default function UIPlayground() {
                 size="md"
               >
                 Destruction
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
           <PlaygroundCard title="Small size (sm)" categoryTitle="Button">
             <div className="flex flex-col items-start gap-y-3">
-              <AriaButton
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="primary"
                 size="sm"
               >
                 Primary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="secondary"
                 size="sm"
               >
                 Secondary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="tertiary"
                 size="sm"
               >
                 Tertiary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="naked"
                 size="sm"
               >
                 Naked
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="outline"
                 size="sm"
               >
                 Outline
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="ghost"
                 size="sm"
               >
                 Ghost
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="destruction"
                 size="sm"
               >
                 Destruction
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
           <PlaygroundCard title="Extra small size (xs)" categoryTitle="Button">
             <div className="flex flex-col items-start gap-y-3">
-              <AriaButton
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="primary"
                 size="xs"
               >
                 Primary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="secondary"
                 size="xs"
               >
                 Secondary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="tertiary"
                 size="xs"
               >
                 Tertiary
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="naked"
                 size="xs"
               >
                 Naked
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="outline"
                 size="xs"
               >
                 Outline
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="ghost"
                 size="xs"
               >
                 Ghost
-              </AriaButton>
-              <AriaButton
+              </Button>
+              <Button
                 leadingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 trailingIcon={<BaseIcon icon={PlusCircleIcon} size="sm" />}
                 variant="destruction"
                 size="xs"
               >
                 Destruction
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
         </div>
@@ -1443,77 +1438,77 @@ export default function UIPlayground() {
         <div className="grid grid-cols-[repeat(auto-fill,minmax(300px,1fr))] gap-4">
           <PlaygroundCard title="Medium size (md)" categoryTitle="Button">
             <div className="flex w-full flex-col items-start gap-y-3">
-              <AriaButton variant="primary" size="md">
+              <Button variant="primary" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
-              <AriaButton variant="secondary" size="md">
+              </Button>
+              <Button variant="secondary" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
-              <AriaButton variant="tertiary" size="md">
+              </Button>
+              <Button variant="tertiary" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
-              <AriaButton variant="naked" size="md">
+              </Button>
+              <Button variant="naked" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
-              <AriaButton variant="outline" size="md">
+              </Button>
+              <Button variant="outline" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
-              <AriaButton variant="ghost" size="md">
+              </Button>
+              <Button variant="ghost" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
-              <AriaButton variant="destruction" size="md">
+              </Button>
+              <Button variant="destruction" size="md">
                 <BaseIcon icon={PlusCircleIcon} size="md" />
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
           <PlaygroundCard title="Medium size (sm)" categoryTitle="Button">
             <div className="flex w-full flex-col items-start gap-y-3">
-              <AriaButton variant="primary" size="sm">
+              <Button variant="primary" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="secondary" size="sm">
+              </Button>
+              <Button variant="secondary" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="tertiary" size="sm">
+              </Button>
+              <Button variant="tertiary" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="naked" size="sm">
+              </Button>
+              <Button variant="naked" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="outline" size="sm">
+              </Button>
+              <Button variant="outline" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="ghost" size="sm">
+              </Button>
+              <Button variant="ghost" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="destruction" size="sm">
+              </Button>
+              <Button variant="destruction" size="sm">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
           <PlaygroundCard title="Extra small size (xs)" categoryTitle="Button">
             <div className="flex w-full flex-col items-start gap-y-3">
-              <AriaButton variant="primary" size="xs">
+              <Button variant="primary" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="secondary" size="xs">
+              </Button>
+              <Button variant="secondary" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="tertiary" size="xs">
+              </Button>
+              <Button variant="tertiary" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="naked" size="xs">
+              </Button>
+              <Button variant="naked" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="outline" size="xs">
+              </Button>
+              <Button variant="outline" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="ghost" size="xs">
+              </Button>
+              <Button variant="ghost" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
-              <AriaButton variant="destruction" size="xs">
+              </Button>
+              <Button variant="destruction" size="xs">
                 <BaseIcon icon={PlusCircleIcon} size="sm" />
-              </AriaButton>
+              </Button>
             </div>
           </PlaygroundCard>
         </div>
@@ -1557,12 +1552,12 @@ export default function UIPlayground() {
       <Wrapper title="Button group">
         <PlaygroundCard title="Medium size (md)" categoryTitle="Button group">
           <div className="flex items-center gap-x-4">
-            <AriaButtonGroup>
-              <AriaButtonGroupItem id="1d">1d</AriaButtonGroupItem>
-              <AriaButtonGroupItem id="1w">1w</AriaButtonGroupItem>
-              <AriaButtonGroupItem id="1m">1m</AriaButtonGroupItem>
-              <AriaButtonGroupItem id="1y">1y</AriaButtonGroupItem>
-            </AriaButtonGroup>
+            <ButtonGroup>
+              <ButtonGroupItem id="1d">1d</ButtonGroupItem>
+              <ButtonGroupItem id="1w">1w</ButtonGroupItem>
+              <ButtonGroupItem id="1m">1m</ButtonGroupItem>
+              <ButtonGroupItem id="1y">1y</ButtonGroupItem>
+            </ButtonGroup>
           </div>
         </PlaygroundCard>
       </Wrapper>
@@ -1839,15 +1834,15 @@ export default function UIPlayground() {
 
       <Wrapper title="Form">
         <form className="flex flex-col gap-4" onSubmit={(e) => e.preventDefault()}>
-          <AriaTextField label="Name" placeholder="Enter your name" isRequired />
-          <AriaTextarea
+          <TextField label="Name" placeholder="Enter your name" isRequired />
+          <Textarea
             label="Description"
             placeholder="Enter your description"
             errorMessage="Description is required"
           />
-          <AriaButton type="submit" variant="primary" size="sm">
+          <Button type="submit" variant="primary" size="sm">
             Submit
-          </AriaButton>
+          </Button>
         </form>
       </Wrapper>
     </div>

@@ -25,7 +25,7 @@ import {
 } from './dropdown'
 import { AriaDescription, AriaFieldError, AriaLabel } from './field'
 import { ListBox } from './list-box'
-import { AriaPopoverContent, type AriaPopoverContentProps } from './popover'
+import { PopoverContent, type PopoverContentProps } from './popover'
 import { composeTailwindRenderProps, focusStyles } from './primitive'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -85,7 +85,7 @@ interface SelectListProps<T extends object>
   extends Omit<ListBoxProps<T>, 'layout' | 'orientation'>,
     Pick<PopoverProps, 'placement'> {
   items?: Iterable<T>
-  popoverClassName?: AriaPopoverContentProps['className']
+  popoverClassName?: PopoverContentProps['className']
 }
 
 const SelectList = <T extends object>({
@@ -96,7 +96,7 @@ const SelectList = <T extends object>({
   ...props
 }: SelectListProps<T>) => {
   return (
-    <AriaPopoverContent
+    <PopoverContent
       showArrow={false}
       respectScreen={false}
       className={composeTailwindRenderProps(
@@ -117,7 +117,7 @@ const SelectList = <T extends object>({
       >
         {children}
       </ListBox>
-    </AriaPopoverContent>
+    </PopoverContent>
   )
 }
 

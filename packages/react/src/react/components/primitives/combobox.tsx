@@ -4,33 +4,18 @@ import * as React from 'react'
 
 import {
   CaretDownIcon,
-  CaretUpDownIcon,
   CheckIcon,
   MagnifyingGlassIcon,
   SpinnerIcon,
   XCircleIcon,
-  XIcon,
 } from '@phosphor-icons/react'
-import { useControllableState } from '@radix-ui/react-use-controllable-state'
 import { tv } from 'tailwind-variants'
 
-import { Badge } from './badge'
 import { BaseIcon } from './base-icon'
-import { Button } from './button'
-import {
-  Command,
-  CommandEmpty,
-  CommandGroup,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from './command'
 import { AriaDescription, AriaFieldError } from './field'
-import { Label } from './label'
-import { Popover, PopoverContent, PopoverTrigger } from './popover'
 import { focusStyles } from './primitive'
 
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { Label } from '../../../../v2'
 import { cn } from '../../utils/cn'
 
 /**
@@ -42,19 +27,19 @@ import { cn } from '../../utils/cn'
 /**
  * @deprecated
  */
-type AriaComboboxItem = { label: string; value: string }
+type ComboboxItem = { label: string; value: string }
 
 /**
  * @deprecated
  */
-interface AriaComboboxContextValue {
+interface ComboboxContextValue {
   open: boolean
   setOpen: (open: boolean) => void
   search: string
   setSearch: (search: string) => void
   value: string | null
   onChange: (value: string | null) => void
-  items: AriaComboboxItem[]
+  items: ComboboxItem[]
   isPending?: boolean
   isDisabled?: boolean
   isRequired?: boolean
@@ -67,13 +52,13 @@ interface AriaComboboxContextValue {
 /**
  * @deprecated
  */
-const AriaComboboxContext = React.createContext<AriaComboboxContextValue | null>(null)
+const ComboboxContext = React.createContext<ComboboxContextValue | null>(null)
 
 /**
  * @deprecated
  */
-const useAriaComboboxContext = () => {
-  const context = React.useContext(AriaComboboxContext)
+const useComboboxContext = () => {
+  const context = React.useContext(ComboboxContext)
   if (!context) {
     throw new Error('Combobox components must be used within Combobox')
   }
@@ -83,11 +68,11 @@ const useAriaComboboxContext = () => {
 /**
  * @deprecated
  */
-interface AriaComboboxProps {
+interface ComboboxProps {
   value: string | null
   onChange: (value: string | null) => void
 
-  items: AriaComboboxItem[]
+  items: ComboboxItem[]
   isPending?: boolean
 
   onSearch?: (q: string) => void
@@ -122,7 +107,7 @@ const ariaTriggerStyles = tv({
 /**
  * @deprecated
  */
-interface AriaComboboxTriggerProps {
+interface ComboboxTriggerProps {
   children: React.ReactNode
   className?: string
   isPending?: boolean
@@ -131,8 +116,8 @@ interface AriaComboboxTriggerProps {
 /**
  * @deprecated
  */
-const AriaComboboxTrigger = ({ children, className }: AriaComboboxTriggerProps) => {
-  const { open, setOpen, isDisabled, errorMessage } = useAriaComboboxContext()
+const ComboboxTrigger = ({ children, className }: ComboboxTriggerProps) => {
+  const { open, setOpen, isDisabled, errorMessage } = useComboboxContext()
 
   return (
     <div
@@ -161,7 +146,7 @@ const AriaComboboxTrigger = ({ children, className }: AriaComboboxTriggerProps) 
 /**
  * @deprecated
  */
-interface AriaComboboxSearchInputProps {
+interface ComboboxSearchInputProps {
   placeholder?: string
   className?: string
 }
@@ -169,9 +154,9 @@ interface AriaComboboxSearchInputProps {
 /**
  * @deprecated
  */
-const AriaComboboxSearchInput = ({ placeholder, className }: AriaComboboxSearchInputProps) => {
+const ComboboxSearchInput = ({ placeholder, className }: ComboboxSearchInputProps) => {
   const { open, search, setSearch, value, items, isDisabled, setOpen, onChange, isPending } =
-    useAriaComboboxContext()
+    useComboboxContext()
   const inputRef = React.useRef<HTMLInputElement>(null)
   const [selectedText, setSelectedText] = React.useState('')
 
@@ -252,7 +237,7 @@ const AriaComboboxSearchInput = ({ placeholder, className }: AriaComboboxSearchI
 /**
  * @deprecated
  */
-interface AriaComboboxListProps {
+interface ComboboxListProps {
   children: React.ReactNode
   className?: string
 }
@@ -260,8 +245,8 @@ interface AriaComboboxListProps {
 /**
  * @deprecated
  */
-const AriaComboboxList = ({ children, className }: AriaComboboxListProps) => {
-  const { open, setOpen } = useAriaComboboxContext()
+const ComboboxList = ({ children, className }: ComboboxListProps) => {
+  const { open, setOpen } = useComboboxContext()
   const listRef = React.useRef<HTMLDivElement>(null)
 
   // Click outside
@@ -291,21 +276,21 @@ const AriaComboboxList = ({ children, className }: AriaComboboxListProps) => {
 /**
  * @deprecated
  */
-interface AriaComboboxLabelProps {
+interface ComboboxLabelProps {
   children: React.ReactNode
 }
 
 /**
  * @deprecated
  */
-const AriaComboboxLabel = ({ children }: AriaComboboxLabelProps) => {
+const ComboboxLabel = ({ children }: ComboboxLabelProps) => {
   return <span>{children}</span>
 }
 
 /**
  * @deprecated
  */
-interface AriaComboboxOptionProps {
+interface ComboboxOptionProps {
   isSelected?: boolean
   onSelect?: () => void
   children: React.ReactNode
@@ -315,7 +300,7 @@ interface AriaComboboxOptionProps {
 /**
  * @deprecated
  */
-const AriaComboboxOption = ({ isSelected, onSelect, children, value }: AriaComboboxOptionProps) => {
+const ComboboxOption = ({ isSelected, onSelect, children, value }: ComboboxOptionProps) => {
   const {
     items,
     onChange,
@@ -323,7 +308,7 @@ const AriaComboboxOption = ({ isSelected, onSelect, children, value }: AriaCombo
     setSearch,
     value: currentValue,
     deselectable,
-  } = useAriaComboboxContext()
+  } = useComboboxContext()
 
   const handleSelect = () => {
     if (value) {
@@ -369,7 +354,7 @@ const AriaComboboxOption = ({ isSelected, onSelect, children, value }: AriaCombo
 /**
  * @deprecated
  */
-const AriaCombobox = ({
+const Combobox = ({
   className,
   value,
   onChange,
@@ -385,7 +370,7 @@ const AriaCombobox = ({
   isRequired,
   deselectable: _deselectable = false,
   children,
-}: AriaComboboxProps) => {
+}: ComboboxProps) => {
   const [open, setOpen] = React.useState(false)
   const [search, setSearch] = React.useState('')
   const rootRef = React.useRef<HTMLDivElement>(null)
@@ -395,7 +380,7 @@ const AriaCombobox = ({
     onOpenChange?.(next)
   }
 
-  const contextValue: AriaComboboxContextValue = {
+  const contextValue: ComboboxContextValue = {
     open,
     setOpen: handleOpen,
     search,
@@ -416,7 +401,7 @@ const AriaCombobox = ({
   }
 
   return (
-    <AriaComboboxContext.Provider value={contextValue}>
+    <ComboboxContext.Provider value={contextValue}>
       <div ref={rootRef} className={cn('flex flex-col gap-y-4 group', className)}>
         {label && (
           <Label>
@@ -429,291 +414,16 @@ const AriaCombobox = ({
           <AriaFieldError>{errorMessage}</AriaFieldError>
         </div>
       </div>
-    </AriaComboboxContext.Provider>
+    </ComboboxContext.Provider>
   )
 }
 
 export {
-  AriaCombobox,
-  AriaComboboxLabel,
-  AriaComboboxList,
-  AriaComboboxOption,
-  AriaComboboxSearchInput,
-  AriaComboboxTrigger,
-}
-export type { AriaComboboxItem, AriaComboboxProps }
-
-/**
- *
- * Shadcn component
- *
- */
-
-interface Item {
-  value: string
-  label: string
-}
-
-interface ComboboxContextValue {
-  open: boolean
-  onOpenChange: React.Dispatch<React.SetStateAction<boolean>>
-  value: string[]
-  onValueChange: React.Dispatch<React.SetStateAction<string[]>>
-  items: Item[]
-  setItems: React.Dispatch<React.SetStateAction<Item[]>>
-  multipleItems?: boolean
-}
-
-const [_ComboboxProvider, useCombobox] =
-  createRequiredContext<ComboboxContextValue>('Combobox provider')
-
-interface ComboboxProviderProps {
-  children?: React.ReactNode
-  open?: boolean
-  onOpenChange?: React.Dispatch<React.SetStateAction<boolean>>
-  value?: string[]
-  onValueChange?: React.Dispatch<React.SetStateAction<string[]>>
-  items: Item[]
-  multipleItems?: boolean
-}
-
-function ComboboxProvider(props: ComboboxProviderProps) {
-  const [items, setItems] = React.useState<Item[]>(props.items ?? [])
-
-  // typing value
-  const [value, setValue] = useControllableState<string[]>({
-    defaultProp: [''],
-    onChange: props.onValueChange,
-    prop: props.value,
-  })
-
-  // popover state
-  const [open, setOpen] = useControllableState({
-    defaultProp: false,
-    onChange: props.onOpenChange,
-    prop: props.open,
-  })
-
-  return (
-    <_ComboboxProvider
-      value={value}
-      onValueChange={setValue}
-      open={open}
-      onOpenChange={setOpen}
-      items={items}
-      setItems={setItems}
-      multipleItems={props.multipleItems ?? false}
-    >
-      <_ComboboxPopoverProvider>{props.children}</_ComboboxPopoverProvider>
-    </_ComboboxProvider>
-  )
-}
-
-function _ComboboxPopoverProvider(props: { children?: React.ReactNode }) {
-  const ctx = useCombobox()
-  return (
-    <Popover open={ctx.open} onOpenChange={ctx.onOpenChange}>
-      {props.children}
-    </Popover>
-  )
-}
-
-function ComboboxTriggerMultiValue(props: {
-  children?: ((selectedItem: Item[] | undefined) => React.ReactElement) | React.ReactNode
-  className?: string
-}) {
-  const ctx = useCombobox()
-
-  const selectedItems = ctx.items.filter((item) => ctx.value.includes(item.value))
-
-  const onTriggerKeyDown: React.KeyboardEventHandler = (event) => {
-    if (event.key === 'ArrowDown') ctx.onOpenChange(true)
-  }
-
-  const renderItems = React.useMemo(() => {
-    return (
-      <span className="flex flex-wrap flex-1 gap-2 pr-8">
-        {selectedItems.map((selectedItem) => (
-          <Badge
-            onClick={(e) => {
-              e.stopPropagation()
-              ctx.onValueChange((prevItems) =>
-                prevItems.filter((prevItem) => prevItem !== selectedItem.value)
-              )
-            }}
-            shape="square"
-            intent="gray"
-            key={selectedItem.value}
-            className="flex "
-          >
-            {selectedItem.label}
-            <XIcon className="size-5 ml-1" />
-          </Badge>
-        ))}
-      </span>
-    )
-  }, [selectedItems])
-
-  return (
-    <PopoverTrigger
-      asChild
-      onKeyDown={onTriggerKeyDown}
-      className={cn('w-[200px] min-h-18 justify-between flex h-auto relative', props.className)}
-      aria-expanded={ctx.open}
-    >
-      {typeof props.children === 'function' ? (
-        props.children(selectedItems)
-      ) : props.children ? (
-        props.children
-      ) : (
-        <Button variant="outline" role="combobox">
-          {selectedItems.length > 0 ? renderItems : 'Please select item'}
-          <CaretUpDownIcon className="h-8 w-8 shrink-0 opacity-50 absolute right-4 inset-y-0 my-auto" />
-        </Button>
-      )}
-    </PopoverTrigger>
-  )
-}
-
-function ComboboxTrigger(props: {
-  children?: ((selectedItem: Item | undefined) => React.ReactElement) | React.ReactNode
-  className?: string
-}) {
-  const ctx = useCombobox()
-
-  if (ctx.multipleItems) {
-    throw new Error(
-      'Please use `MultipleValueComboboxTrigger` component for mange multi value selection, this will make component maintenance more easier'
-    )
-  }
-
-  const selectedItem = ctx.items.find((item) => ctx.value.includes(item.value))
-
-  const onTriggerKeyDown: React.KeyboardEventHandler = (event) => {
-    if (event.key === 'ArrowDown') ctx.onOpenChange(true)
-  }
-
-  return (
-    <PopoverTrigger
-      asChild
-      onKeyDown={onTriggerKeyDown}
-      className={cn('w-[200px] justify-between', props.className)}
-      aria-expanded={ctx.open}
-    >
-      {typeof props.children === 'function' ? (
-        props.children(selectedItem)
-      ) : props.children ? (
-        props.children
-      ) : (
-        <Button variant="outline" role="combobox">
-          {selectedItem?.label || 'Please select item'}
-          <CaretUpDownIcon className="ml-4 h-8 w-8 shrink-0 opacity-50" />
-        </Button>
-      )}
-    </PopoverTrigger>
-  )
-}
-
-function ComboboxCommandInput() {
-  return <CommandInput placeholder="Search framework..." />
-}
-
-function ComboboxContent({
-  children,
-  className,
-  ...props
-}: { children?: React.ReactNode; className?: string } & React.ComponentPropsWithRef<
-  typeof PopoverContent
->) {
-  return (
-    <Command loop className="w-fit">
-      <PopoverContent
-        className={cn('w-(--radix-popover-trigger-width) bg-background p-0', className)}
-        {...props}
-      >
-        {children}
-      </PopoverContent>
-    </Command>
-  )
-}
-
-function ComboboxCommandEmpty({
-  children,
-  className,
-  ...props
-}: { children?: React.ReactNode } & React.ComponentPropsWithRef<typeof CommandEmpty>) {
-  return (
-    <CommandEmpty className={cn('text-muted-foreground', className)} {...props}>
-      {children || 'No framework found'}
-    </CommandEmpty>
-  )
-}
-
-function ComboboxCommandList({
-  children,
-  ...props
-}: { children?: React.ReactNode } & React.ComponentPropsWithRef<typeof CommandList>) {
-  return <CommandList {...props}>{children}</CommandList>
-}
-
-function ComboboxCommandGroup({
-  children: Children,
-  ...props
-}: {
-  children: React.FC<{ items: Item[] }>
-} & Omit<React.ComponentPropsWithRef<typeof CommandGroup>, 'children'>) {
-  const ctx = useCombobox()
-  return (
-    <CommandGroup {...props}>
-      <Children items={ctx.items} />
-    </CommandGroup>
-  )
-}
-
-function ComboboxCommandItem({
-  value,
-  label,
-  ...props
-}: { children?: React.ReactNode; value: string; label: string } & React.ComponentPropsWithRef<
-  typeof CommandItem
->) {
-  const ctx = useCombobox()
-
-  const isValueExistedBefore = ctx.value.some((existedValue) => existedValue === value)
-
-  const onSelect = () => {
-    ctx.onValueChange((prevItems) => {
-      if (ctx.multipleItems) {
-        return isValueExistedBefore
-          ? prevItems.filter((prevItem) => prevItem !== value)
-          : [...prevItems, value]
-      }
-
-      return isValueExistedBefore ? [] : [value]
-    })
-
-    !ctx.multipleItems && ctx.onOpenChange(false)
-  }
-
-  return (
-    <CommandItem id={value} value={value} onSelect={onSelect} {...props}>
-      <CheckIcon
-        className={cn('mr-4 h-8 w-8', isValueExistedBefore ? 'opacity-100' : 'opacity-0')}
-      />
-      {label}
-    </CommandItem>
-  )
-}
-
-export {
-  ComboboxCommandEmpty,
-  ComboboxCommandGroup,
-  ComboboxCommandInput,
-  ComboboxCommandItem,
-  ComboboxCommandList,
-  ComboboxContent,
-  ComboboxProvider,
+  Combobox,
+  ComboboxLabel,
+  ComboboxList,
+  ComboboxOption,
+  ComboboxSearchInput,
   ComboboxTrigger,
-  ComboboxTriggerMultiValue,
-  useCombobox,
 }
+export type { ComboboxItem, ComboboxProps }

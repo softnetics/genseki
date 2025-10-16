@@ -12,7 +12,7 @@ import { useFormStatus } from 'react-dom'
 import { CopyIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
-import { AriaButton } from './button'
+import { Button } from './button'
 import type { AriaFieldProps } from './field'
 import {
   AriaDescription as AriaDescription,
@@ -27,9 +27,9 @@ import { BaseIcon } from '../../components/primitives/base-icon'
 import { Typography } from '../../components/primitives/typography'
 import { cn } from '../../utils/cn'
 
-type AriaInputType = Exclude<ReactAriaInputPrimitiveProps['type'], 'password'>
+type InputType = Exclude<ReactAriaInputPrimitiveProps['type'], 'password'>
 
-interface AriaBaseTextFieldProps extends TextFieldPrimitiveProps, AriaFieldProps {
+interface BaseTextFieldProps extends TextFieldPrimitiveProps, AriaFieldProps {
   prefix?: React.ReactNode
   suffix?: React.ReactNode
   isPending?: boolean
@@ -38,14 +38,14 @@ interface AriaBaseTextFieldProps extends TextFieldPrimitiveProps, AriaFieldProps
   isShowCopyButton?: boolean
 }
 
-interface AriaRevealableTextFieldProps extends AriaBaseTextFieldProps {
+interface RevealableTextFieldProps extends BaseTextFieldProps {
   isRevealable: true
   type: 'password'
 }
 
-interface AriaNonRevealableTextFieldProps extends AriaBaseTextFieldProps {
+interface NonRevealableTextFieldProps extends BaseTextFieldProps {
   isRevealable?: never
-  type?: AriaInputType
+  type?: InputType
 }
 
 const fieldgroupVariants = tv({
@@ -64,13 +64,13 @@ const fieldgroupVariants = tv({
 /**
  * @deprecated use InputProps
  */
-type AriaTextFieldProps = (AriaRevealableTextFieldProps | AriaNonRevealableTextFieldProps) &
+type TextFieldProps = (RevealableTextFieldProps | NonRevealableTextFieldProps) &
   VariantProps<typeof fieldgroupVariants>
 
 /**
  * @deprecated use Input
  */
-const AriaTextField = ({
+const TextField = ({
   placeholder,
   label,
   description,
@@ -82,7 +82,7 @@ const AriaTextField = ({
   isRevealable,
   type,
   ...props
-}: AriaTextFieldProps) => {
+}: TextFieldProps) => {
   const formStatus = useFormStatus()
   const disabled = formStatus.pending || props.isDisabled
 
@@ -136,7 +136,7 @@ const AriaTextField = ({
             )}
             <AriaInput placeholder={placeholder} disabled={disabled} />
             {isRevealable ? (
-              <AriaButton
+              <Button
                 variant="vanish"
                 size="md"
                 type="button"
@@ -148,7 +148,7 @@ const AriaTextField = ({
                 ) : (
                   <BaseIcon icon={EyeIcon} weight="regular" size="md" />
                 )}
-              </AriaButton>
+              </Button>
             ) : isPending ? (
               <Loader variant="spin" />
             ) : suffix ? (
@@ -167,7 +167,7 @@ const AriaTextField = ({
             ) : null}
             {props.isShowCopyButton && (
               <div className="border-l border-border ml-1 flex items-center gap-2">
-                <AriaButton
+                <Button
                   variant="vanish"
                   size="md"
                   type="button"
@@ -178,7 +178,7 @@ const AriaTextField = ({
                 >
                   <BaseIcon icon={CopyIcon} size="md" weight="regular" />
                   Copy
-                </AriaButton>
+                </Button>
               </div>
             )}
           </AriaFieldGroup>
@@ -192,36 +192,4 @@ const AriaTextField = ({
   )
 }
 
-export { AriaTextField, type AriaTextFieldProps }
-
-/**
- *
- * Shadcn component
- *
- */
-
-function Input({
-  className,
-  type,
-  isError,
-  ...props
-}: React.ComponentProps<'input'> & { isError?: boolean }) {
-  return (
-    <input
-      type={type}
-      className={cn(
-        'file:text-foreground placeholder:text-muted-foreground selection:bg-primary selection:text-primary-foreground dark:bg-input/30 border-input h-18 w-full min-w-0 rounded-md border bg-transparent px-6 py-2 text-base shadow-xs transition-[color,box-shadow] outline-none file:inline-flex file:h-14 file:border-0 file:bg-transparent file:text-sm file:font-medium disabled:pointer-events-none disabled:cursor-not-allowed disabled:opacity-50 md:text-sm',
-        'focus-visible:border-ring focus-visible:ring-ring/50 focus-visible:ring-[3px]',
-        'aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive',
-        className
-      )}
-      data-slot="input"
-      aria-invalid={isError}
-      {...props}
-    />
-  )
-}
-
-type InputProps = React.ComponentPropsWithRef<typeof Input>
-
-export { Input, type InputProps }
+export { TextField, type TextFieldProps }

@@ -12,6 +12,7 @@ import {
   XIcon,
 } from '@phosphor-icons/react'
 
+import { Typography } from '@genseki/react'
 import {
   Input,
   InputGroup,
@@ -20,8 +21,7 @@ import {
   InputGroupControl,
   InputGroupText,
   Label,
-  Typography,
-} from '@genseki/react'
+} from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 
