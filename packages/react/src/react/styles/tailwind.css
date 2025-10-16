@@ -282,6 +282,7 @@
   --color-accent: var(--color-bluegray-50);
   --color-accent-fg: var(--color-bluegray-900);
 
+  --color-overlay: var(--color-white);
   --color-overlay-fg: var(--color-bluegray-900);
 
   --color-muted: var(--color-bluegray-100);

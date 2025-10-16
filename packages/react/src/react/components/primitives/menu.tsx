@@ -122,7 +122,7 @@ const MenuContent = <T extends object>({
       arrowBoundaryOffset={props.arrowBoundaryOffset}
       className={composeTailwindRenderProps(
         popoverClassName,
-        'shadow-xs outline-hidden z-50 min-w-44 rounded-lg p-0 sm:pb-0 bg-bg'
+        'shadow-xs outline-hidden z-50 min-w-44 rounded-lg p-0 sm:pb-0'
       )}
     >
       <MenuPrimitive
