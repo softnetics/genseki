@@ -1,5 +1,21 @@
 # @example/erp
 
+## 0.1.0-alpha.57
+
+### Patch Changes
+
+- [#237](https://github.com/softnetics/genseki/pull/237) [`bb5a2bd`](https://github.com/softnetics/genseki/commit/bb5a2bd8997a2b40d895829253e66db7c5dfa3e0) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - - move `shadcn` components to `v2` folder and export the directory
+  - flatten `primary` button variant
+  - fix: `aria-menu` background
+  - rename back the deprecated react-aria components by removing the leading `Aria[component-name]` keyword
+- Updated dependencies [[`bb5a2bd`](https://github.com/softnetics/genseki/commit/bb5a2bd8997a2b40d895829253e66db7c5dfa3e0)]:
+  - @genseki/react@0.1.0-alpha.59
+  - @genseki/next@0.1.0-alpha.59
+  - @genseki/plugins@0.1.0-alpha.59
+  - @genseki/prisma-generator@0.1.0-alpha.59
+  - @genseki/react-query@0.1.0-alpha.59
+  - @genseki/rest@0.1.0-alpha.59
+
 ## 0.1.0-alpha.56
 
 ### Patch Changes
