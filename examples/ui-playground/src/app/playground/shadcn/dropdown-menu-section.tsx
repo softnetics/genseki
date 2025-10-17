@@ -166,13 +166,31 @@ function DropdownWithCheckboxes() {
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuLabel>View</DropdownMenuLabel>
-          <DropdownMenuCheckboxItem checked={showStatusBar} onCheckedChange={setShowStatusBar}>
+          <DropdownMenuCheckboxItem
+            onSelect={(e) => {
+              e.preventDefault()
+            }}
+            checked={showStatusBar}
+            onCheckedChange={setShowStatusBar}
+          >
             Status Bar
           </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={showPanel} onCheckedChange={setShowPanel}>
+          <DropdownMenuCheckboxItem
+            onSelect={(e) => {
+              e.preventDefault()
+            }}
+            checked={showPanel}
+            onCheckedChange={setShowPanel}
+          >
             Panel
           </DropdownMenuCheckboxItem>
-          <DropdownMenuCheckboxItem checked={showSidebar} onCheckedChange={setShowSidebar}>
+          <DropdownMenuCheckboxItem
+            onSelect={(e) => {
+              e.preventDefault()
+            }}
+            checked={showSidebar}
+            onCheckedChange={setShowSidebar}
+          >
             Sidebar
           </DropdownMenuCheckboxItem>
         </DropdownMenuContent>

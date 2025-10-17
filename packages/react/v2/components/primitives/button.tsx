@@ -11,7 +11,7 @@ import { cn } from '../../../src/react/utils/cn'
 
 const buttonVariants = cva(
   [
-    "inline-flex items-center justify-center gap-4 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-8 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring ring-offset-1 focus-visible:ring-ring/50 focus-visible:ring-[2px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
+    "inline-flex items-center justify-center gap-4 whitespace-nowrap rounded-md text-sm font-medium transition-all disabled:pointer-events-none [&_svg]:pointer-events-none [&_svg:not([class*='size-'])]:size-8 shrink-0 [&_svg]:shrink-0 outline-none focus-visible:border-ring ring-offset-1 focus-visible:ring-ring focus-visible:ring-[2px] aria-invalid:ring-destructive/20 dark:aria-invalid:ring-destructive/40 aria-invalid:border-destructive",
     'disabled:opacity-80 cursor-pointer',
   ],
   {
@@ -30,7 +30,7 @@ const buttonVariants = cva(
         ghost:
           ' bg-surface-button-ghost hover:bg-surface-button-ghost-hover active:bg-surface-button-ghost text-text-secondary hover:text-accent-foreground dark:hover:bg-accent/50',
         destructive:
-          'bg-destructive text-white hover:bg-destructive/90 active:bg-destructive focus-visible:ring-destructive/20 dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
+          'bg-destructive text-white hover:bg-destructive/90 active:bg-destructive focus-visible:ring-destructive dark:focus-visible:ring-destructive/40 dark:bg-destructive/60',
       },
       size: {
         default: 'h-18 px-8 py-4 has-[>svg]:px-6',
