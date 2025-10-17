@@ -10,7 +10,7 @@ import { EditorProvider } from './rich-text-provider'
 import { cn } from '../../../../utils/cn'
 import { focusStyles } from '../../../primitives'
 import { CustomFieldError } from '../../../primitives/custom-field-error'
-import { AriaDescription, AriaFieldGroup } from '../../../primitives/field'
+import { Description, FieldGroup } from '../../../primitives/field'
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
   value?: string | Content | Content[]
@@ -42,7 +42,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
 
   return (
     <div className="flex flex-col gap-y-4" data-invalid={true}>
-      <AriaFieldGroup
+      <FieldGroup
         isDisabled={props.isDisabled}
         isInvalid={isInvalid}
         data-loading={props.isPending ? 'true' : undefined}
@@ -57,8 +57,8 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
         >
           <EditorProvider {...props.editorProviderProps} editor={editor} />
         </div>
-      </AriaFieldGroup>
-      {props.description && <AriaDescription>{props.description}</AriaDescription>}
+      </FieldGroup>
+      {props.description && <Description>{props.description}</Description>}
       <CustomFieldError errorMessage={props.errorMessage} />
     </div>
   )

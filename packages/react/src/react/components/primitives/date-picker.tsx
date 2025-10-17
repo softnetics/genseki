@@ -18,7 +18,7 @@ import type { DateDuration } from '@internationalized/date'
 import { Button } from './button'
 import { Calendar } from './calendar'
 import { DateInput } from './date-field'
-import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaLabel } from './field'
+import { Description, FieldError, FieldGroup, Label } from './field'
 import { PopoverClose, PopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 import { RangeCalendar } from './range-calendar'
@@ -101,16 +101,16 @@ const DatePicker = <T extends DateValue>({
         className={composeTailwindRenderProps(className, 'group/date-picker flex flex-col gap-y-4')}
       >
         {label && (
-          <AriaLabel>
+          <Label>
             {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-          </AriaLabel>
+          </Label>
         )}
-        <AriaFieldGroup className="min-w-40">
+        <FieldGroup className="min-w-40">
           <DateInput size="md" className="w-full pr-16" />
           <DatePickerIcon />
-        </AriaFieldGroup>
-        {description && <AriaDescription>{description}</AriaDescription>}
-        <AriaFieldError>{errorMessage}</AriaFieldError>
+        </FieldGroup>
+        {description && <Description>{description}</Description>}
+        <FieldError>{errorMessage}</FieldError>
         <DatePickerOverlay />
       </DatePickerPrimitive>
     </I18nProvider>

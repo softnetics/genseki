@@ -26,7 +26,7 @@ import { composeTailwindRenderProps, focusStyles } from './primitive'
 /**
  * @deprecated
  */
-interface AriaFieldProps {
+interface FieldProps {
   label?: string
   placeholder?: string
   description?: string
@@ -38,7 +38,7 @@ interface AriaFieldProps {
 /**
  * @deprecated
  */
-const ariaFieldStyles = tv({
+const FieldStyles = tv({
   slots: {
     description: 'text-pretty text-secondary-fg text-sm',
     label: 'w-fit cursor-default font-semibold text-fg text-base',
@@ -49,16 +49,12 @@ const ariaFieldStyles = tv({
 /**
  * @deprecated
  */
-const {
-  description: ariaDescription,
-  label: ariaLabel,
-  fieldError: ariaFieldError,
-} = ariaFieldStyles()
+const { description: ariaDescription, label: ariaLabel, fieldError: ariaFieldError } = FieldStyles()
 
 /**
  * @deprecated
  */
-const AriaLabel = forwardRef<HTMLLabelElement, LabelProps>(function Label(
+const Label = forwardRef<HTMLLabelElement, LabelProps>(function Label(
   { className, ...props },
   ref
 ) {
@@ -76,7 +72,7 @@ interface AriaDescriptionProps extends TextProps {
 /**
  * @deprecated
  */
-const AriaDescription = forwardRef<HTMLElement, AriaDescriptionProps>(function Description(
+const Description = forwardRef<HTMLElement, AriaDescriptionProps>(function Description(
   { className, isWarning, ...props },
   ref
 ) {
@@ -93,14 +89,14 @@ const AriaDescription = forwardRef<HTMLElement, AriaDescriptionProps>(function D
 /**
  * @deprecated
  */
-interface AriaFieldErrorProps extends FieldErrorPrimitiveProps {
+interface FieldErrorProps extends FieldErrorPrimitiveProps {
   ref?: React.RefObject<HTMLElement>
 }
 
 /**
  * @deprecated
  */
-const AriaFieldError = forwardRef<HTMLElement, AriaFieldErrorProps>(function FieldError(
+const FieldError = forwardRef<HTMLElement, FieldErrorProps>(function FieldError(
   { className, ...props },
   ref
 ) {
@@ -149,7 +145,7 @@ interface AriaFieldGroupProps extends GroupProps {
 /**
  * @deprecated
  */
-const AriaFieldGroup = forwardRef<HTMLDivElement, AriaFieldGroupProps>(function FieldGroup(
+const FieldGroup = forwardRef<HTMLDivElement, AriaFieldGroupProps>(function FieldGroup(
   { className, ...props },
   ref
 ) {
@@ -170,12 +166,12 @@ const AriaFieldGroup = forwardRef<HTMLDivElement, AriaFieldGroupProps>(function 
 /**
  * @deprecated
  */
-interface AriaInputProps extends InputPrimitiveProps {}
+interface InputProps extends InputPrimitiveProps {}
 
 /**
  * @deprecated
  */
-const AriaInput = forwardRef<HTMLInputElement, AriaInputProps>(function Input(
+const Input = forwardRef<HTMLInputElement, InputProps>(function Input(
   { className, ...props },
   ref
 ) {
@@ -191,5 +187,5 @@ const AriaInput = forwardRef<HTMLInputElement, AriaInputProps>(function Input(
   )
 })
 
-export type { AriaFieldErrorProps, AriaFieldProps, AriaInputProps }
-export { AriaDescription, AriaFieldError, AriaFieldGroup, ariaFieldStyles, AriaInput, AriaLabel }
+export type { FieldErrorProps, FieldProps, InputProps }
+export { Description, FieldError, FieldGroup, FieldStyles, Input, Label }

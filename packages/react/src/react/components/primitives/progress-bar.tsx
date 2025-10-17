@@ -7,7 +7,7 @@ import {
 
 import { motion } from 'motion/react'
 
-import { AriaLabel } from './field'
+import { Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 interface ProgressBarProps extends ProgressBarPrimitiveProps {
@@ -74,7 +74,7 @@ const ProgressBar = ({
           {/* percent */}
           {isShowPercent && (
             <div className="flex justify-between gap-2">
-              {label && <AriaLabel>{label}</AriaLabel>}
+              {label && <Label>{label}</Label>}
               <span className="text-muted-fg text-sm tabular-nums">{valueText}</span>
             </div>
           )}

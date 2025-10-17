@@ -16,7 +16,7 @@ import { CaretDownIcon } from '@phosphor-icons/react'
 import { twMerge } from 'tailwind-merge'
 
 import { DropdownItem, DropdownLabel, DropdownSection } from './dropdown'
-import { AriaDescription, AriaFieldGroup, type AriaFieldProps, AriaInput, AriaLabel } from './field'
+import { Description, FieldGroup, type FieldProps, Input, Label } from './field'
 import { ListBox } from './list-box'
 import { PopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
@@ -30,7 +30,7 @@ interface MultipleSelectProps<T>
       ComboBoxProps<T & { selectedKeys: Selection }>,
       'isRequired' | 'validate' | 'validationBehavior'
     >,
-    AriaFieldProps,
+    FieldProps,
     Pick<TagGroupProps, 'shape'>,
     Pick<GroupProps, 'isDisabled' | 'isInvalid'> {
   className?: string
@@ -128,11 +128,11 @@ const MultipleSelect = <T extends object>({
       {({ isInvalid, isDisabled }) => (
         <>
           {props.label && (
-            <AriaLabel onClick={() => inputRef.current?.focus()}>
+            <Label onClick={() => inputRef.current?.focus()}>
               {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-            </AriaLabel>
+            </Label>
           )}
-          <AriaFieldGroup
+          <FieldGroup
             ref={triggerRef as RefObject<HTMLDivElement>}
             isDisabled={isDisabled}
             isInvalid={isInvalid}
@@ -176,7 +176,7 @@ const MultipleSelect = <T extends object>({
               onInputChange={isMax ? () => {} : setInputValue}
             >
               <div className="flex w-full flex-row items-center justify-between">
-                <AriaInput
+                <Input
                   onFocus={() => triggerButtonRef.current?.click()}
                   ref={inputRef as RefObject<HTMLInputElement>}
                   className="flex-1 p-6 shadow-none ring-0"
@@ -213,7 +213,7 @@ const MultipleSelect = <T extends object>({
                     renderEmptyState ? (
                       renderEmptyState(inputValue)
                     ) : (
-                      <AriaDescription className="block p-3">
+                      <Description className="block p-3">
                         {inputValue ? (
                           <>
                             No results found for:{' '}
@@ -222,7 +222,7 @@ const MultipleSelect = <T extends object>({
                         ) : (
                           'No options'
                         )}
-                      </AriaDescription>
+                      </Description>
                     )
                   }
                   items={(availableItemsToSelect as T[]) ?? props.items}
@@ -240,12 +240,10 @@ const MultipleSelect = <T extends object>({
                 </ListBox>
               </PopoverContent>
             </ComboBox>
-          </AriaFieldGroup>
-          {props.description && <AriaDescription>{props.description}</AriaDescription>}
+          </FieldGroup>
+          {props.description && <Description>{props.description}</Description>}
           {props.errorMessage && isInvalid && (
-            <AriaDescription className="text-danger text-sm/5">
-              {props.errorMessage}
-            </AriaDescription>
+            <Description className="text-danger text-sm/5">{props.errorMessage}</Description>
           )}
         </>
       )}

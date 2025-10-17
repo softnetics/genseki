@@ -23,7 +23,7 @@ import {
   DropdownSection,
   DropdownSeparator,
 } from './dropdown'
-import { AriaDescription, AriaFieldError, AriaLabel } from './field'
+import { Description, FieldError, Label } from './field'
 import { ListBox } from './list-box'
 import { PopoverContent, type PopoverContentProps } from './popover'
 import { composeTailwindRenderProps, focusStyles } from './primitive'
@@ -68,13 +68,13 @@ const Select = <T extends object>({
       {(values) => (
         <>
           {label && (
-            <AriaLabel>
+            <Label>
               {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-            </AriaLabel>
+            </Label>
           )}
           {typeof props.children === 'function' ? props.children(values) : props.children}
-          {description && <AriaDescription>{description}</AriaDescription>}
-          <AriaFieldError>{errorMessage}</AriaFieldError>
+          {description && <Description>{description}</Description>}
+          <FieldError>{errorMessage}</FieldError>
         </>
       )}
     </SelectPrimitive>

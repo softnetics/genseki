@@ -16,7 +16,7 @@ import { CheckIcon, MinusIcon } from '@phosphor-icons/react'
 import { twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
-import { AriaDescription, AriaFieldError, AriaLabel } from './field'
+import { Description, FieldError, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 import { cn } from '../../utils/cn'
@@ -37,12 +37,10 @@ const CheckboxGroup = forwardRef(function CheckboxGroup(
       {...props}
       className={composeTailwindRenderProps(className, 'flex flex-col gap-y-2')}
     >
-      {props.label && <AriaLabel>{props.label}</AriaLabel>}
+      {props.label && <Label>{props.label}</Label>}
       <>{props.children as React.ReactNode}</>
-      {props.description && (
-        <AriaDescription className="block">{props.description}</AriaDescription>
-      )}
-      <AriaFieldError>{props.errorMessage}</AriaFieldError>
+      {props.description && <Description className="block">{props.description}</Description>}
+      <FieldError>{props.errorMessage}</FieldError>
     </CheckboxGroupPrimitive>
   )
 })
@@ -139,14 +137,14 @@ const Checkbox = forwardRef(function Checkbox(
             <div className="flex flex-col gap-1">
               <>
                 {props.label ? (
-                  <AriaLabel className={cn(props.description, sizeClasses[size].label)}>
+                  <Label className={cn(props.description, sizeClasses[size].label)}>
                     {props.label}
                     {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-                  </AriaLabel>
+                  </Label>
                 ) : (
                   (props.children as React.ReactNode)
                 )}
-                {props.description && <AriaDescription>{props.description}</AriaDescription>}
+                {props.description && <Description>{props.description}</Description>}
               </>
             </div>
           </div>

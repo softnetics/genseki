@@ -16,7 +16,7 @@ import { ColorArea } from './color-area'
 import { ColorField } from './color-field'
 import { ColorSlider } from './color-slider'
 import { ColorSwatch } from './color-swatch'
-import { AriaDescription } from './field'
+import { Description } from './field'
 import { Popover, PopoverContent, type PopoverContentProps } from './popover'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -96,7 +96,7 @@ const ColorPicker = ({
           </PopoverContent>
         </Popover>
       </ColorPickerPrimitive>
-      {description && <AriaDescription>{description}</AriaDescription>}
+      {description && <Description>{description}</Description>}
     </div>
   )
 }

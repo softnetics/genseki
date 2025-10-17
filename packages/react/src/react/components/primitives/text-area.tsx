@@ -4,7 +4,7 @@ import { TextArea, TextField, type TextFieldProps } from 'react-aria-components'
 
 import { twJoin } from 'tailwind-merge'
 
-import { AriaDescription, AriaFieldError, type AriaFieldProps, AriaLabel } from './field'
+import { Description, FieldError, type FieldProps, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 /**
@@ -16,7 +16,7 @@ import { composeTailwindRenderProps } from './primitive'
 /**
  * @deprecated
  */
-interface TextareaProps extends Omit<TextFieldProps, 'className'>, AriaFieldProps {
+interface TextareaProps extends Omit<TextFieldProps, 'className'>, FieldProps {
   className?: string | ((v: TextFieldProps) => string)
 }
 
@@ -40,9 +40,9 @@ const Textarea = ({
       )}
     >
       {label && (
-        <AriaLabel>
+        <Label>
           {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </AriaLabel>
+        </Label>
       )}
       <TextArea
         placeholder={placeholder}
@@ -58,8 +58,8 @@ const Textarea = ({
           ])
         )}
       />
-      {description && <AriaDescription>{description}</AriaDescription>}
-      <AriaFieldError>{errorMessage}</AriaFieldError>
+      {description && <Description>{description}</Description>}
+      <FieldError>{errorMessage}</FieldError>
     </TextField>
   )
 }

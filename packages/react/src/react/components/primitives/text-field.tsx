@@ -13,13 +13,13 @@ import { CopyIcon, EyeClosedIcon, EyeIcon } from '@phosphor-icons/react'
 import { tv, type VariantProps } from 'tailwind-variants'
 
 import { Button } from './button'
-import type { AriaFieldProps } from './field'
+import type { FieldProps } from './field'
 import {
-  AriaDescription as AriaDescription,
-  AriaFieldError as AriaFieldError,
-  AriaFieldGroup as AriaFieldGroup,
-  AriaInput,
-  AriaLabel as AriaLabel,
+  Description as Description,
+  FieldError as FieldError,
+  FieldGroup as FieldGroup,
+  Input,
+  Label as Label,
 } from './field'
 import { Loader } from './loader'
 
@@ -29,7 +29,7 @@ import { cn } from '../../utils/cn'
 
 type InputType = Exclude<ReactAriaInputPrimitiveProps['type'], 'password'>
 
-interface BaseTextFieldProps extends TextFieldPrimitiveProps, AriaFieldProps {
+interface BaseTextFieldProps extends TextFieldPrimitiveProps, FieldProps {
   prefix?: React.ReactNode
   suffix?: React.ReactNode
   isPending?: boolean
@@ -105,11 +105,11 @@ const TextField = ({
       {!props.children ? (
         <>
           {label && (
-            <AriaLabel>
+            <Label>
               {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-            </AriaLabel>
+            </Label>
           )}
-          <AriaFieldGroup
+          <FieldGroup
             isDisabled={disabled}
             isInvalid={isInvalid}
             data-loading={isPending ? 'true' : undefined}
@@ -134,7 +134,7 @@ const TextField = ({
             ) : (
               prefix && <div data-slot="prefix">{prefix}</div>
             )}
-            <AriaInput placeholder={placeholder} disabled={disabled} />
+            <Input placeholder={placeholder} disabled={disabled} />
             {isRevealable ? (
               <Button
                 variant="vanish"
@@ -181,9 +181,9 @@ const TextField = ({
                 </Button>
               </div>
             )}
-          </AriaFieldGroup>
-          {description && <AriaDescription>{description}</AriaDescription>}
-          <AriaFieldError>{errorMessage}</AriaFieldError>
+          </FieldGroup>
+          {description && <Description>{description}</Description>}
+          <FieldError>{errorMessage}</FieldError>
         </>
       ) : (
         props.children
