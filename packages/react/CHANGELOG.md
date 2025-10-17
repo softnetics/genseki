@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.61
+
+### Patch Changes
+
+- [#241](https://github.com/softnetics/genseki/pull/241) [`5ef0717`](https://github.com/softnetics/genseki/commit/5ef0717207c29e0fe2e588f3e0a056c42db36323) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: remove leading `Aria` from field.tsx components, add `use client` directive
+
 ## 0.1.0-alpha.60
 
 ### Patch Changes
