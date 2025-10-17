@@ -1,14 +1,14 @@
 import * as React from 'react'
 
 import {
-  BookOpenIcon,
-  RobotIcon,
+  ChartLineUpIcon,
   StackIcon,
+  StorefrontIcon,
   TerminalWindowIcon,
+  TreeStructureIcon,
   WaveformIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
 import {
   Sidebar,
   SidebarContent,
@@ -17,16 +17,12 @@ import {
   SidebarRail,
 } from '@genseki/react/v2'
 
+import { NavFooter } from './nav-footer'
 import { NavHeader } from './nav-header'
 import { NavMain } from './nav-main'
 
 // This is sample data.
 const data = {
-  user: {
-    name: 'shadcn',
-    email: 'm@example.com',
-    avatar: '/avatars/shadcn.jpg',
-  },
   teams: [
     {
       name: 'Acme Inc',
@@ -46,63 +42,97 @@ const data = {
   ],
   navMain: [
     {
-      title: 'Playground',
+      title: 'Omni-Channel Management',
       url: '#',
-      icon: TerminalWindowIcon,
+      icon: TreeStructureIcon,
       isActive: true,
       items: [
         {
-          title: 'History',
+          title: 'Bplus Sync',
           url: '#',
         },
         {
-          title: 'Starred',
+          title: 'Product',
           url: '#',
         },
         {
-          title: 'Settings',
+          title: 'Delivery Fee (by Weight)',
+          url: '#',
+        },
+        {
+          title: 'Delivery Fee (by Carton)',
+          url: '#',
+        },
+        {
+          title: 'Order',
+          url: '#',
+        },
+        {
+          title: 'Data export',
+          url: '#',
+        },
+        {
+          title: 'Packing',
+          url: '#',
+        },
+        {
+          title: 'Inventory',
+          url: '#',
+        },
+        {
+          title: 'Inventory transfer',
           url: '#',
         },
       ],
     },
     {
-      title: 'Models',
+      title: 'Dashboard',
       url: '#',
-      icon: RobotIcon,
+      icon: ChartLineUpIcon,
+      isActive: true,
       items: [
         {
-          title: 'Genesis',
+          title: 'User summary',
           url: '#',
         },
         {
-          title: 'Explorer',
+          title: 'Sales reports',
           url: '#',
         },
         {
-          title: 'Quantum',
+          title: 'Finance overview',
+          url: '#',
+        },
+        {
+          title: 'Growth analytics',
+          url: '#',
+        },
+        {
+          title: 'Performance metrics',
+          url: '#',
+        },
+        {
+          title: 'Engagement insights',
           url: '#',
         },
       ],
     },
     {
-      title: 'Documentation',
+      title: 'Storefront Management',
       url: '#',
-      icon: BookOpenIcon,
+      icon: StorefrontIcon,
+      isActive: true,
       items: [
         {
-          title: 'Introduction',
+          title: 'Line shop',
           url: '#',
         },
         {
-          title: 'Get Started',
+          title: 'Shopee',
           url: '#',
         },
         {
-          title: 'Tutorials',
-          url: '#',
-        },
-        {
-          title: 'Changelog',
+          title: 'Lazada',
           url: '#',
         },
       ],
@@ -113,16 +143,14 @@ const data = {
 export function AppSidebar({ ...props }: React.ComponentProps<typeof Sidebar>) {
   return (
     <Sidebar collapsible="icon" {...props}>
-      <SidebarHeader>
+      <SidebarHeader className="px-6 py-0">
         <NavHeader />
       </SidebarHeader>
       <SidebarContent>
         <NavMain items={data.navMain} />
       </SidebarContent>
       <SidebarFooter>
-        <div className="w-full bg-muted rounded-md px-6 py-4 text-muted-fg border border-border">
-          <Typography>Footer content</Typography>
-        </div>
+        <NavFooter />
       </SidebarFooter>
       <SidebarRail />
     </Sidebar>

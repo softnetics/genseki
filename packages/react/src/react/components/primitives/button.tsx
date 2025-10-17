@@ -148,7 +148,7 @@ interface ButtonLinkProps
 /**
  * @deprecated
  */
-const AriaButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
+const ButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(function ButtonLink(
   { className, variant, size, isDisabled = false, isPending = false, children, ...props },
   ref
 ) {
@@ -184,4 +184,4 @@ const AriaButtonLink = React.forwardRef<HTMLAnchorElement, ButtonLinkProps>(func
   )
 })
 
-export { AriaButtonLink, Button, type ButtonLinkProps, type ButtonProps }
+export { Button, ButtonLink, type ButtonLinkProps, type ButtonProps }

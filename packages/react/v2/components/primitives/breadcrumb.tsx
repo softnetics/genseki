@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-import { CaretRightIcon, DotsThreeIcon } from '@phosphor-icons/react'
+import { DotsThreeIcon } from '@phosphor-icons/react'
 import { Slot } from '@radix-ui/react-slot'
 
 import { cn } from '../../../src/react/utils/cn'
@@ -14,7 +14,7 @@ function BreadcrumbList({ className, ...props }: React.ComponentProps<'ol'>) {
     <ol
       data-slot="breadcrumb-list"
       className={cn(
-        'text-muted-foreground flex flex-wrap items-center gap-3 text-sm break-words sm:gap-5',
+        'text-muted-foreground flex flex-wrap items-center gap-2 text-sm break-words sm:gap-2',
         className
       )}
       {...props}
@@ -72,7 +72,7 @@ function BreadcrumbSeparator({ children, className, ...props }: React.ComponentP
       className={cn('[&>svg]:size-7', className)}
       {...props}
     >
-      {children ?? <CaretRightIcon />}
+      {children ?? '/'}
     </li>
   )
 }

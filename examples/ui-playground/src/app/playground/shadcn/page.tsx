@@ -1,3 +1,4 @@
+'use client'
 import * as React from 'react'
 
 import Link from 'next/link'
@@ -6,9 +7,12 @@ import { Typography } from '@genseki/react'
 import { linkVariants } from '@genseki/react/v2'
 
 import { ButtonSection } from './button-section'
+import { CollapsibleSection } from './collapsible-section'
 import { ComboboxSection } from './combobox-section'
+import { DropdownMenuSection } from './dropdown-menu-section'
 import { InputSection } from './input-section'
 import { LinkSection } from './link-section'
+import { TooltipSection } from './tooltip-section'
 
 export default function ComboboxPage() {
   return (
@@ -37,6 +41,21 @@ export default function ComboboxPage() {
           Link
         </Typography>
         <LinkSection />
+
+        <Typography type="h2" weight="bold" id="tooltip">
+          Tooltip
+        </Typography>
+        <TooltipSection />
+
+        <Typography type="h2" weight="bold" id="dropdown-menu">
+          Dropdown Menu
+        </Typography>
+        <DropdownMenuSection />
+
+        <Typography type="h2" weight="bold" id="collapsible">
+          Collapsible
+        </Typography>
+        <CollapsibleSection />
       </div>
       <div className="relative bg-card border-l border-border w-[200px]">
         <div className="sticky inset-0 max-h-screen [overscroll-behavior:none] p-4">
@@ -70,6 +89,27 @@ export default function ComboboxPage() {
               className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
             >
               {'>'} Link
+            </Link>
+            <hr />
+            <Link
+              href="#tooltip"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Tooltip
+            </Link>
+            <hr />
+            <Link
+              href="#dropdown-menu"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Dropdown Menu
+            </Link>
+            <hr />
+            <Link
+              href="#collapsible"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Collapsible
             </Link>
             <hr />
             <Link

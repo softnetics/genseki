@@ -2,12 +2,12 @@
 
 import {
   Breadcrumb,
+  BreadcrumbEllipsis,
   BreadcrumbItem,
   BreadcrumbLink,
   BreadcrumbList,
   BreadcrumbPage,
   BreadcrumbSeparator,
-  Separator,
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
@@ -20,15 +20,18 @@ function DummySidebarPage() {
     <SidebarProvider>
       <AppSidebar />
       <SidebarInset>
-        <header className="flex h-32 shrink-0 items-center gap-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-24">
+        <header className="flex h-18 py-4 box-content shrink-0 shadow-xs items-center gap-4 transition-[width,height] ease-linear group-has-data-[collapsible=icon]/sidebar-wrapper:h-24 border-b border-border">
           <div className="flex items-center gap-4 px-8">
-            <SidebarTrigger className="-ml-2" />
-            <Separator orientation="vertical" className="mr-4 data-[orientation=vertical]:h-8" />
             <Breadcrumb>
               <BreadcrumbList>
+                <BreadcrumbItem className="md:hidden">
+                  <SidebarTrigger className="size-18" variant="outline" />
+                </BreadcrumbItem>
                 <BreadcrumbItem className="hidden md:block">
                   <BreadcrumbLink href="#">Building Your Application</BreadcrumbLink>
                 </BreadcrumbItem>
+                <BreadcrumbSeparator className="hidden md:block" />
+                <BreadcrumbEllipsis />
                 <BreadcrumbSeparator className="hidden md:block" />
                 <BreadcrumbItem>
                   <BreadcrumbPage>Data Fetching</BreadcrumbPage>

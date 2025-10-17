@@ -213,7 +213,7 @@ function CustomTriggerComboboxMultiple() {
         {(selectedItems) => (
           <Button
             variant="secondary"
-            className="w-[250px] grid [grid-template-columns:1fr_1fr] gap-2 p-2 border-border border"
+            className="w-[250px] grid [grid-template-columns:1fr_1fr] gap-2 p-2 border-primary border"
           >
             {selectedItems?.map((selectedItem) => (
               <span
