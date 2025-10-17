@@ -11,7 +11,7 @@ import {
 import { tv } from 'tailwind-variants'
 
 import { ColorThumb } from './color-thumb'
-import { AriaLabel } from './field'
+import { Label } from './field'
 
 const trackStyles = tv({
   base: 'group col-span-2 rounded-lg',
@@ -53,7 +53,7 @@ const ColorSlider = ({ showOutput = true, label, className, ...props }: ColorSli
       )}
     >
       <div className="flex items-center">
-        {label && <AriaLabel className="text-sm [grid-area:label]">{label}</AriaLabel>}
+        {label && <Label className="text-sm [grid-area:label]">{label}</Label>}
         {showOutput && (
           <SliderOutput className="text-sm [grid-area:output] data-[orientation=horizontal]:ml-auto" />
         )}

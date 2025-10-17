@@ -16,10 +16,10 @@ import { mimeTypeValidate } from '../../../core/utils'
 import { useStorageAdapter } from '../../providers/root'
 import { isImageKey } from '../../utils/is-image-key'
 import {
-  AriaDescription,
-  AriaLabel,
   BaseIcon,
   Button,
+  Description,
+  Label,
   Modal,
   ModalClose,
   ModalContent,
@@ -417,9 +417,9 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
   return (
     <div className="group flex flex-col gap-y-4">
       {props.label && (
-        <AriaLabel htmlFor={props.name}>
+        <Label htmlFor={props.name}>
           {props.label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </AriaLabel>
+        </Label>
       )}
       {fileKey ? (
         <FileDisplayer
@@ -492,7 +492,7 @@ export const FileUploadField = (props: FileUploadFieldProps) => {
           )}
         </div>
       )}
-      {props.description && <AriaDescription>{props.description}</AriaDescription>}
+      {props.description && <Description>{props.description}</Description>}
       <CustomFieldError errorMessage={props.errorMessage} />
     </div>
   )

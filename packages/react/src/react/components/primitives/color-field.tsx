@@ -11,7 +11,7 @@ import { twJoin } from 'tailwind-merge'
 
 import { ColorPicker } from './color-picker'
 import { ColorSwatch } from './color-swatch'
-import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaInput, AriaLabel } from './field'
+import { Description, FieldError, FieldGroup, Input, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 import { Typography } from '../../components/primitives/typography'
@@ -55,8 +55,8 @@ const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
           '**:data-[slot=color-swatch]:-ml-0.5 group flex w-full flex-col gap-y-1'
         )}
       >
-        {label && <AriaLabel>{label}</AriaLabel>}
-        <AriaFieldGroup data-loading={isLoading ? 'true' : undefined}>
+        {label && <Label>{label}</Label>}
+        <FieldGroup data-loading={isLoading ? 'true' : undefined}>
           {prefix && typeof prefix === 'string' ? (
             <Typography
               data-slot="prefix"
@@ -83,7 +83,7 @@ const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
                 )}
               </span>
             )}
-            <AriaInput placeholder={placeholder} />
+            <Input placeholder={placeholder} />
           </div>
           {suffix && typeof suffix === 'string' ? (
             <Typography
@@ -97,9 +97,9 @@ const ColorField = forwardRef<HTMLInputElement, ColorFieldProps>(
           ) : (
             suffix
           )}
-        </AriaFieldGroup>
-        {description && <AriaDescription>{description}</AriaDescription>}
-        <AriaFieldError>{errorMessage}</AriaFieldError>
+        </FieldGroup>
+        {description && <Description>{description}</Description>}
+        <FieldError>{errorMessage}</FieldError>
       </ColorFieldPrimitive>
     )
   }

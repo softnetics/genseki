@@ -19,7 +19,7 @@ import { twJoin, twMerge } from 'tailwind-merge'
 import { tv } from 'tailwind-variants'
 
 import { badgeShapes, badgeStyles } from './badge'
-import { AriaDescription, AriaLabel } from './field'
+import { Description, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
@@ -120,9 +120,9 @@ const TagGroup = ({ children, ref, className, ...props }: TagGroupProps) => {
           shape: props.shape || 'square',
         }}
       >
-        {props.label && <AriaLabel className="mb-1">{props.label}</AriaLabel>}
+        {props.label && <Label className="mb-1">{props.label}</Label>}
         {children}
-        {props.description && <AriaDescription>{props.description}</AriaDescription>}
+        {props.description && <Description>{props.description}</Description>}
       </TagGroupContext.Provider>
     </TagGroupPrimitive>
   )

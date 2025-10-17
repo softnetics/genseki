@@ -12,7 +12,7 @@ import {
 import { tv } from 'tailwind-variants'
 
 import { BaseIcon } from './base-icon'
-import { AriaDescription, AriaFieldError } from './field'
+import { Description, FieldError } from './field'
 import { focusStyles } from './primitive'
 
 import { Label } from '../../../../v2'
@@ -410,8 +410,8 @@ const Combobox = ({
         )}
         <div>
           {children}
-          {description && <AriaDescription>{description}</AriaDescription>}
-          <AriaFieldError>{errorMessage}</AriaFieldError>
+          {description && <Description>{description}</Description>}
+          <FieldError>{errorMessage}</FieldError>
         </div>
       </div>
     </ComboboxContext.Provider>

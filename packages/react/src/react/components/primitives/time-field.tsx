@@ -8,7 +8,7 @@ import {
 } from 'react-aria-components'
 
 import { DateInput } from './date-field'
-import { AriaDescription, AriaFieldError, AriaFieldGroup, AriaLabel } from './field'
+import { Description, FieldError, FieldGroup, Label } from './field'
 import { composeTailwindRenderProps } from './primitive'
 
 interface TimeFieldProps<T extends TimeValue> extends TimeFieldPrimitiveProps<T> {
@@ -37,11 +37,11 @@ const TimeField = <T extends TimeValue>({
       className={composeTailwindRenderProps(className, 'group/time-field flex flex-col gap-y-4')}
     >
       {label && (
-        <AriaLabel>
+        <Label>
           {label} {props.isRequired && <span className="ml-1 text-text-brand">*</span>}
-        </AriaLabel>
+        </Label>
       )}
-      <AriaFieldGroup>
+      <FieldGroup>
         {prefix && typeof prefix === 'string' ? (
           <span className="ml-2 text-muted-fg">{prefix}</span>
         ) : (
@@ -55,9 +55,9 @@ const TimeField = <T extends TimeValue>({
             suffix
           )
         ) : null}
-      </AriaFieldGroup>
-      {description && <AriaDescription>{description}</AriaDescription>}
-      <AriaFieldError>{errorMessage}</AriaFieldError>
+      </FieldGroup>
+      {description && <Description>{description}</Description>}
+      <FieldError>{errorMessage}</FieldError>
     </TimeFieldPrimitive>
   )
 }

@@ -1,7 +1,7 @@
 'use client'
 import { FieldErrorContext } from 'react-aria-components'
 
-import { AriaFieldError } from './field'
+import { FieldError } from './field'
 
 export const CustomFieldError = (props: { errorMessage?: string }) => {
   return (
@@ -24,7 +24,7 @@ export const CustomFieldError = (props: { errorMessage?: string }) => {
         },
       }}
     >
-      <AriaFieldError>{props.errorMessage}</AriaFieldError>
+      <FieldError>{props.errorMessage}</FieldError>
     </FieldErrorContext>
   )
 }
