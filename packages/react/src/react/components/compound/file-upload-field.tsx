@@ -16,10 +16,10 @@ import { mimeTypeValidate } from '../../../core/utils'
 import { useStorageAdapter } from '../../providers/root'
 import { isImageKey } from '../../utils/is-image-key'
 import {
-  Description,
-  Label,
   BaseIcon,
   Button,
+  Description,
+  Label,
   Modal,
   ModalClose,
   ModalContent,
