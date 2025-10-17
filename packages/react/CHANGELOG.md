@@ -1,5 +1,17 @@
 # @genseki/react
 
+## 0.1.0-alpha.60
+
+### Patch Changes
+
+- [#239](https://github.com/softnetics/genseki/pull/239) [`f468c02`](https://github.com/softnetics/genseki/commit/f468c0278c7ff330d80ae2ee079e93324c67fd4d) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Migrate UI to shadcn
+
+  - New `sidebar` component
+  - New `breadcrumb` component
+  - New `dropdown-menu` component
+  - New `skeleton` component
+  - New `tooltip` component
+
 ## 0.1.0-alpha.59
 
 ### Patch Changes
