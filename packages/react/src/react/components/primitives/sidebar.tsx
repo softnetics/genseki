@@ -34,9 +34,17 @@ import { Tooltip, TooltipContent } from './tooltip'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { useMediaQuery } from '../../hooks/use-media-query'
-
+/**
+ * @deprecated
+ */
 const SIDEBAR_COOKIE_NAME = 'sidebar-state'
+/**
+ * @deprecated
+ */
 const SIDEBAR_COOKIE_MAX_AGE = 60 * 60 * 24 * 7
+/**
+ * @deprecated
+ */
 type SidebarContextProps = {
   state: 'expanded' | 'collapsed'
   open: boolean
@@ -47,8 +55,14 @@ type SidebarContextProps = {
   toggleSidebar: () => void
 }
 
+/**
+ * @deprecated
+ */
 const SidebarContext = createContext<SidebarContextProps | null>(null)
 
+/**
+ * @deprecated
+ */
 const useSidebar = () => {
   const context = use(SidebarContext)
   if (!context) {
@@ -58,6 +72,9 @@ const useSidebar = () => {
   return context
 }
 
+/**
+ * @deprecated
+ */
 interface SidebarProviderProps extends React.ComponentProps<'div'> {
   defaultOpen?: boolean
   isOpen?: boolean
@@ -65,6 +82,9 @@ interface SidebarProviderProps extends React.ComponentProps<'div'> {
   onOpenChange?: (open: boolean) => void
 }
 
+/**
+ * @deprecated
+ */
 const SidebarProvider = ({
   defaultOpen = true,
   isOpen: openProp,
@@ -149,6 +169,9 @@ const SidebarProvider = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const gap = tv({
   base: [
     'w-(--sidebar-width) group-data-[sidebar-collapsible=hidden]/sidebar-container:w-0',
@@ -167,6 +190,9 @@ const gap = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 const sidebar = tv({
   base: [
     'fixed inset-y-0 z-10 hidden h-svh w-(--sidebar-width) not-has-data-sidebar-footer:pb-2 transition-[left,right,width] duration-200 ease-linear md:flex',
@@ -198,6 +224,9 @@ const sidebar = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface SidebarProps extends React.ComponentProps<'div'> {
   intent?: 'default' | 'float' | 'inset' | 'fleet'
   collapsible?: 'hidden' | 'dock' | 'none'
@@ -205,6 +234,9 @@ interface SidebarProps extends React.ComponentProps<'div'> {
   closeButton?: boolean
 }
 
+/**
+ * @deprecated
+ */
 const Sidebar = ({
   closeButton = true,
   collapsible = 'hidden',
@@ -281,6 +313,9 @@ const Sidebar = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const header = tv({
   base: 'mb-2 flex flex-col **:data-[slot=sidebar-label-mask]:hidden',
   variants: {
@@ -291,6 +326,9 @@ const header = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 const SidebarHeader = ({ className, ref, ...props }: React.ComponentProps<'div'>) => {
   const { state } = use(SidebarContext)!
   return (
@@ -302,7 +340,9 @@ const SidebarHeader = ({ className, ref, ...props }: React.ComponentProps<'div'>
     />
   )
 }
-
+/**
+ * @deprecated
+ */
 const footer = tv({
   base: [
     'mt-auto flex flex-col p-2',
@@ -331,7 +371,9 @@ const footer = tv({
     },
   },
 })
-
+/**
+ * @deprecated
+ */
 const SidebarFooter = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const { state, isMobile } = useSidebar()
   const collapsed = state === 'collapsed' && !isMobile
@@ -348,7 +390,9 @@ const SidebarFooter = ({ className, ...props }: React.ComponentProps<'div'>) => 
     />
   )
 }
-
+/**
+ * @deprecated
+ */
 const SidebarContent = ({ className, ...props }: React.ComponentProps<'div'>) => {
   const { state } = useSidebar()
   return (
@@ -363,7 +407,9 @@ const SidebarContent = ({ className, ...props }: React.ComponentProps<'div'>) =>
     />
   )
 }
-
+/**
+ * @deprecated
+ */
 const SidebarSectionGroup = ({ className, ...props }: React.ComponentProps<'section'>) => {
   const { state, isMobile } = useSidebar()
   const collapsed = state === 'collapsed' && !isMobile
@@ -380,9 +426,15 @@ const SidebarSectionGroup = ({ className, ...props }: React.ComponentProps<'sect
   )
 }
 
+/**
+ * @deprecated
+ */
 interface SidebarSectionProps extends React.ComponentProps<'div'> {
   label?: string
 }
+/**
+ * @deprecated
+ */
 const SidebarSection = ({ className, ...props }: SidebarSectionProps) => {
   const { state } = useSidebar()
   return (
@@ -405,6 +457,9 @@ const SidebarSection = ({ className, ...props }: SidebarSectionProps) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 const sidebarItemStyles = tv({
   base: [
     'group/sidebar-item relative col-span-full cursor-pointer overflow-hidden text-sidebar-fg/70 focus-visible:outline-hidden sm:text-sm',
@@ -440,6 +495,9 @@ const sidebarItemStyles = tv({
   ],
 })
 
+/**
+ * @deprecated
+ */
 interface SidebarItemProps extends Omit<React.ComponentProps<typeof Link>, 'children'> {
   ghost?: boolean
   isCurrent?: boolean
@@ -452,6 +510,9 @@ interface SidebarItemProps extends Omit<React.ComponentProps<typeof Link>, 'chil
   badge?: string | number | undefined
 }
 
+/**
+ * @deprecated
+ */
 const SidebarItem = ({
   isCurrent,
   tooltip,
@@ -523,6 +584,9 @@ const SidebarItem = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const sidebarLink = tv({
   base: 'col-span-full items-center focus:outline-hidden',
   variants: {
@@ -534,8 +598,14 @@ const sidebarLink = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface SidebarLinkProps extends LinkProps {}
 
+/**
+ * @deprecated
+ */
 const SidebarLink = React.forwardRef<HTMLAnchorElement, SidebarLinkProps>(
   ({ className, ...props }, ref) => {
     const { state, isMobile } = useSidebar()
@@ -556,6 +626,9 @@ const SidebarLink = React.forwardRef<HTMLAnchorElement, SidebarLinkProps>(
   }
 )
 
+/**
+ * @deprecated
+ */
 const SidebarInset = ({ className, ref, ...props }: React.ComponentProps<'main'>) => {
   return (
     <main
@@ -571,7 +644,14 @@ const SidebarInset = ({ className, ref, ...props }: React.ComponentProps<'main'>
   )
 }
 
+/**
+ * @deprecated
+ */
 interface SidebarDisclosureGroupProps extends DisclosureGroupProps {}
+
+/**
+ * @deprecated
+ */
 const SidebarDisclosureGroup = ({
   allowsMultipleExpanded = true,
   className,
@@ -587,8 +667,14 @@ const SidebarDisclosureGroup = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 interface SidebarDisclosureProps extends DisclosureProps {}
 
+/**
+ * @deprecated
+ */
 const SidebarDisclosure = React.forwardRef<HTMLDivElement, Omit<SidebarDisclosureProps, 'ref'>>(
   ({ className, ...props }, ref) => {
     const { state } = useSidebar()
@@ -606,6 +692,9 @@ const SidebarDisclosure = React.forwardRef<HTMLDivElement, Omit<SidebarDisclosur
   }
 )
 
+/**
+ * @deprecated
+ */
 const sidebarDisclosureTrigger = tv({
   base: [
     'group relative flex w-full cursor-pointer items-center overflow-hidden rounded-lg px-[calc(var(--spacing)*4)] py-[calc(var(--spacing)*4)] text-sidebar-fg/70 outline-hidden sm:text-sm',
@@ -625,8 +714,14 @@ const sidebarDisclosureTrigger = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface SidebarDisclosureTriggerProps extends ButtonProps {}
 
+/**
+ * @deprecated
+ */
 const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisclosureTriggerProps>(
   ({ className, onClick, ...props }, ref) => {
     const { state, isMobile, toggleSidebar } = useSidebar()
@@ -670,6 +765,9 @@ const SidebarDisclosureTrigger = React.forwardRef<HTMLButtonElement, SidebarDisc
   }
 )
 
+/**
+ * @deprecated
+ */
 const SidebarDisclosurePanel = (props: React.ComponentProps<typeof DisclosurePanel>) => {
   return (
     <DisclosurePanel
@@ -680,6 +778,9 @@ const SidebarDisclosurePanel = (props: React.ComponentProps<typeof DisclosurePan
   )
 }
 
+/**
+ * @deprecated
+ */
 const SidebarSeparator = ({ className, ...props }: SidebarSeparatorProps) => {
   return (
     <Separator
@@ -693,6 +794,9 @@ const SidebarSeparator = ({ className, ...props }: SidebarSeparatorProps) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 const SidebarTrigger = ({
   onPress,
   children,
@@ -724,6 +828,9 @@ const SidebarTrigger = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const SidebarRail = ({ className, ref, ...props }: React.ComponentProps<'button'>) => {
   const { toggleSidebar } = useSidebar()
 
@@ -748,8 +855,14 @@ const SidebarRail = ({ className, ref, ...props }: React.ComponentProps<'button'
   )
 }
 
+/**
+ * @deprecated
+ */
 type SidebarLabelProps = React.ComponentProps<typeof Text>
 
+/**
+ * @deprecated
+ */
 const SidebarLabel = ({ className, ref, ...props }: SidebarLabelProps) => {
   const { state, isMobile } = useSidebar()
   const collapsed = state === 'collapsed' && !isMobile
@@ -772,6 +885,9 @@ const SidebarLabel = ({ className, ref, ...props }: SidebarLabelProps) => {
   return null
 }
 
+/**
+ * @deprecated
+ */
 const nav = tv({
   base: [
     'isolate flex h-[3.2rem] items-center justify-between gap-x-2 px-4 text-navbar-fg sm:justify-start md:w-full',
@@ -784,10 +900,16 @@ const nav = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface SidebarNavProps extends React.ComponentProps<'nav'> {
   isSticky?: boolean
 }
 
+/**
+ * @deprecated
+ */
 const SidebarNav = ({ isSticky = false, className, ...props }: SidebarNavProps) => {
   return <nav data-slot="sidebar-nav" {...props} className={nav({ isSticky, className })} />
 }

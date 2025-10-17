@@ -9,14 +9,29 @@ import { twMerge } from 'tailwind-merge'
 import { Link } from './link'
 import { composeTailwindRenderProps } from './primitive'
 
+/**
+ *
+ * React Aria component
+ *
+ */
+
+/**
+ * @deprecated
+ */
 interface BreadcrumbsContextProps {
   separator?: 'chevron' | 'slash' | boolean
 }
 
+/**
+ * @deprecated
+ */
 const BreadcrumbsProvider = createContext<BreadcrumbsContextProps>({
   separator: 'slash',
 })
 
+/**
+ * @deprecated
+ */
 const Breadcrumbs = <T extends object>({
   className,
   ...props
@@ -28,11 +43,17 @@ const Breadcrumbs = <T extends object>({
   )
 }
 
+/**
+ * @deprecated
+ */
 interface BreadcrumbsItemProps extends BreadcrumbProps, BreadcrumbsContextProps {
   href?: string
   trailing?: React.ReactNode
 }
 
+/**
+ * @deprecated
+ */
 const BreadcrumbsItem = ({
   href,
   separator = true,
@@ -63,6 +84,9 @@ const BreadcrumbsItem = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const Separator = ({ separator = 'slash' }: { separator?: BreadcrumbsItemProps['separator'] }) => {
   return (
     <span className="*:text-text-muted-fg *:shrink-0 *:data-[slot=icon]:size-3.5">
