@@ -19,9 +19,7 @@ function TextareaWithLabel() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <label htmlFor="message" className="text-sm font-medium">
-          Message
-        </label>
+        <Label htmlFor="message">Message</Label>
         <Textarea id="message" placeholder="Type your message here..." />
       </div>
     </div>
@@ -33,17 +31,15 @@ function TextareaWithDescription() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <label htmlFor="feedback" className="text-sm font-medium">
-          Feedback
-        </label>
+        <Label htmlFor="feedback">Feedback</Label>
         <Textarea
           id="feedback"
           placeholder="Please provide your feedback..."
           className="min-h-24"
         />
-        <p className="text-sm text-muted-foreground">
+        <Typography type="caption" className=" text-muted-foreground">
           Please provide detailed feedback about your experience.
-        </p>
+        </Typography>
       </div>
     </div>
   )
@@ -63,18 +59,16 @@ function TextareaWithError() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <Label htmlFor="error-textarea" className="text-sm font-medium">
-          Message
-        </Label>
+        <Label htmlFor="error-textarea">Message</Label>
         <Textarea
           id="error-textarea"
           placeholder="Type your message here..."
           aria-invalid="true"
           className="border-destructive focus-visible:ring-destructive"
         />
-        <p className="text-sm text-destructive">
+        <Typography type="caption" className=" text-destructive">
           This field is required and must be at least 10 characters.
-        </p>
+        </Typography>
       </div>
     </div>
   )
@@ -85,15 +79,15 @@ function TextareaSizes() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <Label className="text-sm font-medium">Small</Label>
-        <Textarea placeholder="Small textarea" className="min-h-16 text-sm" />
+        <Label>Small</Label>
+        <Textarea placeholder="Small textarea" className="min-h-16 " />
       </div>
       <div className="space-y-4">
-        <Label className="text-sm font-medium">Default</Label>
+        <Label>Default</Label>
         <Textarea placeholder="Default textarea" />
       </div>
       <div className="space-y-4">
-        <Label className="text-sm font-medium">Large</Label>
+        <Label>Large</Label>
         <Textarea placeholder="Large textarea" className="min-h-48 text-lg" />
       </div>
     </div>
@@ -108,9 +102,7 @@ function TextareaWithCharacterCount() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <Label htmlFor="character-count" className="text-sm font-medium">
-          Message
-        </Label>
+        <Label htmlFor="character-count">Message</Label>
         <Textarea
           id="character-count"
           placeholder="Type your message here..."
@@ -118,7 +110,7 @@ function TextareaWithCharacterCount() {
           onChange={(e) => setValue(e.target.value)}
           maxLength={maxLength}
         />
-        <div className="flex justify-between text-sm text-muted-foreground">
+        <div className="flex justify-between  text-muted-foreground">
           <span>
             Character count: {value.length}/{maxLength}
           </span>
@@ -136,9 +128,7 @@ function TextareaWithAutoResize() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <Label htmlFor="auto-resize" className="text-sm font-medium">
-          Auto-resizing textarea
-        </Label>
+        <Label htmlFor="auto-resize">Auto-resizing textarea</Label>
         <Textarea
           id="auto-resize"
           placeholder="This textarea will grow as you type..."
@@ -154,9 +144,7 @@ function TextareaWithCustomStyling() {
   return (
     <div className="flex flex-col gap-4">
       <div className="space-y-4">
-        <Label htmlFor="custom-styling" className="text-sm font-medium">
-          Custom styled textarea
-        </Label>
+        <Label htmlFor="custom-styling">Custom styled textarea</Label>
         <Textarea
           id="custom-styling"
           placeholder="This textarea has custom styling..."
