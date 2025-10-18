@@ -448,7 +448,7 @@ function ToastWithCustomStyling() {
     toast(
       <div className="flex items-center gap-2">
         <CheckCircleIcon className="text-green-500" />
-        <span className="font-semibold">Success!</span>
+        <Typography className="font-semibold">Success!</Typography>
       </div>,
       {
         description: 'Your action was completed successfully.',

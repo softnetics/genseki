@@ -111,12 +111,12 @@ function TextareaWithCharacterCount() {
           maxLength={maxLength}
         />
         <div className="flex justify-between  text-muted-foreground">
-          <span>
+          <Typography>
             Character count: {value.length}/{maxLength}
-          </span>
-          <span className={value.length > maxLength * 0.9 ? 'text-destructive' : ''}>
+          </Typography>
+          <Typography className={value.length > maxLength * 0.9 ? 'text-destructive' : ''}>
             {maxLength - value.length} remaining
-          </span>
+          </Typography>
         </div>
       </div>
     </div>

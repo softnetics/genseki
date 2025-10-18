@@ -20,7 +20,7 @@ import { TooltipSection } from './tooltip-section'
 
 export default function ComboboxPage() {
   return (
-    <div className="flex gap-y-8">
+    <div className="bg-background flex gap-y-8">
       <div className="flex-1 max-w-4xl flex flex-col gap-y-8 py-16 mx-auto">
         <Typography type="h1" weight="bold">
           Shadcn components
