@@ -260,7 +260,7 @@ const DialogCloseIndicator = ({ className, ...props }: CloseButtonIndicatorProps
       slot="close"
       className={composeTailwindRenderProps(
         className,
-        'close hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-primary absolute right-1 top-1 z-50 grid size-12 place-content-center rounded-xl focus-visible:ring-1 sm:right-2 sm:top-2 sm:size-7 sm:rounded-md'
+        'close hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-primary absolute right-1 top-1 z-50 grid size-12 place-content-center rounded-xl focus-visible:ring-[2px] sm:right-2 sm:top-2 sm:size-7 sm:rounded-md'
       )}
     >
       <BaseIcon icon={XIcon} size="sm" weight="bold" />
@@ -288,7 +288,7 @@ const DialogCloseIcon = ({ className, ...props }: CloseButtonIndicatorProps) => 
       slot="close"
       className={composeTailwindRenderProps(
         className,
-        'close absolute top-4 right-4 z-50 grid size-8 place-content-center rounded-full hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-1 focus-visible:ring-primary sm:top-5 sm:right-5 sm:size-8 sm:rounded-md'
+        'close absolute top-4 right-4 z-50 grid size-8 place-content-center rounded-full hover:bg-secondary focus:bg-secondary focus:outline-hidden focus-visible:ring-[2px] focus-visible:ring-primary sm:top-5 sm:right-5 sm:size-8 sm:rounded-md'
       )}
       {...props}
     >

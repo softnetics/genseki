@@ -12,6 +12,10 @@ import { ComboboxSection } from './combobox-section'
 import { DropdownMenuSection } from './dropdown-menu-section'
 import { InputSection } from './input-section'
 import { LinkSection } from './link-section'
+import { TextareaSection } from './textarea-section'
+import { ToastSection } from './toast-section'
+import { ToggleGroupSection } from './toggle-group-section'
+import { ToggleSection } from './toggle-section'
 import { TooltipSection } from './tooltip-section'
 
 export default function ComboboxPage() {
@@ -56,6 +60,26 @@ export default function ComboboxPage() {
           Collapsible
         </Typography>
         <CollapsibleSection />
+
+        <Typography type="h2" weight="bold" id="toggle">
+          Toggle
+        </Typography>
+        <ToggleSection />
+
+        <Typography type="h2" weight="bold" id="toggle-group">
+          Toggle Group
+        </Typography>
+        <ToggleGroupSection />
+
+        <Typography type="h2" weight="bold" id="textarea">
+          Textarea
+        </Typography>
+        <TextareaSection />
+
+        <Typography type="h2" weight="bold" id="toast">
+          Toast
+        </Typography>
+        <ToastSection />
       </div>
       <div className="relative bg-card border-l border-border w-[200px]">
         <div className="sticky inset-0 max-h-screen [overscroll-behavior:none] p-4">
@@ -110,6 +134,34 @@ export default function ComboboxPage() {
               className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
             >
               {'>'} Collapsible
+            </Link>
+            <hr />
+            <Link
+              href="#toggle"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Toggle
+            </Link>
+            <hr />
+            <Link
+              href="#toggle-group"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Toggle Group
+            </Link>
+            <hr />
+            <Link
+              href="#textarea"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Textarea
+            </Link>
+            <hr />
+            <Link
+              href="#toast"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Toast
             </Link>
             <hr />
             <Link

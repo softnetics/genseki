@@ -7,6 +7,9 @@ import { composeRenderProps, ToggleButton, ToggleButtonGroup } from 'react-aria-
 import type { VariantProps } from 'tailwind-variants'
 import { tv } from 'tailwind-variants'
 
+/**
+ * @deprecated
+ */
 type ToggleGroupContextProps = {
   isDisabled?: boolean
   gap?: 0 | 1 | 2 | 3 | 4
@@ -15,6 +18,9 @@ type ToggleGroupContextProps = {
   size?: 'xs' | 'sm' | 'md' | 'lg' | 'square-petite'
 }
 
+/**
+ * @deprecated
+ */
 const ToggleGroupContext = createContext<ToggleGroupContextProps>({
   gap: 1,
   intent: 'outline',
@@ -22,22 +28,38 @@ const ToggleGroupContext = createContext<ToggleGroupContextProps>({
   size: 'md',
 })
 
+/**
+ * @deprecated
+ */
 type BaseToggleGroupProps = Omit<ToggleGroupContextProps, 'gap' | 'intent'>
+
+/**
+ * @deprecated
+ */
 interface ToggleGroupPropsNonZeroGap extends BaseToggleGroupProps {
   gap?: Exclude<ToggleGroupContextProps['gap'], 0>
   intent?: ToggleGroupContextProps['intent']
 }
 
+/**
+ * @deprecated
+ */
 interface ToggleGroupPropsGapZero extends BaseToggleGroupProps {
   gap?: 0
   intent?: Exclude<ToggleGroupContextProps['intent'], 'plain'>
 }
 
+/**
+ * @deprecated
+ */
 type ToggleGroupProps = ToggleButtonGroupProps &
   (ToggleGroupPropsGapZero | ToggleGroupPropsNonZeroGap) & {
     ref?: React.RefObject<HTMLDivElement>
   }
 
+/**
+ * @deprecated
+ */
 const toggleGroupStyles = tv({
   base: 'flex',
   variants: {
@@ -74,6 +96,9 @@ const toggleGroupStyles = tv({
   ],
 })
 
+/**
+ * @deprecated
+ */
 const ToggleGroup = ({
   className,
   ref,
@@ -104,6 +129,9 @@ const ToggleGroup = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const toggleStyles = tv({
   base: [
     'inset-ring inset-ring-border cursor-default items-center gap-x-2 rounded-lg outline-hidden sm:text-sm',
@@ -155,10 +183,16 @@ const toggleStyles = tv({
   ],
 })
 
+/**
+ * @deprecated
+ */
 interface ToggleProps extends ToggleButtonProps, VariantProps<typeof toggleStyles> {
   ref?: React.RefObject<HTMLButtonElement>
 }
 
+/**
+ * @deprecated
+ */
 const Toggle = ({ className, intent, ref, ...props }: ToggleProps) => {
   const {
     intent: groupIntent,
