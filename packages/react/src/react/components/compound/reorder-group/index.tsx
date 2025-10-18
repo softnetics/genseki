@@ -17,12 +17,18 @@ import { DotsSixIcon } from '@phosphor-icons/react'
 
 import { BaseIcon, Button, Typography } from '../../primitives'
 
+/**
+ * @deprecated Implement yourselves
+ */
 interface ReorderGroupProps {
   title?: string
   children: ReactNode
   onReorder?: (newOrder: string[]) => void
 }
 
+/**
+ * @deprecated Implement yourselves
+ */
 interface SortableItemProps {
   id: string
   children: ReactElement
@@ -30,6 +36,9 @@ interface SortableItemProps {
   order?: number
 }
 
+/**
+ * @deprecated Implement yourselves
+ */
 const ReorderGroup = ({ children, onReorder, title }: ReorderGroupProps) => {
   // convert children to array of ReactElement
   const elements = Children.toArray(children) as ReactElement[]
@@ -86,6 +95,9 @@ const ReorderGroup = ({ children, onReorder, title }: ReorderGroupProps) => {
   )
 }
 
+/**
+ * @deprecated Implement yourselves
+ */
 const SortableItem = ({ id, children, title, order }: SortableItemProps) => {
   const { attributes, listeners, setNodeRef, transform, transition } = useSortable({ id })
 

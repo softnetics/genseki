@@ -35,7 +35,7 @@ function BasicCollapsible() {
           </div>
         </div>
         <CollapsibleContent className="space-y-2 mt-4">
-          <div className="rounded-md border px-4 py-3 text-sm">
+          <div className="rounded-md border px-4 py-3 ">
             This is the collapsible content that can be shown or hidden.
           </div>
         </CollapsibleContent>
@@ -61,15 +61,15 @@ function FileTreeStyle() {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="ml-6 space-y-1">
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <FileIcon />
               report.pdf
             </div>
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <FileIcon />
               presentation.pptx
             </div>
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <FileIcon />
               notes.txt
             </div>
@@ -84,15 +84,15 @@ function FileTreeStyle() {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="ml-6 space-y-1">
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <ImageIcon />
               photo1.jpg
             </div>
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <ImageIcon />
               photo2.png
             </div>
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <ImageIcon />
               screenshot.png
             </div>
@@ -107,15 +107,15 @@ function FileTreeStyle() {
             </Button>
           </CollapsibleTrigger>
           <CollapsibleContent className="ml-6 space-y-1">
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <VideoIcon />
               tutorial.mp4
             </div>
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <VideoIcon />
               demo.mov
             </div>
-            <div className="flex items-center gap-2 p-2 text-sm text-muted-foreground">
+            <div className="flex items-center gap-2 p-2  text-muted-foreground">
               <MusicNoteIcon />
               audio.mp3
             </div>
@@ -168,12 +168,12 @@ function FAQStyle() {
           >
             <CollapsibleTrigger asChild>
               <Button variant="ghost" className="w-full justify-between h-auto p-4 text-left">
-                <span className="font-medium">{item.question}</span>
+                <Typography className="font-medium">{item.question}</Typography>
                 {openItems.includes(item.id) ? <CaretDownIcon /> : <CaretRightIcon />}
               </Button>
             </CollapsibleTrigger>
-            <CollapsibleContent className="px-4 pb-4">
-              <div className="text-sm text-muted-foreground">{item.answer}</div>
+            <CollapsibleContent className="px-6 py-4">
+              <Typography className="text-muted-foreground">{item.answer}</Typography>
             </CollapsibleContent>
           </Collapsible>
         ))}
@@ -183,7 +183,7 @@ function FAQStyle() {
 }
 
 // Settings Panel Style
-function SettingsPanelStyle() {
+function SettingTypographyelStyle() {
   const [openSections, setOpenSections] = React.useState<string[]>(['general'])
 
   const toggleSection = (sectionId: string) => {
@@ -199,19 +199,19 @@ function SettingsPanelStyle() {
       content: (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm">Dark Mode</span>
+            <Typography className="">Dark Mode</Typography>
             <Button variant="outline" size="sm">
               Toggle
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Notifications</span>
+            <Typography className="">Notifications</Typography>
             <Button variant="outline" size="sm">
               Configure
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Language</span>
+            <Typography className="">Language</Typography>
             <Button variant="outline" size="sm">
               English
             </Button>
@@ -225,19 +225,19 @@ function SettingsPanelStyle() {
       content: (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm">Two-Factor Authentication</span>
+            <Typography className="">Two-Factor Authentication</Typography>
             <Button variant="outline" size="sm">
               Enable
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Data Export</span>
+            <Typography className="">Data Export</Typography>
             <Button variant="outline" size="sm">
               Export
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Account Deletion</span>
+            <Typography className="">Account Deletion</Typography>
             <Button variant="destructive" size="sm">
               Delete
             </Button>
@@ -251,19 +251,19 @@ function SettingsPanelStyle() {
       content: (
         <div className="space-y-3">
           <div className="flex items-center justify-between">
-            <span className="text-sm">Debug Mode</span>
+            <Typography className="">Debug Mode</Typography>
             <Button variant="outline" size="sm">
               Off
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Cache Management</span>
+            <Typography className="">Cache Management</Typography>
             <Button variant="outline" size="sm">
               Clear
             </Button>
           </div>
           <div className="flex items-center justify-between">
-            <span className="text-sm">Reset Settings</span>
+            <Typography className="">Reset Settings</Typography>
             <Button variant="destructive" size="sm">
               Reset
             </Button>
@@ -283,12 +283,17 @@ function SettingsPanelStyle() {
               onOpenChange={() => toggleSection(section.id)}
             >
               <CollapsibleTrigger asChild>
-                <Button variant="ghost" className="w-full justify-between h-auto p-4">
-                  <span className="font-medium">{section.title}</span>
+                <Button
+                  variant="ghost"
+                  className="w-full justify-between h-auto p-4 data-[state=open]:rounded-bl-none data-[state=open]:rounded-br-none"
+                >
+                  <Typography className="font-medium">{section.title}</Typography>
                   {openSections.includes(section.id) ? <CaretDownIcon /> : <CaretRightIcon />}
                 </Button>
               </CollapsibleTrigger>
-              <CollapsibleContent className="px-4 pb-4">{section.content}</CollapsibleContent>
+              <CollapsibleContent className="p-4 pl-6 border-t border-border">
+                {section.content}
+              </CollapsibleContent>
             </Collapsible>
           </div>
         ))}
@@ -323,7 +328,7 @@ function MultipleIndependentCollapsibles() {
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-2">
             <div className="rounded-md border p-4">
-              <p className="text-sm">
+              <p className="">
                 This is the content for section 1. Each collapsible can be controlled independently.
               </p>
             </div>
@@ -339,7 +344,7 @@ function MultipleIndependentCollapsibles() {
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-2">
             <div className="rounded-md border p-4">
-              <p className="text-sm">
+              <p className="">
                 This section starts open by default. You can see how the state is managed
                 independently.
               </p>
@@ -355,7 +360,7 @@ function MultipleIndependentCollapsibles() {
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-2">
             <div className="rounded-md border p-4">
-              <p className="text-sm">
+              <p className="">
                 This is the third section. Notice how each collapsible maintains its own state.
               </p>
             </div>
@@ -401,7 +406,7 @@ export function CollapsibleSection() {
           A settings panel with collapsible sections for different categories.
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
-          <SettingsPanelStyle />
+          <SettingTypographyelStyle />
         </div>
       </PlaygroundCard>
 

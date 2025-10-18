@@ -183,6 +183,7 @@
 
   /* Surface */
 
+  --color-surface-primary: var(--color-white);
   --color-surface-primary-hover: var(--color-bluegray-100);
   --color-surface-primary-active: var(--color-bluegray-100);
   --color-surface-primary-disabled: var(--color-bluegray-50);
@@ -463,7 +464,7 @@
   }
 
   ::-webkit-scrollbar-thumb {
-    background: var(--border);
+    background: var(--color-border);
     border-radius: 4px;
   }
 }

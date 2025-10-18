@@ -2,13 +2,12 @@
 
 import { Toaster as ToasterPrimitive, type ToasterProps } from 'sonner'
 
-import { useTheme } from '../../providers/theme'
-
+/**
+ * @deprecated
+ */
 const Toast = ({ ...props }: ToasterProps) => {
-  const { theme = 'system' } = useTheme()
   return (
     <ToasterPrimitive
-      theme={theme as ToasterProps['theme']}
       className="toaster group"
       richColors
       toastOptions={{
