@@ -3,9 +3,7 @@
 import React from 'react'
 
 import { IconChevronLgRight } from '@intentui/icons'
-import { CubeIcon, Folder } from '@phosphor-icons/react'
-
-import { BaseIcon } from './base-icon'
+import { CubeIcon, FolderIcon } from '@phosphor-icons/react'
 
 import { BadgeOrange } from '../../icons/badge-orange'
 import { DotsCard } from '../../icons/dots-card'
@@ -22,11 +20,7 @@ const Card: React.FC<CardProps> = ({ title, itemNumber, description, buttonTitle
   return (
     <div className="bg-white rounded-2xl shadow-sm p-2 max-w-sm w-[296px] border border-bluegray-300 relative">
       <BadgeOrange className="size-24 absolute top-0 left-6 -translate-y-1/2 z-[1]" />
-      <BaseIcon
-        icon={CubeIcon}
-        size="md"
-        className="text-text-brand size-10 absolute top-0 left-8 -translate-y-1/2 z-[2] translate-x-1/2"
-      />
+      <CubeIcon className="text-text-brand size-10 absolute top-0 left-8 -translate-y-1/2 z-[2] translate-x-1/2" />
       {/* Header */}
       <div className="flex justify-between items-center px-8 pb-4 pt-14 border-b border-bluegray-300 relative overflow-hidden">
         {/* Dots */}
@@ -36,7 +30,7 @@ const Card: React.FC<CardProps> = ({ title, itemNumber, description, buttonTitle
         <p className="text-lg font-semibold text-bluegray-800">{title}</p>
         {itemNumber && (
           <div className="flex items-center gap-2">
-            <BaseIcon icon={Folder} size="md" className="text-text-secondary" />
+            <FolderIcon className="text-text-secondary" />
             <span className="text-sm text-text-secondary">{itemNumber} items</span>
           </div>
         )}
