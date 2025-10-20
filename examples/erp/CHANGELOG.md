@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.60
+
+### Patch Changes
+
+- [#244](https://github.com/softnetics/genseki/pull/244) [`a2acb52`](https://github.com/softnetics/genseki/commit/a2acb52870d9c91d13123a5632da1aee40856717) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - chore: update tiptap version
+
+- Updated dependencies [[`a2acb52`](https://github.com/softnetics/genseki/commit/a2acb52870d9c91d13123a5632da1aee40856717)]:
+  - @genseki/plugins@0.1.0-alpha.62
+  - @genseki/react@0.1.0-alpha.62
+  - @genseki/next@0.1.0-alpha.62
+  - @genseki/prisma-generator@0.1.0-alpha.62
+  - @genseki/react-query@0.1.0-alpha.62
+  - @genseki/rest@0.1.0-alpha.62
+
 ## 0.1.0-alpha.59
 
 ### Patch Changes

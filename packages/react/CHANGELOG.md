@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.62
+
+### Patch Changes
+
+- [#244](https://github.com/softnetics/genseki/pull/244) [`a2acb52`](https://github.com/softnetics/genseki/commit/a2acb52870d9c91d13123a5632da1aee40856717) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - chore: update tiptap version
+
 ## 0.1.0-alpha.61
 
 ### Patch Changes
