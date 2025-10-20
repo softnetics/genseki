@@ -1,5 +1,12 @@
 # @genseki/next
 
+## 0.1.0-alpha.63
+
+### Patch Changes
+
+- Updated dependencies [[`6e0a0ce`](https://github.com/softnetics/genseki/commit/6e0a0cec1c77f0830caa5c21b65bad220ae939c6)]:
+  - @genseki/react@0.1.0-alpha.63
+
 ## 0.1.0-alpha.62
 
 ### Patch Changes
