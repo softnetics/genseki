@@ -375,7 +375,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           A simple input field with placeholder text.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <BasicInput />
         </div>
       </PlaygroundCard>
@@ -384,7 +384,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Different HTML input types with appropriate validation and keyboard behaviors.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputTypes />
         </div>
       </PlaygroundCard>
@@ -393,7 +393,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Inputs can be in different states: default, disabled, or invalid.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputStates />
         </div>
       </PlaygroundCard>
@@ -402,7 +402,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           A controlled input where the value is managed by React state.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ControlledInput />
         </div>
       </PlaygroundCard>
@@ -411,7 +411,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Inputs paired with labels and helper text for better accessibility.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputWithLabels />
         </div>
       </PlaygroundCard>
@@ -420,7 +420,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           File input for uploading single or multiple files.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <FileInput />
         </div>
       </PlaygroundCard>
@@ -429,7 +429,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Input groups with icons or text at the start (left side) of the input field.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputGroupInlineStart />
         </div>
       </PlaygroundCard>
@@ -438,7 +438,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Input groups with icons or text at the end (right side) of the input field.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputGroupInlineEnd />
         </div>
       </PlaygroundCard>
@@ -448,7 +448,7 @@ export function InputSection() {
           Input groups with interactive buttons for actions like clearing, toggling visibility, or
           submitting.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputGroupWithButtons />
         </div>
       </PlaygroundCard>
@@ -457,7 +457,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Input groups with addons on both sides for complex input scenarios.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputGroupBothSides />
         </div>
       </PlaygroundCard>
@@ -466,7 +466,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Input groups with addons positioned above (block-start) or below (block-end) the input.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputGroupBlockAlignment />
         </div>
       </PlaygroundCard>
@@ -475,7 +475,7 @@ export function InputSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Input groups in different states: default, disabled, and invalid.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <InputGroupStates />
         </div>
       </PlaygroundCard>
