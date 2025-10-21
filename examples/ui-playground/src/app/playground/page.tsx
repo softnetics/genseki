@@ -1,25 +1,14 @@
 'use client'
 
-import { Suspense, useState } from 'react'
+import { useState } from 'react'
 
-import { IconGallery, IconGrid4, IconLink, IconRedo, IconUndo } from '@intentui/icons'
 import {
-  CaretDownIcon,
   DiscordLogoIcon,
   GithubLogoIcon,
   MagnifyingGlassIcon,
   PlusCircleIcon,
-  TextAlignCenterIcon,
-  TextAlignJustifyIcon,
-  TextAlignLeftIcon,
-  TextAlignRightIcon,
-  TextBIcon,
-  TextItalicIcon,
-  TextStrikethroughIcon,
-  TextUnderlineIcon,
   TrashIcon,
 } from '@phosphor-icons/react'
-import { StarterKit } from '@tiptap/starter-kit'
 import { useTheme } from 'next-themes'
 
 import {
@@ -55,6 +44,7 @@ import {
   Radio,
   RadioGroup,
   ReorderGroup,
+  RichTextEditor,
   Switch,
   Tab,
   Table,
@@ -71,15 +61,9 @@ import {
   Textarea,
   TextField,
   TimeField,
-  ToggleGroup,
-  Toolbar,
-  ToolbarGroup,
-  ToolbarItem,
-  ToolbarSeparator,
   Tooltip,
   TooltipContent,
 } from '@genseki/react'
-import { RichTextEditor } from '@genseki/react'
 import { BaseIcon } from '@genseki/react'
 import { Typography } from '@genseki/react'
 import { Badge } from '@genseki/react'
@@ -90,7 +74,6 @@ import { ColorPicker } from '@genseki/react'
 import { DateField } from '@genseki/react'
 import { DatePicker } from '@genseki/react'
 import { ListBox, ListBoxItem, ListBoxItemDetails, ListBoxSection } from '@genseki/react'
-import { Menu, MenuContent, MenuItem } from '@genseki/react'
 import { MultipleSelect, MultipleSelectItem } from '@genseki/react'
 import { RangeCalendar } from '@genseki/react'
 import {
@@ -104,6 +87,7 @@ import {
 } from '@genseki/react'
 
 import { PlaygroundCard } from '../../components/card'
+import { editorProviderProps } from '../../components/slot-before'
 import { Wrapper } from '../../components/wrapper'
 
 const MOCK_OPTIONS = [
@@ -361,145 +345,8 @@ export default function UIPlayground() {
           </PlaygroundCard>
         </div>
       </Wrapper>
-      <Wrapper title="Toolbar">
-        <div className="flex justify-center">
-          <Toolbar aria-label="Toolbars" className="flex items-center">
-            <ToolbarGroup aria-label="Text Formatting Options" className="flex items-center">
-              <ToggleGroup size="md">
-                <ToolbarItem defaultSelected aria-label="Bold" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextBIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextBIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-                <ToolbarItem aria-label="Italic" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextItalicIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextItalicIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-                <ToolbarItem aria-label="Underline" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextUnderlineIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextUnderlineIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-                <ToolbarItem aria-label="Strikethrough" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextStrikethroughIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextStrikethroughIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-              </ToggleGroup>
-            </ToolbarGroup>
-            <ToolbarSeparator />
-            <ToolbarGroup aria-label="Alignment" className="flex items-center">
-              <ToggleGroup selectionMode="single">
-                <ToolbarItem id="0" aria-label="Align Left" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextAlignLeftIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextAlignLeftIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-                <ToolbarItem id="1" aria-label="Align Center" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextAlignCenterIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextAlignCenterIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-                <ToolbarItem id="2" aria-label="Align Right" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextAlignRightIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextAlignRightIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-                <ToolbarItem id="3" aria-label="Align Justify" intent="outline">
-                  {({ isSelected }) => (
-                    <>
-                      {isSelected ? (
-                        <BaseIcon icon={TextAlignJustifyIcon} size="md" weight="bold" />
-                      ) : (
-                        <BaseIcon icon={TextAlignJustifyIcon} size="md" weight="regular" />
-                      )}
-                    </>
-                  )}
-                </ToolbarItem>
-              </ToggleGroup>
-            </ToolbarGroup>
-            <ToolbarSeparator />
-            <Checkbox>Spell Check</Checkbox>
-            <ToolbarGroup className="ml-auto">
-              <Menu>
-                <Button aria-label="Other options" variant="ghost" size="md">
-                  Options
-                  <BaseIcon icon={CaretDownIcon} size="md" weight="regular" />
-                </Button>
-                <MenuContent showArrow placement="bottom right">
-                  <MenuItem>
-                    <IconUndo />
-                    Undo
-                  </MenuItem>
-                  <MenuItem>
-                    <IconRedo />
-                    Redo
-                  </MenuItem>
-                  <MenuItem>
-                    <IconLink />
-                    Insert Link
-                  </MenuItem>
-                  <MenuItem>
-                    <IconGallery />
-                    Insert Image
-                  </MenuItem>
-                  <MenuItem>
-                    <IconGrid4 />
-                    Insert Grid
-                  </MenuItem>
-                </MenuContent>
-              </Menu>
-            </ToolbarGroup>
-          </Toolbar>
-        </div>
-      </Wrapper>
-      <Wrapper title="Rich text">
-        <Suspense fallback={<div>Loading...</div>}>
-          <RichTextEditor editorProviderProps={{ extensions: [StarterKit] }} />
-        </Suspense>
+      <Wrapper title="Rich text editor">
+        <RichTextEditor editorProviderProps={editorProviderProps} />
       </Wrapper>
       <Wrapper title="Date picker">
         <div className="flex justify-start">

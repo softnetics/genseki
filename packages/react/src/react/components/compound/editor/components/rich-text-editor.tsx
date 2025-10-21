@@ -7,10 +7,8 @@ import { isDeepEqual } from 'remeda'
 
 import { EditorProvider } from './rich-text-provider'
 
-import { cn } from '../../../../utils/cn'
-import { focusStyles } from '../../../primitives'
 import { CustomFieldError } from '../../../primitives/custom-field-error'
-import { Description, FieldGroup } from '../../../primitives/field'
+import { Description } from '../../../primitives/field'
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
   value?: string | Content | Content[]
@@ -24,8 +22,6 @@ export interface RichTextEditorProps {
 }
 
 export const RichTextEditor = (props: RichTextEditorProps) => {
-  const isInvalid = !!props.errorMessage
-
   const editor = useEditor({
     ...props.editorProviderProps,
     content: props.value,
@@ -42,22 +38,14 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
 
   return (
     <div className="flex flex-col gap-y-4" data-invalid={true}>
-      <FieldGroup
-        isDisabled={props.isDisabled}
-        isInvalid={isInvalid}
-        data-loading={props.isPending ? 'true' : undefined}
-        className="overflow-auto relative resize-none w-full"
-      >
-        <div
-          className={cn(
-            'relative bg-bg flex flex-col border-none w-full h-full rounded-md',
-            props.isDisabled && 'opacity-60 pointer-events-none',
-            props.errorMessage && focusStyles.variants.isInvalid
-          )}
-        >
-          <EditorProvider {...props.editorProviderProps} editor={editor} />
-        </div>
-      </FieldGroup>
+      <EditorProvider
+        {...props.editorProviderProps}
+        inputGroupProps={{
+          isDisabled: props.isDisabled,
+          isInvalid: !!props.errorMessage,
+          isPending: props.isPending,
+        }}
+      />
       {props.description && <Description>{props.description}</Description>}
       <CustomFieldError errorMessage={props.errorMessage} />
     </div>
