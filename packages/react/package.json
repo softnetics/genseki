@@ -73,6 +73,7 @@
     "@tiptap/core": "^2.26.3",
     "@tiptap/extension-color": "^2.26.3",
     "@tiptap/extension-image": "^2.26.3",
+    "@tiptap/extension-link": "2.26.3",
     "@tiptap/extension-text-align": "^2.26.3",
     "@tiptap/extension-text-style": "^2.26.3",
     "@tiptap/extension-typography": "^2.26.3",
