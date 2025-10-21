@@ -58,7 +58,7 @@ export const EditorSlotBefore = () => {
   )
 }
 
-export const postEditorProviderProps = {
+export const editorProviderProps = {
   immediatelyRender: false,
   shouldRerenderOnTransaction: true,
   content: {

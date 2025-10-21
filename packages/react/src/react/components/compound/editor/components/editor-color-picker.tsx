@@ -2,7 +2,7 @@
 import React, { useState } from 'react'
 import { type Color as ReactAriaColor, parseColor } from 'react-aria-components'
 
-import { SelectionBackgroundIcon, TextAaIcon } from '@phosphor-icons/react'
+import { SelectionBackgroundIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
 import { BaseIcon } from '../../../primitives'
@@ -55,8 +55,7 @@ export const EditorTextColorPicker = () => {
       onPopupClose={(color) => {
         editor.chain().setColor(color.toString('hex')).run()
       }}
-      label={<BaseIcon icon={TextAaIcon} size="md" weight="duotone" />}
-      buttonClassName="p-4 border border-border/50 bg-secondary/25"
+      buttonClassName="p-4 bg-secondary/25"
     />
   )
 }

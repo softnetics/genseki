@@ -2,6 +2,7 @@
 
 import {
   type Icon,
+  LinkIcon,
   ListBulletsIcon,
   TextBolderIcon,
   TextItalicIcon,
@@ -13,7 +14,7 @@ import { useCurrentEditor } from '@tiptap/react'
 import { BaseIcon } from '../../../primitives/base-icon'
 import { ToolbarItem } from '../../../primitives/toolbar'
 
-type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList'
+type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList' | 'link'
 
 type MarkOptions = Record<
   MarkType,
@@ -66,6 +67,27 @@ const useMark = (type: MarkType) => {
         editor.chain().focus().toggleBulletList().run()
       },
     },
+    link: {
+      label: 'Link',
+      icon: LinkIcon,
+      isSelected: editor.isActive('link'),
+      onClick() {
+        if (!editor.isActive('link')) {
+          const { state } = editor
+          const { from, to } = state.selection
+          const currentText = state.doc.textBetween(from, to, '')
+
+          editor.chain().focus().extendMarkRange('link').run()
+          editor
+            .chain()
+            .focus()
+            .setMark('link', { href: currentText || 'https://' })
+            .run()
+          return
+        }
+        editor.chain().focus().unsetMark('link').run()
+      },
+    },
   }
 
   return options[type]
@@ -80,8 +102,9 @@ export const MarkButton = (props: { type: MarkType }) => {
   return (
     <ToolbarItem
       size="md"
-      className="duration-150 ease-out transition-all"
-      isSelected={markOption.isSelected}
+      variant="default"
+      className="duration-150 ease-out transition-all h-[36px]"
+      data-selected={markOption.isSelected}
       onClick={markOption.onClick}
       aria-label={markOption.label}
     >

@@ -3,12 +3,12 @@ import React from 'react'
 import type { Key } from 'react-aria-components'
 
 import {
-  ParagraphIcon,
   TextHFiveIcon,
   TextHFourIcon,
   TextHOneIcon,
   TextHThreeIcon,
   TextHTwoIcon,
+  TextTIcon,
 } from '@phosphor-icons/react'
 import type { Editor } from '@tiptap/core'
 import { useCurrentEditor } from '@tiptap/react'
@@ -17,7 +17,7 @@ import { BaseIcon } from '../../../primitives/base-icon'
 import { Select, SelectList, SelectOption, SelectTrigger } from '../../../primitives/select'
 
 const textStylesList = [
-  { icon: ParagraphIcon, label: 'Normal', value: 'p', type: 'paragraph' },
+  { icon: TextTIcon, label: 'Normal', value: 'p', type: 'paragraph' },
   { icon: TextHOneIcon, label: 'Heading 1', value: 'h1', type: 'heading', level: 1 },
   { icon: TextHTwoIcon, label: 'Heading 2', value: 'h2', type: 'heading', level: 2 },
   { icon: TextHThreeIcon, label: 'Heading 3', value: 'h3', type: 'heading', level: 3 },
@@ -79,7 +79,7 @@ export const SelectTextStyle = () => {
       aria-label="Select text style"
       onSelectionChange={selectChange}
     >
-      <SelectTrigger className="h-full" />
+      <SelectTrigger className="h-[36px]" />
       <SelectList items={textStylesList}>
         {(item) => (
           <SelectOption key={item.value} id={item.value} textValue={item.value}>
