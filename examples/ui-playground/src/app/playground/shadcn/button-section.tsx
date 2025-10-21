@@ -15,8 +15,13 @@ import {
   SortDescendingIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
-import { Button, ButtonGroup, ButtonGroupSeparator, ButtonGroupText } from '@genseki/react/v2'
+import {
+  Button,
+  ButtonGroup,
+  ButtonGroupSeparator,
+  ButtonGroupText,
+  Typography,
+} from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 
@@ -68,7 +73,7 @@ function ButtonSizes() {
         <MagnifyingGlassIcon />
         Small
       </Button>
-      <Button size="default">
+      <Button size="md">
         <MagnifyingGlassIcon />
         Default
       </Button>
@@ -270,7 +275,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Different button variants with various styles and purposes.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonVariants />
         </div>
       </PlaygroundCard>
@@ -279,7 +284,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Buttons come in three sizes: small, default, and large.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonSizes />
         </div>
       </PlaygroundCard>
@@ -288,7 +293,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Icon-only buttons in different sizes.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <IconButtons />
         </div>
       </PlaygroundCard>
@@ -297,7 +302,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Buttons with icons alongside text labels.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonsWithIcons />
         </div>
       </PlaygroundCard>
@@ -306,7 +311,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Buttons can be disabled or show a pending/loading state.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonStates />
         </div>
       </PlaygroundCard>
@@ -315,7 +320,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           A button that shows loading state during async operations.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <LoadingButton />
         </div>
       </PlaygroundCard>
@@ -324,7 +329,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           A simple button group with connected buttons.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonGroupBasic />
         </div>
       </PlaygroundCard>
@@ -333,7 +338,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Button groups with separators between buttons for visual distinction.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonGroupWithSeparators />
         </div>
       </PlaygroundCard>
@@ -342,7 +347,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Button groups with text labels and icons for better context.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonGroupWithText />
         </div>
       </PlaygroundCard>
@@ -351,7 +356,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Vertical button groups for stacked layouts.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonGroupVertical />
         </div>
       </PlaygroundCard>
@@ -360,7 +365,7 @@ export function ButtonSection() {
         <Typography type="body" className="text-muted-foreground mb-4">
           Button groups with different button variants mixed together.
         </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
+        <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonGroupVariants />
         </div>
       </PlaygroundCard>

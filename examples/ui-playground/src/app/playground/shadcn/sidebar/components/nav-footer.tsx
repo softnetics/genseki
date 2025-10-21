@@ -1,6 +1,5 @@
 import { CaretUpDownIcon, SignOutIcon, UserIcon } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
 import {
   DropdownMenu,
   DropdownMenuContent,
@@ -8,6 +7,7 @@ import {
   DropdownMenuTrigger,
   SidebarMenu,
   SidebarMenuItem,
+  Typography,
 } from '@genseki/react/v2'
 
 import { cn } from '../../../../../../../../packages/react/src/react/utils/cn'
@@ -21,7 +21,7 @@ function NavFooter() {
             <button
               className={cn(
                 // pl-2 because using internal user icon ml-2 (2+2) = 4
-                'w-full flex items-center p-4 pl-2 gap-4 bg-background rounded-lg shadow transition-all duration-100',
+                'w-full flex items-center p-4 pl-2 gap-4 bg-background rounded-lg shadow transition-all duration-100 focus-within:ring-ring focus-within:ring-[2px] outline-none',
                 'group-data-[state=collapsed]:bg-transparent group-data-[state=collapsed]:shadow-none group-data-[state=collapsed]:px-0 overflow-clip'
               )}
             >

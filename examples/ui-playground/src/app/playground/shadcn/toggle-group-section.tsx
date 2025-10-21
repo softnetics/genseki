@@ -17,8 +17,7 @@ import {
   TextUnderlineIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
-import { ToggleGroup, ToggleGroupItem } from '@genseki/react/v2'
+import { ToggleGroup, ToggleGroupItem, Typography } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 
@@ -97,12 +96,7 @@ function ToggleGroupSizes() {
         <ToggleGroupItem value="medium">Medium</ToggleGroupItem>
       </ToggleGroup>
 
-      <ToggleGroup
-        type="single"
-        value={defaultValue}
-        onValueChange={setDefaultValue}
-        size="default"
-      >
+      <ToggleGroup type="single" value={defaultValue} onValueChange={setDefaultValue} size="md">
         <ToggleGroupItem value="default">Default</ToggleGroupItem>
         <ToggleGroupItem value="large">Large</ToggleGroupItem>
       </ToggleGroup>
@@ -122,13 +116,13 @@ function ToggleGroupWithIcons() {
   return (
     <div className="flex flex-wrap gap-4">
       <ToggleGroup type="multiple" value={value} onValueChange={setValue}>
-        <ToggleGroupItem value="bold" size="default">
+        <ToggleGroupItem value="bold" size="md">
           <TextBolderIcon />
         </ToggleGroupItem>
-        <ToggleGroupItem value="italic" size="default">
+        <ToggleGroupItem value="italic" size="md">
           <TextItalicIcon />
         </ToggleGroupItem>
-        <ToggleGroupItem value="underline" size="default">
+        <ToggleGroupItem value="underline" size="md">
           <TextUnderlineIcon />
         </ToggleGroupItem>
       </ToggleGroup>

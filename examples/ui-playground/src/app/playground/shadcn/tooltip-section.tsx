@@ -8,8 +8,7 @@ import {
   WarningIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
-import { Button } from '@genseki/react/v2'
+import { Button, Typography } from '@genseki/react/v2'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'

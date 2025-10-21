@@ -3,16 +3,10 @@ import React from 'react'
 import { Slot } from '@radix-ui/react-slot'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { cn } from '../../utils/cn'
+import { cn } from '../../../src/react/utils/cn'
 
-/**
- * @deprecated
- */
 type TypographyTag = 'h1' | 'h2' | 'h3' | 'h4' | 'body' | 'label' | 'caption'
 
-/**
- * @deprecated
- */
 const nativeElementsMap: Record<TypographyTag, React.ElementType> = {
   h1: 'h1',
   h2: 'h2',
@@ -23,9 +17,6 @@ const nativeElementsMap: Record<TypographyTag, React.ElementType> = {
   label: 'p',
 }
 
-/**
- * @deprecated
- */
 const typographyVariants = cva('inline-block', {
   variants: {
     weight: {
@@ -46,9 +37,6 @@ const typographyVariants = cva('inline-block', {
   },
 })
 
-/**
- * @deprecated
- */
 interface TypographyProps
   extends React.HTMLAttributes<HTMLElement>,
     VariantProps<typeof typographyVariants> {
@@ -56,9 +44,6 @@ interface TypographyProps
   asChild?: boolean
 }
 
-/**
- * @deprecated
- */
 export const Typography = ({
   type = 'body',
   weight = 'normal',

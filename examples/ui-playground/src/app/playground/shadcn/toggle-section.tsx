@@ -14,8 +14,7 @@ import {
   TextUnderlineIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
-import { Toggle } from '@genseki/react/v2'
+import { Toggle, Typography } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 
@@ -63,7 +62,7 @@ function ToggleSizes() {
       <Toggle pressed={smPressed} onPressedChange={setSmPressed} size="sm">
         Small
       </Toggle>
-      <Toggle pressed={defaultPressed} onPressedChange={setDefaultPressed} size="default">
+      <Toggle pressed={defaultPressed} onPressedChange={setDefaultPressed} size="md">
         Default
       </Toggle>
       <Toggle pressed={lgPressed} onPressedChange={setLgPressed} size="lg">
@@ -81,13 +80,13 @@ function ToggleWithIcons() {
 
   return (
     <div className="flex flex-wrap gap-4">
-      <Toggle pressed={boldPressed} onPressedChange={setBoldPressed} size="default">
+      <Toggle pressed={boldPressed} onPressedChange={setBoldPressed} size="md">
         <TextBolderIcon />
       </Toggle>
-      <Toggle pressed={italicPressed} onPressedChange={setItalicPressed} size="default">
+      <Toggle pressed={italicPressed} onPressedChange={setItalicPressed} size="md">
         <TextItalicIcon />
       </Toggle>
-      <Toggle pressed={underlinePressed} onPressedChange={setUnderlinePressed} size="default">
+      <Toggle pressed={underlinePressed} onPressedChange={setUnderlinePressed} size="md">
         <TextUnderlineIcon />
       </Toggle>
     </div>
@@ -122,18 +121,13 @@ function TextFormattingExample() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-2">
-        <Toggle
-          pressed={boldPressed}
-          onPressedChange={setBoldPressed}
-          size="default"
-          variant="outline"
-        >
+        <Toggle pressed={boldPressed} onPressedChange={setBoldPressed} size="md" variant="outline">
           <TextBolderIcon />
         </Toggle>
         <Toggle
           pressed={italicPressed}
           onPressedChange={setItalicPressed}
-          size="default"
+          size="md"
           variant="outline"
         >
           <TextItalicIcon />
@@ -141,7 +135,7 @@ function TextFormattingExample() {
         <Toggle
           pressed={underlinePressed}
           onPressedChange={setUnderlinePressed}
-          size="default"
+          size="md"
           variant="outline"
         >
           <TextUnderlineIcon />
@@ -168,7 +162,7 @@ function AlignmentControls() {
         <Toggle
           pressed={alignment === 'left'}
           onPressedChange={(pressed) => pressed && setAlignment('left')}
-          size="default"
+          size="md"
           variant="outline"
         >
           <AlignLeftSimpleIcon />
@@ -176,7 +170,7 @@ function AlignmentControls() {
         <Toggle
           pressed={alignment === 'center'}
           onPressedChange={(pressed) => pressed && setAlignment('center')}
-          size="default"
+          size="md"
           variant="outline"
         >
           <AlignCenterHorizontalSimpleIcon />
@@ -184,7 +178,7 @@ function AlignmentControls() {
         <Toggle
           pressed={alignment === 'right'}
           onPressedChange={(pressed) => pressed && setAlignment('right')}
-          size="default"
+          size="md"
           variant="outline"
         >
           <AlignRightSimpleIcon />
@@ -212,24 +206,16 @@ function FavoriteActions() {
   return (
     <div className="space-y-4">
       <div className="flex flex-wrap gap-4">
-        <Toggle
-          pressed={favorites.heart}
-          onPressedChange={() => toggleFavorite('heart')}
-          size="default"
-        >
+        <Toggle pressed={favorites.heart} onPressedChange={() => toggleFavorite('heart')} size="md">
           <HeartIcon />
         </Toggle>
-        <Toggle
-          pressed={favorites.star}
-          onPressedChange={() => toggleFavorite('star')}
-          size="default"
-        >
+        <Toggle pressed={favorites.star} onPressedChange={() => toggleFavorite('star')} size="md">
           <StarIcon />
         </Toggle>
         <Toggle
           pressed={favorites.bookmark}
           onPressedChange={() => toggleFavorite('bookmark')}
-          size="default"
+          size="md"
         >
           <BookmarkIcon />
         </Toggle>

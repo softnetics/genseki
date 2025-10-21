@@ -13,7 +13,6 @@ import {
   UserIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
 import { Button } from '@genseki/react/v2'
 import {
   DropdownMenu,
@@ -30,6 +29,7 @@ import {
   DropdownMenuSubContent,
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
+  Typography,
 } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
