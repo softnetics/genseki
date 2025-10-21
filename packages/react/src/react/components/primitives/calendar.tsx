@@ -28,12 +28,18 @@ import { Select, SelectLabel, SelectList, SelectOption, SelectTrigger } from './
 
 import { BaseIcon } from '../../components/primitives/base-icon'
 
+/**
+ * @deprecated
+ */
 interface CalendarProps<T extends DateValue>
   extends Omit<CalendarPrimitiveProps<T>, 'visibleDuration'> {
   errorMessage?: string
   className?: string
 }
 
+/**
+ * @deprecated
+ */
 const Calendar = <T extends DateValue>({ errorMessage, className, ...props }: CalendarProps<T>) => {
   const now = today(getLocalTimeZone())
 
@@ -70,6 +76,9 @@ const Calendar = <T extends DateValue>({ errorMessage, className, ...props }: Ca
   )
 }
 
+/**
+ * @deprecated
+ */
 const CalendarHeader = ({
   isRange,
   className,
@@ -127,6 +136,9 @@ const CalendarHeader = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 const SelectMonth = ({ state }: { state: CalendarState }) => {
   const months = []
 
@@ -161,6 +173,9 @@ const SelectMonth = ({ state }: { state: CalendarState }) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 const SelectYear = ({ state }: { state: CalendarState }) => {
   const years: { value: CalendarDate; formatted: string }[] = []
   const formatter = useDateFormatter({
@@ -196,6 +211,9 @@ const SelectYear = ({ state }: { state: CalendarState }) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 const CalendarGridHeader = () => {
   return (
     <CalendarGridHeaderPrimitive>

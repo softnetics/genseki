@@ -12,7 +12,6 @@ import {
   XIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
 import {
   Input,
   InputGroup,
@@ -21,6 +20,7 @@ import {
   InputGroupControl,
   InputGroupText,
   Label,
+  Typography,
 } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
@@ -136,6 +136,48 @@ function FileInput() {
   )
 }
 
+// Time Inputs
+function TimeInputs() {
+  const [time, setTime] = React.useState('09:00')
+  const [startTime, setStartTime] = React.useState('09:00')
+  const [endTime, setEndTime] = React.useState('17:00')
+
+  return (
+    <div className="space-y-6">
+      <div className="space-y-2">
+        <Label htmlFor="time" className="text-sm font-medium">
+          Time
+        </Label>
+        <Input id="time" type="time" value={time} onChange={(e) => setTime(e.target.value)} />
+        <Typography type="caption" className="text-muted-foreground">
+          Selected time: {time}
+        </Typography>
+      </div>
+
+      <div className="space-y-2">
+        <Label className="text-sm font-medium">Time range</Label>
+        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+          <Input
+            type="time"
+            value={startTime}
+            onChange={(e) => setStartTime(e.target.value)}
+            aria-label="Start time"
+          />
+          <Input
+            type="time"
+            value={endTime}
+            onChange={(e) => setEndTime(e.target.value)}
+            aria-label="End time"
+          />
+        </div>
+        <Typography type="caption" className="text-muted-foreground">
+          {startTime} - {endTime}
+        </Typography>
+      </div>
+    </div>
+  )
+}
+
 // Input Group - Inline Start
 function InputGroupInlineStart() {
   return (
@@ -230,12 +272,16 @@ function InputGroupWithButtons() {
         </InputGroupAddon>
       </InputGroup>
 
-      <InputGroup>
+      <InputGroup disabled>
         <InputGroupControl>
           <Input type={showPassword ? 'text' : 'password'} placeholder="Enter password" />
         </InputGroupControl>
         <InputGroupAddon align="inline-end">
-          <InputGroupButton size="icon-xs" onClick={() => setShowPassword(!showPassword)}>
+          <InputGroupButton
+            size="icon-xs"
+            onClick={() => setShowPassword(!showPassword)}
+            className="border-none"
+          >
             {showPassword ? <EyeSlashIcon /> : <EyeIcon />}
           </InputGroupButton>
         </InputGroupAddon>
@@ -343,14 +389,14 @@ function InputGroupStates() {
         </InputGroupControl>
       </InputGroup>
 
-      <InputGroup data-disabled="true">
+      <InputGroup disabled={true}>
         <InputGroupAddon align="inline-start">
           <InputGroupText>
             <EnvelopeIcon />
           </InputGroupText>
         </InputGroupAddon>
         <InputGroupControl>
-          <Input placeholder="Disabled state" disabled />
+          <Input placeholder="Disabled state" />
         </InputGroupControl>
       </InputGroup>
 
@@ -422,6 +468,15 @@ export function InputSection() {
         </Typography>
         <div className="p-4 bg-secondary w-full rounded-lg">
           <FileInput />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard title="Time Inputs" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          Time input and time range using native time picker UI.
+        </Typography>
+        <div className="p-4 bg-secondary w-full rounded-lg">
+          <TimeInputs />
         </div>
       </PlaygroundCard>
 

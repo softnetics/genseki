@@ -1,7 +1,6 @@
 import React from 'react'
 
-import { Typography } from '@genseki/react'
-import { Label, Textarea } from '@genseki/react/v2'
+import { Label, Textarea, Typography } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'
 

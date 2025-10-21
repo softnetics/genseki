@@ -3,12 +3,12 @@ import * as React from 'react'
 
 import Link from 'next/link'
 
-import { Typography } from '@genseki/react'
-import { linkVariants } from '@genseki/react/v2'
+import { linkVariants, Typography } from '@genseki/react/v2'
 
 import { ButtonSection } from './button-section'
 import { CollapsibleSection } from './collapsible-section'
 import { ComboboxSection } from './combobox-section'
+import { DatePickerSection } from './date-picker-section'
 import { DropdownMenuSection } from './dropdown-menu-section'
 import { InputSection } from './input-section'
 import { LinkSection } from './link-section'
@@ -35,6 +35,11 @@ export default function ComboboxPage() {
           Combobox
         </Typography>
         <ComboboxSection />
+
+        <Typography type="h2" weight="bold" id="date-picker">
+          Date picker
+        </Typography>
+        <DatePickerSection />
 
         <Typography type="h2" weight="bold" id="input">
           Input
@@ -99,6 +104,13 @@ export default function ComboboxPage() {
               className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
             >
               {'>'} Combobox
+            </Link>
+            <hr />
+            <Link
+              href="#date-picker"
+              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
+            >
+              {'>'} Date picker
             </Link>
             <hr />
             <Link

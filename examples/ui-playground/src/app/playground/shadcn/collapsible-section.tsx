@@ -11,8 +11,7 @@ import {
   VideoIcon,
 } from '@phosphor-icons/react'
 
-import { Typography } from '@genseki/react'
-import { Button } from '@genseki/react/v2'
+import { Button, Typography } from '@genseki/react/v2'
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from '@genseki/react/v2'
 
 import { PlaygroundCard } from '~/src/components/card'

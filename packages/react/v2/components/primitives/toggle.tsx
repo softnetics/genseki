@@ -17,14 +17,14 @@ const toggleVariants = cva(
           'border border-input bg-transparent shadow-xs hover:bg-accent hover:text-accent-foreground',
       },
       size: {
-        default: 'h-18 px-4 min-w-18',
+        md: 'h-18 px-4 min-w-18',
         sm: 'h-16 px-3 min-w-16',
         lg: 'h-20 px-5 min-w-20',
       },
     },
     defaultVariants: {
       variant: 'default',
-      size: 'default',
+      size: 'md',
     },
   }
 )

@@ -1,4 +1,4 @@
-import { Typography } from '@genseki/react'
+import { Typography } from '@genseki/react/v2'
 
 import { ForgotPasswordClientForm } from './forgot-password.client'
 

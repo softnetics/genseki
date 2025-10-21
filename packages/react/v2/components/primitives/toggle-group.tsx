@@ -10,7 +10,7 @@ import { toggleVariants } from './toggle'
 import { cn } from '../../../src/react/utils/cn'
 
 const ToggleGroupContext = React.createContext<VariantProps<typeof toggleVariants>>({
-  size: 'default',
+  size: 'md',
   variant: 'default',
 })
 

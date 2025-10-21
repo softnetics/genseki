@@ -4,7 +4,6 @@ import type { Icon } from '@phosphor-icons/react'
 import { CaretRightIcon } from '@phosphor-icons/react'
 import Link from 'next/link'
 
-import { Typography } from '@genseki/react'
 import {
   Collapsible,
   CollapsibleContent,
@@ -16,6 +15,7 @@ import {
   SidebarMenuSub,
   SidebarMenuSubButton,
   SidebarMenuSubItem,
+  Typography,
 } from '@genseki/react/v2'
 
 import { cn } from '../../../../../../../../packages/react/src/react/utils/cn'
