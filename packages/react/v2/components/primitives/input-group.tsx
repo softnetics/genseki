@@ -152,10 +152,14 @@ function InputGroupText({ className, ...props }: React.ComponentProps<'span'>) {
 
 function InputGroupControl({ className, disabled, ...props }: React.ComponentProps<typeof Input>) {
   const ctx = useInputGroup()
+
+  const isDisabled = ctx.disabled || disabled
+
   return (
     <Slot
       data-slot="input-group-control"
-      disabled={ctx.disabled || disabled}
+      disabled={isDisabled}
+      aria-disabled={isDisabled}
       className={cn(
         'flex-2 rounded-none border-0 bg-transparent shadow-none focus-visible:ring-0 dark:bg-transparent',
         className

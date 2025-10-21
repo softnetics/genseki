@@ -532,9 +532,6 @@ importers:
       cookie-es:
         specifier: ^2.0.0
         version: 2.0.0
-      date-fns:
-        specifier: ^4.1.0
-        version: 4.1.0
       deepmerge-ts:
         specifier: ^7.1.5
         version: 7.1.5

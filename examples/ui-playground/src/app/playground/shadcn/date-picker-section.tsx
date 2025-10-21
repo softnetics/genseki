@@ -35,7 +35,13 @@ function BasicDatePicker() {
   return (
     <div>
       <DatePickerProvider>
-        <DatePickerTrigger value={date} />
+        <DatePickerTrigger
+          value={date}
+          formatDate={(value) => {
+            // `formatDate` is optional
+            return value?.getTime()
+          }}
+        />
         <DatePickerContent>
           <Calendar
             mode="single"

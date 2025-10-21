@@ -86,7 +86,6 @@
     "clsx": "^2.1.1",
     "cmdk": "^1.1.1",
     "cookie-es": "^2.0.0",
-    "date-fns": "^4.1.0",
     "deepmerge-ts": "^7.1.5",
     "defu": "^6.1.4",
     "input-otp": "^1.4.2",

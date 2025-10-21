@@ -4,7 +4,6 @@ import * as React from 'react'
 
 import { CalendarBlankIcon } from '@phosphor-icons/react'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
-import { format } from 'date-fns'
 
 import { Button } from './button'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
@@ -36,12 +35,16 @@ export function DatePickerTrigger({
   asChild,
   value,
   children,
+  formatDate,
   ...props
 }: {
   asChild?: boolean
   value?: Date
+  formatDate?: (value: Date | undefined) => string | number | undefined
 } & Omit<React.ComponentPropsWithRef<typeof PopoverTrigger>, 'value'>) {
   const { onOpenChange } = useDatePickerProvider()
+
+  const displayValue = formatDate ? formatDate(value) : value?.toLocaleDateString()
 
   return (
     <PopoverTrigger
@@ -66,7 +69,7 @@ export function DatePickerTrigger({
           )}
         >
           <CalendarBlankIcon />
-          {value ? format(value, 'PPP') : <Typography>Pick a date</Typography>}
+          <Typography>{displayValue || 'Pick a date'}</Typography>
         </Button>
       )}
     </PopoverTrigger>
