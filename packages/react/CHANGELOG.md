@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.65
+
+### Patch Changes
+
+- [#251](https://github.com/softnetics/genseki/pull/251) [`a4812ac`](https://github.com/softnetics/genseki/commit/a4812ace26992a7a95deb17d4e7e85bec008fcd3) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: richtext-editor designs and add link-extension
+
 ## 0.1.0-alpha.64
 
 ### Patch Changes
