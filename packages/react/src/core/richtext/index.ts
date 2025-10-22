@@ -39,6 +39,7 @@ const getSanitizedExtensions = (unSanitizedExtensions: Extensions): SanitizedExt
       case 'color':
       case 'image':
       case 'imageUpload':
+      case 'link':
         return R.omit(extension, ['config'])
       default:
         throw new Error(`Unknown extension name: ${extension.name}`)

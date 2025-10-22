@@ -4,11 +4,14 @@ import React, { createContext, useContext } from 'react'
 import type { GroupProps, SeparatorProps, ToolbarProps } from 'react-aria-components'
 import { composeRenderProps, Group, Toolbar as ToolbarPrimitive } from 'react-aria-components'
 
+import type { VariantProps } from 'class-variance-authority'
 import { twMerge } from 'tailwind-merge'
 
 import { composeTailwindRenderProps } from './primitive'
 import { Separator } from './separator'
-import { Toggle, type ToggleProps } from './toggle'
+
+import type { toggleVariants } from '../../../../v2'
+import { Toggle } from '../../../../v2'
 
 const ToolbarContext = createContext<{ orientation?: ToolbarProps['orientation'] }>({
   orientation: 'horizontal',
@@ -55,13 +58,17 @@ const ToolbarGroup = ({ isDisabled, className, ...props }: ToolbarGroupProps) =>
   )
 }
 
-type ToggleItemProps = ToggleProps
-const ToolbarItem = ({ isDisabled, ref, ...props }: ToggleItemProps) => {
-  const context = useContext(ToolbarGroupContext)
-  const effectiveIsDisabled = isDisabled || context.isDisabled
+interface ToggleItemProps
+  extends React.ComponentProps<typeof Toggle>,
+    VariantProps<typeof toggleVariants> {}
 
-  return <Toggle ref={ref} isDisabled={effectiveIsDisabled} {...props} />
+const ToolbarItem = ({ disabled, ref, ...props }: ToggleItemProps) => {
+  const context = useContext(ToolbarGroupContext)
+  const effectiveIsDisabled = disabled || context.isDisabled
+
+  return <Toggle ref={ref} disabled={effectiveIsDisabled} {...props} />
 }
+
 type ToolbarSeparatorProps = SeparatorProps
 const ToolbarSeparator = ({ className, ...props }: ToolbarSeparatorProps) => {
   const { orientation } = useContext(ToolbarContext)

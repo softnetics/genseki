@@ -2,8 +2,8 @@
 import { ArrowClockwiseIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
+import { Button } from '../../../../../../v2'
 import { BaseIcon } from '../../../primitives/base-icon'
-import { Button } from '../../../primitives/button'
 
 export const UndoButton = () => {
   const { editor } = useCurrentEditor()
@@ -12,14 +12,14 @@ export const UndoButton = () => {
 
   return (
     <Button
-      variant="ghost"
       size="md"
-      isDisabled={!editor.can().undo()}
+      variant="ghost"
+      className="toolbar-item spaced"
       onClick={() => {
         editor.chain().focus().undo().run()
       }}
-      className="toolbar-item spaced"
       aria-label="Undo"
+      disabled={!editor.can().undo()}
     >
       <BaseIcon icon={ArrowCounterClockwiseIcon} weight="regular" />
     </Button>
@@ -33,14 +33,14 @@ export const RedoButton = () => {
 
   return (
     <Button
-      variant="ghost"
       size="md"
-      isDisabled={!editor.can().redo()}
+      variant="ghost"
+      className="duration-150 ease-out transition-all h-[36px]"
       onClick={() => {
         editor.chain().focus().redo().run()
       }}
-      className="toolbar-item"
       aria-label="Redo"
+      disabled={!editor.can().redo()}
     >
       <BaseIcon icon={ArrowClockwiseIcon} weight="regular" />
     </Button>

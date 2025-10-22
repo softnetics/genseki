@@ -66,7 +66,7 @@ const ColorPicker = ({
               buttonClassName
             )}
           >
-            <ColorSwatch className="size-14" />
+            <ColorSwatch className="size-10 rounded-full" />
             {label && label}
           </Button>
           <PopoverContent

@@ -2,8 +2,8 @@
 import { ImageIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
+import { Button } from '../../../../../../v2'
 import { BaseIcon } from '../../../primitives/base-icon'
-import { Button } from '../../../primitives/button'
 
 export const UploadImageButton = () => {
   const { editor } = useCurrentEditor()
@@ -12,9 +12,9 @@ export const UploadImageButton = () => {
 
   return (
     <Button
-      size="sm"
+      size="md"
       variant="ghost"
-      className="self-center p-6"
+      className="self-center h-[36px]"
       onClick={() => {
         editor.chain().focus().setImageUploadNode().run()
       }}

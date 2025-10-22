@@ -17,8 +17,13 @@ export const EditorBar: React.FC<{ className?: string; children?: React.ReactNod
   if (!editor) throw new Error('Editor not found')
 
   return (
-    <div className={cn('overflow-x-auto sticky top-1 m-4 z-10 bg-bg rounded-lg', className)}>
-      <Toolbar className="flex items-stretch">{children}</Toolbar>
+    <div
+      className={cn(
+        'overflow-x-auto self-start sticky top-1 z-10 bg-bg rounded-lg w-full flex items-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        className
+      )}
+    >
+      <Toolbar className="flex items-stretch h-fit">{children}</Toolbar>
     </div>
   )
 }
