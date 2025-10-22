@@ -1,5 +1,19 @@
 # @example/erp
 
+## 0.1.0-alpha.63
+
+### Patch Changes
+
+- [#251](https://github.com/softnetics/genseki/pull/251) [`a4812ac`](https://github.com/softnetics/genseki/commit/a4812ace26992a7a95deb17d4e7e85bec008fcd3) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: richtext-editor designs and add link-extension
+
+- Updated dependencies [[`a4812ac`](https://github.com/softnetics/genseki/commit/a4812ace26992a7a95deb17d4e7e85bec008fcd3)]:
+  - @genseki/react@0.1.0-alpha.65
+  - @genseki/next@0.1.0-alpha.65
+  - @genseki/plugins@0.1.0-alpha.65
+  - @genseki/prisma-generator@0.1.0-alpha.65
+  - @genseki/react-query@0.1.0-alpha.65
+  - @genseki/rest@0.1.0-alpha.65
+
 ## 0.1.0-alpha.62
 
 ### Patch Changes
