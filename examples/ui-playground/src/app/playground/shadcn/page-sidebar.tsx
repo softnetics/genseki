@@ -17,6 +17,7 @@ const navigationItems = [
   { href: '#button', label: 'Button' },
   { href: '#combobox', label: 'Combobox' },
   { href: '#date-picker', label: 'Date picker' },
+  { href: '#dialog', label: 'Dialog' },
   { href: '#input', label: 'Input' },
   { href: '#input-otp', label: 'Input OTP' },
   { href: '#link', label: 'Link' },

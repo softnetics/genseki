@@ -1,19 +1,28 @@
+import type React from 'react'
+
 import { StarIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { Typography } from '@genseki/react/v2'
 
-type PlaygroundCardProps = React.PropsWithChildren<{
-  title: string
-  categoryTitle?: string
-}>
+type PlaygroundCardProps = React.PropsWithChildren<
+  {
+    title: string
+    categoryTitle?: string
+  } & React.HTMLAttributes<HTMLDivElement>
+>
 
 export const PlaygroundCard = ({
   title,
   categoryTitle = 'Feature',
   children,
+  className,
+  ...props
 }: PlaygroundCardProps) => {
   return (
-    <div className="border-border inline-flex min-w-[260px] flex-col rounded-lg border bg-background">
+    <div
+      className={`border-border inline-flex min-w-[260px] flex-col rounded-lg border bg-background ${className}`}
+      {...props}
+    >
       <div className="border-border flex w-full flex-col gap-y-4 border-b px-6 py-8">
         <div className="flex items-center gap-x-2">
           <div className="rounded-md bg-blue-500 p-2">

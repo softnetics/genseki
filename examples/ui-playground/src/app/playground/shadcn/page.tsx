@@ -7,6 +7,7 @@ import { ButtonSection } from './button-section'
 import { CollapsibleSection } from './collapsible-section'
 import { ComboboxSection } from './combobox-section'
 import { DatePickerSection } from './date-picker-section'
+import { DialogSection } from './dialog-section'
 import { DropdownMenuSection } from './dropdown-menu-section'
 import { InputOtpSection } from './input-otp-section'
 import { InputSection } from './input-section'
@@ -43,6 +44,10 @@ export default function ComboboxPage() {
           Date picker
         </Typography>
         <DatePickerSection />
+        <Typography type="h2" weight="bold" id="dialog">
+          Dialog
+        </Typography>
+        <DialogSection />
         <Typography type="h2" weight="bold" id="input">
           Input
         </Typography>
