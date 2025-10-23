@@ -109,7 +109,9 @@ export default function ComboboxPage() {
         </Typography>
         <ToastSection />
       </div>
-      <PageSidebar />
+      <React.Suspense fallback={null}>
+        <PageSidebar />
+      </React.Suspense>
     </div>
   )
 }
