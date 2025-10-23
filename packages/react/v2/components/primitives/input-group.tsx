@@ -30,7 +30,7 @@ function InputGroup({
         data-disabled={disabled}
         role="group"
         className={cn(
-          'group/input-group data-disabled:bg-surface-primary-disabled data-disabled:border-border-primary bg-background border-input dark:bg-input/30 relative flex w-full items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none',
+          'group/input-group data-disabled:bg-surface-primary-disabled data-disabled:border-border-primary bg-background border-input dark:bg-input/30 relative flex items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none',
           'h-auto min-w-0 has-[>textarea]:h-auto',
 
           // Variants based on alignment.

@@ -104,10 +104,10 @@ function InputWithLabels() {
       </div>
 
       <div className="space-y-2">
-        <Label htmlFor="email" className="text-sm font-medium">
+        <Label htmlFor="email-2" className="text-sm font-medium">
           Email <span className="text-destructive">*</span>
         </Label>
-        <Input id="email" type="email" placeholder="you@example.com" required />
+        <Input id="email-2" type="email" placeholder="you@example.com" required />
         <Typography type="caption" className="text-muted-foreground">
           We{"'"}ll never share your email with anyone else.
         </Typography>

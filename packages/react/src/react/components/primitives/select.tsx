@@ -31,6 +31,9 @@ import { composeTailwindRenderProps, focusStyles } from './primitive'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { cn } from '../../utils/cn'
 
+/**
+ * @deprecated
+ */
 const selectTriggerStyles = tv({
   extend: focusStyles,
   base: [
@@ -45,6 +48,9 @@ const selectTriggerStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface SelectProps<T extends object> extends SelectPrimitiveProps<T> {
   label?: string
   description?: string
@@ -53,6 +59,9 @@ interface SelectProps<T extends object> extends SelectPrimitiveProps<T> {
   className?: string
 }
 
+/**
+ * @deprecated
+ */
 const Select = <T extends object>({
   label,
   description,
@@ -81,6 +90,9 @@ const Select = <T extends object>({
   )
 }
 
+/**
+ * @deprecated
+ */
 interface SelectListProps<T extends object>
   extends Omit<ListBoxProps<T>, 'layout' | 'orientation'>,
     Pick<PopoverProps, 'placement'> {
@@ -88,6 +100,9 @@ interface SelectListProps<T extends object>
   popoverClassName?: PopoverContentProps['className']
 }
 
+/**
+ * @deprecated
+ */
 const SelectList = <T extends object>({
   children,
   items,
@@ -121,11 +136,17 @@ const SelectList = <T extends object>({
   )
 }
 
+/**
+ * @deprecated
+ */
 interface SelectTriggerProps extends React.ComponentProps<typeof Button> {
   prefix?: React.ReactNode
   className?: string
 }
 
+/**
+ * @deprecated
+ */
 const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
   return (
     <Button
@@ -149,10 +170,26 @@ const SelectTrigger = ({ className, ...props }: SelectTriggerProps) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 const SelectSection = DropdownSection
+
+/**
+ * @deprecated
+ */
 const SelectSeparator = DropdownSeparator
+/**
+ * @deprecated
+ */
 const SelectLabel = DropdownLabel
+/**
+ * @deprecated
+ */
 const SelectOptionDetails = DropdownItemDetails
+/**
+ * @deprecated
+ */
 const SelectOption = DropdownItem
 
 export {

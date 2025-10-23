@@ -7,6 +7,9 @@ import clsx from 'clsx'
 
 import { Select, SelectList, SelectOption, SelectTrigger, Typography } from '../..'
 
+/**
+ * @deprecated
+ */
 interface PaginationProps {
   variant?: 'default' | 'compact'
   currentPage: number
@@ -15,6 +18,9 @@ interface PaginationProps {
   maxVisiblePages?: number
 }
 
+/**
+ * @deprecated
+ */
 const Pagination = (props: PaginationProps) => {
   const { currentPage, totalPages, onPageChange, maxVisiblePages = 5, variant = 'compact' } = props
 
@@ -102,12 +108,18 @@ const Pagination = (props: PaginationProps) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 interface PageSizeSelectProps {
   pageSize: number
   onPageSizeChange: (pageSize: number) => void
   options?: { value: number; label: string }[]
 }
 
+/**
+ * @deprecated
+ */
 const PageSizeSelect = (props: PageSizeSelectProps) => {
   const pageSizeOptions = props.options ?? [
     { value: 10, label: '10' },

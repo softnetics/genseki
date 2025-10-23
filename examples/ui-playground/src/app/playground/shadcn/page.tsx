@@ -1,17 +1,22 @@
 'use client'
 import * as React from 'react'
 
-import Link from 'next/link'
-
-import { linkVariants, Typography } from '@genseki/react/v2'
+import { Typography } from '@genseki/react/v2'
 
 import { ButtonSection } from './button-section'
 import { CollapsibleSection } from './collapsible-section'
 import { ComboboxSection } from './combobox-section'
 import { DatePickerSection } from './date-picker-section'
 import { DropdownMenuSection } from './dropdown-menu-section'
+import { InputOtpSection } from './input-otp-section'
 import { InputSection } from './input-section'
 import { LinkSection } from './link-section'
+import PageSidebar from './page-sidebar'
+import { PaginationSection } from './pagination-section'
+import { ProgressSection } from './progress-section'
+import { SelectSection } from './select-section'
+import { SwitchSection } from './switch-section'
+import { TabsSection } from './tabs-section'
 import { TextareaSection } from './textarea-section'
 import { ToastSection } from './toast-section'
 import { ToggleGroupSection } from './toggle-group-section'
@@ -30,161 +35,76 @@ export default function ComboboxPage() {
           Button
         </Typography>
         <ButtonSection />
-
         <Typography type="h2" weight="bold" id="combobox">
           Combobox
         </Typography>
         <ComboboxSection />
-
         <Typography type="h2" weight="bold" id="date-picker">
           Date picker
         </Typography>
         <DatePickerSection />
-
         <Typography type="h2" weight="bold" id="input">
           Input
         </Typography>
         <InputSection />
-
+        <Typography type="h2" weight="bold" id="input-otp">
+          Input OTP
+        </Typography>
+        <InputOtpSection />A
         <Typography type="h2" weight="bold" id="link">
           Link
         </Typography>
         <LinkSection />
-
+        <Typography type="h2" weight="bold" id="pagination">
+          Pagination
+        </Typography>
+        <PaginationSection />
+        <Typography type="h2" weight="bold" id="progress">
+          Progress
+        </Typography>
+        <ProgressSection />
+        <Typography type="h2" weight="bold" id="select">
+          Select
+        </Typography>
+        <SelectSection />
+        <Typography type="h2" weight="bold" id="switch">
+          Switch
+        </Typography>
+        <SwitchSection />
+        <Typography type="h2" weight="bold" id="tabs">
+          Tabs
+        </Typography>
+        <TabsSection />
         <Typography type="h2" weight="bold" id="tooltip">
           Tooltip
         </Typography>
         <TooltipSection />
-
         <Typography type="h2" weight="bold" id="dropdown-menu">
           Dropdown Menu
         </Typography>
         <DropdownMenuSection />
-
         <Typography type="h2" weight="bold" id="collapsible">
           Collapsible
         </Typography>
         <CollapsibleSection />
-
         <Typography type="h2" weight="bold" id="toggle">
           Toggle
         </Typography>
         <ToggleSection />
-
         <Typography type="h2" weight="bold" id="toggle-group">
           Toggle Group
         </Typography>
         <ToggleGroupSection />
-
         <Typography type="h2" weight="bold" id="textarea">
           Textarea
         </Typography>
         <TextareaSection />
-
         <Typography type="h2" weight="bold" id="toast">
           Toast
         </Typography>
         <ToastSection />
       </div>
-      <div className="relative bg-card border-l border-border w-[200px]">
-        <div className="sticky inset-0 max-h-screen [overscroll-behavior:none] p-4">
-          <div className="flex flex-col gap-y-3">
-            <Link
-              href="#button"
-              className={linkVariants({
-                className: 'text-text-secondary gayx-24',
-                variant: 'plain',
-              })}
-            >
-              {'>'} Button
-            </Link>
-            <hr />
-            <Link
-              href="#combobox"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Combobox
-            </Link>
-            <hr />
-            <Link
-              href="#date-picker"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Date picker
-            </Link>
-            <hr />
-            <Link
-              href="#input"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Input
-            </Link>
-            <hr />
-            <Link
-              href="#link"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Link
-            </Link>
-            <hr />
-            <Link
-              href="#tooltip"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Tooltip
-            </Link>
-            <hr />
-            <Link
-              href="#dropdown-menu"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Dropdown Menu
-            </Link>
-            <hr />
-            <Link
-              href="#collapsible"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Collapsible
-            </Link>
-            <hr />
-            <Link
-              href="#toggle"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Toggle
-            </Link>
-            <hr />
-            <Link
-              href="#toggle-group"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Toggle Group
-            </Link>
-            <hr />
-            <Link
-              href="#textarea"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Textarea
-            </Link>
-            <hr />
-            <Link
-              href="#toast"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Toast
-            </Link>
-            <hr />
-            <Link
-              href="/playground/shadcn/sidebar"
-              className={linkVariants({ className: 'text-text-secondary', variant: 'plain' })}
-            >
-              {'>'} Sidebar
-            </Link>
-          </div>
-        </div>
-      </div>
+      <PageSidebar />
     </div>
   )
 }

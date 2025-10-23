@@ -22,6 +22,9 @@ import { tv } from 'tailwind-variants'
 import { Badge } from './badge'
 import { composeTailwindRenderProps } from './primitive'
 
+/**
+ * @deprecated
+ */
 const tabsStyles = tv({
   base: 'group/tabs flex gap-4 forced-color-adjust-none',
   variants: {
@@ -36,6 +39,9 @@ const tabsStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface TabsProps extends TabsPrimitiveProps {
   size?: 'md' | 'lg'
   ref?: React.RefObject<HTMLDivElement>
@@ -56,6 +62,9 @@ const Tabs = ({ className, ref, size, ...props }: TabsProps) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 const tabListStyles = tv({
   base: 'flex forced-color-adjust-none',
   variants: {
@@ -66,9 +75,16 @@ const tabListStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface TabListProps<T extends object> extends TabListPrimitiveProps<T> {
   ref?: React.RefObject<HTMLDivElement>
 }
+
+/**
+ * @deprecated
+ */
 const TabList = <T extends object>({ className, ref, ...props }: TabListProps<T>) => {
   const id = useId()
   return (
@@ -84,6 +100,9 @@ const TabList = <T extends object>({ className, ref, ...props }: TabListProps<T>
   )
 }
 
+/**
+ * @deprecated
+ */
 const tabStyles = tv({
   base: [
     'relative flex cursor-pointer items-center whitespace-nowrap rounded-full font-semibold outline-hidden transition *:data-[slot=icon]:mr-2 *:data-[slot=icon]:size-4 focus-visible:text-text-brand',
@@ -106,10 +125,17 @@ const tabStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface TabProps extends TabPrimitiveProps {
   badgeNumber?: number
   ref?: React.RefObject<HTMLButtonElement>
 }
+
+/**
+ * @deprecated
+ */
 const Tab = ({ children, badgeNumber, ref, ...props }: TabProps) => {
   return (
     <TabPrimitive
@@ -152,9 +178,16 @@ const Tab = ({ children, badgeNumber, ref, ...props }: TabProps) => {
   )
 }
 
+/**
+ * @deprecated
+ */
 interface TabPanelProps extends TabPanelPrimitiveProps {
   ref?: React.RefObject<HTMLDivElement>
 }
+
+/**
+ * @deprecated
+ */
 const TabPanel = ({ className, ref, ...props }: TabPanelProps) => {
   return (
     <TabPanelPrimitive

@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { CheckIcon } from '@phosphor-icons/react'
+import { CheckIcon, UserIcon } from '@phosphor-icons/react'
 
 import {
   Button,
@@ -13,6 +13,10 @@ import {
   ComboboxProvider,
   ComboboxTrigger,
   ComboboxTriggerMultiValue,
+  InputGroup,
+  InputGroupAddon,
+  InputGroupControl,
+  InputGroupText,
   Typography,
 } from '@genseki/react/v2'
 
@@ -205,6 +209,70 @@ function ControlledComboboxSingle() {
   )
 }
 
+function ControlledInputGroupComboboxSingle() {
+  const [value, setValue] = React.useState<string[]>([])
+  const [open, setOpen] = React.useState(false)
+
+  return (
+    <div className="space-y-4">
+      <div className="flex">
+        <InputGroup>
+          <ComboboxProvider
+            items={languages}
+            open={open}
+            onOpenChange={setOpen}
+            value={value ?? undefined}
+            onValueChange={setValue}
+          >
+            <InputGroupAddon align="inline-start">
+              <InputGroupText>
+                <UserIcon />
+              </InputGroupText>
+            </InputGroupAddon>
+            <InputGroupControl>
+              <ComboboxTrigger>
+                <div className="py-4 px-6">
+                  <Typography>{value || 'Please select item'}</Typography>
+                </div>
+              </ComboboxTrigger>
+            </InputGroupControl>
+            <ComboboxContent>
+              <ComboboxCommandInput />
+              <ComboboxCommandEmpty>No language found.</ComboboxCommandEmpty>
+              <ComboboxCommandList>
+                <ComboboxCommandGroup>
+                  {({ items }) => {
+                    return items.map((language) => (
+                      <ComboboxCommandItem
+                        key={language.value}
+                        value={language.value}
+                        label={language.label}
+                      />
+                    ))
+                  }}
+                </ComboboxCommandGroup>
+              </ComboboxCommandList>
+            </ComboboxContent>
+          </ComboboxProvider>
+        </InputGroup>
+      </div>
+      <div className="flex gap-2 items-center">
+        <Typography type="caption" className="text-muted-foreground">
+          Selected: {value.join(', ') || 'None'}
+        </Typography>
+        <div className="inline-flex gap-x-4">
+          <Button size="sm" variant="outline" onClick={() => setValue([''])}>
+            Clear
+          </Button>
+          <Button size="sm" variant="outline" onClick={() => setValue(['typescript'])}>
+            TypeScript
+          </Button>
+        </div>
+      </div>
+    </div>
+  )
+}
+
 // Custom Trigger Combobox Example
 function CustomTriggerComboboxMultiple() {
   return (
@@ -323,6 +391,18 @@ export function ComboboxSection() {
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
           <ControlledComboboxSingle />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard
+        title="Input group controlled Combobox (Single selection)"
+        categoryTitle="Component"
+      >
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A controlled combobox with input group.
+        </Typography>
+        <div className="p-4 bg-background w-full rounded-lg">
+          <ControlledInputGroupComboboxSingle />
         </div>
       </PlaygroundCard>
 
