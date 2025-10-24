@@ -6,6 +6,9 @@ import { IconBulletFill } from '@intentui/icons'
 import { OTPInput, OTPInputContext } from 'input-otp'
 import { twMerge } from 'tailwind-merge'
 
+/**
+ * @deprecated
+ */
 type InputOTOPProps = React.ComponentProps<typeof OTPInput>
 const InputOTP = ({
   className,
@@ -30,15 +33,28 @@ const InputOTP = ({
   />
 )
 
+/**
+ * @deprecated
+ */
 type InputOTPGroupProps = React.ComponentProps<'div'>
+
+/**
+ * @deprecated
+ */
 const InputOTPGroup = ({ className, ref, ...props }: InputOTPGroupProps) => (
   <div ref={ref} className={twMerge('flex items-center gap-x-1.5', className)} {...props} />
 )
 
+/**
+ * @deprecated
+ */
 interface InputOTPSlotProps extends React.ComponentProps<'div'> {
   index: number
 }
 
+/**
+ * @deprecated
+ */
 const InputOTPSlot = ({ index, className, ref, ...props }: InputOTPSlotProps) => {
   const inputOTPContext = use(OTPInputContext)
   const slot = inputOTPContext.slots[index]
@@ -69,7 +85,13 @@ const InputOTPSlot = ({ index, className, ref, ...props }: InputOTPSlotProps) =>
   )
 }
 
+/**
+ * @deprecated
+ */
 type InputOTPSeparatorProps = React.ComponentProps<'div'>
+/**
+ * @deprecated
+ */
 const InputOTPSeparator = ({ ref, ...props }: InputOTPSeparatorProps) => (
   <div ref={ref} {...props}>
     <IconBulletFill className="size-2" />

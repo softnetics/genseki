@@ -11,6 +11,9 @@ import { composeTailwindRenderProps } from './primitive'
 
 import { cn } from '../../utils/cn'
 
+/**
+ * @deprecated
+ */
 interface SwitchProps extends SwitchPrimitiveProps {
   size?: 'md' | 'lg'
   ref?: React.RefObject<HTMLLabelElement>
@@ -18,6 +21,10 @@ interface SwitchProps extends SwitchPrimitiveProps {
   isRequired?: boolean
   label?: string
 }
+
+/**
+ * @deprecated
+ */
 const Switch = forwardRef(function Switch(
   { className, size = 'md', ...props }: SwitchProps,
   ref: React.ForwardedRef<HTMLLabelElement>
