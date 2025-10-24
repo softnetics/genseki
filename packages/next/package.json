@@ -1,7 +1,7 @@
 {
   "name": "@genseki/next",
   "description": "Next.js integration for Genseki",
-  "version": "0.1.0-alpha.65",
+  "version": "0.1.0-alpha.66",
   "sideEffects": false,
   "type": "module",
   "files": [

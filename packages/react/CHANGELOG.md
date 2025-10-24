@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.66
+
+### Patch Changes
+
+- [#253](https://github.com/softnetics/genseki/pull/253) [`0f192e5`](https://github.com/softnetics/genseki/commit/0f192e5ee361fc40ebeba840ca7f692d3ca4fb2a) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - Migrate `input-otp`, `pagination`, `progress `, `select`, `switch` and `tabs`
+
 ## 0.1.0-alpha.65
 
 ### Patch Changes

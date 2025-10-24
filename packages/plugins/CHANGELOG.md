@@ -1,5 +1,7 @@
 # @genseki/plugins
 
+## 0.1.0-alpha.66
+
 ## 0.1.0-alpha.65
 
 ## 0.1.0-alpha.64
