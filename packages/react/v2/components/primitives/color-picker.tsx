@@ -378,7 +378,6 @@ export const ColorPickerFormat = ({ className, ...props }: ColorPickerFormatProp
           readOnly
           type="text"
           value={`rgba(${rgb.join(', ')}, ${alpha}%)`}
-          {...props}
         />
       </div>
     )
