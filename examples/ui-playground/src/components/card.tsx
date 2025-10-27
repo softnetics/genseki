@@ -1,5 +1,6 @@
 import type React from 'react'
 
+import { type Icon, WarningIcon } from '@phosphor-icons/react'
 import { StarIcon } from '@phosphor-icons/react/dist/ssr'
 
 import { Typography } from '@genseki/react/v2'
@@ -42,6 +43,21 @@ export const PlaygroundCard = ({
         </Typography>
         {children}
       </div>
+    </div>
+  )
+}
+
+export function InformationCard({
+  icon: Icon = WarningIcon,
+  ...props
+}: {
+  icon?: Icon
+  children?: React.ReactNode
+}) {
+  return (
+    <div className="leading-[200%] whitespace-pre-wrap bg-surface-accent border border-border-accent p-6 rounded-lg">
+      <Icon weight="fill" className="text-icon-accent" />
+      {props.children}
     </div>
   )
 }

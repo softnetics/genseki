@@ -4,10 +4,13 @@ import * as React from 'react'
 import { Typography } from '@genseki/react/v2'
 
 import { ButtonSection } from './button-section'
+import { CheckboxSection } from './checkbox-section'
 import { CollapsibleSection } from './collapsible-section'
+import { ColorPickerSection } from './color-picker-section'
 import { ComboboxSection } from './combobox-section'
 import { DatePickerSection } from './date-picker-section'
 import { DialogSection } from './dialog-section'
+import { DropZoneSection } from './drop-zone-section'
 import { DropdownMenuSection } from './dropdown-menu-section'
 import { InputOtpSection } from './input-otp-section'
 import { InputSection } from './input-section'
@@ -16,6 +19,7 @@ import PageSidebar from './page-sidebar'
 import { PaginationSection } from './pagination-section'
 import { ProgressSection } from './progress-section'
 import { SelectSection } from './select-section'
+import { SliderSection } from './slider-section'
 import { SwitchSection } from './switch-section'
 import { TabsSection } from './tabs-section'
 import { TextareaSection } from './textarea-section'
@@ -36,6 +40,14 @@ export default function ComboboxPage() {
           Button
         </Typography>
         <ButtonSection />
+        <Typography type="h2" weight="bold" id="checkbox">
+          Checkbox
+        </Typography>
+        <CheckboxSection />
+        <Typography type="h2" weight="bold" id="color-picker">
+          Color Picker
+        </Typography>
+        <ColorPickerSection />
         <Typography type="h2" weight="bold" id="combobox">
           Combobox
         </Typography>
@@ -48,6 +60,10 @@ export default function ComboboxPage() {
           Dialog
         </Typography>
         <DialogSection />
+        <Typography type="h2" weight="bold" id="drop-zone">
+          Drop Zone
+        </Typography>
+        <DropZoneSection />
         <Typography type="h2" weight="bold" id="input">
           Input
         </Typography>
@@ -72,6 +88,10 @@ export default function ComboboxPage() {
           Select
         </Typography>
         <SelectSection />
+        <Typography type="h2" weight="bold" id="slider">
+          Slider
+        </Typography>
+        <SliderSection />
         <Typography type="h2" weight="bold" id="switch">
           Switch
         </Typography>

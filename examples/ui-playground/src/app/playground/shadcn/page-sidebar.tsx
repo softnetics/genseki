@@ -17,7 +17,10 @@ import {
 const navigationItems = [
   { href: '#button', label: 'Button' },
   { href: '#combobox', label: 'Combobox' },
+  { href: '#checkbox', label: 'Checkbox' },
+  { href: '#color-picker', label: 'Color picker' },
   { href: '#date-picker', label: 'Date picker' },
+  { href: '#drop-zone', label: 'Drop zone' },
   { href: '#dialog', label: 'Dialog' },
   { href: '#input', label: 'Input' },
   { href: '#input-otp', label: 'Input OTP' },
@@ -25,6 +28,7 @@ const navigationItems = [
   { href: '#pagination', label: 'Pagination' },
   { href: '#progress', label: 'Progress' },
   { href: '#select', label: 'Select' },
+  { href: '#slider', label: 'Slider' },
   { href: '#switch', label: 'Switch' },
   { href: '#tabs', label: 'Tabs' },
   { href: '#tooltip', label: 'Tooltip' },
