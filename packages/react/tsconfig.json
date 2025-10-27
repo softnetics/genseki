@@ -8,6 +8,6 @@
     "types": ["node"],
     "noEmit": true
   },
-  "include": ["src", "v2"],
+  "include": ["src", "v2", "types/tanstack.d.ts"],
   "exclude": ["dist", "node_modules"]
 }
