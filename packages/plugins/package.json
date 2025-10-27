@@ -1,6 +1,6 @@
 {
   "name": "@genseki/plugins",
-  "version": "0.1.0-alpha.66",
+  "version": "0.1.0-alpha.67",
   "sideEffects": false,
   "type": "module",
   "files": [

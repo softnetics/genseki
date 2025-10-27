@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.67
+
+### Patch Changes
+
+- [#255](https://github.com/softnetics/genseki/pull/255) [`c03c47a`](https://github.com/softnetics/genseki/commit/c03c47a23477bcde1f5839f020c362da53704cc9) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: add `use client` directive to `pagination`
+
 ## 0.1.0-alpha.66
 
 ### Patch Changes
