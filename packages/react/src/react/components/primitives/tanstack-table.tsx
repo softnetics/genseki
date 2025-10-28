@@ -98,7 +98,8 @@ export function TanstackTable<T>({
                   className={clsx(
                     'focus-visible:ring-focus ring-inset',
                     header.colSpan > 1 && 'border-bluegray-300 border-b',
-                    classNames?.tableHead
+                    classNames?.tableHead,
+                    header.column.columnDef.meta?.thClassName
                   )}
                   onClick={
                     canSort && children ? header.column.getToggleSortingHandler() : undefined

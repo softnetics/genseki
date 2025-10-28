@@ -109,6 +109,9 @@ export const columns = [
   columnHelper.accessor('author.name', {
     header: 'Author Name',
     cell: (info) => info.getValue(),
+    meta: {
+      thClassName: 'bg-orange-700',
+    },
   }),
   columnHelper.accessor('author.email', {
     header: 'Author Email',
