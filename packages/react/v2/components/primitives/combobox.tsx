@@ -1,5 +1,5 @@
 'use client'
-import React from 'react'
+import React, { useEffect } from 'react'
 
 import { CaretUpDownIcon, CheckIcon, XIcon } from '@phosphor-icons/react'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
@@ -35,7 +35,6 @@ interface ComboboxContextValue {
   value: string[]
   onValueChange: React.Dispatch<React.SetStateAction<string[]>>
   items: Item[]
-  setItems: React.Dispatch<React.SetStateAction<Item[]>>
   multipleItems?: boolean
 }
 
@@ -52,15 +51,24 @@ interface ComboboxProviderProps {
   multipleItems?: boolean
 }
 
-function ComboboxProvider(props: ComboboxProviderProps) {
-  const [items, setItems] = React.useState<Item[]>(props.items ?? [])
+const ComboboxProvider = React.memo((props: ComboboxProviderProps) => {
+  const filterValueAppearInItems = (value: string[]) => {
+    return value?.filter((v) => props.items.some((item) => item.value === v)) || []
+  }
 
   // typing value
   const [value, setValue] = useControllableState<string[]>({
-    defaultProp: [''],
-    onChange: props.onValueChange,
+    defaultProp: [],
+    onChange: (value) => {
+      props.onValueChange?.(filterValueAppearInItems(value))
+    },
     prop: props.value,
   })
+
+  useEffect(() => {
+    // Sync if value is not under items
+    setValue(filterValueAppearInItems(value))
+  }, [props.items])
 
   // popover state
   const [open, setOpen] = useControllableState({
@@ -75,14 +83,13 @@ function ComboboxProvider(props: ComboboxProviderProps) {
       onValueChange={setValue}
       open={open}
       onOpenChange={setOpen}
-      items={items}
-      setItems={setItems}
+      items={props.items}
       multipleItems={props.multipleItems ?? false}
     >
       <_ComboboxPopoverProvider>{props.children}</_ComboboxPopoverProvider>
     </_ComboboxProvider>
   )
-}
+})
 
 function _ComboboxPopoverProvider(props: { children?: React.ReactNode }) {
   const ctx = useCombobox()

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { useState } from 'react'
 
 import { CheckIcon, UserIcon } from '@phosphor-icons/react'
 
@@ -57,27 +57,67 @@ const languages = [
 ]
 
 function BasicComboboxMultiple() {
+  const [items, setItems] = useState(frameworks)
+
   return (
-    <ComboboxProvider items={frameworks} multipleItems={true}>
-      <ComboboxTriggerMultiValue className="w-[200px]" />
-      <ComboboxContent>
-        <ComboboxCommandInput />
-        <ComboboxCommandEmpty>No framework found.</ComboboxCommandEmpty>
-        <ComboboxCommandList>
-          <ComboboxCommandGroup>
-            {({ items }) => {
-              return items.map((framework) => (
-                <ComboboxCommandItem
-                  key={framework.value}
-                  value={framework.value}
-                  label={framework.label}
-                />
-              ))
-            }}
-          </ComboboxCommandGroup>
-        </ComboboxCommandList>
-      </ComboboxContent>
-    </ComboboxProvider>
+    <div>
+      <button
+        className="px-8 py-4 bg-blue-500 text-white rounded-md mb-4 cursor-pointer"
+        onClick={() => {
+          setItems((prev) => {
+            // Generate a random alphabet letter for value and label
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+            const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
+            return [
+              ...prev,
+              {
+                value: randomChar + Math.floor(Math.random() * 100),
+                label: randomChar.toUpperCase(),
+              },
+            ]
+          })
+        }}
+      >
+        append item
+      </button>
+      <button
+        className="px-8 py-4 bg-red-500 text-white rounded-md mb-4 cursor-pointer ml-4"
+        onClick={() => {
+          setItems([
+            {
+              value: 'next.js',
+              label: 'Next.js',
+            },
+            {
+              value: 'sveltekit',
+              label: 'SvelteKit',
+            },
+          ])
+        }}
+      >
+        Reset items
+      </button>
+      <ComboboxProvider items={items} multipleItems={true}>
+        <ComboboxTriggerMultiValue className="w-[200px]" />
+        <ComboboxContent>
+          <ComboboxCommandInput />
+          <ComboboxCommandEmpty>No framework found.</ComboboxCommandEmpty>
+          <ComboboxCommandList>
+            <ComboboxCommandGroup>
+              {({ items }) => {
+                return items.map((framework) => (
+                  <ComboboxCommandItem
+                    key={framework.value}
+                    value={framework.value}
+                    label={framework.label}
+                  />
+                ))
+              }}
+            </ComboboxCommandGroup>
+          </ComboboxCommandList>
+        </ComboboxContent>
+      </ComboboxProvider>
+    </div>
   )
 }
 
@@ -108,16 +148,56 @@ function BasicComboboxSingle() {
 
 // Controlled Combobox Example
 function ControlledComboboxMultiple() {
+  const [items, setItems] = useState(frameworks)
   const [value, setValue] = React.useState<string[]>([])
   const [open, setOpen] = React.useState(false)
 
+  console.log('value:', value)
+  console.log('items:', items)
+
   return (
     <div className="space-y-4">
+      <button
+        className="px-8 py-4 bg-blue-500 text-white rounded-md mb-4 cursor-pointer"
+        onClick={() => {
+          setItems((prev) => {
+            // Generate a random alphabet letter for value and label
+            const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+            const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
+            return [
+              ...prev,
+              {
+                value: randomChar + Math.floor(Math.random() * 100),
+                label: randomChar.toUpperCase(),
+              },
+            ]
+          })
+        }}
+      >
+        append item
+      </button>
+      <button
+        className="px-8 py-4 bg-red-500 text-white rounded-md mb-4 cursor-pointer ml-4"
+        onClick={() => {
+          setItems([
+            {
+              value: 'next.js',
+              label: 'Next.js',
+            },
+            {
+              value: 'sveltekit',
+              label: 'SvelteKit',
+            },
+          ])
+        }}
+      >
+        Reset items
+      </button>
       <ComboboxProvider
-        items={languages}
+        items={items}
         open={open}
         onOpenChange={setOpen}
-        value={value ?? undefined}
+        value={value}
         onValueChange={setValue}
         multipleItems
       >
@@ -143,14 +223,14 @@ function ControlledComboboxMultiple() {
 
       <div className="flex gap-2 items-center">
         <Typography type="caption" className="text-muted-foreground">
-          Selected: {value.join(', ') || 'None'}
+          Selected: {JSON.stringify(value)}
         </Typography>
         <div className="inline-flex gap-x-4">
-          <Button size="sm" variant="outline" onClick={() => setValue([''])}>
+          <Button size="sm" variant="outline" onClick={() => setValue([])}>
             Clear
           </Button>
-          <Button size="sm" variant="outline" onClick={() => setValue(['typescript'])}>
-            TypeScript
+          <Button size="sm" variant="outline" onClick={() => setValue(['sveltekit'])}>
+            Svelete Kit
           </Button>
         </div>
       </div>
@@ -194,10 +274,10 @@ function ControlledComboboxSingle() {
 
       <div className="flex gap-2 items-center">
         <Typography type="caption" className="text-muted-foreground">
-          Selected: {value.join(', ') || 'None'}
+          {JSON.stringify(value)}
         </Typography>
         <div className="inline-flex gap-x-4">
-          <Button size="sm" variant="outline" onClick={() => setValue([''])}>
+          <Button size="sm" variant="outline" onClick={() => setValue([])}>
             Clear
           </Button>
           <Button size="sm" variant="outline" onClick={() => setValue(['typescript'])}>
@@ -258,10 +338,10 @@ function ControlledInputGroupComboboxSingle() {
       </div>
       <div className="flex gap-2 items-center">
         <Typography type="caption" className="text-muted-foreground">
-          Selected: {value.join(', ') || 'None'}
+          {JSON.stringify(value)}
         </Typography>
         <div className="inline-flex gap-x-4">
-          <Button size="sm" variant="outline" onClick={() => setValue([''])}>
+          <Button size="sm" variant="outline" onClick={() => setValue([])}>
             Clear
           </Button>
           <Button size="sm" variant="outline" onClick={() => setValue(['typescript'])}>
