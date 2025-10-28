@@ -1,5 +1,13 @@
 # @genseki/react
 
+## 0.1.0-alpha.68
+
+### Patch Changes
+
+- [#257](https://github.com/softnetics/genseki/pull/257) [`055a591`](https://github.com/softnetics/genseki/commit/055a5917b7afea10e40c62088f3ce5f5ed019ce2) Thanks [@intaniger](https://github.com/intaniger)! - feat: added support for custom th className via `meta.thClassName`
+
+- [#261](https://github.com/softnetics/genseki/pull/261) [`2171612`](https://github.com/softnetics/genseki/commit/2171612a07cf35fa397933fbe27175adf3ac646a) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: combobox state management
+
 ## 0.1.0-alpha.67
 
 ### Patch Changes
