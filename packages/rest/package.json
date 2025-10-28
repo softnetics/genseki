@@ -2,7 +2,7 @@
   "name": "@genseki/rest",
   "sideEffects": false,
   "type": "module",
-  "version": "0.1.0-alpha.67",
+  "version": "0.1.0-alpha.68",
   "files": [
     "dist"
   ],
