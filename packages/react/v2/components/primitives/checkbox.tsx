@@ -51,14 +51,13 @@ const checkboxIndicator = cva<Variants>('', {
   },
 })
 
-function Checkbox({
-  className,
-  variant,
-  shape,
-  icon: Icon = CheckIcon,
-  ...props
-}: React.ComponentProps<typeof CheckboxPrimitive.Root> &
-  VariantProps<typeof checkbox> & { icon?: Icon }) {
+interface CheckboxProps
+  extends React.ComponentProps<typeof CheckboxPrimitive.Root>,
+    VariantProps<typeof checkbox> {
+  icon?: Icon
+}
+
+function Checkbox({ className, variant, shape, icon: Icon = CheckIcon, ...props }: CheckboxProps) {
   return (
     <CheckboxPrimitive.Root
       data-slot="checkbox"
@@ -75,4 +74,4 @@ function Checkbox({
   )
 }
 
-export { Checkbox }
+export { Checkbox, type CheckboxProps }

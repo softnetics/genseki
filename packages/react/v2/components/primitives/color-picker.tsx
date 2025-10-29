@@ -1,5 +1,5 @@
 'use client'
-import {
+import React, {
   type ComponentProps,
   type HTMLAttributes,
   memo,
@@ -12,6 +12,7 @@ import {
 
 import { EyedropperIcon } from '@phosphor-icons/react'
 import * as Slider from '@radix-ui/react-slider'
+import { useControllableState } from '@radix-ui/react-use-controllable-state'
 import Color from 'color'
 
 import { Button } from './button'
@@ -32,6 +33,7 @@ interface ColorPickerContextValue {
   setSaturation: (saturation: number) => void
   setLightness: (lightness: number) => void
   setAlpha: (alpha: number) => void
+  setHSLA: (hue: number, saturation: number, lightness: number, alpha: number) => void
   setMode: (mode: string) => void
 }
 
@@ -41,7 +43,7 @@ export const [ColorPickerContextProvider, useColorPicker] =
 export type ColorPickerProps = HTMLAttributes<HTMLDivElement> & {
   value?: Parameters<typeof Color>[0]
   defaultValue?: Parameters<typeof Color>[0]
-  onChange?: (value: Parameters<typeof Color.rgb>[0]) => void
+  onChange?: React.Dispatch<React.SetStateAction<Parameters<typeof Color.rgb>[0]>>
 }
 export const ColorPicker = ({
   value,
@@ -50,76 +52,79 @@ export const ColorPicker = ({
   className,
   ...props
 }: ColorPickerProps) => {
-  // Handle controlled vs uncontrolled
-  const currentValue = value !== undefined ? value : defaultValue
-  const initialColor = Color(currentValue)
-
-  const [hue, setHue] = useState(() => {
-    try {
-      return initialColor.hue() || 0
-    } catch {
-      return 0
-    }
-  })
-  const [saturation, setSaturation] = useState(() => {
-    try {
-      return initialColor.saturationl() || 100
-    } catch {
-      return 100
-    }
-  })
-  const [lightness, setLightness] = useState(() => {
-    try {
-      return initialColor.lightness() || 50
-    } catch {
-      return 50
-    }
-  })
-  const [alpha, setAlpha] = useState(() => {
-    try {
-      return initialColor.alpha() * 100 || 100
-    } catch {
-      return 100
-    }
-  })
   const [mode, setMode] = useState('hex')
-  const isInitialMount = useRef(true)
 
-  // Update color when controlled value changes
-  useEffect(() => {
-    if (value !== undefined && !isInitialMount.current) {
-      try {
-        const color = Color(value)
-        setHue(color.hue() || 0)
-        setSaturation(color.saturationl() || 100)
-        setLightness(color.lightness() || 50)
-        setAlpha(color.alpha() * 100 || 100)
-      } catch (error) {
-        console.error('Failed to parse color value:', error)
-      }
-    }
-  }, [value])
+  // Convert color string to HSLA
+  const colorToHSLA = useCallback(
+    (colorInput?: Parameters<typeof Color>[0]) => {
+      const color = Color(colorInput ?? defaultValue)
+      return [
+        color.hue() || 0,
+        color.saturationl() || 100,
+        color.lightness() || 50,
+        color.alpha() * 100 || 100,
+      ] as const /*HSLA*/
+    },
+    [defaultValue]
+  )
+  // Internal state for HSLA
+  const [colorValue, setColorValue] = useControllableState({
+    defaultProp: colorToHSLA(defaultValue),
+    prop: colorToHSLA(value),
+    onChange: (hsla) => {
+      // Convert HSLA back to color and call onChange with the color value
+      const color = Color.hsl(hsla[0], hsla[1], hsla[2], hsla[3] / 100)
+      onChange?.(color)
+    },
+  })
 
-  // Notify parent of changes (skip initial mount)
-  useEffect(() => {
-    if (onChange && !isInitialMount.current) {
-      const color = Color.hsl(hue, saturation, lightness).alpha(alpha / 100)
-      const rgba = color.rgb().array()
-      onChange([rgba[0], rgba[1], rgba[2], alpha / 100])
-    }
-    isInitialMount.current = false
-  }, [hue, saturation, lightness, alpha, onChange])
+  const setHue = useCallback(
+    (newHue: number) => {
+      setColorValue((prev) => [newHue, prev[1], prev[2], prev[3]])
+    },
+    [setColorValue]
+  )
+
+  const setSaturation = useCallback(
+    (newSaturation: number) => {
+      setColorValue((prev) => [prev[0], newSaturation, prev[2], prev[3]])
+    },
+    [setColorValue]
+  )
+
+  const setLightness = useCallback(
+    (newLightness: number) => {
+      setColorValue((prev) => [prev[0], prev[1], newLightness, prev[3]])
+    },
+    [setColorValue]
+  )
+
+  const setAlpha = useCallback(
+    (newAlpha: number) => {
+      setColorValue((prev) => [prev[0], prev[1], prev[2], newAlpha])
+    },
+    [setColorValue]
+  )
+
+  const setHSLA = useCallback(
+    (h: number, s: number, l: number, a: number) => {
+      setColorValue([h, s, l, a])
+    },
+    [setColorValue]
+  )
+
   return (
     <ColorPickerContextProvider
-      hue={hue}
-      saturation={saturation}
-      lightness={lightness}
-      alpha={alpha}
+      hue={colorValue[0]}
+      saturation={colorValue[1]}
+      lightness={colorValue[2]}
+      alpha={colorValue[3]}
       mode={mode}
       setHue={setHue}
       setSaturation={setSaturation}
       setLightness={setLightness}
       setAlpha={setAlpha}
+      setHSLA={setHSLA}
       setMode={setMode}
     >
       <div className={cn('flex size-full flex-col gap-8', className)} {...props} />
@@ -128,11 +133,11 @@ export const ColorPicker = ({
 }
 export type ColorPickerSelectionProps = HTMLAttributes<HTMLDivElement>
 export const ColorPickerSelection = memo(({ className, ...props }: ColorPickerSelectionProps) => {
+  const { hue, setSaturation, setLightness } = useColorPicker()
   const containerRef = useRef<HTMLDivElement>(null)
   const [isDragging, setIsDragging] = useState(false)
   const [positionX, setPositionX] = useState(0)
   const [positionY, setPositionY] = useState(0)
-  const { hue, setSaturation, setLightness } = useColorPicker()
   const backgroundGradient = useMemo(() => {
     return `linear-gradient(0deg, rgba(0,0,0,1), rgba(0,0,0,0)),
             linear-gradient(90deg, rgba(255,255,255,1), rgba(255,255,255,0)),
@@ -242,7 +247,7 @@ export const ColorPickerAlpha = ({ className, ...props }: ColorPickerAlphaProps)
 }
 export type ColorPickerEyeDropperProps = ComponentProps<typeof Button>
 export const ColorPickerEyeDropper = ({ className, ...props }: ColorPickerEyeDropperProps) => {
-  const { setHue, setSaturation, setLightness, setAlpha } = useColorPicker()
+  const { setHSLA } = useColorPicker()
   const handleEyeDropper = async () => {
     try {
       // @ts-expect-error - EyeDropper API is experimental
@@ -250,10 +255,7 @@ export const ColorPickerEyeDropper = ({ className, ...props }: ColorPickerEyeDro
       const result = await eyeDropper.open()
       const color = Color(result.sRGBHex)
       const [h, s, l] = color.hsl().array()
-      setHue(h)
-      setSaturation(s)
-      setLightness(l)
-      setAlpha(100)
+      setHSLA(h, s, l, 100)
     } catch (error) {
       console.error('EyeDropper failed:', error)
     }

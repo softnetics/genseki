@@ -56,6 +56,15 @@ function BasicColorPicker() {
       <Typography type="caption" className="text-muted-foreground">
         Selected color: rgba({color.toString()})
       </Typography>
+      <Button
+        className="w-fit"
+        variant="naked"
+        onClick={() => {
+          setColor([173, 216, 230, 1])
+        }}
+      >
+        Set color to lightblue
+      </Button>
     </div>
   )
 }
@@ -292,14 +301,14 @@ export function ColorPickerSection() {
     <>
       <div className="grid gap-8">
         <InformationCard>
-          You can use the
+          You can use the{' '}
           <span className="text-secondary-fg border rounded-sm bg-secondary p-1 ml-2">
             useColorPicker
-          </span>
+          </span>{' '}
           under the{' '}
           <span className="text-secondary-fg border rounded-sm bg-secondary p-1 ml-2">
             {'<ColorPicker/>'}
-          </span>
+          </span>{' '}
           component
         </InformationCard>
 

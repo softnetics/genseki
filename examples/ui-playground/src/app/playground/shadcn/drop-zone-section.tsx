@@ -182,6 +182,90 @@ function CustomDropzone() {
   )
 }
 
+function CustomDropzoneWithFileReplcaeContent(props: { removePreview: () => void }) {
+  const { previews, isDragActive } = useDropZone()
+
+  return (
+    <DropZoneArea>
+      <div className="relative grid grid-cols-3 gap-6 border p-6 rounded-md">
+        {previews?.map(({ type, url }) => (
+          <div
+            key={url}
+            className="bg-secondary my-auto rotate-0 rounded-md"
+            style={{
+              rotate: `${isDragActive ? Math.random() * 12 * (Math.random() > 0.5 ? 1 : -1) : 0}deg`,
+              transition: 'all 0.25s ease-out',
+              boxShadow: `0px 2px ${isDragActive ? 10 : 0}px -2px #595959`,
+            }}
+          >
+            {type.startsWith('image/') ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={url} alt="image" key={url} onLoad={() => URL.revokeObjectURL(url)} />
+            ) : type.startsWith('video/') ? (
+              <video controls width="640" height="480" autoPlay>
+                <source src={url} key={url} type={type} onLoad={() => URL.revokeObjectURL(url)} />
+              </video>
+            ) : type.startsWith('audio/') ? (
+              <audio controls>
+                <source src={url} key={url} type={type} onLoad={() => URL.revokeObjectURL(url)} />
+              </audio>
+            ) : null}
+          </div>
+        ))}
+      </div>
+    </DropZoneArea>
+  )
+}
+
+// Custom Dropzone with file replace
+function CustomDropzoneWithFileReplace() {
+  const [files, setFiles] = useState<File[]>([])
+  const [previews, setPreviews] = useState<{ type: string; url: string }[]>([])
+
+  const handleDrop = (acceptedFiles: File[]) => {
+    setFiles(acceptedFiles)
+    const newPreviews = acceptedFiles.map((file) => ({
+      type: file.type,
+      url: URL.createObjectURL(file),
+    }))
+    setPreviews(newPreviews)
+  }
+
+  const handleError = (error: Error) => {
+    console.log(error)
+  }
+
+  const removePreview = () => {
+    setFiles([])
+    setPreviews([])
+  }
+
+  return (
+    <DropzoneProvider
+      src={files}
+      previews={previews}
+      onError={handleError}
+      onDrop={handleDrop}
+      className="min-h-32"
+      maxFiles={Infinity}
+    >
+      <DropZoneEmptyContent>
+        <DropZoneArea>
+          {/* These content will be displayed if no previewable item */}
+          <div className="flex flex-col items-center justify-center gap-y-6">
+            <DropZoneEmptyUploadButton />
+            <DropZoneEmptyUploadDescription />
+            <DropZoneEmptyUploadCaption />
+          </div>
+        </DropZoneArea>
+      </DropZoneEmptyContent>
+      <DropZoneNonemptyContent>
+        <CustomDropzoneWithFileReplcaeContent removePreview={removePreview} />
+      </DropZoneNonemptyContent>
+    </DropzoneProvider>
+  )
+}
+
 // Dropzone with Image Preview
 function DropzoneWithImagePreview() {
   const [files, setFiles] = useState<File[]>([])
@@ -409,12 +493,21 @@ export function DropZoneSection() {
           </span>{' '}
           component to manage the file
         </InformationCard>
-        <PlaygroundCard title="Basic Dropzone" categoryTitle="Component">
+        <PlaygroundCard title="Custom Dropzone" categoryTitle="Component">
           <Typography type="body" className="text-muted-foreground mb-4">
             A basic dropzone for file uploads with drag and drop functionality.
           </Typography>
           <div className="p-4 bg-background w-full rounded-lg">
             <CustomDropzone />
+          </div>
+        </PlaygroundCard>
+
+        <PlaygroundCard title="Custom Dropzone with replacable preview" categoryTitle="Component">
+          <Typography type="body" className="text-muted-foreground mb-4">
+            A basic replacable preview dropzone for file uploads with drag and drop functionality.
+          </Typography>
+          <div className="p-4 bg-background w-full rounded-lg">
+            <CustomDropzoneWithFileReplace />
           </div>
         </PlaygroundCard>
 

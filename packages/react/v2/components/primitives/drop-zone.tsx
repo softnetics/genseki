@@ -170,7 +170,7 @@ export const DropZoneArea = (props: React.ComponentPropsWithRef<'button'>) => {
   const dropzoneCtx = useDropZone()
 
   return (
-    <button
+    <div
       data-drag-active={dropzoneCtx.isDragActive}
       data-drag-accept={dropzoneCtx.isDragAccept}
       data-drag-reject={dropzoneCtx.isDragReject}
@@ -182,9 +182,6 @@ export const DropZoneArea = (props: React.ComponentPropsWithRef<'button'>) => {
         'disabled:bg-surface-primary-disabled',
         props.className
       )}
-      disabled={props.disabled}
-      aria-disabled={props.disabled}
-      type="button"
       {...dropzoneCtx.getRootProps({
         style: {
           border: '2px dashed var(--color-border)',
@@ -198,7 +195,7 @@ export const DropZoneArea = (props: React.ComponentPropsWithRef<'button'>) => {
         id={props.id}
       />
       {props.children}
-    </button>
+    </div>
   )
 }
 
