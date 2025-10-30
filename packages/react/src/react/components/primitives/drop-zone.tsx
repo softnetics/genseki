@@ -6,6 +6,9 @@ import { tv } from 'tailwind-variants'
 
 import { focusStyles } from './primitive'
 
+/**
+ * @deprecated
+ */
 const dropZoneStyles = tv({
   extend: focusStyles,
   base: 'group flex min-h-[100px] max-h-[200px] flex-col items-center justify-center gap-2 rounded-md border border-dashed p-12 text-sm has-[slot=description]:text-center',
@@ -16,6 +19,9 @@ const dropZoneStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 const DropZone = ({ className, ...props }: DropZoneProps) => (
   <DropPrimitiveZone
     className={composeRenderProps(className, (className, renderProps) =>

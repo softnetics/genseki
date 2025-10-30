@@ -21,12 +21,18 @@ import { composeTailwindRenderProps } from './primitive'
 
 import { cn } from '../../utils/cn'
 
+/**
+ * @deprecated
+ */
 interface CheckboxGroupProps extends CheckboxGroupPrimitiveProps {
   label?: string
   description?: string
   errorMessage?: string | ((validation: ValidationResult) => string)
 }
 
+/**
+ * @deprecated
+ */
 const CheckboxGroup = forwardRef(function CheckboxGroup(
   { className, ...props }: CheckboxGroupProps,
   ref: React.ForwardedRef<HTMLDivElement>
@@ -45,6 +51,9 @@ const CheckboxGroup = forwardRef(function CheckboxGroup(
   )
 })
 
+/**
+ * @deprecated
+ */
 const checkboxStyles = tv({
   base: 'group flex items-center gap-2 text-sm transition',
   variants: {
@@ -54,6 +63,9 @@ const checkboxStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 const boxStyles = tv({
   base: 'inset-ring inset-ring-fg/10 flex size-8 shrink-0 items-center justify-center rounded-sm text-bg transition *:data-[slot=icon]:size-6',
   variants: {
@@ -76,6 +88,9 @@ const boxStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface CheckboxProps extends CheckboxPrimitiveProps {
   description?: string
   errorMessage?: string
@@ -84,6 +99,9 @@ interface CheckboxProps extends CheckboxPrimitiveProps {
   isTextCenter?: boolean
 }
 
+/**
+ * @deprecated
+ */
 const Checkbox = forwardRef(function Checkbox(
   { className, size = 'md', isTextCenter = true, ...props }: CheckboxProps,
   ref: React.ForwardedRef<HTMLLabelElement>

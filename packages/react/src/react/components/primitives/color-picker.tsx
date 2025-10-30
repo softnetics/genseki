@@ -22,6 +22,9 @@ import { Popover, PopoverContent, type PopoverContentProps } from './popover'
 import { BaseIcon } from '../../components/primitives/base-icon'
 import { cn } from '../../utils/cn'
 
+/**
+ * @deprecated
+ */
 interface ColorPickerProps
   extends ColorPickerPrimitiveProps,
     Pick<PopoverContentProps, 'placement'> {
@@ -36,6 +39,9 @@ interface ColorPickerProps
   onPopupOpenChange?: (open: boolean) => void
 }
 
+/**
+ * @deprecated
+ */
 const ColorPicker = ({
   showArrow = false,
   placement = 'bottom start',
@@ -103,10 +109,16 @@ const ColorPicker = ({
 
 declare global {
   interface Window {
+    /**
+     * @deprecated
+     */
     EyeDropper?: new () => { open: () => Promise<{ sRGBHex: string }> }
   }
 }
 
+/**
+ * @deprecated
+ */
 const EyeDropper = () => {
   const state = use(ColorPickerStateContext)!
 

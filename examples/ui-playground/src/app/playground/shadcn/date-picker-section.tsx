@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
 import type { DateRange } from 'react-day-picker'
 
-import { CalendarDotsIcon, ClockIcon, WarningIcon } from '@phosphor-icons/react'
+import { CalendarDotsIcon, ClockIcon } from '@phosphor-icons/react'
 import {
   addDays,
   endOfMonth,
@@ -27,7 +27,7 @@ import {
   Typography,
 } from '@genseki/react/v2'
 
-import { PlaygroundCard } from '../../../components/card'
+import { InformationCard, PlaygroundCard } from '../../../components/card'
 
 function BasicDatePicker() {
   const [date, setDate] = useState<Date>()
@@ -534,12 +534,9 @@ function DisabledDates() {
 export function DatePickerSection() {
   return (
     <div className="grid gap-8">
-      <div className="leading-[200%] whitespace-pre-wrap bg-surface-accent border border-border-accent p-6 rounded-lg">
-        <WarningIcon weight="fill" className="text-icon-accent" />
+      <InformationCard>
         Our example use{' '}
-        <span className="text-secondary-fg border rounded-sm bg-secondary p-1 ml-2">
-          Popover
-        </span>,{' '}
+        <span className="text-secondary-fg border rounded-sm bg-secondary p-1 ml-2">Popover</span>,{' '}
         <span className="text-secondary-fg border rounded-sm bg-secondary p-1 ml-2">
           PopoverContent
         </span>{' '}
@@ -559,7 +556,7 @@ export function DatePickerSection() {
         <span className="text-secondary-fg border rounded-sm bg-secondary p-1 ml-2">
           DatePickerTrigger
         </span>
-      </div>
+      </InformationCard>
       <PlaygroundCard title="Simple date picker" categoryTitle="Component">
         <Typography type="body" className="text-muted-foreground mb-4">
           A simple default datepicker

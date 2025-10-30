@@ -13,6 +13,9 @@ import { tv } from 'tailwind-variants'
 import { ColorThumb } from './color-thumb'
 import { Label } from './field'
 
+/**
+ * @deprecated
+ */
 const trackStyles = tv({
   base: 'group col-span-2 rounded-lg',
   variants: {
@@ -26,11 +29,17 @@ const trackStyles = tv({
   },
 })
 
+/**
+ * @deprecated
+ */
 interface ColorSliderProps extends ColorSliderPrimitiveProps {
   label?: string
   showOutput?: boolean
 }
 
+/**
+ * @deprecated
+ */
 const colorSliderStyles = tv({
   base: 'group relative py-2',
   variants: {
@@ -43,6 +52,9 @@ const colorSliderStyles = tv({
     },
   },
 })
+/**
+ * @deprecated
+ */
 const ColorSlider = ({ showOutput = true, label, className, ...props }: ColorSliderProps) => {
   return (
     <ColorSliderPrimitive
