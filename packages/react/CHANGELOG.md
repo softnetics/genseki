@@ -1,5 +1,18 @@
 # @genseki/react
 
+## 0.1.0-alpha.69
+
+### Patch Changes
+
+- [#259](https://github.com/softnetics/genseki/pull/259) [`60794b8`](https://github.com/softnetics/genseki/commit/60794b864df1a761e4adf50d0f1a0e746ae11eec) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - New components
+  - New `dropzone` component & examples
+  - New `file-preview` component & examples
+  - New `color-picker` component & examples
+  - New `slider` component & examples
+  - New `checkbox` component & examples
+  - New peer dependency color for managing internal color system
+  - New peer dependencu react-dropzone for managing file dropzone state
+
 ## 0.1.0-alpha.68
 
 ### Patch Changes
