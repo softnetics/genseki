@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.70
+
+### Patch Changes
+
+- [#264](https://github.com/softnetics/genseki/pull/264) [`fedeb66`](https://github.com/softnetics/genseki/commit/fedeb66aeab007779bdba1cb23930573f9b398c4) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: `combobox` reactive value re-rendering from dynamic items change.
+
 ## 0.1.0-alpha.69
 
 ### Patch Changes
