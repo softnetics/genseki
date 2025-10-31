@@ -43,6 +43,30 @@ const frameworks = [
     value: 'astro',
     label: 'Astro',
   },
+  {
+    value: 'solidjs',
+    label: 'SolidJS',
+  },
+  {
+    value: 'vue',
+    label: 'Vue',
+  },
+  {
+    value: 'angular',
+    label: 'Angular',
+  },
+  {
+    value: 'ember',
+    label: 'Ember',
+  },
+  {
+    value: 'react',
+    label: 'React',
+  },
+  {
+    value: 'backbone',
+    label: 'Backbone',
+  },
 ]
 
 const languages = [
@@ -249,13 +273,52 @@ function ControlledComboboxMultiple() {
 
 // Controlled Combobox Example
 function ControlledComboboxSingle() {
+  const [items, setItems] = useState(frameworks)
   const [value, setValue] = React.useState<string[]>([])
   const [open, setOpen] = React.useState(false)
 
   return (
     <div className="space-y-4">
+      <div className="flex space-x-4">
+        <button
+          className="px-8 py-4 bg-blue-500 text-white rounded-md mb-4 cursor-pointer"
+          onClick={() => {
+            setItems((prev) => {
+              // Generate a random alphabet letter for value and label
+              const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+              const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
+              return [
+                ...prev,
+                {
+                  value: randomChar + Math.floor(Math.random() * 100),
+                  label: randomChar.toUpperCase(),
+                },
+              ]
+            })
+          }}
+        >
+          append item
+        </button>
+        <button
+          className="px-8 py-4 bg-red-500 text-white rounded-md mb-4 cursor-pointer"
+          onClick={() => {
+            setItems([
+              {
+                value: 'next.js',
+                label: 'Next.js',
+              },
+              {
+                value: 'sveltekit',
+                label: 'SvelteKit',
+              },
+            ])
+          }}
+        >
+          Reset items
+        </button>
+      </div>
       <ComboboxProvider
-        items={languages}
+        items={items}
         open={open}
         onOpenChange={setOpen}
         value={value ?? undefined}
