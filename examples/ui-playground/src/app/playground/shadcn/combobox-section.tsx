@@ -57,46 +57,55 @@ const languages = [
 ]
 
 function BasicComboboxMultiple() {
+  const [flag, setFlag] = useState(false)
   const [items, setItems] = useState(frameworks)
 
   return (
     <div>
-      <button
-        className="px-8 py-4 bg-blue-500 text-white rounded-md mb-4 cursor-pointer"
-        onClick={() => {
-          setItems((prev) => {
-            // Generate a random alphabet letter for value and label
-            const alphabet = 'abcdefghijklmnopqrstuvwxyz'
-            const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
-            return [
-              ...prev,
+      <div className="flex space-x-4">
+        <button
+          onClick={() => setFlag((prev) => !prev)}
+          className="px-8 py-4 bg-yellow-500 text-white rounded-md mb-4 cursor-pointer"
+        >
+          Toggle re-rendering
+        </button>
+        <button
+          className="px-8 py-4 bg-blue-500 text-white rounded-md mb-4 cursor-pointer"
+          onClick={() => {
+            setItems((prev) => {
+              // Generate a random alphabet letter for value and label
+              const alphabet = 'abcdefghijklmnopqrstuvwxyz'
+              const randomChar = alphabet[Math.floor(Math.random() * alphabet.length)]
+              return [
+                ...prev,
+                {
+                  value: randomChar + Math.floor(Math.random() * 100),
+                  label: randomChar.toUpperCase(),
+                },
+              ]
+            })
+          }}
+        >
+          append item
+        </button>
+        <button
+          className="px-8 py-4 bg-red-500 text-white rounded-md mb-4 cursor-pointer"
+          onClick={() => {
+            setItems([
               {
-                value: randomChar + Math.floor(Math.random() * 100),
-                label: randomChar.toUpperCase(),
+                value: 'next.js',
+                label: 'Next.js',
               },
-            ]
-          })
-        }}
-      >
-        append item
-      </button>
-      <button
-        className="px-8 py-4 bg-red-500 text-white rounded-md mb-4 cursor-pointer ml-4"
-        onClick={() => {
-          setItems([
-            {
-              value: 'next.js',
-              label: 'Next.js',
-            },
-            {
-              value: 'sveltekit',
-              label: 'SvelteKit',
-            },
-          ])
-        }}
-      >
-        Reset items
-      </button>
+              {
+                value: 'sveltekit',
+                label: 'SvelteKit',
+              },
+            ])
+          }}
+        >
+          Reset items
+        </button>
+      </div>
       <ComboboxProvider items={items} multipleItems={true}>
         <ComboboxTriggerMultiValue className="w-[200px]" />
         <ComboboxContent>
@@ -152,8 +161,8 @@ function ControlledComboboxMultiple() {
   const [value, setValue] = React.useState<string[]>([])
   const [open, setOpen] = React.useState(false)
 
-  console.log('value:', value)
-  console.log('items:', items)
+  // console.log('value:', value)
+  // console.log('items:', items)
 
   return (
     <div className="space-y-4">

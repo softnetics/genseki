@@ -1,5 +1,5 @@
 'use client'
-import React, { useEffect } from 'react'
+import React, { useEffect, useRef } from 'react'
 
 import { CaretUpDownIcon, CheckIcon, XIcon } from '@phosphor-icons/react'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
@@ -18,6 +18,7 @@ import { Popover, PopoverContent, PopoverTrigger } from './popover'
 import { Badge } from '../../../src'
 import { createRequiredContext } from '../../../src/react/hooks/create-required-context'
 import { cn } from '../../../src/react/utils/cn'
+
 /**
  *
  * Shadcn component
@@ -51,30 +52,38 @@ interface ComboboxProviderProps {
   multipleItems?: boolean
 }
 
+const useItemsChange = (items: Item[], itemsChangeCb: () => void) => {
+  const prevItemsRef = useRef(items)
+
+  useEffect(() => {
+    // Sync check if value is not under items by comparing prev items, and current items
+    if (JSON.stringify(prevItemsRef.current) !== JSON.stringify(items)) {
+      itemsChangeCb()
+      prevItemsRef.current = items
+    }
+  }, [items])
+}
+
 const ComboboxProvider = React.memo((props: ComboboxProviderProps) => {
   const filterValueAppearInItems = (value: string[]) => {
     return value?.filter((v) => props.items.some((item) => item.value === v)) || []
   }
-
   // typing value
   const [value, setValue] = useControllableState<string[]>({
     defaultProp: [],
-    onChange: (value) => {
-      props.onValueChange?.(filterValueAppearInItems(value))
-    },
+    onChange: (value) => props.onValueChange?.(filterValueAppearInItems(value)),
     prop: props.value,
   })
-
-  useEffect(() => {
-    // Sync if value is not under items
-    setValue(filterValueAppearInItems(value))
-  }, [props.items])
 
   // popover state
   const [open, setOpen] = useControllableState({
     defaultProp: false,
     onChange: props.onOpenChange,
     prop: props.open,
+  })
+
+  useItemsChange(props.items, () => {
+    setValue(filterValueAppearInItems(value))
   })
 
   return (
