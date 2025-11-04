@@ -45,6 +45,16 @@ function SelectTrigger({
   )
 }
 
+function SelectEmptyContent(props: { children?: React.ReactNode; className?: string }) {
+  return (
+    <div
+      className={cn('h-32 flex justify-center items-center text-sm text-muted-fg', props.className)}
+    >
+      {props.children || 'No items'}
+    </div>
+  )
+}
+
 function SelectContent({
   className,
   children,
@@ -52,6 +62,8 @@ function SelectContent({
   align = 'center',
   ...props
 }: React.ComponentProps<typeof SelectPrimitive.Content>) {
+  const isEmpty = React.Children.count(children) === 0
+
   return (
     <SelectPrimitive.Portal>
       <SelectPrimitive.Content
@@ -74,7 +86,7 @@ function SelectContent({
               'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-2'
           )}
         >
-          {children}
+          {isEmpty ? <SelectEmptyContent /> : children}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
@@ -173,6 +185,7 @@ const SelectItemText = SelectPrimitive.ItemText
 export {
   Select,
   SelectContent,
+  SelectEmptyContent,
   SelectGroup,
   SelectItem,
   SelectItemIndicator,

@@ -17,6 +17,7 @@ import {
   InputGroupButton,
   InputGroupControl,
   InputGroupText,
+  SelectEmptyContent,
   SelectItemIndicator,
   SelectItemText,
   Typography,
@@ -70,6 +71,62 @@ function BasicSelect() {
       <Typography type="body" className="text-text-secondary">
         Selected value: {value || 'None'}
       </Typography>
+    </div>
+  )
+}
+// Empty Select
+function EmptySelect() {
+  return (
+    <div className="space-y-4">
+      <Select>
+        <SelectTrigger className="min-w-[300px]">
+          <div className="flex gap-x-2 items-center">
+            <SelectValue placeholder="Select a fruit" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {[].map((item) => (
+            <SelectItem key={item} value={item}>
+              <SelectItemText>{item}</SelectItemText>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
+
+// Custom empty Select
+function CustomEmptySelect() {
+  const items: string[] = []
+
+  return (
+    <div className="space-y-4">
+      <Select>
+        <SelectTrigger className="min-w-[300px]">
+          <div className="flex gap-x-2 items-center">
+            <SelectValue placeholder="Select a fruit" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {items.length > 0 ? (
+            items.map((item) => (
+              <SelectItem key={item} value={item}>
+                <SelectItemText>{item}</SelectItemText>
+              </SelectItem>
+            ))
+          ) : (
+            <SelectEmptyContent className="h-[120px] flex-col space-y-4">
+              <Typography type="caption" className="text-fg">
+                No products
+              </Typography>
+              <Typography type="label" className="">
+                Please create a new product first
+              </Typography>
+            </SelectEmptyContent>
+          )}
+        </SelectContent>
+      </Select>
     </div>
   )
 }
@@ -541,6 +598,22 @@ export function SelectSection() {
         </Typography>
         <div className="p-4 bg-secondary w-full rounded-lg">
           <BasicSelect />
+        </div>
+      </PlaygroundCard>
+      <PlaygroundCard title="Empty Select" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          An empty select dropdown item, display the place holder value
+        </Typography>
+        <div className="p-4 bg-secondary w-full rounded-lg">
+          <EmptySelect />
+        </div>
+      </PlaygroundCard>
+      <PlaygroundCard title="Custom empty Select" categoryTitle="Component">
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A custom empty select
+        </Typography>
+        <div className="p-4 bg-secondary w-full rounded-lg">
+          <CustomEmptySelect />
         </div>
       </PlaygroundCard>
       <PlaygroundCard title="Basic Select with input group" categoryTitle="Component">
