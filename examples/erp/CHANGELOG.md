@@ -1,5 +1,17 @@
 # @example/erp
 
+## 0.1.0-alpha.69
+
+### Patch Changes
+
+- Updated dependencies [[`661f11a`](https://github.com/softnetics/genseki/commit/661f11a3f7013b44bf0fcef5ecc8e04e4b037ded)]:
+  - @genseki/react@0.1.0-alpha.71
+  - @genseki/next@0.1.0-alpha.71
+  - @genseki/plugins@0.1.0-alpha.71
+  - @genseki/prisma-generator@0.1.0-alpha.71
+  - @genseki/react-query@0.1.0-alpha.71
+  - @genseki/rest@0.1.0-alpha.71
+
 ## 0.1.0-alpha.68
 
 ### Patch Changes
