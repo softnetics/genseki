@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.71
+
+### Patch Changes
+
+- [#269](https://github.com/softnetics/genseki/pull/269) [`661f11a`](https://github.com/softnetics/genseki/commit/661f11a3f7013b44bf0fcef5ecc8e04e4b037ded) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: make combobox able to disabled.
+
 ## 0.1.0-alpha.70
 
 ### Patch Changes
