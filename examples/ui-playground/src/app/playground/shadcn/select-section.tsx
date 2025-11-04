@@ -84,7 +84,13 @@ function EmptySelect() {
             <SelectValue placeholder="Select a fruit" />
           </div>
         </SelectTrigger>
-        <SelectContent>{/* No data here! */}</SelectContent>
+        <SelectContent>
+          {[].map((item) => (
+            <SelectItem key={item} value={item}>
+              <SelectItemText>{item}</SelectItemText>
+            </SelectItem>
+          ))}
+        </SelectContent>
       </Select>
     </div>
   )
@@ -92,6 +98,8 @@ function EmptySelect() {
 
 // Custom empty Select
 function CustomEmptySelect() {
+  const items: string[] = []
+
   return (
     <div className="space-y-4">
       <Select>
@@ -101,7 +109,22 @@ function CustomEmptySelect() {
           </div>
         </SelectTrigger>
         <SelectContent>
-          <SelectEmptyContent className="text-red-500">ไม่มีสินค้า</SelectEmptyContent>
+          {items.length > 0 ? (
+            items.map((item) => (
+              <SelectItem key={item} value={item}>
+                <SelectItemText>{item}</SelectItemText>
+              </SelectItem>
+            ))
+          ) : (
+            <SelectEmptyContent className="h-[120px] flex-col space-y-4">
+              <Typography type="caption" className="text-fg">
+                No products
+              </Typography>
+              <Typography type="label" className="">
+                Please create a new product first
+              </Typography>
+            </SelectEmptyContent>
+          )}
         </SelectContent>
       </Select>
     </div>
