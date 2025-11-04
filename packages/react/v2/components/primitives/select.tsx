@@ -45,6 +45,14 @@ function SelectTrigger({
   )
 }
 
+export function SelectEmptyContent(props: { children?: React.ReactNode; className?: string }) {
+  return (
+    <div className={cn('h-32 grid place-items-center text-sm text-muted-fg', props.className)}>
+      {props.children || 'No items'}
+    </div>
+  )
+}
+
 function SelectContent({
   className,
   children,
@@ -74,7 +82,7 @@ function SelectContent({
               'h-[var(--radix-select-trigger-height)] w-full min-w-[var(--radix-select-trigger-width)] scroll-my-2'
           )}
         >
-          {children}
+          {children || <SelectEmptyContent />}
         </SelectPrimitive.Viewport>
         <SelectScrollDownButton />
       </SelectPrimitive.Content>
