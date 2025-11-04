@@ -157,9 +157,9 @@ function BasicComboboxMultiple() {
 function BasicComboboxSingle() {
   return (
     <ComboboxProvider items={frameworks}>
-      <ComboboxTrigger className="w-[200px]" />
+      <ComboboxTrigger className="w-[200px]" disabled={false /* You can disable the trigger */} />
       <ComboboxContent>
-        <ComboboxCommandInput />
+        <ComboboxCommandInput disabled={false} />
         <ComboboxCommandEmpty>No framework found.</ComboboxCommandEmpty>
         <ComboboxCommandList>
           <ComboboxCommandGroup>
@@ -234,7 +234,10 @@ function ControlledComboboxMultiple() {
         onValueChange={setValue}
         multipleItems
       >
-        <ComboboxTriggerMultiValue className="w-[250px]" />
+        <ComboboxTriggerMultiValue
+          disabled={false /* You can disable the trigger */}
+          className="w-[250px]"
+        />
         <ComboboxContent>
           <ComboboxCommandInput />
           <ComboboxCommandEmpty>No language found.</ComboboxCommandEmpty>
@@ -432,8 +435,9 @@ function CustomTriggerComboboxMultiple() {
       <ComboboxTriggerMultiValue>
         {(selectedItems) => (
           <Button
+            disabled={false}
             variant="secondary"
-            className="w-[250px] grid [grid-template-columns:1fr_1fr] gap-2 p-2 border-primary border"
+            className="w-[250px] grid [grid-template-columns:1fr_1fr] gap-2 p-2 border-primary border disabled:border-muted"
           >
             {selectedItems?.map((selectedItem) => (
               <span
