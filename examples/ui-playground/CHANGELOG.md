@@ -1,5 +1,11 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.70
+
+### Patch Changes
+
+- [#266](https://github.com/softnetics/genseki/pull/266) [`b917963`](https://github.com/softnetics/genseki/commit/b91796397886601b54204f0d3126ea455d580176) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add empty state content for select box
+
 ## 0.1.0-alpha.69
 
 ### Patch Changes
