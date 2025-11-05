@@ -24,7 +24,52 @@ import { DropzoneProvider } from '@genseki/react/v2'
 
 import { InformationCard, PlaygroundCard } from '~/src/components/card'
 
-function CustomDropzoneContent(props: { removePreview: () => void }) {
+function FilePreviewItem(props: { index: number; removePreview: (index?: number) => void }) {
+  const dropzoneCtx = useDropZone()
+
+  return (
+    <FilePreview>
+      <FilePreviewThumbnail />
+      {/*
+       * You can pass a preview as a children of FilePreviewThumbnail
+       * <FilePreviewThumbnail className="size-50">
+       *   <img src="..." alt="..." />
+       * </FilePreviewThumbnail>
+       */}
+      <FilePreviewContent>
+        <FilePreviewTitle>{dropzoneCtx.src?.[props.index].name}</FilePreviewTitle>
+        <FilePreviewStatus status="COMPLETED" />
+        <FilePreviewAddons>
+          <DropZoneArea className="hidden" aria-hidden />
+          <button
+            onClick={() => {
+              dropzoneCtx.inputRef.current.click()
+            }}
+            className="px-4 py-2 rounded-sm bg-surface-primary-hover text-text-secondary cursor-pointer"
+          >
+            <Typography type="caption" weight="medium">
+              Change
+            </Typography>
+          </button>
+
+          <button
+            onClick={() => props.removePreview(props.index)}
+            className="px-4 py-2 rounded-sm bg-surface-incorrect text-text-incorrect-bold cursor-pointer"
+          >
+            <Typography type="caption" weight="medium">
+              Remove
+            </Typography>
+          </button>
+        </FilePreviewAddons>
+      </FilePreviewContent>
+    </FilePreview>
+  )
+}
+
+function CustomDropzoneContent(props: {
+  children?: React.ReactNode
+  removePreview: (number?: number) => void
+}) {
   const fullPreview = false // Try change this flag
   const dropzoneCtx = useDropZone()
   const router = useRouter()
@@ -53,41 +98,7 @@ function CustomDropzoneContent(props: { removePreview: () => void }) {
   if (isValidPreview && !fullPreview) {
     return (
       // Handle more customization by yourselves here
-      <div className="flex flex-col gap-y-4">
-        {dropzoneCtx.previews.map((preview) => (
-          <FilePreview key={preview.url}>
-            <FilePreviewThumbnail />
-            {/*
-             * You can pass a preview as a children of FilePreviewThumbnail
-             * <FilePreviewThumbnail className="size-50">
-             *   <img src="..." alt="..." />
-             * </FilePreviewThumbnail>
-             */}
-            <FilePreviewContent>
-              <FilePreviewTitle>PDF 2024-my-portfolioss.pdf</FilePreviewTitle>
-              <FilePreviewStatus status="COMPLETED" />
-              <FilePreviewAddons>
-                <button
-                  onClick={() => props.removePreview()}
-                  className="px-4 py-2 rounded-sm bg-surface-primary-hover text-text-secondary cursor-pointer"
-                >
-                  <Typography type="caption" weight="medium">
-                    Change
-                  </Typography>
-                </button>
-                <button
-                  onClick={() => props.removePreview()}
-                  className="px-4 py-2 rounded-sm bg-surface-incorrect text-text-incorrect-bold cursor-pointer"
-                >
-                  <Typography type="caption" weight="medium">
-                    Remove
-                  </Typography>
-                </button>
-              </FilePreviewAddons>
-            </FilePreviewContent>
-          </FilePreview>
-        ))}
-      </div>
+      props.children
     )
   }
 
@@ -150,7 +161,8 @@ function CustomDropzone() {
     console.log(error)
   }
 
-  const removePreview = () => {
+  const removePreview = (imageId?: number) => {
+    // You can use imageId or something to filter the remove preview
     setFiles([])
     setPreviews([])
   }
@@ -176,7 +188,13 @@ function CustomDropzone() {
       </DropZoneEmptyContent>
       <DropZoneNonemptyContent>
         {/* These content will be displayed if there're available previewable item */}
-        <CustomDropzoneContent removePreview={removePreview} />
+        <CustomDropzoneContent removePreview={removePreview}>
+          <div className="flex flex-col gap-y-4">
+            {previews.map((preview, index) => (
+              <FilePreviewItem key={preview.url} index={index} removePreview={removePreview} />
+            ))}
+          </div>
+        </CustomDropzoneContent>
       </DropZoneNonemptyContent>
     </DropzoneProvider>
   )
