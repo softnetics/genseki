@@ -3,4 +3,4 @@
 '@genseki/react': patch
 ---
 
-fix: make combobox able to disabled.
+fix: Add example for `dialog` open with `dropdown-menu-item`
