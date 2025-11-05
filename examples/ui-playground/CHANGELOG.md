@@ -1,5 +1,17 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.73
+
+### Patch Changes
+
+- [#275](https://github.com/softnetics/genseki/pull/275) [`a4fbd3d`](https://github.com/softnetics/genseki/commit/a4fbd3df0d4ff44c2d234e09199a16fc2e415560) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: improve example for `drop-zone`.
+
+- Updated dependencies [[`8eb7411`](https://github.com/softnetics/genseki/commit/8eb7411a734fb3570426a68a4a71618b82f4a281)]:
+  - @genseki/react@0.1.0-alpha.72
+  - @genseki/next@0.1.0-alpha.72
+  - @genseki/react-query@0.1.0-alpha.72
+  - @genseki/rest@0.1.0-alpha.72
+
 ## 0.1.0-alpha.72
 
 ### Patch Changes
