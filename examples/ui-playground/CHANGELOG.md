@@ -1,5 +1,11 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.72
+
+### Patch Changes
+
+- [#271](https://github.com/softnetics/genseki/pull/271) [`20cd4f4`](https://github.com/softnetics/genseki/commit/20cd4f49342b6ad25de8ff44e2c9c600022cde37) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add `dialog-overlay-props` for `dialog-content`.
+
 ## 0.1.0-alpha.71
 
 ### Patch Changes
