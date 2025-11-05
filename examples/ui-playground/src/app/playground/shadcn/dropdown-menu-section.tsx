@@ -54,9 +54,6 @@ function BasicDropdown() {
             console.log(e)
           }}
           className="p-18"
-          dialogOverlayProps={{
-            className: 'bg-gradient-to-br from-gray-500/50 to-secondary/5 backdrop-blur-sm',
-          }}
         >
           <DialogHeader>
             <div className="flex items-center gap-6">
