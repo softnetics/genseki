@@ -13,7 +13,16 @@ import {
   UserIcon,
 } from '@phosphor-icons/react'
 
-import { Button } from '@genseki/react/v2'
+import {
+  Button,
+  Dialog,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from '@genseki/react/v2'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -38,30 +47,69 @@ import { PlaygroundCard } from '~/src/components/card'
 function BasicDropdown() {
   return (
     <div className="flex flex-wrap gap-4">
-      <DropdownMenu>
-        <DropdownMenuTrigger asChild>
-          <Button variant="outline">Open Menu</Button>
-        </DropdownMenuTrigger>
-        <DropdownMenuContent>
-          <DropdownMenuItem>
-            <UserIcon />
-            Profile
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <PencilIcon />
-            Settings
-          </DropdownMenuItem>
-          <DropdownMenuItem>
-            <HeartIcon />
-            Favorites
-          </DropdownMenuItem>
-          <DropdownMenuSeparator />
-          <DropdownMenuItem>
-            <TrashIcon />
-            Delete
-          </DropdownMenuItem>
-        </DropdownMenuContent>
-      </DropdownMenu>
+      <Dialog>
+        <DialogContent
+          onPointerDownOutside={(e) => {
+            e.preventDefault()
+            console.log(e)
+          }}
+          className="p-18"
+          dialogOverlayProps={{
+            className: 'bg-gradient-to-br from-gray-500/50 to-secondary/5 backdrop-blur-sm',
+          }}
+        >
+          <DialogHeader>
+            <div className="flex items-center gap-6">
+              <div className="flex size-20 items-center justify-center rounded-full bg-primary/5 ">
+                <UserIcon className="size-12 text-primary" />
+              </div>
+              <div>
+                <DialogTitle className="text-xl">Welcome!</DialogTitle>
+                <DialogDescription>
+                  This is a custom styled dialog with enhanced visual appeal.
+                </DialogDescription>
+              </div>
+            </div>
+          </DialogHeader>
+          <div className="py-6">
+            <Typography type="body" className="text-text-secondary">
+              This dialog features custom styling including gradient backgrounds, enhanced borders,
+              and larger icons to create a more engaging user experience.
+            </Typography>
+          </div>
+          <DialogFooter className="gap-2">
+            <Button variant="secondary">Maybe Later</Button>
+            <Button>Get Started</Button>
+          </DialogFooter>
+        </DialogContent>
+
+        <DropdownMenu>
+          <DropdownMenuTrigger asChild>
+            <Button variant="outline">Open Menu</Button>
+          </DropdownMenuTrigger>
+          <DropdownMenuContent>
+            <DropdownMenuItem>
+              <UserIcon />
+              Profile
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <PencilIcon />
+              Settings
+            </DropdownMenuItem>
+            <DropdownMenuItem>
+              <HeartIcon />
+              Favorites
+            </DropdownMenuItem>
+            <DropdownMenuSeparator />
+            <DropdownMenuItem asChild>
+              <DialogTrigger className="w-full">
+                <TrashIcon />
+                Delete
+              </DialogTrigger>
+            </DropdownMenuItem>
+          </DropdownMenuContent>
+        </DropdownMenu>
+      </Dialog>
     </div>
   )
 }
