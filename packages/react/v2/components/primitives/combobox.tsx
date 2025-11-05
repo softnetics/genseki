@@ -109,10 +109,13 @@ function _ComboboxPopoverProvider(props: { children?: React.ReactNode }) {
   )
 }
 
-function ComboboxTriggerMultiValue(props: {
+function ComboboxTriggerMultiValue({
+  className,
+  children,
+  ...props
+}: {
   children?: ((selectedItem: Item[] | undefined) => React.ReactElement) | React.ReactNode
-  className?: string
-}) {
+} & Omit<React.ComponentPropsWithRef<typeof PopoverTrigger>, 'children'>) {
   const ctx = useCombobox()
 
   const selectedItems = ctx.items.filter((item) => ctx.value.includes(item.value))
@@ -149,13 +152,15 @@ function ComboboxTriggerMultiValue(props: {
     <PopoverTrigger
       asChild
       onKeyDown={onTriggerKeyDown}
-      className={cn('w-[200px] min-h-18 justify-between flex h-auto relative', props.className)}
+      className={cn('w-[200px] min-h-18 justify-between flex h-auto relative', className)}
       aria-expanded={ctx.open}
+      {...props}
+      // These properties will be merged down to a children
     >
-      {typeof props.children === 'function' ? (
-        props.children(selectedItems)
-      ) : props.children ? (
-        props.children
+      {typeof children === 'function' ? (
+        children(selectedItems)
+      ) : children ? (
+        children
       ) : (
         <Button variant="outline" role="combobox">
           {selectedItems.length > 0 ? renderItems : 'Please select item'}
@@ -166,10 +171,13 @@ function ComboboxTriggerMultiValue(props: {
   )
 }
 
-function ComboboxTrigger(props: {
+function ComboboxTrigger({
+  className,
+  children,
+  ...props
+}: {
   children?: ((selectedItem: Item | undefined) => React.ReactElement) | React.ReactNode
-  className?: string
-}) {
+} & Omit<React.ComponentPropsWithRef<typeof PopoverTrigger>, 'children'>) {
   const ctx = useCombobox()
 
   if (ctx.multipleItems) {
@@ -188,13 +196,14 @@ function ComboboxTrigger(props: {
     <PopoverTrigger
       asChild
       onKeyDown={onTriggerKeyDown}
-      className={cn('w-[200px] justify-between', props.className)}
+      className={cn('w-[200px] justify-between', className)}
       aria-expanded={ctx.open}
+      {...props}
     >
-      {typeof props.children === 'function' ? (
-        props.children(selectedItem)
-      ) : props.children ? (
-        props.children
+      {typeof children === 'function' ? (
+        children(selectedItem)
+      ) : children ? (
+        children
       ) : (
         <Button variant="outline" role="combobox">
           {selectedItem?.label || 'Please select item'}
