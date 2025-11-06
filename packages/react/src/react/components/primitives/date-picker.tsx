@@ -1,5 +1,6 @@
 'use client'
 
+import type React from 'react'
 import {
   DatePicker as DatePickerPrimitive,
   type DatePickerProps as DatePickerPrimitiveProps,
@@ -24,6 +25,7 @@ import { composeTailwindRenderProps } from './primitive'
 import { RangeCalendar } from './range-calendar'
 
 import { BaseIcon } from '../../components/primitives/base-icon'
+import { cn } from '../../utils/cn'
 
 interface DatePickerOverlayProps
   extends Omit<DialogProps, 'children' | 'className' | 'style'>,
@@ -69,11 +71,18 @@ const DatePickerOverlay = ({
   )
 }
 
-const DatePickerIcon = () => (
+const DatePickerIcon = ({
+  className,
+  ...props
+}: Omit<React.ComponentPropsWithRef<typeof Button>, 'size' | 'variant'>) => (
   <Button
     size="md"
     variant="vanish"
-    className="-translate-x-2 rounded-full outline-offset-0 hover:bg-transparent pressed:bg-transparent **:data-[slot=icon]:text-muted-fg"
+    className={cn(
+      '-translate-x-2 rounded-full outline-offset-0 hover:bg-transparent pressed:bg-transparent **:data-[slot=icon]:text-muted-fg',
+      className
+    )}
+    {...props}
   >
     <BaseIcon icon={CalendarDotsIcon} weight="duotone" className="group-open:text-fg" aria-hidden />
   </Button>
@@ -107,7 +116,7 @@ const DatePicker = <T extends DateValue>({
         )}
         <FieldGroup className="min-w-40">
           <DateInput size="md" className="w-full pr-16" />
-          <DatePickerIcon />
+          <DatePickerIcon isDisabled={props.isDisabled || props.isReadOnly} />
         </FieldGroup>
         {description && <Description>{description}</Description>}
         <FieldError>{errorMessage}</FieldError>
