@@ -1,5 +1,7 @@
 # @genseki/rest
 
+## 0.1.0-alpha.73
+
 ## 0.1.0-alpha.72
 
 ## 0.1.0-alpha.71
