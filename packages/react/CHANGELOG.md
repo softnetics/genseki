@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.72
+
+### Patch Changes
+
+- [#273](https://github.com/softnetics/genseki/pull/273) [`8eb7411`](https://github.com/softnetics/genseki/commit/8eb7411a734fb3570426a68a4a71618b82f4a281) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: remove `peer-disabled` from `label`.
+
 ## 0.1.0-alpha.71
 
 ### Patch Changes
