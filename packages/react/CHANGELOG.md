@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.73
+
+### Patch Changes
+
+- [#276](https://github.com/softnetics/genseki/pull/276) [`e70d3bc`](https://github.com/softnetics/genseki/commit/e70d3bc8e276ef05103c3203adba5f3f59c071a2) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: `intent-ui` date component disabled and read-only state.
+
 ## 0.1.0-alpha.72
 
 ### Patch Changes
