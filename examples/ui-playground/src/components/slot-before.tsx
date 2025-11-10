@@ -8,26 +8,26 @@ import Underline from '@tiptap/extension-underline'
 import StarterKit from '@tiptap/starter-kit'
 
 import {
+  CustomImageExtension,
+  ImageUploadNodeExtension,
+  ToolbarGroup,
+  ToolbarSeparator,
+} from '@genseki/react'
+import {
+  BackColorExtension,
   CustomLinkExtension,
   EditorBar,
   EditorBgColorPicker,
   EditorTextColorPicker,
   MarkButton,
   RedoButton,
+  SelectionExtension,
   SelectTextStyle,
   TextAlignButton,
   TextAlignButtonsGroup,
-  ToolbarGroup,
-  ToolbarSeparator,
   UndoButton,
   UploadImageButton,
-} from '@genseki/react'
-import {
-  BackColorExtension,
-  CustomImageExtension,
-  ImageUploadNodeExtension,
-  SelectionExtension,
-} from '@genseki/react'
+} from '@genseki/react/v2'
 
 export const EditorSlotBefore = () => {
   return (
