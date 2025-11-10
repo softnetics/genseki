@@ -11,7 +11,6 @@ import {
 } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { BaseIcon } from '../../../primitives/base-icon'
 import { ToolbarItem } from '../../../primitives/toolbar'
 
 type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList' | 'link'
@@ -75,14 +74,9 @@ const useMark = (type: MarkType) => {
         if (!editor.isActive('link')) {
           const { state } = editor
           const { from, to } = state.selection
-          const currentText = state.doc.textBetween(from, to, '')
+          const url = state.doc.textBetween(from, to, '')
 
-          editor.chain().focus().extendMarkRange('link').run()
-          editor
-            .chain()
-            .focus()
-            .setMark('link', { href: currentText || 'https://' })
-            .run()
+          editor.chain().focus().insertContent(`[](${url})`).run()
           return
         }
         editor.chain().focus().unsetMark('link').run()
@@ -93,6 +87,9 @@ const useMark = (type: MarkType) => {
   return options[type]
 }
 
+/**
+ * @deprecated
+ */
 export const MarkButton = (props: { type: MarkType }) => {
   const { editor } = useCurrentEditor()
   const markOption = useMark(props.type)
@@ -104,11 +101,9 @@ export const MarkButton = (props: { type: MarkType }) => {
       size="md"
       variant="default"
       className="duration-150 ease-out transition-all h-[36px]"
-      data-selected={markOption.isSelected}
       onClick={markOption.onClick}
-      aria-label={markOption.label}
     >
-      <BaseIcon icon={markOption.icon} weight={markOption.isSelected ? 'bold' : 'regular'} />
+      <markOption.icon weight={markOption.isSelected ? 'bold' : 'regular'} />
     </ToolbarItem>
   )
 }

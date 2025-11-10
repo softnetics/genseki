@@ -19,6 +19,9 @@ interface EditorProviderPropsWithEditor extends EditorProviderProps {
   }
 }
 
+/**
+ * @deprecated
+ */
 export function EditorProvider({
   children,
   slotAfter,

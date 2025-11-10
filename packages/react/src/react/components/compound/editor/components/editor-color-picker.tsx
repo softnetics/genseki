@@ -5,9 +5,11 @@ import { type Color as ReactAriaColor, parseColor } from 'react-aria-components'
 import { SelectionBackgroundIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { BaseIcon } from '../../../primitives'
 import { ColorPicker, type ColorPickerProps } from '../../../primitives/color-picker'
 
+/**
+ * @deprecated
+ */
 export const EditorColorPicker = ({
   onPopupClose,
   ...props
@@ -29,6 +31,9 @@ export const EditorColorPicker = ({
   )
 }
 
+/**
+ * @deprecated
+ */
 export const EditorBgColorPicker = () => {
   const { editor } = useCurrentEditor()
 
@@ -39,12 +44,15 @@ export const EditorBgColorPicker = () => {
       onPopupClose={(color) => {
         editor.chain().setBackColor(color.toString('hex')).run()
       }}
-      label={<BaseIcon icon={SelectionBackgroundIcon} size="md" weight="duotone" />}
-      buttonClassName="p-4 border border-border/50 bg-secondary/25"
+      label={<SelectionBackgroundIcon />}
+      buttonClassName="p-4 bg-secondary/25"
     />
   )
 }
 
+/**
+ * @deprecated
+ */
 export const EditorTextColorPicker = () => {
   const { editor } = useCurrentEditor()
 
