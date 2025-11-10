@@ -99,6 +99,7 @@ export const MarkButton = (props: { type: MarkType }) => {
       variant="default"
       className="duration-150 ease-out transition-all h-[36px]"
       onClick={markOption.onClick}
+      type="button"
     >
       <markOption.icon weight={markOption.isSelected ? 'bold' : 'regular'} />
     </ToolbarItem>
