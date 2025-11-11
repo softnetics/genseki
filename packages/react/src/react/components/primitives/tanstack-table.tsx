@@ -1,10 +1,11 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { type CSSProperties, useRef } from 'react'
 
 import { CircleNotchIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react/dist/ssr'
 import {
+  type Column,
   flexRender,
   type Row,
   type SortDirection,
@@ -39,6 +40,28 @@ export interface TanstackTableProps<T> {
   configuration?: {
     sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   }
+}
+
+const getCommonPinningClassesAndStyle = (column: Column<any>) => {
+  const isPinned = column.getIsPinned()
+  const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left')
+  const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right')
+
+  const className = clsx(
+    isPinned ? 'sticky z-[1]' : 'relative',
+    isLastLeftPinnedColumn && 'shadow-[inset_-4px_0_4px_-4px_gray]',
+    isFirstRightPinnedColumn && 'shadow-[inset_4px_0_4px_-4px_gray]'
+  )
+
+  const style: CSSProperties = {
+    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
+    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    width: column.getSize(),
+    minWidth: column.getSize(),
+    maxWidth: column.getSize(),
+  }
+
+  return { className, style }
 }
 
 export const getSortIcon = (isSorted: false | SortDirection) => {
@@ -92,6 +115,8 @@ export function TanstackTable<T>({
               const canSort = configuration?.sortBy?.some(
                 ([columnPath]) => columnPath === normalizeColumnId(header.column.id)
               )
+              const { className: pinnedHeaderClassName, style: pinnedHeaderStyle } =
+                getCommonPinningClassesAndStyle(header.column)
               return (
                 <TableHead
                   key={normalizeColumnId(header.id)}
@@ -99,8 +124,10 @@ export function TanstackTable<T>({
                     'focus-visible:ring-focus ring-inset',
                     header.colSpan > 1 && 'border-bluegray-300 border-b',
                     classNames?.tableHead,
-                    header.column.columnDef.meta?.thClassName
+                    header.column.columnDef.meta?.thClassName,
+                    pinnedHeaderClassName
                   )}
+                  style={pinnedHeaderStyle}
                   onClick={
                     canSort && children ? header.column.getToggleSortingHandler() : undefined
                   }
@@ -138,10 +165,13 @@ export function TanstackTable<T>({
               className={clsx('border-b border-border last:border-b-0', classNames?.tableBodyRow)}
             >
               {row.getVisibleCells().map((cell) => {
+                const { className: pinnedCellClassName, style: pinnedCellStyle } =
+                  getCommonPinningClassesAndStyle(cell.column)
                 return (
                   <TableCell
                     key={cell.id}
-                    className={clsx(classNames?.tableCell)}
+                    className={clsx(classNames?.tableCell, pinnedCellClassName)}
+                    style={pinnedCellStyle}
                     onClick={(e) => onRowClick?.(row, e)}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
