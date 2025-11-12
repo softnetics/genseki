@@ -1,15 +1,16 @@
 'use client'
-import React, { useState } from 'react'
+import { useState } from 'react'
 import { type Color as ReactAriaColor, parseColor } from 'react-aria-components'
 
 import { SelectionBackgroundIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { ColorPicker, type ColorPickerProps } from '../../../primitives/color-picker'
+// TODO: Migrate to v2
+import {
+  ColorPicker,
+  type ColorPickerProps,
+} from '../../../../../src/react/components/primitives/color-picker'
 
-/**
- * @deprecated
- */
 export const EditorColorPicker = ({
   onPopupClose,
   ...props
@@ -31,9 +32,6 @@ export const EditorColorPicker = ({
   )
 }
 
-/**
- * @deprecated
- */
 export const EditorBgColorPicker = () => {
   const { editor } = useCurrentEditor()
 
@@ -50,9 +48,6 @@ export const EditorBgColorPicker = () => {
   )
 }
 
-/**
- * @deprecated
- */
 export const EditorTextColorPicker = () => {
   const { editor } = useCurrentEditor()
 

@@ -11,7 +11,7 @@ import {
 } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { ToolbarItem } from '../../../primitives/toolbar'
+import { ToolbarItem } from '../../../../../src/react/components/primitives/toolbar'
 
 type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList' | 'link'
 
@@ -87,9 +87,6 @@ const useMark = (type: MarkType) => {
   return options[type]
 }
 
-/**
- * @deprecated
- */
 export const MarkButton = (props: { type: MarkType }) => {
   const { editor } = useCurrentEditor()
   const markOption = useMark(props.type)
@@ -102,6 +99,7 @@ export const MarkButton = (props: { type: MarkType }) => {
       variant="default"
       className="duration-150 ease-out transition-all h-[36px]"
       onClick={markOption.onClick}
+      type="button"
     >
       <markOption.icon weight={markOption.isSelected ? 'bold' : 'regular'} />
     </ToolbarItem>

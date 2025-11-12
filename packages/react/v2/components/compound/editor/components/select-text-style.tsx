@@ -20,7 +20,7 @@ import {
   SelectItemText,
   SelectTrigger,
   SelectValue,
-} from '../../../../../../v2'
+} from '../../../../components/primitives/select'
 
 const textStylesList = [
   { icon: TextTIcon, label: 'Normal', value: 'p', type: 'paragraph' },
@@ -51,9 +51,6 @@ const getSelectedTextStyle = (editor: Editor) => {
   return null
 }
 
-/**
- * @deprecated
- */
 export const SelectTextStyle = () => {
   const { editor } = useCurrentEditor()
   if (!editor) throw new Error('Editor provider is missing')

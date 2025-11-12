@@ -3,17 +3,11 @@ import type React from 'react'
 
 import { useCurrentEditor } from '@tiptap/react'
 
-import { cn } from '../../../../utils/cn'
-import { Toolbar, ToolbarGroup } from '../../../primitives/toolbar'
+import { Toolbar, ToolbarGroup } from '../../../../../src/react/components/primitives/toolbar'
+import { cn } from '../../../../../src/react/utils/cn'
 
-/**
- * @deprecated
- */
 export const EditorBarGroup = ToolbarGroup
 
-/**
- * @deprecated
- */
 export const EditorBar: React.FC<{ className?: string; children?: React.ReactNode }> = ({
   className,
   children,

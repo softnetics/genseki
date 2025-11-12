@@ -2,11 +2,8 @@
 import { ArrowClockwiseIcon, ArrowCounterClockwiseIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { Button } from '../../../../../../v2'
+import { Button } from '../../../../components/primitives/button'
 
-/**
- * @deprecated
- */
 export const UndoButton = () => {
   const { editor } = useCurrentEditor()
 
@@ -27,9 +24,6 @@ export const UndoButton = () => {
   )
 }
 
-/**
- * @deprecated
- */
 export const RedoButton = () => {
   const { editor } = useCurrentEditor()
 

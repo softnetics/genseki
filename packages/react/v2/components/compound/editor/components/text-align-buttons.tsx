@@ -10,8 +10,9 @@ import {
 } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { ToggleGroup, ToggleGroupItem } from '../../../../../../v2'
-import { ToolbarItem } from '../../../primitives/toolbar'
+// TODO: Migrate to v2
+import { ToolbarItem } from '../../../../../src/react/components/primitives/toolbar'
+import { ToggleGroup, ToggleGroupItem } from '../../../../components/primitives/toggle-group'
 
 type TextAlignType = 'left' | 'center' | 'right' | 'justify'
 
@@ -44,9 +45,6 @@ const useCurrentTextAlign = (editor: any): TextAlignType => {
   return 'left'
 }
 
-/**
- * @deprecated
- */
 export const TextAlignButtonsGroup = ({ children }: { children: React.ReactNode }) => {
   const { editor } = useCurrentEditor()
   if (!editor) throw new Error('Editor provider is missing')
@@ -72,9 +70,6 @@ export const TextAlignButtonsGroup = ({ children }: { children: React.ReactNode 
   )
 }
 
-/**
- * @deprecated
- */
 export const TextAlignButton = ({ type }: { type: TextAlignType }) => {
   const { currentAlign } = useTextAlignGroup()
   const Icon = justifyOptions[type].icon

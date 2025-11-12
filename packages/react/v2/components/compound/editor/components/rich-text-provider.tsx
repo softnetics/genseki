@@ -7,7 +7,7 @@ import {
   useEditor,
 } from '@tiptap/react'
 
-import { cn } from '../../../../utils/cn'
+import { cn } from '../../../../../src/react/utils/cn'
 import { InputGroup, InputGroupControl } from '../../../primitives'
 
 interface EditorProviderPropsWithEditor extends EditorProviderProps {
@@ -19,9 +19,6 @@ interface EditorProviderPropsWithEditor extends EditorProviderProps {
   }
 }
 
-/**
- * @deprecated
- */
 export function EditorProvider({
   children,
   slotAfter,
