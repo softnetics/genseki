@@ -49,7 +49,7 @@ export function EditorProvider({
               <EditorContent
                 editor={editorInstance}
                 className={cn(
-                  '!rounded-md min-h-[240px] bg-white w-full outline-none',
+                  '!rounded-md min-h-[240px] max-h-[240px] bg-white w-full outline-none overflow-y-auto',
                   editorContainerProps.className
                 )}
                 data-slot="input-group-control"
