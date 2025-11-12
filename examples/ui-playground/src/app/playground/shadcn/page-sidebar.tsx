@@ -38,6 +38,7 @@ const navigationItems = [
   { href: '#toggle-group', label: 'Toggle Group' },
   { href: '#textarea', label: 'Textarea' },
   { href: '#toast', label: 'Toast' },
+  { href: '#rich-text-editor', label: 'Rich Text Editor' },
   { href: '/playground/shadcn/sidebar', label: 'Sidebar' },
 ]
 
