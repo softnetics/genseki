@@ -1,5 +1,19 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.75
+
+### Patch Changes
+
+- [#278](https://github.com/softnetics/genseki/pull/278) [`6a6f28f`](https://github.com/softnetics/genseki/commit/6a6f28fd739b8f3708eb0faabdbb916adc160c42) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: add richtext hyperlink extension
+
+- [#281](https://github.com/softnetics/genseki/pull/281) [`c4f06a4`](https://github.com/softnetics/genseki/commit/c4f06a4930a26eb4ee318452081c9739c5735677) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: rich text disable not work
+
+- Updated dependencies [[`6a6f28f`](https://github.com/softnetics/genseki/commit/6a6f28fd739b8f3708eb0faabdbb916adc160c42), [`c4f06a4`](https://github.com/softnetics/genseki/commit/c4f06a4930a26eb4ee318452081c9739c5735677)]:
+  - @genseki/react@0.1.0-alpha.74
+  - @genseki/next@0.1.0-alpha.74
+  - @genseki/react-query@0.1.0-alpha.74
+  - @genseki/rest@0.1.0-alpha.74
+
 ## 0.1.0-alpha.74
 
 ### Patch Changes
