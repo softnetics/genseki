@@ -41,7 +41,7 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
   }, [editor, props.value, props.isDisabled])
 
   return (
-    <div className="flex flex-col gap-y-4" data-invalid={true}>
+    <div className="flex flex-col gap-y-4 w-full" data-invalid={true}>
       <EditorProvider
         {...props.editorProviderProps}
         editor={editor}
