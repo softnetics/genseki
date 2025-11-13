@@ -11,6 +11,7 @@ export const UploadImageButton = () => {
 
   return (
     <Button
+      type="button"
       size="md"
       variant="ghost"
       className="self-center h-[36px]"

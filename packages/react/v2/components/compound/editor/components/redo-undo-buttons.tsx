@@ -31,6 +31,7 @@ export const RedoButton = () => {
 
   return (
     <Button
+      type="button"
       size="md"
       variant="ghost"
       className="duration-150 ease-out transition-all h-[36px]"
