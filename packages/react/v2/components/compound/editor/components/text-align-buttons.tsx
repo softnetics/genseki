@@ -78,6 +78,7 @@ export const TextAlignButton = ({ type }: { type: TextAlignType }) => {
   return (
     <ToggleGroupItem value={type} aria-label={`Align ${type}`} asChild>
       <ToolbarItem
+        type="button"
         variant="default"
         data-selected={isSelected}
         aria-label={`Text align ${type}`}
