@@ -1,6 +1,6 @@
 {
   "name": "@genseki/prisma-generator",
-  "version": "0.1.0-alpha.74",
+  "version": "0.1.0-alpha.75",
   "description": "",
   "main": "./dist/index.js",
   "bin": {
