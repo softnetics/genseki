@@ -1,18 +1,20 @@
 'use client'
 
-import React, { useRef } from 'react'
+import React, { type CSSProperties, useRef } from 'react'
 
 import { CircleNotchIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react/dist/ssr'
 import {
+  type Column,
   flexRender,
   type Row,
   type SortDirection,
   type Table as TanstackTableCore,
 } from '@tanstack/react-table'
-import clsx from 'clsx'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
+
+import { cn } from '../../utils/cn'
 
 type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement>) => void
 
@@ -39,6 +41,25 @@ export interface TanstackTableProps<T> {
   configuration?: {
     sortBy?: ([string, 'asc' | 'desc'] | [string])[]
   }
+}
+
+const getCommonPinningClassesAndStyle = (column: Column<any>) => {
+  const isPinned = column.getIsPinned()
+  const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left')
+  const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right')
+
+  const className = cn(
+    isPinned ? 'sticky z-[1]' : 'relative',
+    isLastLeftPinnedColumn && 'shadow-[inset_-4px_0_4px_-4px_gray]',
+    isFirstRightPinnedColumn && 'shadow-[inset_4px_0_4px_-4px_gray]'
+  )
+
+  const style: CSSProperties = {
+    left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
+    right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+  }
+
+  return { className, style }
 }
 
 export const getSortIcon = (isSorted: false | SortDirection) => {
@@ -92,15 +113,19 @@ export function TanstackTable<T>({
               const canSort = configuration?.sortBy?.some(
                 ([columnPath]) => columnPath === normalizeColumnId(header.column.id)
               )
+              const { className: pinnedHeaderClassName, style: pinnedHeaderStyle } =
+                getCommonPinningClassesAndStyle(header.column)
               return (
                 <TableHead
                   key={normalizeColumnId(header.id)}
-                  className={clsx(
+                  className={cn(
                     'focus-visible:ring-focus ring-inset',
                     header.colSpan > 1 && 'border-bluegray-300 border-b',
                     classNames?.tableHead,
+                    pinnedHeaderClassName,
                     header.column.columnDef.meta?.thClassName
                   )}
+                  style={pinnedHeaderStyle}
                   onClick={
                     canSort && children ? header.column.getToggleSortingHandler() : undefined
                   }
@@ -109,7 +134,7 @@ export function TanstackTable<T>({
                   tabIndex={canSort ? 0 : -1}
                 >
                   <span
-                    className={clsx(
+                    className={cn(
                       'inline-flex items-center gap-2 w-full',
                       header.colSpan > 1 && 'justify-center'
                     )}
@@ -123,7 +148,7 @@ export function TanstackTable<T>({
           </TableRow>
         ))}
       </TableHeader>
-      <TableBody className={clsx(classNames?.tableBody)}>
+      <TableBody className={cn(classNames?.tableBody)}>
         {isLoading ? (
           <TableLoading table={table} />
         ) : isError ? (
@@ -135,13 +160,20 @@ export function TanstackTable<T>({
             <TableRow
               key={row.id}
               data-state={row.getIsSelected() && 'selected'}
-              className={clsx('border-b border-border last:border-b-0', classNames?.tableBodyRow)}
+              className={cn('border-b border-border last:border-b-0', classNames?.tableBodyRow)}
             >
               {row.getVisibleCells().map((cell) => {
+                const { className: pinnedCellClassName, style: pinnedCellStyle } =
+                  getCommonPinningClassesAndStyle(cell.column)
                 return (
                   <TableCell
                     key={cell.id}
-                    className={clsx(classNames?.tableCell)}
+                    className={cn(
+                      classNames?.tableCell,
+                      pinnedCellClassName,
+                      cell.column.columnDef.meta?.tdClassName
+                    )}
+                    style={pinnedCellStyle}
                     onClick={(e) => onRowClick?.(row, e)}
                   >
                     {flexRender(cell.column.columnDef.cell, cell.getContext())}
