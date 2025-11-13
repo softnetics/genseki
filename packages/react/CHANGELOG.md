@@ -1,5 +1,15 @@
 # @genseki/react
 
+## 0.1.0-alpha.75
+
+### Patch Changes
+
+- [`6e32d75`](https://github.com/softnetics/genseki/commit/6e32d75cad437453d0a88afcb425037258c7c295) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: rich text type button
+
+- [#279](https://github.com/softnetics/genseki/pull/279) [`873044a`](https://github.com/softnetics/genseki/commit/873044a1efbe2f0c3f093a1304887a147e8fef67) Thanks [@PondC](https://github.com/PondC)! - Add sticky column pinning style
+
+- [#282](https://github.com/softnetics/genseki/pull/282) [`78be38e`](https://github.com/softnetics/genseki/commit/78be38ec735188b3b1f744618abe63e134d4767f) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: rich text type button
+
 ## 0.1.0-alpha.74
 
 ### Patch Changes
