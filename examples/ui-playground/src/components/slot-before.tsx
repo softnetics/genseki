@@ -19,6 +19,7 @@ import {
   EditorBar,
   EditorBgColorPicker,
   EditorTextColorPicker,
+  LinkButton,
   MarkButton,
   RedoButton,
   SelectionExtension,
@@ -37,7 +38,7 @@ export const EditorSlotBefore = () => {
         <MarkButton type="bold" />
         <MarkButton type="italic" />
         <MarkButton type="underline" />
-        <MarkButton type="link" />
+        <LinkButton />
       </ToolbarGroup>
       <ToolbarSeparator className="h-auto" />
       <EditorTextColorPicker />

@@ -37,8 +37,12 @@ export const RichTextEditor = (props: RichTextEditorProps) => {
     if (props.value !== undefined && !isDeepEqual(editor.getJSON(), props.value)) {
       editor.commands.setContent(props.value)
     }
+  }, [editor, props.value])
+
+  useEffect(() => {
+    if (!editor) return
     editor.setEditable(!props.isDisabled)
-  }, [editor, props.value, props.isDisabled])
+  }, [editor, props.isDisabled])
 
   return (
     <div className="flex flex-col gap-y-4 w-full" data-invalid={true}>

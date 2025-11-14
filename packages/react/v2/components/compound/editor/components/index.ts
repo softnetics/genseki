@@ -1,5 +1,6 @@
 export * from './editor-bar'
 export * from './editor-color-picker'
+export * from './link-button'
 export * from './mark-button'
 export * from './redo-undo-buttons'
 export * from './rich-text-editor'
