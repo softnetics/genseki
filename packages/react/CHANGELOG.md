@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.0-alpha.77
+
+### Patch Changes
+
+- [#286](https://github.com/softnetics/genseki/pull/286) [`f55637d`](https://github.com/softnetics/genseki/commit/f55637de53b0255421a4e13514beea6970bf1080) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: missing use client in link button
+
 ## 0.1.0-alpha.76
 
 ### Patch Changes
