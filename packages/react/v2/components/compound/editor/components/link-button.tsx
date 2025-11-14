@@ -1,3 +1,4 @@
+'use client'
 import { useCallback } from 'react'
 
 import { LinkIcon } from '@phosphor-icons/react'
