@@ -2,7 +2,6 @@
 
 import {
   type Icon,
-  LinkIcon,
   ListBulletsIcon,
   TextBolderIcon,
   TextItalicIcon,
@@ -13,7 +12,7 @@ import { useCurrentEditor } from '@tiptap/react'
 
 import { ToolbarItem } from '../../../../../src/react/components/primitives/toolbar'
 
-type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList' | 'link'
+type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList'
 
 type MarkOptions = Record<
   MarkType,
@@ -66,22 +65,6 @@ const useMark = (type: MarkType) => {
         editor.chain().focus().toggleBulletList().run()
       },
     },
-    link: {
-      label: 'Link',
-      icon: LinkIcon,
-      isSelected: editor.isActive('link'),
-      onClick() {
-        if (!editor.isActive('link')) {
-          const { state } = editor
-          const { from, to } = state.selection
-          const url = state.doc.textBetween(from, to, '')
-
-          editor.chain().focus().insertContent(`[](${url})`).run()
-          return
-        }
-        editor.chain().focus().unsetMark('link').run()
-      },
-    },
   }
 
   return options[type]
@@ -97,7 +80,7 @@ export const MarkButton = (props: { type: MarkType }) => {
     <ToolbarItem
       size="md"
       variant="default"
-      className="duration-150 ease-out transition-all h-[36px]"
+      className="duration-150 ease-out transition-all h-18"
       onClick={markOption.onClick}
       type="button"
     >
