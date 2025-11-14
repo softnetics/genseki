@@ -1,5 +1,12 @@
 # @genseki/react
 
+## 0.1.0-alpha.76
+
+### Patch Changes
+
+- [#284](https://github.com/softnetics/genseki/pull/284) [`0db7932`](https://github.com/softnetics/genseki/commit/0db7932f1ac83b467d2726721f6b7c5a5d5e29a2) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: rich text bug useEffect and z index
+  fix: rich text link to use prompt instead of markdown
+
 ## 0.1.0-alpha.75
 
 ### Patch Changes

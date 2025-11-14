@@ -2,7 +2,7 @@
   "name": "@genseki/react-query",
   "description": "",
   "sideEffects": false,
-  "version": "0.1.0-alpha.75",
+  "version": "0.1.0-alpha.76",
   "type": "module",
   "files": [
     "dist"
