@@ -57,6 +57,7 @@ const getCommonPinningClassesAndStyle = (column: Column<any>) => {
   const style: CSSProperties = {
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    width: column.getSize(),
   }
 
   return { className, style }
