@@ -39,6 +39,7 @@ const navigationItems = [
   { href: '#textarea', label: 'Textarea' },
   { href: '#toast', label: 'Toast' },
   { href: '#rich-text-editor', label: 'Rich Text Editor' },
+  { href: '#collection-card', label: 'Collection Card' },
   { href: '/playground/shadcn/sidebar', label: 'Sidebar' },
 ]
 
