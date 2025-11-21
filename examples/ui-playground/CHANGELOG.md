@@ -1,5 +1,13 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.79
+
+### Patch Changes
+
+- [#289](https://github.com/softnetics/genseki/pull/289) [`6df8d40`](https://github.com/softnetics/genseki/commit/6df8d40b9a47d47ac726acd67a2fd86f3e39260c) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add separator variant & examples.
+
+- [#289](https://github.com/softnetics/genseki/pull/289) [`13269e6`](https://github.com/softnetics/genseki/commit/13269e66cbe2406c51213312f317fade55aeee36) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add new tanstack table component examples.
+
 ## 0.1.0-alpha.78
 
 ### Patch Changes
