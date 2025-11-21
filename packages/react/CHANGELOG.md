@@ -1,5 +1,12 @@
 # @genseki/react
 
+## 0.1.0-alpha.78
+
+### Patch Changes
+
+- [#292](https://github.com/softnetics/genseki/pull/292) [`50e50d6`](https://github.com/softnetics/genseki/commit/50e50d61a6e388952c6693ff3f6328f186243514) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - - feat: add separator variant.
+  - feat: improve tanstack table component.
+
 ## 0.1.0-alpha.77
 
 ### Patch Changes
