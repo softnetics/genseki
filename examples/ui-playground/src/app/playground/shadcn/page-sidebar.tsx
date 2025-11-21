@@ -27,6 +27,7 @@ const navigationItems = [
   { href: '#link', label: 'Link' },
   { href: '#pagination', label: 'Pagination' },
   { href: '#progress', label: 'Progress' },
+  { href: '#separator', label: 'Separator' },
   { href: '#select', label: 'Select' },
   { href: '#slider', label: 'Slider' },
   { href: '#switch', label: 'Switch' },

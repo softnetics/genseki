@@ -20,6 +20,7 @@ import { PaginationSection } from './pagination-section'
 import { ProgressSection } from './progress-section'
 import { RichTextSection } from './rich-text-section'
 import { SelectSection } from './select-section'
+import { SeparatorSection } from './separator-section'
 import { SliderSection } from './slider-section'
 import { SwitchSection } from './switch-section'
 import { TableSection } from './table-section'
@@ -73,7 +74,7 @@ export default function ComboboxPage() {
         <Typography type="h2" weight="bold" id="input-otp">
           Input OTP
         </Typography>
-        <InputOtpSection />A
+        <InputOtpSection />
         <Typography type="h2" weight="bold" id="link">
           Link
         </Typography>
@@ -94,6 +95,10 @@ export default function ComboboxPage() {
           Slider
         </Typography>
         <SliderSection />
+        <Typography type="h2" weight="bold" id="separator">
+          Separator
+        </Typography>
+        <SeparatorSection />
         <Typography type="h2" weight="bold" id="switch">
           Switch
         </Typography>
