@@ -1,5 +1,49 @@
 # @example/ui-playground
 
+## 0.1.0-alpha.78
+
+### Patch Changes
+
+- Updated dependencies [[`f55637d`](https://github.com/softnetics/genseki/commit/f55637de53b0255421a4e13514beea6970bf1080)]:
+  - @genseki/react@0.1.0-alpha.77
+  - @genseki/next@0.1.0-alpha.77
+  - @genseki/react-query@0.1.0-alpha.77
+  - @genseki/rest@0.1.0-alpha.77
+
+## 0.1.0-alpha.77
+
+### Patch Changes
+
+- Updated dependencies [[`0db7932`](https://github.com/softnetics/genseki/commit/0db7932f1ac83b467d2726721f6b7c5a5d5e29a2)]:
+  - @genseki/react@0.1.0-alpha.76
+  - @genseki/next@0.1.0-alpha.76
+  - @genseki/react-query@0.1.0-alpha.76
+  - @genseki/rest@0.1.0-alpha.76
+
+## 0.1.0-alpha.76
+
+### Patch Changes
+
+- Updated dependencies [[`6e32d75`](https://github.com/softnetics/genseki/commit/6e32d75cad437453d0a88afcb425037258c7c295), [`873044a`](https://github.com/softnetics/genseki/commit/873044a1efbe2f0c3f093a1304887a147e8fef67), [`78be38e`](https://github.com/softnetics/genseki/commit/78be38ec735188b3b1f744618abe63e134d4767f)]:
+  - @genseki/react@0.1.0-alpha.75
+  - @genseki/next@0.1.0-alpha.75
+  - @genseki/react-query@0.1.0-alpha.75
+  - @genseki/rest@0.1.0-alpha.75
+
+## 0.1.0-alpha.75
+
+### Patch Changes
+
+- [#278](https://github.com/softnetics/genseki/pull/278) [`6a6f28f`](https://github.com/softnetics/genseki/commit/6a6f28fd739b8f3708eb0faabdbb916adc160c42) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: add richtext hyperlink extension
+
+- [#281](https://github.com/softnetics/genseki/pull/281) [`c4f06a4`](https://github.com/softnetics/genseki/commit/c4f06a4930a26eb4ee318452081c9739c5735677) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: rich text disable not work
+
+- Updated dependencies [[`6a6f28f`](https://github.com/softnetics/genseki/commit/6a6f28fd739b8f3708eb0faabdbb916adc160c42), [`c4f06a4`](https://github.com/softnetics/genseki/commit/c4f06a4930a26eb4ee318452081c9739c5735677)]:
+  - @genseki/react@0.1.0-alpha.74
+  - @genseki/next@0.1.0-alpha.74
+  - @genseki/react-query@0.1.0-alpha.74
+  - @genseki/rest@0.1.0-alpha.74
+
 ## 0.1.0-alpha.74
 
 ### Patch Changes

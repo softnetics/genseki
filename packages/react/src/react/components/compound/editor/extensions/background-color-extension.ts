@@ -2,6 +2,9 @@ import '@tiptap/extension-text-style'
 
 import { Extension } from '@tiptap/core'
 
+/**
+ * @deprecated
+ */
 export type ColorOptions = {
   types: string[]
 }
@@ -21,6 +24,9 @@ declare module '@tiptap/core' {
   }
 }
 
+/**
+ * @deprecated
+ */
 export const BackColorExtension = Extension.create<ColorOptions>({
   name: 'backColor',
   addOptions() {

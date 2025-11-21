@@ -11,7 +11,6 @@ import {
 import { useCurrentEditor } from '@tiptap/react'
 
 import { ToggleGroup, ToggleGroupItem } from '../../../../../../v2'
-import { BaseIcon } from '../../../primitives/base-icon'
 import { ToolbarItem } from '../../../primitives/toolbar'
 
 type TextAlignType = 'left' | 'center' | 'right' | 'justify'
@@ -45,6 +44,9 @@ const useCurrentTextAlign = (editor: any): TextAlignType => {
   return 'left'
 }
 
+/**
+ * @deprecated
+ */
 export const TextAlignButtonsGroup = ({ children }: { children: React.ReactNode }) => {
   const { editor } = useCurrentEditor()
   if (!editor) throw new Error('Editor provider is missing')
@@ -70,6 +72,9 @@ export const TextAlignButtonsGroup = ({ children }: { children: React.ReactNode 
   )
 }
 
+/**
+ * @deprecated
+ */
 export const TextAlignButton = ({ type }: { type: TextAlignType }) => {
   const { currentAlign } = useTextAlignGroup()
   const Icon = justifyOptions[type].icon
@@ -83,7 +88,7 @@ export const TextAlignButton = ({ type }: { type: TextAlignType }) => {
         aria-label={`Text align ${type}`}
         className="size-[36px]"
       >
-        <BaseIcon icon={Icon} weight={isSelected ? 'bold' : 'regular'} />
+        <Icon weight={isSelected ? 'bold' : 'regular'} className="size-8" />
       </ToolbarItem>
     </ToggleGroupItem>
   )

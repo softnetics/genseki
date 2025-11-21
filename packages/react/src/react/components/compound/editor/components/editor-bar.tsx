@@ -6,8 +6,14 @@ import { useCurrentEditor } from '@tiptap/react'
 import { cn } from '../../../../utils/cn'
 import { Toolbar, ToolbarGroup } from '../../../primitives/toolbar'
 
+/**
+ * @deprecated
+ */
 export const EditorBarGroup = ToolbarGroup
 
+/**
+ * @deprecated
+ */
 export const EditorBar: React.FC<{ className?: string; children?: React.ReactNode }> = ({
   className,
   children,
@@ -19,7 +25,7 @@ export const EditorBar: React.FC<{ className?: string; children?: React.ReactNod
   return (
     <div
       className={cn(
-        'overflow-x-auto self-start sticky top-1 z-10 bg-bg rounded-lg w-full flex items-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
+        'overflow-x-auto self-start sticky top-1 z-11 bg-bg rounded-lg w-full flex items-center [scrollbar-width:none] [&::-webkit-scrollbar]:hidden',
         className
       )}
     >

@@ -18,6 +18,7 @@ import { LinkSection } from './link-section'
 import PageSidebar from './page-sidebar'
 import { PaginationSection } from './pagination-section'
 import { ProgressSection } from './progress-section'
+import { RichTextSection } from './rich-text-section'
 import { SelectSection } from './select-section'
 import { SliderSection } from './slider-section'
 import { SwitchSection } from './switch-section'
@@ -133,6 +134,10 @@ export default function ComboboxPage() {
           Toast
         </Typography>
         <ToastSection />
+        <Typography type="h2" weight="bold" id="rich-text-editor">
+          Rich Text Editor
+        </Typography>
+        <RichTextSection />
       </div>
       <React.Suspense fallback={null}>
         <PageSidebar />

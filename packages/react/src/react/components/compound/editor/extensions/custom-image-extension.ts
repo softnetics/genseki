@@ -4,10 +4,16 @@ import Image, { type ImageOptions } from '@tiptap/extension-image'
 import type { StorageAdapterClient } from '../../../../../core/file-storage-adapters'
 import { CustomImageNodeWithRenderer } from '../nodes/custom-image-node'
 
+/**
+ * @deprecated implement this extension in project directly
+ */
 export interface CustomImageOptions extends ImageOptions {
   storageAdapter: StorageAdapterClient
 }
 
+/**
+ * @deprecated implement this extension in project directly
+ */
 // Custom Image extension that only accepts data-key attribute
 export const CustomImageExtension = Image.extend<CustomImageOptions>({
   name: 'customImage',

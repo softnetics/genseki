@@ -9,6 +9,10 @@ import { EditorProvider } from './rich-text-provider'
 
 import { CustomFieldError } from '../../../primitives/custom-field-error'
 import { Description } from '../../../primitives/field'
+
+/**
+ * @deprecated
+ */
 export interface RichTextEditorProps {
   editorProviderProps: EditorProviderProps
   value?: string | Content | Content[]
@@ -21,6 +25,9 @@ export interface RichTextEditorProps {
   label?: string
 }
 
+/**
+ * @deprecated
+ */
 export const RichTextEditor = (props: RichTextEditorProps) => {
   const editor = useEditor({
     ...props.editorProviderProps,

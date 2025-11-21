@@ -13,8 +13,14 @@ import {
 import type { Editor } from '@tiptap/core'
 import { useCurrentEditor } from '@tiptap/react'
 
-import { BaseIcon } from '../../../primitives/base-icon'
-import { Select, SelectList, SelectOption, SelectTrigger } from '../../../primitives/select'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from '../../../../../../v2'
 
 const textStylesList = [
   { icon: TextTIcon, label: 'Normal', value: 'p', type: 'paragraph' },
@@ -45,6 +51,9 @@ const getSelectedTextStyle = (editor: Editor) => {
   return null
 }
 
+/**
+ * @deprecated
+ */
 export const SelectTextStyle = () => {
   const { editor } = useCurrentEditor()
   if (!editor) throw new Error('Editor provider is missing')
@@ -72,22 +81,23 @@ export const SelectTextStyle = () => {
 
   return (
     <Select
-      selectedKey={getSelectedTextStyle(editor)}
-      className="w-72"
-      defaultSelectedKey="Normal"
-      placeholder="Choose style"
-      aria-label="Select text style"
-      onSelectionChange={selectChange}
+      value={getSelectedTextStyle(editor) ?? 'p'}
+      defaultValue="p"
+      onValueChange={selectChange}
     >
-      <SelectTrigger className="h-[36px]" />
-      <SelectList items={textStylesList}>
-        {(item) => (
-          <SelectOption key={item.value} id={item.value} textValue={item.value}>
-            <BaseIcon icon={item.icon} size="sm" weight="regular" />
-            {item.label}
-          </SelectOption>
-        )}
-      </SelectList>
+      <SelectTrigger className="w-full">
+        <SelectValue />
+      </SelectTrigger>
+      <SelectContent>
+        {textStylesList.map((textStyle) => (
+          <SelectItem key={textStyle.value} value={textStyle.value}>
+            <SelectItemText className="flex items-center gap-2">
+              <textStyle.icon />
+              {textStyle.label}
+            </SelectItemText>
+          </SelectItem>
+        ))}
+      </SelectContent>
     </Select>
   )
 }
