@@ -21,6 +21,7 @@ import { ProgressSection } from './progress-section'
 import { SelectSection } from './select-section'
 import { SliderSection } from './slider-section'
 import { SwitchSection } from './switch-section'
+import { TableSection } from './table-section'
 import { TabsSection } from './tabs-section'
 import { TextareaSection } from './textarea-section'
 import { ToastSection } from './toast-section'
@@ -96,6 +97,10 @@ export default function ComboboxPage() {
           Switch
         </Typography>
         <SwitchSection />
+        <Typography type="h2" weight="bold" id="table">
+          Table
+        </Typography>
+        <TableSection />
         <Typography type="h2" weight="bold" id="tabs">
           Tabs
         </Typography>

@@ -30,6 +30,7 @@ const navigationItems = [
   { href: '#select', label: 'Select' },
   { href: '#slider', label: 'Slider' },
   { href: '#switch', label: 'Switch' },
+  { href: '#table', label: 'Table' },
   { href: '#tabs', label: 'Tabs' },
   { href: '#tooltip', label: 'Tooltip' },
   { href: '#dropdown-menu', label: 'Dropdown Menu' },
