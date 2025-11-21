@@ -14,6 +14,7 @@ import {
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
 
+import { Typography } from '../../../../v2'
 import { cn } from '../../utils/cn'
 
 type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement>) => void
@@ -133,15 +134,22 @@ export function TanstackTable<T>({
                   role={canSort ? 'button' : undefined}
                   tabIndex={canSort ? 0 : -1}
                 >
-                  <span
+                  <div
                     className={cn(
                       'inline-flex items-center gap-2 w-full',
                       header.colSpan > 1 && 'justify-center'
                     )}
                   >
-                    <span>{children}</span>
+                    <Typography
+                      type="caption"
+                      weight="semibold"
+                      className="text-text-tertiary"
+                      asChild
+                    >
+                      <span>{children}</span>
+                    </Typography>
                     {canSort && children && getSortIcon(header.column.getIsSorted())}
-                  </span>
+                  </div>
                 </TableHead>
               )
             })}
@@ -230,14 +238,12 @@ export const TableEmpty = (props: {
     <TableRow className="h-[560px]">
       <TableCell colSpan={props.table.getAllLeafColumns().length} className="h-24 text-center">
         {props.emptyFallback ?? (
-          <div className="flex flex-col items-center py-10 gap-8">
+          <div className="flex flex-col items-center py-10 gap-5">
             <WarningCircleIcon
               className="text-xl size-auto text-input-text-placeholder"
-              weight="fill"
+              weight="regular"
             />
-            <p className="text-base font-regular text-typo-secondary">
-              {props.emptyMessage ?? 'No data'}
-            </p>
+            <Typography>{props.emptyMessage ?? 'No data'}</Typography>
           </div>
         )}
       </TableCell>

@@ -56,5 +56,6 @@
   ],
   "[sql]": {
     "editor.defaultFormatter": "adpyke.vscode-sql-formatter"
-  }
+  },
+  "typescript.experimental.useTsgo": false
 }
