@@ -1,4 +1,4 @@
-import { tv, type VariantProps } from 'tailwind-variants'
+import { cva, type VariantProps } from 'class-variance-authority'
 
 const badgeIntents = {
   gray: 'bg-white border-gray-300 text-text-secondary',
@@ -19,19 +19,21 @@ const sizeStyles = {
   md: 'text-sm px-5 py-1',
   lg: 'text-sm px-6 py-2',
 }
-const badgeStyles = tv({
-  base: 'inline-flex items-center font-medium border **:data-[slot=icon]:size-3 forced-colors:outline',
-  variants: {
-    intent: { ...badgeIntents },
-    shape: { ...badgeShapes },
-    size: { ...sizeStyles },
-  },
-  defaultVariants: {
-    intent: 'gray',
-    shape: 'circle',
-    size: 'md',
-  },
-})
+const badgeStyles = cva(
+  'inline-flex items-center font-medium border **:data-[slot=icon]:size-3 forced-colors:outline',
+  {
+    variants: {
+      intent: { ...badgeIntents },
+      shape: { ...badgeShapes },
+      size: { ...sizeStyles },
+    },
+    defaultVariants: {
+      intent: 'gray',
+      shape: 'circle',
+      size: 'md',
+    },
+  }
+)
 
 interface BadgeProps
   extends React.HTMLAttributes<HTMLDivElement>,
