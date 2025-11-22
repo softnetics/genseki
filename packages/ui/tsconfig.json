@@ -1,0 +1,13 @@
+{
+  "extends": "@internal/project-config/tsconfig/reactjs.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "baseUrl": ".",
+    "module": "ESNext",
+    "moduleResolution": "bundler",
+    "types": ["node"],
+    "noEmit": true
+  },
+  "include": ["src", "v2"],
+  "exclude": ["dist", "node_modules"]
+}

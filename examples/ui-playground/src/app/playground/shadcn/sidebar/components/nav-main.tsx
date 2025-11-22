@@ -18,7 +18,7 @@ import {
   Typography,
 } from '@genseki/react/v2'
 
-import { cn } from '../../../../../../../../packages/react/src/react/utils/cn'
+import { cn } from '../../../../../../../../legacies/react/src/react/utils/cn'
 
 function NavMain({
   items,
