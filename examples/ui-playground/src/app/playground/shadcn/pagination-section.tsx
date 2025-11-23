@@ -17,7 +17,7 @@ import {
 
 import { PlaygroundCard } from '~/src/components/card'
 
-import { cn } from '../../../../../../packages/react/src/react/utils/cn'
+import { cn } from '../../../../../../legacies/react/src/react/utils/cn'
 
 // Default Pagination
 function DefaultPagination() {
