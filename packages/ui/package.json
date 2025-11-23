@@ -68,9 +68,10 @@
     "tailwind-merge": "^3.0.2"
   },
   "devDependencies": {
-    "@vitejs/plugin-react": "^4.3.4",
+    "@types/node": "22.13.10",
     "@types/react": "^19.1.6",
     "@types/react-dom": "^19.1.6",
+    "@vitejs/plugin-react": "^4.3.4",
     "color": "^5.0.2",
     "tsup": "^8.5.0",
     "type-fest": "^4.38.0",
