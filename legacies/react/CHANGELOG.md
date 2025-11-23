@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.1
+
+### Patch Changes
+
+- [`72f97f9`](https://github.com/softnetics/genseki/commit/72f97f91fbdf71b137c454befff55ee0dabba53f) Thanks [@saenyakorn](https://github.com/saenyakorn)! - Fix publish config
+
 ## 0.1.0
 
 ### Minor Changes

@@ -1,5 +1,15 @@
 # @example/ui-playground
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`72f97f9`](https://github.com/softnetics/genseki/commit/72f97f91fbdf71b137c454befff55ee0dabba53f)]:
+  - @genseki/react@0.1.1
+  - @genseki/next@0.1.1
+  - @genseki/react-query@0.1.1
+  - @genseki/rest@0.1.1
+
 ## 0.1.0
 
 ### Minor Changes
