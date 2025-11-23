@@ -23,10 +23,12 @@
     "exports": {
       ".": {
         "import": "./dist/src/index.js",
+        "require": "./dist/src/index.js",
         "types": "./dist/src/index.d.ts"
       },
       "./v2": {
         "import": "./dist/v2/index.js",
+        "require": "./dist/v2/index.js",
         "types": "./dist/v2/index.d.ts"
       },
       "./tailwind.css": "./dist/src/react/styles/tailwind.css"
