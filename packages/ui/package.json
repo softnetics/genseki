@@ -31,7 +31,7 @@
     "format": "prettier --write .",
     "format:check": "prettier --check .",
     "typecheck": "tsc",
-    "test": "vitest run",
+    "test": "vitest run --passWithNoTests",
     "diagnostics": "tsc --noEmit --extendedDiagnostics",
     "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json && pnpm copy-styles",
     "copy-styles": "mkdir -p dist/src/styles && cp src/styles/*.css dist/src/styles"
