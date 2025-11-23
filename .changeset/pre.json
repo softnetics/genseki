@@ -10,7 +10,8 @@
     "@genseki/react-query": "0.0.0",
     "@genseki/rest": "0.0.0",
     "@example/ui-playground": "0.0.0",
-    "@genseki/prisma-generator": "0.0.0"
+    "@genseki/prisma-generator": "0.0.0",
+    "@genseki/ui": "0.0.0"
   },
   "changesets": [
     "better-impalas-join",
@@ -74,6 +75,7 @@
     "green-meals-do",
     "green-snails-explode",
     "happy-crabs-tap",
+    "healthy-poets-fix",
     "heavy-bears-yell",
     "heavy-numbers-make",
     "hip-deer-do",
