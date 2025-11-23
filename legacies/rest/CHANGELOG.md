@@ -1,5 +1,17 @@
 # @genseki/rest
 
+## 0.1.0
+
+### Minor Changes
+
+- 016175c: [[DRIZZ-40] Rest RPC](https://app.plane.so/softnetics/browse/DRIZZ-40/)
+- 39f4197: Add "before" middleware to alter Request object
+
+### Patch Changes
+
+- 7dcadee: [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+- 82272fc: [[DRIZZ-102] Improve DX in genseki](https://app.plane.so/softnetics/browse/DRIZZ-102/)
+
 ## 0.1.0-alpha.78
 
 ## 0.1.0-alpha.77

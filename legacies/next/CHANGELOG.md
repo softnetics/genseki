@@ -1,5 +1,164 @@
 # @genseki/next
 
+## 0.1.0
+
+### Minor Changes
+
+- 70d8d5e: [[DRIZZ-7] Create a new richtext editor](https://app.plane.so/softnetics/browse/DRIZZ-7/)
+- 9b9a82b: [[DRIZZ-57] NextJS Integration Resource Route](https://app.plane.so/softnetics/browse/DRIZZ-57/)
+- 8c4bc36: [[DRIZZ-39] Server Function RPC](https://app.plane.so/softnetics/browse/DRIZZ-39/)
+- 016175c: [[DRIZZ-40] Rest RPC](https://app.plane.so/softnetics/browse/DRIZZ-40/)
+- aeab5ea: [[DRIZZ-35] - [Forget Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-35/)
+  [[DRIZZ-34] - [Reset Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-34/)
+  [[DRIZZ-33] - [Change Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-33/)
+- 86cb362: [[DRIZZ-97] Migrate to zod4](https://app.plane.so/softnetics/browse/DRIZZ-97/)
+- 33ee207: [[DRIZZ-56] Router Matching](https://app.plane.so/softnetics/browse/DRIZZ-56/) - using radix3 as a route matching data structure
+- aaf8c4f: - [[DRIZZ-54] Collection Records Display](https://app.plane.so/softnetics/browse/DRIZZ-54/)
+- 8b8ccc9: [[DRIZZ-77] Inject RequestContext to handler per request](https://app.plane.so/softnetics/browse/DRIZZ-77/)
+- ad503a7: [[DRIZZ-31] Register Page](https://app.plane.so/softnetics/browse/DRIZZ-31/)
+  [[DRIZZ-32] Login page](https://app.plane.so/softnetics/browse/DRIZZ-32/)
+- d02a6d7: [[DRIZZ-93] Create Tags, Badges and Multiselection](https://github.com/softnetics/kivotos/pull/29)
+- aa58557: [[DRIZZ-83] Modal & Dialog box](https://app.plane.so/softnetics/browse/DRIZZ-83/)
+
+### Patch Changes
+
+- 4322698: Fix request context misconfigure
+- 51dd567: Fix nextjs resource route response
+- a2050f0: Fix invalid response type
+- 63c94ed: [Breaking] Change context model to user-defined context
+- 8df54c5: Fix Forgot password and Change phone bugs in phone plugin
+- c227c3f: [Breaking] Replace Drizzle with Prisma
+- 36bb10e: Refactor Collection Model
+- 7acbdc9: [Breaking] Change core model of Genseki
+- 7dcadee: [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+- 82272fc: [[DRIZZ-102] Improve DX in genseki](https://app.plane.so/softnetics/browse/DRIZZ-102/)
+- 3912698: [[DRIZZ-98] Simplify endpoints logic in collection builder for type simplicity](https://app.plane.so/softnetics/browse/DRIZZ-98/)
+- 5aca910: [Chore] Add peer dependencies
+- df4dc0b: [[DRIZZ-58] Setup Release workflow](https://app.plane.so/softnetics/browse/DRIZZ-58/)
+- 02f4233: [Feature] Implement a plugin for phone authentication
+- ba3ea68: Fix catching error in nextjs resource route
+- Updated dependencies [0f10dbb]
+- Updated dependencies [b0301bc]
+- Updated dependencies [5a5c79f]
+- Updated dependencies [b56cc5e]
+- Updated dependencies [4e69970]
+- Updated dependencies [0c2645b]
+- Updated dependencies [6e32d75]
+- Updated dependencies [60794b8]
+- Updated dependencies [9336c89]
+- Updated dependencies [4322698]
+- Updated dependencies [6a6f28f]
+- Updated dependencies [72ddbd9]
+- Updated dependencies [b1908d1]
+- Updated dependencies [cef24e5]
+- Updated dependencies [1277e45]
+- Updated dependencies [4357c07]
+- Updated dependencies [f6474c1]
+- Updated dependencies [873044a]
+- Updated dependencies [cb2221f]
+- Updated dependencies [5ef0717]
+- Updated dependencies [e312530]
+- Updated dependencies [63c94ed]
+- Updated dependencies [c03c47a]
+- Updated dependencies [c22fe0b]
+- Updated dependencies [cb9d38e]
+- Updated dependencies [d0b6db4]
+- Updated dependencies [9b9a82b]
+- Updated dependencies [2ad9bd3]
+- Updated dependencies [fa5325a]
+- Updated dependencies [136c1bc]
+- Updated dependencies [8eb7411]
+- Updated dependencies [51ce530]
+- Updated dependencies [78be38e]
+- Updated dependencies [39e013b]
+- Updated dependencies [0db7932]
+- Updated dependencies [49927f2]
+- Updated dependencies [28387bf]
+- Updated dependencies [4f04302]
+- Updated dependencies [16e83a3]
+- Updated dependencies [fedeb66]
+- Updated dependencies [f55637d]
+- Updated dependencies [d8c4ace]
+- Updated dependencies [d6f819f]
+- Updated dependencies [7cd8620]
+- Updated dependencies [8651a68]
+- Updated dependencies [1a8874b]
+- Updated dependencies [983ce71]
+- Updated dependencies [e4b450c]
+- Updated dependencies [b859987]
+- Updated dependencies [164983e]
+- Updated dependencies [9ad485e]
+- Updated dependencies [0f192e5]
+- Updated dependencies [055a591]
+- Updated dependencies [80d8389]
+- Updated dependencies [dfad76d]
+- Updated dependencies [0b9269d]
+- Updated dependencies [2006302]
+- Updated dependencies [082b5bc]
+- Updated dependencies [bb5a2bd]
+- Updated dependencies [6e0a0ce]
+- Updated dependencies [8c4bc36]
+- Updated dependencies [1877fa0]
+- Updated dependencies [b493941]
+- Updated dependencies [82f9f33]
+- Updated dependencies [5ac7bc7]
+- Updated dependencies [016175c]
+- Updated dependencies [17efb99]
+- Updated dependencies [aeab5ea]
+- Updated dependencies [f468c02]
+- Updated dependencies [a2acb52]
+- Updated dependencies [7273ee1]
+- Updated dependencies [3f1cfc5]
+- Updated dependencies [3a9f911]
+- Updated dependencies [86cb362]
+- Updated dependencies [36bb10e]
+- Updated dependencies [8b4de17]
+- Updated dependencies [a9fc278]
+- Updated dependencies [50e50d6]
+- Updated dependencies [c17aae8]
+- Updated dependencies [af6664c]
+- Updated dependencies [5e85599]
+- Updated dependencies [9f29ffd]
+- Updated dependencies [cd6fdb4]
+- Updated dependencies [0def80f]
+- Updated dependencies [47b5852]
+- Updated dependencies [454c82d]
+- Updated dependencies [9f3aa3a]
+- Updated dependencies [33ee207]
+- Updated dependencies [7dcadee]
+- Updated dependencies [82272fc]
+- Updated dependencies [1a38106]
+- Updated dependencies [3912698]
+- Updated dependencies [eea522d]
+- Updated dependencies [c4f06a4]
+- Updated dependencies [5aca910]
+- Updated dependencies [aaf8c4f]
+- Updated dependencies [1748c70]
+- Updated dependencies [a1d05fc]
+- Updated dependencies [f2adbb5]
+- Updated dependencies [df4dc0b]
+- Updated dependencies [8b8ccc9]
+- Updated dependencies [ad503a7]
+- Updated dependencies [bd93756]
+- Updated dependencies [650bcad]
+- Updated dependencies [deb33b3]
+- Updated dependencies [02f4233]
+- Updated dependencies [d105b0d]
+- Updated dependencies [abb3578]
+- Updated dependencies [e88f0b7]
+- Updated dependencies [a4812ac]
+- Updated dependencies [e5eb01c]
+- Updated dependencies [bd3d4e6]
+- Updated dependencies [2171612]
+- Updated dependencies [3195164]
+- Updated dependencies [6766250]
+- Updated dependencies [f88f0f2]
+- Updated dependencies [cee6794]
+- Updated dependencies [0b0912b]
+- Updated dependencies [e70d3bc]
+- Updated dependencies [831b2cd]
+  - @genseki/react@0.1.0
+
 ## 0.1.0-alpha.78
 
 ### Patch Changes

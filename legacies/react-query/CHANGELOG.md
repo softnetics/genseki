@@ -1,5 +1,25 @@
 # @genseki/react-query
 
+## 0.1.0
+
+### Minor Changes
+
+- 1dee054: [[DRIZZ-41] React Query](https://app.plane.so/softnetics/browse/DRIZZ-41/)
+- e66eaa3: [Feature] Add `useGetQueryData`, `useSetQueryData`, and `useOptimisticUpdateQuery`
+
+### Patch Changes
+
+- 218c7e3: Remove `header` object from query key
+- 28387bf: Fix query key in useInvalidateQueries
+- 36bb10e: Refactor Collection Model
+- 7acbdc9: [Breaking] Change core model of Genseki
+- 7dcadee: [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+- 82272fc: [[DRIZZ-102] Improve DX in genseki](https://app.plane.so/softnetics/browse/DRIZZ-102/)
+- 6fc1d78: Fix remove payload from useMutation
+- 1b99806: Fix `useInvalidateQuery` does not match its type
+- 32757e7: [Fix] Check empty payload in queryKey
+- 414c31a: Change query key extraction spelling from `header` to `headers`
+
 ## 0.1.0-alpha.78
 
 ## 0.1.0-alpha.77

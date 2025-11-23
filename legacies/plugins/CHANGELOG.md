@@ -1,5 +1,35 @@
 # @genseki/plugins
 
+## 0.1.0
+
+### Minor Changes
+
+- 833fefd: Implement self-managed PIN code via `onOtpSent` in Phone Plugin
+- 49927f2: Add Phone plugins
+- 5ac7bc7: [Feature] Improve Email and Password flexibility
+- ce64292: Implement auto login after sign up for phone plugin
+- 02f4233: [Feature] Implement a plugin for phone authentication
+
+### Patch Changes
+
+- 72ddbd9: [Feature] implement proper way to handle options and conditional disabling
+- cef24e5: Upgrade Zod version to 3.25.67
+- 63c94ed: [Breaking] Change context model to user-defined context
+- 8df54c5: Fix Forgot password and Change phone bugs in phone plugin
+- d6f819f: [Fix] plugin type and make `userId` in verification to be optional
+- c227c3f: [Breaking] Replace Drizzle with Prisma
+- a2acb52: chore: update tiptap version
+- 36bb10e: Refactor Collection Model
+- 7acbdc9: [Breaking] Change core model of Genseki
+- 92c78d7: Fix [Phone Plugin] Avoid User Enumeration by changing login error message
+- c17aae8: [Fix] Improve Plugin type-guard
+- 7dcadee: [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+- 82272fc: [[DRIZZ-102] Improve DX in genseki](https://app.plane.so/softnetics/browse/DRIZZ-102/)
+- 83a5c51: Fix phone plugin bugs and simplify error code
+- 5b9967f: fix: :coffin: remove user collection from plugin
+- 6766250: - fix `RecordifyFlattenApiRouter` wrong implementation
+  - fix wrong phone plguin login path
+
 ## 0.1.0-alpha.78
 
 ## 0.1.0-alpha.77

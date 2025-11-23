@@ -1,5 +1,13 @@
 # @genseki/prisma-generator
 
+## 0.1.0
+
+### Patch Changes
+
+- b651962: [Fix] Prisma generator bin name
+- 86ffa1a: [Fix] Add bundle script for Prisma generator
+- c227c3f: [Breaking] Replace Drizzle with Prisma
+
 ## 0.1.0-alpha.78
 
 ## 0.1.0-alpha.77

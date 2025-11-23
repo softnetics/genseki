@@ -1,5 +1,212 @@
 # @genseki/react
 
+## 0.1.0
+
+### Minor Changes
+
+- 4e69970: [[DRIZZ-78] Request validation layer](https://app.plane.so/softnetics/browse/DRIZZ-78/)
+- 9336c89: [[DRIZZ-64,DRIZZ-65,DRIZZ-66] Integrate Relationship to React Hook Form](https://app.plane.so/softnetics/browse/DRIZZ-66)
+- 72ddbd9: [Feature] implement proper way to handle options and conditional disabling
+- c22fe0b: [[DRIZZ-87] Provided default api for custom default api logic](https://app.plane.so/softnetics/browse/DRIZZ-87/)
+- 9b9a82b: [[DRIZZ-57] NextJS Integration Resource Route](https://app.plane.so/softnetics/browse/DRIZZ-57/)
+- 2ad9bd3: fix genseki table ui and search
+- fa5325a: [Feat] Add combobox as a default connect autoField
+- 16e83a3: [Feature] Export Tanstack table component
+- b859987: [[DRIZZ-60] Default API Handler](https://app.plane.so/softnetics/browse/DRIZZ-60/)
+- dfad76d: Custimizable list page UI and components, developer can compose the entirely page from scratch
+- 082b5bc: redesign components and add new component
+- 8c4bc36: [[DRIZZ-39] Server Function RPC](https://app.plane.so/softnetics/browse/DRIZZ-39/)
+- 5ac7bc7: [Feature] Improve Email and Password flexibility
+- 016175c: [[DRIZZ-40] Rest RPC](https://app.plane.so/softnetics/browse/DRIZZ-40/)
+- aeab5ea: [[DRIZZ-35] - [Forget Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-35/)
+  [[DRIZZ-34] - [Reset Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-34/)
+  [[DRIZZ-33] - [Change Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-33/)
+- 7273ee1: [[DRIZZ-96] Richtext editor and storage plugin](https://app.plane.so/softnetics/browse/DRIZZ-96/)
+- 86cb362: [[DRIZZ-97] Migrate to zod4](https://app.plane.so/softnetics/browse/DRIZZ-97/)
+- 8b4de17: New media upload components with AutoField integrated, small minor modal UI improvement
+- 9f29ffd: Create form and update form bugs fixed and multiple components visual improvement
+- 47b5852: :label: export `ToClientCollection` type from `./collection`
+- 33ee207: [[DRIZZ-56] Router Matching](https://app.plane.so/softnetics/browse/DRIZZ-56/) - using radix3 as a route matching data structure
+- 8b8ccc9: [[DRIZZ-77] Inject RequestContext to handler per request](https://app.plane.so/softnetics/browse/DRIZZ-77/)
+- ad503a7: [[DRIZZ-31] Register Page](https://app.plane.so/softnetics/browse/DRIZZ-31/)
+  [[DRIZZ-32] Login page](https://app.plane.so/softnetics/browse/DRIZZ-32/)
+- bd93756: [Fix] any password can login due to unawaited Promise leak
+- deb33b3: [[DRIZZ-69] Plugin system](https://app.plane.so/softnetics/browse/DRIZZ-69/)
+- 02f4233: [Feature] Implement a plugin for phone authentication
+- d105b0d: Customizable create page, developer can render a customized page via `config.page` when adding create page with `CollectionBuilder.create`.
+
+  ```ts
+  collection.create(fields, { options: options, page: /* Your customized create page */ })
+  ```
+
+  For working example, see https://github.com/softnetics/genseki/blob/8b38a1ab9379330e290eb8633dcbf8106ae435b8/examples/erp/genseki/collections/posts.client.tsx#L318-L390
+
+- cee6794: [[DRIZZ-67] Permission](https://app.plane.so/softnetics/browse/DRIZZ-67)
+- 831b2cd: Add surface colors
+
+### Patch Changes
+
+- 0f10dbb: - Migrate from `tv` to `cva`
+  - Introducing `create-required-context`
+  - Incremental adopting Intent UI color system to Shadcn color system from
+  - Rename and deprecated react aria
+    - `textfield`
+    - `label`
+    - `button`
+    - `popover` _(with children composible components too)_
+    - `dialog` _(with children composible components too)_
+    - `modal` _(with children composible components too)_
+    - `sheet` _(with children composible components too)_
+    - `base-icon`
+    - `combobox` _(with children composible components too)_
+    - `field-group`
+  - Migrate `textfield` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Migrate `button` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Create `Shadcn` UI playground for Shadcn particularly
+  - Change UI playground project structure
+  - Introducing to new components by Shadcn
+    - Input
+    - Input group
+    - Button
+    - Label
+    - Dialog
+    - Menu
+    - Popover
+    - Combobox composition
+    - Command **(from cmdk)**
+- b0301bc: [Feature] Uploading image to storage in rich text
+- 5a5c79f: [[DRIZZ-86] Embed \_\_pk to relation field](https://app.plane.so/softnetics/browse/DRIZZ-86/)
+  [[DRIZZ-85] withValidator not working properly due to wrong response](https://app.plane.so/softnetics/browse/DRIZZ-85/)
+- b56cc5e: feat: can disable in autofield
+- 0c2645b: [Feature] Add options to customize Table using Tanstack table
+  [Fix] Move identifierColumn under Fields
+- 6e32d75: fix: rich text type button
+- 60794b8: New components
+  - New `dropzone` component & examples
+  - New `file-preview` component & examples
+  - New `color-picker` component & examples
+  - New `slider` component & examples
+  - New `checkbox` component & examples
+  - New peer dependency color for managing internal color system
+  - New peer dependencu react-dropzone for managing file dropzone state
+- 4322698: Fix request context misconfigure
+- 6a6f28f: feat: add richtext hyperlink extension
+- b1908d1: [Fix] Media file uploader not working (https://github.com/softnetics/genseki/pull/142)
+- cef24e5: Upgrade Zod version to 3.25.67
+- 1277e45: [[DRIZZ-99] Split the UIPlayground package to standalone package](https://app.plane.so/softnetics/browse/DRIZZ-99/)
+  [[DRIZZ-100] Reconfigure components after large codebase restructure](https://app.plane.so/softnetics/browse/DRIZZ-100/)
+- 4357c07: fix: custom list api
+- f6474c1: chore: add raw body response
+- 873044a: Add sticky column pinning style
+- cb2221f: [Feature] Upgrade to support relation table for searching and sorting
+- 5ef0717: fix: remove leading `Aria` from field.tsx components, add `use client` directive
+- e312530: [Fix] Error message not show
+- 63c94ed: [Breaking] Change context model to user-defined context
+- c03c47a: fix: add `use client` directive to `pagination`
+- cb9d38e: feat: Implement Controlled RichTextEditor
+- d0b6db4: Fix file upload handler implementation
+- 136c1bc: [[DRIZZ-104] Fix simplify endpoint type problem about default api](https://app.plane.so/softnetics/browse/DRIZZ-104/)
+- 8eb7411: fix: remove `peer-disabled` from `label`.
+- 51ce530: [[Fix] Fix component props type not showing.](https://github.com/softnetics/genseki/issues/189)
+- 78be38e: fix: rich text type button
+- 39e013b: Revamp new design system and design token for Genseki.
+- 0db7932: fix: rich text bug useEffect and z index
+  fix: rich text link to use prompt instead of markdown
+- 49927f2: Add Phone plugins
+- 28387bf: Fix query key in useInvalidateQueries
+- 4f04302: [Feature] Add delete object from storage
+- fedeb66: fix: `combobox` reactive value re-rendering from dynamic items change.
+- f55637d: fix: missing use client in link button
+- d8c4ace: Support custom banner
+- d6f819f: [Fix] plugin type and make `userId` in verification to be optional
+- 7cd8620: Convert richtext field type to `json` from `string` and new S3 Storage adapter for object storing
+- 8651a68: Fix create nested relation
+- 1a8874b: [Fix] Build error due to using node-specific module
+- 983ce71: export `createGensekiUiRoute`
+- e4b450c: migrate `date-picker`, `time-input` and more fixes
+
+  1. `typography` component now in the `v2`
+  2. Add example for server side sidebar toggle state as a default value (Via data hydration)
+  3. Fix `breadcrumb` focus ring color
+  4. Fix `sidebar-footer` example, focus ring color.
+  5. Fix `group-input-addon` focusing state
+  6. Fix `group-input` disable background color
+  7. Change button variant `default` to `md`
+  8. Make `button-section` and `input-section` default background color to secondary color, so background color of input will be noticable
+  9. Add `date-picker` examples (at `date-picker-section`)
+  10. Add `time-input` examples (at `input-section`)
+  11. New dependencies `date-fns` for `@example/ui-playground` and `react-day-picker` as a peer dependency for `@genseki/react`
+
+- 164983e: [Fix] Use `createEndpoint` for `builder.endpoint`
+- 9ad485e: export getDefaultValueFromFields for custom page
+- 0f192e5: Migrate `input-otp`, `pagination`, `progress `, `select`, `switch` and `tabs`
+- 055a591: feat: added support for custom th className via `meta.thClassName`
+- 80d8389: [Feature] Add schema validation message on update view
+- 0b9269d: fix: card and avatar is not client component
+- 2006302: [Fix] Allow passing options for setting cookie via response helper
+- bb5a2bd: - move `shadcn` components to `v2` folder and export the directory
+  - flatten `primary` button variant
+  - fix: `aria-menu` background
+  - rename back the deprecated react-aria components by removing the leading `Aria[component-name]` keyword
+- 6e0a0ce: fix: `input`, `input-group` background-color and`button` ghost variant
+- 1877fa0: fix: cancel select single dropdown
+- b493941: [Feature] Type-safe me API endpoint
+- 82f9f33: fix optional relation fields
+- 17efb99: Fix logout which was not setting the empty session cookie in the response headers
+- f468c02: Migrate UI to shadcn
+
+  - New `sidebar` component
+  - New `breadcrumb` component
+  - New `dropdown-menu` component
+  - New `skeleton` component
+  - New `tooltip` component
+
+- a2acb52: chore: update tiptap version
+- 3f1cfc5: remove `--color-surface-muted`
+- 3a9f911: [Fix] use useMutation in CRUD page instead of serverFunction
+- 36bb10e: Refactor Collection Model
+- a9fc278: Functional create or connect many relations
+  Fix duplicate fields when have more than one field
+- 50e50d6: - feat: add separator variant.
+  - feat: improve tanstack table component.
+- c17aae8: [Fix] Improve Plugin type-guard
+- af6664c: Support hint text for media input
+- 5e85599: [Feat] Add custom search placeholder
+- cd6fdb4: fix: can't delete single
+- 0def80f: [[DRIZZ-95] Fix remote cache problem in github actions](https://app.plane.so/softnetics/browse/DRIZZ-95/)
+- 454c82d: [Fix] Missing collection home page
+- 9f3aa3a: [Breaking] Allow multiple fields in one collection
+- 7dcadee: [[DRIZZ-101] Fix bundler and typescript problem](https://app.plane.so/softnetics/browse/DRIZZ-101/)
+- 82272fc: [[DRIZZ-102] Improve DX in genseki](https://app.plane.so/softnetics/browse/DRIZZ-102/)
+- 1a38106: [[DRIZZ-91] Error because not pick tsName when attempt to lookup tableRelatonalConfig from table](https://app.plane.so/softnetics/browse/DRIZZ-91/)
+- 3912698: [[DRIZZ-98] Simplify endpoints logic in collection builder for type simplicity](https://app.plane.so/softnetics/browse/DRIZZ-98/)
+- eea522d: [Fix] Change type date in zod schema
+- c4f06a4: fix: rich text disable not work
+- 5aca910: [Chore] Add peer dependencies
+- aaf8c4f: - [[DRIZZ-54] Collection Records Display](https://app.plane.so/softnetics/browse/DRIZZ-54/)
+- 1748c70: - Reduce type inference by utilize type caching and unnecessary type utilities
+  - Add "use client" to `useCollectionForm` to ensure that the hook is used only in the client-side
+- a1d05fc: change `generateJSON` import path
+- f2adbb5: fix: home card not update
+- df4dc0b: [[DRIZZ-58] Setup Release workflow](https://app.plane.so/softnetics/browse/DRIZZ-58/)
+- 650bcad: [Fix] `getFieldsClient` wrong omit field
+- abb3578: [Fix] Display required error message
+- e88f0b7: feat: add action select
+- a4812ac: feat: richtext-editor designs and add link-extension
+- e5eb01c: fix: richText height and resizeable
+- bd3d4e6: Export more gensiki internal modules (most are UI components)
+- 2171612: fix: combobox state management
+- 3195164: fix: Add example for `dialog` open with `dropdown-menu-item`
+- 6766250: - fix `RecordifyFlattenApiRouter` wrong implementation
+  - fix wrong phone plguin login path
+- f88f0f2: - Deprecated `link` component
+  - Remove button `link` variant
+  - Add example for `link` usage
+  - Update button variants
+  - update design tokens
+- 0b0912b: [Feat]: add limit to type 'create' and remove button
+- e70d3bc: fix: `intent-ui` date component disabled and read-only state.
+
 ## 0.1.0-alpha.78
 
 ### Patch Changes

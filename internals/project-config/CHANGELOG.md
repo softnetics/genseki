@@ -1,5 +1,12 @@
 # @internal/project-config
 
+## 0.0.1
+
+### Patch Changes
+
+- c227c3f: [Breaking] Replace Drizzle with Prisma
+- 9f3aa3a: [Breaking] Allow multiple fields in one collection
+
 ## 0.0.1-alpha.0
 
 ### Patch Changes
