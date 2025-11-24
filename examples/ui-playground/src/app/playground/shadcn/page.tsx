@@ -6,6 +6,7 @@ import { Typography } from '@genseki/react/v2'
 import { ButtonSection } from './button-section'
 import { CheckboxSection } from './checkbox-section'
 import { CollapsibleSection } from './collapsible-section'
+import { CollectionCardSection } from './collection-card-section'
 import { ColorPickerSection } from './color-picker-section'
 import { ComboboxSection } from './combobox-section'
 import { DatePickerSection } from './date-picker-section'
@@ -143,6 +144,10 @@ export default function ComboboxPage() {
           Rich Text Editor
         </Typography>
         <RichTextSection />
+        <Typography type="h2" weight="bold" id="collection-card">
+          Collection Card
+        </Typography>
+        <CollectionCardSection />
       </div>
       <React.Suspense fallback={null}>
         <PageSidebar />
