@@ -1,5 +1,293 @@
 # @example/erp
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`72f97f9`](https://github.com/softnetics/genseki/commit/72f97f91fbdf71b137c454befff55ee0dabba53f)]:
+  - @genseki/react@0.1.1
+  - @genseki/next@0.1.1
+  - @genseki/plugins@0.1.1
+  - @genseki/prisma-generator@0.1.1
+  - @genseki/react-query@0.1.1
+  - @genseki/rest@0.1.1
+
+## 0.1.0
+
+### Minor Changes
+
+- fa5325a: [Feat] Add combobox as a default connect autoField
+- 7273ee1: [[DRIZZ-96] Richtext editor and storage plugin](https://app.plane.so/softnetics/browse/DRIZZ-96/)
+- 9f29ffd: Create form and update form bugs fixed and multiple components visual improvement
+
+### Patch Changes
+
+- 0f10dbb: - Migrate from `tv` to `cva`
+  - Introducing `create-required-context`
+  - Incremental adopting Intent UI color system to Shadcn color system from
+  - Rename and deprecated react aria
+    - `textfield`
+    - `label`
+    - `button`
+    - `popover` _(with children composible components too)_
+    - `dialog` _(with children composible components too)_
+    - `modal` _(with children composible components too)_
+    - `sheet` _(with children composible components too)_
+    - `base-icon`
+    - `combobox` _(with children composible components too)_
+    - `field-group`
+  - Migrate `textfield` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Migrate `button` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Create `Shadcn` UI playground for Shadcn particularly
+  - Change UI playground project structure
+  - Introducing to new components by Shadcn
+    - Input
+    - Input group
+    - Button
+    - Label
+    - Dialog
+    - Menu
+    - Popover
+    - Combobox composition
+    - Command **(from cmdk)**
+- b0301bc: [Feature] Uploading image to storage in rich text
+- b651962: [Fix] Prisma generator bin name
+- 0c2645b: [Feature] Add options to customize Table using Tanstack table
+  [Fix] Move identifierColumn under Fields
+- 72ddbd9: [Feature] implement proper way to handle options and conditional disabling
+- cef24e5: Upgrade Zod version to 3.25.67
+- 4357c07: fix: custom list api
+- cb2221f: [Feature] Upgrade to support relation table for searching and sorting
+- 63c94ed: [Breaking] Change context model to user-defined context
+- cb9d38e: feat: Implement Controlled RichTextEditor
+- 2ad9bd3: fix genseki table ui and search
+- 49927f2: Add Phone plugins
+- 4f04302: [Feature] Add delete object from storage
+- 8df54c5: Fix Forgot password and Change phone bugs in phone plugin
+- d6f819f: [Fix] plugin type and make `userId` in verification to be optional
+- 7cd8620: Convert richtext field type to `json` from `string` and new S3 Storage adapter for object storing
+- e4b450c: migrate `date-picker`, `time-input` and more fixes
+
+  1. `typography` component now in the `v2`
+  2. Add example for server side sidebar toggle state as a default value (Via data hydration)
+  3. Fix `breadcrumb` focus ring color
+  4. Fix `sidebar-footer` example, focus ring color.
+  5. Fix `group-input-addon` focusing state
+  6. Fix `group-input` disable background color
+  7. Change button variant `default` to `md`
+  8. Make `button-section` and `input-section` default background color to secondary color, so background color of input will be noticable
+  9. Add `date-picker` examples (at `date-picker-section`)
+  10. Add `time-input` examples (at `input-section`)
+  11. New dependencies `date-fns` for `@example/ui-playground` and `react-day-picker` as a peer dependency for `@genseki/react`
+
+- 055a591: feat: added support for custom th className via `meta.thClassName`
+- dfad76d: Custimizable list page UI and components, developer can compose the entirely page from scratch
+- bb5a2bd: - move `shadcn` components to `v2` folder and export the directory
+  - flatten `primary` button variant
+  - fix: `aria-menu` background
+  - rename back the deprecated react-aria components by removing the leading `Aria[component-name]` keyword
+- b493941: [Feature] Type-safe me API endpoint
+- 5ac7bc7: [Feature] Improve Email and Password flexibility
+- c227c3f: [Breaking] Replace Drizzle with Prisma
+- aeab5ea: [[DRIZZ-35] - [Forget Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-35/)
+  [[DRIZZ-34] - [Reset Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-34/)
+  [[DRIZZ-33] - [Change Password Page]](https://app.plane.so/softnetics/browse/DRIZZ-33/)
+- a2acb52: chore: update tiptap version
+- 36bb10e: Refactor Collection Model
+- 7acbdc9: [Breaking] Change core model of Genseki
+- 8b4de17: New media upload components with AutoField integrated, small minor modal UI improvement
+- a9fc278: Functional create or connect many relations
+  Fix duplicate fields when have more than one field
+- c17aae8: [Fix] Improve Plugin type-guard
+- 5e85599: [Feat] Add custom search placeholder
+- cd6fdb4: fix: can't delete single
+- 9f3aa3a: [Breaking] Allow multiple fields in one collection
+- 83a5c51: Fix phone plugin bugs and simplify error code
+- eea522d: [Fix] Change type date in zod schema
+- b590f41: fix: add min-height of richtext
+- 650bcad: [Fix] `getFieldsClient` wrong omit field
+- 02f4233: [Feature] Implement a plugin for phone authentication
+- d105b0d: Customizable create page, developer can render a customized page via `config.page` when adding create page with `CollectionBuilder.create`.
+
+  ```ts
+  collection.create(fields, { options: options, page: /* Your customized create page */ })
+  ```
+
+  For working example, see https://github.com/softnetics/genseki/blob/8b38a1ab9379330e290eb8633dcbf8106ae435b8/examples/erp/genseki/collections/posts.client.tsx#L318-L390
+
+- abb3578: [Fix] Display required error message
+- e88f0b7: feat: add action select
+- a4812ac: feat: richtext-editor designs and add link-extension
+- f88f0f2: - Deprecated `link` component
+  - Remove button `link` variant
+  - Add example for `link` usage
+  - Update button variants
+  - update design tokens
+- 0b0912b: [Feat]: add limit to type 'create' and remove button
+- 57862df: fix: tailwind config file path
+- Updated dependencies [0f10dbb]
+- Updated dependencies [218c7e3]
+- Updated dependencies [b0301bc]
+- Updated dependencies [b651962]
+- Updated dependencies [5a5c79f]
+- Updated dependencies [b56cc5e]
+- Updated dependencies [833fefd]
+- Updated dependencies [4e69970]
+- Updated dependencies [0c2645b]
+- Updated dependencies [70d8d5e]
+- Updated dependencies [6e32d75]
+- Updated dependencies [60794b8]
+- Updated dependencies [9336c89]
+- Updated dependencies [4322698]
+- Updated dependencies [6a6f28f]
+- Updated dependencies [72ddbd9]
+- Updated dependencies [86ffa1a]
+- Updated dependencies [b1908d1]
+- Updated dependencies [51dd567]
+- Updated dependencies [a2050f0]
+- Updated dependencies [cef24e5]
+- Updated dependencies [1277e45]
+- Updated dependencies [4357c07]
+- Updated dependencies [f6474c1]
+- Updated dependencies [873044a]
+- Updated dependencies [cb2221f]
+- Updated dependencies [5ef0717]
+- Updated dependencies [e312530]
+- Updated dependencies [63c94ed]
+- Updated dependencies [c03c47a]
+- Updated dependencies [c22fe0b]
+- Updated dependencies [cb9d38e]
+- Updated dependencies [d0b6db4]
+- Updated dependencies [9b9a82b]
+- Updated dependencies [2ad9bd3]
+- Updated dependencies [fa5325a]
+- Updated dependencies [136c1bc]
+- Updated dependencies [8eb7411]
+- Updated dependencies [51ce530]
+- Updated dependencies [78be38e]
+- Updated dependencies [39e013b]
+- Updated dependencies [0db7932]
+- Updated dependencies [49927f2]
+- Updated dependencies [28387bf]
+- Updated dependencies [4f04302]
+- Updated dependencies [8df54c5]
+- Updated dependencies [16e83a3]
+- Updated dependencies [fedeb66]
+- Updated dependencies [f55637d]
+- Updated dependencies [d8c4ace]
+- Updated dependencies [d6f819f]
+- Updated dependencies [7cd8620]
+- Updated dependencies [8651a68]
+- Updated dependencies [1a8874b]
+- Updated dependencies [983ce71]
+- Updated dependencies [e4b450c]
+- Updated dependencies [b859987]
+- Updated dependencies [164983e]
+- Updated dependencies [9ad485e]
+- Updated dependencies [0f192e5]
+- Updated dependencies [055a591]
+- Updated dependencies [80d8389]
+- Updated dependencies [dfad76d]
+- Updated dependencies [0b9269d]
+- Updated dependencies [2006302]
+- Updated dependencies [082b5bc]
+- Updated dependencies [bb5a2bd]
+- Updated dependencies [6e0a0ce]
+- Updated dependencies [8c4bc36]
+- Updated dependencies [1877fa0]
+- Updated dependencies [b493941]
+- Updated dependencies [82f9f33]
+- Updated dependencies [5ac7bc7]
+- Updated dependencies [1dee054]
+- Updated dependencies [016175c]
+- Updated dependencies [c227c3f]
+- Updated dependencies [17efb99]
+- Updated dependencies [aeab5ea]
+- Updated dependencies [f468c02]
+- Updated dependencies [a2acb52]
+- Updated dependencies [7273ee1]
+- Updated dependencies [3f1cfc5]
+- Updated dependencies [3a9f911]
+- Updated dependencies [86cb362]
+- Updated dependencies [36bb10e]
+- Updated dependencies [7acbdc9]
+- Updated dependencies [92c78d7]
+- Updated dependencies [8b4de17]
+- Updated dependencies [a9fc278]
+- Updated dependencies [50e50d6]
+- Updated dependencies [c17aae8]
+- Updated dependencies [af6664c]
+- Updated dependencies [5e85599]
+- Updated dependencies [9f29ffd]
+- Updated dependencies [cd6fdb4]
+- Updated dependencies [39f4197]
+- Updated dependencies [0def80f]
+- Updated dependencies [47b5852]
+- Updated dependencies [454c82d]
+- Updated dependencies [9f3aa3a]
+- Updated dependencies [33ee207]
+- Updated dependencies [7dcadee]
+- Updated dependencies [82272fc]
+- Updated dependencies [83a5c51]
+- Updated dependencies [1a38106]
+- Updated dependencies [6fc1d78]
+- Updated dependencies [3912698]
+- Updated dependencies [eea522d]
+- Updated dependencies [ce64292]
+- Updated dependencies [1b99806]
+- Updated dependencies [c4f06a4]
+- Updated dependencies [5aca910]
+- Updated dependencies [aaf8c4f]
+- Updated dependencies [1748c70]
+- Updated dependencies [a1d05fc]
+- Updated dependencies [f2adbb5]
+- Updated dependencies [df4dc0b]
+- Updated dependencies [8b8ccc9]
+- Updated dependencies [ad503a7]
+- Updated dependencies [bd93756]
+- Updated dependencies [650bcad]
+- Updated dependencies [deb33b3]
+- Updated dependencies [5b9967f]
+- Updated dependencies [02f4233]
+- Updated dependencies [d105b0d]
+- Updated dependencies [abb3578]
+- Updated dependencies [e88f0b7]
+- Updated dependencies [e66eaa3]
+- Updated dependencies [d02a6d7]
+- Updated dependencies [a4812ac]
+- Updated dependencies [e5eb01c]
+- Updated dependencies [bd3d4e6]
+- Updated dependencies [2171612]
+- Updated dependencies [3195164]
+- Updated dependencies [aa58557]
+- Updated dependencies [6766250]
+- Updated dependencies [f88f0f2]
+- Updated dependencies [cee6794]
+- Updated dependencies [ba3ea68]
+- Updated dependencies [0b0912b]
+- Updated dependencies [32757e7]
+- Updated dependencies [414c31a]
+- Updated dependencies [e70d3bc]
+- Updated dependencies [831b2cd]
+  - @genseki/react@0.1.0
+  - @genseki/react-query@0.1.0
+  - @genseki/prisma-generator@0.1.0
+  - @genseki/plugins@0.1.0
+  - @genseki/next@0.1.0
+  - @genseki/rest@0.1.0
+
+## 0.1.0-alpha.76
+
+### Patch Changes
+
+- Updated dependencies [[`50e50d6`](https://github.com/softnetics/genseki/commit/50e50d61a6e388952c6693ff3f6328f186243514)]:
+  - @genseki/react@0.1.0-alpha.78
+  - @genseki/next@0.1.0-alpha.78
+  - @genseki/plugins@0.1.0-alpha.78
+  - @genseki/prisma-generator@0.1.0-alpha.78
+  - @genseki/react-query@0.1.0-alpha.78
+  - @genseki/rest@0.1.0-alpha.78
+
 ## 0.1.0-alpha.75
 
 ### Patch Changes

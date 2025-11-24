@@ -1,5 +1,268 @@
 # @example/ui-playground
 
+## 0.1.1
+
+### Patch Changes
+
+- Updated dependencies [[`72f97f9`](https://github.com/softnetics/genseki/commit/72f97f91fbdf71b137c454befff55ee0dabba53f)]:
+  - @genseki/react@0.1.1
+  - @genseki/next@0.1.1
+  - @genseki/react-query@0.1.1
+  - @genseki/rest@0.1.1
+
+## 0.1.0
+
+### Minor Changes
+
+- 1277e45: [[DRIZZ-99] Split the UIPlayground package to standalone package](https://app.plane.so/softnetics/browse/DRIZZ-99/)
+  [[DRIZZ-100] Reconfigure components after large codebase restructure](https://app.plane.so/softnetics/browse/DRIZZ-100/)
+- 082b5bc: redesign components and add new component
+- 06da61b: add darkmode switch button
+
+### Patch Changes
+
+- 0f10dbb: - Migrate from `tv` to `cva`
+  - Introducing `create-required-context`
+  - Incremental adopting Intent UI color system to Shadcn color system from
+  - Rename and deprecated react aria
+    - `textfield`
+    - `label`
+    - `button`
+    - `popover` _(with children composible components too)_
+    - `dialog` _(with children composible components too)_
+    - `modal` _(with children composible components too)_
+    - `sheet` _(with children composible components too)_
+    - `base-icon`
+    - `combobox` _(with children composible components too)_
+    - `field-group`
+  - Migrate `textfield` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Migrate `button` to Shadcn _(Not completely 100% from entirely project perspective, since some compound component required react aria primitive component as a base, **the change will incrementally adopt**)_
+  - Create `Shadcn` UI playground for Shadcn particularly
+  - Change UI playground project structure
+  - Introducing to new components by Shadcn
+    - Input
+    - Input group
+    - Button
+    - Label
+    - Dialog
+    - Menu
+    - Popover
+    - Combobox composition
+    - Command **(from cmdk)**
+- 60794b8: New components
+  - New `dropzone` component & examples
+  - New `file-preview` component & examples
+  - New `color-picker` component & examples
+  - New `slider` component & examples
+  - New `checkbox` component & examples
+  - New peer dependency color for managing internal color system
+  - New peer dependencu react-dropzone for managing file dropzone state
+- 6a6f28f: feat: add richtext hyperlink extension
+- cef24e5: Upgrade Zod version to 3.25.67
+- 39e013b: Revamp new design system and design token for Genseki.
+- fedeb66: fix: `combobox` reactive value re-rendering from dynamic items change.
+- e4b450c: migrate `date-picker`, `time-input` and more fixes
+
+  1. `typography` component now in the `v2`
+  2. Add example for server side sidebar toggle state as a default value (Via data hydration)
+  3. Fix `breadcrumb` focus ring color
+  4. Fix `sidebar-footer` example, focus ring color.
+  5. Fix `group-input-addon` focusing state
+  6. Fix `group-input` disable background color
+  7. Change button variant `default` to `md`
+  8. Make `button-section` and `input-section` default background color to secondary color, so background color of input will be noticable
+  9. Add `date-picker` examples (at `date-picker-section`)
+  10. Add `time-input` examples (at `input-section`)
+  11. New dependencies `date-fns` for `@example/ui-playground` and `react-day-picker` as a peer dependency for `@genseki/react`
+
+- 0f192e5: Migrate `input-otp`, `pagination`, `progress `, `select`, `switch` and `tabs`
+- a4fbd3d: fix: improve example for `drop-zone`.
+- bb5a2bd: - move `shadcn` components to `v2` folder and export the directory
+  - flatten `primary` button variant
+  - fix: `aria-menu` background
+  - rename back the deprecated react-aria components by removing the leading `Aria[component-name]` keyword
+- 6e0a0ce: fix: `input`, `input-group` background-color and`button` ghost variant
+- c227c3f: [Breaking] Replace Drizzle with Prisma
+- f468c02: Migrate UI to shadcn
+
+  - New `sidebar` component
+  - New `breadcrumb` component
+  - New `dropdown-menu` component
+  - New `skeleton` component
+  - New `tooltip` component
+
+- 6df8d40: feat: add separator variant & examples.
+- a2acb52: chore: update tiptap version
+- 7273ee1: [[DRIZZ-96] Richtext editor and storage plugin](https://app.plane.so/softnetics/browse/DRIZZ-96/)
+- 9f29ffd: Create form and update form bugs fixed and multiple components visual improvement
+- 20cd4f4: feat: add `dialog-overlay-props` for `dialog-content`.
+- c4f06a4: fix: rich text disable not work
+- b917963: feat: add empty state content for select box
+- a4812ac: feat: richtext-editor designs and add link-extension
+- 2171612: fix: combobox state management
+- 3195164: fix: Add example for `dialog` open with `dropdown-menu-item`
+- 13269e6: feat: add new tanstack table component examples.
+- 57862df: fix: tailwind config file path
+- Updated dependencies [0f10dbb]
+- Updated dependencies [218c7e3]
+- Updated dependencies [b0301bc]
+- Updated dependencies [5a5c79f]
+- Updated dependencies [b56cc5e]
+- Updated dependencies [4e69970]
+- Updated dependencies [0c2645b]
+- Updated dependencies [70d8d5e]
+- Updated dependencies [6e32d75]
+- Updated dependencies [60794b8]
+- Updated dependencies [9336c89]
+- Updated dependencies [4322698]
+- Updated dependencies [6a6f28f]
+- Updated dependencies [72ddbd9]
+- Updated dependencies [b1908d1]
+- Updated dependencies [51dd567]
+- Updated dependencies [a2050f0]
+- Updated dependencies [cef24e5]
+- Updated dependencies [1277e45]
+- Updated dependencies [4357c07]
+- Updated dependencies [f6474c1]
+- Updated dependencies [873044a]
+- Updated dependencies [cb2221f]
+- Updated dependencies [5ef0717]
+- Updated dependencies [e312530]
+- Updated dependencies [63c94ed]
+- Updated dependencies [c03c47a]
+- Updated dependencies [c22fe0b]
+- Updated dependencies [cb9d38e]
+- Updated dependencies [d0b6db4]
+- Updated dependencies [9b9a82b]
+- Updated dependencies [2ad9bd3]
+- Updated dependencies [fa5325a]
+- Updated dependencies [136c1bc]
+- Updated dependencies [8eb7411]
+- Updated dependencies [51ce530]
+- Updated dependencies [78be38e]
+- Updated dependencies [39e013b]
+- Updated dependencies [0db7932]
+- Updated dependencies [49927f2]
+- Updated dependencies [28387bf]
+- Updated dependencies [4f04302]
+- Updated dependencies [8df54c5]
+- Updated dependencies [16e83a3]
+- Updated dependencies [fedeb66]
+- Updated dependencies [f55637d]
+- Updated dependencies [d8c4ace]
+- Updated dependencies [d6f819f]
+- Updated dependencies [7cd8620]
+- Updated dependencies [8651a68]
+- Updated dependencies [1a8874b]
+- Updated dependencies [983ce71]
+- Updated dependencies [e4b450c]
+- Updated dependencies [b859987]
+- Updated dependencies [164983e]
+- Updated dependencies [9ad485e]
+- Updated dependencies [0f192e5]
+- Updated dependencies [055a591]
+- Updated dependencies [80d8389]
+- Updated dependencies [dfad76d]
+- Updated dependencies [0b9269d]
+- Updated dependencies [2006302]
+- Updated dependencies [082b5bc]
+- Updated dependencies [bb5a2bd]
+- Updated dependencies [6e0a0ce]
+- Updated dependencies [8c4bc36]
+- Updated dependencies [1877fa0]
+- Updated dependencies [b493941]
+- Updated dependencies [82f9f33]
+- Updated dependencies [5ac7bc7]
+- Updated dependencies [1dee054]
+- Updated dependencies [016175c]
+- Updated dependencies [c227c3f]
+- Updated dependencies [17efb99]
+- Updated dependencies [aeab5ea]
+- Updated dependencies [f468c02]
+- Updated dependencies [a2acb52]
+- Updated dependencies [7273ee1]
+- Updated dependencies [3f1cfc5]
+- Updated dependencies [3a9f911]
+- Updated dependencies [86cb362]
+- Updated dependencies [36bb10e]
+- Updated dependencies [7acbdc9]
+- Updated dependencies [8b4de17]
+- Updated dependencies [a9fc278]
+- Updated dependencies [50e50d6]
+- Updated dependencies [c17aae8]
+- Updated dependencies [af6664c]
+- Updated dependencies [5e85599]
+- Updated dependencies [9f29ffd]
+- Updated dependencies [cd6fdb4]
+- Updated dependencies [39f4197]
+- Updated dependencies [0def80f]
+- Updated dependencies [47b5852]
+- Updated dependencies [454c82d]
+- Updated dependencies [9f3aa3a]
+- Updated dependencies [33ee207]
+- Updated dependencies [7dcadee]
+- Updated dependencies [82272fc]
+- Updated dependencies [1a38106]
+- Updated dependencies [6fc1d78]
+- Updated dependencies [3912698]
+- Updated dependencies [eea522d]
+- Updated dependencies [1b99806]
+- Updated dependencies [c4f06a4]
+- Updated dependencies [5aca910]
+- Updated dependencies [aaf8c4f]
+- Updated dependencies [1748c70]
+- Updated dependencies [a1d05fc]
+- Updated dependencies [f2adbb5]
+- Updated dependencies [df4dc0b]
+- Updated dependencies [8b8ccc9]
+- Updated dependencies [ad503a7]
+- Updated dependencies [bd93756]
+- Updated dependencies [650bcad]
+- Updated dependencies [deb33b3]
+- Updated dependencies [02f4233]
+- Updated dependencies [d105b0d]
+- Updated dependencies [abb3578]
+- Updated dependencies [e88f0b7]
+- Updated dependencies [e66eaa3]
+- Updated dependencies [d02a6d7]
+- Updated dependencies [a4812ac]
+- Updated dependencies [e5eb01c]
+- Updated dependencies [bd3d4e6]
+- Updated dependencies [2171612]
+- Updated dependencies [3195164]
+- Updated dependencies [aa58557]
+- Updated dependencies [6766250]
+- Updated dependencies [f88f0f2]
+- Updated dependencies [cee6794]
+- Updated dependencies [ba3ea68]
+- Updated dependencies [0b0912b]
+- Updated dependencies [32757e7]
+- Updated dependencies [414c31a]
+- Updated dependencies [e70d3bc]
+- Updated dependencies [831b2cd]
+  - @genseki/react@0.1.0
+  - @genseki/react-query@0.1.0
+  - @genseki/next@0.1.0
+  - @genseki/rest@0.1.0
+
+## 0.1.0-alpha.80
+
+### Patch Changes
+
+- Updated dependencies [[`50e50d6`](https://github.com/softnetics/genseki/commit/50e50d61a6e388952c6693ff3f6328f186243514)]:
+  - @genseki/react@0.1.0-alpha.78
+  - @genseki/next@0.1.0-alpha.78
+  - @genseki/react-query@0.1.0-alpha.78
+  - @genseki/rest@0.1.0-alpha.78
+
+## 0.1.0-alpha.79
+
+### Patch Changes
+
+- [#289](https://github.com/softnetics/genseki/pull/289) [`6df8d40`](https://github.com/softnetics/genseki/commit/6df8d40b9a47d47ac726acd67a2fd86f3e39260c) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add separator variant & examples.
+
+- [#289](https://github.com/softnetics/genseki/pull/289) [`13269e6`](https://github.com/softnetics/genseki/commit/13269e66cbe2406c51213312f317fade55aeee36) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add new tanstack table component examples.
+
 ## 0.1.0-alpha.78
 
 ### Patch Changes

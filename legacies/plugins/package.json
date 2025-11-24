@@ -1,0 +1,51 @@
+{
+  "name": "@genseki/plugins",
+  "version": "0.1.1",
+  "sideEffects": false,
+  "type": "module",
+  "files": [
+    "dist"
+  ],
+  "exports": {
+    ".": {
+      "import": "./src/index.ts",
+      "require": "./src/index.ts",
+      "types": "./src/index.ts"
+    }
+  },
+  "publishConfig": {
+    "exports": {
+      ".": {
+        "import": "./dist/src/index.js",
+        "types": "./dist/src/index.d.ts"
+      }
+    }
+  },
+  "scripts": {
+    "lint": "eslint .",
+    "format": "prettier --write .",
+    "format:check": "prettier --check .",
+    "typecheck": "tsc",
+    "test": "vitest",
+    "diagnostics": "tsc --noEmit --extendedDiagnostics",
+    "bundle": "rm -rf dist && tsc -p tsconfig.bundle.json"
+  },
+  "dependencies": {
+    "@tiptap/react": "^2.26.3",
+    "@tiptap/starter-kit": "^2.26.3",
+    "cookie-es": "^2.0.0",
+    "deepmerge-ts": "^7.1.5",
+    "defu": "^6.1.4",
+    "neverthrow": "^8.2.0",
+    "remeda": "^2.21.2",
+    "zod": "^4.0.11"
+  },
+  "devDependencies": {
+    "@genseki/react": "workspace:^",
+    "@types/json-schema": "^7.0.15",
+    "@types/node": "^24.1.0",
+    "tsup": "^8.5.0",
+    "type-fest": "^4.41.0",
+    "vitest": "^3.0.9"
+  }
+}

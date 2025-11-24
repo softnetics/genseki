@@ -1,0 +1,12 @@
+@import '@genseki/react/tailwind.css';
+@import './tiptap-style.css';
+
+@source "../../node_modules/@genseki/react";
+
+.tiptap.ProseMirror {
+  height: 100%;
+  min-height: 240px;
+  padding: 16px;
+  outline: none;
+  background-color: var(--color-bluegray-50);
+}

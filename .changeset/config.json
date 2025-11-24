@@ -3,6 +3,7 @@
   "changelog": ["@changesets/changelog-github", { "repo": "softnetics/genseki" }],
   "commit": false,
   "fixed": [
+    ["@genseki/ui"],
     ["@genseki/react", "@genseki/next", "@genseki/rest", "@genseki/react-query", "@genseki/plugins", "@genseki/prisma-generator"]
   ],
   "linked": [],
