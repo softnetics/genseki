@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.3
+
+### Patch Changes
+
+- [#298](https://github.com/softnetics/genseki/pull/298) [`33f7555`](https://github.com/softnetics/genseki/commit/33f7555b1be0fc58ba6a96f3307fedbdb7edcb26) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: tabs styling.
+
 ## 0.1.2
 
 ### Patch Changes
