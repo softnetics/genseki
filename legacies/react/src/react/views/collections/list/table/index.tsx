@@ -11,7 +11,7 @@ import {
 import {
   TanstackTable,
   type TanstackTableProps,
-} from '../../../../components/primitives/tanstack-table'
+} from '../../../../../../v2/components/primitives/tanstack-table'
 import { useTableStatesContext } from '../../../../providers/table'
 import type { BaseData } from '../../types'
 import { useCollectionList } from '../context'

@@ -12,10 +12,16 @@ import {
   type Table as TanstackTableCore,
 } from '@tanstack/react-table'
 
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
-
-import { Typography } from '../../../../v2'
-import { cn } from '../../utils/cn'
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from '../../../src/react/components/primitives/table'
+import { cn } from '../../../src/react/utils/cn'
+import { Typography } from '../..'
 
 type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement>) => void
 
@@ -58,6 +64,7 @@ const getCommonPinningClassesAndStyle = (column: Column<any>) => {
   const style: CSSProperties = {
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    width: column.getSize(),
   }
 
   return { className, style }
