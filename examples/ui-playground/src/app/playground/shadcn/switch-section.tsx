@@ -4,8 +4,8 @@ import * as React from 'react'
 
 import { BellIcon, MoonIcon, ShieldIcon, WifiHighIcon } from '@phosphor-icons/react'
 
-import { Label, Typography } from '@genseki/react/v2'
-import { Switch } from '@genseki/react/v2'
+import { Label, Typography } from '@genseki/ui'
+import { Switch } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

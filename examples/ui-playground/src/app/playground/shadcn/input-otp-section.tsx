@@ -2,13 +2,7 @@
 
 import * as React from 'react'
 
-import {
-  InputOTP,
-  InputOTPGroup,
-  InputOTPSeparator,
-  InputOTPSlot,
-  Typography,
-} from '@genseki/react/v2'
+import { InputOTP, InputOTPGroup, InputOTPSeparator, InputOTPSlot, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

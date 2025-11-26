@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 
-import { Button, Progress, Typography } from '@genseki/react/v2'
+import { Button, Progress, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '../../../components/card'
 

@@ -1,4 +1,4 @@
-import { Typography } from '@genseki/react/v2'
+import { Typography } from '@genseki/ui'
 
 export const Wrapper = ({ children, title }: { children: React.ReactNode; title: string }) => {
   return (

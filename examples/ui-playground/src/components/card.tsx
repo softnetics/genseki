@@ -3,7 +3,7 @@ import type React from 'react'
 import { type Icon, WarningIcon } from '@phosphor-icons/react'
 import { StarIcon } from '@phosphor-icons/react/dist/ssr'
 
-import { Typography } from '@genseki/react/v2'
+import { Typography } from '@genseki/ui'
 
 type PlaygroundCardProps = React.PropsWithChildren<
   {

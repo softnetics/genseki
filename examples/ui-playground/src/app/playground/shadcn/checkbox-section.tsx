@@ -2,7 +2,7 @@ import React from 'react'
 
 import { CheckIcon, MinusIcon, XIcon } from '@phosphor-icons/react'
 
-import { Checkbox, Label, Typography } from '@genseki/react/v2'
+import { Checkbox, Label, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

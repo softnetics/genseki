@@ -16,6 +16,7 @@
     "@genseki/react": "workspace:^",
     "@genseki/react-query": "workspace:^",
     "@genseki/rest": "workspace:^",
+    "@genseki/ui": "workspace:^",
     "@intentui/icons": "^1.10.31",
     "@phosphor-icons/react": "^2.1.8",
     "@tailwindcss/postcss": "^4.1.7",

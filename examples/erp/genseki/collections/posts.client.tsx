@@ -42,7 +42,7 @@ import {
   useNavigation,
   useTableStatesContext,
 } from '@genseki/react'
-import { Button } from '@genseki/react/v2'
+import { Button } from '@genseki/ui'
 
 import { type fields } from './posts'
 

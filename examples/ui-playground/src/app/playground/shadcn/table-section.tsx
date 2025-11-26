@@ -3,7 +3,7 @@ import React from 'react'
 import { createColumnHelper, getCoreRowModel, useReactTable } from '@tanstack/react-table'
 
 import { TanstackTable } from '@genseki/react'
-import { Typography } from '@genseki/react/v2'
+import { Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '../../../components/card'
 

@@ -21,7 +21,7 @@ import {
   SelectItemIndicator,
   SelectItemText,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 import {
   Select,
   SelectContent,
@@ -33,7 +33,7 @@ import {
   SelectSeparator,
   SelectTrigger,
   SelectValue,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

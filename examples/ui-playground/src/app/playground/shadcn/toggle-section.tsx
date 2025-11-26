@@ -14,7 +14,7 @@ import {
   TextUnderlineIcon,
 } from '@phosphor-icons/react'
 
-import { Toggle, Typography } from '@genseki/react/v2'
+import { Toggle, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

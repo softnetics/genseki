@@ -1,4 +1,4 @@
-import { Typography } from '@genseki/react/v2'
+import { Typography } from '@genseki/ui'
 
 import { SetupClientForm } from './setup.client'
 

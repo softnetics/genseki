@@ -12,7 +12,7 @@ import {
   DialogTitle,
   Input,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

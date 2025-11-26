@@ -15,13 +15,7 @@ import {
   SortDescendingIcon,
 } from '@phosphor-icons/react'
 
-import {
-  Button,
-  ButtonGroup,
-  ButtonGroupSeparator,
-  ButtonGroupText,
-  Typography,
-} from '@genseki/react/v2'
+import { Button, ButtonGroup, ButtonGroupSeparator, ButtonGroupText, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 
@@ -162,11 +156,35 @@ function LoadingButton() {
 function ButtonGroupBasic() {
   return (
     <ButtonGroup>
-      <Button variant="outline">One</Button>
+      <Button variant="outline" className="">
+        One
+      </Button>
+      <Button variant="outline" className="">
+        Two
+      </Button>
+
+      <Button variant="outline" className="">
+        Three
+      </Button>
+    </ButtonGroup>
+  )
+}
+
+// Button Group - Basic (primary)
+function ButtonGroupBasicPrimary() {
+  return (
+    <ButtonGroup>
+      <Button variant="primary" className="">
+        One
+      </Button>
       <ButtonGroupSeparator />
-      <Button variant="outline">Two</Button>
-      <ButtonGroupSeparator />
-      <Button variant="outline">Three</Button>
+      <Button variant="primary" className="">
+        Two
+      </Button>
+
+      <Button variant="primary" className="">
+        Three
+      </Button>
     </ButtonGroup>
   )
 }
@@ -331,6 +349,19 @@ export function ButtonSection() {
         </Typography>
         <div className="p-4 bg-secondary w-full rounded-lg">
           <ButtonGroupBasic />
+        </div>
+      </PlaygroundCard>
+
+      <PlaygroundCard
+        title="Button Group - Basic (Primary & Separator)"
+        categoryTitle="Composition"
+      >
+        <Typography type="body" className="text-muted-foreground mb-4">
+          A simple button group with connected buttons in primary variants and button group
+          separator.
+        </Typography>
+        <div className="p-4 bg-secondary w-full rounded-lg">
+          <ButtonGroupBasicPrimary />
         </div>
       </PlaygroundCard>
 

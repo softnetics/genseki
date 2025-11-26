@@ -4,7 +4,7 @@ import * as React from 'react'
 
 import { CaretDoubleLeftIcon, CaretDoubleRightIcon } from '@phosphor-icons/react'
 
-import { Button, buttonVariants, Typography } from '@genseki/react/v2'
+import { Button, buttonVariants, Typography } from '@genseki/ui'
 import {
   Pagination,
   PaginationContent,
@@ -13,7 +13,7 @@ import {
   PaginationLink,
   PaginationNext,
   PaginationPrevious,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

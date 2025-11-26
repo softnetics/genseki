@@ -1,7 +1,6 @@
 'use client'
 
-import type { Icon } from '@phosphor-icons/react'
-import { CaretRightIcon } from '@phosphor-icons/react'
+import { CaretRightIcon, type Icon } from '@phosphor-icons/react'
 import Link from 'next/link'
 
 import {
@@ -16,7 +15,7 @@ import {
   SidebarMenuSubButton,
   SidebarMenuSubItem,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { cn } from '../../../../../../../../legacies/react/src/react/utils/cn'
 
