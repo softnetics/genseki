@@ -8,9 +8,6 @@ export interface UseSearchReturn {
   search: string
 }
 
-/**
- * @deprecated Use `useSearch` from `@genseki/ui` instaed
- */
 export function useSearch(options?: Options): UseSearchReturn {
   const [search, setSearch] = useQueryState(
     'search',
