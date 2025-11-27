@@ -24,47 +24,47 @@ import { PlaygroundCard } from '~/src/components/card'
 
 const frameworks = [
   {
-    value: 'next.js',
+    value: 'f1',
     label: 'Next.js',
   },
   {
-    value: 'sveltekit',
+    value: 'f2',
     label: 'SvelteKit',
   },
   {
-    value: 'nuxt.js',
+    value: 'f3',
     label: 'Nuxt.js',
   },
   {
-    value: 'remix',
+    value: 'f4',
     label: 'Remix',
   },
   {
-    value: 'astro',
+    value: 'f5',
     label: 'Astro',
   },
   {
-    value: 'solidjs',
+    value: 'f6',
     label: 'SolidJS',
   },
   {
-    value: 'vue',
+    value: 'f7',
     label: 'Vue',
   },
   {
-    value: 'angular',
+    value: 'f8',
     label: 'Angular',
   },
   {
-    value: 'ember',
+    value: 'f9',
     label: 'Ember',
   },
   {
-    value: 'react',
+    value: 'f10',
     label: 'React',
   },
   {
-    value: 'backbone',
+    value: 'f11',
     label: 'Backbone',
   },
 ]

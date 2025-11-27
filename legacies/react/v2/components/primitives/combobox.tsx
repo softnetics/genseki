@@ -296,7 +296,7 @@ function ComboboxCommandItem({
   }
 
   return (
-    <CommandItem id={value} value={value} onSelect={onSelect} {...props}>
+    <CommandItem id={value} value={value} keywords={[label]} onSelect={onSelect} {...props}>
       <CheckIcon
         className={cn('mr-4 h-8 w-8', isValueExistedBefore ? 'opacity-100' : 'opacity-0')}
       />
