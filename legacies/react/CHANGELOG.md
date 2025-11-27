@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.4
+
+### Patch Changes
+
+- [#301](https://github.com/softnetics/genseki/pull/301) [`e3e60d6`](https://github.com/softnetics/genseki/commit/e3e60d69ad449ddb8ba10793f7a9198ef1b22546) Thanks [@Desmenez](https://github.com/Desmenez)! - [Fix]: search combobox by label
+
 ## 0.1.3
 
 ### Patch Changes
