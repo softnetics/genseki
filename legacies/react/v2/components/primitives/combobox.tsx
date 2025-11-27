@@ -218,15 +218,22 @@ function ComboboxCommandInput(props: React.ComponentPropsWithRef<typeof CommandI
   return <CommandInput placeholder="Search item..." {...props} />
 }
 
+/**
+ * @description Composing of `Command` and `PopoverContent`
+ * @argument commandProps —— props which will be passed to `Command` from `cmdk`
+ */
 function ComboboxContent({
   children,
   className,
+  commandProps,
   ...props
-}: { children?: React.ReactNode; className?: string } & React.ComponentPropsWithRef<
-  typeof PopoverContent
->) {
+}: {
+  children?: React.ReactNode
+  className?: string
+  commandProps?: React.ComponentPropsWithRef<typeof Command>
+} & React.ComponentPropsWithRef<typeof PopoverContent>) {
   return (
-    <Command loop className="w-fit">
+    <Command loop className="w-fit" {...commandProps}>
       <PopoverContent
         className={cn('w-(--radix-popover-trigger-width) bg-background p-0', className)}
         {...props}
@@ -296,7 +303,7 @@ function ComboboxCommandItem({
   }
 
   return (
-    <CommandItem id={value} value={value} onSelect={onSelect} {...props}>
+    <CommandItem id={value} value={value} keywords={[label]} onSelect={onSelect} {...props}>
       <CheckIcon
         className={cn('mr-4 h-8 w-8', isValueExistedBefore ? 'opacity-100' : 'opacity-0')}
       />
