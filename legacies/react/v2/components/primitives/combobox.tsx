@@ -230,7 +230,7 @@ function ComboboxContent({
 }: {
   children?: React.ReactNode
   className?: string
-  commandProps: React.ComponentPropsWithRef<typeof Command>
+  commandProps?: React.ComponentPropsWithRef<typeof Command>
 } & React.ComponentPropsWithRef<typeof PopoverContent>) {
   return (
     <Command loop className="w-fit" {...commandProps}>
