@@ -134,7 +134,7 @@ function FirstLastPagination() {
               disabled={currentPage === 1}
               className="gap-2"
             >
-              <CaretDoubleLeftIcon className="size-4" />
+              <CaretDoubleLeftIcon />
               <Typography className="sr-only">First page</Typography>
             </Button>
           </PaginationItem>
@@ -164,64 +164,9 @@ function FirstLastPagination() {
               disabled={currentPage === totalPages}
               className="gap-2"
             >
-              <CaretDoubleRightIcon className="size-4" />
+              <CaretDoubleRightIcon />
               <Typography className="sr-only">Last page</Typography>
             </Button>
-          </PaginationItem>
-        </PaginationContent>
-      </Pagination>
-      <Typography type="body" className="text-text-secondary">
-        Current page: {currentPage} of {totalPages}
-      </Typography>
-    </div>
-  )
-}
-
-// Bordered Pagination
-function BorderedPagination() {
-  const [currentPage, setCurrentPage] = React.useState(2)
-  const totalPages = 10
-
-  return (
-    <div className="space-y-4">
-      <Pagination>
-        <PaginationContent className="border border-border rounded-md p-2">
-          <PaginationItem>
-            <PaginationPrevious
-              href="#"
-              onClick={(e) => {
-                e.preventDefault()
-                setCurrentPage(Math.max(1, currentPage - 1))
-              }}
-              className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
-            />
-          </PaginationItem>
-          {Array.from({ length: 3 }, (_, i) => {
-            const page = i + 1
-            return (
-              <PaginationItem key={page}>
-                <PaginationLink
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault()
-                    setCurrentPage(page)
-                  }}
-                  isActive={currentPage === page}
-                >
-                  {page}
-                </PaginationLink>
-              </PaginationItem>
-            )
-          })}
-          <PaginationItem>
-            <PaginationNext
-              href="#"
-              onClick={(e) => {
-                e.preventDefault()
-                setCurrentPage(Math.min(totalPages, currentPage + 1))
-              }}
-              className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
-            />
           </PaginationItem>
         </PaginationContent>
       </Pagination>
@@ -278,7 +223,9 @@ function WithEllipsisPagination() {
                 </PaginationLink>
               </PaginationItem>
               <PaginationItem>
-                <PaginationEllipsis />
+                <PaginationLink>
+                  <PaginationEllipsis />
+                </PaginationLink>
               </PaginationItem>
             </>
           )}
@@ -301,7 +248,9 @@ function WithEllipsisPagination() {
           {showEndEllipsis && (
             <>
               <PaginationItem>
-                <PaginationEllipsis />
+                <PaginationLink>
+                  <PaginationEllipsis />
+                </PaginationLink>
               </PaginationItem>
               <PaginationItem>
                 <PaginationLink
@@ -395,9 +344,13 @@ function NumberlessWithTextPagination() {
             />
           </PaginationItem>
           <PaginationItem>
-            <Typography className="px-4 py-2 text-sm text-muted-foreground">
-              Page {currentPage} of {totalPages}
-            </Typography>
+            <PaginationLink className="w-min cursor-default pointer-events-none" asChild>
+              <div>
+                <Typography className="px-4 py-2 text-sm text-muted-foreground">
+                  Page {currentPage} of {totalPages}
+                </Typography>
+              </div>
+            </PaginationLink>
           </PaginationItem>
           <PaginationItem>
             <PaginationNext
@@ -445,15 +398,6 @@ export function PaginationSection() {
         </Typography>
         <div className="p-4 bg-background w-full rounded-lg">
           <FirstLastPagination />
-        </div>
-      </PlaygroundCard>
-
-      <PlaygroundCard title="Bordered Pagination" categoryTitle="Component">
-        <Typography type="body" className="text-muted-foreground mb-4">
-          Pagination with a border around the entire component.
-        </Typography>
-        <div className="p-4 bg-background w-full rounded-lg">
-          <BorderedPagination />
         </div>
       </PlaygroundCard>
 

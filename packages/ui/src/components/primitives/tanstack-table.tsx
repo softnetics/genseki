@@ -14,8 +14,8 @@ import {
 } from '@tanstack/react-table'
 
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from './table'
+import { Typography } from './typography'
 
-import { Typography } from '../../../../v2'
 import { cn } from '../../utils/cn'
 
 type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement>) => void
@@ -23,7 +23,6 @@ type RowClickHandler<T> = (row: Row<T>, e: React.MouseEvent<HTMLTableCellElement
 export interface TanstackTableProps<T> {
   className?: string
   classNames?: {
-    tableContainer?: string
     tableHeader?: string
     tableHead?: string
     tableHeadRow?: string
@@ -33,9 +32,10 @@ export interface TanstackTableProps<T> {
   }
   table: TanstackTableCore<T>
   isLoading?: boolean
-  loadingItems?: number
   isError?: boolean
   onRowClick?: 'toggleSelect' | RowClickHandler<T>
+  loadingFallback?: React.ReactNode
+  loadingMessage?: React.ReactNode
   errorFallback?: React.ReactNode
   errorMessage?: React.ReactNode
   emptyFallback?: React.ReactNode
@@ -78,24 +78,21 @@ export const getSortIcon = (isSorted: false | SortDirection) => {
 
 const normalizeColumnId = (id: string) => id.replace(/_/g, '.')
 
-/**
- * @deprecated Please use `TanstackTable` from `@genseki/ui` instead
- */
 export function TanstackTable<T>({
   className,
   classNames,
   table,
   isLoading = false,
-  // loadingItems = 5,
   isError = false,
   onRowClick: onRowClickProp,
-  emptyFallback: emptyFallback,
-  errorFallback,
   configuration,
+  loadingFallback,
+  loadingMessage,
+  emptyFallback,
+  emptyMessage,
+  errorFallback,
+  errorMessage,
 }: TanstackTableProps<T>) {
-  const errorMessage = 'Error'
-  const emptyMessage = 'No data'
-
   const containerRef = useRef<HTMLTableElement>(null)
 
   const onRowClick =
@@ -163,7 +160,11 @@ export function TanstackTable<T>({
       </TableHeader>
       <TableBody className={cn(classNames?.tableBody)}>
         {isLoading ? (
-          <TableLoading table={table} />
+          <TableLoading
+            table={table}
+            loadingFallback={loadingFallback}
+            loadingMessage={loadingMessage}
+          />
         ) : isError ? (
           <TableError table={table} errorFallback={errorFallback} errorMessage={errorMessage} />
         ) : table.getRowCount() === 0 ? (
@@ -201,25 +202,27 @@ export function TanstackTable<T>({
   )
 }
 
-/**
- * @deprecated Please use `TanstackTable` from `@genseki/ui` instead
- */
-export const TableLoading = (props: { table: TanstackTableCore<any> }) => {
+export const TableLoading = (props: {
+  table: TanstackTableCore<any>
+  loadingFallback?: React.ReactNode
+  loadingMessage?: React.ReactNode
+}) => {
   return (
     <TableRow className="h-[560px]">
       <TableCell colSpan={props.table.getAllLeafColumns().length} className="h-32 text-center">
-        <div className="flex flex-col items-center py-10 gap-8">
-          <CircleNotchIcon className="text-xl size-auto text-input-text-placeholder animate-spin" />
-          <p className="text-base font-regular text-typo-secondary">Loading</p>
-        </div>
+        {props.loadingFallback ?? (
+          <div className="flex flex-col items-center py-10 gap-8">
+            <CircleNotchIcon className="text-xl size-auto text-input-text-placeholder animate-spin" />
+            <p className="text-base font-regular text-typo-secondary">
+              {props.loadingMessage ?? 'Loading'}
+            </p>
+          </div>
+        )}
       </TableCell>
     </TableRow>
   )
 }
 
-/**
- * @deprecated Please use `TanstackTable` from `@genseki/ui` instead
- */
 export const TableError = (props: {
   table: TanstackTableCore<any>
   errorFallback?: React.ReactNode
@@ -240,10 +243,6 @@ export const TableError = (props: {
     </TableRow>
   )
 }
-
-/**
- * @deprecated Please use `TanstackTable` from `@genseki/ui` instead
- */
 export const TableEmpty = (props: {
   table: TanstackTableCore<any>
   emptyFallback?: React.ReactNode
@@ -263,6 +262,12 @@ export const TableEmpty = (props: {
         )}
       </TableCell>
     </TableRow>
+  )
+}
+
+export function TanstackTableFrame({ className, ...props }: React.ComponentPropsWithRef<'div'>) {
+  return (
+    <div className={cn('overflow-auto border rounded-sm border-border', className)} {...props} />
   )
 }
 
