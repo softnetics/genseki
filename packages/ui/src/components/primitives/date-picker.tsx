@@ -69,7 +69,7 @@ export function DatePickerTrigger({
           )}
         >
           <CalendarBlankIcon />
-          <Typography>{displayValue || 'Pick a date'}</Typography>
+          <Typography>{displayValue}</Typography>
         </Button>
       )}
     </PopoverTrigger>

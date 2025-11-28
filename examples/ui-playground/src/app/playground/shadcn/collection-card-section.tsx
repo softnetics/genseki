@@ -8,7 +8,7 @@ import {
   CollectionCardIcon,
   CollectionCardTitle,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 export function CollectionCardSection() {
   return (

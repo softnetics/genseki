@@ -11,7 +11,7 @@ import {
   SidebarInset,
   SidebarProvider,
   SidebarTrigger,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { AppSidebar } from './components/app-sidebar'
 

@@ -25,7 +25,7 @@ import {
   PopoverContent,
   PopoverTrigger,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { InformationCard, PlaygroundCard } from '../../../components/card'
 

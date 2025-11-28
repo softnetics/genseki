@@ -4,7 +4,7 @@ import type { PropsWithChildren } from 'react'
 
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
 
-import { Toaster } from '@genseki/react/v2'
+import { Toaster } from '@genseki/ui'
 
 export function Providers(props: PropsWithChildren) {
   return (

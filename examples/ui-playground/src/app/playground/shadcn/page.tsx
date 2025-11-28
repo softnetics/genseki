@@ -1,7 +1,7 @@
 'use client'
 import * as React from 'react'
 
-import { Typography } from '@genseki/react/v2'
+import { Typography } from '@genseki/ui'
 
 import { ButtonSection } from './button-section'
 import { CheckboxSection } from './checkbox-section'
@@ -19,6 +19,7 @@ import { LinkSection } from './link-section'
 import PageSidebar from './page-sidebar'
 import { PaginationSection } from './pagination-section'
 import { ProgressSection } from './progress-section'
+import { RadioGroupSection } from './radio-group-section'
 import { RichTextSection } from './rich-text-section'
 import { SelectSection } from './select-section'
 import { SeparatorSection } from './separator-section'
@@ -140,6 +141,10 @@ export default function ComboboxPage() {
           Toast
         </Typography>
         <ToastSection />
+        <Typography type="h2" weight="bold" id="radio-group">
+          Radio group
+        </Typography>
+        <RadioGroupSection />
         <Typography type="h2" weight="bold" id="rich-text-editor">
           Rich Text Editor
         </Typography>

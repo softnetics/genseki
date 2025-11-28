@@ -1,6 +1,6 @@
 import { MoonStarsIcon } from '@phosphor-icons/react'
 
-import { SidebarMenu, SidebarMenuItem, SidebarTrigger, Typography } from '@genseki/react/v2'
+import { SidebarMenu, SidebarMenuItem, SidebarTrigger, Typography } from '@genseki/ui'
 
 function NavHeader() {
   return (

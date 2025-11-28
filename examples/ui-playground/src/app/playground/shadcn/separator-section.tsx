@@ -1,6 +1,6 @@
 import React from 'react'
 
-import { Separator, Typography } from '@genseki/react/v2'
+import { Separator, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

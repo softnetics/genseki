@@ -22,7 +22,7 @@ import {
   DialogHeader,
   DialogTitle,
   DialogTrigger,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 import {
   DropdownMenu,
   DropdownMenuCheckboxItem,
@@ -39,7 +39,7 @@ import {
   DropdownMenuSubTrigger,
   DropdownMenuTrigger,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

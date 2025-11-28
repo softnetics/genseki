@@ -19,8 +19,8 @@ import {
   FilePreviewTitle,
   Typography,
   useDropZone,
-} from '@genseki/react/v2'
-import { DropzoneProvider } from '@genseki/react/v2'
+} from '@genseki/ui'
+import { DropzoneProvider } from '@genseki/ui'
 
 import { InformationCard, PlaygroundCard } from '~/src/components/card'
 

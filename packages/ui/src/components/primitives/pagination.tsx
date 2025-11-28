@@ -1,10 +1,21 @@
 'use client'
 import * as React from 'react'
 
-import { CaretLeftIcon, CaretRightIcon, DotsThreeIcon } from '@phosphor-icons/react'
+import { ArrowLeftIcon, ArrowRightIcon, DotsThreeIcon } from '@phosphor-icons/react'
 import { Slot } from '@radix-ui/react-slot'
+import { useControllableState } from '@radix-ui/react-use-controllable-state'
 
 import { type Button, buttonVariants } from './button'
+import { ButtonGroup, buttonGroupVariants } from './button-group'
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectItemText,
+  SelectTrigger,
+  SelectValue,
+} from './select'
+import { Typography } from './typography'
 
 import { cn } from '../../utils/cn'
 
@@ -14,29 +25,29 @@ function Pagination({ className, ...props }: React.ComponentProps<'nav'>) {
       role="navigation"
       aria-label="pagination"
       data-slot="pagination"
-      className={cn('mx-auto flex w-full justify-center', className)}
+      className={className}
       {...props}
     />
   )
 }
 
-function PaginationContent({ className, ...props }: React.ComponentProps<'ul'>) {
+function PaginationContent({ className, ...props }: React.ComponentProps<typeof ButtonGroup>) {
   return (
-    <ul
+    <ButtonGroup
       data-slot="pagination-content"
-      className={cn('flex flex-row items-center gap-2', className)}
+      className={buttonGroupVariants({ orientation: 'horizontal', className })}
       {...props}
     />
   )
 }
 
-function PaginationItem({ ...props }: React.ComponentProps<'li'>) {
-  return <li data-slot="pagination-item" {...props} />
+function PaginationItem({ ...props }: React.ComponentProps<typeof Slot>) {
+  return <Slot data-slot="pagination-item" {...props} />
 }
 
 type PaginationLinkProps = {
   isActive?: boolean
-} & Pick<React.ComponentProps<typeof Button>, 'size'> &
+} & Pick<React.ComponentProps<typeof Button>, 'size' | 'disabled'> &
   React.ComponentProps<'a'>
 
 function PaginationLink({
@@ -55,9 +66,10 @@ function PaginationLink({
       data-active={isActive}
       className={cn(
         buttonVariants({
-          variant: isActive ? 'outline' : 'ghost',
+          variant: 'outline',
           size,
         }),
+        isActive && 'bg-surface-button-outline-hover',
         className
       )}
       {...props}
@@ -68,13 +80,23 @@ function PaginationLink({
 function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
+      asChild
       aria-label="Go to previous page"
       size="md"
-      className={cn('gap-2 px-5 sm:pl-5', className)}
+      className={cn(
+        // Strict width since sizing does not enforce the width
+        'w-18',
+        {
+          'w-16': props.size === 'sm',
+          'w-20': props.size === 'lg',
+        },
+        className
+      )}
       {...props}
     >
-      <CaretLeftIcon />
-      <span className="hidden sm:block">Previous</span>
+      <button>
+        <ArrowLeftIcon />
+      </button>
     </PaginationLink>
   )
 }
@@ -82,13 +104,23 @@ function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof
 function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
   return (
     <PaginationLink
+      asChild
       aria-label="Go to next page"
       size="md"
-      className={cn('gap-2 px-5 sm:pr-5', className)}
+      className={cn(
+        // Strict width since sizing does not enforce the width
+        'w-18',
+        {
+          'w-16': props.size === 'sm',
+          'w-20': props.size === 'lg',
+        },
+        className
+      )}
       {...props}
     >
-      <span className="hidden sm:block">Next</span>
-      <CaretRightIcon />
+      <button>
+        <ArrowRightIcon />
+      </button>
     </PaginationLink>
   )
 }
@@ -107,8 +139,81 @@ function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'
   )
 }
 
+type PageSizeSelectProps = Omit<
+  React.ComponentPropsWithRef<typeof Select>,
+  'value' | 'onValueChange'
+> & {
+  value?: number
+  onValueChange?: React.Dispatch<React.SetStateAction<number>>
+  options?: number[]
+  className?: string
+}
+
+function PageSizeSelect({ className, options, ...props }: PageSizeSelectProps) {
+  const pageSizeOptions = options ?? [10, 20, 50, 100]
+
+  const [value, setValue] = useControllableState({
+    defaultProp: 10,
+    prop: props.value,
+    onChange: props.onValueChange,
+  })
+
+  return (
+    <div className="flex items-center gap-6">
+      <Select {...props} value={value.toString()} onValueChange={(value) => setValue(~~value)}>
+        <SelectTrigger className={cn('text-text-primary w-72', className)}>
+          <div>
+            {props.children}
+            <SelectValue aria-label="Show" placeholder="Show" />
+          </div>
+        </SelectTrigger>
+        <SelectContent>
+          {pageSizeOptions.map((option) => (
+            <SelectItem key={option} value={option.toString()}>
+              <SelectItemText>{option}</SelectItemText>
+            </SelectItem>
+          ))}
+        </SelectContent>
+      </Select>
+    </div>
+  )
+}
+
+interface PageIndexProps extends React.ComponentPropsWithRef<'div'> {
+  page: number
+  totalPage: number
+}
+
+function PageIndex({ page, totalPage, ...props }: PageIndexProps) {
+  return (
+    <div {...props}>
+      <Typography className="text-text-tertiary whitespace-pre-wrap">Page </Typography>
+      <Typography weight="semibold" className="text-text-primary whitespace-pre-wrap">
+        {page}{' '}
+      </Typography>
+      <Typography className="text-text-tertiary whitespace-pre-wrap">of </Typography>
+      <Typography weight="semibold" className="text-text-primary">
+        {totalPage}
+      </Typography>
+    </div>
+  )
+}
+
+function PaginationBarContainer(props: React.PropsWithChildren) {
+  return (
+    <div className="p-6 flex justify-between bg-background border-t border-border">
+      {props.children}
+    </div>
+  )
+}
+
 export {
+  PageIndex,
+  type PageIndexProps,
+  PageSizeSelect,
+  type PageSizeSelectProps,
   Pagination,
+  PaginationBarContainer,
   PaginationContent,
   PaginationEllipsis,
   PaginationItem,

@@ -45,7 +45,7 @@
   "typescript.enablePromptUseWorkspaceTsdk": true,
   "typescript.tsdk": "node_modules/typescript/lib",
   "tailwindCSS.experimental.configFile": {
-    "packages/react/src/react/styles/tailwind.css": "packages/react/**",
+    "legacies/react/src/react/styles/tailwind.css": ["legacies/react/**", "packages/ui/**"],
     "examples/erp/src/app/(admin)/admin/tailwind.css": "examples/erp/src/app/(admin)/admin/**",
     "examples/ui-playground/src/styles/tailwind.css": "examples/ui-playground/**"
   },

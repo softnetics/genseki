@@ -10,13 +10,7 @@ import {
   WaveformIcon,
 } from '@phosphor-icons/react'
 
-import {
-  Sidebar,
-  SidebarContent,
-  SidebarFooter,
-  SidebarHeader,
-  SidebarRail,
-} from '@genseki/react/v2'
+import { Sidebar, SidebarContent, SidebarFooter, SidebarHeader, SidebarRail } from '@genseki/ui'
 
 import { NavFooter } from './nav-footer'
 import { NavHeader } from './nav-header'

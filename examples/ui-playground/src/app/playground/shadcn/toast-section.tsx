@@ -8,7 +8,7 @@ import {
   ShareIcon,
 } from '@phosphor-icons/react'
 
-import { Button, toast, Typography } from '@genseki/react/v2'
+import { Button, toast, Typography } from '@genseki/ui'
 
 import { PlaygroundCard } from '~/src/components/card'
 

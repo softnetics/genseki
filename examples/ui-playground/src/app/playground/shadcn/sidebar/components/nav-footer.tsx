@@ -8,7 +8,7 @@ import {
   SidebarMenu,
   SidebarMenuItem,
   Typography,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { cn } from '../../../../../../../../legacies/react/src/react/utils/cn'
 

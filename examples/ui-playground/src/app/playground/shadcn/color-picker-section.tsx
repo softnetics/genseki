@@ -9,7 +9,7 @@ import {
   PopoverTrigger,
   Typography,
   useColorPicker,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 import {
   ColorPicker,
   ColorPickerAlpha,
@@ -23,7 +23,7 @@ import {
   SelectItem,
   SelectTrigger,
   SelectValue,
-} from '@genseki/react/v2'
+} from '@genseki/ui'
 
 import { InformationCard, PlaygroundCard } from '~/src/components/card'
 
