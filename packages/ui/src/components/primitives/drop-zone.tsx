@@ -10,7 +10,7 @@ import { PaperclipIcon } from '@phosphor-icons/react'
 import { Button } from './button'
 import { Typography } from './typography'
 
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/internals/create-required-context'
 import { cn } from '../../utils/cn'
 declare namespace Intl {
   type ListType = 'conjunction' | 'disjunction'

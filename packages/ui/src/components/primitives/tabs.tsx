@@ -5,7 +5,7 @@ import * as React from 'react'
 import * as TabsPrimitive from '@radix-ui/react-tabs'
 import { cva, type VariantProps } from 'class-variance-authority'
 
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/internals/create-required-context'
 import { cn } from '../../utils/cn'
 
 type Variants = 'default' | 'underline'

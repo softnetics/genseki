@@ -14,7 +14,7 @@ import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from '
 import { Skeleton } from './skeleton'
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from './tooltip'
 
-import { useMediaQuery } from '../../hooks/use-media-query'
+import { useMediaQuery } from '../../hooks/internals/use-media-query'
 import { cn } from '../../utils/cn'
 
 const SIDEBAR_COOKIE_NAME = 'sidebar-state'

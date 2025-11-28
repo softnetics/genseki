@@ -20,7 +20,7 @@ import { Input } from './input'
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from './select'
 import { Typography } from './typography'
 
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/internals/create-required-context'
 import { cn } from '../../utils/cn'
 
 interface ColorPickerContextValue {

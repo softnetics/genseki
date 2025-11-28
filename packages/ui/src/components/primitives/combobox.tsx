@@ -16,7 +16,7 @@ import {
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
 
 import { Badge } from '../../../src'
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/internals/create-required-context'
 import { cn } from '../../utils/cn'
 
 /**

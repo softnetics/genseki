@@ -9,7 +9,7 @@ import { Button } from './button'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
 import { Typography } from './typography'
 
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/internals/create-required-context'
 import { cn } from '../../utils/cn'
 
 const [_DatePickerProvider, useDatePickerProvider] = createRequiredContext<{

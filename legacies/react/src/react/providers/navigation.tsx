@@ -2,6 +2,9 @@
 
 import { createContext, useContext } from 'react'
 
+/**
+ * @deprecated
+ */
 export interface NavigationContextValue {
   navigate: (path: string, type?: 'push' | 'replace') => void
   getPathname: () => string
@@ -10,6 +13,9 @@ export interface NavigationContextValue {
 
 export const NavigationContext = createContext<NavigationContextValue>(null!)
 
+/**
+ * @deprecated
+ */
 export const useNavigation = () => {
   const context = useContext(NavigationContext)
   if (!context) {
