@@ -1,5 +1,12 @@
 # @example/ui-playground
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [[`7a7d498`](https://github.com/softnetics/genseki/commit/7a7d498c60d283dd54d4f4e5bea7b73d5b39664d)]:
+  - @genseki/ui@1.1.2
+
 ## 0.1.6
 
 ### Patch Changes

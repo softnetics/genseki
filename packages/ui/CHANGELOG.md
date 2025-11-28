@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.2
+
+### Patch Changes
+
+- [#306](https://github.com/softnetics/genseki/pull/306) [`7a7d498`](https://github.com/softnetics/genseki/commit/7a7d498c60d283dd54d4f4e5bea7b73d5b39664d) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: `PageSizeSelectProps` type.
+
 ## 1.1.1
 
 ### Patch Changes
