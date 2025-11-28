@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.1
+
+### Patch Changes
+
+- [#304](https://github.com/softnetics/genseki/pull/304) [`c968c01`](https://github.com/softnetics/genseki/commit/c968c01b7a5b5229cfc409f4e67e133c7825a7a9) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: UI component improvement focus on tanstack-table and pagination.
+
 ## 1.1.0
 
 ### Minor Changes
