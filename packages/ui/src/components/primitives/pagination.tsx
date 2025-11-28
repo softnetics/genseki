@@ -144,7 +144,7 @@ type PageSizeSelectProps = Omit<
   'value' | 'onValueChange'
 > & {
   value?: number
-  onValueChange?: React.Dispatch<React.SetStateAction<number>>
+  onValueChange?: React.Dispatch<number>
   options?: number[]
   className?: string
 }
