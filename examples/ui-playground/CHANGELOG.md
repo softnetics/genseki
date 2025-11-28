@@ -1,5 +1,11 @@
 # @example/ui-playground
 
+## 0.1.5
+
+### Patch Changes
+
+- [#300](https://github.com/softnetics/genseki/pull/300) [`c23388d`](https://github.com/softnetics/genseki/commit/c23388d1c12b4cfbabac6aab8d7132cc2dc69c42) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: UI component improvement focus on `tanstack-table` and `pagination`.
+
 ## 0.1.4
 
 ### Patch Changes
