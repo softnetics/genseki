@@ -3,17 +3,10 @@ import type { Dispatch, SetStateAction } from 'react'
 
 import { parseAsInteger, useQueryStates } from 'nuqs'
 
-/**
- * @deprecated Use `usePagination` from `@genseki/ui` instead
- */
 export interface PaginationValue {
   page: number
   pageSize: number
 }
-
-/**
- * @deprecated Use `usePagination` from `@genseki/ui` instead
- */
 
 export interface UsePaginationReturn {
   pagination: PaginationValue
@@ -21,7 +14,6 @@ export interface UsePaginationReturn {
 }
 
 /**
- * @deprecated Use `usePagination` from `@genseki/ui` instead
  * @description Handle standard pagination data
  */
 export function usePagination(): UsePaginationReturn {

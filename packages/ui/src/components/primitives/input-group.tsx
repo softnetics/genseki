@@ -8,7 +8,7 @@ import { cva, type VariantProps } from 'class-variance-authority'
 import { Button } from './button'
 import type { Input } from './input'
 
-import { createRequiredContext } from '../../hooks/create-required-context'
+import { createRequiredContext } from '../../hooks/internals/create-required-context'
 import { cn } from '../../utils/cn'
 
 const [InputGroupProvider, useInputGroup] = createRequiredContext<{

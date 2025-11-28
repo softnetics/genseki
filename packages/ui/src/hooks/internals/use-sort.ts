@@ -8,22 +8,13 @@ const sortSchema = z.object({
   desc: z.boolean(),
 })
 
-/**
- * @deprecated Use `SortValue` from `@genseki/ui` instead
- */
 export type SortValue = z.infer<typeof sortSchema>[]
 
-/**
- * @deprecated Use `UseSort` from `@genseki/ui` instead
- */
 export interface UseSort {
   Sort: SortValue
   SetSort: Dispatch<SetStateAction<SortValue>>
 }
 
-/**
- * @deprecated Use `useSort` from `@genseki/ui` instead
- */
 export function useSort() {
   const [sort, setSort] = useQueryState(
     'sort',
