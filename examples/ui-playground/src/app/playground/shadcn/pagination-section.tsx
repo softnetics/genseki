@@ -41,14 +41,13 @@ function DefaultPagination() {
           {[...Array(3).keys()].map((i) => {
             const page = i + 1
             return (
-              <PaginationItem key={page}>
+              <PaginationItem key={page} isActive={currentPage === page}>
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
                     setCurrentPage(page)
                   }}
-                  isActive={currentPage === page}
                 >
                   {page}
                 </PaginationLink>
@@ -86,14 +85,13 @@ function CustomizedPagination() {
             const page = i + 1
             const isActive = currentPage === page
             return (
-              <PaginationItem key={page}>
+              <PaginationItem key={page} isActive={currentPage === page}>
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
                     setCurrentPage(page)
                   }}
-                  isActive={currentPage === page}
                   className={cn(
                     'gap-2',
                     isActive && 'border-none',
@@ -142,14 +140,13 @@ function FirstLastPagination() {
             const page = i + 1
 
             return (
-              <PaginationItem key={page}>
+              <PaginationItem key={page} isActive={currentPage === page}>
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
                     setCurrentPage(page)
                   }}
-                  isActive={currentPage === page}
                 >
                   {page}
                 </PaginationLink>
@@ -210,14 +207,13 @@ function WithEllipsisPagination() {
 
           {showStartEllipsis && (
             <>
-              <PaginationItem>
+              <PaginationItem isActive={currentPage === 1}>
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
                     setCurrentPage(1)
                   }}
-                  isActive={currentPage === 1}
                 >
                   1
                 </PaginationLink>
@@ -231,14 +227,13 @@ function WithEllipsisPagination() {
           )}
 
           {visiblePages.map((page) => (
-            <PaginationItem key={page}>
+            <PaginationItem key={page} isActive={currentPage === page}>
               <PaginationLink
                 href="#"
                 onClick={(e) => {
                   e.preventDefault()
                   setCurrentPage(page)
                 }}
-                isActive={currentPage === page}
               >
                 {page}
               </PaginationLink>
@@ -252,14 +247,13 @@ function WithEllipsisPagination() {
                   <PaginationEllipsis />
                 </PaginationLink>
               </PaginationItem>
-              <PaginationItem>
+              <PaginationItem isActive={currentPage === totalPages}>
                 <PaginationLink
                   href="#"
                   onClick={(e) => {
                     e.preventDefault()
                     setCurrentPage(totalPages)
                   }}
-                  isActive={currentPage === totalPages}
                 >
                   {totalPages}
                 </PaginationLink>

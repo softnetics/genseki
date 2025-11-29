@@ -500,28 +500,18 @@ function BasicStickyColumnTable() {
       <PaginationBarContainer>
         <Pagination>
           <PaginationContent>
-            <PaginationItem>
-              <PaginationPrevious
-                disabled={firstLage}
-                onClick={(e) => setPageIndex((prev) => prev - 1)}
-              />
+            <PaginationItem disabled={firstLage}>
+              <PaginationPrevious onClick={(e) => setPageIndex((prev) => prev - 1)} />
             </PaginationItem>
             {[...Array(Math.ceil(users.length / pageSize)).keys()].map((index) => (
-              <PaginationItem key={index}>
-                <PaginationLink
-                  onClick={() => setPageIndex(index)}
-                  isActive={index === pageIndex}
-                  href="#"
-                >
+              <PaginationItem key={index} isActive={index === pageIndex}>
+                <PaginationLink onClick={() => setPageIndex(index)} href="#">
                   {index + 1}
                 </PaginationLink>
               </PaginationItem>
             ))}
-            <PaginationItem>
-              <PaginationNext
-                disabled={lastPage}
-                onClick={(e) => setPageIndex((prev) => prev + 1)}
-              />
+            <PaginationItem disabled={lastPage}>
+              <PaginationNext onClick={(e) => setPageIndex((prev) => prev + 1)} />
             </PaginationItem>
           </PaginationContent>
         </Pagination>
