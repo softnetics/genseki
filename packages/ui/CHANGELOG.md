@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.4
+
+### Patch Changes
+
+- [#310](https://github.com/softnetics/genseki/pull/310) [`c16bc95`](https://github.com/softnetics/genseki/commit/c16bc95335b806bd9a3ed9337e69b58ea2571f4f) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: switch layout bug.
+
 ## 1.1.3
 
 ### Patch Changes
