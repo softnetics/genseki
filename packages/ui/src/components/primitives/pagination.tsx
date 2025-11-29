@@ -4,8 +4,9 @@ import * as React from 'react'
 import { ArrowLeftIcon, ArrowRightIcon, DotsThreeIcon } from '@phosphor-icons/react'
 import { Slot } from '@radix-ui/react-slot'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
+import type { VariantProps } from 'class-variance-authority'
 
-import { type Button, buttonVariants } from './button'
+import { buttonVariants } from './button'
 import { ButtonGroup, buttonGroupVariants } from './button-group'
 import {
   Select,
@@ -41,13 +42,20 @@ function PaginationContent({ className, ...props }: React.ComponentProps<typeof 
   )
 }
 
+interface PaginationItemProps
+  extends React.ComponentProps<typeof Slot>,
+    VariantProps<typeof buttonVariants> {
+  isActive?: boolean
+  disabled?: boolean
+}
+
 function PaginationItem({
   className,
   variant = 'outline',
   size = 'icon',
   isActive,
   ...props
-}: { isActive?: boolean } & React.ComponentProps<typeof Button>) {
+}: PaginationItemProps) {
   return (
     <Slot
       {...props}

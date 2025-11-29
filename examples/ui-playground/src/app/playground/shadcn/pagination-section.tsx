@@ -194,14 +194,13 @@ function WithEllipsisPagination() {
     <div className="space-y-4">
       <Pagination>
         <PaginationContent>
-          <PaginationItem>
+          <PaginationItem disabled={currentPage === 1}>
             <PaginationPrevious
               href="#"
               onClick={(e) => {
                 e.preventDefault()
                 setCurrentPage(Math.max(1, currentPage - 1))
               }}
-              className={currentPage === 1 ? 'pointer-events-none opacity-50' : ''}
             />
           </PaginationItem>
 
@@ -261,14 +260,13 @@ function WithEllipsisPagination() {
             </>
           )}
 
-          <PaginationItem>
+          <PaginationItem disabled={currentPage === totalPages}>
             <PaginationNext
               href="#"
               onClick={(e) => {
                 e.preventDefault()
                 setCurrentPage(Math.min(totalPages, currentPage + 1))
               }}
-              className={currentPage === totalPages ? 'pointer-events-none opacity-50' : ''}
             />
           </PaginationItem>
         </PaginationContent>
