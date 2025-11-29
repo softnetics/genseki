@@ -1,5 +1,14 @@
 # @example/ui-playground
 
+## 0.1.8
+
+### Patch Changes
+
+- [#308](https://github.com/softnetics/genseki/pull/308) [`be40555`](https://github.com/softnetics/genseki/commit/be40555b83921bdef1be7c592414a955eec23e71) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: pagination ui hierarchy.
+
+- Updated dependencies [[`be40555`](https://github.com/softnetics/genseki/commit/be40555b83921bdef1be7c592414a955eec23e71)]:
+  - @genseki/ui@1.1.3
+
 ## 0.1.7
 
 ### Patch Changes
