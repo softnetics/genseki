@@ -4,8 +4,9 @@ import * as React from 'react'
 import { ArrowLeftIcon, ArrowRightIcon, DotsThreeIcon } from '@phosphor-icons/react'
 import { Slot } from '@radix-ui/react-slot'
 import { useControllableState } from '@radix-ui/react-use-controllable-state'
+import type { VariantProps } from 'class-variance-authority'
 
-import { type Button, buttonVariants } from './button'
+import { buttonVariants } from './button'
 import { ButtonGroup, buttonGroupVariants } from './button-group'
 import {
   Select,
@@ -41,59 +42,49 @@ function PaginationContent({ className, ...props }: React.ComponentProps<typeof 
   )
 }
 
-function PaginationItem({ ...props }: React.ComponentProps<typeof Slot>) {
-  return <Slot data-slot="pagination-item" {...props} />
+interface PaginationItemProps
+  extends React.ComponentProps<typeof Slot>,
+    VariantProps<typeof buttonVariants> {
+  isActive?: boolean
+  disabled?: boolean
 }
 
-type PaginationLinkProps = {
-  isActive?: boolean
-} & Pick<React.ComponentProps<typeof Button>, 'size' | 'disabled'> &
-  React.ComponentProps<'a'>
-
-function PaginationLink({
+function PaginationItem({
   className,
-  isActive,
+  variant = 'outline',
   size = 'icon',
-  asChild,
+  isActive,
   ...props
-}: { asChild?: boolean } & PaginationLinkProps) {
-  const Comp = asChild ? Slot : 'a'
-
+}: PaginationItemProps) {
   return (
-    <Comp
-      aria-current={isActive ? 'page' : undefined}
-      data-slot="pagination-link"
-      data-active={isActive}
+    <Slot
+      {...props}
       className={cn(
         buttonVariants({
-          variant: 'outline',
+          variant,
           size,
         }),
         isActive && 'bg-surface-button-outline-hover',
         className
       )}
-      {...props}
+      data-slot="pagination-item"
+      aria-current={isActive ? 'page' : undefined}
+      data-active={isActive}
     />
   )
 }
 
-function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
+type PaginationLinkProps = React.ComponentProps<'a'>
+
+function PaginationLink({ asChild, ...props }: { asChild?: boolean } & PaginationLinkProps) {
+  const Comp = asChild ? Slot : 'a'
+
+  return <Comp data-slot="pagination-link" {...props} />
+}
+
+function PaginationPrevious(props: React.ComponentProps<typeof PaginationLink>) {
   return (
-    <PaginationLink
-      asChild
-      aria-label="Go to previous page"
-      size="md"
-      className={cn(
-        // Strict width since sizing does not enforce the width
-        'w-18',
-        {
-          'w-16': props.size === 'sm',
-          'w-20': props.size === 'lg',
-        },
-        className
-      )}
-      {...props}
-    >
+    <PaginationLink asChild aria-label="Go to previous page" {...props}>
       <button>
         <ArrowLeftIcon />
       </button>
@@ -101,23 +92,9 @@ function PaginationPrevious({ className, ...props }: React.ComponentProps<typeof
   )
 }
 
-function PaginationNext({ className, ...props }: React.ComponentProps<typeof PaginationLink>) {
+function PaginationNext(props: React.ComponentProps<typeof PaginationLink>) {
   return (
-    <PaginationLink
-      asChild
-      aria-label="Go to next page"
-      size="md"
-      className={cn(
-        // Strict width since sizing does not enforce the width
-        'w-18',
-        {
-          'w-16': props.size === 'sm',
-          'w-20': props.size === 'lg',
-        },
-        className
-      )}
-      {...props}
-    >
+    <PaginationLink asChild aria-label="Go to next page" {...props}>
       <button>
         <ArrowRightIcon />
       </button>
@@ -128,10 +105,10 @@ function PaginationNext({ className, ...props }: React.ComponentProps<typeof Pag
 function PaginationEllipsis({ className, ...props }: React.ComponentProps<'span'>) {
   return (
     <span
+      {...props}
+      className={cn('flex size-18 items-center justify-center', className)}
       aria-hidden
       data-slot="pagination-ellipsis"
-      className={cn('flex size-18 items-center justify-center', className)}
-      {...props}
     >
       <DotsThreeIcon className="size-8" />
       <span className="sr-only">More pages</span>
