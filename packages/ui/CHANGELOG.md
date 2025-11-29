@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.3
+
+### Patch Changes
+
+- [#308](https://github.com/softnetics/genseki/pull/308) [`be40555`](https://github.com/softnetics/genseki/commit/be40555b83921bdef1be7c592414a955eec23e71) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: pagination ui hierarchy.
+
 ## 1.1.2
 
 ### Patch Changes
