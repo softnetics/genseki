@@ -172,44 +172,6 @@ function DisabledSwitch() {
   )
 }
 
-// Switch Sizes
-function SwitchSizes() {
-  const [small, setSmall] = React.useState(false)
-  const [defaultSize, setDefaultSize] = React.useState(true)
-  const [large, setLarge] = React.useState(false)
-
-  return (
-    <div className="space-y-6">
-      <div className="space-y-4">
-        <div className="flex items-center justify-between">
-          <Label htmlFor="small-switch">Small Switch</Label>
-          <Switch
-            id="small-switch"
-            checked={small}
-            onCheckedChange={setSmall}
-            className="h-4 w-8"
-          />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="default-switch">Default Switch</Label>
-          <Switch id="default-switch" checked={defaultSize} onCheckedChange={setDefaultSize} />
-        </div>
-
-        <div className="flex items-center justify-between">
-          <Label htmlFor="large-switch">Large Switch</Label>
-          <Switch
-            id="large-switch"
-            checked={large}
-            onCheckedChange={setLarge}
-            className="h-8 w-16"
-          />
-        </div>
-      </div>
-    </div>
-  )
-}
-
 // Switch with Form
 function SwitchWithForm() {
   const [formData, setFormData] = React.useState({
@@ -409,15 +371,6 @@ export function SwitchSection() {
         </Typography>
         <div className="p-4 bg-secondary w-full rounded-lg">
           <DisabledSwitch />
-        </div>
-      </PlaygroundCard>
-
-      <PlaygroundCard title="Switch Sizes" categoryTitle="Component">
-        <Typography type="body" className="text-muted-foreground mb-4">
-          Switches in different sizes: small, default, and large.
-        </Typography>
-        <div className="p-4 bg-secondary w-full rounded-lg">
-          <SwitchSizes />
         </div>
       </PlaygroundCard>
 
