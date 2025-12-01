@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.7
+
+### Patch Changes
+
+- [#317](https://github.com/softnetics/genseki/pull/317) [`2cd4f2e`](https://github.com/softnetics/genseki/commit/2cd4f2ede0e27ba0d683919efd466c7977f77566) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: change PaginationBarContainer props.
+
 ## 1.1.6
 
 ### Patch Changes
