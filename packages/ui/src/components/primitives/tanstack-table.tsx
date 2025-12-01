@@ -265,12 +265,6 @@ export const TableEmpty = (props: {
   )
 }
 
-export function TanstackTableFrame({ className, ...props }: React.ComponentPropsWithRef<'div'>) {
-  return (
-    <div className={cn('overflow-auto border rounded-sm border-border', className)} {...props} />
-  )
-}
-
 declare module '@tanstack/react-table' {
   interface ColumnMeta<TData extends RowData, TValue> {
     tdClassName?: string

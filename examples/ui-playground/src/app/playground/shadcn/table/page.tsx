@@ -20,7 +20,6 @@ import {
   PaginationPrevious,
   TanstackTable,
   TanstackTableContainer,
-  TanstackTableFrame,
 } from '@genseki/ui'
 
 interface User {
@@ -493,10 +492,9 @@ function BasicStickyColumnTable() {
   const lastPage = pageIndex === Math.ceil(users.length / pageSize) - 1
 
   return (
-    <TanstackTableFrame>
-      <TanstackTableContainer variant="naked">
-        <TanstackTable table={table} />
-      </TanstackTableContainer>
+    <TanstackTableContainer>
+      <TanstackTable table={table} />
+
       <PaginationBarContainer>
         <Pagination>
           <PaginationContent>
@@ -522,7 +520,7 @@ function BasicStickyColumnTable() {
           </PageSizeSelect>
         </div>
       </PaginationBarContainer>
-    </TanstackTableFrame>
+    </TanstackTableContainer>
   )
 }
 

@@ -36,16 +36,28 @@ import {
 import { PopoverContent } from './popover'
 import { composeTailwindRenderProps } from './primitive'
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 interface MenuContextProps {
   respectScreen: boolean
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const MenuContext = createContext<MenuContextProps>({ respectScreen: true })
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 interface MenuProps extends MenuTriggerPrimitiveProps {
   respectScreen?: boolean
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const Menu = ({ respectScreen = true, ...props }: MenuProps) => {
   return (
     <MenuContext value={{ respectScreen }}>
@@ -54,16 +66,25 @@ const Menu = ({ respectScreen = true, ...props }: MenuProps) => {
   )
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const MenuSubMenu = ({ delay = 0, ...props }) => (
   <SubmenuTriggerPrimitive {...props} delay={delay}>
     {props.children}
   </SubmenuTriggerPrimitive>
 )
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 interface MenuTriggerProps extends ButtonProps {
   className?: string
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
   ({ className, ...props }, ref) => (
     <Button
@@ -80,6 +101,9 @@ const MenuTrigger = React.forwardRef<HTMLButtonElement, MenuTriggerProps>(
   )
 )
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 interface MenuContentProps<T>
   extends Pick<
       PopoverProps,
@@ -99,6 +123,9 @@ interface MenuContentProps<T>
   respectScreen?: boolean
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const MenuContent = <T extends object>({
   className,
   showArrow = false,
@@ -137,10 +164,16 @@ const MenuContent = <T extends object>({
   )
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 interface MenuItemProps extends MenuItemPrimitiveProps, VariantProps<typeof dropdownItemStyles> {
   isDanger?: boolean
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const MenuItem = ({ className, isDanger = false, children, ...props }: MenuItemProps) => {
   const textValue = props.textValue || (typeof children === 'string' ? children : undefined)
   return (
@@ -190,10 +223,16 @@ const MenuItem = ({ className, isDanger = false, children, ...props }: MenuItemP
   )
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 export interface MenuHeaderProps extends React.ComponentProps<typeof Header> {
   separator?: boolean
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const MenuHeader = ({ className, separator = false, ...props }: MenuHeaderProps) => (
   <Header
     className={twMerge(
@@ -205,13 +244,22 @@ const MenuHeader = ({ className, separator = false, ...props }: MenuHeaderProps)
   />
 )
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 const { section, header } = dropdownSectionStyles()
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 interface MenuSectionProps<T> extends MenuSectionPrimitiveProps<T> {
   ref?: React.Ref<HTMLElement>
   title?: string
 }
 
+/**
+ * @deprecated  Switch to `DropdownMenu`
+ */
 // TODO: /** @ts-expect-error The legacy ref here is bastards */
 const MenuSection = <T extends object>({ className, ref, ...props }: MenuSectionProps<T>) => {
   return (
