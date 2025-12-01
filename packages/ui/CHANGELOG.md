@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.6
+
+### Patch Changes
+
+- [#315](https://github.com/softnetics/genseki/pull/315) [`1854523`](https://github.com/softnetics/genseki/commit/1854523bf54b348762454d5be3f29c4b0627bdf1) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: add className and other props passing to `PaginationBarContainer`.
+
 ## 1.1.5
 
 ### Patch Changes
