@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.5
+
+### Patch Changes
+
+- [#312](https://github.com/softnetics/genseki/pull/312) [`4eead5b`](https://github.com/softnetics/genseki/commit/4eead5bec57523180daa0962bd225a708f9d2c61) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: remove redundant `TanstackTableFrame`, and deprecated component.
+
 ## 0.1.4
 
 ### Patch Changes
