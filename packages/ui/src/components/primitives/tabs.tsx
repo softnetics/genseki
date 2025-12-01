@@ -11,12 +11,12 @@ import { cn } from '../../utils/cn'
 type Variants = 'default' | 'underline'
 
 const tabListVariants = cva<{ variant: Record<Variants, any> }>(
-  'h-18 w-fit items-center justify-center',
+  'w-full items-center justify-center',
   {
     variants: {
       variant: {
         default: 'bg-muted text-muted-foreground inline-flex rounded-lg p-[3px]',
-        underline: '',
+        underline: 'border-b',
       },
     },
     defaultVariants: {
@@ -32,8 +32,10 @@ const tabVariants = cva<{ variant: Record<Variants, any> }>(
       variant: {
         default:
           'h-[calc(100%-1px)] gap-3 data-[state=active]:bg-background dark:data-[state=active]:text-foreground focus-visible:ring-ring dark:data-[state=active]:border-input dark:data-[state=active]:bg-input/30 text-foreground dark:text-muted-foreground rounded-md border border-transparent px-4 py-2 focus-visible:ring-[2px] data-[state=active]:shadow-sm ',
-        underline:
-          'data-[state=active]:text-primary data-[state=active]:border-primary px-3 pb-5 border-b-[2px] focus-visible:ring-[2px] focus-visible:ring-ring focus-visible:ring-offset-2',
+        underline: [
+          'relative data-[state=active]:text-primary px-3 pb-5 focus-visible:ring-[2px] focus-visible:ring-ring focus-visible:ring-offset-2',
+          'before:absolute before:block before:content-[""] data-[state=active]:before:w-full before:h-1 before:bg-primary before:-bottom-px',
+        ],
       },
     },
     defaultVariants: {
