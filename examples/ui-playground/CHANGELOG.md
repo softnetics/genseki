@@ -1,5 +1,20 @@
 # @example/ui-playground
 
+## 0.1.9
+
+### Patch Changes
+
+- [#310](https://github.com/softnetics/genseki/pull/310) [`c16bc95`](https://github.com/softnetics/genseki/commit/c16bc95335b806bd9a3ed9337e69b58ea2571f4f) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: switch layout bug.
+
+- [#312](https://github.com/softnetics/genseki/pull/312) [`4eead5b`](https://github.com/softnetics/genseki/commit/4eead5bec57523180daa0962bd225a708f9d2c61) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: remove redundant `TanstackTableFrame`, and deprecated component.
+
+- Updated dependencies [[`c16bc95`](https://github.com/softnetics/genseki/commit/c16bc95335b806bd9a3ed9337e69b58ea2571f4f), [`4eead5b`](https://github.com/softnetics/genseki/commit/4eead5bec57523180daa0962bd225a708f9d2c61)]:
+  - @genseki/ui@1.1.4
+  - @genseki/react@0.1.5
+  - @genseki/next@0.1.5
+  - @genseki/react-query@0.1.5
+  - @genseki/rest@0.1.5
+
 ## 0.1.8
 
 ### Patch Changes
