@@ -176,10 +176,10 @@ function PageIndex({ page, totalPage, ...props }: PageIndexProps) {
   )
 }
 
-function PaginationBarContainer({ children, ...props }: React.ComponentPropsWithRef<'div'>) {
+function PaginationBarContainer({ className, ...props }: React.ComponentPropsWithRef<'div'>) {
   return (
     <div
-      className={cn('p-6 flex justify-between bg-background border-t border-border', children)}
+      className={cn('p-6 flex justify-between bg-background border-t border-border', className)}
       {...props}
     />
   )
