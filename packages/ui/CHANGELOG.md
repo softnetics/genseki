@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.5
+
+### Patch Changes
+
+- [#313](https://github.com/softnetics/genseki/pull/313) [`b45ea3f`](https://github.com/softnetics/genseki/commit/b45ea3f41aac047b7cf399961359d5b73d5a3b9a) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: `tabs` component styling unknown reason reverted back to old one.
+
 ## 1.1.4
 
 ### Patch Changes
