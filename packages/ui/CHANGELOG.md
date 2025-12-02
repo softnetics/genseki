@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.9
+
+### Patch Changes
+
+- [#321](https://github.com/softnetics/genseki/pull/321) [`05f3938`](https://github.com/softnetics/genseki/commit/05f39385873684b2ccc21c4b741055f1fce0d2c0) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: table shadow and table example.
+
 ## 1.1.8
 
 ### Patch Changes
