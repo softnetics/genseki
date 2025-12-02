@@ -14,7 +14,10 @@ function BasicSeparatorExamples() {
       </div>
       <div className="flex h-24 items-center gap-4">
         <span className="text-sm text-muted-foreground">Top</span>
-        <Separator orientation="vertical" className="h-full" />
+        <Separator
+          orientation="vertical"
+          className="bg-blue-500  data-[orientation=vertical]:w-4"
+        />
         <span className="text-sm text-muted-foreground">Bottom</span>
       </div>
       <div className="flex items-center gap-4">
