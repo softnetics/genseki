@@ -50,15 +50,16 @@ const getCommonPinningClassesAndStyle = (column: Column<any>) => {
   const isLastLeftPinnedColumn = isPinned === 'left' && column.getIsLastColumn('left')
   const isFirstRightPinnedColumn = isPinned === 'right' && column.getIsFirstColumn('right')
 
-  const className = cn(
-    isPinned ? 'sticky z-[1]' : 'relative',
-    isLastLeftPinnedColumn && 'shadow-[inset_-4px_0_4px_-4px_gray]',
-    isFirstRightPinnedColumn && 'shadow-[inset_4px_0_4px_-4px_gray]'
-  )
+  const className = cn(isPinned ? 'sticky z-[1]' : 'relative')
 
   const style: CSSProperties = {
     left: isPinned === 'left' ? `${column.getStart('left')}px` : undefined,
     right: isPinned === 'right' ? `${column.getAfter('right')}px` : undefined,
+    boxShadow: isLastLeftPinnedColumn
+      ? 'inset -4px 0 4px -4px #bbbbbb'
+      : isFirstRightPinnedColumn
+        ? 'inset 4px 0 4px -4px #bbbbbb'
+        : undefined,
     width: column.getSize(),
   }
 

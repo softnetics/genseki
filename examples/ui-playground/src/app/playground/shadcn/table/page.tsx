@@ -483,7 +483,7 @@ function BasicStickyColumnTable() {
     getPaginationRowModel: getPaginationRowModel(),
     columns,
     state: {
-      columnPinning: { left: ['id'] },
+      columnPinning: { left: ['id'], right: ['notes'] },
       pagination: { pageIndex: pageIndex, pageSize: pageSize },
     },
   })
@@ -495,7 +495,7 @@ function BasicStickyColumnTable() {
     <TanstackTableContainer>
       <TanstackTable table={table} />
 
-      <PaginationBarContainer>
+      <PaginationBarContainer className="sticky left-0 bottom-0">
         <Pagination>
           <PaginationContent>
             <PaginationItem disabled={firstLage}>
