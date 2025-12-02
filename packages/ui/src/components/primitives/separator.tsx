@@ -4,6 +4,8 @@ import React from 'react'
 import * as SeparatorPrimitive from '@radix-ui/react-separator'
 import { cva, type VariantProps } from 'class-variance-authority'
 
+import { cn } from '../../utils/cn'
+
 /**
  * Shadcn component
  */
@@ -39,7 +41,7 @@ function Separator({
       data-slot="separator"
       decorative={decorative}
       orientation={orientation}
-      className={separator({ variant, className })}
+      className={cn(separator({ variant }), className)}
       {...props}
     />
   )
