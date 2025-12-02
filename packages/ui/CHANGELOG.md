@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.8
+
+### Patch Changes
+
+- [#319](https://github.com/softnetics/genseki/pull/319) [`dd44cd0`](https://github.com/softnetics/genseki/commit/dd44cd0e33a04c5689b1deaec41c52cae08442d2) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: separator class overriding.
+
 ## 1.1.7
 
 ### Patch Changes
