@@ -27,7 +27,7 @@ export function UpdateClientView(props: UpdateClientViewProps) {
   }, [])
 
   const form = useForm({
-    resolver: standardSchemaResolver(schema),
+    resolver: standardSchemaResolver(schema as any),
     defaultValues: props.defaultValues,
   })
 

@@ -4,5 +4,6 @@ import { nextjsApp } from '~/genseki/config'
 
 const { GET, POST, PUT, PATCH, DELETE } = createApiResourceRouter(nextjsApp, {
   pathPrefix: '/api',
-})
+}) as any
+
 export { DELETE, GET, PATCH, POST, PUT }
