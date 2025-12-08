@@ -1,9 +1,9 @@
 'use client'
-
 import type { PropsWithChildren } from 'react'
 
 import { isServer, QueryClient, QueryClientProvider } from '@tanstack/react-query'
 import { ThemeProvider as NextThemesProvider } from 'next-themes'
+import { NuqsAdapter } from 'nuqs/adapters/next/app'
 
 function makeQueryClient() {
   return new QueryClient({
@@ -36,16 +36,18 @@ function getQueryClient() {
 export function Providers(props: PropsWithChildren) {
   const queryClient = getQueryClient()
   return (
-    <QueryClientProvider client={queryClient}>
-      <NextThemesProvider
-        attribute="class"
-        defaultTheme="system"
-        enableSystem
-        disableTransitionOnChange
-        enableColorScheme
-      >
-        {props.children}
-      </NextThemesProvider>
-    </QueryClientProvider>
+    <NuqsAdapter>
+      <QueryClientProvider client={queryClient}>
+        <NextThemesProvider
+          attribute="class"
+          defaultTheme="system"
+          enableSystem
+          disableTransitionOnChange
+          enableColorScheme
+        >
+          {props.children}
+        </NextThemesProvider>
+      </QueryClientProvider>
+    </NuqsAdapter>
   )
 }
