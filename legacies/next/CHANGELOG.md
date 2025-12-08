@@ -1,5 +1,14 @@
 # @genseki/next
 
+## 0.1.6
+
+### Patch Changes
+
+- [#323](https://github.com/softnetics/genseki/pull/323) [`fe66dd3`](https://github.com/softnetics/genseki/commit/fe66dd3bd5fdabfe42c02a583534383a4b0d94f9) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - feat: bump version of `nuqs`.
+
+- Updated dependencies [[`fe66dd3`](https://github.com/softnetics/genseki/commit/fe66dd3bd5fdabfe42c02a583534383a4b0d94f9)]:
+  - @genseki/react@0.1.6
+
 ## 0.1.5
 
 ### Patch Changes
