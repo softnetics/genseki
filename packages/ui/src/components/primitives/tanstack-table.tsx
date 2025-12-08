@@ -4,11 +4,11 @@ import React, { type CSSProperties, useRef } from 'react'
 
 import { CircleNotchIcon, WarningCircleIcon, WarningIcon } from '@phosphor-icons/react'
 import { CaretDownIcon, CaretUpDownIcon, CaretUpIcon } from '@phosphor-icons/react/dist/ssr'
-import type { RowData } from '@tanstack/react-table'
 import {
   type Column,
   flexRender,
   type Row,
+  type RowData,
   type SortDirection,
   type Table as TanstackTableCore,
 } from '@tanstack/react-table'
@@ -267,7 +267,8 @@ export const TableEmpty = (props: {
 }
 
 declare module '@tanstack/react-table' {
-  interface ColumnMeta<TData extends RowData, TValue> {
+  // Keep generics identical to upstream to satisfy module augmentation rules
+  interface ColumnMeta<TData extends RowData = RowData, TValue = unknown> {
     tdClassName?: string
     thClassName?: string
   }

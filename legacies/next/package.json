@@ -32,7 +32,7 @@
   "dependencies": {
     "@genseki/react": "workspace:^",
     "cookie-es": "^2.0.0",
-    "next": "^15.2.2",
+    "next": "^16.0.7",
     "nuqs": "^2.8.3",
     "radix3": "^1.1.2",
     "react": "^19.1.0",

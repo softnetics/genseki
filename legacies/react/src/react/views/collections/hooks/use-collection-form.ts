@@ -23,7 +23,7 @@ export const useCollectionForm = <
     return fieldsShapeToZodObject(fields.shape)
   }, [])
   return useForm<TFieldValues, TContext, TTransformedValues>({
-    resolver: standardSchemaResolver(schema),
+    resolver: standardSchemaResolver(schema as any),
     defaultValues:
       props?.defaultValues ??
       (getDefaultValueFromFieldsClient(fields, storageAdapter) as DefaultValues<TFieldValues>),
