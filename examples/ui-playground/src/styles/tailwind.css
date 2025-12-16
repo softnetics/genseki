@@ -2,6 +2,7 @@
 @import './tiptap-style.css';
 
 @source "../../node_modules/@genseki/react";
+@source "../../node_modules/@genseki/ui";
 
 .tiptap.ProseMirror {
   height: 100%;
