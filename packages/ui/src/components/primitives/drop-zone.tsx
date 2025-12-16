@@ -182,7 +182,7 @@ export const DropZoneArea = (
       data-file-dialog-active={dropzoneCtx.isFileDialogActive}
       data-disabled={dropzoneCtx.disabled}
       className={cn(
-        'group/dropzone relative h-auto w-full flex-col overflow-hidden rounded-md border border-dashed p-12',
+        'bg-background group/dropzone relative h-auto w-full flex-col overflow-hidden rounded-md border border-dashed p-12',
         'data-[drag-active=true]:ring-ring ring-offset-2 data-[drag-active=true]:outline-none data-[drag-active=true]:ring-[2px]',
         'data-[disabled=true]:bg-surface-primary-disabled',
         props.className
@@ -260,7 +260,7 @@ export const DropZoneEmptyUploadButton = ({
       variant="outline"
       asChild
       className={cn(
-        'group-data-[disabled=true]/dropzone:bg-surface-primary-disabled group-data-[disabled=true]/dropzone:active:bg-surface-primary-disabled group-data-[disabled=true]/dropzone:cursor-default',
+        'group-hadata-[disabled=true]/dropzone:bg-surface-primary-disabled group-data-[disabled=true]/dropzone:active:bg-surface-primary-disabled group-data-[disabled=true]/dropzone:cursor-default',
         className
       )}
       children={
