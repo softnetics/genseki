@@ -1,5 +1,14 @@
 # @example/ui-playground
 
+## 0.1.16
+
+### Patch Changes
+
+- [#325](https://github.com/softnetics/genseki/pull/325) [`176d493`](https://github.com/softnetics/genseki/commit/176d493b730d8fb2092fb006196f6707632db4f2) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - fix: tailwind file sourcing & dropzone disabled state.
+
+- Updated dependencies [[`176d493`](https://github.com/softnetics/genseki/commit/176d493b730d8fb2092fb006196f6707632db4f2)]:
+  - @genseki/ui@1.1.11
+
 ## 0.1.15
 
 ### Patch Changes
