@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.12
+
+### Patch Changes
+
+- [#329](https://github.com/softnetics/genseki/pull/329) [`e904f31`](https://github.com/softnetics/genseki/commit/e904f31f4e0a6f7a5b98be8686856ea1669957c0) Thanks [@SupakornNetsuwan](https://github.com/SupakornNetsuwan)! - add background color for `dropzone`.
+
 ## 1.1.11
 
 ### Patch Changes
