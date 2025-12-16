@@ -167,36 +167,44 @@ function CustomDropzone() {
     setPreviews([])
   }
 
+  const [disabled, setDisabled] = useState(false)
+
   return (
-    <DropzoneProvider
-      src={files}
-      previews={previews}
-      onError={handleError}
-      onDrop={handleDrop}
-      className="min-h-32"
-      maxFiles={5}
-    >
-      <DropZoneEmptyContent>
-        <DropZoneArea>
-          {/* These content will be displayed if no previewable item */}
-          <div className="flex flex-col items-center justify-center gap-y-6">
-            <DropZoneEmptyUploadButton />
-            <DropZoneEmptyUploadDescription />
-            <DropZoneEmptyUploadCaption />
-          </div>
-        </DropZoneArea>
-      </DropZoneEmptyContent>
-      <DropZoneNonemptyContent>
-        {/* These content will be displayed if there're available previewable item */}
-        <CustomDropzoneContent removePreview={removePreview}>
-          <div className="flex flex-col gap-y-4">
-            {previews.map((preview, index) => (
-              <FilePreviewItem key={preview.url} index={index} removePreview={removePreview} />
-            ))}
-          </div>
-        </CustomDropzoneContent>
-      </DropZoneNonemptyContent>
-    </DropzoneProvider>
+    <div>
+      <Button className="mb-12" onClick={() => setDisabled(!disabled)}>
+        Toggle disabled
+      </Button>
+      <DropzoneProvider
+        src={files}
+        previews={previews}
+        onError={handleError}
+        onDrop={handleDrop}
+        className="min-h-32"
+        maxFiles={5}
+        disabled={disabled}
+      >
+        <DropZoneEmptyContent>
+          <DropZoneArea>
+            {/* These content will be displayed if no previewable item */}
+            <div className="flex flex-col items-center justify-center gap-y-6">
+              <DropZoneEmptyUploadButton />
+              <DropZoneEmptyUploadDescription />
+              <DropZoneEmptyUploadCaption />
+            </div>
+          </DropZoneArea>
+        </DropZoneEmptyContent>
+        <DropZoneNonemptyContent>
+          {/* These content will be displayed if there're available previewable item */}
+          <CustomDropzoneContent removePreview={removePreview}>
+            <div className="flex flex-col gap-y-4">
+              {previews.map((preview, index) => (
+                <FilePreviewItem key={preview.url} index={index} removePreview={removePreview} />
+              ))}
+            </div>
+          </CustomDropzoneContent>
+        </DropZoneNonemptyContent>
+      </DropzoneProvider>
+    </div>
   )
 }
 

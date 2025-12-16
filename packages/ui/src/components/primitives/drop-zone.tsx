@@ -41,6 +41,7 @@ interface DropzoneContextType extends DropzoneState {
   maxSize?: DropzoneOptions['maxSize']
   minSize?: DropzoneOptions['minSize']
   maxFiles?: DropzoneOptions['maxFiles']
+  disabled?: DropzoneOptions['disabled']
 }
 
 interface FinalDropzoneContextType extends DropzoneContextType {
@@ -137,6 +138,7 @@ export const DropzoneProvider = ({
       maxSize={maxSize}
       minSize={minSize}
       maxFiles={maxFiles}
+      disabled={disabled}
       {...dropzoneCtx}
     >
       {children}
@@ -166,7 +168,9 @@ export const DropZoneEmptyContent = (props: { children?: React.ReactNode }) => {
   return props.children
 }
 
-export const DropZoneArea = (props: React.ComponentPropsWithRef<'button'>) => {
+export const DropZoneArea = (
+  props: Pick<React.ComponentPropsWithRef<'button'>, 'className' | 'id' | 'children'>
+) => {
   const dropzoneCtx = useDropZone()
 
   return (
@@ -176,10 +180,11 @@ export const DropZoneArea = (props: React.ComponentPropsWithRef<'button'>) => {
       data-drag-reject={dropzoneCtx.isDragReject}
       data-focused={dropzoneCtx.isFocused}
       data-file-dialog-active={dropzoneCtx.isFileDialogActive}
+      data-disabled={dropzoneCtx.disabled}
       className={cn(
         'group/dropzone relative h-auto w-full flex-col overflow-hidden rounded-md border border-dashed p-12',
         'data-[drag-active=true]:ring-ring ring-offset-2 data-[drag-active=true]:outline-none data-[drag-active=true]:ring-[2px]',
-        'disabled:bg-surface-primary-disabled',
+        'data-[disabled=true]:bg-surface-primary-disabled',
         props.className
       )}
       {...dropzoneCtx.getRootProps({
@@ -190,8 +195,8 @@ export const DropZoneArea = (props: React.ComponentPropsWithRef<'button'>) => {
     >
       <input
         {...dropzoneCtx.getInputProps()}
-        disabled={props.disabled}
-        aria-disabled={props.disabled}
+        disabled={dropzoneCtx.disabled}
+        aria-disabled={dropzoneCtx.disabled}
         id={props.id}
       />
       {props.children}
@@ -254,13 +259,12 @@ export const DropZoneEmptyUploadButton = ({
     <Button
       variant="outline"
       asChild
+      className={cn(
+        'group-data-[disabled=true]/dropzone:bg-surface-primary-disabled group-data-[disabled=true]/dropzone:active:bg-surface-primary-disabled group-data-[disabled=true]/dropzone:cursor-default',
+        className
+      )}
       children={
-        <span
-          className={cn(
-            'group-disabled/dropzone:bg-surface-primary-disabled group-disabled/dropzone:active:bg-surface-primary-disabled group-disabled/dropzone:cursor-default',
-            className
-          )}
-        >
+        <span>
           <PaperclipIcon />
           <span>Upload {maxFiles === 1 ? 'a file' : 'files'}</span>
         </span>
