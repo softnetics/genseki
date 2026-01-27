@@ -1,5 +1,17 @@
 # @example/ui-playground
 
+## 0.1.18
+
+### Patch Changes
+
+- [#330](https://github.com/softnetics/genseki/pull/330) [`b70772c`](https://github.com/softnetics/genseki/commit/b70772c115c96c8255519f92c247575920cb651b) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: auto text color richtext
+
+- Updated dependencies [[`b70772c`](https://github.com/softnetics/genseki/commit/b70772c115c96c8255519f92c247575920cb651b)]:
+  - @genseki/react@0.1.7
+  - @genseki/next@0.1.7
+  - @genseki/react-query@0.1.7
+  - @genseki/rest@0.1.7
+
 ## 0.1.17
 
 ### Patch Changes
