@@ -44,6 +44,7 @@ export const EditorSlotBefore = () => {
       <ToolbarSeparator className="h-auto" />
       <EditorTextColorPicker />
       <EditorBgColorPicker />
+      <AutoTextColorButton />
       <ToolbarSeparator className="h-auto" />
       <ToolbarGroup className="items-center">
         <TextAlignButtonsGroup>
@@ -58,7 +59,6 @@ export const EditorSlotBefore = () => {
       <UploadImageButton />
       <RedoButton />
       <UndoButton />
-      <AutoTextColorButton />
     </EditorBar>
   )
 }

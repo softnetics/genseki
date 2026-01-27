@@ -1,6 +1,6 @@
 'use client'
 
-import { PaintBrushBroadIcon } from '@phosphor-icons/react'
+import { DropSlashIcon } from '@phosphor-icons/react'
 import { useCurrentEditor } from '@tiptap/react'
 
 import { Button } from '../../../../components/primitives/button'
@@ -21,7 +21,7 @@ export const AutoTextColorButton = () => {
       disabled={!editor.can().unsetColor()}
       title="Reset text color"
     >
-      <PaintBrushBroadIcon className="size-8" />
+      <DropSlashIcon className="size-8" />
     </Button>
   )
 }
