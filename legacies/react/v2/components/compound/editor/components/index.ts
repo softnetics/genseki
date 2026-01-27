@@ -1,3 +1,4 @@
+export * from './auto-text-color-button'
 export * from './editor-bar'
 export * from './editor-color-picker'
 export * from './link-button'

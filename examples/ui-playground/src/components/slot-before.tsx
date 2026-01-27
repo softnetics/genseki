@@ -14,6 +14,7 @@ import {
   ToolbarSeparator,
 } from '@genseki/react'
 import {
+  AutoTextColorButton,
   BackColorExtension,
   CustomLinkExtension,
   EditorBar,
@@ -57,6 +58,7 @@ export const EditorSlotBefore = () => {
       <UploadImageButton />
       <RedoButton />
       <UndoButton />
+      <AutoTextColorButton />
     </EditorBar>
   )
 }
