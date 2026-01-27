@@ -14,6 +14,7 @@ import {
   ToolbarSeparator,
 } from '@genseki/react'
 import {
+  AutoTextColorButton,
   BackColorExtension,
   CustomLinkExtension,
   EditorBar,
@@ -43,6 +44,7 @@ export const EditorSlotBefore = () => {
       <ToolbarSeparator className="h-auto" />
       <EditorTextColorPicker />
       <EditorBgColorPicker />
+      <AutoTextColorButton />
       <ToolbarSeparator className="h-auto" />
       <ToolbarGroup className="items-center">
         <TextAlignButtonsGroup>
