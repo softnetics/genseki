@@ -20,6 +20,7 @@ export const AutoTextColorButton = () => {
       }}
       disabled={!editor.can().unsetColor()}
       title="Reset text color"
+      type="button"
     >
       <DropSlashIcon className="size-8" />
     </Button>
