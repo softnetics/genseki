@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.8
+
+### Patch Changes
+
+- [#332](https://github.com/softnetics/genseki/pull/332) [`23a9e14`](https://github.com/softnetics/genseki/commit/23a9e14ed9124c870d1af9da2ed5e1545bbb606e) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: type button in clear color in richtext
+
 ## 0.1.7
 
 ### Patch Changes
