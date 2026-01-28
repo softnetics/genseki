@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.7
+
+### Patch Changes
+
+- [#330](https://github.com/softnetics/genseki/pull/330) [`b70772c`](https://github.com/softnetics/genseki/commit/b70772c115c96c8255519f92c247575920cb651b) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: auto text color richtext
+
 ## 0.1.6
 
 ### Patch Changes
