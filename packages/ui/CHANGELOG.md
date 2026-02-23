@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.13
+
+### Patch Changes
+
+- [#336](https://github.com/softnetics/genseki/pull/336) [`bc52d5a`](https://github.com/softnetics/genseki/commit/bc52d5a0e42064be735fa5f134cd7cea2329e14f) Thanks [@t0ngk](https://github.com/t0ngk)! - [Fix] UI: change DropZoneEmptyUploadButton from span to button for better accessibility
+
 ## 1.1.12
 
 ### Patch Changes
