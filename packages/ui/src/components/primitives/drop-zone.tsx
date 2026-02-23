@@ -264,10 +264,10 @@ export const DropZoneEmptyUploadButton = ({
         className
       )}
       children={
-        <span>
+        <button>
           <PaperclipIcon />
           <span>Upload {maxFiles === 1 ? 'a file' : 'files'}</span>
-        </span>
+        </button>
       }
       {...props}
     />
