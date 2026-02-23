@@ -255,7 +255,7 @@ export const DropZoneEmptyUploadButton = ({
       variant="outline"
       asChild
       children={
-        <span
+        <button
           className={cn(
             'group-disabled/dropzone:bg-surface-primary-disabled group-disabled/dropzone:active:bg-surface-primary-disabled group-disabled/dropzone:cursor-default',
             className
@@ -263,7 +263,7 @@ export const DropZoneEmptyUploadButton = ({
         >
           <PaperclipIcon />
           <span>Upload {maxFiles === 1 ? 'a file' : 'files'}</span>
-        </span>
+        </button>
       }
       {...props}
     />
