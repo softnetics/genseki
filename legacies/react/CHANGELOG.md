@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.9
+
+### Patch Changes
+
+- [#334](https://github.com/softnetics/genseki/pull/334) [`7a1d32b`](https://github.com/softnetics/genseki/commit/7a1d32bc12684211a07eac84cca17b035a3467d8) Thanks [@t0ngk](https://github.com/t0ngk)! - fix: change DropZoneEmptyUploadButton from span to button for better accessibility
+
 ## 0.1.8
 
 ### Patch Changes
