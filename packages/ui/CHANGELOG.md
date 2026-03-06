@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.14
+
+### Patch Changes
+
+- [#338](https://github.com/softnetics/genseki/pull/338) [`0375edd`](https://github.com/softnetics/genseki/commit/0375edd7f720a93cbb0cbca21358b1a795485aa0) Thanks [@TeeGoood](https://github.com/TeeGoood)! - feat: Add Filter components
+
 ## 1.1.13
 
 ### Patch Changes
