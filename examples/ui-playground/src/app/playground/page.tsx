@@ -85,6 +85,7 @@ import {
   SelectSeparator,
   SelectTrigger,
 } from '@genseki/react'
+import { Filter, type FilterItem } from '@genseki/ui'
 
 import { PlaygroundCard } from '../../components/card'
 import { editorProviderProps } from '../../components/slot-before'
@@ -285,6 +286,22 @@ const mockDataReorder: ReorderMockData[] = [
 export default function UIPlayground() {
   const { setTheme, theme } = useTheme()
   const [btnData, setBtnData] = useState<ReorderMockData[]>(mockDataReorder)
+  const [filterItems, setFilterItems] = useState<FilterItem[]>([
+    { column: 'color', value: 'red', label: 'Red' },
+    { column: 'color', value: 'blue', label: 'Blue', description: 'A calming blue shade' },
+    {
+      column: 'animal',
+      value: 'cat',
+      label: 'Cat',
+      description: 'A small domesticated carnivorous mammal',
+    },
+    {
+      column: 'animal',
+      value: 'dog',
+      label: 'Dog',
+      description: 'A domesticated carnivorous mammal that typically has a long snout',
+    },
+  ])
 
   // Map new order
   const handleReorder = (newOrder: string[]) => {
@@ -1691,6 +1708,10 @@ export default function UIPlayground() {
             Submit
           </Button>
         </form>
+      </Wrapper>
+
+      <Wrapper title="Filter">
+        <Filter items={filterItems} onChange={setFilterItems} />
       </Wrapper>
     </div>
   )
