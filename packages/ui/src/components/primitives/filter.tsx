@@ -9,6 +9,8 @@ import { Checkbox } from './checkbox'
 import { Popover, PopoverContent, PopoverTrigger } from './popover'
 import { Typography } from './typography'
 
+import { cn } from '../../utils/cn'
+
 export type FilterItem = {
   column: string
   value: string
@@ -56,25 +58,27 @@ export function Filter({ items, onChange }: FilterProps) {
 
   function columnCount(column: string) {
     return internalItems.reduce(
-      (acc, item) => (acc + item.column === column && item.isSelected ? 0 : 1),
+      (acc, item) => acc + (item.column === column && item.isSelected ? 1 : 0),
       0
     )
   }
 
   const columns = Array.from(new Set(internalItems.map((item) => item.column)))
+  const totalSelected = internalItems.reduce((acc, item) => acc + (item.isSelected ? 1 : 0), 0)
 
   return (
     <Popover open={openModal} onOpenChange={setOpenModal}>
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-fit">
           <Typography>Filter</Typography>
+          <CountBadge count={totalSelected} />
           <SlidersHorizontalIcon />
         </Button>
       </PopoverTrigger>
       <PopoverContent asChild>
         <div className="w-fit py-6 bg-surface-primary border border-border-primary rounded-xl flex flex-col gap-4 min-w-[600px] h-[436px]">
           <Typography type="h4" weight="bold" className="px-6 text-lg w-full">
-            Appy Filters
+            Apply Filters
           </Typography>
 
           <div className="flex items-start gap-6 w-full px-6 flex-1 min-h-0">
@@ -88,9 +92,7 @@ export function Filter({ items, onChange }: FilterProps) {
                   <Typography weight="normal" type="body">
                     Columns {column}
                   </Typography>
-                  <div className="size-[22px] rounded-full bg-surface-primary border flex items-center justify-center">
-                    {columnCount(column)}
-                  </div>
+                  <CountBadge count={columnCount(column)} />
                 </li>
               ))}
             </ul>
@@ -134,5 +136,20 @@ export function Filter({ items, onChange }: FilterProps) {
         </div>
       </PopoverContent>
     </Popover>
+  )
+}
+
+function CountBadge({ count }: { count: number }) {
+  return (
+    <div
+      className={cn(
+        'size-[22px] rounded-full bg-surface-primary border flex items-center justify-center',
+        {
+          'opacity-0': count === 0,
+        }
+      )}
+    >
+      {count}
+    </div>
   )
 }
