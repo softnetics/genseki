@@ -1,5 +1,14 @@
 # @example/ui-playground
 
+## 0.1.22
+
+### Patch Changes
+
+- [#338](https://github.com/softnetics/genseki/pull/338) [`0375edd`](https://github.com/softnetics/genseki/commit/0375edd7f720a93cbb0cbca21358b1a795485aa0) Thanks [@TeeGoood](https://github.com/TeeGoood)! - feat: Add Filter components
+
+- Updated dependencies [[`0375edd`](https://github.com/softnetics/genseki/commit/0375edd7f720a93cbb0cbca21358b1a795485aa0)]:
+  - @genseki/ui@1.1.14
+
 ## 0.1.21
 
 ### Patch Changes
