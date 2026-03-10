@@ -11,60 +11,69 @@ import { Typography } from './typography'
 
 import { cn } from '../../utils/cn'
 
-export type FilterItem = {
-  column: string
-  value: string
-  isSelected?: boolean
+export type FilterOption<T extends string = string> = {
+  value: T
   label: string
+  isSelected?: boolean
   description?: string
 }
 
-interface FilterProps {
-  items: FilterItem[]
-  onChange: (items: FilterItem[]) => void
+export type FilterOptions = Record<string, FilterOption[]>
+
+export function getSelectedValues<T extends string>(options: FilterOption<T>[]) {
+  return options.filter((option) => option.isSelected).map((option) => option.value)
 }
 
-export function getSelectedValues(column: string, items: FilterItem[]) {
-  return items.filter((item) => item.column === column && item.isSelected).map((item) => item.value)
+export interface FilterProps {
+  options: FilterOptions
+  onChange: (options: FilterOptions) => void
 }
 
-export function Filter({ items, onChange }: FilterProps) {
+export function Filter({ options, onChange }: FilterProps) {
   const [openModal, setOpenModal] = React.useState(false)
-  const [internalItems, setInternalItems] = React.useState(items)
+  const [internalOptions, setInternalOptions] = React.useState(options)
   const [selectedColumn, setSelectedColumn] = React.useState<string | null>(
-    items.length > 0 ? items[0].column : null
+    Object.keys(options)[0] ?? null
   )
 
-  function toggleItem(column: string, value: string) {
-    const newItems = internalItems.map((item) => ({
-      ...item,
-      isSelected:
-        item.column === column && item.value === value ? !item.isSelected : item.isSelected,
-    }))
-    setInternalItems(newItems)
+  function toggleItem(column: string, label: string) {
+    setInternalOptions((prev) => {
+      const prevOptions = prev[column]
+      if (!prevOptions) return prev
+      const newOptions = prevOptions.map((option) => ({
+        ...option,
+        isSelected: option.label === label ? !option.isSelected : option.isSelected,
+      }))
+      return { ...prev, [column]: newOptions }
+    })
   }
 
   function apply() {
-    onChange(internalItems)
+    onChange(internalOptions)
     setOpenModal(false)
   }
 
   function reset() {
-    const newItems = internalItems.map((item) => ({ ...item, isSelected: false }))
-    setInternalItems(newItems)
-    onChange(newItems)
+    const newOptions = Object.fromEntries(
+      Object.entries(internalOptions).map(([column, options]) => [
+        column,
+        options.map((option) => ({ ...option, isSelected: false })),
+      ])
+    )
+    setInternalOptions(newOptions)
+    onChange(newOptions)
     setOpenModal(false)
   }
 
   function columnCount(column: string) {
-    return internalItems.reduce(
-      (acc, item) => acc + (item.column === column && item.isSelected ? 1 : 0),
-      0
-    )
+    return internalOptions[column]?.length || 0
   }
 
-  const columns = Array.from(new Set(internalItems.map((item) => item.column)))
-  const totalSelected = internalItems.reduce((acc, item) => acc + (item.isSelected ? 1 : 0), 0)
+  const columns = Object.keys(internalOptions)
+  const totalSelected = Object.entries(options).reduce(
+    (acc, [_, options]) => acc + options.filter((option) => option.isSelected).length,
+    0
+  )
 
   return (
     <Popover open={openModal} onOpenChange={setOpenModal}>
@@ -90,7 +99,7 @@ export function Filter({ items, onChange }: FilterProps) {
                   onClick={() => setSelectedColumn(column)}
                 >
                   <Typography weight="normal" type="body">
-                    Columns {column}
+                    {column}
                   </Typography>
                   <CountBadge count={columnCount(column)} />
                 </li>
@@ -98,26 +107,25 @@ export function Filter({ items, onChange }: FilterProps) {
             </ul>
 
             <ul className="flex-1 h-full border border-border-primary p-3 rounded-lg overflow-auto">
-              {internalItems
-                .filter((item) => item.column === selectedColumn)
-                .map((item) => (
+              {selectedColumn &&
+                internalOptions[selectedColumn]?.map((option) => (
                   <li
-                    key={`${item.column}-${item.value}`}
+                    key={`${selectedColumn}-${option.value}`}
                     className="w-full flex gap-4 items-start p-4 cursor-pointer"
-                    onClick={() => toggleItem(item.column, item.value)}
+                    onClick={() => toggleItem(selectedColumn, option.label)}
                   >
-                    <Checkbox checked={item.isSelected} className="mt-1" />
+                    <Checkbox checked={option.isSelected} className="mt-1" />
                     <div>
                       <Typography weight="medium" type="body" className="block">
-                        {item.label}
+                        {option.label}
                       </Typography>
-                      {item.description && (
+                      {option.description && (
                         <Typography
                           weight="normal"
                           type="caption"
                           className="text-text-secondary block"
                         >
-                          {item.description}
+                          {option.description}
                         </Typography>
                       )}
                     </div>

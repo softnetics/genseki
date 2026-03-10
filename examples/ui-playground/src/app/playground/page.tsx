@@ -85,7 +85,7 @@ import {
   SelectSeparator,
   SelectTrigger,
 } from '@genseki/react'
-import { Filter, type FilterItem } from '@genseki/ui'
+import { Filter } from '@genseki/ui'
 
 import { PlaygroundCard } from '../../components/card'
 import { editorProviderProps } from '../../components/slot-before'
@@ -283,25 +283,33 @@ const mockDataReorder: ReorderMockData[] = [
   { id: 'id5', text: 'Button 5' },
 ]
 
+const colorOptions = [
+  { value: 'red', label: 'Red', isSelected: true },
+  { value: 'blue', label: 'Blue', description: 'A calming blue shade' },
+  { value: 'green', label: 'Green', description: 'A refreshing green tone' },
+]
+
+const animalOptions = [
+  { value: 'cat', label: 'Cat', description: 'A small domesticated carnivorous mammal' },
+  {
+    value: 'dog',
+    label: 'Dog',
+    description: 'A domesticated carnivorous mammal that typically has a long snout',
+  },
+  {
+    value: 'bird',
+    label: 'Bird',
+    description: 'A warm-blooded egg-laying vertebrate distinguished by feathers',
+  },
+]
+
 export default function UIPlayground() {
   const { setTheme, theme } = useTheme()
   const [btnData, setBtnData] = useState<ReorderMockData[]>(mockDataReorder)
-  const [filterItems, setFilterItems] = useState<FilterItem[]>([
-    { column: 'color', value: 'red', label: 'Red' },
-    { column: 'color', value: 'blue', label: 'Blue', description: 'A calming blue shade' },
-    {
-      column: 'animal',
-      value: 'cat',
-      label: 'Cat',
-      description: 'A small domesticated carnivorous mammal',
-    },
-    {
-      column: 'animal',
-      value: 'dog',
-      label: 'Dog',
-      description: 'A domesticated carnivorous mammal that typically has a long snout',
-    },
-  ])
+  const [filterOptions, setFilterOptions] = useState({
+    color: colorOptions,
+    animal: animalOptions,
+  })
 
   // Map new order
   const handleReorder = (newOrder: string[]) => {
@@ -1711,7 +1719,7 @@ export default function UIPlayground() {
       </Wrapper>
 
       <Wrapper title="Filter">
-        <Filter items={filterItems} onChange={setFilterItems} />
+        <Filter options={filterOptions} onChange={setFilterOptions} />
       </Wrapper>
     </div>
   )
