@@ -24,14 +24,14 @@ export function getSelectedValues<T extends string>(options: FilterOption<T>[]) 
   return options.filter((option) => option.isSelected).map((option) => option.value)
 }
 
-export interface FilterProps {
-  options: FilterOptions
-  onChange: (options: FilterOptions) => void
+export interface FilterProps<T extends FilterOptions = FilterOptions> {
+  options: T
+  onChange: (options: T) => void
 }
 
-export function Filter({ options, onChange }: FilterProps) {
+export function Filter<T extends FilterOptions>({ options, onChange }: FilterProps<T>) {
   const [openModal, setOpenModal] = React.useState(false)
-  const [internalOptions, setInternalOptions] = React.useState(options)
+  const [internalOptions, setInternalOptions] = React.useState<T>(options)
   const [selectedColumn, setSelectedColumn] = React.useState<string | null>(
     Object.keys(options)[0] ?? null
   )
@@ -59,7 +59,7 @@ export function Filter({ options, onChange }: FilterProps) {
         column,
         options.map((option) => ({ ...option, isSelected: false })),
       ])
-    )
+    ) as T
     setInternalOptions(newOptions)
     onChange(newOptions)
     setOpenModal(false)
