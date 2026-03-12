@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.16
+
+### Patch Changes
+
+- [#342](https://github.com/softnetics/genseki/pull/342) [`8d55940`](https://github.com/softnetics/genseki/commit/8d55940c81d6e59a5c1f82eaacdc8ec6ea3a5872) Thanks [@TeeGoood](https://github.com/TeeGoood)! - fix: filter opions don't update when prop change
+
 ## 1.1.15
 
 ### Patch Changes
