@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.15
+
+### Patch Changes
+
+- [#340](https://github.com/softnetics/genseki/pull/340) [`4bca8ab`](https://github.com/softnetics/genseki/commit/4bca8abf1bec3fc3725770a6d56f908892b9d2fb) Thanks [@TeeGoood](https://github.com/TeeGoood)! - refactor: improve enum typesafety for `Filter` component
+
 ## 1.1.14
 
 ### Patch Changes
