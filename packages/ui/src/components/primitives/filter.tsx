@@ -36,6 +36,10 @@ export function Filter<T extends FilterOptions>({ options, onChange }: FilterPro
     Object.keys(options)[0] ?? null
   )
 
+  React.useEffect(() => {
+    setInternalOptions(options)
+  }, [options])
+
   function toggleItem(column: string, label: string) {
     setInternalOptions((prev) => {
       const prevOptions = prev[column]
@@ -79,9 +83,9 @@ export function Filter<T extends FilterOptions>({ options, onChange }: FilterPro
     <Popover open={openModal} onOpenChange={setOpenModal}>
       <PopoverTrigger asChild>
         <Button variant="outline" className="w-fit">
-          <Typography>Filter</Typography>
+          <Typography className="text-icon-tertiary">Filter</Typography>
           <CountBadge count={totalSelected} />
-          <SlidersHorizontalIcon />
+          <SlidersHorizontalIcon className="text-icon-tertiary" />
         </Button>
       </PopoverTrigger>
       <PopoverContent asChild>
