@@ -27,9 +27,13 @@ export function getSelectedValues<T extends string>(options: FilterOption<T>[]) 
 export interface FilterProps<T extends FilterOptions = FilterOptions> {
   options: T
   onChange: (options: T) => void
+  classNames?: {
+    trigger?: string
+    content?: string
+  }
 }
 
-export function Filter<T extends FilterOptions>({ options, onChange }: FilterProps<T>) {
+export function Filter<T extends FilterOptions>({ options, onChange, classNames }: FilterProps<T>) {
   const [openModal, setOpenModal] = React.useState(false)
   const [internalOptions, setInternalOptions] = React.useState<T>(options)
   const [selectedColumn, setSelectedColumn] = React.useState<string | null>(
@@ -82,14 +86,19 @@ export function Filter<T extends FilterOptions>({ options, onChange }: FilterPro
   return (
     <Popover open={openModal} onOpenChange={setOpenModal}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className="w-fit">
+        <Button variant="outline" className={cn('w-fit', classNames?.trigger)}>
           <Typography className="text-icon-tertiary">Filter</Typography>
           <CountBadge count={totalSelected} />
           <SlidersHorizontalIcon className="text-icon-tertiary" />
         </Button>
       </PopoverTrigger>
       <PopoverContent asChild>
-        <div className="w-fit py-6 bg-surface-primary border border-border-primary rounded-xl flex flex-col gap-4 min-w-[600px] h-[436px]">
+        <div
+          className={cn(
+            'w-fit py-6 bg-surface-primary border border-border-primary rounded-xl flex flex-col gap-4 min-w-[600px] h-[436px]',
+            classNames?.content
+          )}
+        >
           <Typography type="h4" weight="bold" className="px-6 text-lg w-full">
             Apply Filters
           </Typography>
