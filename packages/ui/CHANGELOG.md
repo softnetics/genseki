@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.17
+
+### Patch Changes
+
+- [#344](https://github.com/softnetics/genseki/pull/344) [`028ec11`](https://github.com/softnetics/genseki/commit/028ec11efd20620d4320ac13bdc91e01e3f1407e) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: add classname props for filter
+
 ## 1.1.16
 
 ### Patch Changes
