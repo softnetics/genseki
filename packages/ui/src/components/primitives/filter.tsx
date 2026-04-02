@@ -44,6 +44,13 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
     setInternalOptions(options)
   }, [options])
 
+  function handleOpenChange(open: boolean) {
+    if (!open) {
+      setInternalOptions(options)
+    }
+    setOpenModal(open)
+  }
+
   function toggleItem(column: string, label: string) {
     setInternalOptions((prev) => {
       const prevOptions = prev[column]
@@ -73,8 +80,8 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
     setOpenModal(false)
   }
 
-  function columnCount(column: string) {
-    return internalOptions[column]?.length || 0
+  function columnSelectedCount(column: string) {
+    return internalOptions[column]?.filter((o) => o.isSelected).length || 0
   }
 
   const columns = Object.keys(internalOptions)
@@ -84,7 +91,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
   )
 
   return (
-    <Popover open={openModal} onOpenChange={setOpenModal}>
+    <Popover open={openModal} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
         <Button variant="outline" className={cn('w-fit', classNames?.trigger)}>
           <Typography className="text-icon-tertiary">Filter</Typography>
@@ -114,7 +121,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
                   <Typography weight="normal" type="body">
                     {column}
                   </Typography>
-                  <CountBadge count={columnCount(column)} />
+                  <CountBadge count={columnSelectedCount(column)} />
                 </li>
               ))}
             </ul>
@@ -164,7 +171,7 @@ function CountBadge({ count }: { count: number }) {
   return (
     <div
       className={cn(
-        'size-[22px] rounded-full bg-surface-primary border flex items-center justify-center',
+        'size-[22px] rounded-full bg-surface-primary border flex items-center justify-center text-xs',
         {
           'opacity-0': count === 0,
         }
