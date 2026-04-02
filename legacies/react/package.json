@@ -99,7 +99,6 @@
     "defu": "^6.1.4",
     "input-otp": "^1.4.2",
     "motion": "^12.7.4",
-    "nuqs": "^2.8.3",
     "radix3": "^1.1.2",
     "react": "^19.2.1",
     "react-aria-components": "^1.10.1",
@@ -129,6 +128,7 @@
   },
   "peerDependencies": {
     "color": "^5.0.2",
+    "nuqs": "^2.8.3",
     "react": "^19.1.0",
     "react-day-picker": "^9.11.1",
     "react-dom": "^19.1.0",
