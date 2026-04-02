@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.18
+
+### Patch Changes
+
+- [#347](https://github.com/softnetics/genseki/pull/347) [`cbd13a6`](https://github.com/softnetics/genseki/commit/cbd13a67f056792f193702a182711e5ab9f087aa) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [FIX] Filter Component UI
+
 ## 1.1.17
 
 ### Patch Changes
