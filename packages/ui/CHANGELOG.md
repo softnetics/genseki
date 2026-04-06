@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.20
+
+### Patch Changes
+
+- [#350](https://github.com/softnetics/genseki/pull/350) [`98c39b0`](https://github.com/softnetics/genseki/commit/98c39b0068da82e00a2ab41bae4ab675de48d9d0) Thanks [@TeeGoood](https://github.com/TeeGoood)! - fix: filter option count
+
 ## 1.1.19
 
 ### Patch Changes
