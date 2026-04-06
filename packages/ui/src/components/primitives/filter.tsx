@@ -81,7 +81,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
   }
 
   function columnSelectedCount(column: string) {
-    return internalOptions[column]?.filter((o) => o.isSelected).length || 0
+    return options[column]?.filter((o) => o.isSelected).length || 0
   }
 
   const columns = Object.keys(internalOptions)
