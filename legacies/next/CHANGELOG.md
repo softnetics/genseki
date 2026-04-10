@@ -1,5 +1,12 @@
 # @genseki/next
 
+## 0.1.11
+
+### Patch Changes
+
+- Updated dependencies [[`154217e`](https://github.com/softnetics/genseki/commit/154217e0aeed51264e6efa6fe6422180f4d8330d)]:
+  - @genseki/react@0.1.11
+
 ## 0.1.10
 
 ### Patch Changes
