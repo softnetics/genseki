@@ -35,12 +35,19 @@ interface TableStatesProviderProps {
   children?: React.ReactNode
 }
 
+export interface TableStatesContextProviderProps extends TableStatesProviderProps {
+  pagination: UsePaginationReturn['pagination']
+  setPagination: UsePaginationReturn['setPagination']
+  sort: UseSort['Sort']
+  setSort: UseSort['SetSort']
+  search: UseSearchReturn['search']
+  setSearch: UseSearchReturn['setSearch']
+}
+
 const TableStatesContext = createContext<TanstackTableContextValue>(null!)
 
-export const TableStatesProvider = (props: TableStatesProviderProps) => {
-  const { pagination, setPagination } = usePagination()
-  const { sort, setSort } = useSort()
-  const { search, setSearch } = useSearch()
+export const TableStatesContextProvider = (props: TableStatesContextProviderProps) => {
+  const { children, pagination, setPagination, sort, setSort, search, setSearch } = props
   // row selection does not maintain a state wih URL search parameter like pagination and search
   const [rowSelection, setRowSelection] = useState<RowSelectionState>({})
 
@@ -66,8 +73,27 @@ export const TableStatesProvider = (props: TableStatesProviderProps) => {
         isRowsSelected,
       }}
     >
-      {props.children}
+      {children}
     </TableStatesContext>
+  )
+}
+
+export const TableStatesProvider = (props: TableStatesProviderProps) => {
+  const { pagination, setPagination } = usePagination()
+  const { sort, setSort } = useSort()
+  const { search, setSearch } = useSearch()
+
+  return (
+    <TableStatesContextProvider
+      pagination={pagination}
+      setPagination={setPagination}
+      sort={sort}
+      setSort={setSort}
+      search={search}
+      setSearch={setSearch}
+    >
+      {props.children}
+    </TableStatesContextProvider>
   )
 }
 
