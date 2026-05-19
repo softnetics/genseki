@@ -31,7 +31,12 @@ function InputGroup({
         role="group"
         className={cn(
           'group/input-group data-disabled:bg-surface-primary-disabled data-disabled:border-border-primary bg-background border-input dark:bg-input/30 relative flex items-center rounded-md border shadow-xs transition-[color,box-shadow] outline-none',
+          'has-[input:disabled]:bg-surface-primary-disabled has-[input:disabled]:border-border-disabled has-[input:disabled]:cursor-not-allowed',
+          'has-[textarea:disabled]:bg-surface-primary-disabled has-[textarea:disabled]:border-border-disabled has-[textarea:disabled]:cursor-not-allowed',
+          'aria-disabled:bg-surface-primary-disabled aria-disabled:border-border-disabled aria-disabled:cursor-not-allowed',
+          'aria-disabled:[&_[data-slot=input-group-control]]:!bg-transparent aria-disabled:[&_[data-slot=input-group-control]]:!text-text-disabled',
           'h-auto min-w-0 has-[>textarea]:h-auto',
+          'has-[>input]:h-18 has-[>input]:[&_[data-slot=input-group-control]]:h-full',
 
           // Variants based on alignment.
           'has-[>[data-align=inline-start]]:[&>input]:pl-4',

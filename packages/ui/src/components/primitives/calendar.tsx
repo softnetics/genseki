@@ -137,11 +137,7 @@ function Calendar({
           defaultClassNames.outside,
           classNames?.outside
         ),
-        disabled: cn(
-          'text-muted-foreground opacity-50',
-          defaultClassNames.disabled,
-          classNames?.disabled
-        ),
+        disabled: cn('text-text-disabled', defaultClassNames.disabled, classNames?.disabled),
         hidden: cn('invisible', defaultClassNames.hidden, classNames?.hidden),
       }}
       components={{

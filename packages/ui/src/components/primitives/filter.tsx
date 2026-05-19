@@ -89,17 +89,27 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
     (acc, [_, options]) => acc + options.filter((option) => option.isSelected).length,
     0
   )
+  const internalTotalSelected = Object.values(internalOptions).reduce(
+    (acc, opts) => acc + opts.filter((option) => option.isSelected).length,
+    0
+  )
 
   return (
     <Popover open={openModal} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className={cn('w-fit', classNames?.trigger)}>
+        <Button
+          variant="outline"
+          className={cn(
+            'w-fit data-[state=open]:border-ring data-[state=open]:ring-ring data-[state=open]:ring-[2px]',
+            classNames?.trigger
+          )}
+        >
           <Typography className="text-icon-tertiary">Filter</Typography>
           <CountBadge count={totalSelected} />
           <SlidersHorizontalIcon className="text-icon-tertiary" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent asChild>
+      <PopoverContent align="end" asChild>
         <div
           className={cn(
             'w-fit py-6 bg-surface-primary border border-border-primary rounded-xl flex flex-col gap-4 min-w-[600px] h-[436px]',
@@ -115,7 +125,11 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
               {columns.map((column) => (
                 <li
                   key={column}
-                  className="w-full p-4 rounded-sm hover:bg-surface-primary-hover flex items-center cursor-pointer justify-between"
+                  aria-selected={selectedColumn === column}
+                  className={cn(
+                    'w-full p-4 rounded-sm hover:bg-surface-primary-hover flex items-center cursor-pointer justify-between',
+                    selectedColumn === column && 'bg-surface-primary-hover'
+                  )}
                   onClick={() => setSelectedColumn(column)}
                 >
                   <Typography weight="normal" type="body">
@@ -155,7 +169,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
           </div>
 
           <div className="w-full px-6 pt-4 border-t flex items-center justify-end gap-2 border-border-primary">
-            <Button variant="outline" onClick={reset}>
+            <Button variant="outline" onClick={reset} disabled={internalTotalSelected === 0}>
               <TrashIcon />
               <Typography>Reset All</Typography>
             </Button>
