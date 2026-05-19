@@ -36,6 +36,7 @@ function InputGroup({
           'aria-disabled:bg-surface-primary-disabled aria-disabled:border-border-disabled aria-disabled:cursor-not-allowed',
           'aria-disabled:[&_[data-slot=input-group-control]]:!bg-transparent aria-disabled:[&_[data-slot=input-group-control]]:!text-text-disabled',
           'h-auto min-w-0 has-[>textarea]:h-auto',
+          'has-[>input]:h-18 has-[>input]:[&_[data-slot=input-group-control]]:h-full',
 
           // Variants based on alignment.
           'has-[>[data-align=inline-start]]:[&>input]:pl-4',
