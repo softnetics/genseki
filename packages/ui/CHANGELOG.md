@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.22
+
+### Patch Changes
+
+- [#357](https://github.com/softnetics/genseki/pull/357) [`d12757a`](https://github.com/softnetics/genseki/commit/d12757a93d9426d972da2d4ef64fe2a278c29ac3) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [FIX] General UI fixes
+
 ## 1.1.21
 
 ### Patch Changes
