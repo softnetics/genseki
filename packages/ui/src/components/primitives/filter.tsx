@@ -89,6 +89,10 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
     (acc, [_, options]) => acc + options.filter((option) => option.isSelected).length,
     0
   )
+  const internalTotalSelected = Object.values(internalOptions).reduce(
+    (acc, opts) => acc + opts.filter((option) => option.isSelected).length,
+    0
+  )
 
   return (
     <Popover open={openModal} onOpenChange={handleOpenChange}>
@@ -165,7 +169,11 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
           </div>
 
           <div className="w-full px-6 pt-4 border-t flex items-center justify-end gap-2 border-border-primary">
-            <Button variant="outline" onClick={reset}>
+            <Button
+              variant="outline"
+              onClick={reset}
+              disabled={internalTotalSelected === 0}
+            >
               <TrashIcon />
               <Typography>Reset All</Typography>
             </Button>
