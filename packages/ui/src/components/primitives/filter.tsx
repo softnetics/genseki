@@ -169,11 +169,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
           </div>
 
           <div className="w-full px-6 pt-4 border-t flex items-center justify-end gap-2 border-border-primary">
-            <Button
-              variant="outline"
-              onClick={reset}
-              disabled={internalTotalSelected === 0}
-            >
+            <Button variant="outline" onClick={reset} disabled={internalTotalSelected === 0}>
               <TrashIcon />
               <Typography>Reset All</Typography>
             </Button>
