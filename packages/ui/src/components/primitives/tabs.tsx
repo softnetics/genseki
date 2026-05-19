@@ -26,7 +26,7 @@ const tabListVariants = cva<{ variant: Record<Variants, any> }>(
 )
 
 const tabVariants = cva<{ variant: Record<Variants, any> }>(
-  "inline-flex flex-1 items-center justify-center text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-8",
+  "inline-flex flex-1 items-center justify-center text-sm font-medium whitespace-nowrap transition-[color,box-shadow] outline-none disabled:pointer-events-none disabled:text-text-disabled [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-8",
   {
     variants: {
       variant: {
