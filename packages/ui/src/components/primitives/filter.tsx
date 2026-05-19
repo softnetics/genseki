@@ -121,7 +121,11 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
               {columns.map((column) => (
                 <li
                   key={column}
-                  className="w-full p-4 rounded-sm hover:bg-surface-primary-hover flex items-center cursor-pointer justify-between"
+                  aria-selected={selectedColumn === column}
+                  className={cn(
+                    'w-full p-4 rounded-sm hover:bg-surface-primary-hover flex items-center cursor-pointer justify-between',
+                    selectedColumn === column && 'bg-surface-primary-hover'
+                  )}
                   onClick={() => setSelectedColumn(column)}
                 >
                   <Typography weight="normal" type="body">
