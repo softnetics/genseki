@@ -93,13 +93,19 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
   return (
     <Popover open={openModal} onOpenChange={handleOpenChange}>
       <PopoverTrigger asChild>
-        <Button variant="outline" className={cn('w-fit', classNames?.trigger)}>
+        <Button
+          variant="outline"
+          className={cn(
+            'w-fit data-[state=open]:border-ring data-[state=open]:ring-ring data-[state=open]:ring-[2px]',
+            classNames?.trigger
+          )}
+        >
           <Typography className="text-icon-tertiary">Filter</Typography>
           <CountBadge count={totalSelected} />
           <SlidersHorizontalIcon className="text-icon-tertiary" />
         </Button>
       </PopoverTrigger>
-      <PopoverContent asChild>
+      <PopoverContent align="end" asChild>
         <div
           className={cn(
             'w-fit py-6 bg-surface-primary border border-border-primary rounded-xl flex flex-col gap-4 min-w-[600px] h-[436px]',
