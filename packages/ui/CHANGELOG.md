@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.23
+
+### Patch Changes
+
+- [#359](https://github.com/softnetics/genseki/pull/359) [`fc0789d`](https://github.com/softnetics/genseki/commit/fc0789dbb0caa5901515a6051a7612bb23cf570c) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [FIX] Focus state on filter button
+
 ## 1.1.22
 
 ### Patch Changes
