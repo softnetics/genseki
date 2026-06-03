@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.24
+
+### Patch Changes
+
+- [#361](https://github.com/softnetics/genseki/pull/361) [`83a76d7`](https://github.com/softnetics/genseki/commit/83a76d7ff6c4f1107bff8745e82acc1f6ddb595b) Thanks [@jettapat-metier](https://github.com/jettapat-metier)! - [FIX] Filter count display
+
 ## 1.1.23
 
 ### Patch Changes
