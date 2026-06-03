@@ -81,14 +81,10 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
   }
 
   function columnSelectedCount(column: string) {
-    return options[column]?.filter((o) => o.isSelected).length || 0
+    return internalOptions[column]?.filter((o) => o.isSelected).length || 0
   }
 
   const columns = Object.keys(internalOptions)
-  const totalSelected = Object.entries(options).reduce(
-    (acc, [_, options]) => acc + options.filter((option) => option.isSelected).length,
-    0
-  )
   const internalTotalSelected = Object.values(internalOptions).reduce(
     (acc, opts) => acc + opts.filter((option) => option.isSelected).length,
     0
@@ -105,7 +101,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
           )}
         >
           <Typography className="text-icon-tertiary">Filter</Typography>
-          <CountBadge count={totalSelected} />
+          <CountBadge count={internalTotalSelected} />
           <SlidersHorizontalIcon className="text-icon-tertiary" />
         </Button>
       </PopoverTrigger>
