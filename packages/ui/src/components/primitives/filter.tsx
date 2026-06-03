@@ -100,7 +100,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
         <Button
           variant="outline"
           className={cn(
-            'w-fit data-[state=open]:border-ring data-[state=open]:ring-ring data-[state=open]:ring-[2px]',
+            'w-fit ring-offset-0 data-[state=open]:border-ring data-[state=open]:ring-ring data-[state=open]:ring-[2px]',
             classNames?.trigger
           )}
         >
