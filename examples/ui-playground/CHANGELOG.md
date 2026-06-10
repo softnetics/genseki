@@ -1,5 +1,14 @@
 # @example/ui-playground
 
+## 0.1.34
+
+### Patch Changes
+
+- [#363](https://github.com/softnetics/genseki/pull/363) [`41ab4f9`](https://github.com/softnetics/genseki/commit/41ab4f9f114ac5dd662295bd42b6bc3f0a4588bd) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: add badge icon, fix size
+
+- Updated dependencies [[`41ab4f9`](https://github.com/softnetics/genseki/commit/41ab4f9f114ac5dd662295bd42b6bc3f0a4588bd)]:
+  - @genseki/ui@1.1.25
+
 ## 0.1.33
 
 ### Patch Changes

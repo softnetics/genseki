@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.25
+
+### Patch Changes
+
+- [#363](https://github.com/softnetics/genseki/pull/363) [`41ab4f9`](https://github.com/softnetics/genseki/commit/41ab4f9f114ac5dd662295bd42b6bc3f0a4588bd) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - feat: add badge icon, fix size
+
 ## 1.1.24
 
 ### Patch Changes
