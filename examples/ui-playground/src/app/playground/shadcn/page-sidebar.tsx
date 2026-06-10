@@ -16,6 +16,7 @@ import {
 } from '@genseki/ui'
 
 const navigationItems = [
+  { href: '#badge', label: 'Badge' },
   { href: '#button', label: 'Button' },
   { href: '#combobox', label: 'Combobox' },
   { href: '#checkbox', label: 'Checkbox' },

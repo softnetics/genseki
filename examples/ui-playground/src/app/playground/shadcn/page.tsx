@@ -3,6 +3,7 @@ import * as React from 'react'
 
 import { Typography } from '@genseki/ui'
 
+import { BadgeSection } from './badge-section'
 import { ButtonSection } from './button-section'
 import { CheckboxSection } from './checkbox-section'
 import { CollapsibleSection } from './collapsible-section'
@@ -41,6 +42,10 @@ export default function ComboboxPage() {
           Shadcn components
         </Typography>
         <hr />
+        <Typography type="h2" weight="bold" id="badge">
+          Badge
+        </Typography>
+        <BadgeSection />
         <Typography type="h2" weight="bold" id="button">
           Button
         </Typography>
