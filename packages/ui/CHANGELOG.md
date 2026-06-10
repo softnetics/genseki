@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.26
+
+### Patch Changes
+
+- [#365](https://github.com/softnetics/genseki/pull/365) [`94ecd02`](https://github.com/softnetics/genseki/commit/94ecd02946ee2eba3c62a60a84eee9c937d9cb2f) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: count badge size
+
 ## 1.1.25
 
 ### Patch Changes
