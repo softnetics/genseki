@@ -181,7 +181,7 @@ function CountBadge({ count }: { count: number }) {
   return (
     <div
       className={cn(
-        'size-[22px] rounded-full bg-surface-primary border flex items-center justify-center text-xs',
+        'size-11 rounded-full bg-surface-primary border flex items-center justify-center text-xs',
         {
           'opacity-0': count === 0,
         }
