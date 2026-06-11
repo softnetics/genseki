@@ -161,7 +161,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
                         <Typography
                           weight="normal"
                           type="caption"
-                          className="text-text-secondary  whitespace-pre-wrap"
+                          className="text-text-secondary whitespace-pre-wrap"
                         >
                           {option.description}
                         </Typography>
