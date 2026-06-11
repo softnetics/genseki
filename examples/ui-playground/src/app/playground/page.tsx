@@ -1719,7 +1719,14 @@ export default function UIPlayground() {
       </Wrapper>
 
       <Wrapper title="Filter">
-        <Filter options={filterOptions} onChange={setFilterOptions} />
+        <Filter
+          options={filterOptions}
+          onChange={setFilterOptions}
+          classNames={{
+            selectKey: 'w-full',
+            selectValue: 'w-200',
+          }}
+        />
       </Wrapper>
     </div>
   )

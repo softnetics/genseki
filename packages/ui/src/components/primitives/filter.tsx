@@ -30,6 +30,8 @@ export interface FilterProps<T extends FilterOptions = FilterOptions> {
   classNames?: {
     trigger?: string
     content?: string
+    selectKey?: string
+    selectValue?: string
   }
 }
 
@@ -124,7 +126,8 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
                   aria-selected={selectedColumn === column}
                   className={cn(
                     'w-full p-4 rounded-sm hover:bg-surface-primary-hover flex items-center cursor-pointer justify-between',
-                    selectedColumn === column && 'bg-surface-primary-hover'
+                    selectedColumn === column && 'bg-surface-primary-hover',
+                    classNames?.selectKey
                   )}
                   onClick={() => setSelectedColumn(column)}
                 >
@@ -136,12 +139,17 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
               ))}
             </ul>
 
-            <ul className="flex-1 h-full border border-border-primary p-3 rounded-lg overflow-auto">
+            <ul
+              className={cn(
+                'flex-1 h-full border border-border-primary p-3 rounded-lg overflow-y-auto',
+                classNames?.selectValue
+              )}
+            >
               {selectedColumn &&
                 internalOptions[selectedColumn]?.map((option) => (
                   <li
                     key={`${selectedColumn}-${option.value}`}
-                    className="w-full flex gap-4 items-start p-4 cursor-pointer"
+                    className="flex gap-4 items-start p-4 cursor-pointer"
                     onClick={() => toggleItem(selectedColumn, option.label)}
                   >
                     <Checkbox checked={option.isSelected} className="mt-1" />
@@ -153,7 +161,7 @@ export function Filter<T extends FilterOptions>({ options, onChange, classNames 
                         <Typography
                           weight="normal"
                           type="caption"
-                          className="text-text-secondary block"
+                          className="text-text-secondary  whitespace-pre-wrap"
                         >
                           {option.description}
                         </Typography>
@@ -181,7 +189,7 @@ function CountBadge({ count }: { count: number }) {
   return (
     <div
       className={cn(
-        'size-11 rounded-full bg-surface-primary border flex items-center justify-center text-xs',
+        'size-10 rounded-full bg-surface-primary border flex items-center justify-center text-xs',
         {
           'opacity-0': count === 0,
         }
