@@ -1,5 +1,11 @@
 # @genseki/ui
 
+## 1.1.27
+
+### Patch Changes
+
+- [#367](https://github.com/softnetics/genseki/pull/367) [`9e69323`](https://github.com/softnetics/genseki/commit/9e69323e1e5d7713cb246df949b880830f00c792) Thanks [@TeerapatChan](https://github.com/TeerapatChan)! - fix: filter content width, text wrap, overflow-y
+
 ## 1.1.26
 
 ### Patch Changes
