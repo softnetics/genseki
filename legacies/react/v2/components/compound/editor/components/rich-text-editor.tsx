@@ -2,17 +2,17 @@
 
 import { useEffect } from 'react'
 
-import { type Content, type EditorProviderProps, useEditor } from '@tiptap/react'
+import { type Content, useEditor } from '@tiptap/react'
 import { isDeepEqual } from 'remeda'
 
-import { EditorProvider } from './rich-text-provider'
+import { EditorProvider, type EditorProviderPropsWithEditor } from './rich-text-provider'
 
 import { CustomFieldError } from '../../../../../src/react/components/primitives/custom-field-error'
 // TODO: Migrate to v2
 import { Description } from '../../../../../src/react/components/primitives/field'
 
 export interface RichTextEditorProps {
-  editorProviderProps: EditorProviderProps
+  editorProviderProps: Omit<EditorProviderPropsWithEditor, 'editor' | 'inputGroupProps'>
   value?: string | Content | Content[]
   onChange?: (content: string | Content | Content[]) => void
   isDisabled?: boolean
