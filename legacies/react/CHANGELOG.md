@@ -1,5 +1,11 @@
 # @genseki/react
 
+## 0.1.12
+
+### Patch Changes
+
+- [#370](https://github.com/softnetics/genseki/pull/370) [`5792e1b`](https://github.com/softnetics/genseki/commit/5792e1ba36a5c1656eaf970af9eb323a3d86959b) Thanks [@Suntoh](https://github.com/Suntoh)! - [BRV-985] add rich text editor components and video embed functionality
+
 ## 0.1.11
 
 ### Patch Changes
