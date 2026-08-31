@@ -2,17 +2,17 @@
 
 import { useEffect } from 'react'
 
-import { type Content, type EditorProviderProps, useEditor } from '@tiptap/react'
+import { type Content, useEditor } from '@tiptap/react'
 import { isDeepEqual } from 'remeda'
 
-import { EditorProvider } from './rich-text-provider'
+import { EditorProvider, type EditorProviderPropsWithEditor } from './rich-text-provider'
 
 import { CustomFieldError } from '../../../../../src/react/components/primitives/custom-field-error'
 // TODO: Migrate to v2
 import { Description } from '../../../../../src/react/components/primitives/field'
 
 export interface RichTextEditorProps {
-  editorProviderProps: EditorProviderProps
+  editorProviderProps: Omit<EditorProviderPropsWithEditor, 'editor' | 'inputGroupProps'>
   value?: string | Content | Content[]
   onChange?: (content: string | Content | Content[]) => void
   isDisabled?: boolean
@@ -24,8 +24,18 @@ export interface RichTextEditorProps {
 }
 
 export const RichTextEditor = (props: RichTextEditorProps) => {
+  const {
+    slotBefore: _slotBefore,
+    slotAfter: _slotAfter,
+    editorContainerProps: _editorContainerProps,
+    minHeightClassName: _minHeightClassName,
+    maxHeightClassName: _maxHeightClassName,
+    children: _children,
+    ...editorOptions
+  } = props.editorProviderProps
+
   const editor = useEditor({
-    ...props.editorProviderProps,
+    ...editorOptions,
     content: props.value,
     onUpdate({ editor }) {
       props.onChange?.(editor.getJSON())

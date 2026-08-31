@@ -10,13 +10,15 @@ import {
 import { cn } from '../../../../../src/react/utils/cn'
 import { InputGroup, InputGroupControl } from '../../../primitives'
 
-interface EditorProviderPropsWithEditor extends EditorProviderProps {
+export interface EditorProviderPropsWithEditor extends EditorProviderProps {
   editor?: Editor | null
   inputGroupProps?: {
     isInvalid?: boolean
     isDisabled?: boolean
     isPending?: boolean
   }
+  minHeightClassName?: string
+  maxHeightClassName?: string | null
 }
 
 export function EditorProvider({
@@ -26,6 +28,8 @@ export function EditorProvider({
   editorContainerProps = {},
   editor,
   inputGroupProps,
+  minHeightClassName = 'min-h-[240px]',
+  maxHeightClassName = null,
   ...editorOptions
 }: EditorProviderPropsWithEditor) {
   const editorInstance = editor ?? useEditor(editorOptions)
@@ -49,7 +53,9 @@ export function EditorProvider({
               <EditorContent
                 editor={editorInstance}
                 className={cn(
-                  '!rounded-md min-h-[240px] max-h-[240px] bg-white w-full outline-none overflow-y-auto tiptap-content-editor',
+                  'rounded-md! bg-white w-full outline-none overflow-y-auto tiptap-content-editor',
+                  minHeightClassName,
+                  maxHeightClassName,
                   editorContainerProps.className
                 )}
                 data-slot="input-group-control"

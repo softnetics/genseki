@@ -1,3 +1,6 @@
 export * from './background-color-extension'
 export * from './custom-link-extension'
+export * from './indent-extension'
 export * from './selection-extension'
+export * from './video-embed-extension'
+export * from './youtube-extension'

@@ -3,6 +3,7 @@
 import {
   type Icon,
   ListBulletsIcon,
+  ListNumbersIcon,
   TextBolderIcon,
   TextItalicIcon,
   TextStrikethroughIcon,
@@ -12,7 +13,7 @@ import { useCurrentEditor } from '@tiptap/react'
 
 import { ToolbarItem } from '../../../../../src/react/components/primitives/toolbar'
 
-type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList'
+type MarkType = 'bold' | 'italic' | 'underline' | 'strike' | 'bulletList' | 'orderedList'
 
 type MarkOptions = Record<
   MarkType,
@@ -63,6 +64,14 @@ const useMark = (type: MarkType) => {
       isSelected: editor.isActive('bulletList'),
       onClick() {
         editor.chain().focus().toggleBulletList().run()
+      },
+    },
+    orderedList: {
+      label: 'Numbered List',
+      icon: ListNumbersIcon,
+      isSelected: editor.isActive('orderedList'),
+      onClick() {
+        editor.chain().focus().toggleOrderedList().run()
       },
     },
   }
