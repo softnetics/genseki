@@ -8,6 +8,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
+  id-token: write
   actions: read
   checks: read
   contents: write
@@ -45,6 +46,10 @@ jobs:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
 
+      # Trusted publishing needs npm CLI >= 11.5.1; Node 22.14 ships 10.9.x.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
+
       - name: Install dependencies
         run: pnpm install --prefer-offline --frozen-lockfile
 
@@ -59,5 +64,7 @@ jobs:
           version: pnpm changeset version
           publish: pnpm changeset publish
         env:
-          NPM_TOKEN: ${{ secrets.NPM_TOKEN }}
+          # No NPM_TOKEN: publishing authenticates via OIDC against each package's
+          # trusted publisher. A token here would be preferred over OIDC and, being
+          # expired, would fail.
           GITHUB_TOKEN: ${{ github.token }}
