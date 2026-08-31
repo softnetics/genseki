@@ -8,6 +8,7 @@ on:
 concurrency: ${{ github.workflow }}-${{ github.ref }}
 
 permissions:
+  id-token: write
   actions: read
   checks: read
   contents: write
@@ -44,6 +45,12 @@ jobs:
         with:
           node-version: ${{ env.NODE_VERSION }}
           cache: pnpm
+
+      # `pnpm publish` delegates to `npm publish`, and npm's trusted publishing
+      # (OIDC) needs npm >= 11.5.1 - Node 22.14 ships 10.9.x, which silently
+      # falls back to token auth. See pnpm#11566 and pnpm#9812.
+      - name: Upgrade npm for trusted publishing
+        run: npm install -g npm@latest
 
       - name: Install dependencies
         run: pnpm install --prefer-offline --frozen-lockfile
