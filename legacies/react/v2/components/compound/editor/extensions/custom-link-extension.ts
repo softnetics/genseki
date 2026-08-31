@@ -5,12 +5,12 @@ export interface CustomLinkOptions extends LinkOptions {
   siteUrl?: string
 }
 
-export const isInternalHref = (href: unknown, siteUrl?: string): boolean => {
-  if (typeof href !== 'string' || !siteUrl) return false
+export const isInternalHref = (url: unknown, base?: string): boolean => {
+  if (typeof url !== 'string' || !base) return false
 
   try {
-    const resolved = new URL(href, siteUrl)
-    return resolved.origin === new URL(siteUrl).origin
+    const resolved = new URL(url, base)
+    return resolved.origin === new URL(base).origin
   } catch {
     // Unparseable href: treat as external, the safer default.
     return false

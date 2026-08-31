@@ -84,6 +84,7 @@
     "@tiptap/extension-link": "2.26.3",
     "@tiptap/extension-text-align": "^2.26.3",
     "@tiptap/extension-text-style": "^2.26.3",
+    "@tiptap/extension-youtube": "^2.26.3",
     "@tiptap/extension-typography": "^2.26.3",
     "@tiptap/extension-underline": "^2.26.3",
     "@tiptap/html": "^2.26.3",

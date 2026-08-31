@@ -10,8 +10,6 @@ import {
 import { cn } from '../../../../../src/react/utils/cn'
 import { InputGroup, InputGroupControl } from '../../../primitives'
 
-const DEFAULT_MIN_HEIGHT_CLASS_NAME = 'min-h-[240px]'
-
 export interface EditorProviderPropsWithEditor extends EditorProviderProps {
   editor?: Editor | null
   inputGroupProps?: {
@@ -30,7 +28,7 @@ export function EditorProvider({
   editorContainerProps = {},
   editor,
   inputGroupProps,
-  minHeightClassName = DEFAULT_MIN_HEIGHT_CLASS_NAME,
+  minHeightClassName = 'min-h-[240px]',
   maxHeightClassName = null,
   ...editorOptions
 }: EditorProviderPropsWithEditor) {

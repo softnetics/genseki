@@ -12,7 +12,7 @@ import { ToolbarItem } from '../../../../../src/react/components/primitives/tool
 export const VideoEmbedButton = () => {
   const { editor } = useCurrentEditor()
 
-  if (!editor) return null
+  if (!editor) throw new Error('Editor provider is missing')
 
   return (
     <ToolbarItem

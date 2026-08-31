@@ -3,6 +3,7 @@
 import * as React from 'react'
 
 import { VideoIcon } from '@phosphor-icons/react'
+import { mergeAttributes, Node } from '@tiptap/core'
 import type { NodeViewProps } from '@tiptap/react'
 import { NodeViewWrapper, ReactNodeViewRenderer } from '@tiptap/react'
 
@@ -10,6 +11,7 @@ import {
   validateVideoEmbedUrl,
   VIDEO_EMBED_REJECTION_MESSAGE,
 } from '../extensions/video-embed-extension'
+import { isYoutubeUrl } from '../extensions/youtube-extension'
 
 export const VideoEmbedInputNode: React.FC<NodeViewProps> = (props) => {
   const [url, setUrl] = React.useState('')
@@ -24,7 +26,7 @@ export const VideoEmbedInputNode: React.FC<NodeViewProps> = (props) => {
       .run()
   }
 
-  const submit = () => {
+  const submit = (url: string) => {
     const value = url.trim()
 
     const rejection = validateVideoEmbedUrl(value)
@@ -33,20 +35,25 @@ export const VideoEmbedInputNode: React.FC<NodeViewProps> = (props) => {
       return
     }
 
+    const hasYoutubeNode = props.editor.extensionManager.extensions.some(
+      (extension) => extension.name === 'youtube'
+    )
+    const type = hasYoutubeNode && isYoutubeUrl(value) ? 'youtube' : 'videoEmbed'
+
     // Replace this placeholder with the real embed
     const pos = props.getPos()
     props.editor
       .chain()
       .focus()
       .deleteRange({ from: pos, to: pos + 1 })
-      .insertContentAt(pos, [{ type: 'videoEmbed', attrs: { src: value } }])
+      .insertContentAt(pos, [{ type, attrs: { src: value } }])
       .run()
   }
 
   const onKeyDown = (event: React.KeyboardEvent) => {
     if (event.key === 'Enter') {
       event.preventDefault()
-      submit()
+      submit(url)
     }
     if (event.key === 'Escape') {
       event.preventDefault()
@@ -84,7 +91,11 @@ export const VideoEmbedInputNode: React.FC<NodeViewProps> = (props) => {
           <button type="button" onClick={remove} className="tiptap-video-embed-input-cancel">
             Cancel
           </button>
-          <button type="button" onClick={submit} className="tiptap-video-embed-input-submit">
+          <button
+            type="button"
+            onClick={() => submit(url)}
+            className="tiptap-video-embed-input-submit"
+          >
             Embed
           </button>
         </div>
@@ -94,3 +105,52 @@ export const VideoEmbedInputNode: React.FC<NodeViewProps> = (props) => {
 }
 
 export const VideoEmbedInputNodeWithRenderer = ReactNodeViewRenderer(VideoEmbedInputNode)
+
+export type VideoEmbedInputOptions = {
+  HTMLAttributes: Record<string, unknown>
+}
+
+declare module '@tiptap/core' {
+  interface Commands<ReturnType> {
+    videoEmbedInput: {
+      /** Drop an in-editor panel that asks for a video URL. */
+      setVideoEmbedInputNode: () => ReturnType
+    }
+  }
+}
+
+export const VideoEmbedInputExtension = Node.create<VideoEmbedInputOptions>({
+  name: 'videoEmbedInput',
+  group: 'block',
+  atom: true,
+  draggable: false,
+  selectable: true,
+
+  addOptions() {
+    return {
+      HTMLAttributes: {},
+    }
+  },
+
+  parseHTML() {
+    return [{ tag: 'div[data-type="video-embed-input"]' }]
+  },
+
+  renderHTML({ HTMLAttributes }) {
+    return ['div', mergeAttributes({ 'data-type': 'video-embed-input' }, HTMLAttributes)]
+  },
+
+  addNodeView() {
+    return VideoEmbedInputNodeWithRenderer
+  },
+
+  addCommands() {
+    return {
+      setVideoEmbedInputNode:
+        () =>
+        ({ commands }) => {
+          return commands.insertContent({ type: this.name })
+        },
+    }
+  },
+})

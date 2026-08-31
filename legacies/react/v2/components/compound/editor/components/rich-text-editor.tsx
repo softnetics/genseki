@@ -24,8 +24,18 @@ export interface RichTextEditorProps {
 }
 
 export const RichTextEditor = (props: RichTextEditorProps) => {
+  const {
+    slotBefore: _slotBefore,
+    slotAfter: _slotAfter,
+    editorContainerProps: _editorContainerProps,
+    minHeightClassName: _minHeightClassName,
+    maxHeightClassName: _maxHeightClassName,
+    children: _children,
+    ...editorOptions
+  } = props.editorProviderProps
+
   const editor = useEditor({
-    ...props.editorProviderProps,
+    ...editorOptions,
     content: props.value,
     onUpdate({ editor }) {
       props.onChange?.(editor.getJSON())
